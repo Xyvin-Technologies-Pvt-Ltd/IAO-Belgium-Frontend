@@ -15,7 +15,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -23,19 +23,17 @@ jobs:
           cache: "npm"
           cache-dependency-path: "package-lock.json"
 
-      # 3️⃣ Install deps & build (IMPORTANT PART)
+      # 3️⃣ Install dependencies & build
       - name: Install Dependencies and Build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
-          cd frontend
           npm ci
           npm run build
 
-      # 4️⃣ Rename dist (optional but matches your standard)
+      # 4️⃣ Rename dist folder
       - name: Rename dist folder
         run: |
-          cd frontend
           mv dist iao-belgium
 
       # 5️⃣ Prepare temp directory on Lightsail
@@ -55,7 +53,7 @@ jobs:
         uses: burnett01/rsync-deployments@5.2.1
         with:
           switches: -avzr --delete
-          path: frontend/iao-belgium/
+          path: iao-belgium/
           remote_path: ~/deploy-temp/
           remote_host: ${{ secrets.LIGHTSAIL_HOST }}
           remote_user: ${{ secrets.LIGHTSAIL_USER }}
