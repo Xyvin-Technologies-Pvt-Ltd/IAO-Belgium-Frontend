@@ -1,4 +1,3 @@
-import React from "react";
 import {
   createRouter,
   createRootRoute,
@@ -7,9 +6,11 @@ import {
 } from "@tanstack/react-router";
 import RootLayout from "../layouts/RootLayout";
 import ProtectedLayout from "../layouts/ProtectedLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
 import Login from "../pages/student/Login";
-import ApplicationForm from "../pages/student/ApplicationForm";
-
+import ApplicationForm from "../pages/student/application/ApplicationForm";
+import TeacherDashboard from "../pages/teacher/TeacherDashboard";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -26,7 +27,7 @@ const loginRoute = createRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: () => <Navigate to="/login" />,
+  component: () => <Navigate to="/login" replace />,
 });
 
 // Create protected layout route
@@ -36,9 +37,20 @@ const protectedRoute = createRoute({
   component: ProtectedLayout,
 });
 
-// Protected routes configuration
-const protectedRoutes = [
-  { path: "/application", component: ApplicationForm },
+// Create dashboard layout route for teacher and admin
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: "dashboard",
+  component: DashboardLayout,
+});
+
+// Protected routes configuration (for students)
+const protectedRoutes = [{ path: "/application", component: ApplicationForm }];
+
+// Dashboard routes configuration (for teacher and admin)
+const dashboardRoutes = [
+  { path: "/teacher", component: TeacherDashboard },
+  { path: "/admin", component: AdminDashboard },
 ];
 
 // Generate protected route children
@@ -50,11 +62,21 @@ const protectedRouteChildren = protectedRoutes.map(({ path, component }) =>
   })
 );
 
+// Generate dashboard route children
+const dashboardRouteChildren = dashboardRoutes.map(({ path, component }) =>
+  createRoute({
+    getParentRoute: () => dashboardRoute,
+    path,
+    component,
+  })
+);
+
 // Create the route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   protectedRoute.addChildren(protectedRouteChildren),
+  dashboardRoute.addChildren(dashboardRouteChildren),
 ]);
 
 // Create the router

@@ -42,11 +42,11 @@ const Login = () => {
             </div>
 
             <div className="space-y-3">
-              <Button variant="outline" className="w-full h-11">
+              <Button variant="secondary" className="w-full h-11">
                 Continue with Google
               </Button>
 
-              <Button variant="outline" className="w-full h-11">
+              <Button variant="secondary" className="w-full h-11">
                 Continue with Microsoft
               </Button>
             </div>

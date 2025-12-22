@@ -1,5 +1,107 @@
 {
   "form": {
     "title": "Application en ligne IAO"
+  },
+  "application": {
+    "title": "Msc Ostéopathie - Formulaire de candidature",
+    "subtitle": "Complétons votre candidature",
+    "steps": {
+      "basicInfo": "Informations de base",
+      "documents": "Documents",
+      "payment": "Paiement"
+    }
+  },
+  "stepOne": {
+    "title": "Informations de base",
+    "subtitle": "Veuillez fournir vos informations de base",
+    "stepIndicator": "Étape 1 sur 3",
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "phone": "Numéro de téléphone",
+      "education": "Formation précédente",
+      "address": "Adresse",
+      "postalCode": "Code postal",
+      "country": "Pays",
+      "city": "Ville"
+    },
+    "placeholders": {
+      "firstName": "firstname",
+      "lastName": "lastname",
+      "email": "email@example.com",
+      "phone": "Entrez votre numéro de téléphone",
+      "education": "Sélectionnez votre niveau d'études",
+      "address": "Entrez votre adresse",
+      "postalCode": "Entrez le code postal",
+      "country": "Sélectionnez le pays",
+      "city": "Entrez votre ville"
+    },
+    "educationOptions": {
+      "highschool": "Lycée",
+      "bachelor": "Licence",
+      "master": "Master"
+    },
+    "buttons": {
+      "saveLogout": "Sauvegarder et déconnecter",
+      "nextStep": "Étape suivante"
+    }
+  },
+  "stepTwo": {
+    "title": "Documents",
+    "subtitle": "Téléchargez vos documents et références",
+    "stepIndicator": "Étape 2 sur 3",
+    "documentRequirements": {
+      "title": "Exigences documentaires",
+      "description": "Veuillez vous assurer que tous les documents sont clairs, lisibles et en anglais ou accompagnés de traductions certifiées."
+    },
+    "uploadIdCard": {
+      "title": "Télécharger la carte d'identité",
+      "acceptedFormats": "Pièce d'identité officielle, Passeport, Carte d'identité"
+    },
+    "uploadQualification": {
+      "title": "Télécharger votre certificat de qualification",
+      "checkboxLabel": "Je termine encore ma qualification. Je soumettrai mon diplôme plus tard."
+    },
+    "fileUpload": {
+      "dragDrop": "Choisissez un fichier ou glissez-déposez-le ici",
+      "fileSize": "JPEG, PNG et PDF jusqu'à 50MB",
+      "browseFile": "Parcourir le fichier",
+      "browseFiles": "Parcourir les fichiers",
+      "removeFile": "Supprimer le fichier"
+    },
+    "buttons": {
+      "previousStep": "Étape précédente",
+      "saveLogout": "Sauvegarder et déconnecter",
+      "nextStep": "Étape suivante"
+    }
+  },
+  "stepThree": {
+    "title": "Paiement",
+    "subtitle": "Examinez et complétez votre processus de paiement",
+    "stepIndicator": "Étape 3 sur 3",
+    "applicationReview": {
+      "title": "Votre candidature",
+      "subtitle": "Examinez votre candidature",
+      "editButton": "Modifier"
+    },
+    "paymentDetails": {
+      "title": "Détails du paiement",
+      "applicationFee": {
+        "title": "Frais de candidature",
+        "description": "Les frais non remboursables couvrent le traitement de votre candidature."
+      },
+      "selectCountry": "Sélectionnez le pays",
+      "selectPaymentMethod": "Sélectionnez le mode de paiement",
+      "paymentMethods": {
+        "ideal": "iDEAL",
+        "sepa": "SEPA Instant"
+      }
+    },
+    "buttons": {
+      "previousStep": "Étape précédente",
+      "saveLogout": "Sauvegarder et déconnecter",
+      "submitApplication": "Soumettre la candidature"
+    }
   }
 }

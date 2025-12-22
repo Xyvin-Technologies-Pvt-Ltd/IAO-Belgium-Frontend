@@ -1,10 +1,10 @@
-import { Navigate, Outlet } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
 import Header from "@/components/Header";
 
 const ProtectedLayout = () => {
   // For now, we're not implementing auth checks
   // In a real app, you would check authentication here
-  
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
