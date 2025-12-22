@@ -11,6 +11,7 @@ import Login from "../pages/student/Login";
 import ApplicationForm from "../pages/student/application/ApplicationForm";
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import Courses from "@/pages/admin/course";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -51,6 +52,7 @@ const protectedRoutes = [{ path: "/application", component: ApplicationForm }];
 const dashboardRoutes = [
   { path: "/teacher", component: TeacherDashboard },
   { path: "/admin", component: AdminDashboard },
+  {path: "/admin/course-administration/courses", component:Courses},
 ];
 
 // Generate protected route children
