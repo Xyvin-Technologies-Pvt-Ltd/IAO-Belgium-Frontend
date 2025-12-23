@@ -7,6 +7,8 @@ import { CircleAlert } from "lucide-react";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import logo from "../../assets/images/logo.png";
 import bg from "../../assets/images/login-image.webp";
+import googleIcon from "../../assets/icons/google.svg";
+import microsoftIcon from "../../assets/icons/microsoft.svg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +16,13 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleEmailSubmit = () => {
-    navigate({ to: "/application" });
+    const savedStep = localStorage.getItem("currentStep");
+
+    if (savedStep) {
+      navigate({ to: "/student/review" });
+    } else {
+      navigate({ to: "/application" });
+    }
   };
   return (
     <div className="h-screen bg-background p-4 lg:p-6">
@@ -43,10 +51,16 @@ const Login = () => {
 
             <div className="space-y-3">
               <Button variant="secondary" className="w-full h-11">
+                <img src={googleIcon} alt="Google" className="w-6 h-6 mr-2" />
                 Continue with Google
               </Button>
 
               <Button variant="secondary" className="w-full h-11">
+                <img
+                  src={microsoftIcon}
+                  alt="Google"
+                  className="w-6 h-6 mr-1"
+                />
                 Continue with Microsoft
               </Button>
             </div>
@@ -75,7 +89,7 @@ const Login = () => {
                 />
               </div>
 
-              <Button 
+              <Button
                 className="w-full h-11 bg-orange-500 hover:bg-orange-600"
                 onClick={handleEmailSubmit}
               >
