@@ -3,6 +3,7 @@ import { useLanguageStore } from "@/store/useLanguageStore";
 import { Check, Clock, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import PageHeading from "@/components/PageHeading";
 
 const StudentReview = ({ userName = "Maria" }) => {
   const { t } = useLanguageStore();
@@ -31,10 +32,10 @@ const StudentReview = ({ userName = "Maria" }) => {
     return titles[stepNumber];
   };
 
-  const lastUpdated = new Date().toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const lastUpdated = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   const applicationData = {
@@ -68,18 +69,10 @@ const StudentReview = ({ userName = "Maria" }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-semibold">
-            {t?.dashboard?.welcome || `Welcome back, ${userName}!`}
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            {t?.dashboard?.subtitle ||
-              "You can find all the details regarding your application in the dashboard below"}
-          </p>
-        </div>
+    <div className="min-h-screen ">
+      <PageHeading userName={userName} />
 
+      <div className=" px-15  mx-auto space-y-6 mt-8">
         <div className="bg-white rounded-2xl border border-[#EFEFEF] p-6 space-y-6">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-[#FFB200]/10 rounded-full flex items-center justify-center">

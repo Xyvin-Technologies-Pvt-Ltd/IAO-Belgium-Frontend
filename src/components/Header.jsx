@@ -1,7 +1,7 @@
 import { MapPin, ChevronDown } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import logo from "../assets/images/logo.png";
 import userImage from "../assets/images/user.png";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -12,64 +12,87 @@ import {
 import { useLanguageStore } from "@/store/useLanguageStore";
 
 const Header = () => {
-  const { language, setLanguage } = useLanguageStore();
+  const { language, setLanguage, t } = useLanguageStore();
+
+  const { location } = useRouterState();
 
   const languages = [
     { code: "en", name: "English", flag: "🇺🇸" },
     { code: "fr", name: "Français", flag: "🇫🇷" },
   ];
 
-  const currentLanguage = languages.find(
-    (lang) => lang.code === language
-  );
+  const navItems = [
+    { label: "Dashboard", to: "/student/dashboard" },
+    { label: "My Courses", to: "/student/courses" },
+    { label: "My APP", to: "/student/my-app" },
+    { label: "Invoices", to: "/student/invoices" },
+    { label: "Assessment", to: "/student/assessment" },
+  ];
+
+  const isActive = (path) =>
+    location.pathname === path ||
+    location.pathname.startsWith(`${path}/`);
+const showStudentNavbar = location.pathname.startsWith("/student");
 
   return (
     <header className="px-4 sm:px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <img src={logo} alt="IAO Logo" className="h-10 w-auto" />
 
-        {/* LEFT */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          <img
-            src={logo}
-            alt="IAO Logo"
-            className="h-10 sm:h-12 w-auto"
-          />
-
-          {/* Location – hide on mobile */}
           <div className="hidden md:flex items-start gap-3 rounded-full bg-[#FFF2F2] px-6 py-3">
             <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
             <div className="flex flex-col leading-tight">
-              <span className="text-sm text-muted-foreground">
-                Location
-              </span>
-              <span className="text-sm font-semibold">
-                Netherlands
-              </span>
+              <span className="text-sm text-muted-foreground">Location</span>
+              <span className="text-sm font-semibold">Netherlands</span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-2 sm:gap-4">
+    {showStudentNavbar && (
+        <nav className="hidden lg:flex bg-[#FFFFFF]/34 rounded-full px-2 py-1 border border-white">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`px-6 py-4 rounded-[50px] text-base  transition ${
+                isActive(item.to)
+                  ? "bg-primary  shadow-sm"
+                  : " hover:text-primary "
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+    )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-3 rounded-full bg-white px-2 py-2">
+              <img
+                src={userImage}
+                alt="User Avatar"
+                className="h-9 w-9 rounded-full object-cover"
+              />
 
-          {/* Language */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="rounded-full flex items-center gap-2 px-2 sm:px-3"
-              >
-                <span className="text-lg">
-                  {currentLanguage?.flag}
-                </span>
-                <span className="hidden md:inline text-sm">
-                  {currentLanguage?.name}
-                </span>
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </Button>
-            </DropdownMenuTrigger>
+              <div className="hidden md:block text-left">
+                <p className="text-base font-medium">Maria Jeen</p>
+                <p className="text-xs text-muted-foreground">
+                  maria@example.com
+                </p>
+              </div>
 
-            <DropdownMenuContent align="end" className="w-40">
+              <ChevronDown className="h-4 w-4 text-gray-500" />
+            </button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+            <div className="px-2 py-1">
+              <p className="text-xs text-muted-foreground mb-1">Language</p>
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
@@ -84,43 +107,15 @@ const Header = () => {
                   {lang.name}
                 </DropdownMenuItem>
               ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </div>
 
-          {/* Profile */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 sm:gap-3 rounded-full bg-white px-2 py-2">
-                <img
-                  src={userImage}
-                  alt="User Avatar"
-                  className="h-9 w-9 rounded-full object-cover"
-                />
+            <DropdownMenuSeparator />
 
-                <div className="hidden md:block text-left">
-                  <p className="text-base font-medium">
-                    Maria Jeen
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    maria@example.com
-                  </p>
-                </div>
-
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-        </div>
+            <DropdownMenuItem className="text-red-600">
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

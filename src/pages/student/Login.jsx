@@ -19,7 +19,7 @@ const Login = () => {
     const savedStep = localStorage.getItem("currentStep");
 
     if (savedStep) {
-      navigate({ to: "/student/review" });
+      navigate({ to: "/review" });
     } else {
       navigate({ to: "/application" });
     }

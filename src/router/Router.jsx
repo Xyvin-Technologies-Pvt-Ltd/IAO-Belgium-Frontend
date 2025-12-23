@@ -13,6 +13,8 @@ import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import Courses from "@/pages/admin/course";
 import StudentReview from "@/pages/student/review/StudentReview";
+import Dashboard from "@/pages/student/Dashboard";
+import Assessment from "@/pages/student/assessment";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -49,7 +51,9 @@ const dashboardRoute = createRoute({
 // Protected routes configuration (for students)
 const protectedRoutes = [
   { path: "/application", component: ApplicationForm },
-  { path: "/student/review", component: StudentReview },
+  { path: "/review", component: StudentReview },
+  { path: "/student/dashboard", component: Dashboard },
+  { path: "/student/assessment", component: Assessment },
 ];
 // Dashboard routes configuration (for teacher and admin)
 const dashboardRoutes = [
