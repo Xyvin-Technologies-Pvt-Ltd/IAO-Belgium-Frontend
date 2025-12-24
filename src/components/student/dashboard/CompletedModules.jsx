@@ -1,16 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import { Calendar, MapPin, User } from "lucide-react";
 import noModule from "../../../assets/images/no-module.png";
 const CompletedModules = ({ modules = [] }) => {
-  const { t } = useLanguageStore();
-
   return (
     <div className="space-y-4">
-      <h2 className="text-xl">
-        {t?.dashboard?.completedModules || "Completed Modules"}
-      </h2>
-
       <div
         className={` ${
           modules.length === 0

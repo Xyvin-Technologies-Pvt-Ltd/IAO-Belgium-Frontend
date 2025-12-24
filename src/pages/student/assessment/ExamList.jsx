@@ -1,5 +1,4 @@
-import ActionCard from "@/components/common/ActionCard";
-import React from "react";
+import ActionCard from "@/components/student/ActionCard";
 
 const ExamList = () => {
   return (

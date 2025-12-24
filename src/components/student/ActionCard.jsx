@@ -1,10 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Lock,
-  Calendar,
-  CircleCheck,
-} from "lucide-react";
+import { Lock, Calendar, CircleCheck } from "lucide-react";
 
 const STATUS_CONFIG = {
   completed: {
@@ -34,7 +30,7 @@ const ActionCard = ({
   const config = STATUS_CONFIG[status];
 
   return (
-    <Card className="rounded-2xl border border-[#ECECEC] bg-white/60 shadow-sm">
+    <Card className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-6">
       <CardContent className="p-6 space-y-4 ">
         <div className="flex items-start justify-between">
           <div>
@@ -71,7 +67,7 @@ const ActionCard = ({
             </span>
           )}
 
-          {status === "available" && onPrimaryAction && (
+          {onPrimaryAction && (
             <Button onClick={onPrimaryAction}>{config.actionLabel}</Button>
           )}
         </div>

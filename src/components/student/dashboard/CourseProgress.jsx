@@ -7,9 +7,6 @@ const CourseProgress = ({ progress = [] }) => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl">
-        {t?.dashboard?.courseProgress || "Your Course Progress"}
-      </h2>
 
       <div
         className={`bg-white rounded-2xl border border-[#EFEFEF] p-8 ${

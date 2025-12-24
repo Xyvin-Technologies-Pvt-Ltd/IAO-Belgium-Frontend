@@ -15,6 +15,8 @@ import Courses from "@/pages/admin/course";
 import StudentReview from "@/pages/student/review/StudentReview";
 import Dashboard from "@/pages/student/Dashboard";
 import Assessment from "@/pages/student/assessment";
+import ModuleDetails from "@/pages/student/module/ModuleDetails";
+import ChangeLocation from "@/pages/student/module/ChangeLocation";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -54,6 +56,8 @@ const protectedRoutes = [
   { path: "/review", component: StudentReview },
   { path: "/student/dashboard", component: Dashboard },
   { path: "/student/assessment", component: Assessment },
+  { path: "/student/module/$id", component: ModuleDetails },
+  { path: "/student/change-location/$id", component: ChangeLocation },
 ];
 // Dashboard routes configuration (for teacher and admin)
 const dashboardRoutes = [
