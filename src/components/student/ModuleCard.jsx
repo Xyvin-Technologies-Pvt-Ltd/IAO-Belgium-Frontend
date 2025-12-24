@@ -17,7 +17,6 @@ const ModuleCard = ({
   };
 
   const handleChangeLocation = (moduleId) => {
-    console.log("Change location/date for module:", moduleId);
     navigate({
       to: "/student/change-location/$id",
       params: { id: moduleId },
@@ -31,16 +30,21 @@ const ModuleCard = ({
           {modules.map((module) => (
             <div
               key={module.id}
-              className="bg-white rounded-2xl border border-[#EFEFEF] p-6"
+              className="bg-white rounded-2xl border border-[#EFEFEF] p-4 sm:p-6"
             >
+              {/* Header */}
               {!showLocationChange && (
                 <>
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <h3 className="text-2xl font-semibold">{module.title}</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <h3 className="text-lg sm:text-2xl font-semibold">
+                      {module.title}
+                    </h3>
+
                     {!changeLocation && (
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <Button
                           variant="outline"
+                          className="w-full sm:w-auto"
                           onClick={() =>
                             console.log("Add to calendar:", module.id)
                           }
@@ -50,6 +54,7 @@ const ModuleCard = ({
 
                         <Button
                           variant="outline"
+                          className="w-full sm:w-auto"
                           onClick={() => handleViewDetails(module.id)}
                         >
                           View Details
@@ -58,82 +63,85 @@ const ModuleCard = ({
                     )}
                   </div>
 
-                  <div className="my-5 border-t border-gray-200" />
+                  <div className="my-4 border-t border-gray-200" />
                 </>
               )}
 
-              <div className="flex flex-wrap lg:flex-nowrap justify-between gap-6 text-sm">
+              {/* Info Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-sm">
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <User className="w-4 h-4 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-sm">Tutor</span>
-                    <span className="text-base font-semibold text-foreground">
+                  <div>
+                    <p className="text-xs">Tutor</p>
+                    <p className="text-base font-semibold text-foreground">
                       {module.tutor}
-                    </span>
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <Calendar className="w-4 h-4 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-sm">Date</span>
-                    <span className="text-base font-semibold text-foreground">
+                  <div>
+                    <p className="text-xs">Date</p>
+                    <p className="text-base font-semibold text-foreground">
                       {module.date}
-                    </span>
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <Clock className="w-4 h-4 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-sm">Time</span>
-                    <span className="text-base font-semibold text-foreground">
+                  <div>
+                    <p className="text-xs">Time</p>
+                    <p className="text-base font-semibold text-foreground">
                       {module.time}
-                    </span>
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <MapPin className="w-4 h-4 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-sm">Location</span>
-                    <span
+                  <div>
+                    <p className="text-xs">Location</p>
+                    <p
                       className={`text-base font-semibold ${
-                        showLocationChange ? " text-primary" : "text-foreground"
-                      } `}
+                        showLocationChange
+                          ? "text-primary"
+                          : "text-foreground"
+                      }`}
                     >
                       {module.location}
-                    </span>
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="my-5 border-t border-gray-200" />
-              {showLocationChange ? (
-                <>
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-start gap-4">
-                    <p className="text-sm text-muted-foreground">
-                      Need to attend at a different location or time?
-                    </p>
 
-                    <Button
-                      variant="outline"
-                      onClick={() => handleChangeLocation(module.id)}
-                    >
-                      Change Location/Date
-                    </Button>
-                  </div>
-                </>
+              <div className="my-4 border-t border-gray-200" />
+
+              {/* Footer */}
+              {showLocationChange ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    Need to attend at a different location or time?
+                  </p>
+
+                  <Button
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => handleChangeLocation(module.id)}
+                  >
+                    Change Location / Date
+                  </Button>
+                </div>
               ) : (
-                <>
-                  {!changeLocation && (
-                    <div className="mt-5 flex justify-end items-center gap-2 text-sm">
-                      <span className="text-base">Payment Status :</span>
-                      <span className="px-6 py-2 rounded-[6px] bg-[#00B300]/10 text-[#00B300] font-bold">
-                        Paid
-                      </span>
-                    </div>
-                  )}
-                </>
+                !changeLocation && (
+                  <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-3 text-sm">
+                    <span className="text-base">Payment Status :</span>
+                    <span className="px-4 py-2 rounded-[6px] bg-[#00B300]/10 text-[#00B300] font-bold text-center">
+                      Paid
+                    </span>
+                  </div>
+                )
               )}
             </div>
           ))}

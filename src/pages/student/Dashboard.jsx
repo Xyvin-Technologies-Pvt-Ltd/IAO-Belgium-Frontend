@@ -50,7 +50,7 @@ const Dashboard = () => {
     <div className="min-h-screen">
       <PageHeading userName="Maria" />
 
-      <div className="px-15 mx-auto space-y-8 mt-8">
+      <div className="px-5 lg:px-15 mx-auto space-y-8 py-10">
         <div className="space-y-4">
           <h2 className="text-xl">
             {t?.dashboard?.upcomingModule || "Upcoming Module"}

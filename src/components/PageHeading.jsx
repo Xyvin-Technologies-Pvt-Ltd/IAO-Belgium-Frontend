@@ -18,7 +18,7 @@ const PageHeading = ({
     : subtitle;
 
   return (
-    <div className="px-15 mt-8 space-y-2">
+    <div className="px-5 lg:px-15 mt-8 space-y-2">
       <h1 className="text-4xl font-semibold">{title || defaultTitle}</h1>
       <p className="text-muted-foreground text-lg">
         {subtitle || defaultSubtitle}

@@ -58,7 +58,7 @@ const ChangeLocation = () => {
   ];
 
   return (
-    <div className="space-y-10 px-6 lg:px-15 py-10">
+    <div className="space-y-10 px-5 lg:px-15 py-10">
       <Breadcrumb
         items={[
           { label: "Home", href: "/student/dashboard" },
