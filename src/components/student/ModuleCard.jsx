@@ -30,7 +30,7 @@ const ModuleCard = ({
           {modules.map((module) => (
             <div
               key={module.id}
-              className="bg-white rounded-[6px] border border-[#EFEFEF] p-4 sm:p-6"
+              className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-4 sm:p-6"
             >
               {!showLocationChange && (
                 <>
@@ -143,7 +143,7 @@ const ModuleCard = ({
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-[6px] border border-[#EFEFEF] p-8 text-center">
+        <div className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-8 text-center">
           <p className="text-gray-500">No upcoming modules scheduled</p>
         </div>
       )}
