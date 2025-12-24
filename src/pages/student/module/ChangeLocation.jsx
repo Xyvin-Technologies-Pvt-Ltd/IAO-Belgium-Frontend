@@ -74,9 +74,9 @@ const ChangeLocation = () => {
         <h2 className="text-xl">
           Choose an alternative session that fits your schedule
         </h2>
-        <div className="flex items-start gap-3 rounded-[6px] bg-[#FF8904]/10 px-2 py-2 text-sm text-[#A75800]">
-          <span className="mt-0.5">
-            <CircleAlert size={16} />
+        <div className="flex items-start gap-3 rounded-[6px] bg-[#FF8904]/10 px-2 py-2 text-xs text-[#A75800]">
+          <span>
+            <CircleAlert size={14} />
           </span>
           <p>
             We’ll approve your request if a slot is available; otherwise, you’ll

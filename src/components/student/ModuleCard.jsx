@@ -114,7 +114,7 @@ const ModuleCard = ({
 
               <div className="my-4 border-t border-[#EDEDED]" />
               {showLocationChange ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-4">
                   <p className="text-sm text-muted-foreground">
                     Need to attend at a different location or time?
                   </p>
