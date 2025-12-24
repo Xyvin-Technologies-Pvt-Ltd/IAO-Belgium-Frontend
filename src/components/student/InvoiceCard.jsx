@@ -55,7 +55,7 @@ const InvoiceCard = ({
         </div>
       </div>
 
-      <div className="border-t border-gray-200" />
+      <div className="border-t border-[#EDEDED]" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <p className="text-base text-muted-foreground">Module Fee</p>

@@ -29,14 +29,10 @@ const LocationCard = ({ module }) => {
           </span>
         </div>
 
-        <Button
-          disabled={!isAvailable}
-        >
-          Request Switch
-        </Button>
+        <Button disabled={!isAvailable}>Request Switch</Button>
       </div>
 
-      <div className="border-t border-gray-200" />
+      <div className="border-t border-[#EDEDED]" />
 
       <div className="flex flex-col lg:flex-row gap-8 text-sm">
         <div className="flex items-start gap-2 text-muted-foreground">

@@ -52,7 +52,7 @@ const ActionCard = ({
           )}
         </div>
 
-        <div className="border-t border-gray-200" />
+        <div className="border-t border-[#EDEDED]" />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
             {config.icon}

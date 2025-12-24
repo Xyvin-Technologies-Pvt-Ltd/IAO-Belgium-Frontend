@@ -15,7 +15,7 @@ const TableSkeleton = ({ rows = 5, columns = 8 }) => {
   return (
     <>
       {Array.from({ length: rows }).map((_, rowIdx) => (
-        <tr key={rowIdx} className="hover:bg-gray-50 border-b border-gray-200">
+        <tr key={rowIdx} className="hover:bg-gray-50 border-b border-[#EDEDED]">
           {Array.from({ length: columns }).map((_, colIdx) => (
             <td key={colIdx} className="py-4 px-4">
               <Shimmer className={`${getRandomWidth()} h-4 rounded`} />

@@ -16,7 +16,7 @@ const CompletedModules = ({ modules = [] }) => {
             {modules.map((module) => (
               <div
                 key={module.id}
-                className="bg-white/60 border border-gray-200 rounded-[6px] p-6 space-y-4 hover:shadow-md transition-shadow"
+                className="bg-white/60 border border-[#EDEDED] rounded-[6px] p-6 space-y-4 hover:shadow-md transition-shadow"
               >
                 <h3 className="text-2xl font-semibold leading-tight">
                   {module.title}

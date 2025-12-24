@@ -62,7 +62,7 @@ const ModuleCard = ({
                     )}
                   </div>
 
-                  <div className="my-4 border-t border-gray-200" />
+                  <div className="my-4 border-t border-[#EDEDED]" />
                 </>
               )}
 
@@ -103,9 +103,7 @@ const ModuleCard = ({
                     <p className="text-xs">Location</p>
                     <p
                       className={`text-base font-semibold ${
-                        showLocationChange
-                          ? "text-primary"
-                          : "text-foreground"
+                        showLocationChange ? "text-primary" : "text-foreground"
                       }`}
                     >
                       {module.location}
@@ -114,7 +112,7 @@ const ModuleCard = ({
                 </div>
               </div>
 
-              <div className="my-4 border-t border-gray-200" />
+              <div className="my-4 border-t border-[#EDEDED]" />
               {showLocationChange ? (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-muted-foreground">

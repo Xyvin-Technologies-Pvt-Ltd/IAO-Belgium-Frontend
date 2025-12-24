@@ -10,7 +10,7 @@ const Assessment = () => {
   return (
     <div className="space-y-6 px-15 pt-10">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-8 border-b border-gray-200">
+        <div className="flex items-center gap-8 border-b border-[#EDEDED]">
           <button
             onClick={() => setActiveTab("exams")}
             className={`pb-3 text-sm font-medium transition ${
