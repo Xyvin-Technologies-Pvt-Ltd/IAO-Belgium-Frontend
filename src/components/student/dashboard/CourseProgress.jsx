@@ -9,7 +9,7 @@ const CourseProgress = ({ progress = [] }) => {
     <div className="space-y-4">
 
       <div
-        className={`bg-white rounded-2xl border border-[#EFEFEF] p-8 ${
+        className={`bg-white rounded-[6px] border border-[#EFEFEF] p-8 ${
           progress.length === 0 ? "min-h-100 flex flex-col" : ""
         }`}
       >

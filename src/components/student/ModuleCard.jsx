@@ -30,9 +30,8 @@ const ModuleCard = ({
           {modules.map((module) => (
             <div
               key={module.id}
-              className="bg-white rounded-2xl border border-[#EFEFEF] p-4 sm:p-6"
+              className="bg-white rounded-[6px] border border-[#EFEFEF] p-4 sm:p-6"
             >
-              {/* Header */}
               {!showLocationChange && (
                 <>
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -67,7 +66,6 @@ const ModuleCard = ({
                 </>
               )}
 
-              {/* Info Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-sm">
                 <div className="flex items-start gap-2 text-muted-foreground">
                   <User className="w-4 h-4 mt-0.5" />
@@ -117,8 +115,6 @@ const ModuleCard = ({
               </div>
 
               <div className="my-4 border-t border-gray-200" />
-
-              {/* Footer */}
               {showLocationChange ? (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-muted-foreground">
@@ -147,7 +143,7 @@ const ModuleCard = ({
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-[#EFEFEF] p-8 text-center">
+        <div className="bg-white rounded-[6px] border border-[#EFEFEF] p-8 text-center">
           <p className="text-gray-500">No upcoming modules scheduled</p>
         </div>
       )}

@@ -7,7 +7,7 @@ const CompletedModules = ({ modules = [] }) => {
       <div
         className={` ${
           modules.length === 0
-            ? "min-h-100 bg-white p-8 flex flex-col  rounded-2xl border border-[#EFEFEF]"
+            ? "min-h-100 bg-white p-8 flex flex-col  rounded-[6px] border border-[#EFEFEF]"
             : ""
         }`}
       >
@@ -16,7 +16,7 @@ const CompletedModules = ({ modules = [] }) => {
             {modules.map((module) => (
               <div
                 key={module.id}
-                className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 hover:shadow-md transition-shadow"
+                className="bg-white border border-gray-200 rounded-[6px] p-6 space-y-4 hover:shadow-md transition-shadow"
               >
                 <h3 className="text-2xl font-semibold leading-tight">
                   {module.title}

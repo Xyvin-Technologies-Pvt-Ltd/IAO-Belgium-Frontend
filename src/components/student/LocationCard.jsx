@@ -5,7 +5,7 @@ const LocationCard = ({ module }) => {
   const { date, campus, seats, tutor, time, isAvailable } = module;
 
   return (
-    <div className="bg-white/60 rounded-2xl border border-[#EFEFEF] p-6 space-y-6">
+    <div className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-6 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
