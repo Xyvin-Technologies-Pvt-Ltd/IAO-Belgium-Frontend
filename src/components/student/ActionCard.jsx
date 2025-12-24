@@ -30,7 +30,7 @@ const ActionCard = ({
   const config = STATUS_CONFIG[status];
 
   return (
-    <Card className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-6">
+    <Card className="bg-white/60 rounded-[6px] border border-[#EFEFEF]">
       <CardContent className="p-6 space-y-4 ">
         <div className="flex items-start justify-between">
           <div>
