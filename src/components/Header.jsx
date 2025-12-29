@@ -24,15 +24,14 @@ const Header = () => {
   const navItems = [
     { label: "Dashboard", to: "/student/dashboard" },
     { label: "My Courses", to: "/student/courses" },
-    { label: "My APP", to: "/student/my-app" },
+    { label: "My APP", to: "/student/app" },
     { label: "Invoices", to: "/student/invoices" },
     { label: "Assessment", to: "/student/assessment" },
   ];
 
   const isActive = (path) =>
-    location.pathname === path ||
-    location.pathname.startsWith(`${path}/`);
-const showStudentNavbar = location.pathname.startsWith("/student");
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const showStudentNavbar = location.pathname.startsWith("/student");
 
   return (
     <header className="px-4 sm:px-6 py-4">
@@ -49,23 +48,23 @@ const showStudentNavbar = location.pathname.startsWith("/student");
           </div>
         </div>
 
-    {showStudentNavbar && (
-        <nav className="hidden lg:flex bg-[#FFFFFF]/34 rounded-full px-2 py-1 border border-white">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={`px-6 py-4 rounded-[50px] text-base  transition ${
-                isActive(item.to)
-                  ? "bg-primary  shadow-sm"
-                  : " hover:text-primary "
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-    )}
+        {showStudentNavbar && (
+          <nav className="hidden lg:flex bg-[#FFFFFF]/34 rounded-full px-2 py-1 border border-white">
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className={`px-6 py-4 rounded-[50px] text-base  transition ${
+                  isActive(item.to)
+                    ? "bg-primary  shadow-sm"
+                    : " hover:text-primary "
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 rounded-full bg-white px-2 py-2">
@@ -98,9 +97,7 @@ const showStudentNavbar = location.pathname.startsWith("/student");
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
                   className={`flex items-center gap-2 ${
-                    language === lang.code
-                      ? "bg-orange-50 text-orange-600"
-                      : ""
+                    language === lang.code ? "bg-orange-50 text-orange-600" : ""
                   }`}
                 >
                   <span className="text-lg">{lang.flag}</span>
