@@ -20,6 +20,7 @@ import ChangeLocation from "@/pages/student/module/ChangeLocation";
 import AppDetails from "@/pages/student/app/AppDetails";
 import MyApp from "@/pages/student/app";
 import MyCourses from "@/pages/student/module";
+import NotFound from "../pages/NotFound";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -99,4 +100,7 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 // Create the router
-export const router = createRouter({ routeTree });
+export const router = createRouter({ 
+  routeTree,
+  defaultNotFoundComponent: NotFound,
+});
