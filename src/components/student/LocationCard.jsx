@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
+import StatusChip from "../ui/StatusChip";
 
 const LocationCard = ({ module }) => {
   const { date, campus, seats, tutor, time, isAvailable } = module;
@@ -18,15 +19,10 @@ const LocationCard = ({ module }) => {
             <span className="font-medium text-foreground">{campus}</span>
           </div>
 
-          <span
-            className={`px-4 py-2 rounded-full text-xs font-semibold ${
-              isAvailable
-                ? "bg-[#00B300]/5 text-[#00B300]"
-                : "bg-[#FF2600]/10 text-[#FF2600]"
-            }`}
-          >
-            Available seats: {seats}
-          </span>
+          <StatusChip
+            status={isAvailable ? "available" : "unavailable"}
+            label={`Available seats: ${seats}`}
+          />
         </div>
 
         <Button disabled={!isAvailable}>Request Switch</Button>

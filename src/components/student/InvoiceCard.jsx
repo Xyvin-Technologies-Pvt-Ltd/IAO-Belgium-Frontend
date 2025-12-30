@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Download, Eye } from "lucide-react";
+import StatusChip from "../ui/StatusChip";
 
 const InvoiceCard = ({
   status = "paid", // "paid" | "unpaid"
@@ -18,15 +19,7 @@ const InvoiceCard = ({
         <div className="flex items-center gap-3">
           <span className="text-base font-semibold">Payment Status</span>
 
-          <span
-            className={`px-4 py-2 rounded-2xl text-sm font-semibold min-w-16 ${
-              isPaid
-                ? "bg-[#00B300]/10 text-[#00B300]"
-                : "bg-[#FF2600]/10 text-[#FF2600]"
-            }`}
-          >
-            {isPaid ? "Paid" : "Not Paid"}
-          </span>
+         <StatusChip status="paid" />
         </div>
         <div className="flex gap-3">
           {isPaid ? (

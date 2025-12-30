@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import StatusChip from "../ui/StatusChip";
 
 const ModuleCard = ({
   modules = [],
@@ -131,9 +132,7 @@ const ModuleCard = ({
                 !changeLocation && (
                   <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-3 text-sm">
                     <span className="text-base">Payment Status :</span>
-                    <span className="px-4 py-2 rounded-[6px] bg-[#00B300]/10 text-[#00B300] font-bold text-center">
-                      Paid
-                    </span>
+                   <StatusChip status="paid" />
                   </div>
                 )
               )}

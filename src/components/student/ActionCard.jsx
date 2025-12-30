@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, Calendar, CircleCheck } from "lucide-react";
+import StatusChip from "../ui/StatusChip";
 
 const STATUS_CONFIG = {
   completed: {
@@ -60,11 +61,7 @@ const ActionCard = ({
           </div>
 
           {status === "completed" && (
-            <span
-              className={`px-6 py-2 rounded-[14px] text-sm font-bold ${config.badgeClass}`}
-            >
-              {config.badge}
-            </span>
+           <StatusChip status={config.badge} label={config.badge} />
           )}
 
           {onPrimaryAction && (

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { FileDown } from "lucide-react";
+import StatusChip from "../ui/StatusChip";
 
 const AppCard = ({ data }) => {
   const {
@@ -42,17 +43,11 @@ const AppCard = ({ data }) => {
             <div className="flex items-center gap-2 text-base">
               <span>Status :</span>
               {status === "Submitted" ? (
-                <span className="px-6 py-2 rounded-[6px] bg-[#00B300]/10 text-[#00B300] font-bold text-sm">
-                  {status}
-                </span>
+                <StatusChip status="submitted" />
               ) : status === "Ongoing" ? (
-                <span className="px-6 py-2 rounded-[6px] bg-primary/10 text-primary font-bold text-sm">
-                  {status}
-                </span>
+                <StatusChip status="ongoing" />
               ) : (
-                <span className="px-6 py-2 rounded-[6px] bg-[#B32400]/10 text-[#B32400] font-bold text-sm">
-                  {status}
-                </span>
+                <StatusChip status="notsubmitted" />
               )}
             </div>
           </div>
