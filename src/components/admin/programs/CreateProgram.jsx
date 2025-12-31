@@ -4,9 +4,10 @@ import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { LoadingState, ErrorMessage } from "@/components/common";
-import { useCourseById, useCreateCourse, useUpdateCourse } from "@/store/useCourseStore";
+import { useCreateProgram, useProgramById, useUpdateProgram } from "@/store/useProgramStore";
 
-const CreateCourse = ({ open, onClose, courseId }) => {
+
+const CreateProgram = ({ open, onClose, programId }) => {
   const {
     register,
     handleSubmit,
@@ -20,13 +21,13 @@ const CreateCourse = ({ open, onClose, courseId }) => {
       duration: "",
       level: "",
       status: "active",
-    }
+    },
   });
 
-  const isEdit = !!courseId;
-  const { data: course, isLoading, error, refetch } = useCourseById(courseId);
-  const createCourse = useCreateCourse();
-  const updateCourse = useUpdateCourse();
+  const isEdit = !!programId;
+  const { data: program, isLoading, error, refetch } = useProgramById(programId);
+  const createProgram = useCreateProgram();
+  const updateProgram = useUpdateProgram();
 
   const handleClose = () => {
     reset();
@@ -34,21 +35,21 @@ const CreateCourse = ({ open, onClose, courseId }) => {
   };
 
   useEffect(() => {
-    if (course?.data && isEdit) {
-      const courseData = course.data;
-      Object.keys(courseData).forEach(key => {
-        setValue(key, courseData[key]);
+    if (program?.data && isEdit) {
+      const programData = program.data;
+      Object.keys(programData).forEach((key) => {
+        setValue(key, programData[key]);
       });
     }
-  }, [course, isEdit, setValue]);
+  }, [program, isEdit, setValue]);
 
   const onSubmit = (formData) => {
-    const mutation = isEdit ? updateCourse : createCourse;
-    const mutationData = isEdit ? { id: courseId, data: formData } : formData;
-    
+    const mutation = isEdit ? updateProgram : createProgram;
+    const mutationData = isEdit ? { id: programId, data: formData } : formData;
+
     mutation.mutate(mutationData, {
       onSuccess: () => {
-        toast.success(`Course ${isEdit ? 'updated' : 'created'} successfully!`);
+        toast.success(`Program ${isEdit ? "updated" : "created"} successfully!`);
         handleClose();
       },
     });
@@ -56,44 +57,46 @@ const CreateCourse = ({ open, onClose, courseId }) => {
 
   if (!open) return null;
 
-  const isSubmitting = createCourse.isLoading || updateCourse.isLoading;
+  const isSubmitting = createProgram.isLoading || updateProgram.isLoading;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white rounded-xl shadow-lg w-100 p-6">
         <h2 className="text-xl font-bold">
-          {isEdit ? "Edit Course" : "Create a new Course"}
+          {isEdit ? "Edit Program" : "Create a new Program"}
         </h2>
         <p className="text-sm text-gray-500 mb-6">
-          {isEdit ? "Update the course details" : "Let's create a new course"}
+          {isEdit ? "Update the program details" : "Let's create a new program"}
         </p>
 
         {isEdit && isLoading ? (
-          <LoadingState text="Loading course details..." />
+          <LoadingState text="Loading program details..." />
         ) : isEdit && error ? (
-          <ErrorMessage 
-            message={error?.message || "Failed to load course details"}
+          <ErrorMessage
+            message={error?.message || "Failed to load program details"}
             onRetry={refetch}
             variant="card"
           />
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <FormField
-              label="Course Name"
-              placeholder="Enter Course Name"
+              label="Program Name"
+              placeholder="Enter Program Name"
               error={errors.name?.message}
               required
-              {...register("name", { required: "Course name is required" })}
+              {...register("name", { required: "Program name is required" })}
             />
-            
+
             <FormField
               label="Description"
               placeholder="Enter Description"
               error={errors.description?.message}
               required
-              {...register("description", { required: "Description is required" })}
+              {...register("description", {
+                required: "Description is required",
+              })}
             />
-            
+
             <FormField
               label="Duration"
               placeholder="Enter Duration (e.g., 6 months)"
@@ -101,8 +104,6 @@ const CreateCourse = ({ open, onClose, courseId }) => {
               required
               {...register("duration", { required: "Duration is required" })}
             />
-            
-       
 
             <FormActions
               onCancel={handleClose}
@@ -116,4 +117,4 @@ const CreateCourse = ({ open, onClose, courseId }) => {
   );
 };
 
-export default CreateCourse;
+export default CreateProgram;

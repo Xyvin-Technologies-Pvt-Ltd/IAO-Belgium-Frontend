@@ -11,36 +11,37 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useGetCourses, useDeleteCourse } from "@/store/useCourseStore";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
-import CreateCourse from "@/components/admin/courses/CreateCourse";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
+import CreateProgram from "@/components/admin/programs/CreateProgram";
 
-const Courses = () => {
+const Programs = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [courseId, setCourseId] = useState(null);
+  const [programId, setProgramId] = useState(null);
   const [deleteIds, setDeleteIds] = useState([]);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetCourses({
+  const { data, isLoading, error, refetch } = useGetPrograms({
     page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteCourse, isLoading: isDeleting } = useDeleteCourse();
+  const { mutateAsync: deleteProgram, isLoading: isDeleting } =
+    useDeleteProgram();
 
-  const courses = data?.data || [];
+  const programs = data?.data || [];
   const totalRows = data?.total_count || 0;
 
   const handleCheckboxChange = (id) => {
@@ -51,25 +52,25 @@ const Courses = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelected(courses?.map((p) => p._id));
+      setSelected(programs?.map((p) => p._id));
     } else {
       setSelected([]);
     }
   };
 
   const handleOpenCreate = () => {
-    setCourseId(null);
+    setProgramId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (id) => {
-    setCourseId(id);
+    setProgramId(id);
     setIsModalOpen(true);
   };
 
   const handleBulkDeleteClick = () => {
     if (selected.length === 0) {
-      toast.error("Please select at least one course");
+      toast.error("Please select at least one Program");
       return;
     }
     setDeleteIds(selected);
@@ -84,11 +85,11 @@ const Courses = () => {
   const handleConfirmDelete = async () => {
     try {
       if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteCourse(id)));
-        toast.success("Selected courses deleted successfully");
+        await Promise.all(deleteIds.map((id) => deleteProgram(id)));
+        toast.success("Selected Programs deleted successfully");
       } else {
-        await deleteCourse(deleteIds[0]);
-        toast.success("Course deleted successfully");
+        await deleteProgram(deleteIds[0]);
+        toast.success("Program deleted successfully");
       }
     } catch (e) {
       toast.error(e.message || "Something went wrong");
@@ -101,6 +102,7 @@ const Courses = () => {
 
   return (
     <div className="space-y-6 mt-4">
+      <h2 className="text-xl font-semibold text-dashboard-text">Programs</h2>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 w-full">
           <Input
@@ -110,7 +112,7 @@ const Courses = () => {
             whiteBg
             onChange={(e) => setSearch(e.target.value)}
           />
-          
+
           {selected.length > 0 && (
             <Button variant="destructive" onClick={handleBulkDeleteClick}>
               <Trash2 size={16} className="mr-1" />
@@ -118,7 +120,7 @@ const Courses = () => {
             </Button>
           )}
         </div>
-        <Button onClick={handleOpenCreate}>Create Course</Button>
+        <Button onClick={handleOpenCreate}>Create Program</Button>
       </div>
 
       <Table>
@@ -128,12 +130,12 @@ const Courses = () => {
               <input
                 type="checkbox"
                 checked={
-                  selected.length === courses?.length && courses.length > 0
+                  selected.length === programs?.length && programs.length > 0
                 }
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </TableHead>
-            <TableHead>Course Name</TableHead>
+            <TableHead>Program Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>Level</TableHead>
@@ -147,29 +149,29 @@ const Courses = () => {
           ) : error ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
-                <ErrorMessage 
-                  message={error?.message || "Failed to load courses"}
+                <ErrorMessage
+                  message={error?.message || "Failed to load programs"}
                   onRetry={refetch}
                   variant="inline"
                 />
               </TableCell>
             </TableRow>
-          ) : courses?.length > 0 ? (
-            courses?.map((course) => (
-              <TableRow key={course._id}>
+          ) : programs?.length > 0 ? (
+            programs?.map((i) => (
+              <TableRow key={i._id}>
                 <TableCell>
                   <input
                     type="checkbox"
-                    checked={selected.includes(course._id)}
-                    onChange={() => handleCheckboxChange(course._id)}
+                    checked={selected.includes(i._id)}
+                    onChange={() => handleCheckboxChange(i._id)}
                   />
                 </TableCell>
-                <TableCell>{course?.name}</TableCell>
-                <TableCell>{course?.description}</TableCell>
-                <TableCell>{course?.duration}</TableCell>
-                <TableCell>{course?.level}</TableCell>
+                <TableCell>{i?.name}</TableCell>
+                <TableCell>{i?.description}</TableCell>
+                <TableCell>{i?.duration}</TableCell>
+                <TableCell>{i?.level}</TableCell>
                 <TableCell>
-                  <StatusBadge status={course?.status} />
+                  <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell>
                   <RowActionMenu
@@ -177,12 +179,12 @@ const Courses = () => {
                       {
                         label: "Edit",
                         icon: Edit,
-                        onClick: () => handleOpenEdit(course._id),
+                        onClick: () => handleOpenEdit(i._id),
                       },
                       {
                         label: "Delete",
                         icon: Trash2,
-                        onClick: () => handleRowDeleteClick(course._id),
+                        onClick: () => handleRowDeleteClick(i._id),
                       },
                     ]}
                   />
@@ -192,7 +194,7 @@ const Courses = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                No courses found
+                No Programs found
               </TableCell>
             </TableRow>
           )}
@@ -207,10 +209,10 @@ const Courses = () => {
         selected={selected?.length}
       />
 
-      <CreateCourse
+      <CreateProgram
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        courseId={courseId}
+        programId={programId}
       />
       <DeleteConfirm
         open={openDelete}
@@ -218,10 +220,10 @@ const Courses = () => {
         onConfirm={handleConfirmDelete}
         count={deleteIds.length}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "courses" : "course"}
+        data={deleteIds.length > 1 ? "Programs" : "Program"}
       />
     </div>
   );
 };
 
-export default Courses;
+export default Programs;

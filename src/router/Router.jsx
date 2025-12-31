@@ -11,7 +11,6 @@ import Login from "../pages/student/Login";
 import ApplicationForm from "../pages/student/application/ApplicationForm";
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import Courses from "@/pages/admin/course";
 import StudentReview from "@/pages/student/review/StudentReview";
 import Dashboard from "@/pages/student/Dashboard";
 import Assessment from "@/pages/student/assessment";
@@ -21,60 +20,86 @@ import AppDetails from "@/pages/student/app/AppDetails";
 import MyApp from "@/pages/student/app";
 import MyCourses from "@/pages/student/module";
 import NotFound from "../pages/NotFound";
+import Schedules from "@/pages/teacher/schedule";
+import Programs from "@/pages/admin/program";
+import Locations from "@/pages/admin/location";
+import ApplicationReview from "@/pages/admin/application-review";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
 
-// Create the login route (public)
+// Public routes
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
   component: Login,
 });
 
-// Create the index route (redirect to login)
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: () => <Navigate to="/login" replace />,
 });
 
-// Create protected layout route
+// Protected layout for students
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "protected",
   component: ProtectedLayout,
 });
 
-// Create dashboard layout route for teacher and admin
+// Dashboard layout for teachers and admins
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "dashboard",
   component: DashboardLayout,
 });
 
-// Protected routes configuration (for students)
-const protectedRoutes = [
-  { path: "/application", component: ApplicationForm },
-  { path: "/review", component: StudentReview },
+// Student routes (use ProtectedLayout)
+const studentRoutes = [
+  {
+    path: "/student",
+    component: () => <Navigate to="/student/dashboard" replace />,
+  },
   { path: "/student/dashboard", component: Dashboard },
+  { path: "/student/application", component: ApplicationForm },
+  { path: "/student/review", component: StudentReview },
   { path: "/student/assessment", component: Assessment },
   { path: "/student/app", component: MyApp },
+  { path: "/student/app/$id", component: AppDetails },
   { path: "/student/courses", component: MyCourses },
   { path: "/student/module/$id", component: ModuleDetails },
   { path: "/student/change-location/$id", component: ChangeLocation },
-  { path: "/student/app/$id", component: AppDetails },
-];
-// Dashboard routes configuration (for teacher and admin)
-const dashboardRoutes = [
-  { path: "/teacher", component: TeacherDashboard },
-  { path: "/admin", component: AdminDashboard },
-  { path: "/admin/course-administration/courses", component: Courses },
 ];
 
-// Generate protected route children
-const protectedRouteChildren = protectedRoutes.map(({ path, component }) =>
+// Teacher routes (use DashboardLayout)
+const teacherRoutes = [
+  {
+    path: "/teacher",
+    component: () => <Navigate to="/teacher/dashboard" replace />,
+  },
+  { path: "/teacher/dashboard", component: TeacherDashboard },
+  { path: "/teacher/schedules", component: Schedules },
+];
+
+// Admin routes (use DashboardLayout)
+const adminRoutes = [
+  {
+    path: "/admin",
+    component: () => <Navigate to="/admin/dashboard" replace />,
+  },
+  { path: "/admin/dashboard", component: AdminDashboard },
+  { path: "/admin/program-administration/program", component: Programs },
+  { path: "/admin/program-administration/locations", component: Locations },
+  {
+    path: "/admin/admission-administration/application-review",
+    component: ApplicationReview,
+  },
+];
+
+// Generate route children
+const studentRouteChildren = studentRoutes.map(({ path, component }) =>
   createRoute({
     getParentRoute: () => protectedRoute,
     path,
@@ -82,8 +107,15 @@ const protectedRouteChildren = protectedRoutes.map(({ path, component }) =>
   })
 );
 
-// Generate dashboard route children
-const dashboardRouteChildren = dashboardRoutes.map(({ path, component }) =>
+const teacherRouteChildren = teacherRoutes.map(({ path, component }) =>
+  createRoute({
+    getParentRoute: () => dashboardRoute,
+    path,
+    component,
+  })
+);
+
+const adminRouteChildren = adminRoutes.map(({ path, component }) =>
   createRoute({
     getParentRoute: () => dashboardRoute,
     path,
@@ -95,12 +127,12 @@ const dashboardRouteChildren = dashboardRoutes.map(({ path, component }) =>
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
-  protectedRoute.addChildren(protectedRouteChildren),
-  dashboardRoute.addChildren(dashboardRouteChildren),
+  protectedRoute.addChildren(studentRouteChildren),
+  dashboardRoute.addChildren([...teacherRouteChildren, ...adminRouteChildren]),
 ]);
 
 // Create the router
-export const router = createRouter({ 
+export const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFound,
 });

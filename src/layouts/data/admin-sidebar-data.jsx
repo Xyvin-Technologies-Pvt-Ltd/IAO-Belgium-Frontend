@@ -1,4 +1,10 @@
-import { LayoutDashboard, Hash } from "lucide-react";
+import {
+  LayoutDashboard,
+  NotebookText,
+  BookUser,
+  BookMarked,
+  Calendars,
+} from "lucide-react";
 
 export const adminSidebarData = {
   navGroups: [
@@ -7,7 +13,7 @@ export const adminSidebarData = {
       items: [
         {
           title: "Dashboard",
-          url: "/admin",
+          url: "/admin/dashboard",
           icon: LayoutDashboard,
         },
       ],
@@ -16,22 +22,22 @@ export const adminSidebarData = {
       title: "Operations",
       items: [
         {
-          title: "Course Administration",
-          icon: Hash,
+          title: "Program Administration",
+          icon: NotebookText,
           items: [
             {
-              title: "Courses",
-              url: "/admin/course-administration/courses",
+              title: "Program",
+              url: "/admin/program-administration/program",
             },
             {
               title: "Locations",
-              url: "/admin/course-administration/locations",
+              url: "/admin/program-administration/locations",
             },
           ],
         },
         {
           title: "Admission Administration",
-          icon: Hash,
+          icon: BookUser,
           items: [
             {
               title: "Application Review",
@@ -46,12 +52,12 @@ export const adminSidebarData = {
         {
           title: "Class Administration",
           url: "/admin/class-administration",
-          icon: Hash,
+          icon: BookMarked,
         },
         {
           title: "Planning",
           url: "/admin/planning",
-          icon: Hash,
+          icon: Calendars,
         },
       ],
     },

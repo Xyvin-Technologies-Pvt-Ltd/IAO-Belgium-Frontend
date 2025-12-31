@@ -28,8 +28,8 @@ import { useState } from "react";
 export function NavUser() {
   const { isMobile } = useSidebar();
   const [user, setUser] = useState({
-    name: "James Sam",
-    email: "james@example.com",
+    name: "Maria Jeen",
+    email: "maria@example.com",
     avatar: "",
   });
   const navigate = useNavigate();

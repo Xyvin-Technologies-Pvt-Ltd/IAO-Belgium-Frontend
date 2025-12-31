@@ -1,4 +1,10 @@
-import { LayoutDashboard, Hash } from "lucide-react";
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  Calendars,
+  FileMinus,
+  BookOpenCheck,
+} from "lucide-react";
 
 export const teacherSidebarData = {
   navGroups: [
@@ -7,7 +13,7 @@ export const teacherSidebarData = {
       items: [
         {
           title: "Dashboard",
-          url: "/teacher",
+          url: "/teacher/dashboard",
           icon: LayoutDashboard,
         },
       ],
@@ -18,22 +24,22 @@ export const teacherSidebarData = {
         {
           title: "Schedules",
           url: "/teacher/schedules",
-          icon: Hash,
+          icon: CalendarCheck,
         },
         {
           title: "Planning",
           url: "/teacher/planning",
-          icon: Hash,
+          icon: Calendars,
         },
         {
           title: "Documents",
           url: "/teacher/documents",
-          icon: Hash,
+          icon: FileMinus,
         },
         {
           title: "Evaluations",
           url: "/teacher/evaluations",
-          icon: Hash,
+          icon: BookOpenCheck,
         },
       ],
     },

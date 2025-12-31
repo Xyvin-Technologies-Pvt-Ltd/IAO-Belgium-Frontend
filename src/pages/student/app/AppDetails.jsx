@@ -28,7 +28,7 @@ const AppDetails = () => {
     downloadableCount: 3,
     progress: 50,
     showVideo: true,
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/RjPYts-y65I?si=-r7W4cRFAzGKBjg7",
   };
   const instructionData = {
     description: "Our expert educators are reviewing:",
