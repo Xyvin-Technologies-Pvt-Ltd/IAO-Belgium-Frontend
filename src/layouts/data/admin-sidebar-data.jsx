@@ -4,6 +4,8 @@ import {
   BookUser,
   BookMarked,
   Calendars,
+  Users,
+  Shield,
 } from "lucide-react";
 
 export const adminSidebarData = {
@@ -58,6 +60,16 @@ export const adminSidebarData = {
           title: "Planning",
           url: "/admin/planning",
           icon: Calendars,
+        },
+        {
+          title: "Admin Management",
+          url: "/admin/admin-management",
+          icon: Users,
+        },
+         {
+          title: "Role Management",
+          url: "/admin/role-management",
+          icon: Shield,
         },
       ],
     },

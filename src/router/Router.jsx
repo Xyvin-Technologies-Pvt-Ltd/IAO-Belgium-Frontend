@@ -24,6 +24,8 @@ import Schedules from "@/pages/teacher/schedule";
 import Programs from "@/pages/admin/program";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
+import AdminManagement from "@/pages/admin/admin-management";
+import RoleManagement from "@/pages/admin/role-management";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -96,6 +98,8 @@ const adminRoutes = [
     path: "/admin/admission-administration/application-review",
     component: ApplicationReview,
   },
+  { path: "/admin/admin-management", component: AdminManagement },
+  { path: "/admin/role-management", component: RoleManagement },
 ];
 
 // Generate route children
