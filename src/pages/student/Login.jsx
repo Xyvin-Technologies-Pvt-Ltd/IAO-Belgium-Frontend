@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CircleAlert } from "lucide-react";
+import { toast } from "sonner";
 import { useLanguageStore } from "@/store/useLanguageStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import logo from "../../assets/images/logo.png";
 import bg from "../../assets/images/login-image.webp";
 import googleIcon from "../../assets/icons/google.svg";
@@ -12,16 +14,43 @@ import microsoftIcon from "../../assets/icons/microsoft.svg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { t } = useLanguageStore();
+  const { login, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleEmailSubmit = () => {
-    const savedStep = localStorage.getItem("currentStep");
+  const handleEmailSubmit = async () => {
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
 
-    if (savedStep) {
-      navigate({ to: "/review" });
-    } else {
-      navigate({ to: "/application" });
+    // Clear any previous errors
+    clearError();
+
+    try {
+      const response = await login({ email, password: password || "Admin@123" });
+      const userRole = response?.data?.user?.role;      
+      toast.success("Login successful!");
+      
+      // Navigate based on user role
+      if (userRole === "ADMIN") {
+        navigate({ to: "/admin/dashboard" });
+      } else if (userRole === "TEACHER") {
+        navigate({ to: "/teacher/dashboard" });
+      } else {
+        // For students, check if there's a saved step in localStorage
+        const savedStep = localStorage.getItem("currentStep");
+        
+        if (savedStep) {
+          navigate({ to: "/review" });
+        } else {
+          navigate({ to: "/application" });
+        }
+      }
+    } catch (err) {
+      toast.error(err.message || "Login failed. Please try again.");
+      console.error("Login failed:", err);
     }
   };
   return (
@@ -86,14 +115,16 @@ const Login = () => {
                   className="h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
 
               <Button
-                className="w-full h-11 bg-orange-500 hover:bg-orange-600"
+                className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
                 onClick={handleEmailSubmit}
+                disabled={isLoading || !email}
               >
-                Continue with Email
+                {isLoading ? "Signing in..." : "Continue with Email"}
               </Button>
 
               <p className="text-[10px] text-[#005AC8] text-start bg-[#F5F7FF] rounded-[6px] px-2 py-1 flex items-center gap-2">

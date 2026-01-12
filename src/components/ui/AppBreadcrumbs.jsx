@@ -1,9 +1,10 @@
 import { useBreadcrumb } from '@/context/BreadCrumbContext';
-import { useLocation } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { ChevronRight, Home } from 'lucide-react';
 
 export function AppBreadcrumbs() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { breadcrumbs } = useBreadcrumb();
 
   // Helper function to check if a breadcrumb segment is a non-navigable parent
@@ -36,6 +37,10 @@ export function AppBreadcrumbs() {
     return { label, path, navigable };
   });
 
+  const handleBreadcrumbClick = (path) => {
+    navigate({ to: path });
+  };
+
   const displayBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : defaultBreadcrumbs;
 
   return (
@@ -47,9 +52,12 @@ export function AppBreadcrumbs() {
           {index === displayBreadcrumbs.length - 1 ? (
             <span className="text-foreground font-medium">{crumb.label}</span>
           ) : crumb.navigable !== false ? (
-            <a href={crumb.path} className="hover:text-foreground transition-colors">
+            <button 
+              onClick={() => handleBreadcrumbClick(crumb.path)} 
+              className="hover:text-foreground transition-colors cursor-pointer"
+            >
               {crumb.label}
-            </a>
+            </button>
           ) : (
             <span className="text-muted-foreground">{crumb.label}</span>
           )}

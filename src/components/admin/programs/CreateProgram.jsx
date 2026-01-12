@@ -61,11 +61,11 @@ const CreateProgram = ({ open, onClose, programId }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white rounded-xl shadow-lg w-100 p-6">
-        <h2 className="text-xl font-bold">
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-100 p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           {isEdit ? "Edit Program" : "Create a new Program"}
         </h2>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
           {isEdit ? "Update the program details" : "Let's create a new program"}
         </p>
 

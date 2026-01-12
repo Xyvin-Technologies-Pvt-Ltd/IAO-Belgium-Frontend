@@ -13,16 +13,20 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
 import CreateProgram from "@/components/admin/programs/CreateProgram";
+import StatusChip from "@/components/ui/StatusChip";
+import StatusBadge from "@/components/StatusBadge";
 
-const Programs = () => {
+const LearningModule = ({
+  modules = [],
+  isLoading = false,
+  error = null,
+  refetch,
+}) => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -30,22 +34,9 @@ const Programs = () => {
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programId, setProgramId] = useState(null);
+  const [moduleId, setModuleId] = useState(null);
   const [deleteIds, setDeleteIds] = useState([]);
-
-  const debouncedSearch = useDebounce(search, 500);
-
-  const { data, isLoading, error, refetch } = useGetPrograms({
-    page_no: page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  });
-  console.log("Pagination:", data?.pagination);
-  const { mutateAsync: deleteProgram, isLoading: isDeleting } =
-    useDeleteProgram();
-
-  const programs = data?.data || [];
-  const totalRows = data?.pagination?.total || 0;
+  const totalRows = modules?.length || 0;
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -55,25 +46,25 @@ const Programs = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelected(programs?.map((p) => p.id));
+      setSelected(modules?.map((p) => p.id));
     } else {
       setSelected([]);
     }
   };
 
   const handleOpenCreate = () => {
-    setProgramId(null);
+    setModuleId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (id) => {
-    setProgramId(id);
+    setModuleId(id);
     setIsModalOpen(true);
   };
 
   const handleBulkDeleteClick = () => {
     if (selected.length === 0) {
-      toast.error("Please select at least one Program");
+      toast.error("Please select at least one module to delete.");
       return;
     }
     setDeleteIds(selected);
@@ -85,34 +76,10 @@ const Programs = () => {
     setOpenDelete(true);
   };
 
-  const handleRowClick = (programId) => {
-    navigate({
-      to: "/admin/program/$id",
-      params: { id: programId },
-    });
-  };
-
-  const handleConfirmDelete = async () => {
-    try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteProgram(id)));
-        toast.success("Selected Programs deleted successfully");
-      } else {
-        await deleteProgram(deleteIds[0]);
-        toast.success("Program deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
-    } finally {
-      setSelected([]);
-      setDeleteIds([]);
-      setOpenDelete(false);
-    }
-  };
+  const handleConfirmDelete = async () => {};
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text">Programs</h2>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 w-full">
           <Input
@@ -130,7 +97,7 @@ const Programs = () => {
             </Button>
           )}
         </div>
-        <Button onClick={handleOpenCreate}>Create Program</Button>
+        <Button onClick={handleOpenCreate}>Create Module</Button>
       </div>
 
       <Table>
@@ -140,18 +107,18 @@ const Programs = () => {
               <input
                 type="checkbox"
                 checked={
-                  selected.length === programs?.length && programs.length > 0
+                  selected.length === modules?.length && modules.length > 0
                 }
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </TableHead>
             <TableHead>Code</TableHead>
-            <TableHead>Program Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Module</TableHead>
-            <TableHead>Location & Language</TableHead>
-            <TableHead>Registration Fee</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Sessions</TableHead>
+            <TableHead>Available Seats per Batch</TableHead>
+            <TableHead>Resources</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -162,18 +129,17 @@ const Programs = () => {
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load programs"}
+                  message={error?.message || "Failed to load modules"}
                   onRetry={refetch}
                   variant="inline"
                 />
               </TableCell>
             </TableRow>
-          ) : programs?.length > 0 ? (
-            programs?.map((i) => (
-              <TableRow 
-                key={i.id} 
+          ) : modules?.length > 0 ? (
+            modules?.map((i) => (
+              <TableRow
+                key={i.id}
                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => handleRowClick(i.id)}
               >
                 <TableCell>
                   <input
@@ -185,16 +151,15 @@ const Programs = () => {
                 </TableCell>
                 <TableHead>{i?.shortCode}</TableHead>
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.type}</TableCell>
+                <TableCell>{i?.numberOfSessions}</TableCell>
                 <TableCell>{i?.duration}</TableCell>
                 <TableCell>
-                  {i?.moduleCount ? i?.moduleCount + " modules" : "-"}
+                  {i?.resources?.length ? i?.resources.length + " items" : "-"}
                 </TableCell>
+                <TableCell>{i?.amount}</TableCell>
                 <TableCell>
-                  {i?.city}, {i?.country}
-                  {i?.language && `, ${i?.language}`}
+                  <StatusBadge status={i?.isActive} />
                 </TableCell>
-                <TableCell>{i?.registrationFee}</TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
@@ -217,7 +182,7 @@ const Programs = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                No Programs found
+                No modules found
               </TableCell>
             </TableRow>
           )}
@@ -235,18 +200,17 @@ const Programs = () => {
       <CreateProgram
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        programId={programId}
+        programId={moduleId}
       />
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
         count={deleteIds.length}
-        isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Programs" : "Program"}
+        data={deleteIds.length > 1 ? "Modules" : "Module"}
       />
     </div>
   );
 };
 
-export default Programs;
+export default LearningModule;

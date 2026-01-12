@@ -6,6 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { router } from "./router/Router.jsx";
 import { Toaster } from "sonner";
+import { useThemeStore } from "./store/useThemeStore";
+
+// Initialize theme on app start
+useThemeStore.getState().initializeTheme();
 
 const queryClient = new QueryClient();
 

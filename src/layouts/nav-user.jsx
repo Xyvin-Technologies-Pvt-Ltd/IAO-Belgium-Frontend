@@ -23,20 +23,55 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProfile } from "@/api/authApi";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const { logout, isAuthenticated } = useAuthStore();
   const [user, setUser] = useState({
-    name: "Maria Jeen",
-    email: "maria@example.com",
+    name: "",
+    email: "",
     avatar: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        setIsLoading(true);
+        const profileData = await getProfile();
+        console.log("User Profile Data:", profileData);
+        
+        // Update user state with profile data
+        setUser({
+          name: profileData.data?.name || profileData.data?.firstName + " " + profileData.data?.lastName || "User",
+          email: profileData.data?.email || "",
+          avatar: profileData.data?.avatar || profileData.data?.profilePicture || "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        // Set fallback user data
+        setUser({
+          name: "User",
+          email: "",
+          avatar: "",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [isAuthenticated]);
+
   const handleSignOut = () => {
-    localStorage.removeItem("4ZbFyedjehdkjkhj");
-    navigate({ to: "/" });
+    logout();
+    navigate({ to: "/login" });
   };
   return (
     <>
@@ -51,12 +86,16 @@ export function NavUser() {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
                   <AvatarFallback className="rounded-lg">
-                    {user?.name?.substring(0, 1)}
+                    {isLoading ? "..." : (user?.name?.charAt(0)?.toUpperCase() || "U")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-semibold">{user?.name}</span>
-                  <span className="truncate text-xs">{user?.email}</span>
+                  <span className="truncate font-semibold">
+                    {isLoading ? "Loading..." : (user?.name || "User")}
+                  </span>
+                  <span className="truncate text-xs">
+                    {isLoading ? "..." : (user?.email || "No email")}
+                  </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
               </SidebarMenuButton>
@@ -72,12 +111,16 @@ export function NavUser() {
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback className="rounded-lg">
-                      {user?.name?.substring(0, 1)}
+                      {isLoading ? "..." : (user?.name?.charAt(0)?.toUpperCase() || "U")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-semibold">{user?.name}</span>
-                    <span className="truncate text-xs">{user?.email}</span>
+                    <span className="truncate font-semibold">
+                      {isLoading ? "Loading..." : (user?.name || "User")}
+                    </span>
+                    <span className="truncate text-xs">
+                      {isLoading ? "..." : (user?.email || "No email")}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>

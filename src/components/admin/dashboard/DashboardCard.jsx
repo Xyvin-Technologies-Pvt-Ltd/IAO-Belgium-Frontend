@@ -7,15 +7,15 @@ const DashboardCard = ({
   icon: Icon = TrendingUp,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-5 border border-[#E4E4E7] flex justify-between items-start ">
+    <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border flex justify-between items-start">
       <div className="space-y-2">
-        <p className="text-sm">{title}</p>
-        <h2 className="text-2xl font-semibold">{value}</h2>
-        {changeText && <p className="text-xs text-[#49BA6C]">{changeText}</p>}
+        <p className="text-sm text-sidebar-foreground/70">{title}</p>
+        <h2 className="text-2xl font-semibold text-sidebar-foreground">{value}</h2>
+        {changeText && <p className="text-xs text-green-600 dark:text-green-400">{changeText}</p>}
       </div>
 
-      <div className="text-muted-foreground">
-        <Icon size={18}strokeWidth={2} />
+      <div className="text-sidebar-foreground/70">
+        <Icon size={18} strokeWidth={2} />
       </div>
     </div>
   );

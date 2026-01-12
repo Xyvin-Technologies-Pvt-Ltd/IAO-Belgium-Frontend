@@ -45,6 +45,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-dashboard-text: var(--dashboard-text);
+  --color-dashboard-gradient-from: var(--dashboard-gradient-from);
+  --color-dashboard-gradient-to: var(--dashboard-gradient-to);
 }
 
 :root {
@@ -82,6 +84,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --dashboard-text: #374151;
+  --dashboard-gradient-from: #E3E5E6;
+  --dashboard-gradient-to: #FFECD7;
 }
 
 .dark {
@@ -117,6 +121,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --dashboard-text: #A0AEC0;
+  --dashboard-gradient-from: #000000;
+  --dashboard-gradient-to: #1a1a1a;
 }
 
 @layer base {

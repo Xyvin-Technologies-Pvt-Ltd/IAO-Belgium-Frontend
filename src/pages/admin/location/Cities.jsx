@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -19,33 +18,31 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
-import CreateProgram from "@/components/admin/programs/CreateProgram";
+import { useDeleteCity, useGetCities } from "@/store/useCityStore";
+import CreateCity from "@/components/admin/location/CreateCity";
 
-const Programs = () => {
-  const navigate = useNavigate();
+const Cities = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programId, setProgramId] = useState(null);
+  const [cityId, setCityId] = useState(null);
   const [deleteIds, setDeleteIds] = useState([]);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetPrograms({
+  const { data, isLoading, error, refetch } = useGetCities({
     page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  console.log("Pagination:", data?.pagination);
-  const { mutateAsync: deleteProgram, isLoading: isDeleting } =
-    useDeleteProgram();
+  const { mutateAsync: deleteCity, isLoading: isDeleting } =
+    useDeleteCity();
 
-  const programs = data?.data || [];
-  const totalRows = data?.pagination?.total || 0;
+  const cities = data?.data || [];
+  const totalRows = data?.total_count || 0;
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -55,25 +52,25 @@ const Programs = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelected(programs?.map((p) => p.id));
+      setSelected(cities?.map((p) => p._id));
     } else {
       setSelected([]);
     }
   };
 
   const handleOpenCreate = () => {
-    setProgramId(null);
+    setCityId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (id) => {
-    setProgramId(id);
+    setCityId(id);
     setIsModalOpen(true);
   };
 
   const handleBulkDeleteClick = () => {
     if (selected.length === 0) {
-      toast.error("Please select at least one Program");
+      toast.error("Please select at least one City");
       return;
     }
     setDeleteIds(selected);
@@ -85,21 +82,14 @@ const Programs = () => {
     setOpenDelete(true);
   };
 
-  const handleRowClick = (programId) => {
-    navigate({
-      to: "/admin/program/$id",
-      params: { id: programId },
-    });
-  };
-
   const handleConfirmDelete = async () => {
     try {
       if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteProgram(id)));
-        toast.success("Selected Programs deleted successfully");
+        await Promise.all(deleteIds.map((id) => deleteCity(id)));
+        toast.success("Selected cities deleted successfully");
       } else {
-        await deleteProgram(deleteIds[0]);
-        toast.success("Program deleted successfully");
+        await deleteCity(deleteIds[0]);
+        toast.success("City deleted successfully");
       }
     } catch (e) {
       toast.error(e.message || "Something went wrong");
@@ -112,7 +102,6 @@ const Programs = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text">Programs</h2>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 w-full">
           <Input
@@ -130,7 +119,7 @@ const Programs = () => {
             </Button>
           )}
         </div>
-        <Button onClick={handleOpenCreate}>Create Program</Button>
+        <Button onClick={handleOpenCreate}>Create City</Button>
       </div>
 
       <Table>
@@ -140,18 +129,16 @@ const Programs = () => {
               <input
                 type="checkbox"
                 checked={
-                  selected.length === programs?.length && programs.length > 0
+                  selected.length === cities?.length && cities.length > 0
                 }
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Program Name</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
             <TableHead>Duration</TableHead>
-            <TableHead>Module</TableHead>
-            <TableHead>Location & Language</TableHead>
-            <TableHead>Registration Fee</TableHead>
+            <TableHead>Level</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -162,54 +149,43 @@ const Programs = () => {
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load programs"}
+                  message={error?.message || "Failed to load cities"}
                   onRetry={refetch}
                   variant="inline"
                 />
               </TableCell>
             </TableRow>
-          ) : programs?.length > 0 ? (
-            programs?.map((i) => (
-              <TableRow 
-                key={i.id} 
-                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => handleRowClick(i.id)}
-              >
+          ) : cities?.length > 0 ? (
+            cities?.map((i) => (
+              <TableRow key={i._id}>
                 <TableCell>
                   <input
                     type="checkbox"
-                    checked={selected.includes(i.id)}
-                    onChange={() => handleCheckboxChange(i.id)}
-                    onClick={(e) => e.stopPropagation()}
+                    checked={selected.includes(i._id)}
+                    onChange={() => handleCheckboxChange(i._id)}
                   />
                 </TableCell>
-                <TableHead>{i?.shortCode}</TableHead>
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.type}</TableCell>
+                <TableCell>{i?.description}</TableCell>
                 <TableCell>{i?.duration}</TableCell>
+                <TableCell>{i?.level}</TableCell>
                 <TableCell>
-                  {i?.moduleCount ? i?.moduleCount + " modules" : "-"}
+                  <StatusBadge status={i?.status} />
                 </TableCell>
-                <TableCell>
-                  {i?.city}, {i?.country}
-                  {i?.language && `, ${i?.language}`}
-                </TableCell>
-                <TableCell>{i?.registrationFee}</TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
                       {
                         label: "Edit",
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i.id),
+                        onClick: () => handleOpenEdit(i._id),
                       },
                       {
                         label: "Delete",
                         icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i.id),
+                        onClick: () => handleRowDeleteClick(i._id),
                       },
                     ]}
-                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
               </TableRow>
@@ -217,7 +193,7 @@ const Programs = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                No Programs found
+                No cities found
               </TableCell>
             </TableRow>
           )}
@@ -232,10 +208,10 @@ const Programs = () => {
         selected={selected?.length}
       />
 
-      <CreateProgram
+      <CreateCity
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        programId={programId}
+        cityId={cityId}
       />
       <DeleteConfirm
         open={openDelete}
@@ -243,10 +219,10 @@ const Programs = () => {
         onConfirm={handleConfirmDelete}
         count={deleteIds.length}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Programs" : "Program"}
+        data={deleteIds.length > 1 ? "Cities" : "City"}
       />
     </div>
   );
 };
 
-export default Programs;
+export default Cities;

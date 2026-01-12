@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -19,32 +18,30 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
-import CreateProgram from "@/components/admin/programs/CreateProgram";
+import { useDeleteCountry, useGetCountries } from "@/store/useCountryStore";
+import CreateCountry from "@/components/admin/location/CreateCountry";
 
-const Programs = () => {
-  const navigate = useNavigate();
+const Countries = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programId, setProgramId] = useState(null);
+  const [countryId, setCountryId] = useState(null);
   const [deleteIds, setDeleteIds] = useState([]);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetPrograms({
-    page_no: page,
+  const { data, isLoading, error, refetch } = useGetCountries({
+    offset: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  console.log("Pagination:", data?.pagination);
-  const { mutateAsync: deleteProgram, isLoading: isDeleting } =
-    useDeleteProgram();
+  const { mutateAsync: deleteCountry, isLoading: isDeleting } =
+    useDeleteCountry();
 
-  const programs = data?.data || [];
+  const countries = data?.data || [];
   const totalRows = data?.pagination?.total || 0;
 
   const handleCheckboxChange = (id) => {
@@ -55,25 +52,25 @@ const Programs = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelected(programs?.map((p) => p.id));
+      setSelected(countries?.map((p) => p.id));
     } else {
       setSelected([]);
     }
   };
 
   const handleOpenCreate = () => {
-    setProgramId(null);
+    setCountryId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (id) => {
-    setProgramId(id);
+    setCountryId(id);
     setIsModalOpen(true);
   };
 
   const handleBulkDeleteClick = () => {
     if (selected.length === 0) {
-      toast.error("Please select at least one Program");
+      toast.error("Please select at least one Country");
       return;
     }
     setDeleteIds(selected);
@@ -85,21 +82,14 @@ const Programs = () => {
     setOpenDelete(true);
   };
 
-  const handleRowClick = (programId) => {
-    navigate({
-      to: "/admin/program/$id",
-      params: { id: programId },
-    });
-  };
-
   const handleConfirmDelete = async () => {
     try {
       if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteProgram(id)));
-        toast.success("Selected Programs deleted successfully");
+        await Promise.all(deleteIds.map((id) => deleteCountry(id)));
+        toast.success("Selected countries deleted successfully");
       } else {
-        await deleteProgram(deleteIds[0]);
-        toast.success("Program deleted successfully");
+        await deleteCountry(deleteIds[0]);
+        toast.success("Country deleted successfully");
       }
     } catch (e) {
       toast.error(e.message || "Something went wrong");
@@ -112,7 +102,6 @@ const Programs = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text">Programs</h2>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 w-full">
           <Input
@@ -130,7 +119,7 @@ const Programs = () => {
             </Button>
           )}
         </div>
-        <Button onClick={handleOpenCreate}>Create Program</Button>
+        <Button onClick={handleOpenCreate}>Create Country</Button>
       </div>
 
       <Table>
@@ -140,18 +129,14 @@ const Programs = () => {
               <input
                 type="checkbox"
                 checked={
-                  selected.length === programs?.length && programs.length > 0
+                  selected.length === countries?.length && countries.length > 0
                 }
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </TableHead>
             <TableHead>Code</TableHead>
-            <TableHead>Program Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Module</TableHead>
-            <TableHead>Location & Language</TableHead>
-            <TableHead>Registration Fee</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -162,39 +147,27 @@ const Programs = () => {
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load programs"}
+                  message={error?.message || "Failed to load countries"}
                   onRetry={refetch}
                   variant="inline"
                 />
               </TableCell>
             </TableRow>
-          ) : programs?.length > 0 ? (
-            programs?.map((i) => (
-              <TableRow 
-                key={i.id} 
-                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => handleRowClick(i.id)}
-              >
+          ) : countries?.length > 0 ? (
+            countries?.map((i) => (
+              <TableRow key={i.id}>
                 <TableCell>
                   <input
                     type="checkbox"
                     checked={selected.includes(i.id)}
                     onChange={() => handleCheckboxChange(i.id)}
-                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
-                <TableHead>{i?.shortCode}</TableHead>
+                <TableCell>{i?.code}</TableCell>
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.type}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
                 <TableCell>
-                  {i?.moduleCount ? i?.moduleCount + " modules" : "-"}
+                  <StatusBadge status={i?.is_active} />
                 </TableCell>
-                <TableCell>
-                  {i?.city}, {i?.country}
-                  {i?.language && `, ${i?.language}`}
-                </TableCell>
-                <TableCell>{i?.registrationFee}</TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
@@ -209,7 +182,6 @@ const Programs = () => {
                         onClick: () => handleRowDeleteClick(i.id),
                       },
                     ]}
-                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
               </TableRow>
@@ -217,7 +189,7 @@ const Programs = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                No Programs found
+                No countries found
               </TableCell>
             </TableRow>
           )}
@@ -232,10 +204,10 @@ const Programs = () => {
         selected={selected?.length}
       />
 
-      <CreateProgram
+      <CreateCountry
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        programId={programId}
+        countryId={countryId}
       />
       <DeleteConfirm
         open={openDelete}
@@ -243,10 +215,10 @@ const Programs = () => {
         onConfirm={handleConfirmDelete}
         count={deleteIds.length}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Programs" : "Program"}
+        data={deleteIds.length > 1 ? "Countries" : "Country"}
       />
     </div>
   );
 };
 
-export default Programs;
+export default Countries;

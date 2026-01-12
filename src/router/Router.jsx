@@ -22,6 +22,7 @@ import MyCourses from "@/pages/student/module";
 import NotFound from "../pages/NotFound";
 import Schedules from "@/pages/teacher/schedule";
 import Programs from "@/pages/admin/program";
+import ProgramDetail from "@/pages/admin/program/ProgramDetail";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
@@ -92,8 +93,9 @@ const adminRoutes = [
     component: () => <Navigate to="/admin/dashboard" replace />,
   },
   { path: "/admin/dashboard", component: AdminDashboard },
-  { path: "/admin/program-administration/program", component: Programs },
-  { path: "/admin/program-administration/locations", component: Locations },
+  { path: "/admin/program", component: Programs },
+  { path: "/admin/program/$id", component: ProgramDetail },
+  { path: "/admin/locations", component: Locations },
   {
     path: "/admin/admission-administration/application-review",
     component: ApplicationReview,

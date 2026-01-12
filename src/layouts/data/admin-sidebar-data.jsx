@@ -6,6 +6,9 @@ import {
   Calendars,
   Users,
   Shield,
+  GraduationCap,
+  UserCheck,
+  FileText,
 } from "lucide-react";
 
 export const adminSidebarData = {
@@ -20,22 +23,19 @@ export const adminSidebarData = {
         },
       ],
     },
+
     {
       title: "Operations",
       items: [
         {
           title: "Program Administration",
+          url: "/admin/program",
           icon: NotebookText,
-          items: [
-            {
-              title: "Program",
-              url: "/admin/program-administration/program",
-            },
-            {
-              title: "Locations",
-              url: "/admin/program-administration/locations",
-            },
-          ],
+        },
+        {
+          title: "Locations",
+          url: "/admin/locations",
+          icon: Calendars,
         },
         {
           title: "Admission Administration",
@@ -51,25 +51,46 @@ export const adminSidebarData = {
             },
           ],
         },
-        {
-          title: "Class Administration",
-          url: "/admin/class-administration",
-          icon: BookMarked,
-        },
+
         {
           title: "Planning",
           url: "/admin/planning",
           icon: Calendars,
         },
+      ],
+    },
+      {
+      title: "Academic Management",
+      items: [
+        {
+          title: "Teacher Management",
+          url: "/admin/teacher-management",
+          icon: GraduationCap,
+        },
+        {
+          title: "Student Management",
+          url: "/admin/student-management",
+          icon: Users,
+        }
+      ],
+    },
+    {
+      title: "Settings",
+      items: [
         {
           title: "Admin Management",
           url: "/admin/admin-management",
-          icon: Users,
+          icon: UserCheck,
         },
-         {
+        {
           title: "Role Management",
           url: "/admin/role-management",
           icon: Shield,
+        },
+        {
+          title: "Admin Logs",
+          url: "/admin/admin-logs",
+          icon: FileText,
         },
       ],
     },

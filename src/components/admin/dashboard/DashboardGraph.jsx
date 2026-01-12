@@ -10,7 +10,7 @@ import {
 
 const GraphHeader = ({ title }) => (
   <div className="flex items-center justify-between">
-    <h3 className="text-lg font-semibold">{title}</h3>
+    <h3 className="text-lg font-semibold text-sidebar-foreground">{title}</h3>
     {/* date picker can go here */}
   </div>
 );
@@ -28,14 +28,14 @@ const LineGraph = ({ data }) => {
             axisLine={false}
             tickLine={false}
             tickMargin={10}
-            tick={{ fill: "#64748b", fontSize: 12 }}
+            tick={{ fill: "hsl(var(--sidebar-foreground) / 0.7)", fontSize: 12 }}
           />
 
           <YAxis
             axisLine={false}
             tickLine={false}
             tickMargin={10}
-            tick={{ fill: "#94a3b8", fontSize: 12 }}
+            tick={{ fill: "hsl(var(--sidebar-foreground) / 0.5)", fontSize: 12 }}
           />
 
           <Tooltip />
@@ -63,7 +63,7 @@ const LineGraph = ({ data }) => {
 
 const DashboardGraph = ({ title, data }) => {
   return (
-    <div className="bg-white rounded-xl p-5 border border-[#E4E4E7] space-y-6">
+    <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-6">
       <GraphHeader title={title} />
       <LineGraph data={data} />
     </div>

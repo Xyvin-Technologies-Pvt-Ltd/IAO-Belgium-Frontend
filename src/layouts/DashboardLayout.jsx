@@ -1,22 +1,43 @@
-import { Outlet, useNavigate } from "@tanstack/react-router"
+import { Outlet, useNavigate, useLocation } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { useAuthStore } from "@/store/useAuthStore"
 import DashboardLayoutComponent from "./dashboard-layout"
 
-function useAuth() {
-  const token = "4ZbFyedjehdkjkhj"
-  return { isAuthenticated: !!token }
-}
-
 export default function DashboardLayout() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, role } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     if (!isAuthenticated) {
       console.log("[DashboardLayout] redirecting to login")
       navigate({ to: "/login" })
+      return
     }
-  }, [isAuthenticated, navigate])
+
+    // Role-based route protection
+    const currentPath = location.pathname
+    
+    // Check if user is trying to access teacher routes
+    if (currentPath.startsWith("/teacher")) {
+      // Only TEACHER can access teacher routes
+      if (role !== "TEACHER") {
+        console.log("[DashboardLayout] Unauthorized access to teacher routes")
+        navigate({ to: "/login" })
+        return
+      }
+    }
+    
+    // Check if user is trying to access admin routes
+    if (currentPath.startsWith("/admin")) {
+      // Only ADMIN can access admin routes
+      if (role !== "ADMIN") {
+        console.log("[DashboardLayout] Unauthorized access to admin routes")
+        navigate({ to: "/login" })
+        return
+      }
+    }
+  }, [isAuthenticated, role, navigate, location.pathname])
 
   if (!isAuthenticated) {
     return <div>Redirecting...</div>
