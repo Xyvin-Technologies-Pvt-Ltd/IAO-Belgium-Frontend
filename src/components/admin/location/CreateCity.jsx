@@ -14,8 +14,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useCityById, useCreateCity, useUpdateCity } from "@/store/useCityStore";
+import { useGetCountries } from "@/store/useCountryStore";
 
 const CreateCity = ({ open, onClose, cityId }) => {
+  const { data: countries } = useGetCountries();
 
   const {
     register,
@@ -26,9 +28,9 @@ const CreateCity = ({ open, onClose, cityId }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      city: "",
-      language: "",
-      status: true,
+      name: "",
+      countryId: "",
+      isActive: true,
     },
   });
 
@@ -49,17 +51,33 @@ const CreateCity = ({ open, onClose, cityId }) => {
   };
 
   useEffect(() => {
-    if (city?.data && isEdit) {
-      const cityData = city.data;
-      Object.keys(cityData).forEach((key) => {
-        setValue(key, cityData[key]);
+    if (open && !isEdit) {
+      reset({
+        name: "",
+        countryId: "",
+        isActive: true,
       });
     }
-  }, [city, isEdit, setValue]);
+  }, [open, isEdit, reset]);
+
+  useEffect(() => {
+    if (city?.data && isEdit && open) {
+      const cityData = city.data;
+      setValue('name', cityData.name || '');
+      setValue('countryId', cityData.countryId || '');
+      setValue('isActive', cityData.isActive ?? true);
+    }
+  }, [city, isEdit, setValue, open]);
 
   const onSubmit = (formData) => {
+    const payload = {
+      name: formData.name,
+      countryId: formData.countryId,
+      isActive: formData.isActive,
+    };
+
     const mutation = isEdit ? updateCity : createCity;
-    const mutationData = isEdit ? { id: cityId, data: formData } : formData;
+    const mutationData = isEdit ? { id: cityId, data: payload } : payload;
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
@@ -96,40 +114,42 @@ const CreateCity = ({ open, onClose, cityId }) => {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FormField
-              label="City"
+              label="City Name"
               placeholder="Enter city name"
-              error={errors.city?.message}
-              {...register("city")}
+              error={errors.name?.message}
+              required
+              {...register("name", { required: "City name is required" })}
             />
 
             <div className="space-y-2">
-              <Label>Language</Label>
+              <Label>Country</Label>
               <Select
-                onValueChange={(value) => setValue("language", value)}
-                value={watch("language")}
+                onValueChange={(value) => setValue("countryId", value)}
+                value={watch("countryId")}
               >
                 <SelectTrigger whiteBg>
-                  <SelectValue placeholder="Choose Language" />
+                  <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="fr">French</SelectItem>
-                  <SelectItem value="es">Spanish</SelectItem>
-                  <SelectItem value="de">German</SelectItem>
-                  <SelectItem value="it">Italian</SelectItem>
+                  {countries?.data?.map((country) => (
+                    <SelectItem key={country.id} value={country.id}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {errors.language && (
+              {errors.countryId && (
                 <p className="text-red-500 text-sm">
-                  {errors.language.message}
+                  {errors.countryId.message}
                 </p>
               )}
             </div>
 
+         
             <div className="flex items-center space-x-3">
               <Switch
-                checked={watch("status")}
-                onCheckedChange={(checked) => setValue("status", checked)}
+                checked={watch("isActive")}
+                onCheckedChange={(checked) => setValue("isActive", checked)}
               />
               <Label className="text-base font-medium">Active</Label>
             </div>

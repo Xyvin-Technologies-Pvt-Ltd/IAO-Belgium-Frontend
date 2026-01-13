@@ -34,7 +34,7 @@ const Cities = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetCities({
-    page_no: page,
+    offset: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
@@ -42,7 +42,7 @@ const Cities = () => {
     useDeleteCity();
 
   const cities = data?.data || [];
-  const totalRows = data?.total_count || 0;
+  const totalRows = data?.pagination?.total|| 0;
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -135,9 +135,7 @@ const Cities = () => {
               />
             </TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Level</TableHead>
+            <TableHead>Country</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
@@ -147,7 +145,7 @@ const Cities = () => {
             <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || "Failed to load cities"}
                   onRetry={refetch}
@@ -166,11 +164,9 @@ const Cities = () => {
                   />
                 </TableCell>
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.description}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
-                <TableCell>{i?.level}</TableCell>
+                <TableCell>{i?.country_name}</TableCell>
                 <TableCell>
-                  <StatusBadge status={i?.status} />
+                  <StatusBadge status={i?.is_active} />
                 </TableCell>
                 <TableCell>
                   <RowActionMenu

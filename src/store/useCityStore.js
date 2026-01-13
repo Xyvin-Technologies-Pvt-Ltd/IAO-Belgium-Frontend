@@ -33,7 +33,7 @@ export const useCreateCity = (options = {}) => {
       }
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to create city");
+      toast.error(error?.error?.message|| "Failed to create city");
       if (options.onError) {
         options.onError(error);
       }
@@ -54,7 +54,7 @@ export const useUpdateCity = (options = {}) => {
       }
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to update city");
+      toast.error(error?.error?.message || "Failed to update city");
       if (options.onError) {
         options.onError(error);
       }
