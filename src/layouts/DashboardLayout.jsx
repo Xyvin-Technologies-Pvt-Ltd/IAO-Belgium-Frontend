@@ -18,16 +18,6 @@ export default function DashboardLayout() {
     // Role-based route protection
     const currentPath = location.pathname
     
-    // Check if user is trying to access teacher routes
-    if (currentPath.startsWith("/teacher")) {
-      // Only TEACHER can access teacher routes
-      if (role !== "TEACHER") {
-        console.log("[DashboardLayout] Unauthorized access to teacher routes")
-        navigate({ to: "/login" })
-        return
-      }
-    }
-    
     // Check if user is trying to access admin routes
     if (currentPath.startsWith("/admin")) {
       // Only ADMIN can access admin routes

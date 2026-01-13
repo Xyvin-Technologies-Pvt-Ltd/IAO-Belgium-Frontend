@@ -7,7 +7,6 @@ import { LayoutGrid, List } from "lucide-react";
 
 const Schedules = () => {
   const [view, setView] = useState("list");
-
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold ">Schedules</h2>
