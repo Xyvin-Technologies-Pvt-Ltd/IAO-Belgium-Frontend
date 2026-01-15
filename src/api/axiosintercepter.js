@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../store/useAuthStore";
 
-const baseURL = import.meta.env.VITE_APP_AWS_API_URL;
+const baseURL = import.meta.env.VITE_APP_API_URL;
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 const axiosInstance = axios.create({
@@ -15,7 +15,7 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       config.headers["x-api-key"] = apiKey;
     }
-    config.headers["ngrok-skip-browser-warning"] = "true";
+    // config.headers["ngrok-skip-browser-warning"] = "true";
     return config;
   },
   (error) => {
@@ -35,11 +35,11 @@ axiosInstance.interceptors.response.use(
       try {
         // Attempt to refresh the token
         await useAuthStore.getState().refreshAccessToken();
-        
+
         // Retry the original request with the new token
         const newToken = useAuthStore.getState().token;
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         // If refresh fails, logout user and redirect to login

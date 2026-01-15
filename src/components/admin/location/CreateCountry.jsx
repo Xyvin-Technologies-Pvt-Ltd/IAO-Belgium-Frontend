@@ -72,9 +72,6 @@ const CreateCountry = ({ open, onClose, countryId }) => {
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
-        toast.success(
-          `Country ${isEdit ? "updated" : "created"} successfully!`
-        );
         handleClose();
       },
     });

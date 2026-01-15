@@ -11,13 +11,13 @@ import {
   FileText,
 } from "lucide-react";
 
-export const adminSidebarData = {
+export const getAdminSidebarData = (t) => ({
   navGroups: [
     {
-      title: "Main",
+      title: t("sidebar.admin.main"),
       items: [
         {
-          title: "Dashboard",
+          title: t("sidebar.admin.dashboard"),
           url: "/admin/dashboard",
           icon: LayoutDashboard,
         },
@@ -25,74 +25,74 @@ export const adminSidebarData = {
     },
 
     {
-      title: "Operations",
+      title: t("sidebar.admin.operations"),
       items: [
         {
-          title: "Program Administration",
+          title: t("sidebar.admin.programAdministration"),
           url: "/admin/program",
           icon: NotebookText,
         },
         {
-          title: "Locations",
+          title: t("sidebar.admin.locations"),
           url: "/admin/locations",
           icon: Calendars,
         },
         {
-          title: "Admission Administration",
+          title: t("sidebar.admin.admissionAdministration"),
           icon: BookUser,
           items: [
             {
-              title: "Application Review",
+              title: t("sidebar.admin.applicationReview"),
               url: "/admin/admission-administration/application-review",
             },
             {
-              title: "Intakes",
+              title: t("sidebar.admin.intakes"),
               url: "/admin/admission-administration/intakes",
             },
           ],
         },
 
         {
-          title: "Planning",
+          title: t("sidebar.admin.planning"),
           url: "/admin/planning",
           icon: Calendars,
         },
       ],
     },
       {
-      title: "Academic Management",
+      title: t("sidebar.admin.academicManagement"),
       items: [
         {
-          title: "Teacher Management",
+          title: t("sidebar.admin.teacherManagement"),
           url: "/admin/teacher-management",
           icon: GraduationCap,
         },
         {
-          title: "Student Management",
+          title: t("sidebar.admin.studentManagement"),
           url: "/admin/student-management",
           icon: Users,
         }
       ],
     },
     {
-      title: "Settings",
+      title: t("sidebar.admin.settings"),
       items: [
         {
-          title: "Admin Management",
+          title: t("sidebar.admin.adminManagement"),
           url: "/admin/admin-management",
           icon: UserCheck,
         },
         {
-          title: "Role Management",
+          title: t("sidebar.admin.roleManagement"),
           url: "/admin/role-management",
           icon: Shield,
         },
         {
-          title: "Admin Logs",
+          title: t("sidebar.admin.adminLogs"),
           url: "/admin/admin-logs",
           icon: FileText,
         },
       ],
     },
   ],
-};
+});

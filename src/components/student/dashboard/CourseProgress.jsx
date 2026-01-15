@@ -1,13 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import noCourse from "../../../assets/images/no-course.png";
 
 const CourseProgress = ({ progress = [] }) => {
-  const { t } = useLanguageStore();
 
   return (
     <div className="space-y-4">
-
       <div
         className={`bg-white/60 rounded-[6px] border border-[#EFEFEF] p-8 ${
           progress.length === 0 ? "min-h-100 flex flex-col" : ""
@@ -20,9 +17,7 @@ const CourseProgress = ({ progress = [] }) => {
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-2xl font-semibold">
-                        {item.title}
-                      </h3>
+                      <h3 className="text-2xl font-semibold">{item.title}</h3>
 
                       <span className="bg-[#EBEBEB] px-4 py-1.75 rounded-[13px] text-sm font-semibold whitespace-nowrap">
                         {item.totalModules} Modules
@@ -81,7 +76,7 @@ const CourseProgress = ({ progress = [] }) => {
                 className="border-[#0088FF] text-[#0088FF] hover:bg-[#0088FF] hover:text-white"
                 onClick={() => console.log("Explore modules clicked")}
               >
-                {t?.dashboard?.exploreModules || "Explore Modules"}
+                Explore Modules
               </Button>
             </div>
           </div>

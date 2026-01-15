@@ -10,146 +10,109 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteRole, useGetRoles } from "@/store/useRoleStore";
+import {
+  useDeleteRole,
+  useGetRoles,
+  useUpdateRole,
+} from "@/store/useRoleStore";
 import CreateRole from "@/components/admin/role-management/CreateRole";
+import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
 
 const RoleManagement = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roleId, setRoleId] = useState(null);
-  const [deleteIds, setDeleteIds] = useState([]);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetRoles({
+  const { data, isFetching, error, refetch } = useGetRoles({
     page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteRole, isLoading: isDeleting } = useDeleteRole();
+  const { mutateAsync: deleteRole, isPending: isDeleting } = useDeleteRole();
+  const { mutate: updateRole } = useUpdateRole();
 
   const roles = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(roles?.map((p) => p._id));
-    } else {
-      setSelected([]);
-    }
-  };
-
   const handleOpenCreate = () => {
-    setRoleId(null);
+    setSelectedRole(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (id) => {
-    setRoleId(id);
+  const handleOpenEdit = (role) => {
+    setSelectedRole(role);
     setIsModalOpen(true);
-  };
-
-  const handleBulkDeleteClick = () => {
-    if (selected.length === 0) {
-      toast.error("Please select at least one Role");
-      return;
-    }
-    setDeleteIds(selected);
-    setOpenDelete(true);
   };
 
   const handleRowDeleteClick = (id) => {
-    setDeleteIds([id]);
+    setDeleteId(id);
     setOpenDelete(true);
   };
 
   const handleConfirmDelete = async () => {
     try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteRole(id)));
-        toast.success("Selected roles deleted successfully");
-      } else {
-        await deleteRole(deleteIds[0]);
-        toast.success("Role deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
+      await deleteRole(deleteId);
     } finally {
-      setSelected([]);
-      setDeleteIds([]);
+      setDeleteId(null);
       setOpenDelete(false);
     }
+  };
+
+  const handleStatusToggle = (id, currentStatus) => {
+    updateRole({ id, data: { status: !currentStatus } });
   };
 
   return (
     <div className="space-y-6 mt-4">
       <h2 className="text-xl font-semibold text-dashboard-text">
-        Role Management
+        {t("roleManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 w-full">
-          <Input
-            placeholder="Search..."
-            className="max-w-xs"
-            value={search}
-            whiteBg
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {selected.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDeleteClick}>
-              <Trash2 size={16} className="mr-1" />
-              Delete
-            </Button>
-          )}
-        </div>
-        <Button onClick={handleOpenCreate}>Create Role</Button>
+        <Input
+          placeholder={t("roleManagement.search")}
+          className="max-w-xs"
+          value={search}
+          whiteBg
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button onClick={handleOpenCreate}>
+          {t("roleManagement.createRole")}
+        </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={selected.length === roles?.length && roles.length > 0}
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Level</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t("roleManagement.table.name")}</TableHead>
+            <TableHead>{t("roleManagement.table.description")}</TableHead>
+            <TableHead>{t("roleManagement.table.status")}</TableHead>
+            <TableHead>{t("roleManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+          {isFetching ? (
+            <TableSkeleton rows={rowsPerPage} columns={4} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={4} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load roles"}
+                  message={
+                    error?.message || t("roleManagement.messages.loadFailed")
+                  }
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -158,30 +121,24 @@ const RoleManagement = () => {
           ) : roles?.length > 0 ? (
             roles?.map((i) => (
               <TableRow key={i._id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(i._id)}
-                    onChange={() => handleCheckboxChange(i._id)}
-                  />
-                </TableCell>
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.description}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
-                <TableCell>{i?.level}</TableCell>
                 <TableCell>
-                  <StatusBadge status={i?.status} />
+                  <Switch
+                    checked={i?.status}
+                    onCheckedChange={() => handleStatusToggle(i._id, i?.status)}
+                  />
                 </TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("roleManagement.table.edit"),
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i._id),
+                        onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: "Delete",
+                        label: t("roleManagement.delete"),
                         icon: Trash2,
                         onClick: () => handleRowDeleteClick(i._id),
                       },
@@ -192,8 +149,8 @@ const RoleManagement = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                No Roles found
+              <TableCell colSpan={4} className="text-center">
+                {t("roleManagement.table.noRoles")}
               </TableCell>
             </TableRow>
           )}
@@ -205,21 +162,20 @@ const RoleManagement = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
-        selected={selected?.length}
       />
 
       <CreateRole
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        roleId={roleId}
+        roleData={selectedRole}
       />
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
-        count={deleteIds.length}
+        count={1}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Roles" : "Role"}
+        data={t("roleManagement.deleteConfirm.role")}
       />
     </div>
   );

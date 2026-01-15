@@ -6,42 +6,42 @@ import {
   BookOpenCheck,
 } from "lucide-react";
 
-export const teacherSidebarData = {
+export const getTeacherSidebarData = (t) => ({
   navGroups: [
     {
-      title: "Main",
+      title: t("sidebar.teacher.main"),
       items: [
         {
-          title: "Dashboard",
+          title: t("sidebar.teacher.dashboard"),
           url: "/teacher/dashboard",
           icon: LayoutDashboard,
         },
       ],
     },
     {
-      title: "Operations",
+      title: t("sidebar.teacher.operations"),
       items: [
         {
-          title: "Schedules",
+          title: t("sidebar.teacher.schedules"),
           url: "/teacher/schedules",
           icon: CalendarCheck,
         },
         {
-          title: "Planning",
+          title: t("sidebar.teacher.planning"),
           url: "/teacher/planning",
           icon: Calendars,
         },
         {
-          title: "Documents",
+          title: t("sidebar.teacher.documents"),
           url: "/teacher/documents",
           icon: FileMinus,
         },
         {
-          title: "Evaluations",
+          title: t("sidebar.teacher.evaluations"),
           url: "/teacher/evaluations",
           icon: BookOpenCheck,
         },
       ],
     },
   ],
-};
+});

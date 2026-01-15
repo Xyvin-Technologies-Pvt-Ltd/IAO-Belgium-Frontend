@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CircleAlert } from "lucide-react";
 import { toast } from "sonner";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import logo from "../../assets/images/logo.png";
 import bg from "../../assets/images/login-image.webp";
@@ -15,7 +14,6 @@ import microsoftIcon from "../../assets/icons/microsoft.svg";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { t } = useLanguageStore();
   const { login, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
 
@@ -29,10 +27,13 @@ const Login = () => {
     clearError();
 
     try {
-      const response = await login({ email, password: password || "Admin@123" });
-      const userRole = response?.data?.user?.role;      
+      const response = await login({
+        email,
+        password: password || "Admin@123",
+      });
+      const userRole = response?.data?.user?.role;
       toast.success("Login successful!");
-      
+
       // Navigate based on user role
       if (userRole === "ADMIN") {
         navigate({ to: "/admin/dashboard" });
@@ -41,7 +42,7 @@ const Login = () => {
       } else {
         // For students, check if there's a saved step in localStorage
         const savedStep = localStorage.getItem("currentStep");
-        
+
         if (savedStep) {
           navigate({ to: "/review" });
         } else {
@@ -111,7 +112,7 @@ const Login = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder={t.login?.emailPlaceholder || "Enter your email"}
+                  placeholder="Enter your email"
                   className="h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

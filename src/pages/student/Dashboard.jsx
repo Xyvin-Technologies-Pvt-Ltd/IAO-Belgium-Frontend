@@ -1,12 +1,9 @@
 import CourseProgress from "@/components/student/dashboard/CourseProgress";
 import CompletedModules from "@/components/student/dashboard/CompletedModules";
 import PageHeading from "@/components/PageHeading";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import ModuleCard from "@/components/student/ModuleCard";
 
 const Dashboard = () => {
-  const { t } = useLanguageStore();
-
   const upcomingModules = [
     {
       id: 1,
@@ -52,39 +49,29 @@ const Dashboard = () => {
 
       <div className="px-5 lg:px-15 mx-auto space-y-8 py-10">
         <div className="space-y-4">
-          <h2 className="text-xl">
-            {t?.dashboard?.upcomingModule || "Upcoming Module"}
-          </h2>
+          <h2 className="text-xl">Upcoming Module</h2>
           <ModuleCard modules={upcomingModules} />
         </div>
 
         {courseProgress.length > 0 ? (
           <>
             <div className="space-y-4">
-              <h2 className="text-xl">
-                {t?.dashboard?.courseProgress || "Your Course Progress"}
-              </h2>
+              <h2 className="text-xl">Your Course Progress</h2>
               <CourseProgress progress={courseProgress} />
             </div>
             <div className="space-y-4">
-              <h2 className="text-xl">
-                {t?.dashboard?.completedModules || "Completed Modules"}
-              </h2>
+              <h2 className="text-xl">Completed Modules</h2>
               <CompletedModules modules={completedModules} />
             </div>
           </>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <h2 className="text-xl">
-                {t?.dashboard?.courseProgress || "Your Course Progress"}
-              </h2>
+              <h2 className="text-xl">Your Course Progress</h2>
               <CourseProgress progress={courseProgress} />
             </div>
             <div className="space-y-4">
-              <h2 className="text-xl">
-                {t?.dashboard?.completedModules || "Completed Modules"}
-              </h2>
+              <h2 className="text-xl">Completed Modules</h2>
               <CompletedModules modules={completedModules} />
             </div>
           </div>

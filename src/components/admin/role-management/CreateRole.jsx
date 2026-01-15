@@ -1,13 +1,69 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
-import { LoadingState, ErrorMessage } from "@/components/common";
-import { useCreateRole, useRoleById, useUpdateRole } from "@/store/useRoleStore";
+import { useCreateRole, useUpdateRole } from "@/store/useRoleStore";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { LoadingState } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
+const CreateRole = ({ open, onClose, roleData }) => {
+  const { t } = useTranslation();
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
-const CreateRole = ({ open, onClose, roleId }) => {
+  const PERMISSION_MODULES = [
+    {
+      name: t("roleManagement.permissions.rolesManagement"),
+      permissions: [
+        { id: "roles_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "roles_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.adminManagement"),
+      permissions: [
+        { id: "admin_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "admin_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.operationsManagement"),
+      permissions: [
+        { id: "operations_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "operations_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.academicManagement"),
+      permissions: [
+        { id: "academic_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "academic_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.financeManagement"),
+      permissions: [
+        { id: "finance_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "finance_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.masterDataManagement"),
+      permissions: [
+        { id: "master_data_management_view", label: t("roleManagement.modal.viewLabel") },
+        { id: "master_data_management_modify", label: t("roleManagement.modal.modifyLabel") },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.logsManagement"),
+      permissions: [
+        { id: "logs_management_view", label: t("roleManagement.modal.viewLabel") },
+      ],
+    },
+  ];
+
   const {
     register,
     handleSubmit,
@@ -21,32 +77,55 @@ const CreateRole = ({ open, onClose, roleId }) => {
     },
   });
 
-  const isEdit = !!roleId;
-  const { data: role, isLoading, error, refetch } = useRoleById(roleId);
+  const isEdit = !!roleData;
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
 
   const handleClose = () => {
     reset();
+    setSelectedPermissions([]);
     onClose();
   };
 
   useEffect(() => {
-    if (role?.data && isEdit) {
-      const roleData = role.data;
-      Object.keys(roleData).forEach((key) => {
-        setValue(key, roleData[key]);
+    if (open && !isEdit) {
+      reset({
+        name: "",
+        description: "",
       });
+      setSelectedPermissions([]);
     }
-  }, [role, isEdit, setValue]);
+  }, [open, isEdit, reset]);
+
+  useEffect(() => {
+    if (roleData && isEdit && open) {
+      setIsLoadingData(true);
+      setValue("name", roleData.name || "");
+      setValue("description", roleData.description || "");
+      setSelectedPermissions(roleData.permissions || []);
+      setIsLoadingData(false);
+    }
+  }, [roleData, isEdit, setValue, open]);
+
+  const togglePermission = (permissionId) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(permissionId)
+        ? prev.filter((id) => id !== permissionId)
+        : [...prev, permissionId]
+    );
+  };
 
   const onSubmit = (formData) => {
+    const payload = {
+      ...formData,
+      permissions: selectedPermissions,
+    };
+
     const mutation = isEdit ? updateRole : createRole;
-    const mutationData = isEdit ? { id: roleId, data: formData } : formData;
+    const mutationData = isEdit ? { id: roleData._id, data: payload } : payload;
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
-        toast.success(`Role ${isEdit ? "updated" : "created"} successfully!`);
         handleClose();
       },
     });
@@ -54,47 +133,91 @@ const CreateRole = ({ open, onClose, roleId }) => {
 
   if (!open) return null;
 
-  const isSubmitting = createRole.isLoading || updateRole.isLoading;
+  const isSubmitting = createRole.isPending || updateRole.isPending;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white rounded-xl shadow-lg w-100 p-6">
-        <h2 className="text-xl font-bold">
-          {isEdit ? "Edit Role" : "Create a new Role"}
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-150 max-h-[90vh] overflow-y-auto p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          {isEdit ? t("roleManagement.modal.editTitle") : t("roleManagement.modal.createTitle")}
         </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          {isEdit ? "Update the role details" : "Let's create a new role"}
+        <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
+          {isEdit ? t("roleManagement.modal.editSubtitle") : t("roleManagement.modal.createSubtitle")}
         </p>
 
-        {isEdit && isLoading ? (
-          <LoadingState text="Loading role details..." />
-        ) : isEdit && error ? (
-          <ErrorMessage
-            message={error?.message || "Failed to load role details"}
-            onRetry={refetch}
-            variant="card"
-          />
+        {isLoadingData ? (
+          <LoadingState text={t("roleManagement.modal.loadingDetails")} />
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <FormField
-              label="Name"
-              placeholder="Enter Role Name"
+              label={t("roleManagement.modal.nameLabel")}
+              placeholder={t("roleManagement.modal.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: "Role name is required" })}
+              {...register("name", { required: t("roleManagement.modal.nameRequired") })}
             />
 
             <FormField
-              label="Description"
-              placeholder="Enter Description"
+              label={t("roleManagement.modal.descriptionLabel")}
+              placeholder={t("roleManagement.modal.descriptionPlaceholder")}
               error={errors.description?.message}
               required
               {...register("description", {
-                required: "Description is required",
+                required: t("roleManagement.modal.descriptionRequired"),
               })}
             />
 
-          
+            <div className="space-y-3">
+              <Label className="text-base font-medium text-gray-900 dark:text-white">
+                {t("roleManagement.modal.permissionsLabel")}
+              </Label>
+              <div className="border dark:border-white/20 rounded-lg overflow-hidden bg-white dark:bg-black">
+                <div className="grid grid-cols-[2fr_100px_100px] gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-white/20">
+                  <div></div>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                    {t("roleManagement.modal.viewLabel")}
+                  </div>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                    {t("roleManagement.modal.modifyLabel")}
+                  </div>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {PERMISSION_MODULES.map((module, index) => (
+                    <div
+                      key={module.name}
+                      className={`grid grid-cols-[2fr_100px_100px] gap-4 p-4 items-center ${
+                        index !== PERMISSION_MODULES.length - 1
+                          ? "border-b dark:border-white/10"
+                          : ""
+                      }`}
+                    >
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {module.name}
+                      </div>
+                      <div className="flex justify-center">
+                        {module.permissions[0] && (
+                          <Checkbox
+                            id={module.permissions[0].id}
+                            checked={selectedPermissions.includes(module.permissions[0].id)}
+                            onCheckedChange={() => togglePermission(module.permissions[0].id)}
+                          />
+                        )}
+                      </div>
+                      <div className="flex justify-center">
+                        {module.permissions[1] && (
+                          <Checkbox
+                            id={module.permissions[1].id}
+                            checked={selectedPermissions.includes(module.permissions[1].id)}
+                            onCheckedChange={() => togglePermission(module.permissions[1].id)}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <FormActions
               onCancel={handleClose}
               isLoading={isSubmitting}

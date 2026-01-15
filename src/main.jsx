@@ -7,6 +7,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { router } from "./router/Router.jsx";
 import { Toaster } from "sonner";
 import { useThemeStore } from "./store/useThemeStore";
+import "./i18n/config";
 
 // Initialize theme on app start
 useThemeStore.getState().initializeTheme();

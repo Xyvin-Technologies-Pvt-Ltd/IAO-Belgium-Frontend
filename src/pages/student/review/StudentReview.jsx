@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import { Check, Clock, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import PageHeading from "@/components/PageHeading";
 
 const StudentReview = ({ userName = "Maria" }) => {
-  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -86,14 +84,13 @@ const StudentReview = ({ userName = "Maria" }) => {
             </p>
             <h2 className="text-3xl font-semibold">{applicationData.status}</h2>
             <p className="text-muted-foreground text-lg">
-              {t?.dashboard?.statusSubtitle ||
-                "Your application is currently incomplete"}
+              Your application is currently incomplete
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 border-t border-b border-[#EDEDED]">
             <div>
               <p className="text-sm font-semibold text-muted-foreground">
-                {t?.dashboard?.applicationId || "Application ID"}
+                Application ID
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <p className="font-semibold text-base">{applicationData.id}</p>
@@ -102,7 +99,7 @@ const StudentReview = ({ userName = "Maria" }) => {
 
             <div>
               <p className="text-sm font-semibold text-muted-foreground">
-                {t?.dashboard?.lastUpdated || "Last updated on"}
+                Last updated on
               </p>
               <p className="font-semibold text-base mt-1">
                 {applicationData.lastUpdated}
@@ -111,7 +108,7 @@ const StudentReview = ({ userName = "Maria" }) => {
           </div>
           <div className="space-y-4">
             <h3 className="font-semibold text-base">
-              {t?.dashboard?.progressTitle || "Your Application Progress:"}
+           Your Application Progress:
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -163,7 +160,7 @@ const StudentReview = ({ userName = "Maria" }) => {
           </div>
           <div className="flex justify-center pt-4">
             <Button onClick={handleContinueApplication}>
-              {t?.dashboard?.continueApplication || "Continue Application"}
+             Continue Application
             </Button>
           </div>
         </div>

@@ -2,17 +2,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useLanguageStore } from "@/store/useLanguageStore";
 import { FileText, AlertCircle, Info, CloudUpload } from "lucide-react";
 
 const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
-  const { t } = useLanguageStore();
   const [uploadedFiles, setUploadedFiles] = useState({
     idCard: applicationData.files?.idCard || null,
     qualification: applicationData.files?.qualification || null,
   });
-  const [isCompletingQualification, setIsCompletingQualification] =
-    useState(applicationData.isCompletingQualification || false);
+  const [isCompletingQualification, setIsCompletingQualification] = useState(
+    applicationData.isCompletingQualification || false
+  );
 
   const {
     handleSubmit,
@@ -22,7 +21,8 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
     defaultValues: {
       idCard: applicationData.files?.idCard || null,
       qualification: applicationData.files?.qualification || null,
-      completingQualification: applicationData.isCompletingQualification || false,
+      completingQualification:
+        applicationData.isCompletingQualification || false,
     },
   });
 
@@ -52,10 +52,10 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
   };
 
   const onSubmit = (data) => {
-    const stepData = { 
-      ...data, 
-      files: uploadedFiles, 
-      isCompletingQualification 
+    const stepData = {
+      ...data,
+      files: uploadedFiles,
+      isCompletingQualification,
     };
     console.log("STEP 2 DATA 👉", stepData);
     onNext?.(stepData);
@@ -107,7 +107,7 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
                   setUploadedFiles((prev) => ({ ...prev, [fileType]: null }))
                 }
               >
-                {t?.stepTwo?.fileUpload?.removeFile || "Remove File"}
+                Remove File
               </Button>
             </div>
           ) : (
@@ -115,12 +115,10 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
               <CloudUpload className="h-12 w-12 text-primary mx-auto" />
               <div>
                 <p className="text-sm font-medium">
-                  {t?.stepTwo?.fileUpload?.dragDrop ||
-                    "Choose a file or drag & drop it here"}
+                  Choose a file or drag & drop it here
                 </p>
                 <p className="text-xs font-medium text-muted-foreground">
-                  {t?.stepTwo?.fileUpload?.fileSize ||
-                    "JPEG, PNG and PDF up to 50MB"}
+                  JPEG, PNG and PDF up to 50MB
                 </p>
               </div>
               <div>
@@ -139,8 +137,8 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
                   }
                 >
                   {fileType === "qualification"
-                    ? t?.stepTwo?.fileUpload?.browseFiles || "Browse Files"
-                    : t?.stepTwo?.fileUpload?.browseFile || "Browse File"}
+                    ? "Browse Files"
+                    : "Browse File"}
                 </Button>
               </div>
             </div>
@@ -157,28 +155,25 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
     >
       <div>
         <span className="text-sm text-[#066541] bg-[#49BA6C]/20 px-3 py-1 rounded-full">
-          {t?.stepTwo?.stepIndicator || "Step 2 of 3"}
+          Step 2 of 3
         </span>
         <p className="text-base text-muted-foreground mt-2">
-          {t?.stepTwo?.subtitle || "Upload your documents and credentials"}
+          Upload your documents and credentials
         </p>
       </div>
       <div className="flex items-center text-xs text-[#A75800] gap-2 p-2 bg-[#FF8904]/10 rounded-[6px]">
         <AlertCircle className="h-3 w-3" />
         <span>
-          {t?.stepTwo?.documentRequirements?.description ||
-            "Please ensure all documents are clear, legible, and in English or accompanied by certified translations."}
+          Please ensure all documents are clear, legible, and in English or
+          accompanied by certified translations.
         </span>
       </div>
 
       <div className="space-y-8">
         <FileUploadArea
           fileType="idCard"
-          title={t?.stepTwo?.uploadIdCard?.title || "Upload ID Card"}
-          acceptedFormats={
-            t?.stepTwo?.uploadIdCard?.acceptedFormats ||
-            "Official ID, Passport, Identity Card ID Card"
-          }
+          title="Upload ID Card"
+          acceptedFormats="Official ID, Passport, Identity Card ID Card"
         />
         <div className="flex items-start gap-3">
           <input
@@ -188,18 +183,18 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
             checked={isCompletingQualification}
             onChange={(e) => setIsCompletingQualification(e.target.checked)}
           />
-          <label htmlFor="completing-qualification" className="text-sm font-semibold">
-            {t?.stepTwo?.uploadQualification?.checkboxLabel ||
-              "I'm still completing my qualification. I will submit my diploma later."}
+          <label
+            htmlFor="completing-qualification"
+            className="text-sm font-semibold"
+          >
+            I'm still completing my qualification. I will submit my diploma
+            later.
           </label>
         </div>
         {!isCompletingQualification && (
           <FileUploadArea
             fileType="qualification"
-            title={
-              t?.stepTwo?.uploadQualification?.title ||
-              "Upload Your Qualification Certificate"
-            }
+            title="Upload Your Qualification Certificate"
           />
         )}
       </div>
@@ -217,12 +212,10 @@ const StepTwo = ({ onNext, onSaveAndLogout, applicationData = {} }) => {
               onSaveAndLogout?.();
             }}
           >
-            {t?.stepTwo?.buttons?.saveLogout || "Save & Logout"}
+            Save & Logout
           </Button>
 
-          <Button type="submit">
-            {t?.stepTwo?.buttons?.nextStep || "Next Step"}
-          </Button>
+          <Button type="submit">Next Step</Button>
         </div>
       </div>
     </form>

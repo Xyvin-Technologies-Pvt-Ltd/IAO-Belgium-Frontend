@@ -1,30 +1,19 @@
 import { User, FileText, CreditCard, Check } from "lucide-react";
-import { useLanguageStore } from "@/store/useLanguageStore";
 
 const ApplicationHeader = ({ currentStep = 1 }) => {
-  const { t } = useLanguageStore();
-
-  const fallbackSteps = [
+  const steps = [
     { id: 1, label: "Basic Informations", icon: User },
     { id: 2, label: "Documents", icon: FileText },
     { id: 3, label: "Payment", icon: CreditCard },
   ];
 
-  const steps = t?.application?.steps
-    ? [
-        { id: 1, label: t.application.steps.basicInfo, icon: User },
-        { id: 2, label: t.application.steps.documents, icon: FileText },
-        { id: 3, label: t.application.steps.payment, icon: CreditCard },
-      ]
-    : fallbackSteps;
-
   return (
     <div className="mb-8">
       <h1 className="text-4xl font-semibold">
-        {t?.application?.title || "Msc Osteopathy- Application form"}
+        Msc Osteopathy- Application form
       </h1>
       <p className="text-lg text-muted-foreground mt-1">
-        {t?.application?.subtitle || "Let’s complete your application"}
+        Let’s complete your application
       </p>
 
       <div className="flex items-center mt-6">

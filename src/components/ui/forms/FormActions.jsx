@@ -12,7 +12,7 @@ const FormActions = ({
 }) => {
   return (
     <div className={className}>
-      <Button type="button" variant="outline" onClick={onCancel}>
+      <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
         {cancelText}
       </Button>
       <Button type="submit" disabled={isLoading}>

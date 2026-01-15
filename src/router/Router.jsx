@@ -3,10 +3,11 @@ import {
   createRootRoute,
   createRoute,
   Navigate,
+  ErrorComponent,
 } from "@tanstack/react-router";
 import RootLayout from "../layouts/RootLayout";
 import ProtectedLayout from "../layouts/ProtectedLayout";
-import DashboardLayout from "../layouts/DashboardLayout";
+import AdminTeacherLayout from "../layouts/AdminTeacherLayout";
 import Login from "../pages/student/Login";
 import ApplicationForm from "../pages/student/application/ApplicationForm";
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
@@ -27,9 +28,11 @@ import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
 import RoleManagement from "@/pages/admin/role-management";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
+  errorComponent: ErrorComponent,
 });
 
 // Public routes
@@ -52,11 +55,11 @@ const protectedRoute = createRoute({
   component: ProtectedLayout,
 });
 
-// Dashboard layout for teachers and admins
-const dashboardRoute = createRoute({
+// Admin/Teacher layout with sidebar
+const adminTeacherRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: "dashboard",
-  component: DashboardLayout,
+  id: "adminTeacher",
+  component: AdminTeacherLayout,
 });
 
 // Student routes (use ProtectedLayout)
@@ -76,7 +79,7 @@ const studentRoutes = [
   { path: "/student/change-location/$id", component: ChangeLocation },
 ];
 
-// Teacher routes (use DashboardLayout)
+// Teacher routes (use AdminTeacherLayout)
 const teacherRoutes = [
   {
     path: "/teacher",
@@ -86,7 +89,7 @@ const teacherRoutes = [
   { path: "/teacher/schedules", component: Schedules },
 ];
 
-// Admin routes (use DashboardLayout)
+// Admin routes (use AdminTeacherLayout)
 const adminRoutes = [
   {
     path: "/admin",
@@ -115,7 +118,7 @@ const studentRouteChildren = studentRoutes.map(({ path, component }) =>
 
 const teacherRouteChildren = teacherRoutes.map(({ path, component }) =>
   createRoute({
-    getParentRoute: () => dashboardRoute,
+    getParentRoute: () => adminTeacherRoute,
     path,
     component,
   })
@@ -123,7 +126,7 @@ const teacherRouteChildren = teacherRoutes.map(({ path, component }) =>
 
 const adminRouteChildren = adminRoutes.map(({ path, component }) =>
   createRoute({
-    getParentRoute: () => dashboardRoute,
+    getParentRoute: () => adminTeacherRoute,
     path,
     component,
   })
@@ -134,11 +137,19 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   protectedRoute.addChildren(studentRouteChildren),
-  dashboardRoute.addChildren([...teacherRouteChildren, ...adminRouteChildren]),
+  adminTeacherRoute.addChildren([...teacherRouteChildren, ...adminRouteChildren]),
 ]);
 
 // Create the router
 export const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFound,
+  defaultErrorComponent: ({ error }) => (
+    <ErrorBoundary>
+      <ErrorComponent error={error} />
+    </ErrorBoundary>
+  ),
+  context: {
+    errorBoundary: ErrorBoundary,
+  },
 });

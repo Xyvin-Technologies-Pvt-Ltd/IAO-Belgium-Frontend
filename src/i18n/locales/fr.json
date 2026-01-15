@@ -1,0 +1,111 @@
+{
+  "header": {
+    "location": "Emplacement",
+    "locationValue": "Pays-Bas",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "myCourses": "Mes cours",
+      "myApp": "Mon APP",
+      "invoices": "Factures",
+      "assessment": "Évaluation"
+    },
+    "dropdown": {
+      "profile": "Profil",
+      "settings": "Paramètres",
+      "language": "Langue",
+      "signOut": "Se déconnecter"
+    }
+  },
+  "sidebar": {
+    "teacher": {
+      "title": "Tableau de bord enseignant",
+      "main": "Principal",
+      "operations": "Opérations",
+      "dashboard": "Tableau de bord",
+      "schedules": "Horaires",
+      "planning": "Planification",
+      "documents": "Documents",
+      "evaluations": "Évaluations"
+    },
+    "admin": {
+      "title": "Tableau de bord administrateur",
+      "main": "Principal",
+      "operations": "Opérations",
+      "academicManagement": "Gestion académique",
+      "settings": "Paramètres",
+      "dashboard": "Tableau de bord",
+      "programAdministration": "Administration des programmes",
+      "locations": "Emplacements",
+      "admissionAdministration": "Administration des admissions",
+      "applicationReview": "Examen des candidatures",
+      "intakes": "Inscriptions",
+      "planning": "Planification",
+      "teacherManagement": "Gestion des enseignants",
+      "studentManagement": "Gestion des étudiants",
+      "adminManagement": "Gestion des administrateurs",
+      "roleManagement": "Gestion des rôles",
+      "adminLogs": "Journaux d'administration"
+    },
+    "user": {
+      "loading": "Chargement...",
+      "noEmail": "Aucun email",
+      "signOut": "Se déconnecter"
+    },
+    "logo": "Bureau IAO"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français"
+  },
+  "roleManagement": {
+    "title": "Gestion des rôles",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createRole": "Créer un rôle",
+    "table": {
+      "name": "Nom",
+      "description": "Description",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noRoles": "Aucun rôle trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des rôles"
+    },
+    "modal": {
+      "createTitle": "Créer un nouveau rôle",
+      "editTitle": "Modifier le rôle",
+      "createSubtitle": "Créons un nouveau rôle",
+      "editSubtitle": "Mettre à jour les détails du rôle",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Entrez le nom du rôle",
+      "nameRequired": "Le nom du rôle est requis",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez la description",
+      "descriptionRequired": "La description est requise",
+      "permissionsLabel": "Permissions",
+      "viewLabel": "Voir",
+      "modifyLabel": "Modifier",
+      "loadingDetails": "Chargement des détails du rôle..."
+    },
+    "permissions": {
+      "rolesManagement": "Gestion des rôles",
+      "adminManagement": "Gestion des administrateurs",
+      "operationsManagement": "Gestion des opérations",
+      "academicManagement": "Gestion académique",
+      "financeManagement": "Gestion financière",
+      "masterDataManagement": "Gestion des données de base",
+      "logsManagement": "Gestion des journaux"
+    },
+    "deleteConfirm": {
+      "title": "Confirmation de suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer",
+      "role": "Rôle",
+      "cannotUndo": "Cette action ne peut pas être annulée.",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "deleting": "Suppression..."
+    }
+  }
+}

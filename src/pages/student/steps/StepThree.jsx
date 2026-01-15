@@ -10,16 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLanguageStore } from "@/store/useLanguageStore";
-import { Edit, AlertCircle } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-const StepThree = ({
-  onSubmit,
-  onSaveAndLogout,
-  applicationData = {},
-}) => {
-  const { t } = useLanguageStore();
+const StepThree = ({ onSubmit, onSaveAndLogout, applicationData = {} }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(
     applicationData.country || "Netherlands"
@@ -74,10 +67,10 @@ const StepThree = ({
       {/* Header */}
       <div>
         <span className="text-sm text-[#066541] bg-[#49BA6C]/20 px-3 py-1 rounded-full">
-          {t?.stepThree?.stepIndicator || "Step 3 of 3"}
+          Step 3 of 3
         </span>
         <p className="text-base text-muted-foreground mt-2">
-          {t?.stepThree?.subtitle || "Review and complete your payment process"}
+          Review and complete your payment process
         </p>
       </div>
 
@@ -88,11 +81,10 @@ const StepThree = ({
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-base font-semibold text-black">
-                  {t?.stepThree?.applicationReview?.title || "Your Application"}
+                  Your Application
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {t?.stepThree?.applicationReview?.subtitle ||
-                    "Review your application"}
+                  Review your application
                 </p>
               </div>
 
@@ -117,9 +109,7 @@ const StepThree = ({
         </div>
 
         <div className="space-y-6">
-          <Label>
-            {t?.stepThree?.paymentDetails?.title || "Payment Details"}y
-          </Label>
+          <Label>Payment Details</Label>
 
           <div className="bg-[#FF8700]/10 rounded-2xl p-4">
             <div className="flex items-center justify-between">

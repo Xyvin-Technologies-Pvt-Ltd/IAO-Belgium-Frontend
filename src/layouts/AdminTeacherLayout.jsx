@@ -1,16 +1,16 @@
 import { Outlet, useNavigate, useLocation } from "@tanstack/react-router"
 import { useEffect } from "react"
 import { useAuthStore } from "@/store/useAuthStore"
-import DashboardLayoutComponent from "./dashboard-layout"
+import AdminTeacherLayoutComponent from "./admin-teacher-layout"
 
-export default function DashboardLayout() {
+export default function AdminTeacherLayout() {
   const { isAuthenticated, role } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
     if (!isAuthenticated) {
-      console.log("[DashboardLayout] redirecting to login")
+      console.log("[AdminTeacherLayout] redirecting to login")
       navigate({ to: "/login" })
       return
     }
@@ -22,7 +22,7 @@ export default function DashboardLayout() {
     if (currentPath.startsWith("/admin")) {
       // Only ADMIN can access admin routes
       if (role !== "ADMIN") {
-        console.log("[DashboardLayout] Unauthorized access to admin routes")
+        console.log("[AdminTeacherLayout] Unauthorized access to admin routes")
         navigate({ to: "/login" })
         return
       }
@@ -33,5 +33,5 @@ export default function DashboardLayout() {
     return <div>Redirecting...</div>
   }
 
-  return <DashboardLayoutComponent />
+  return <AdminTeacherLayoutComponent />
 }

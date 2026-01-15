@@ -18,8 +18,9 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteLocation, useGetLocations } from "@/store/useLocation";
 import CreateAdmin from "@/components/admin/admin-management/CreateAdmin";
+import { useGetAdmins, useDeleteAdmin, useUpdateAdminStatus, useBulkDeleteAdmins } from "@/store/useAdminStore";
+import { Switch } from "@/components/ui/switch";
 
 const AdminManagement = () => {
   const [page, setPage] = useState(1);
@@ -28,18 +29,19 @@ const AdminManagement = () => {
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [adminId, setAdminId] = useState(null);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [deleteIds, setDeleteIds] = useState([]);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetLocations({
+  const { data, isFetching, error, refetch } = useGetAdmins({
     page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteAdmin, isLoading: isDeleting } =
-    useDeleteLocation();
+  const { mutateAsync: deleteAdmin, isPending: isDeleting } = useDeleteAdmin();
+  const { mutateAsync: bulkDeleteAdmins, isPending: isBulkDeleting } = useBulkDeleteAdmins();
+  const { mutate: updateAdminStatus } = useUpdateAdminStatus();
 
   const admins = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -59,12 +61,12 @@ const AdminManagement = () => {
   };
 
   const handleOpenCreate = () => {
-    setAdminId(null);
+    setSelectedAdmin(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (id) => {
-    setAdminId(id);
+  const handleOpenEdit = (admin) => {
+    setSelectedAdmin(admin);
     setIsModalOpen(true);
   };
 
@@ -83,21 +85,19 @@ const AdminManagement = () => {
   };
 
   const handleConfirmDelete = async () => {
-    try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteAdmin(id)));
-        toast.success("Selected admins deleted successfully");
-      } else {
-        await deleteAdmin(deleteIds[0]);
-        toast.success("Admin deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
-    } finally {
-      setSelected([]);
-      setDeleteIds([]);
-      setOpenDelete(false);
+    if (deleteIds.length > 1) {
+      await bulkDeleteAdmins(deleteIds);
+    } else {
+      await deleteAdmin(deleteIds[0]);
     }
+    setSelected([]);
+    setDeleteIds([]);
+    setOpenDelete(false);
+  };
+
+  const handleStatusToggle = (id, currentStatus) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    updateAdminStatus({ id, status: newStatus });
   };
 
   return (
@@ -135,20 +135,21 @@ const AdminManagement = () => {
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
             </TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Level</TableHead>
+            <TableHead>First Name</TableHead>
+            <TableHead>Last Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Role Name</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+          {isFetching ? (
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || "Failed to load admins"}
                   onRetry={refetch}
@@ -166,12 +167,16 @@ const AdminManagement = () => {
                     onChange={() => handleCheckboxChange(i._id)}
                   />
                 </TableCell>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.description}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
-                <TableCell>{i?.level}</TableCell>
+                <TableCell>{i?.first_name}</TableCell>
+                <TableCell>{i?.last_name}</TableCell>
+                <TableCell>{i?.email}</TableCell>
+                <TableCell>{i?.phone}</TableCell>
+                <TableCell>{i?.role_name}</TableCell>
                 <TableCell>
-                  <StatusBadge status={i?.status} />
+                  <Switch
+                    checked={i?.status === "active"}
+                    onCheckedChange={() => handleStatusToggle(i._id, i?.status)}
+                  />
                 </TableCell>
                 <TableCell>
                   <RowActionMenu
@@ -179,7 +184,7 @@ const AdminManagement = () => {
                       {
                         label: "Edit",
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i._id),
+                        onClick: () => handleOpenEdit(i),
                       },
                       {
                         label: "Delete",
@@ -193,7 +198,7 @@ const AdminManagement = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 No Admins found
               </TableCell>
             </TableRow>
@@ -212,14 +217,14 @@ const AdminManagement = () => {
       <CreateAdmin
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        adminId={adminId}
+        adminData={selectedAdmin}
       />
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
         count={deleteIds.length}
-        isLoading={isDeleting}
+        isLoading={isDeleting || isBulkDeleting}
         data={deleteIds.length > 1 ? "Admins" : "Admin"}
       />
     </div>

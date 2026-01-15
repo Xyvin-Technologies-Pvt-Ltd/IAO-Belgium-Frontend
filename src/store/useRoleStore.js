@@ -1,5 +1,4 @@
-
-import { createRole, deleteRole, getRoleById, getRoles, updateRole } from "@/api/roleApi";
+import { createRole, deleteRole, getRoles, updateRole } from "@/api/roleApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -12,52 +11,33 @@ export const useGetRoles = (filter) => {
   });
 };
 
-export const useRoleById = (id) => {
-  return useQuery({
-    queryKey: ["role", id],
-    queryFn: () => getRoleById(id),
-    enabled: !!id,
-    staleTime: 60000,
-  });
-};
-
-export const useCreateRole = (options = {}) => {
+export const useCreateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createRole,
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      if (options.onSuccess) {
-        options.onSuccess(data);
-      }
+      toast.success(response?.message || "Role created successfully!");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to create role");
-      if (options.onError) {
-        options.onError(error);
-      }
     },
   });
 };
 
-export const useUpdateRole = (options = {}) => {
+export const useUpdateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => updateRole(id, data),
-    onSuccess: (responseData, variables) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       queryClient.invalidateQueries({ queryKey: ["role", variables.id] });
-      if (options.onSuccess) {
-        options.onSuccess(responseData);
-      }
+      toast.success(response?.message || "Role updated successfully!");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update role");
-      if (options.onError) {
-        options.onError(error);
-      }
     },
   });
 };
@@ -67,8 +47,12 @@ export const useDeleteRole = () => {
 
   return useMutation({
     mutationFn: deleteRole,
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
+      toast.success(response?.message || "Role deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete role");
     },
   });
 };

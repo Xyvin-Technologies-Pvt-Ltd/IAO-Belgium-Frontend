@@ -26,10 +26,12 @@ import {
 import { useEffect, useState } from "react";
 import { getProfile } from "@/api/authApi";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useTranslation } from "react-i18next";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { logout, isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -91,10 +93,10 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {isLoading ? "Loading..." : (user?.name || "User")}
+                    {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
                   </span>
                   <span className="truncate text-xs">
-                    {isLoading ? "..." : (user?.email || "No email")}
+                    {isLoading ? "..." : (user?.email || t("sidebar.user.noEmail"))}
                   </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
@@ -116,10 +118,10 @@ export function NavUser() {
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {isLoading ? "Loading..." : (user?.name || "User")}
+                      {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
                     </span>
                     <span className="truncate text-xs">
-                      {isLoading ? "..." : (user?.email || "No email")}
+                      {isLoading ? "..." : (user?.email || t("sidebar.user.noEmail"))}
                     </span>
                   </div>
                 </div>
@@ -155,7 +157,7 @@ export function NavUser() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
                 <LogOut />
-                Sign out
+                {t("sidebar.user.signOut")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

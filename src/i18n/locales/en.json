@@ -1,0 +1,111 @@
+{
+  "header": {
+    "location": "Location",
+    "locationValue": "Netherlands",
+    "nav": {
+      "dashboard": "Dashboard",
+      "myCourses": "My Courses",
+      "myApp": "My APP",
+      "invoices": "Invoices",
+      "assessment": "Assessment"
+    },
+    "dropdown": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "language": "Language",
+      "signOut": "Sign out"
+    }
+  },
+  "sidebar": {
+    "teacher": {
+      "title": "Teacher Dashboard",
+      "main": "Main",
+      "operations": "Operations",
+      "dashboard": "Dashboard",
+      "schedules": "Schedules",
+      "planning": "Planning",
+      "documents": "Documents",
+      "evaluations": "Evaluations"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "main": "Main",
+      "operations": "Operations",
+      "academicManagement": "Academic Management",
+      "settings": "Settings",
+      "dashboard": "Dashboard",
+      "programAdministration": "Program Administration",
+      "locations": "Locations",
+      "admissionAdministration": "Admission Administration",
+      "applicationReview": "Application Review",
+      "intakes": "Intakes",
+      "planning": "Planning",
+      "teacherManagement": "Teacher Management",
+      "studentManagement": "Student Management",
+      "adminManagement": "Admin Management",
+      "roleManagement": "Role Management",
+      "adminLogs": "Admin Logs"
+    },
+    "user": {
+      "loading": "Loading...",
+      "noEmail": "No email",
+      "signOut": "Sign out"
+    },
+    "logo": "IAO Back office"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français"
+  },
+  "roleManagement": {
+    "title": "Role Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "createRole": "Create Role",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noRoles": "No Roles found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load roles"
+    },
+    "modal": {
+      "createTitle": "Create a new Role",
+      "editTitle": "Edit Role",
+      "createSubtitle": "Let's create a new role",
+      "editSubtitle": "Update the role details",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter Role Name",
+      "nameRequired": "Role name is required",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter Description",
+      "descriptionRequired": "Description is required",
+      "permissionsLabel": "Permissions",
+      "viewLabel": "View",
+      "modifyLabel": "Modify",
+      "loadingDetails": "Loading role details..."
+    },
+    "permissions": {
+      "rolesManagement": "Roles Management",
+      "adminManagement": "Admin Management",
+      "operationsManagement": "Operations Management",
+      "academicManagement": "Academic Management",
+      "financeManagement": "Finance Management",
+      "masterDataManagement": "Master Data Management",
+      "logsManagement": "Logs Management"
+    },
+    "deleteConfirm": {
+      "title": "Delete Confirmation",
+      "message": "Are you sure you want to delete",
+      "role": "Role",
+      "cannotUndo": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    }
+  }
+}

@@ -21,44 +21,33 @@ export const useCountryById = (id) => {
   });
 };
 
-export const useCreateCountry = (options = {}) => {
+export const useCreateCountry = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createCountry,
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["countries"] });
-      if (options.onSuccess) {
-        options.onSuccess(data);
-      }
+      toast.success(response?.message || "Country created successfully!");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to create country");
-      if (options.onError) {
-        options.onError(error);
-      }
     },
   });
 };
 
-export const useUpdateCountry = (options = {}) => {
+export const useUpdateCountry = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => updateCountry(id, data),
-    onSuccess: (responseData, variables) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["countries"] });
       queryClient.invalidateQueries({ queryKey: ["country", variables.id] });
-      if (options.onSuccess) {
-        options.onSuccess(responseData);
-      }
+      toast.success(response?.message || "Country updated successfully!");
     },
     onError: (error) => {
-      console.log(error);
-      toast.error(error?.error?.message || "Failed to update country");
-      if (options.onError) {
-        options.onError(error);
-      }
+      toast.error(error?.message || "Failed to update country");
     },
   });
 };
