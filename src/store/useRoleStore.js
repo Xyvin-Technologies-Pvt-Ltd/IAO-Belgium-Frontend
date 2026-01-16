@@ -2,12 +2,13 @@ import { createRole, deleteRole, getRoles, updateRole } from "@/api/roleApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useGetRoles = (filter) => {
+export const useGetRoles = (filter, options = {}) => {
   return useQuery({
     queryKey: ["roles", filter],
     queryFn: () => getRoles(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
 

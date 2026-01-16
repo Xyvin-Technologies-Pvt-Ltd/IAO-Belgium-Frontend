@@ -29,6 +29,8 @@ import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
 import RoleManagement from "@/pages/admin/role-management";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Language from "@/pages/admin/language";
+import Intakes from "@/pages/admin/intake";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -99,9 +101,14 @@ const adminRoutes = [
   { path: "/admin/program", component: Programs },
   { path: "/admin/program/$id", component: ProgramDetail },
   { path: "/admin/locations", component: Locations },
+   { path: "/admin/languages", component: Language },
   {
     path: "/admin/admission-administration/application-review",
     component: ApplicationReview,
+  },
+  {
+    path: "/admin/admission-administration/intakes",
+    component: Intakes,
   },
   { path: "/admin/admin-management", component: AdminManagement },
   { path: "/admin/role-management", component: RoleManagement },

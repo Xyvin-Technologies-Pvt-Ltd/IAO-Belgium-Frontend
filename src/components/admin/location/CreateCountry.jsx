@@ -3,12 +3,32 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
-import { LoadingState, ErrorMessage } from "@/components/common";
-import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useCountryById, useCreateCountry, useUpdateCountry } from "@/store/useCountryStore";
+import { useCreateCountry, useUpdateCountry } from "@/store/useCountryStore";
+import { useTranslation } from "react-i18next";
 
-const CreateCountry = ({ open, onClose, countryId }) => {
+const CURRENCIES = [
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "GBP", name: "British Pound" },
+  { code: "CAD", name: "Canadian Dollar" },
+  { code: "AUD", name: "Australian Dollar" },
+  { code: "JPY", name: "Japanese Yen" },
+  { code: "CNY", name: "Chinese Yuan" },
+  { code: "INR", name: "Indian Rupee" },
+  { code: "CHF", name: "Swiss Franc" },
+  { code: "SEK", name: "Swedish Krona" },
+];
+
+const CreateCountry = ({ open, onClose, countryData }) => {
+  const { t } = useTranslation();
 
   const {
     register,
@@ -21,108 +41,119 @@ const CreateCountry = ({ open, onClose, countryId }) => {
     defaultValues: {
       code: "",
       name: "",
-      isActive: true,
+      currency: "",
     },
   });
 
-  const isEdit = !!countryId;
-  const {
-    data: country,
-    isLoading,
-    error,
-    refetch,
-  } = useCountryById(countryId);
+  const isEdit = !!countryData;
   const createCountry = useCreateCountry();
   const updateCountry = useUpdateCountry();
 
+  const selectedCurrency = watch("currency");
 
   const handleClose = () => {
-    reset();
+    reset({
+      code: "",
+      name: "",
+      currency: "",
+    });
     onClose();
   };
 
   useEffect(() => {
-    if (open && !isEdit) {
+    if (countryData && isEdit && open) {
       reset({
-        code: "",
-        name: "",
-        isActive: true,
+        code: countryData.code || "",
+        name: countryData.name || "",
+        currency: countryData.currency || "",
       });
     }
-  }, [open, isEdit, reset]);
-
-  useEffect(() => {
-    if (country?.data && isEdit && open) {
-      const countryData = country.data;
-      setValue('code', countryData.code || '');
-      setValue('name', countryData.name || '');
-      setValue('isActive', countryData.is_active ?? true);
-    }
-  }, [country, isEdit, setValue, open]);
+  }, [countryData, isEdit, reset, open]);
 
   const onSubmit = (formData) => {
+    if (!formData.currency) {
+      toast.error(t("countryManagement.modal.currencyRequired"));
+      return;
+    }
+
     const payload = {
       code: formData.code,
       name: formData.name,
-      isActive: formData.isActive,
+      currency: formData.currency,
     };
 
-    const mutation = isEdit ? updateCountry : createCountry;
-    const mutationData = isEdit ? { id: countryId, data: payload } : payload;
-
-    mutation.mutate(mutationData, {
-      onSuccess: () => {
-        handleClose();
-      },
-    });
+    if (isEdit) {
+      updateCountry.mutate(
+        { id: countryData._id, data: payload },
+        {
+          onSuccess: () => {
+            handleClose();
+          },
+        }
+      );
+    } else {
+      createCountry.mutate(payload, {
+        onSuccess: () => {
+          handleClose();
+        },
+      });
+    }
   };
 
   if (!open) return null;
 
-  const isSubmitting = createCountry.isLoading || updateCountry.isLoading;
+  const isSubmitting = createCountry.isPending || updateCountry.isPending;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-96 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEdit ? "Edit Country" : "Add Country"}
+          {isEdit ? t("countryManagement.modal.editTitle") : t("countryManagement.modal.createTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          {isEdit ? "Update the Country details" : "Lets create a Country"}
+          {isEdit ? t("countryManagement.modal.editSubtitle") : t("countryManagement.modal.createSubtitle")}
         </p>
 
-        {isEdit && isLoading ? (
-          <LoadingState text="Loading Country details..." />
-        ) : isEdit && error ? (
-          <ErrorMessage
-            message={error?.message || "Failed to load Country details"}
-            onRetry={refetch}
-            variant="card"
-          />
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <FormField
-              label="Country Code"
-              placeholder="Enter country code (e.g., US, CA, UK)"
+              label={t("countryManagement.modal.codeLabel")}
+              placeholder={t("countryManagement.modal.codePlaceholder")}
               error={errors.code?.message}
               required
-              {...register("code", { required: "Country code is required" })}
+              {...register("code", { required: t("countryManagement.modal.codeRequired") })}
             />
 
             <FormField
-              label="Country Name"
-              placeholder="Enter country name"
+              label={t("countryManagement.modal.nameLabel")}
+              placeholder={t("countryManagement.modal.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: "Country name is required" })}
+              {...register("name", { required: t("countryManagement.modal.nameRequired") })}
             />
 
-            <div className="flex items-center space-x-3">
-              <Switch
-                checked={watch("isActive")}
-                onCheckedChange={(checked) => setValue("isActive", checked)}
-              />
-              <Label className="text-base font-medium">Active</Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("countryManagement.modal.currencyLabel")} <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                key={selectedCurrency || 'empty'}
+                value={selectedCurrency || ""}
+                onValueChange={(value) => setValue("currency", value)}
+              >
+                <SelectTrigger whiteBg>
+                  <SelectValue placeholder={t("countryManagement.modal.currencyPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency.code} value={currency.code}>
+                      {currency.code} - {currency.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.currency && (
+                <p className="text-sm text-red-500">{errors.currency.message}</p>
+              )}
             </div>
 
             <FormActions
@@ -131,7 +162,6 @@ const CreateCountry = ({ open, onClose, countryId }) => {
               isEdit={isEdit}
             />
           </form>
-        )}
       </div>
     </div>
   );

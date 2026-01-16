@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Countries from "./Countries";
 import Cities from "./Cities";
 
 const Locations = () => {
-  const [activeTab, setActiveTab] = useState("countries");
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("locationsActiveTab") || "countries";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("locationsActiveTab", activeTab);
+  }, [activeTab]);
 
   const tabs = [
     { id: "countries", label: "Countries", component: Countries },

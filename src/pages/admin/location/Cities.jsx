@@ -10,144 +10,106 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteCity, useGetCities } from "@/store/useCityStore";
+import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
+import {
+  useDeleteCity,
+  useGetCities,
+  useUpdateCity,
+} from "@/store/useCityStore";
 import CreateCity from "@/components/admin/location/CreateCity";
 
 const Cities = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cityId, setCityId] = useState(null);
-  const [deleteIds, setDeleteIds] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetCities({
-    offset: page,
+    page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteCity, isLoading: isDeleting } =
-    useDeleteCity();
+  const { mutateAsync: deleteCity, isPending: isDeleting } = useDeleteCity();
+  const { mutate: updateCity } = useUpdateCity();
 
   const cities = data?.data || [];
-  const totalRows = data?.pagination?.total|| 0;
-
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(cities?.map((p) => p._id));
-    } else {
-      setSelected([]);
-    }
-  };
+  const totalRows = data?.total_count || 0;
 
   const handleOpenCreate = () => {
-    setCityId(null);
+    setSelectedCity(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (id) => {
-    setCityId(id);
+  const handleOpenEdit = (city) => {
+    setSelectedCity(city);
     setIsModalOpen(true);
-  };
-
-  const handleBulkDeleteClick = () => {
-    if (selected.length === 0) {
-      toast.error("Please select at least one City");
-      return;
-    }
-    setDeleteIds(selected);
-    setOpenDelete(true);
   };
 
   const handleRowDeleteClick = (id) => {
-    setDeleteIds([id]);
+    setDeleteId(id);
     setOpenDelete(true);
   };
 
   const handleConfirmDelete = async () => {
     try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteCity(id)));
-        toast.success("Selected cities deleted successfully");
-      } else {
-        await deleteCity(deleteIds[0]);
-        toast.success("City deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
+      await deleteCity(deleteId);
     } finally {
-      setSelected([]);
-      setDeleteIds([]);
+      setDeleteId(null);
       setOpenDelete(false);
     }
+  };
+
+  const handleStatusToggle = (id, currentStatus) => {
+    updateCity({ id, data: { status: !currentStatus } });
   };
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 w-full">
-          <Input
-            placeholder="Search..."
-            className="max-w-xs"
-            value={search}
-            whiteBg
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {selected.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDeleteClick}>
-              <Trash2 size={16} className="mr-1" />
-              Delete
-            </Button>
-          )}
-        </div>
-        <Button onClick={handleOpenCreate}>Create City</Button>
+        <Input
+          placeholder={t("cityManagement.search")}
+          className="max-w-xs"
+          value={search}
+          whiteBg
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button onClick={handleOpenCreate}>
+          {t("cityManagement.createCity")}
+        </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={
-                  selected.length === cities?.length && cities.length > 0
-                }
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Country</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t("cityManagement.table.name")}</TableHead>
+            <TableHead>{t("cityManagement.table.country")}</TableHead>
+            <TableHead>{t("cityManagement.table.status")}</TableHead>
+            <TableHead>{t("cityManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center p-8">
+              <TableCell colSpan={4} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load cities"}
+                  message={
+                    error?.message || t("cityManagement.messages.loadFailed")
+                  }
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -156,28 +118,27 @@ const Cities = () => {
           ) : cities?.length > 0 ? (
             cities?.map((i) => (
               <TableRow key={i._id}>
+                <TableCell>{i?.name}</TableCell>
+                <TableCell>{i?.country?.name}</TableCell>
                 <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(i._id)}
-                    onChange={() => handleCheckboxChange(i._id)}
+                  <Switch
+                    checked={i?.status}
+                    onCheckedChange={(checked) => {
+                      handleStatusToggle(i._id, i?.status);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.country_name}</TableCell>
-                <TableCell>
-                  <StatusBadge status={i?.is_active} />
-                </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("cityManagement.table.edit"),
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i._id),
+                        onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: "Delete",
+                        label: t("cityManagement.delete"),
                         icon: Trash2,
                         onClick: () => handleRowDeleteClick(i._id),
                       },
@@ -188,8 +149,8 @@ const Cities = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                No cities found
+              <TableCell colSpan={4} className="text-center">
+                {t("cityManagement.table.noCities")}
               </TableCell>
             </TableRow>
           )}
@@ -201,21 +162,21 @@ const Cities = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
-        selected={selected?.length}
       />
 
       <CreateCity
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        cityId={cityId}
+        cityData={selectedCity}
       />
+
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
-        count={deleteIds.length}
+        count={1}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Cities" : "City"}
+        data="City"
       />
     </div>
   );

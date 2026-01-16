@@ -8,30 +8,34 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Copy } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
+import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
+import CreateCountry from "@/components/admin/location/CreateCountry";
+import {
+  useDeleteProgram,
+  useGetPrograms,
+  useUpdateProgram,
+  useDuplicateProgram,
+} from "@/store/useProgramStore";
 import CreateProgram from "@/components/admin/programs/CreateProgram";
 
 const Programs = () => {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programId, setProgramId] = useState(null);
-  const [deleteIds, setDeleteIds] = useState([]);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -40,129 +44,85 @@ const Programs = () => {
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  console.log("Pagination:", data?.pagination);
-  const { mutateAsync: deleteProgram, isLoading: isDeleting } =
+  const { mutateAsync: deleteProgram, isPending: isDeleting } =
     useDeleteProgram();
+  const { mutate: updateProgram } = useUpdateProgram();
+  const { mutate: duplicateProgram } = useDuplicateProgram();
 
   const programs = data?.data || [];
-  const totalRows = data?.pagination?.total || 0;
-
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(programs?.map((p) => p.id));
-    } else {
-      setSelected([]);
-    }
-  };
+  const totalRows = data?.total_count || 0;
 
   const handleOpenCreate = () => {
-    setProgramId(null);
+    setSelectedProgram(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (id) => {
-    setProgramId(id);
+  const handleOpenEdit = (program) => {
+    setSelectedProgram(program);
     setIsModalOpen(true);
-  };
-
-  const handleBulkDeleteClick = () => {
-    if (selected.length === 0) {
-      toast.error("Please select at least one Program");
-      return;
-    }
-    setDeleteIds(selected);
-    setOpenDelete(true);
   };
 
   const handleRowDeleteClick = (id) => {
-    setDeleteIds([id]);
+    setDeleteId(id);
     setOpenDelete(true);
-  };
-
-  const handleRowClick = (programId) => {
-    navigate({
-      to: "/admin/program/$id",
-      params: { id: programId },
-    });
   };
 
   const handleConfirmDelete = async () => {
     try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteProgram(id)));
-        toast.success("Selected Programs deleted successfully");
-      } else {
-        await deleteProgram(deleteIds[0]);
-        toast.success("Program deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
+      await deleteProgram(deleteId);
     } finally {
-      setSelected([]);
-      setDeleteIds([]);
+      setDeleteId(null);
       setOpenDelete(false);
     }
   };
 
+  const handleStatusToggle = (id, currentStatus) => {
+    updateProgram({ id, data: { status: !currentStatus } });
+  };
+
+  const handleDuplicate = (id) => {
+    duplicateProgram(id);
+  };
+
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text">Programs</h2>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 w-full">
-          <Input
-            placeholder="Search..."
-            className="max-w-xs"
-            value={search}
-            whiteBg
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {selected.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDeleteClick}>
-              <Trash2 size={16} className="mr-1" />
-              Delete
-            </Button>
-          )}
-        </div>
-        <Button onClick={handleOpenCreate}>Create Program</Button>
+        <Input
+          placeholder={t("programManagement.search")}
+          className="max-w-xs"
+          value={search}
+          whiteBg
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button onClick={handleOpenCreate}>
+          {t("programManagement.createProgram")}
+        </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={
-                  selected.length === programs?.length && programs.length > 0
-                }
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Program Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Module</TableHead>
-            <TableHead>Location & Language</TableHead>
-            <TableHead>Registration Fee</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t("programManagement.table.uid")}</TableHead>
+            <TableHead>{t("programManagement.table.name")}</TableHead>
+            <TableHead>{t("programManagement.table.description")}</TableHead>
+            <TableHead>{t("programManagement.table.type")}</TableHead>
+            <TableHead>{t("programManagement.table.year")}</TableHead>
+            <TableHead>{t("programManagement.table.city")}</TableHead>
+            <TableHead>{t("programManagement.table.language")}</TableHead>
+            <TableHead>{t("programManagement.table.status")}</TableHead>
+            <TableHead>{t("programManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load programs"}
+                  message={
+                    error?.message || t("programManagement.messages.loadFailed")
+                  }
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -170,54 +130,55 @@ const Programs = () => {
             </TableRow>
           ) : programs?.length > 0 ? (
             programs?.map((i) => (
-              <TableRow 
-                key={i.id} 
-                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                onClick={() => handleRowClick(i.id)}
-              >
+              <TableRow key={i._id}>
+                <TableCell>{i?.uid}</TableCell>
+                <TableCell>{i?.name}</TableCell>
+                <TableCell
+                  title={i?.description}
+                  className="max-w-38 overflow-hidden text-ellipsis whitespace-nowrap"
+                >
+                  {i?.description}
+                </TableCell>
+                <TableCell>{i?.program_type}</TableCell>
+                <TableCell>{i?.year}</TableCell>
+                <TableCell>{i?.city?.name}</TableCell>
+                <TableCell>{i?.language?.name}</TableCell>
                 <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(i.id)}
-                    onChange={() => handleCheckboxChange(i.id)}
+                  <Switch
+                    checked={i?.status}
+                    onCheckedChange={(checked) => {
+                      handleStatusToggle(i._id, i?.status);
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
-                <TableHead>{i?.shortCode}</TableHead>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.type}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
-                <TableCell>
-                  {i?.moduleCount ? i?.moduleCount + " modules" : "-"}
-                </TableCell>
-                <TableCell>
-                  {i?.city}, {i?.country}
-                  {i?.language && `, ${i?.language}`}
-                </TableCell>
-                <TableCell>{i?.registrationFee}</TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("programManagement.table.edit"),
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i.id),
+                        onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: "Delete",
+                        label: t("programManagement.duplicate"),
+                        icon: Copy,
+                        onClick: () => handleDuplicate(i._id),
+                      },
+                      {
+                        label: t("programManagement.delete"),
                         icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i.id),
+                        onClick: () => handleRowDeleteClick(i._id),
                       },
                     ]}
-                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                No Programs found
+              <TableCell colSpan={9} className="text-center">
+                {t("programManagement.table.noPrograms")}
               </TableCell>
             </TableRow>
           )}
@@ -229,21 +190,21 @@ const Programs = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
-        selected={selected?.length}
       />
 
       <CreateProgram
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        programId={programId}
+        programData={selectedProgram}
       />
+
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
-        count={deleteIds.length}
+        count={1}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Programs" : "Program"}
+        data="Program"
       />
     </div>
   );

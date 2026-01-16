@@ -34,7 +34,7 @@ export function NavUser() {
   const { t } = useTranslation();
   const [user, setUser] = useState({
     name: "",
-    email: "",
+    role: "",
     avatar: "",
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -47,12 +47,15 @@ export function NavUser() {
       try {
         setIsLoading(true);
         const profileData = await getProfile();
-        console.log("User Profile Data:", profileData);
+        console.log("User Profile Data:", profileData?.data);
         
-        // Update user state with profile data
+        const firstName = profileData.data?.first_name || "";
+        const lastName = profileData.data?.last_name || "";
+        const fullName = `${firstName} ${lastName}`.trim() || "User";
+        
         setUser({
-          name: profileData.data?.name || profileData.data?.firstName + " " + profileData.data?.lastName || "User",
-          email: profileData.data?.email || "",
+          name: fullName,
+          role: profileData.data?.role_access?.name || profileData.data?.role || "",
           avatar: profileData.data?.avatar || profileData.data?.profilePicture || "",
         });
       } catch (error) {
@@ -60,7 +63,7 @@ export function NavUser() {
         // Set fallback user data
         setUser({
           name: "User",
-          email: "",
+          role: "",
           avatar: "",
         });
       } finally {
@@ -71,9 +74,15 @@ export function NavUser() {
     fetchUserProfile();
   }, [isAuthenticated]);
 
-  const handleSignOut = () => {
-    logout();
-    navigate({ to: "/login" });
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      navigate({ to: "/login" });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Navigate to login even if logout fails
+      navigate({ to: "/login" });
+    }
   };
   return (
     <>
@@ -96,7 +105,7 @@ export function NavUser() {
                     {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
                   </span>
                   <span className="truncate text-xs">
-                    {isLoading ? "..." : (user?.email || t("sidebar.user.noEmail"))}
+                    {isLoading ? "..." : (user?.role || t("sidebar.user.noRole"))}
                   </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
@@ -121,7 +130,7 @@ export function NavUser() {
                       {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
                     </span>
                     <span className="truncate text-xs">
-                      {isLoading ? "..." : (user?.email || t("sidebar.user.noEmail"))}
+                      {isLoading ? "..." : (user?.role || t("sidebar.user.noRole"))}
                     </span>
                   </div>
                 </div>

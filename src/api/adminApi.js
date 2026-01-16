@@ -48,13 +48,3 @@ export const deleteAdmin = async (id) => {
   }
 };
 
-export const bulkDeleteAdmins = async (ids) => {
-  try {
-    const response = await axiosInstance.post(`/user/bulk-delete-admins`, {
-      ids: ids,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};

@@ -1,63 +1,44 @@
-
-import { createCity, deleteCity, getCities, getCityById, updateCity } from "@/api/cityApi";
+import { createCity, deleteCity, getCities, updateCity } from "@/api/cityApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useGetCities = (filter) => {
+export const useGetCities = (filter, options = {}) => {
   return useQuery({
     queryKey: ["cities", filter],
     queryFn: () => getCities(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
 
-export const useCityById = (id) => {
-  return useQuery({
-    queryKey: ["city", id],
-    queryFn: () => getCityById(id),
-    enabled: !!id,
-    staleTime: 60000,
-  });
-};
-
-export const useCreateCity = (options = {}) => {
+export const useCreateCity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createCity,
-    onSuccess: (data) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["cities"] });
-      if (options.onSuccess) {
-        options.onSuccess(data);
-      }
+      toast.success(response?.message || "City created successfully!");
     },
     onError: (error) => {
-      toast.error(error?.error?.message|| "Failed to create city");
-      if (options.onError) {
-        options.onError(error);
-      }
+      toast.error(error?.message || "Failed to create city");
     },
   });
 };
 
-export const useUpdateCity = (options = {}) => {
+export const useUpdateCity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => updateCity(id, data),
-    onSuccess: (responseData, variables) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["cities"] });
       queryClient.invalidateQueries({ queryKey: ["city", variables.id] });
-      if (options.onSuccess) {
-        options.onSuccess(responseData);
-      }
+      toast.success(response?.message || "City updated successfully!");
     },
     onError: (error) => {
-      toast.error(error?.error?.message || "Failed to update city");
-      if (options.onError) {
-        options.onError(error);
-      }
+      toast.error(error?.message || "Failed to update city");
     },
   });
 };
@@ -67,8 +48,12 @@ export const useDeleteCity = () => {
 
   return useMutation({
     mutationFn: deleteCity,
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["cities"] });
+      toast.success(response?.message || "City deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete city");
     },
   });
 };

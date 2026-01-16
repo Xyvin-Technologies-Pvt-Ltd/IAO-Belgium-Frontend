@@ -2,7 +2,7 @@ import axiosInstance from "./axiosintercepter";
 
 export const getCities = async (filter) => {
   try {
-    const response = await axiosInstance.get(`/master-data/cities`, {
+    const response = await axiosInstance.get(`/master-data/city`, {
       params: filter,
     });
     return response.data;
@@ -10,17 +10,10 @@ export const getCities = async (filter) => {
     throw error.response.data;
   }
 };
-export const getCityById = async (id) => {
-  try {
-    const response = await axiosInstance.get(`/master-data/cities/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+
 export const createCity = async (data) => {
   try {
-    const response = await axiosInstance.post(`/master-data/cities`, data);
+    const response = await axiosInstance.post(`/master-data/city`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -28,7 +21,7 @@ export const createCity = async (data) => {
 };
 export const updateCity = async (id, data) => {
   try {
-    const response = await axiosInstance.put(`/master-data/cities/${id}`, data);
+    const response = await axiosInstance.put(`/master-data/city/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -36,7 +29,7 @@ export const updateCity = async (id, data) => {
 };
 export const deleteCity = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/master-data/cities/${id}`);
+    const response = await axiosInstance.delete(`/master-data/city/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;

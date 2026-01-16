@@ -32,10 +32,13 @@
       "main": "Principal",
       "operations": "Opérations",
       "academicManagement": "Gestion académique",
+      "masterData": "Données de base",
       "settings": "Paramètres",
       "dashboard": "Tableau de bord",
       "programAdministration": "Administration des programmes",
       "locations": "Emplacements",
+      "languages": "Langues",
+      "teacherData": "Données des enseignants",
       "admissionAdministration": "Administration des admissions",
       "applicationReview": "Examen des candidatures",
       "intakes": "Inscriptions",
@@ -48,7 +51,7 @@
     },
     "user": {
       "loading": "Chargement...",
-      "noEmail": "Aucun email",
+      "noRole": "Aucun rôle",
       "signOut": "Se déconnecter"
     },
     "logo": "Bureau IAO"
@@ -56,6 +59,85 @@
   "languages": {
     "en": "English",
     "fr": "Français"
+  },
+  "common": {
+    "deleteConfirm": {
+      "title": "Confirmation de suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer",
+      "cannotUndo": "Cette action ne peut pas être annulée.",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "deleting": "Suppression..."
+    }
+  },
+  "countryManagement": {
+    "title": "Gestion des pays",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createCountry": "Créer un pays",
+    "table": {
+      "name": "Nom",
+      "description": "Description",
+      "code": "Code",
+      "currency": "Devise",
+      "status": "Statut",
+      "action": "Action",
+      "view": "Voir",
+      "edit": "Modifier",
+      "noCountries": "Aucun pays trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des pays"
+    },
+    "modal": {
+      "createTitle": "Créer un nouveau pays",
+      "editTitle": "Modifier le pays",
+      "createSubtitle": "Créons un nouveau pays",
+      "editSubtitle": "Mettre à jour les détails du pays",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Entrez le nom du pays",
+      "nameRequired": "Le nom du pays est requis",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez la description",
+      "descriptionRequired": "La description est requise",
+      "codeLabel": "Code du pays",
+      "codePlaceholder": "Entrez le code du pays (ex: US, CA, UK)",
+      "codeRequired": "Le code du pays est requis",
+      "currencyLabel": "Devise",
+      "currencyPlaceholder": "Sélectionnez une devise",
+      "currencyRequired": "Veuillez sélectionner une devise",
+      "statusLabel": "Actif",
+      "loadingDetails": "Chargement des détails du pays..."
+    }
+  },
+  "cityManagement": {
+    "title": "Gestion des villes",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createCity": "Créer une ville",
+    "table": {
+      "name": "Nom",
+      "country": "Pays",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noCities": "Aucune ville trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des villes"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle ville",
+      "editTitle": "Modifier la ville",
+      "createSubtitle": "Créons une nouvelle ville",
+      "editSubtitle": "Mettre à jour les détails de la ville",
+      "nameLabel": "Nom de la ville",
+      "namePlaceholder": "Entrez le nom de la ville",
+      "nameRequired": "Le nom de la ville est requis",
+      "countryLabel": "Pays",
+      "countryPlaceholder": "Sélectionnez un pays",
+      "countryRequired": "Le pays est requis"
+    }
   },
   "roleManagement": {
     "title": "Gestion des rôles",
@@ -65,8 +147,10 @@
     "table": {
       "name": "Nom",
       "description": "Description",
+      "permissions": "Permissions",
       "status": "Statut",
       "action": "Action",
+      "view": "Voir",
       "edit": "Modifier",
       "noRoles": "Aucun rôle trouvé"
     },
@@ -89,6 +173,10 @@
       "modifyLabel": "Modifier",
       "loadingDetails": "Chargement des détails du rôle..."
     },
+    "view": {
+      "title": "Vue du rôle",
+      "subtitle": "Détails et permissions du rôle"
+    },
     "permissions": {
       "rolesManagement": "Gestion des rôles",
       "adminManagement": "Gestion des administrateurs",
@@ -97,15 +185,82 @@
       "financeManagement": "Gestion financière",
       "masterDataManagement": "Gestion des données de base",
       "logsManagement": "Gestion des journaux"
+    }
+  },
+  "languageManagement": {
+    "title": "Gestion des langues",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createLanguage": "Créer une langue",
+    "table": {
+      "name": "Nom",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noLanguages": "Aucune langue trouvée"
     },
-    "deleteConfirm": {
-      "title": "Confirmation de suppression",
-      "message": "Êtes-vous sûr de vouloir supprimer",
-      "role": "Rôle",
-      "cannotUndo": "Cette action ne peut pas être annulée.",
-      "cancel": "Annuler",
-      "delete": "Supprimer",
-      "deleting": "Suppression..."
+    "messages": {
+      "loadFailed": "Échec du chargement des langues"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle langue",
+      "editTitle": "Modifier la langue",
+      "createSubtitle": "Créons une nouvelle langue",
+      "editSubtitle": "Mettre à jour les détails de la langue",
+      "nameLabel": "Nom de la langue",
+      "namePlaceholder": "Entrez le nom de la langue",
+      "nameRequired": "Le nom de la langue est requis"
+    }
+  },
+  "programManagement": {
+    "title": "Gestion des programmes",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "createProgram": "Créer un programme",
+    "table": {
+      "uid": "UID",
+      "name": "Nom",
+      "description": "Description",
+      "type": "Type",
+      "year": "Année",
+      "city": "Ville",
+      "language": "Langue",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noPrograms": "Aucun programme trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des programmes"
+    },
+    "modal": {
+      "createTitle": "Créer un nouveau programme",
+      "editTitle": "Modifier le programme",
+      "createSubtitle": "Créons un nouveau programme",
+      "editSubtitle": "Mettre à jour les détails du programme",
+      "nameLabel": "Nom du programme",
+      "namePlaceholder": "Entrez le nom du programme",
+      "nameRequired": "Le nom du programme est requis",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez la description du programme",
+      "descriptionRequired": "La description est requise",
+      "programTypeLabel": "Type de programme",
+      "programTypePlaceholder": "Sélectionnez le type de programme",
+      "programTypeRequired": "Le type de programme est requis",
+      "yearLabel": "Année",
+      "yearPlaceholder": "Entrez l'année (ex: 1, 2, 3)",
+      "yearRequired": "L'année est requise",
+      "languageLabel": "Langue",
+      "languagePlaceholder": "Sélectionnez une langue",
+      "languageRequired": "La langue est requise",
+      "countryLabel": "Pays",
+      "countryPlaceholder": "Sélectionnez un pays",
+      "countryRequired": "Le pays est requis",
+      "cityLabel": "Ville",
+      "cityPlaceholder": "Sélectionnez une ville",
+      "cityPlaceholderDisabled": "Sélectionnez d'abord un pays",
+      "cityRequired": "La ville est requise"
     }
   }
 }

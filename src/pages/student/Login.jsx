@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
+import { sendOtp } from "@/api/authApi";
 import logo from "../../assets/images/logo.png";
 import bg from "../../assets/images/login-image.webp";
 import googleIcon from "../../assets/icons/google.svg";
@@ -13,29 +14,49 @@ import microsoftIcon from "../../assets/icons/microsoft.svg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, isLoading, clearError } = useAuthStore();
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const { verifyOtp, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleEmailSubmit = async () => {
+  const handleSendOtp = async () => {
     if (!email) {
       toast.error("Please enter your email address");
       return;
     }
 
-    // Clear any previous errors
+    setSendingOtp(true);
     clearError();
 
     try {
-      const response = await login({
-        email,
-        password: password || "Admin@123",
-      });
+      await sendOtp({ email });
+      setOtpSent(true);
+      toast.success("OTP sent to your email!");
+    } catch (err) {
+      toast.error(err.message || "Failed to send OTP. Please try again.");
+      console.error("Send OTP failed:", err);
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      toast.error("Please enter the OTP");
+      return;
+    }
+
+    clearError();
+
+    try {
+      const response = await verifyOtp(email, otp);
       const userRole = response?.data?.user?.role;
       toast.success("Login successful!");
+console.log("OTP verified successfully:", response?.data?.user?.role);
 
       // Navigate based on user role
-      if (userRole === "ADMIN") {
+      if (userRole === "admin") {
         navigate({ to: "/admin/dashboard" });
       } else if (userRole === "TEACHER") {
         navigate({ to: "/teacher/dashboard" });
@@ -50,10 +71,11 @@ const Login = () => {
         }
       }
     } catch (err) {
-      toast.error(err.message || "Login failed. Please try again.");
-      console.error("Login failed:", err);
+      toast.error(err.message || "Invalid OTP. Please try again.");
+      console.error("OTP verification failed:", err);
     }
   };
+
   return (
     <div className="h-screen bg-background p-4 lg:p-6">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden bg-background">
@@ -116,21 +138,62 @@ const Login = () => {
                   className="h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                  disabled={sendingOtp || isLoading || otpSent}
                 />
               </div>
 
-              <Button
-                className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
-                onClick={handleEmailSubmit}
-                disabled={isLoading || !email}
-              >
-                {isLoading ? "Signing in..." : "Continue with Email"}
-              </Button>
+              {otpSent && (
+                <div className="space-y-2">
+                  <Label htmlFor="otp">Enter OTP</Label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    placeholder="Enter 6-digit OTP"
+                    className="h-11"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    disabled={isLoading}
+                    maxLength={6}
+                  />
+                </div>
+              )}
+
+              {!otpSent ? (
+                <Button
+                  className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
+                  onClick={handleSendOtp}
+                  disabled={sendingOtp || !email}
+                >
+                  {sendingOtp ? "Sending OTP..." : "Send OTP"}
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <Button
+                    className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
+                    onClick={handleVerifyOtp}
+                    disabled={isLoading || !otp}
+                  >
+                    {isLoading ? "Verifying..." : "Verify OTP"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full h-11"
+                    onClick={() => {
+                      setOtpSent(false);
+                      setOtp("");
+                    }}
+                    disabled={isLoading}
+                  >
+                    Change Email
+                  </Button>
+                </div>
+              )}
 
               <p className="text-[10px] text-[#005AC8] text-start bg-[#F5F7FF] rounded-[6px] px-2 py-1 flex items-center gap-2">
                 <CircleAlert className="h-3 w-3 shrink-0" />
-                We'll send you a one-time verification code to your email
+                {!otpSent
+                  ? "We'll send you a one-time verification code to your email"
+                  : "Enter the 6-digit code sent to your email"}
               </p>
             </div>
           </div>

@@ -4,7 +4,6 @@ import {
   getAdmins,
   updateAdmin,
   updateAdminStatus,
-  bulkDeleteAdmins,
 } from "@/api/adminApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -79,17 +78,4 @@ export const useDeleteAdmin = () => {
   });
 };
 
-export const useBulkDeleteAdmins = () => {
-  const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: bulkDeleteAdmins,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["admins"] });
-      toast.success(response?.message || "Admins deleted successfully!");
-    },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to delete admins");
-    },
-  });
-};

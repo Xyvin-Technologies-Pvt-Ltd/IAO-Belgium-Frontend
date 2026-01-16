@@ -1,23 +1,19 @@
-
-import { createCountry, deleteCountry, getCountry, getCountryById, updateCountry } from "@/api/countryApi";
+import {
+  createCountry,
+  deleteCountry,
+  getCountry,
+  updateCountry,
+} from "@/api/countryApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useGetCountries = (filter) => {
+export const useGetCountries = (filter, options = {}) => {
   return useQuery({
     queryKey: ["countries", filter],
     queryFn: () => getCountry(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
-  });
-};
-
-export const useCountryById = (id) => {
-  return useQuery({
-    queryKey: ["country", id],
-    queryFn: () => getCountryById(id),
-    enabled: !!id,
-    staleTime: 60000,
+    ...options,
   });
 };
 
@@ -57,10 +53,12 @@ export const useDeleteCountry = () => {
 
   return useMutation({
     mutationFn: deleteCountry,
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["countries"] });
-      queryClient.invalidateQueries({ queryKey: ["country"] });
-
+      toast.success(response?.message || "Country deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete country");
     },
   });
 };

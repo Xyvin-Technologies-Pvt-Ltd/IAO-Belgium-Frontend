@@ -10,144 +10,108 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import StatusBadge from "@/components/StatusBadge";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useDeleteCountry, useGetCountries } from "@/store/useCountryStore";
+import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
+import {
+  useDeleteCountry,
+  useGetCountries,
+  useUpdateCountry,
+} from "@/store/useCountryStore";
 import CreateCountry from "@/components/admin/location/CreateCountry";
 
 const Countries = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [countryId, setCountryId] = useState(null);
-  const [deleteIds, setDeleteIds] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetCountries({
-    offset: page,
+    page_no: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteCountry, isLoading: isDeleting } =
+  const { mutateAsync: deleteCountry, isPending: isDeleting } =
     useDeleteCountry();
+  const { mutate: updateCountry } = useUpdateCountry();
 
   const countries = data?.data || [];
-  const totalRows = data?.pagination?.total || 0;
-
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(countries?.map((p) => p.id));
-    } else {
-      setSelected([]);
-    }
-  };
+  const totalRows = data?.total_count || 0;
 
   const handleOpenCreate = () => {
-    setCountryId(null);
+    setSelectedCountry(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (id) => {
-    setCountryId(id);
+  const handleOpenEdit = (country) => {
+    setSelectedCountry(country);
     setIsModalOpen(true);
-  };
-
-  const handleBulkDeleteClick = () => {
-    if (selected.length === 0) {
-      toast.error("Please select at least one Country");
-      return;
-    }
-    setDeleteIds(selected);
-    setOpenDelete(true);
   };
 
   const handleRowDeleteClick = (id) => {
-    setDeleteIds([id]);
+    setDeleteId(id);
     setOpenDelete(true);
   };
 
   const handleConfirmDelete = async () => {
     try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteCountry(id)));
-        toast.success("Selected countries deleted successfully");
-      } else {
-        await deleteCountry(deleteIds[0]);
-        toast.success("Country deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
+      await deleteCountry(deleteId);
     } finally {
-      setSelected([]);
-      setDeleteIds([]);
+      setDeleteId(null);
       setOpenDelete(false);
     }
+  };
+
+  const handleStatusToggle = (id, currentStatus) => {
+    updateCountry({ id, data: { status: !currentStatus } });
   };
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 w-full">
-          <Input
-            placeholder="Search..."
-            className="max-w-xs"
-            value={search}
-            whiteBg
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {selected.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDeleteClick}>
-              <Trash2 size={16} className="mr-1" />
-              Delete
-            </Button>
-          )}
-        </div>
-        <Button onClick={handleOpenCreate}>Create Country</Button>
+        <Input
+          placeholder={t("countryManagement.search")}
+          className="max-w-xs"
+          value={search}
+          whiteBg
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button onClick={handleOpenCreate}>
+          {t("countryManagement.createCountry")}
+        </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={
-                  selected.length === countries?.length && countries.length > 0
-                }
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t("countryManagement.table.name")}</TableHead>
+            <TableHead>{t("countryManagement.table.code")}</TableHead>
+            <TableHead>{t("countryManagement.table.currency")}</TableHead>
+            <TableHead>{t("countryManagement.table.status")}</TableHead>
+            <TableHead>{t("countryManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load countries"}
+                  message={
+                    error?.message || t("countryManagement.messages.loadFailed")
+                  }
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -155,31 +119,31 @@ const Countries = () => {
             </TableRow>
           ) : countries?.length > 0 ? (
             countries?.map((i) => (
-              <TableRow key={i.id}>
+              <TableRow key={i._id}>
+                <TableCell>{i?.name}</TableCell>
+                <TableCell>{i?.code}</TableCell>
+                <TableCell>{i?.currency}</TableCell>
                 <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(i.id)}
-                    onChange={() => handleCheckboxChange(i.id)}
+                  <Switch
+                    checked={i?.status}
+                    onCheckedChange={(checked) => {
+                      handleStatusToggle(i._id, i?.status);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </TableCell>
-                <TableCell>{i?.code}</TableCell>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell>
-                  <StatusBadge status={i?.is_active} />
-                </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("countryManagement.table.edit"),
                         icon: Edit,
-                        onClick: () => handleOpenEdit(i.id),
+                        onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: "Delete",
+                        label: t("countryManagement.delete"),
                         icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i.id),
+                        onClick: () => handleRowDeleteClick(i._id),
                       },
                     ]}
                   />
@@ -188,8 +152,8 @@ const Countries = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
-                No countries found
+              <TableCell colSpan={5} className="text-center">
+                {t("countryManagement.table.noCountries")}
               </TableCell>
             </TableRow>
           )}
@@ -201,21 +165,21 @@ const Countries = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
-        selected={selected?.length}
       />
 
       <CreateCountry
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        countryId={countryId}
+        countryData={selectedCountry}
       />
+
       <DeleteConfirm
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleConfirmDelete}
-        count={deleteIds.length}
+        count={1}
         isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "Countries" : "Country"}
+        data="Country"
       />
     </div>
   );

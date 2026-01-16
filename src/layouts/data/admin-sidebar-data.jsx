@@ -9,6 +9,9 @@ import {
   GraduationCap,
   UserCheck,
   FileText,
+  MapPin,
+  Languages,
+  UserCog,
 } from "lucide-react";
 
 export const getAdminSidebarData = (t) => ({
@@ -32,11 +35,7 @@ export const getAdminSidebarData = (t) => ({
           url: "/admin/program",
           icon: NotebookText,
         },
-        {
-          title: t("sidebar.admin.locations"),
-          url: "/admin/locations",
-          icon: Calendars,
-        },
+
         {
           title: t("sidebar.admin.admissionAdministration"),
           icon: BookUser,
@@ -59,7 +58,7 @@ export const getAdminSidebarData = (t) => ({
         },
       ],
     },
-      {
+    {
       title: t("sidebar.admin.academicManagement"),
       items: [
         {
@@ -71,7 +70,28 @@ export const getAdminSidebarData = (t) => ({
           title: t("sidebar.admin.studentManagement"),
           url: "/admin/student-management",
           icon: Users,
-        }
+        },
+      ],
+    },
+    {
+      title: t("sidebar.admin.masterData"),
+      items: [
+        {
+          title: t("sidebar.admin.locations"),
+          url: "/admin/locations",
+          icon: MapPin,
+        },
+        {
+          title: t("sidebar.admin.languages"),
+          url: "/admin/languages",
+          icon: Languages,
+        },
+
+        {
+          title: t("sidebar.admin.teacherData"),
+          url: "/admin/teacher-data",
+          icon: UserCog,
+        },
       ],
     },
     {

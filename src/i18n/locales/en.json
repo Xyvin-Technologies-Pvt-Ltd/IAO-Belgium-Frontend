@@ -32,10 +32,13 @@
       "main": "Main",
       "operations": "Operations",
       "academicManagement": "Academic Management",
+      "masterData": "Master Data",
       "settings": "Settings",
       "dashboard": "Dashboard",
       "programAdministration": "Program Administration",
       "locations": "Locations",
+      "languages": "Languages",
+      "teacherData": "Teacher Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
       "intakes": "Intakes",
@@ -48,7 +51,7 @@
     },
     "user": {
       "loading": "Loading...",
-      "noEmail": "No email",
+      "noRole": "No role",
       "signOut": "Sign out"
     },
     "logo": "IAO Back office"
@@ -56,6 +59,85 @@
   "languages": {
     "en": "English",
     "fr": "Français"
+  },
+  "common": {
+    "deleteConfirm": {
+      "title": "Delete Confirmation",
+      "message": "Are you sure you want to delete",
+      "cannotUndo": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    }
+  },
+  "countryManagement": {
+    "title": "Country Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "createCountry": "Create Country",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "code": "Code",
+      "currency": "Currency",
+      "status": "Status",
+      "action": "Action",
+      "view": "View",
+      "edit": "Edit",
+      "noCountries": "No Countries found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load countries"
+    },
+    "modal": {
+      "createTitle": "Create a new Country",
+      "editTitle": "Edit Country",
+      "createSubtitle": "Let's create a new country",
+      "editSubtitle": "Update the country details",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter Country Name",
+      "nameRequired": "Country name is required",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter Description",
+      "descriptionRequired": "Description is required",
+      "codeLabel": "Country Code",
+      "codePlaceholder": "Enter Country Code (e.g., US, CA, UK)",
+      "codeRequired": "Country code is required",
+      "currencyLabel": "Currency",
+      "currencyPlaceholder": "Select a currency",
+      "currencyRequired": "Please select a currency",
+      "statusLabel": "Active",
+      "loadingDetails": "Loading country details..."
+    }
+  },
+  "cityManagement": {
+    "title": "City Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "createCity": "Create City",
+    "table": {
+      "name": "Name",
+      "country": "Country",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noCities": "No Cities found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load cities"
+    },
+    "modal": {
+      "createTitle": "Create a new City",
+      "editTitle": "Edit City",
+      "createSubtitle": "Let's create a new city",
+      "editSubtitle": "Update the city details",
+      "nameLabel": "City Name",
+      "namePlaceholder": "Enter city name",
+      "nameRequired": "City name is required",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select Country",
+      "countryRequired": "Country is required"
+    }
   },
   "roleManagement": {
     "title": "Role Management",
@@ -65,8 +147,10 @@
     "table": {
       "name": "Name",
       "description": "Description",
+      "permissions": "Permissions",
       "status": "Status",
       "action": "Action",
+      "view": "View",
       "edit": "Edit",
       "noRoles": "No Roles found"
     },
@@ -89,6 +173,10 @@
       "modifyLabel": "Modify",
       "loadingDetails": "Loading role details..."
     },
+    "view": {
+      "title": "Role View",
+      "subtitle": "Role details and permissions"
+    },
     "permissions": {
       "rolesManagement": "Roles Management",
       "adminManagement": "Admin Management",
@@ -97,15 +185,82 @@
       "financeManagement": "Finance Management",
       "masterDataManagement": "Master Data Management",
       "logsManagement": "Logs Management"
+    }
+  },
+  "languageManagement": {
+    "title": "Language Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "createLanguage": "Create Language",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noLanguages": "No Languages found"
     },
-    "deleteConfirm": {
-      "title": "Delete Confirmation",
-      "message": "Are you sure you want to delete",
-      "role": "Role",
-      "cannotUndo": "This action cannot be undone.",
-      "cancel": "Cancel",
-      "delete": "Delete",
-      "deleting": "Deleting..."
+    "messages": {
+      "loadFailed": "Failed to load languages"
+    },
+    "modal": {
+      "createTitle": "Create a new Language",
+      "editTitle": "Edit Language",
+      "createSubtitle": "Let's create a new language",
+      "editSubtitle": "Update the language details",
+      "nameLabel": "Language Name",
+      "namePlaceholder": "Enter language name",
+      "nameRequired": "Language name is required"
+    }
+  },
+  "programManagement": {
+    "title": "Program Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "createProgram": "Create Program",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "year": "Year",
+      "city": "City",
+      "language": "Language",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noPrograms": "No Programs found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load programs"
+    },
+    "modal": {
+      "createTitle": "Create a new Program",
+      "editTitle": "Edit Program",
+      "createSubtitle": "Let's create a new program",
+      "editSubtitle": "Update the program details",
+      "nameLabel": "Program Name",
+      "namePlaceholder": "Enter program name",
+      "nameRequired": "Program name is required",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter program description",
+      "descriptionRequired": "Description is required",
+      "programTypeLabel": "Program Type",
+      "programTypePlaceholder": "Select program type",
+      "programTypeRequired": "Program type is required",
+      "yearLabel": "Year",
+      "yearPlaceholder": "Enter year (e.g., 1, 2, 3)",
+      "yearRequired": "Year is required",
+      "languageLabel": "Language",
+      "languagePlaceholder": "Select language",
+      "languageRequired": "Language is required",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select country",
+      "countryRequired": "Country is required",
+      "cityLabel": "City",
+      "cityPlaceholder": "Select city",
+      "cityPlaceholderDisabled": "Select country first",
+      "cityRequired": "City is required"
     }
   }
 }

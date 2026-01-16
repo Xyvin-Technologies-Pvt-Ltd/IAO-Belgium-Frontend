@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import { useProgramById } from "@/store/useProgramStore";
 import { useParams } from "@tanstack/react-router";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { Users, DollarSign, Layers, Clock } from "lucide-react";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import LearningModule from "@/components/admin/programs/LearningModule";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import { useGetPrograms } from "@/store/useProgramStore";
 
 const ProgramDetail = () => {
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
 
-  const { data: program, isLoading, error, refetch } = useProgramById(id);
+  const { data: program, isLoading, error, refetch } = useGetPrograms(id);
   const [activeTab, setActiveTab] = useState("Learning Modules");
   useEffect(() => {
     if (program?.data) {

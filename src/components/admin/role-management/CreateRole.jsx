@@ -5,61 +5,98 @@ import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateRole, useUpdateRole } from "@/store/useRoleStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { LoadingState } from "@/components/common";
 import { useTranslation } from "react-i18next";
 
 const CreateRole = ({ open, onClose, roleData }) => {
   const { t } = useTranslation();
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const PERMISSION_MODULES = [
     {
       name: t("roleManagement.permissions.rolesManagement"),
       permissions: [
-        { id: "roles_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "roles_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "roles_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "roles_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.adminManagement"),
       permissions: [
-        { id: "admin_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "admin_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "admin_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "admin_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.operationsManagement"),
       permissions: [
-        { id: "operations_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "operations_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "operations_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "operations_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.academicManagement"),
       permissions: [
-        { id: "academic_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "academic_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "academic_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "academic_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.financeManagement"),
       permissions: [
-        { id: "finance_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "finance_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "finance_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "finance_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.masterDataManagement"),
       permissions: [
-        { id: "master_data_management_view", label: t("roleManagement.modal.viewLabel") },
-        { id: "master_data_management_modify", label: t("roleManagement.modal.modifyLabel") },
+        {
+          id: "master_data_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "master_data_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
       ],
     },
     {
       name: t("roleManagement.permissions.logsManagement"),
       permissions: [
-        { id: "logs_management_view", label: t("roleManagement.modal.viewLabel") },
+        {
+          id: "logs_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
       ],
     },
   ];
@@ -88,22 +125,10 @@ const CreateRole = ({ open, onClose, roleData }) => {
   };
 
   useEffect(() => {
-    if (open && !isEdit) {
-      reset({
-        name: "",
-        description: "",
-      });
-      setSelectedPermissions([]);
-    }
-  }, [open, isEdit, reset]);
-
-  useEffect(() => {
     if (roleData && isEdit && open) {
-      setIsLoadingData(true);
       setValue("name", roleData.name || "");
       setValue("description", roleData.description || "");
       setSelectedPermissions(roleData.permissions || []);
-      setIsLoadingData(false);
     }
   }, [roleData, isEdit, setValue, open]);
 
@@ -139,92 +164,102 @@ const CreateRole = ({ open, onClose, roleData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-150 max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEdit ? t("roleManagement.modal.editTitle") : t("roleManagement.modal.createTitle")}
+          {isEdit
+            ? t("roleManagement.modal.editTitle")
+            : t("roleManagement.modal.createTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          {isEdit ? t("roleManagement.modal.editSubtitle") : t("roleManagement.modal.createSubtitle")}
+          {isEdit
+            ? t("roleManagement.modal.editSubtitle")
+            : t("roleManagement.modal.createSubtitle")}
         </p>
 
-        {isLoadingData ? (
-          <LoadingState text={t("roleManagement.modal.loadingDetails")} />
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
-              label={t("roleManagement.modal.nameLabel")}
-              placeholder={t("roleManagement.modal.namePlaceholder")}
-              error={errors.name?.message}
-              required
-              {...register("name", { required: t("roleManagement.modal.nameRequired") })}
-            />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <FormField
+            label={t("roleManagement.modal.nameLabel")}
+            placeholder={t("roleManagement.modal.namePlaceholder")}
+            error={errors.name?.message}
+            required
+            {...register("name", {
+              required: t("roleManagement.modal.nameRequired"),
+            })}
+          />
 
-            <FormField
-              label={t("roleManagement.modal.descriptionLabel")}
-              placeholder={t("roleManagement.modal.descriptionPlaceholder")}
-              error={errors.description?.message}
-              required
-              {...register("description", {
-                required: t("roleManagement.modal.descriptionRequired"),
-              })}
-            />
+          <FormField
+            label={t("roleManagement.modal.descriptionLabel")}
+            placeholder={t("roleManagement.modal.descriptionPlaceholder")}
+            error={errors.description?.message}
+            required
+            {...register("description", {
+              required: t("roleManagement.modal.descriptionRequired"),
+            })}
+          />
 
-            <div className="space-y-3">
-              <Label className="text-base font-medium text-gray-900 dark:text-white">
-                {t("roleManagement.modal.permissionsLabel")}
-              </Label>
-              <div className="border dark:border-white/20 rounded-lg overflow-hidden bg-white dark:bg-black">
-                <div className="grid grid-cols-[2fr_100px_100px] gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-white/20">
-                  <div></div>
-                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
-                    {t("roleManagement.modal.viewLabel")}
-                  </div>
-                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
-                    {t("roleManagement.modal.modifyLabel")}
-                  </div>
+          <div className="space-y-3">
+            <Label className="text-base font-medium text-gray-900 dark:text-white">
+              {t("roleManagement.modal.permissionsLabel")}
+            </Label>
+            <div className="border dark:border-white/20 rounded-lg overflow-hidden bg-white dark:bg-black">
+              <div className="grid grid-cols-[2fr_100px_100px] gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-white/20">
+                <div></div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                  {t("roleManagement.modal.viewLabel")}
                 </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {PERMISSION_MODULES.map((module, index) => (
-                    <div
-                      key={module.name}
-                      className={`grid grid-cols-[2fr_100px_100px] gap-4 p-4 items-center ${
-                        index !== PERMISSION_MODULES.length - 1
-                          ? "border-b dark:border-white/10"
-                          : ""
-                      }`}
-                    >
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {module.name}
-                      </div>
-                      <div className="flex justify-center">
-                        {module.permissions[0] && (
-                          <Checkbox
-                            id={module.permissions[0].id}
-                            checked={selectedPermissions.includes(module.permissions[0].id)}
-                            onCheckedChange={() => togglePermission(module.permissions[0].id)}
-                          />
-                        )}
-                      </div>
-                      <div className="flex justify-center">
-                        {module.permissions[1] && (
-                          <Checkbox
-                            id={module.permissions[1].id}
-                            checked={selectedPermissions.includes(module.permissions[1].id)}
-                            onCheckedChange={() => togglePermission(module.permissions[1].id)}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                  {t("roleManagement.modal.modifyLabel")}
                 </div>
               </div>
+              <div className="max-h-80 overflow-y-auto">
+                {PERMISSION_MODULES.map((module, index) => (
+                  <div
+                    key={module.name}
+                    className={`grid grid-cols-[2fr_100px_100px] gap-4 p-4 items-center ${
+                      index !== PERMISSION_MODULES.length - 1
+                        ? "border-b dark:border-white/10"
+                        : ""
+                    }`}
+                  >
+                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                      {module.name}
+                    </div>
+                    <div className="flex justify-center">
+                      {module.permissions[0] && (
+                        <Checkbox
+                          id={module.permissions[0].id}
+                          checked={selectedPermissions.includes(
+                            module.permissions[0].id
+                          )}
+                          onCheckedChange={() =>
+                            togglePermission(module.permissions[0].id)
+                          }
+                        />
+                      )}
+                    </div>
+                    <div className="flex justify-center">
+                      {module.permissions[1] && (
+                        <Checkbox
+                          id={module.permissions[1].id}
+                          checked={selectedPermissions.includes(
+                            module.permissions[1].id
+                          )}
+                          onCheckedChange={() =>
+                            togglePermission(module.permissions[1].id)
+                          }
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
 
-            <FormActions
-              onCancel={handleClose}
-              isLoading={isSubmitting}
-              isEdit={isEdit}
-            />
-          </form>
-        )}
+          <FormActions
+            onCancel={handleClose}
+            isLoading={isSubmitting}
+            isEdit={isEdit}
+          />
+        </form>
       </div>
     </div>
   );

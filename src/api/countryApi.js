@@ -2,7 +2,7 @@ import axiosInstance from "./axiosintercepter";
 
 export const getCountry = async (filter) => {
   try {
-    const response = await axiosInstance.get(`/master-data/countries`, {
+    const response = await axiosInstance.get(`/master-data/country`, {
       params: filter,
     });
     return response.data;
@@ -10,17 +10,10 @@ export const getCountry = async (filter) => {
     throw error.response.data;
   }
 };
-export const getCountryById = async (id) => {
-  try {
-    const response = await axiosInstance.get(`/master-data/countries/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+
 export const createCountry = async (data) => {
   try {
-    const response = await axiosInstance.post(`/master-data/countries`, data);
+    const response = await axiosInstance.post(`/master-data/country`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -28,7 +21,7 @@ export const createCountry = async (data) => {
 };
 export const updateCountry = async (id, data) => {
   try {
-    const response = await axiosInstance.put(`/master-data/countries/${id}`, data);
+    const response = await axiosInstance.put(`/master-data/country/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -36,7 +29,7 @@ export const updateCountry = async (id, data) => {
 };
 export const deleteCountry = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/master-data/countries/${id}`);
+    const response = await axiosInstance.delete(`/master-data/country/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
