@@ -1,6 +1,5 @@
 import {
   createAdmin,
-  deleteAdmin,
   getAdmins,
   updateAdmin,
   updateAdminStatus,
@@ -63,19 +62,5 @@ export const useUpdateAdminStatus = () => {
   });
 };
 
-export const useDeleteAdmin = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: deleteAdmin,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["admins"] });
-      toast.success(response?.message || "Admin deleted successfully!");
-    },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to delete admin");
-    },
-  });
-};
 
 

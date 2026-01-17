@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useCreateCountry, useUpdateCountry } from "@/store/useCountryStore";
+import { countrySchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
 
 const CURRENCIES = [
@@ -38,6 +40,7 @@ const CreateCountry = ({ open, onClose, countryData }) => {
     watch,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(countrySchema),
     defaultValues: {
       code: "",
       name: "",
@@ -71,13 +74,8 @@ const CreateCountry = ({ open, onClose, countryData }) => {
   }, [countryData, isEdit, reset, open]);
 
   const onSubmit = (formData) => {
-    if (!formData.currency) {
-      toast.error(t("countryManagement.modal.currencyRequired"));
-      return;
-    }
-
     const payload = {
-      code: formData.code,
+      code: formData.code.toUpperCase(), // Ensure uppercase
       name: formData.name,
       currency: formData.currency,
     };
@@ -120,7 +118,12 @@ const CreateCountry = ({ open, onClose, countryData }) => {
               placeholder={t("countryManagement.modal.codePlaceholder")}
               error={errors.code?.message}
               required
-              {...register("code", { required: t("countryManagement.modal.codeRequired") })}
+              {...register("code", { 
+                onChange: (e) => {
+                  // Convert to uppercase as user types
+                  e.target.value = e.target.value.toUpperCase();
+                }
+              })}
             />
 
             <FormField
@@ -128,7 +131,7 @@ const CreateCountry = ({ open, onClose, countryData }) => {
               placeholder={t("countryManagement.modal.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: t("countryManagement.modal.nameRequired") })}
+              {...register("name")}
             />
 
             <div className="space-y-2">

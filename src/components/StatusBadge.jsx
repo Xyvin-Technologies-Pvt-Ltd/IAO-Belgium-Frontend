@@ -14,6 +14,8 @@ const statusVariants = {
   offline: "text-red-500",
   drafted: "text-amber-600",
   sended: "text-green-600",
+  open: "text-green-600",
+  closed: "text-red-500",
   // Ride statuses
   requested: "text-amber-600",
   accepted: "text-blue-600",

@@ -18,7 +18,6 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import CreateProgram from "@/components/admin/programs/CreateProgram";
-import StatusChip from "@/components/ui/StatusChip";
 import StatusBadge from "@/components/StatusBadge";
 
 const LearningModule = ({

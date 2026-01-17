@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { ChevronDown, Languages } from "lucide-react";
+import moment from "moment";
 
 export default function AdminTeacherLayoutComponent() {
   const { initializeTheme } = useThemeStore();
@@ -32,7 +34,8 @@ export default function AdminTeacherLayoutComponent() {
     i18n.changeLanguage(langCode);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const currentLanguage =
+    languages.find((lang) => lang.code === i18n.language) || languages[0];
 
   return (
     <SidebarProvider>
@@ -46,8 +49,9 @@ export default function AdminTeacherLayoutComponent() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-9 px-3 gap-2">
-                    <span className="text-lg">{currentLanguage.flag}</span>
-                    <span className="text-xs font-medium uppercase">{currentLanguage.code}</span>
+                    <Languages className="h-4 w-4" />
+                    <span>{currentLanguage.name}</span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -56,7 +60,9 @@ export default function AdminTeacherLayoutComponent() {
                       key={lang.code}
                       onClick={() => changeLanguage(lang.code)}
                       className={`flex items-center gap-2 ${
-                        i18n.language === lang.code ? "bg-orange-50 text-orange-600" : ""
+                        i18n.language === lang.code
+                          ? "bg-orange-50 text-orange-600"
+                          : ""
                       }`}
                     >
                       <span className="text-lg">{lang.flag}</span>
@@ -66,6 +72,9 @@ export default function AdminTeacherLayoutComponent() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeToggle />
+              <p className="text-sm text-dashboard-text-secondary">
+              {moment().format("ddd, DD MMM, YYYY").toUpperCase()}</p>
+
             </div>
           </div>
 

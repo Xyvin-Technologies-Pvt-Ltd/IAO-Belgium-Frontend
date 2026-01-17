@@ -25,7 +25,7 @@ const ListView = () => {
   const [deleteIds, setDeleteIds] = useState([]);
 
   const { data, isLoading, error, refetch } = useGetPrograms({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
   });
   const { mutateAsync: deleteCourse, isLoading: isDeleting } =

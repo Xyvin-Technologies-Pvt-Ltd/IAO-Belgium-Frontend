@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -13,6 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useCreateCity, useUpdateCity } from "@/store/useCityStore";
 import { useGetCountries } from "@/store/useCountryStore";
+import { citySchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
 
 const CreateCity = ({ open, onClose, cityData }) => {
@@ -27,6 +29,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
     watch,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(citySchema),
     defaultValues: {
       name: "",
       country: "",
@@ -40,7 +43,10 @@ const CreateCity = ({ open, onClose, cityData }) => {
   const selectedCountry = watch("country");
 
   const handleClose = () => {
-    reset();
+    reset({
+      name: "",
+      country: "",
+    });
     onClose();
   };
 
@@ -87,7 +93,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
               placeholder={t("cityManagement.modal.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: t("cityManagement.modal.nameRequired") })}
+              {...register("name")}
             />
 
             <div className="space-y-2">
@@ -95,7 +101,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
               <Select
                 key={selectedCountry || 'empty'}
                 value={selectedCountry || ""}
-                onValueChange={(value) => setValue("country", value)}
+                onValueChange={(value) => setValue("country", value, { shouldValidate: true })}
               >
                 <SelectTrigger whiteBg>
                   <SelectValue placeholder={t("cityManagement.modal.countryPlaceholder")} />

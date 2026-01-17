@@ -1,10 +1,11 @@
 import { create } from "zustand";
-import { verifyOtp, refreshToken as refreshTokenApi, logout as logoutApi } from "../api/authApi";
+import { verifyOtp, refreshToken as refreshTokenApi, logout as logoutApi, getProfile } from "../api/authApi";
 
 export const useAuthStore = create((set, get) => ({
   token: null, 
   role: null,
   user: null,
+  profile: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -28,16 +29,37 @@ export const useAuthStore = create((set, get) => ({
         error: null,
       });
 
+      // Fetch profile after successful login
+      await get().fetchProfile();
+
       return response;
     } catch (error) {
       set({
         token: null,
         role: null,
         user: null,
+        profile: null,
         isAuthenticated: false,
         isLoading: false,
         error: error.message || "OTP verification failed",
       });
+      throw error;
+    }
+  },
+
+  fetchProfile: async () => {
+    try {
+      const response = await getProfile();
+      const profileData = response.data;
+      
+      set({
+        profile: profileData,
+      });
+      
+      return response;
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+      set({ error: error.message || "Failed to fetch profile" });
       throw error;
     }
   },
@@ -52,6 +74,7 @@ export const useAuthStore = create((set, get) => ({
         token: null,
         role: null,
         user: null,
+        profile: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
@@ -89,12 +112,16 @@ export const useAuthStore = create((set, get) => ({
         error: null,
       });
 
+      // Fetch profile after token refresh
+      await get().fetchProfile();
+
       return response;
     } catch (error) {
       set({
         token: null,
         role: null,
         user: null,
+        profile: null,
         isAuthenticated: false,
         isLoading: false,
         error: error.message || "Token refresh failed",

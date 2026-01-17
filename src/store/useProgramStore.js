@@ -3,12 +3,13 @@ import { createProgram, deleteProgram, duplicateProgram, getPrograms, updateProg
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useGetPrograms = (filter) => {
+export const useGetPrograms = (filter, options = {}) => {
   return useQuery({
     queryKey: ["programs", filter],
     queryFn: () => getPrograms(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
 

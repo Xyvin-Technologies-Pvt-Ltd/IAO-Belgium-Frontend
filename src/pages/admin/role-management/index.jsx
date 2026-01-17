@@ -40,7 +40,7 @@ const RoleManagement = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetRoles({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });

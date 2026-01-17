@@ -61,6 +61,11 @@
     "fr": "Français"
   },
   "common": {
+    "welcome": {
+      "back": "Welcome back!",
+      "backWithName": "Welcome back, {name}!",
+      "subtitle": "All your courses, progress, and updates in one place."
+    },
     "deleteConfirm": {
       "title": "Delete Confirmation",
       "message": "Are you sure you want to delete",
@@ -96,16 +101,12 @@
       "editSubtitle": "Update the country details",
       "nameLabel": "Name",
       "namePlaceholder": "Enter Country Name",
-      "nameRequired": "Country name is required",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter Description",
-      "descriptionRequired": "Description is required",
       "codeLabel": "Country Code",
       "codePlaceholder": "Enter Country Code (e.g., US, CA, UK)",
-      "codeRequired": "Country code is required",
       "currencyLabel": "Currency",
       "currencyPlaceholder": "Select a currency",
-      "currencyRequired": "Please select a currency",
       "statusLabel": "Active",
       "loadingDetails": "Loading country details..."
     }
@@ -133,10 +134,8 @@
       "editSubtitle": "Update the city details",
       "nameLabel": "City Name",
       "namePlaceholder": "Enter city name",
-      "nameRequired": "City name is required",
       "countryLabel": "Country",
-      "countryPlaceholder": "Select Country",
-      "countryRequired": "Country is required"
+      "countryPlaceholder": "Select Country"
     }
   },
   "roleManagement": {
@@ -164,10 +163,8 @@
       "editSubtitle": "Update the role details",
       "nameLabel": "Name",
       "namePlaceholder": "Enter Role Name",
-      "nameRequired": "Role name is required",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter Description",
-      "descriptionRequired": "Description is required",
       "permissionsLabel": "Permissions",
       "viewLabel": "View",
       "modifyLabel": "Modify",
@@ -208,8 +205,7 @@
       "createSubtitle": "Let's create a new language",
       "editSubtitle": "Update the language details",
       "nameLabel": "Language Name",
-      "namePlaceholder": "Enter language name",
-      "nameRequired": "Language name is required"
+      "namePlaceholder": "Enter language name"
     }
   },
   "programManagement": {
@@ -241,26 +237,19 @@
       "editSubtitle": "Update the program details",
       "nameLabel": "Program Name",
       "namePlaceholder": "Enter program name",
-      "nameRequired": "Program name is required",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter program description",
-      "descriptionRequired": "Description is required",
       "programTypeLabel": "Program Type",
       "programTypePlaceholder": "Select program type",
-      "programTypeRequired": "Program type is required",
       "yearLabel": "Year",
       "yearPlaceholder": "Enter year (e.g., 1, 2, 3)",
-      "yearRequired": "Year is required",
       "languageLabel": "Language",
       "languagePlaceholder": "Select language",
-      "languageRequired": "Language is required",
       "countryLabel": "Country",
       "countryPlaceholder": "Select country",
-      "countryRequired": "Country is required",
       "cityLabel": "City",
       "cityPlaceholder": "Select city",
-      "cityPlaceholderDisabled": "Select country first",
-      "cityRequired": "City is required"
+      "cityPlaceholderDisabled": "Select country first"
     }
   }
 }

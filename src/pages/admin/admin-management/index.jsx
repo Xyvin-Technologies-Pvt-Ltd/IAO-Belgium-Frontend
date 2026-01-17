@@ -8,38 +8,28 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
-import RowActionMenu from "@/components/ui/table/RowActionMenu";
-import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import CreateAdmin from "@/components/admin/admin-management/CreateAdmin";
-import {
-  useGetAdmins,
-  useDeleteAdmin,
-  useUpdateAdminStatus,
-} from "@/store/useAdminStore";
+import { useGetAdmins, useUpdateAdminStatus } from "@/store/useAdminStore";
 import { Switch } from "@/components/ui/switch";
 
 const AdminManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetAdmins({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteAdmin, isPending: isDeleting } = useDeleteAdmin();
   const { mutate: updateAdminStatus } = useUpdateAdminStatus();
 
   const admins = data?.data || [];
@@ -47,17 +37,6 @@ const AdminManagement = () => {
 
   const handleOpenCreate = () => {
     setIsModalOpen(true);
-  };
-
-  const handleRowDeleteClick = (id) => {
-    setDeleteId(id);
-    setOpenDelete(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    await deleteAdmin(deleteId);
-    setDeleteId(null);
-    setOpenDelete(false);
   };
 
   const handleStatusToggle = (id, currentStatus) => {
@@ -89,15 +68,14 @@ const AdminManagement = () => {
             <TableHead>Phone</TableHead>
             <TableHead>Role Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || "Failed to load admins"}
                   onRetry={refetch}
@@ -120,22 +98,11 @@ const AdminManagement = () => {
                     onCheckedChange={() => handleStatusToggle(i._id, i?.status)}
                   />
                 </TableCell>
-                <TableCell>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: "Delete",
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
-                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={5} className="text-center">
                 No Admins found
               </TableCell>
             </TableRow>
@@ -151,14 +118,6 @@ const AdminManagement = () => {
       />
 
       <CreateAdmin open={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <DeleteConfirm
-        open={openDelete}
-        onClose={() => setOpenDelete(false)}
-        onConfirm={handleConfirmDelete}
-        count={1}
-        isLoading={isDeleting}
-        data="Admin"
-      />
     </div>
   );
 };

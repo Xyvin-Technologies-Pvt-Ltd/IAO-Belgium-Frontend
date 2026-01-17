@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateRole, useUpdateRole } from "@/store/useRoleStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { roleSchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
 
 const CreateRole = ({ open, onClose, roleData }) => {
@@ -106,11 +108,15 @@ const CreateRole = ({ open, onClose, roleData }) => {
     handleSubmit,
     reset,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(roleSchema),
     defaultValues: {
       name: "",
       description: "",
+      permissions: [],
     },
   });
 
@@ -119,7 +125,11 @@ const CreateRole = ({ open, onClose, roleData }) => {
   const updateRole = useUpdateRole();
 
   const handleClose = () => {
-    reset();
+    reset({
+      name: "",
+      description: "",
+      permissions: [],
+    });
     setSelectedPermissions([]);
     onClose();
   };
@@ -128,16 +138,23 @@ const CreateRole = ({ open, onClose, roleData }) => {
     if (roleData && isEdit && open) {
       setValue("name", roleData.name || "");
       setValue("description", roleData.description || "");
+      setValue("permissions", roleData.permissions || []);
       setSelectedPermissions(roleData.permissions || []);
     }
   }, [roleData, isEdit, setValue, open]);
 
   const togglePermission = (permissionId) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(permissionId)
-        ? prev.filter((id) => id !== permissionId)
-        : [...prev, permissionId]
-    );
+    const newPermissions = selectedPermissions.includes(permissionId)
+      ? selectedPermissions.filter((id) => id !== permissionId)
+      : [...selectedPermissions, permissionId];
+    
+    setSelectedPermissions(newPermissions);
+    setValue("permissions", newPermissions, { shouldValidate: true });
+    
+    // Clear permissions error if at least one permission is selected
+    if (newPermissions.length > 0) {
+      clearErrors("permissions");
+    }
   };
 
   const onSubmit = (formData) => {
@@ -180,9 +197,7 @@ const CreateRole = ({ open, onClose, roleData }) => {
             placeholder={t("roleManagement.modal.namePlaceholder")}
             error={errors.name?.message}
             required
-            {...register("name", {
-              required: t("roleManagement.modal.nameRequired"),
-            })}
+            {...register("name")}
           />
 
           <FormField
@@ -190,14 +205,12 @@ const CreateRole = ({ open, onClose, roleData }) => {
             placeholder={t("roleManagement.modal.descriptionPlaceholder")}
             error={errors.description?.message}
             required
-            {...register("description", {
-              required: t("roleManagement.modal.descriptionRequired"),
-            })}
+            {...register("description")}
           />
 
           <div className="space-y-3">
             <Label className="text-base font-medium text-gray-900 dark:text-white">
-              {t("roleManagement.modal.permissionsLabel")}
+              {t("roleManagement.modal.permissionsLabel")} <span className="text-red-500">*</span>
             </Label>
             <div className="border dark:border-white/20 rounded-lg overflow-hidden bg-white dark:bg-black">
               <div className="grid grid-cols-[2fr_100px_100px] gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 border-b dark:border-white/20">
@@ -252,6 +265,9 @@ const CreateRole = ({ open, onClose, roleData }) => {
                 ))}
               </div>
             </div>
+            {errors.permissions && (
+              <p className="text-sm text-red-500">{errors.permissions.message}</p>
+            )}
           </div>
 
           <FormActions

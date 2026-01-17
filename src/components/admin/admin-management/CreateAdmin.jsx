@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { adminSchema } from "@/validations/admin";
 
 const CreateAdmin = ({ open, onClose }) => {
   const {
@@ -23,6 +25,7 @@ const CreateAdmin = ({ open, onClose }) => {
     watch,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(adminSchema),
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -42,16 +45,17 @@ const CreateAdmin = ({ open, onClose }) => {
   const selectedRole = watch("role_access");
 
   const handleClose = () => {
-    reset();
+    reset({
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      role_access: "",
+    });
     onClose();
   };
 
   const onSubmit = (formData) => {
-    if (!formData.role_access) {
-      toast.error("Please select a role");
-      return;
-    }
-
     createAdmin.mutate(formData, {
       onSuccess: () => {
         handleClose();
@@ -77,7 +81,7 @@ const CreateAdmin = ({ open, onClose }) => {
               placeholder="Enter First Name"
               error={errors.first_name?.message}
               required
-              {...register("first_name", { required: "First name is required" })}
+              {...register("first_name")}
             />
 
             <FormField
@@ -85,7 +89,7 @@ const CreateAdmin = ({ open, onClose }) => {
               placeholder="Enter Last Name"
               error={errors.last_name?.message}
               required
-              {...register("last_name", { required: "Last name is required" })}
+              {...register("last_name")}
             />
 
             <FormField
@@ -93,13 +97,7 @@ const CreateAdmin = ({ open, onClose }) => {
               placeholder="Enter Email"
               error={errors.email?.message}
               required
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
-                },
-              })}
+              {...register("email")}
             />
 
             <FormField
@@ -107,7 +105,7 @@ const CreateAdmin = ({ open, onClose }) => {
               placeholder="Enter Phone"
               error={errors.phone?.message}
               required
-              {...register("phone", { required: "Phone is required" })}
+              {...register("phone")}
             />
 
             <div className="space-y-2">
@@ -119,7 +117,7 @@ const CreateAdmin = ({ open, onClose }) => {
               ) : (
                 <Select
                   value={selectedRole}
-                  onValueChange={(value) => setValue("role_access", value)}
+                  onValueChange={(value) => setValue("role_access", value, { shouldValidate: true })}
                 >
                  <SelectTrigger whiteBg>
                     <SelectValue placeholder="Select a role" />

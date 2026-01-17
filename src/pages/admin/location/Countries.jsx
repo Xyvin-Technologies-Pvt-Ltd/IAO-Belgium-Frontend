@@ -38,7 +38,7 @@ const Countries = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetCountries({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });

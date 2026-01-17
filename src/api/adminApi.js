@@ -38,13 +38,3 @@ export const updateAdminStatus = async (id, status) => {
     throw error.response.data;
   }
 };
-
-export const deleteAdmin = async (id) => {
-  try {
-    const response = await axiosInstance.delete(`/admin/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-

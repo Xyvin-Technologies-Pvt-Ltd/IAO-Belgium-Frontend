@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import {
@@ -16,24 +17,33 @@ import { useGetCities } from "@/store/useCityStore";
 import { useGetLanguages } from "@/store/useLanguageStore";
 import { useTranslation } from "react-i18next";
 import { useCreateProgram, useUpdateProgram } from "@/store/useProgramStore";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { programSchema } from "@/validations/admin";
 
 const CreateProgram = ({ open, onClose, programData }) => {
   const { t } = useTranslation();
   const [languagePage, setLanguagePage] = useState(1);
   const [cityPage, setCityPage] = useState(1);
   const [countryPage, setCountryPage] = useState(1);
-  const [allLanguages, setAllLanguages] = useState([]);
-  const [allCities, setAllCities] = useState([]);
-  const [allCountries, setAllCountries] = useState([]);
+  const languageLimit = 10;
+  const cityLimit = 10;
+  const countryLimit = 10;
 
-  const { data: countriesData, isFetching: isFetchingCountries } = useGetCountries({ 
-    page_no: countryPage, 
-    limit: 20 
-  }, { enabled: open });
-  const { data: languagesData, isFetching: isFetchingLanguages } = useGetLanguages({ 
-    page_no: languagePage, 
-    limit: 20 
-  }, { enabled: open });
+  const { data: countriesData } = useGetCountries(
+    {
+      page: countryPage,
+      limit: countryLimit,
+    },
+    { enabled: open }
+  );
+  const { data: languagesData } = useGetLanguages(
+    {
+      page: languagePage,
+      limit: languageLimit,
+    },
+    { enabled: open }
+  );
 
   const {
     register,
@@ -43,6 +53,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
     watch,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(programSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -60,54 +71,20 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   const selectedCountry = watch("country");
   const selectedProgramType = watch("program_type");
-  const selectedYear = watch("year");
   const selectedLanguage = watch("language");
   const selectedCity = watch("city");
 
-  const { data: citiesData, isFetching: isFetchingCities } = useGetCities({
-    page_no: cityPage,
-    limit: 20,
+  const { data: citiesData } = useGetCities({
+    page: cityPage,
+    limit: cityLimit,
     ...(selectedCountry ? { country: selectedCountry } : {}),
   }, { enabled: open && !!selectedCountry });
 
-  // Accumulate languages as new pages load
-  useEffect(() => {
-    if (languagesData?.data) {
-      setAllLanguages(prev => {
-        const existingIds = new Set(prev.map(l => l._id));
-        const newLanguages = languagesData.data.filter(l => !existingIds.has(l._id));
-        return [...prev, ...newLanguages];
-      });
-    }
-  }, [languagesData]);
-
-  // Accumulate countries as new pages load
-  useEffect(() => {
-    if (countriesData?.data) {
-      setAllCountries(prev => {
-        const existingIds = new Set(prev.map(c => c._id));
-        const newCountries = countriesData.data.filter(c => !existingIds.has(c._id));
-        return [...prev, ...newCountries];
-      });
-    }
-  }, [countriesData]);
-
-  // Accumulate cities as new pages load
-  useEffect(() => {
-    if (citiesData?.data) {
-      setAllCities(prev => {
-        const existingIds = new Set(prev.map(c => c._id));
-        const newCities = citiesData.data.filter(c => !existingIds.has(c._id));
-        return [...prev, ...newCities];
-      });
-    }
-  }, [citiesData]);
-
   // Reset cities when country changes
   useEffect(() => {
-    setAllCities([]);
     setCityPage(1);
-  }, [selectedCountry]);
+    setValue("city", "");
+  }, [selectedCountry, setValue]);
 
   // Reset pagination when modal opens
   useEffect(() => {
@@ -115,9 +92,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       setLanguagePage(1);
       setCityPage(1);
       setCountryPage(1);
-      setAllLanguages([]);
-      setAllCities([]);
-      setAllCountries([]);
     }
   }, [open]);
 
@@ -126,9 +100,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
     setLanguagePage(1);
     setCityPage(1);
     setCountryPage(1);
-    setAllLanguages([]);
-    setAllCities([]);
-    setAllCountries([]);
     onClose();
   };
 
@@ -139,29 +110,15 @@ const CreateProgram = ({ open, onClose, programData }) => {
       setValue('program_type', programData.program_type || '');
       setValue('year', programData.year || '');
       setValue('language', programData.language?._id || '');
-      setValue('city', programData.city?._id || '');
-      setValue('country', programData.city?.country?._id || '');
-
-      // Add the selected items to the accumulated arrays if they exist
-      if (programData.language) {
-        setAllLanguages(prev => {
-          const exists = prev.some(l => l._id === programData.language._id);
-          return exists ? prev : [programData.language, ...prev];
-        });
-      }
-
-      if (programData.city?.country) {
-        setAllCountries(prev => {
-          const exists = prev.some(c => c._id === programData.city.country._id);
-          return exists ? prev : [programData.city.country, ...prev];
-        });
-      }
-
-      if (programData.city) {
-        setAllCities(prev => {
-          const exists = prev.some(c => c._id === programData.city._id);
-          return exists ? prev : [programData.city, ...prev];
-        });
+      // Set country first, then city after a brief delay to ensure cities are fetched
+      if (programData.city?.country?._id) {
+        setValue('country', programData.city.country._id);
+        // Use setTimeout to ensure the country is set and cities query is triggered
+        setTimeout(() => {
+          if (programData.city?._id) {
+            setValue('city', programData.city._id);
+          }
+        }, 100);
       }
     }
   }, [programData, isEdit, setValue, open]);
@@ -190,6 +147,24 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   const isSubmitting = createProgram.isPending || updateProgram.isPending;
 
+  const languages = languagesData?.data || [];
+  const totalLanguages = languagesData?.total_count || 0;
+  const totalLanguagePages = Math.ceil(totalLanguages / languageLimit);
+  const hasLanguagePrev = languagePage > 1;
+  const hasLanguageNext = languagePage < totalLanguagePages;
+
+  const countries = countriesData?.data || [];
+  const totalCountries = countriesData?.total_count || 0;
+  const totalCountryPages = Math.ceil(totalCountries / countryLimit);
+  const hasCountryPrev = countryPage > 1;
+  const hasCountryNext = countryPage < totalCountryPages;
+
+  const cities = citiesData?.data || [];
+  const totalCities = citiesData?.total_count || 0;
+  const totalCityPages = Math.ceil(totalCities / cityLimit);
+  const hasCityPrev = cityPage > 1;
+  const hasCityNext = cityPage < totalCityPages;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md max-h-[90vh] flex flex-col">
@@ -209,7 +184,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               placeholder={t("programManagement.modal.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: t("programManagement.modal.nameRequired") })}
+              {...register("name")}
             />
 
             <div className="space-y-2">
@@ -217,7 +192,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <Textarea
                 placeholder={t("programManagement.modal.descriptionPlaceholder")}
                 className="bg-white dark:bg-white/5"
-                {...register("description", { required: t("programManagement.modal.descriptionRequired") })}
+                {...register("description")}
               />
               {errors.description && (
                 <p className="text-red-500 text-sm">
@@ -231,7 +206,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <Select
                 key={selectedProgramType || 'empty-type'}
                 value={selectedProgramType || ""}
-                onValueChange={(value) => setValue("program_type", value)}
+                onValueChange={(value) => setValue("program_type", value, { shouldValidate: true })}
               >
                 <SelectTrigger whiteBg>
                   <SelectValue placeholder={t("programManagement.modal.programTypePlaceholder")} />
@@ -254,11 +229,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               type="number"
               error={errors.year?.message}
               required
-              {...register("year", { 
-                required: t("programManagement.modal.yearRequired"),
-                min: { value: 1, message: "Year must be at least 1" },
-                max: { value: 10, message: "Year must be at most 10" }
-              })}
+              {...register("year")}
             />
 
             <div className="space-y-2">
@@ -266,28 +237,51 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <Select
                 key={selectedLanguage || 'empty-language'}
                 value={selectedLanguage || ""}
-                onValueChange={(value) => setValue("language", value)}
+                onValueChange={(value) => setValue("language", value, { shouldValidate: true })}
               >
                 <SelectTrigger whiteBg>
                   <SelectValue placeholder={t("programManagement.modal.languagePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent
-                  onScroll={(e) => {
-                    const target = e.currentTarget;
-                    const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-                    if (bottom && !isFetchingLanguages && allLanguages.length < (languagesData?.total_count || 0)) {
-                      setLanguagePage(prev => prev + 1);
-                    }
-                  }}
+                  position="popper"
+                  sideOffset={4}
+                  className="w-(--radix-select-trigger-width)"
                 >
-                  {allLanguages?.map((language) => (
-                    <SelectItem key={language._id} value={language._id}>
-                      {language.name}
-                    </SelectItem>
-                  ))}
-                  {isFetchingLanguages && (
-                    <div className="text-center py-2 text-sm text-gray-500">
-                      Loading...
+                  <div className="max-h-75 overflow-y-auto">
+                    {languages?.map((language) => (
+                      <SelectItem key={language._id} value={language._id}>
+                        {language.name}
+                      </SelectItem>
+                    ))}
+                  </div>
+                  {totalLanguages > languageLimit && (
+                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setLanguagePage((prev) => Math.max(1, prev - 1));
+                        }}
+                        disabled={!hasLanguagePrev}
+                        className="h-8 w-8"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setLanguagePage((prev) => prev + 1);
+                        }}
+                        disabled={!hasLanguageNext}
+                        className="h-8 w-8"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
                     </div>
                   )}
                 </SelectContent>
@@ -305,7 +299,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 key={selectedCountry || 'empty-country'}
                 value={selectedCountry || ""}
                 onValueChange={(value) => {
-                  setValue("country", value);
+                  setValue("country", value, { shouldValidate: true });
                   setValue("city", ""); // Reset city when country changes
                 }}
               >
@@ -313,22 +307,45 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   <SelectValue placeholder={t("programManagement.modal.countryPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent
-                  onScroll={(e) => {
-                    const target = e.currentTarget;
-                    const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-                    if (bottom && !isFetchingCountries && allCountries.length < (countriesData?.total_count || 0)) {
-                      setCountryPage(prev => prev + 1);
-                    }
-                  }}
+                  position="popper"
+                  sideOffset={4}
+                  className="w-(--radix-select-trigger-width)"
                 >
-                  {allCountries?.map((country) => (
-                    <SelectItem key={country._id} value={country._id}>
-                      {country.name}
-                    </SelectItem>
-                  ))}
-                  {isFetchingCountries && (
-                    <div className="text-center py-2 text-sm text-gray-500">
-                      Loading...
+                  <div className="max-h-75 overflow-y-auto">
+                    {countries?.map((country) => (
+                      <SelectItem key={country._id} value={country._id}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </div>
+                  {totalCountries > countryLimit && (
+                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCountryPage((prev) => Math.max(1, prev - 1));
+                        }}
+                        disabled={!hasCountryPrev}
+                        className="h-8 w-8"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCountryPage((prev) => prev + 1);
+                        }}
+                        disabled={!hasCountryNext}
+                        className="h-8 w-8"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
                     </div>
                   )}
                 </SelectContent>
@@ -345,29 +362,52 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <Select
                 key={selectedCity || 'empty-city'}
                 value={selectedCity || ""}
-                onValueChange={(value) => setValue("city", value)}
+                onValueChange={(value) => setValue("city", value, { shouldValidate: true })}
                 disabled={!selectedCountry}
               >
                 <SelectTrigger whiteBg>
                   <SelectValue placeholder={selectedCountry ? t("programManagement.modal.cityPlaceholder") : t("programManagement.modal.cityPlaceholderDisabled")} />
                 </SelectTrigger>
                 <SelectContent
-                  onScroll={(e) => {
-                    const target = e.currentTarget;
-                    const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-                    if (bottom && !isFetchingCities && allCities.length < (citiesData?.total_count || 0)) {
-                      setCityPage(prev => prev + 1);
-                    }
-                  }}
+                  position="popper"
+                  sideOffset={4}
+                  className="w-(--radix-select-trigger-width)"
                 >
-                  {allCities?.map((city) => (
-                    <SelectItem key={city._id} value={city._id}>
-                      {city.name}
-                    </SelectItem>
-                  ))}
-                  {isFetchingCities && (
-                    <div className="text-center py-2 text-sm text-gray-500">
-                      Loading...
+                  <div className="max-h-75 overflow-y-auto">
+                    {cities?.map((city) => (
+                      <SelectItem key={city._id} value={city._id}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </div>
+                  {totalCities > cityLimit && (
+                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCityPage((prev) => Math.max(1, prev - 1));
+                        }}
+                        disabled={!hasCityPrev}
+                        className="h-8 w-8"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCityPage((prev) => prev + 1);
+                        }}
+                        disabled={!hasCityNext}
+                        className="h-8 w-8"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
                     </div>
                   )}
                 </SelectContent>

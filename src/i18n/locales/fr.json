@@ -61,6 +61,11 @@
     "fr": "Français"
   },
   "common": {
+    "welcome": {
+      "back": "Bon retour !",
+      "backWithName": "Bon retour, {name} !",
+      "subtitle": "Tous vos cours, progrès et mises à jour en un seul endroit."
+    },
     "deleteConfirm": {
       "title": "Confirmation de suppression",
       "message": "Êtes-vous sûr de vouloir supprimer",
@@ -96,16 +101,12 @@
       "editSubtitle": "Mettre à jour les détails du pays",
       "nameLabel": "Nom",
       "namePlaceholder": "Entrez le nom du pays",
-      "nameRequired": "Le nom du pays est requis",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Entrez la description",
-      "descriptionRequired": "La description est requise",
       "codeLabel": "Code du pays",
       "codePlaceholder": "Entrez le code du pays (ex: US, CA, UK)",
-      "codeRequired": "Le code du pays est requis",
       "currencyLabel": "Devise",
       "currencyPlaceholder": "Sélectionnez une devise",
-      "currencyRequired": "Veuillez sélectionner une devise",
       "statusLabel": "Actif",
       "loadingDetails": "Chargement des détails du pays..."
     }
@@ -133,10 +134,8 @@
       "editSubtitle": "Mettre à jour les détails de la ville",
       "nameLabel": "Nom de la ville",
       "namePlaceholder": "Entrez le nom de la ville",
-      "nameRequired": "Le nom de la ville est requis",
       "countryLabel": "Pays",
-      "countryPlaceholder": "Sélectionnez un pays",
-      "countryRequired": "Le pays est requis"
+      "countryPlaceholder": "Sélectionnez un pays"
     }
   },
   "roleManagement": {
@@ -164,10 +163,8 @@
       "editSubtitle": "Mettre à jour les détails du rôle",
       "nameLabel": "Nom",
       "namePlaceholder": "Entrez le nom du rôle",
-      "nameRequired": "Le nom du rôle est requis",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Entrez la description",
-      "descriptionRequired": "La description est requise",
       "permissionsLabel": "Permissions",
       "viewLabel": "Voir",
       "modifyLabel": "Modifier",
@@ -208,8 +205,7 @@
       "createSubtitle": "Créons une nouvelle langue",
       "editSubtitle": "Mettre à jour les détails de la langue",
       "nameLabel": "Nom de la langue",
-      "namePlaceholder": "Entrez le nom de la langue",
-      "nameRequired": "Le nom de la langue est requis"
+      "namePlaceholder": "Entrez le nom de la langue"
     }
   },
   "programManagement": {
@@ -241,26 +237,19 @@
       "editSubtitle": "Mettre à jour les détails du programme",
       "nameLabel": "Nom du programme",
       "namePlaceholder": "Entrez le nom du programme",
-      "nameRequired": "Le nom du programme est requis",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Entrez la description du programme",
-      "descriptionRequired": "La description est requise",
       "programTypeLabel": "Type de programme",
       "programTypePlaceholder": "Sélectionnez le type de programme",
-      "programTypeRequired": "Le type de programme est requis",
       "yearLabel": "Année",
       "yearPlaceholder": "Entrez l'année (ex: 1, 2, 3)",
-      "yearRequired": "L'année est requise",
       "languageLabel": "Langue",
       "languagePlaceholder": "Sélectionnez une langue",
-      "languageRequired": "La langue est requise",
       "countryLabel": "Pays",
       "countryPlaceholder": "Sélectionnez un pays",
-      "countryRequired": "Le pays est requis",
       "cityLabel": "Ville",
       "cityPlaceholder": "Sélectionnez une ville",
-      "cityPlaceholderDisabled": "Sélectionnez d'abord un pays",
-      "cityRequired": "La ville est requise"
+      "cityPlaceholderDisabled": "Sélectionnez d'abord un pays"
     }
   }
 }

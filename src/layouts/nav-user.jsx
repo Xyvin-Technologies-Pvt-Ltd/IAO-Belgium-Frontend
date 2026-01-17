@@ -23,56 +23,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
-import { getProfile } from "@/api/authApi";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTranslation } from "react-i18next";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { logout, isAuthenticated } = useAuthStore();
+  const { logout, isAuthenticated, profile, isLoading } = useAuthStore();
   const { t } = useTranslation();
-  const [user, setUser] = useState({
-    name: "",
-    role: "",
-    avatar: "",
-  });
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!isAuthenticated) return;
-      
-      try {
-        setIsLoading(true);
-        const profileData = await getProfile();
-        console.log("User Profile Data:", profileData?.data);
-        
-        const firstName = profileData.data?.first_name || "";
-        const lastName = profileData.data?.last_name || "";
-        const fullName = `${firstName} ${lastName}`.trim() || "User";
-        
-        setUser({
-          name: fullName,
-          role: profileData.data?.role_access?.name || profileData.data?.role || "",
-          avatar: profileData.data?.avatar || profileData.data?.profilePicture || "",
-        });
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-        // Set fallback user data
-        setUser({
-          name: "User",
-          role: "",
-          avatar: "",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [isAuthenticated]);
+  const firstName = profile?.first_name || "";
+  const lastName = profile?.last_name || "";
+  const fullName = `${firstName} ${lastName}`.trim() || "User";
+  const role = profile?.role_access?.name || profile?.role || "";
+  const avatar = profile?.avatar || profile?.profilePicture || "";
 
   const handleSignOut = async () => {
     try {
@@ -84,6 +48,7 @@ export function NavUser() {
       navigate({ to: "/login" });
     }
   };
+
   return (
     <>
       <SidebarMenu>
@@ -95,17 +60,17 @@ export function NavUser() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarImage src={avatar} alt={fullName} />
                   <AvatarFallback className="rounded-lg">
-                    {isLoading ? "..." : (user?.name?.charAt(0)?.toUpperCase() || "U")}
+                    {isLoading ? "..." : (fullName?.charAt(0)?.toUpperCase() || "U")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
+                    {isLoading ? t("sidebar.user.loading") : fullName}
                   </span>
                   <span className="truncate text-xs">
-                    {isLoading ? "..." : (user?.role || t("sidebar.user.noRole"))}
+                    {isLoading ? "..." : (role || t("sidebar.user.noRole"))}
                   </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
@@ -120,17 +85,17 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarImage src={avatar} alt={fullName} />
                     <AvatarFallback className="rounded-lg">
-                      {isLoading ? "..." : (user?.name?.charAt(0)?.toUpperCase() || "U")}
+                      {isLoading ? "..." : (fullName?.charAt(0)?.toUpperCase() || "U")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {isLoading ? t("sidebar.user.loading") : (user?.name || "User")}
+                      {isLoading ? t("sidebar.user.loading") : fullName}
                     </span>
                     <span className="truncate text-xs">
-                      {isLoading ? "..." : (user?.role || t("sidebar.user.noRole"))}
+                      {isLoading ? "..." : (role || t("sidebar.user.noRole"))}
                     </span>
                   </div>
                 </div>

@@ -40,7 +40,7 @@ const Programs = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetPrograms({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });

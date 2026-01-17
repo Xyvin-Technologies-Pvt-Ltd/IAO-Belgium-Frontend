@@ -16,13 +16,11 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
-import {
-  useDeleteIntake,
-  useGetIntakes,
-  useUpdateIntake,
-} from "@/store/useIntakeStore";
+import { useDeleteIntake, useGetIntakes } from "@/store/useIntakeStore";
+import CreateIntake from "@/components/admin/intake/CreateIntake";
+import StatusBadge from "@/components/StatusBadge";
+import moment from "moment";
 
 const Intakes = () => {
   const { t } = useTranslation();
@@ -37,13 +35,12 @@ const Intakes = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetIntakes({
-    page_no: page,
+    page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
   const { mutateAsync: deleteIntake, isPending: isDeleting } =
     useDeleteIntake();
-  const { mutate: updateIntake } = useUpdateIntake();
 
   const intakes = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -72,10 +69,6 @@ const Intakes = () => {
     }
   };
 
-  const handleStatusToggle = (id, currentStatus) => {
-    updateIntake({ id, data: { status: !currentStatus } });
-  };
-
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
@@ -95,16 +88,21 @@ const Intakes = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("languageManagement.table.name")}</TableHead>
+            <TableHead>Program</TableHead>
+            <TableHead>Admission Fee</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>End Date</TableHead>
+            <TableHead>Registration Deadline</TableHead>
             <TableHead>{t("languageManagement.table.status")}</TableHead>
             <TableHead>{t("languageManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={3} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -119,14 +117,25 @@ const Intakes = () => {
             intakes?.map((i) => (
               <TableRow key={i._id}>
                 <TableCell>{i?.name}</TableCell>
+                <TableCell>{i?.program?.name || "N/A"}</TableCell>
+                <TableCell>${i?.admission_fee || 0}</TableCell>
                 <TableCell>
-                  <Switch
-                    checked={i?.status}
-                    onCheckedChange={(checked) => {
-                      handleStatusToggle(i._id, i?.status);
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
+                  {i?.start_date
+                    ? moment(i.start_date).format("MMM DD, YYYY")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {i?.end_date
+                    ? moment(i.end_date).format("MMM DD, YYYY")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {i?.registration_deadline
+                    ? moment(i.registration_deadline).format("MMM DD, YYYY")
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
@@ -148,7 +157,7 @@ const Intakes = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={3} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("languageManagement.table.noLanguages")}
               </TableCell>
             </TableRow>
@@ -161,6 +170,11 @@ const Intakes = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
+      />
+      <CreateIntake
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        intakeData={selectedIntake}
       />
 
       <DeleteConfirm
