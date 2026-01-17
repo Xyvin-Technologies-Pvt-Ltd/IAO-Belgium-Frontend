@@ -2,152 +2,61 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
-  Navigate,
   ErrorComponent,
 } from "@tanstack/react-router";
 import RootLayout from "../layouts/RootLayout";
-import ProtectedLayout from "../layouts/ProtectedLayout";
 import AdminTeacherLayout from "../layouts/AdminTeacherLayout";
-import Login from "../pages/student/Login";
-import ApplicationForm from "../pages/student/application/ApplicationForm";
-import TeacherDashboard from "../pages/teacher/TeacherDashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import StudentReview from "@/pages/student/review/StudentReview";
-import Dashboard from "@/pages/student/Dashboard";
-import Assessment from "@/pages/student/assessment";
-import ModuleDetails from "@/pages/student/module/ModuleDetails";
-import ChangeLocation from "@/pages/student/module/ChangeLocation";
-import AppDetails from "@/pages/student/app/AppDetails";
-import MyApp from "@/pages/student/app";
-import MyCourses from "@/pages/student/module";
 import NotFound from "../pages/NotFound";
-import Schedules from "@/pages/teacher/schedule";
-import Programs from "@/pages/admin/program";
-import ProgramDetail from "@/pages/admin/program/ProgramDetail";
-import Locations from "@/pages/admin/location";
-import ApplicationReview from "@/pages/admin/application-review";
-import AdminManagement from "@/pages/admin/admin-management";
-import RoleManagement from "@/pages/admin/role-management";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Language from "@/pages/admin/language";
-import Intakes from "@/pages/admin/intake";
+import { publicRoutes } from "./routes/publicRoutes.jsx";
+import { teacherRoutes } from "./routes/teacherRoutes.jsx";
+import { adminRoutes } from "./routes/adminRoutes.jsx";
 
+// Root route
 const rootRoute = createRootRoute({
   component: RootLayout,
   errorComponent: ErrorComponent,
 });
 
-// Public routes
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-  component: Login,
-});
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: () => <Navigate to="/login" replace />,
-});
-
-// Protected layout for students
+// Protected layout route
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "protected",
-  component: ProtectedLayout,
-});
-
-// Admin/Teacher layout with sidebar
-const adminTeacherRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  id: "adminTeacher",
   component: AdminTeacherLayout,
 });
 
-// Student routes (use ProtectedLayout)
-const studentRoutes = [
-  {
-    path: "/student",
-    component: () => <Navigate to="/student/dashboard" replace />,
-  },
-  { path: "/student/dashboard", component: Dashboard },
-  { path: "/student/application", component: ApplicationForm },
-  { path: "/student/review", component: StudentReview },
-  { path: "/student/assessment", component: Assessment },
-  { path: "/student/app", component: MyApp },
-  { path: "/student/app/$id", component: AppDetails },
-  { path: "/student/courses", component: MyCourses },
-  { path: "/student/module/$id", component: ModuleDetails },
-  { path: "/student/change-location/$id", component: ChangeLocation },
-];
-
-// Teacher routes (use AdminTeacherLayout)
-const teacherRoutes = [
-  {
-    path: "/teacher",
-    component: () => <Navigate to="/teacher/dashboard" replace />,
-  },
-  { path: "/teacher/dashboard", component: TeacherDashboard },
-  { path: "/teacher/schedules", component: Schedules },
-];
-
-// Admin routes (use AdminTeacherLayout)
-const adminRoutes = [
-  {
-    path: "/admin",
-    component: () => <Navigate to="/admin/dashboard" replace />,
-  },
-  { path: "/admin/dashboard", component: AdminDashboard },
-  { path: "/admin/program", component: Programs },
-  { path: "/admin/program/$id", component: ProgramDetail },
-  { path: "/admin/locations", component: Locations },
-   { path: "/admin/languages", component: Language },
-  {
-    path: "/admin/admission-administration/application-review",
-    component: ApplicationReview,
-  },
-  {
-    path: "/admin/admission-administration/intakes",
-    component: Intakes,
-  },
-  { path: "/admin/admin-management", component: AdminManagement },
-  { path: "/admin/role-management", component: RoleManagement },
-];
-
-// Generate route children
-const studentRouteChildren = studentRoutes.map(({ path, component }) =>
+// Helper function to create routes
+const createProtectedRoute = (path, component) =>
   createRoute({
     getParentRoute: () => protectedRoute,
     path,
     component,
-  })
-);
+  });
 
-const teacherRouteChildren = teacherRoutes.map(({ path, component }) =>
+const createPublicRoute = (path, component) =>
   createRoute({
-    getParentRoute: () => adminTeacherRoute,
+    getParentRoute: () => rootRoute,
     path,
     component,
-  })
+  });
+
+// Create route objects
+const publicRouteObjects = publicRoutes.map(({ path, component }) => 
+  createPublicRoute(path, component)
 );
 
-const adminRouteChildren = adminRoutes.map(({ path, component }) =>
-  createRoute({
-    getParentRoute: () => adminTeacherRoute,
-    path,
-    component,
-  })
-);
+const protectedRouteObjects = [
+  ...teacherRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
+  ...adminRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
+];
 
 // Create the route tree
 const routeTree = rootRoute.addChildren([
-  indexRoute,
-  loginRoute,
-  protectedRoute.addChildren(studentRouteChildren),
-  adminTeacherRoute.addChildren([...teacherRouteChildren, ...adminRouteChildren]),
+  ...publicRouteObjects,
+  protectedRoute.addChildren(protectedRouteObjects),
 ]);
 
-// Create the router
+// Create and export the router
 export const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFound,

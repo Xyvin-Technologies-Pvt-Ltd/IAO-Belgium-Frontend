@@ -103,7 +103,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
                 value={selectedCountry || ""}
                 onValueChange={(value) => setValue("country", value, { shouldValidate: true })}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={t("cityManagement.modal.countryPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>

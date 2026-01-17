@@ -83,7 +83,6 @@ const Cities = () => {
           placeholder={t("cityManagement.search")}
           className="max-w-xs"
           value={search}
-          whiteBg
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate}>

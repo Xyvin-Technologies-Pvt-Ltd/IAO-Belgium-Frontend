@@ -72,7 +72,6 @@ const ViewApplication = ({ open, onClose, applicationId }) => {
             <div className="space-y-2">
               <label>Remarks</label>
               <Textarea
-                whiteBg
                 placeholder="Enter any remarks to add before forwarding"
                 rows={4}
               />

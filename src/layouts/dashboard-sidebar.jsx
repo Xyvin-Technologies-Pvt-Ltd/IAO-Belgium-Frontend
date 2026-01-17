@@ -12,17 +12,23 @@ import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import { TeamSwitcher } from './team-switcher'
 import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '@/store/useAuthStore'
 
 export function DashboardSidebar() {
   const location = useLocation();
   const { t } = useTranslation();
+  const { profile } = useAuthStore();
+  
+  // Get user permissions from profile
+  const userPermissions = profile?.role_access?.permissions || [];
   
   const getSidebarData = () => {
     if (location.pathname.startsWith('/teacher')) {
       return getTeacherSidebarData(t);
     } else if (location.pathname.startsWith('/admin')) {
-      return getAdminSidebarData(t);
-    } return getTeacherSidebarData(t);
+      return getAdminSidebarData(t, userPermissions);
+    } 
+    return getTeacherSidebarData(t);
   };
 
   const currentSidebarData = getSidebarData();

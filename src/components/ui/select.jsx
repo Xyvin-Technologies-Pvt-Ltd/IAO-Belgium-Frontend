@@ -25,7 +25,6 @@ function SelectValue({
 function SelectTrigger({
   className,
   children,
-  whiteBg = false,
   ...props
 }) {
   return (
@@ -33,7 +32,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       className={cn(
         "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        whiteBg ? "bg-white" : "bg-input-foreground",
+        "bg-white",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         "flex items-center justify-between gap-2 data-placeholder:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className

@@ -11,7 +11,7 @@ const Schedules = () => {
     <div className="space-y-6">
       <h2 className="text-xl font-semibold ">Schedules</h2>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Input placeholder="Search Sessions" whiteBg className="max-w-sm" />
+        <Input placeholder="Search Sessions" className="max-w-sm" />
         <div className="flex items-center gap-2">
           <Button
             variant={view === "list" ? "default" : "outline"}

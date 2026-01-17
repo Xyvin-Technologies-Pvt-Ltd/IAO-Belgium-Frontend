@@ -85,7 +85,6 @@ const LearningModule = ({
             placeholder="Search..."
             className="max-w-xs"
             value={search}
-            whiteBg
             onChange={(e) => setSearch(e.target.value)}
           />
 

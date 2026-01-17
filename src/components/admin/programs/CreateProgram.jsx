@@ -208,7 +208,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 value={selectedProgramType || ""}
                 onValueChange={(value) => setValue("program_type", value, { shouldValidate: true })}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={t("programManagement.modal.programTypePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -239,7 +239,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 value={selectedLanguage || ""}
                 onValueChange={(value) => setValue("language", value, { shouldValidate: true })}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={t("programManagement.modal.languagePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent
@@ -303,7 +303,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   setValue("city", ""); // Reset city when country changes
                 }}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={t("programManagement.modal.countryPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent
@@ -365,7 +365,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 onValueChange={(value) => setValue("city", value, { shouldValidate: true })}
                 disabled={!selectedCountry}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={selectedCountry ? t("programManagement.modal.cityPlaceholder") : t("programManagement.modal.cityPlaceholderDisabled")} />
                 </SelectTrigger>
                 <SelectContent

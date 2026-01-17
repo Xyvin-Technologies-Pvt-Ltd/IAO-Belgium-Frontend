@@ -162,7 +162,6 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
                 >
                   <SelectTrigger
                     className={errors.program ? "border-red-500" : ""}
-                    whiteBg
                   >
                     <SelectValue placeholder="Select program" />
                   </SelectTrigger>

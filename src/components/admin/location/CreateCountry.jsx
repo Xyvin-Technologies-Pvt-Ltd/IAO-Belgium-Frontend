@@ -143,7 +143,7 @@ const CreateCountry = ({ open, onClose, countryData }) => {
                 value={selectedCurrency || ""}
                 onValueChange={(value) => setValue("currency", value)}
               >
-                <SelectTrigger whiteBg>
+                <SelectTrigger>
                   <SelectValue placeholder={t("countryManagement.modal.currencyPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>

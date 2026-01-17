@@ -76,7 +76,6 @@ const Intakes = () => {
           placeholder={t("languageManagement.search")}
           className="max-w-xs"
           value={search}
-          whiteBg
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate}>

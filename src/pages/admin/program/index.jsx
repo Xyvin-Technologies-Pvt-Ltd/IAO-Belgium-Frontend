@@ -91,7 +91,6 @@ const Programs = () => {
           placeholder={t("programManagement.search")}
           className="max-w-xs"
           value={search}
-          whiteBg
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate}>

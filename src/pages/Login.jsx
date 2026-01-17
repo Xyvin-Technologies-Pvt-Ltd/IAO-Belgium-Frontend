@@ -7,10 +7,8 @@ import { CircleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { sendOtp } from "@/api/authApi";
-import logo from "../../assets/images/logo.png";
-import bg from "../../assets/images/login-image.webp";
-import googleIcon from "../../assets/icons/google.svg";
-import microsoftIcon from "../../assets/icons/microsoft.svg";
+import logo from "../assets/images/logo.png";
+import bg from "../assets/images/login-image.webp";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -53,7 +51,7 @@ const Login = () => {
       const response = await verifyOtp(email, otp);
       const userRole = response?.data?.user?.role;
       toast.success("Login successful!");
-console.log("OTP verified successfully:", response?.data?.user?.role);
+      console.log("OTP verified successfully:", response?.data?.user?.role);
 
       // Navigate based on user role
       if (userRole === "admin") {
@@ -99,33 +97,6 @@ console.log("OTP verified successfully:", response?.data?.user?.role);
               <p className="text-sm text-muted-foreground">
                 Create your account to get started
               </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button variant="secondary" className="w-full h-11">
-                <img src={googleIcon} alt="Google" className="w-6 h-6 mr-2" />
-                Continue with Google
-              </Button>
-
-              <Button variant="secondary" className="w-full h-11">
-                <img
-                  src={microsoftIcon}
-                  alt="Google"
-                  className="w-6 h-6 mr-1"
-                />
-                Continue with Microsoft
-              </Button>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-background px-2 text-muted-foreground">
-                  or use your email
-                </span>
-              </div>
             </div>
 
             <div className="space-y-4">

@@ -119,7 +119,7 @@ const CreateAdmin = ({ open, onClose }) => {
                   value={selectedRole}
                   onValueChange={(value) => setValue("role_access", value, { shouldValidate: true })}
                 >
-                 <SelectTrigger whiteBg>
+                 <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
