@@ -79,6 +79,9 @@ const Language = () => {
 
   return (
     <div className="space-y-6 mt-4">
+        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+       {t("languageManagement.title")}
+      </h2>
       <div className="flex items-center justify-between gap-2">
         <Input
           placeholder={t("languageManagement.search")}

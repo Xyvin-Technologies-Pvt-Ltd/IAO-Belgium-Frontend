@@ -185,7 +185,7 @@
     }
   },
   "languageManagement": {
-    "title": "Language Management",
+    "title": "Languages",
     "search": "Search...",
     "delete": "Delete",
     "createLanguage": "Create Language",
@@ -209,7 +209,7 @@
     }
   },
   "programManagement": {
-    "title": "Program Management",
+    "title": "Programs",
     "search": "Search...",
     "delete": "Delete",
     "duplicate": "Duplicate",
@@ -250,6 +250,135 @@
       "cityLabel": "City",
       "cityPlaceholder": "Select city",
       "cityPlaceholderDisabled": "Select country first"
+    }
+  },
+  "intakeManagement": {
+    "title": "Intakes",
+    "search": "Search...",
+    "delete": "Delete",
+    "createIntake": "Create Intake",
+    "table": {
+      "name": "Name",
+      "program": "Program",
+      "admissionFee": "Admission Fee",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "registrationDeadline": "Registration Deadline",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noIntakes": "No Intakes found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load intakes"
+    },
+    "modal": {
+      "createTitle": "Create a new Intake",
+      "editTitle": "Edit Intake",
+      "createSubtitle": "Let's create a new intake",
+      "editSubtitle": "Update the intake details",
+      "nameLabel": "Intake Name",
+      "namePlaceholder": "Enter intake name",
+      "programLabel": "Program",
+      "programPlaceholder": "Select program",
+      "admissionFeeLabel": "Admission Fee",
+      "admissionFeePlaceholder": "Enter admission fee",
+      "startDateLabel": "Start Date",
+      "endDateLabel": "End Date",
+      "registrationDeadlineLabel": "Registration Deadline",
+      "studentsPerBatchLabel": "Students Per Batch",
+      "studentsPerBatchPlaceholder": "Enter students per batch",
+      "maxStudentEnrollmentLabel": "Max Student Enrollment",
+      "maxStudentEnrollmentPlaceholder": "Enter max enrollment"
+    }
+  },
+  "adminManagement": {
+    "title": "Admin Management",
+    "search": "Search...",
+    "createAdmin": "Create Admin",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "roleName": "Role Name",
+      "status": "Status",
+      "noAdmins": "No Admins found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load admins"
+    },
+    "modal": {
+      "createTitle": "Create a new Admin",
+      "createSubtitle": "Let's create a new admin",
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "Enter First Name",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "Enter Last Name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter Email",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "Enter Phone",
+      "roleLabel": "Role",
+      "rolePlaceholder": "Select a role",
+      "loadingRoles": "Loading roles...",
+      "noActiveRoles": "No active roles found"
+    }
+  },
+  "locationManagement": {
+    "title": "Locations",
+    "tabs": {
+      "countries": "Countries",
+      "cities": "Cities"
+    }
+  },
+  "applicationReview": {
+    "title": "Application Review",
+    "search": "Search...",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "previousEducation": "Previous Education",
+      "address": "Address",
+      "postalCode": "Postal Code",
+      "city": "City",
+      "country": "Country",
+      "status": "Status",
+      "action": "Action",
+      "noApplications": "No Applications found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load applications"
+    },
+    "modal": {
+      "basicInfo": "Basic info",
+      "attachedDocuments": "Attached Documents",
+      "actions": "Actions",
+      "phoneNumber": "Phone number",
+      "emailAddress": "Email Address",
+      "previousEducation": "Previous education",
+      "program": "Program",
+      "address": "Address",
+      "applicationId": "Application ID",
+      "noDocuments": "No documents attached",
+      "requestAdditionalInfo": "Request additional information",
+      "remarks": "Remarks",
+      "remarksPlaceholder": "Enter any remarks to add before forwarding",
+      "processing": "Processing...",
+      "reject": "Reject",
+      "waitlist": "Waitlist",
+      "accept": "Accept"
+    },
+    "documents": {
+      "idCard": "ID Card",
+      "qualificationCertificate": "Qualification Certificate",
+      "pdfDocument": "PDF Document",
+      "view": "View",
+      "download": "Download",
+      "flagDocument": "Flag document",
+      "unflagDocument": "Unflag document",
+      "documentFlagged": "Document flagged"
     }
   }
 }

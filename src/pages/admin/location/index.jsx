@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import Countries from "./Countries";
 import Cities from "./Cities";
 
 const Locations = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem("locationsActiveTab") || "countries";
   });
@@ -12,15 +14,17 @@ const Locations = () => {
   }, [activeTab]);
 
   const tabs = [
-    { id: "countries", label: "Countries", component: Countries },
-    { id: "cities", label: "Cities", component: Cities },
+    { id: "countries", label: t("locationManagement.tabs.countries"), component: Countries },
+    { id: "cities", label: t("locationManagement.tabs.cities"), component: Cities },
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">Locations</h2>
+      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+        {t("locationManagement.title")}
+      </h2>
       
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 dark:border-white/20">

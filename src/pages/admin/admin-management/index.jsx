@@ -16,8 +16,10 @@ import { useDebounce } from "@/hooks/useDebounce";
 import CreateAdmin from "@/components/admin/admin-management/CreateAdmin";
 import { useGetAdmins, useUpdateAdminStatus } from "@/store/useAdminStore";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
 
 const AdminManagement = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -46,27 +48,29 @@ const AdminManagement = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text">
-        Admin Management
+      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+        {t("adminManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder="Search..."
+          placeholder={t("adminManagement.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>Create Admin</Button>
+        <Button onClick={handleOpenCreate}>
+          {t("adminManagement.createAdmin")}
+        </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Role Name</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>{t("adminManagement.table.name")}</TableHead>
+            <TableHead>{t("adminManagement.table.email")}</TableHead>
+            <TableHead>{t("adminManagement.table.phone")}</TableHead>
+            <TableHead>{t("adminManagement.table.roleName")}</TableHead>
+            <TableHead>{t("adminManagement.table.status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -76,7 +80,7 @@ const AdminManagement = () => {
             <TableRow>
               <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load admins"}
+                  message={error?.message || t("adminManagement.messages.loadFailed")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -102,7 +106,7 @@ const AdminManagement = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center">
-                No Admins found
+                {t("adminManagement.table.noAdmins")}
               </TableCell>
             </TableRow>
           )}

@@ -8,6 +8,7 @@ const statusVariants = {
   approved: "text-green-600",
   suspended: "text-gray-500",
   rejected: "text-red-600",
+  resubmitted: "text-blue-600",
   deleted: "text-red-500",
   available: "text-green-600",
   on_ride: "text-blue-600",

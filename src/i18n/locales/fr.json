@@ -185,7 +185,7 @@
     }
   },
   "languageManagement": {
-    "title": "Gestion des langues",
+    "title": "Langues",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "createLanguage": "Créer une langue",
@@ -209,7 +209,7 @@
     }
   },
   "programManagement": {
-    "title": "Gestion des programmes",
+    "title": "Programmes",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
@@ -250,6 +250,135 @@
       "cityLabel": "Ville",
       "cityPlaceholder": "Sélectionnez une ville",
       "cityPlaceholderDisabled": "Sélectionnez d'abord un pays"
+    }
+  },
+  "intakeManagement": {
+    "title": "Inscriptions",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createIntake": "Créer une inscription",
+    "table": {
+      "name": "Nom",
+      "program": "Programme",
+      "admissionFee": "Frais d'admission",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "registrationDeadline": "Date limite d'inscription",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noIntakes": "Aucune inscription trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des inscriptions"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle inscription",
+      "editTitle": "Modifier l'inscription",
+      "createSubtitle": "Créons une nouvelle inscription",
+      "editSubtitle": "Mettre à jour les détails de l'inscription",
+      "nameLabel": "Nom de l'inscription",
+      "namePlaceholder": "Entrez le nom de l'inscription",
+      "programLabel": "Programme",
+      "programPlaceholder": "Sélectionnez un programme",
+      "admissionFeeLabel": "Frais d'admission",
+      "admissionFeePlaceholder": "Entrez les frais d'admission",
+      "startDateLabel": "Date de début",
+      "endDateLabel": "Date de fin",
+      "registrationDeadlineLabel": "Date limite d'inscription",
+      "studentsPerBatchLabel": "Étudiants par lot",
+      "studentsPerBatchPlaceholder": "Entrez le nombre d'étudiants par lot",
+      "maxStudentEnrollmentLabel": "Inscription maximale d'étudiants",
+      "maxStudentEnrollmentPlaceholder": "Entrez l'inscription maximale"
+    }
+  },
+  "adminManagement": {
+    "title": "Gestion des administrateurs",
+    "search": "Rechercher...",
+    "createAdmin": "Créer un administrateur",
+    "table": {
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "roleName": "Nom du rôle",
+      "status": "Statut",
+      "noAdmins": "Aucun administrateur trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des administrateurs"
+    },
+    "modal": {
+      "createTitle": "Créer un nouvel administrateur",
+      "createSubtitle": "Créons un nouvel administrateur",
+      "firstNameLabel": "Prénom",
+      "firstNamePlaceholder": "Entrez le prénom",
+      "lastNameLabel": "Nom de famille",
+      "lastNamePlaceholder": "Entrez le nom de famille",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Entrez l'email",
+      "phoneLabel": "Téléphone",
+      "phonePlaceholder": "Entrez le téléphone",
+      "roleLabel": "Rôle",
+      "rolePlaceholder": "Sélectionnez un rôle",
+      "loadingRoles": "Chargement des rôles...",
+      "noActiveRoles": "Aucun rôle actif trouvé"
+    }
+  },
+  "locationManagement": {
+    "title": "Emplacements",
+    "tabs": {
+      "countries": "Pays",
+      "cities": "Villes"
+    }
+  },
+  "applicationReview": {
+    "title": "Examen des candidatures",
+    "search": "Rechercher...",
+    "table": {
+      "uid": "UID",
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "previousEducation": "Formation antérieure",
+      "address": "Adresse",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "country": "Pays",
+      "status": "Statut",
+      "action": "Action",
+      "noApplications": "Aucune candidature trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des candidatures"
+    },
+    "modal": {
+      "basicInfo": "Informations de base",
+      "attachedDocuments": "Documents joints",
+      "actions": "Actions",
+      "phoneNumber": "Numéro de téléphone",
+      "emailAddress": "Adresse email",
+      "previousEducation": "Formation antérieure",
+      "program": "Programme",
+      "address": "Adresse",
+      "applicationId": "ID de candidature",
+      "noDocuments": "Aucun document joint",
+      "requestAdditionalInfo": "Demander des informations supplémentaires",
+      "remarks": "Remarques",
+      "remarksPlaceholder": "Entrez des remarques à ajouter avant de transmettre",
+      "processing": "Traitement...",
+      "reject": "Rejeter",
+      "waitlist": "Liste d'attente",
+      "accept": "Accepter"
+    },
+    "documents": {
+      "idCard": "Carte d'identité",
+      "qualificationCertificate": "Certificat de qualification",
+      "pdfDocument": "Document PDF",
+      "view": "Voir",
+      "download": "Télécharger",
+      "flagDocument": "Signaler le document",
+      "unflagDocument": "Retirer le signalement",
+      "documentFlagged": "Document signalé"
     }
   }
 }

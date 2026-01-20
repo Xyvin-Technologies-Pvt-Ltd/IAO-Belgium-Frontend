@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from "@tanstack/react-router"
 import { useEffect } from "react"
 import { useAuthStore } from "@/store/useAuthStore"
 import AdminTeacherLayoutComponent from "./admin-teacher-layout"
+import LoadingSpinner from "@/components/common/LoadingSpinner"
 
 export default function AdminTeacherLayout() {
   const { isAuthenticated, role, isInitialized } = useAuthStore()
@@ -36,11 +37,33 @@ export default function AdminTeacherLayout() {
 
   // Show loading while initializing
   if (!isInitialized) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-black">
+        <div className="text-center">
+          <LoadingSpinner 
+            size="xl" 
+            text="Initializing..." 
+            className="mb-4"
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400">Please wait while we set up your workspace</p>
+        </div>
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
-    return <div>Redirecting...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-black">
+        <div className="text-center">
+          <LoadingSpinner 
+            size="lg" 
+            text="Redirecting..." 
+            className="mb-4"
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400">Taking you to the login page</p>
+        </div>
+      </div>
+    )
   }
 
   return <AdminTeacherLayoutComponent />

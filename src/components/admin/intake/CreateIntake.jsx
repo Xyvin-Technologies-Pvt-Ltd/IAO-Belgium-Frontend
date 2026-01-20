@@ -129,19 +129,19 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-[600px] max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           {isEdit
-            ? t("languageManagement.modal.editTitle")
-            : t("languageManagement.modal.createTitle")}
+            ? t("intakeManagement.modal.editTitle")
+            : t("intakeManagement.modal.createTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
           {isEdit
-            ? t("languageManagement.modal.editSubtitle")
-            : t("languageManagement.modal.createSubtitle")}
+            ? t("intakeManagement.modal.editSubtitle")
+            : t("intakeManagement.modal.createSubtitle")}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField
-            label={t("languageManagement.modal.nameLabel")}
-            placeholder={t("languageManagement.modal.namePlaceholder")}
+            label={t("intakeManagement.modal.nameLabel")}
+            placeholder={t("intakeManagement.modal.namePlaceholder")}
             error={errors.name?.message}
             required
             {...register("name")}
@@ -149,7 +149,7 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
 
           <div className="space-y-2">
             <Label className="text-sm font-medium">
-              Program <span className="text-red-500">*</span>
+              {t("intakeManagement.modal.programLabel")} <span className="text-red-500">*</span>
             </Label>
             <Controller
               name="program"
@@ -163,7 +163,7 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
                   <SelectTrigger
                     className={errors.program ? "border-red-500" : ""}
                   >
-                    <SelectValue placeholder="Select program" />
+                    <SelectValue placeholder={t("intakeManagement.modal.programPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent
                     position="popper"
@@ -217,8 +217,8 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
           </div>
 
           <FormField
-            label="Admission Fee"
-            placeholder="Enter admission fee"
+            label={t("intakeManagement.modal.admissionFeeLabel")}
+            placeholder={t("intakeManagement.modal.admissionFeePlaceholder")}
             type="number"
             error={errors.admission_fee?.message}
             required
@@ -227,7 +227,7 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label="Start Date"
+              label={t("intakeManagement.modal.startDateLabel")}
               type="date"
               error={errors.start_date?.message}
               required
@@ -235,7 +235,7 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
             />
 
             <FormField
-              label="End Date"
+              label={t("intakeManagement.modal.endDateLabel")}
               type="date"
               error={errors.end_date?.message}
               required
@@ -244,7 +244,7 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
           </div>
 
           <FormField
-            label="Registration Deadline"
+            label={t("intakeManagement.modal.registrationDeadlineLabel")}
             type="date"
             error={errors.registration_deadline?.message}
             required
@@ -253,8 +253,8 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label="Students Per Batch"
-              placeholder="Enter students per batch"
+              label={t("intakeManagement.modal.studentsPerBatchLabel")}
+              placeholder={t("intakeManagement.modal.studentsPerBatchPlaceholder")}
               type="number"
               error={errors.student_per_batch?.message}
               required
@@ -262,8 +262,8 @@ const CreateIntake = ({ open, onClose, intakeData }) => {
             />
 
             <FormField
-              label="Max Student Enrollment"
-              placeholder="Enter max enrollment"
+              label={t("intakeManagement.modal.maxStudentEnrollmentLabel")}
+              placeholder={t("intakeManagement.modal.maxStudentEnrollmentPlaceholder")}
               type="number"
               error={errors.max_student_enrollment?.message}
               required

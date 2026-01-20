@@ -2,14 +2,66 @@ import { X, Eye, Download, Flag, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { useState, useEffect } from "react";
+import { useUpdateApplication } from "@/store/useApplication";
+import { useTranslation } from "react-i18next";
 
-const ViewApplication = ({ open, onClose, applicationId }) => {
-  if (!open) return null;
+const ViewApplication = ({ open, onClose, application }) => {
+  const { t } = useTranslation();
+  const [requestAdditionalInfo, setRequestAdditionalInfo] = useState(false);
+  const [remarks, setRemarks] = useState("");
+  const [documentFlags, setDocumentFlags] = useState({
+    id_card: false,
+    qualification_certificate: false
+  });
+  
+  const updateApplicationMutation = useUpdateApplication();
+
+  // Initialize document flags when application changes
+  const toggleDocumentFlag = (documentType) => {
+    setDocumentFlags(prev => ({
+      ...prev,
+      [documentType]: !prev[documentType]
+    }));
+  };
+
+  // Check if any document is flagged
+  const hasAnyFlaggedDocument = Object.values(documentFlags).some(flag => flag);
+
+  if (!open || !application) return null;
+
+  const handleStatusUpdate = (status) => {
+    const updateData = {
+      status,
+    };
+
+    // Add remarks if provided
+    if (remarks.trim()) {
+      updateData.remarks = remarks.trim();
+    }
+
+    // Add document flags only if they are true
+    if (application.id_card && documentFlags.id_card) {
+      updateData.id_card = { flag: true };
+    }
+    if (application.qualification_certificate && documentFlags.qualification_certificate) {
+      updateData.qualification_certificate = { flag: true };
+    }
+
+    updateApplicationMutation.mutate({
+      id: application._id,
+      data: updateData
+    }, {
+      onSuccess: () => {
+        onClose(); // Close modal on success
+      }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-hidden">
-        <div className="flex items-start justify-between p-6 border-b">
+      <div className="bg-white dark:bg-black w-full max-w-4xl rounded-xl shadow-lg overflow-hidden border dark:border-white/20">
+        <div className="flex items-start justify-between p-6 border-b dark:border-white/20">
           <div className="flex items-start gap-4">
             <img
               src="https://i.pravatar.cc/100?img=12"
@@ -19,70 +71,127 @@ const ViewApplication = ({ open, onClose, applicationId }) => {
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-dashboard-text">
-                  Jamie McCarthy
+                <h2 className="text-lg font-bold text-dashboard-text dark:text-white">
+                  {application?.user?.first_name && application?.user?.last_name 
+                    ? `${application.user.first_name} ${application.user.last_name}`
+                    : application?.user?.email || 'Unknown Applicant'}
                 </h2>
-                <span className="px-1.5 py-0.5 text-xs font-medium rounded-[6px] bg-[#DBA91C] text-white">
-                  Pending
+                <span className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
+                  application?.status === 'pending' ? 'bg-[#DBA91C]' :
+                  application?.status === 'approved' ? 'bg-green-500' :
+                  application?.status === 'rejected' ? 'bg-red-500' :
+                  'bg-gray-500'
+                }`}>
+                  {application?.status?.charAt(0).toUpperCase() + application?.status?.slice(1) || 'Pending'}
                 </span>
               </div>
-              <p className="text-sm font-medium">AP-101</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-white/70">{application?.uid || 'N/A'}</p>
             </div>
           </div>
 
           <button onClick={onClose}>
-            <X className="text-muted-foreground" />
+            <X className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white" />
           </button>
         </div>
 
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           <div>
-            <h3 className="text-base font-semibold mb-4 text-dashboard-text">
-              Basic info
+            <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
+              {t("applicationReview.modal.basicInfo")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InfoItem label="Phone number" value="+910 23 665 XXXX" />
-              <InfoItem label="Email Address" value="jamiemccarthy@gmail.com" />
-              <InfoItem label="Previous education" value="MBA" />
-              <InfoItem label="Course" value="Msc Osteopathy" />
+              <InfoItem label={t("applicationReview.modal.phoneNumber")} value={application?.user?.phone || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || 'N/A'} />
             </div>
           </div>
 
           <div>
-            <h3 className="text-base font-semibold mb-4 text-dashboard-text">
-              Attached Documents
+            <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
+              {t("applicationReview.modal.attachedDocuments")}
             </h3>
 
-            <DocumentRow title="ID proof.pdf" size="245 KB" />
-            <DocumentRow title="Qualification Certificate.pdf" size="245 KB" />
+            {application?.id_card?.url && (
+              <DocumentRow 
+                title={t("applicationReview.documents.idCard")} 
+                size={t("applicationReview.documents.pdfDocument")} 
+                url={application.id_card.url}
+                flagged={documentFlags.id_card}
+                onToggleFlag={() => toggleDocumentFlag('id_card')}
+              />
+            )}
+            
+            {application?.qualification_certificate?.url && (
+              <DocumentRow 
+                title={t("applicationReview.documents.qualificationCertificate")} 
+                size={t("applicationReview.documents.pdfDocument")} 
+                url={application.qualification_certificate.url}
+                flagged={documentFlags.qualification_certificate}
+                onToggleFlag={() => toggleDocumentFlag('qualification_certificate')}
+              />
+            )}
+
+            {!application?.id_card?.url && !application?.qualification_certificate?.url && (
+              <p className="text-sm text-muted-foreground dark:text-white/70">{t("applicationReview.modal.noDocuments")}</p>
+            )}
           </div>
 
           <div>
-            <h3 className="text-base font-semibold mb-4 text-dashboard-text">
-              Actions
+            <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
+              {t("applicationReview.modal.actions")}
             </h3>
 
             <div className="flex items-center gap-3 mb-4">
-              <Switch id="request-info" />
-              <label htmlFor="request-info" className="text-sm cursor-pointer">
-                Request additional information
+              <Switch 
+                id="request-info" 
+                checked={requestAdditionalInfo}
+                onCheckedChange={setRequestAdditionalInfo}
+              />
+              <label htmlFor="request-info" className="text-sm cursor-pointer text-gray-700 dark:text-white/70">
+                {t("applicationReview.modal.requestAdditionalInfo")}
               </label>
             </div>
 
-            <div className="space-y-2">
-              <label>Remarks</label>
-              <Textarea
-                placeholder="Enter any remarks to add before forwarding"
-                rows={4}
-              />
-            </div>
+            {requestAdditionalInfo && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-white/70">{t("applicationReview.modal.remarks")}</label>
+                <Textarea
+                  placeholder={t("applicationReview.modal.remarksPlaceholder")}
+                  rows={4}
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  className="bg-white dark:bg-white/5"
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 p-6 border-t">
-          <Button variant="secondary">Reject</Button>
-          <Button variant="secondary">Waitlist</Button>
-          <Button>Accept</Button>
+        <div className="flex items-center justify-end gap-3 p-6 border-t dark:border-white/20">
+          <Button 
+            variant="secondary"
+            onClick={() => handleStatusUpdate('rejected')}
+            disabled={updateApplicationMutation.isPending}
+          >
+            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.reject")}
+          </Button>
+          <Button 
+            variant="secondary"
+            onClick={() => handleStatusUpdate('waitlisted')}
+            disabled={updateApplicationMutation.isPending}
+          >
+            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.waitlist")}
+          </Button>
+          <Button 
+            disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
+            className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
+            onClick={() => handleStatusUpdate('approved')}
+          >
+            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
+          </Button>
         </div>
       </div>
     </div>
@@ -93,31 +202,60 @@ export default ViewApplication;
 
 const InfoItem = ({ label, value }) => (
   <div>
-    <p className="text-sm text-muted-foreground">{label}</p>
-    <p className="text-base font-semibold text-dashboard-text">{value}</p>
+    <p className="text-sm text-muted-foreground dark:text-white/70">{label}</p>
+    <p className="text-base font-semibold text-dashboard-text dark:text-white">{value}</p>
   </div>
 );
 
-const DocumentRow = ({ title, size }) => (
-  <div className="flex items-center justify-between border rounded-lg px-4 py-3 mb-3">
-    <div className="flex items-center gap-3">
-      <FileText size={18} className="text-muted-foreground" />
-      <div>
-        <p className="text-sm font-semibold text-dashboard-text">{title}</p>
-        <p className="text-xs text-muted-foreground">{size}</p>
+const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="flex items-center justify-between border dark:border-white/20 rounded-lg px-4 py-3 mb-3 bg-white dark:bg-white/5">
+      <div className="flex items-center gap-3">
+        <FileText size={18} className="text-muted-foreground dark:text-white/70" />
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-dashboard-text dark:text-white">{title}</p>
+            {flagged && (
+              <Flag size={14} className="text-red-500" title={t("applicationReview.documents.documentFlagged")} />
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground dark:text-white/70">{size}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <Action 
+          icon={Eye} 
+          label={t("applicationReview.documents.view")} 
+          onClick={() => url && window.open(url, '_blank')}
+        />
+        <Action 
+          icon={Download} 
+          label={t("applicationReview.documents.download")} 
+          onClick={() => {
+            if (url) {
+              window.open(url, '_blank');
+            }
+          }}
+        />
+        <Action 
+          icon={Flag} 
+          label={flagged ? t("applicationReview.documents.unflagDocument") : t("applicationReview.documents.flagDocument")}
+          onClick={onToggleFlag}
+          className={flagged ? "text-red-500 hover:text-red-700 dark:hover:text-red-400" : ""}
+        />
       </div>
     </div>
+  );
+};
 
-    <div className="flex items-center gap-4">
-      <Action icon={Eye} label="View" />
-      <Action icon={Download} label="Download" />
-      <Action icon={Flag} label="Flag document" />
-    </div>
-  </div>
-);
-
-const Action = ({ icon: Icon, label }) => (
-  <button className="flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-black">
+const Action = ({ icon: Icon, label, onClick, className = "" }) => (
+  <button 
+    className={`flex items-center gap-1 text-sm font-semibold text-muted-foreground dark:text-white/70 hover:text-black dark:hover:text-white ${className}`}
+    onClick={onClick}
+  >
     <Icon size={16} />
     {label}
   </button>

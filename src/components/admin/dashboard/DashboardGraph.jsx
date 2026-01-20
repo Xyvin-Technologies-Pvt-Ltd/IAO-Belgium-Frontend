@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useEffect, useState } from "react";
 
 const GraphHeader = ({ title }) => (
   <div className="flex items-center justify-between">
@@ -16,6 +17,27 @@ const GraphHeader = ({ title }) => (
 );
 
 const LineGraph = ({ data }) => {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    checkDarkMode();
+    
+    // Watch for class changes on document element
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const axisColor = isDark ? '#ffffff' : 'hsl(var(--sidebar-foreground))';
+
   return (
     <div className="h-75 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -28,14 +50,14 @@ const LineGraph = ({ data }) => {
             axisLine={false}
             tickLine={false}
             tickMargin={10}
-            tick={{ fill: "hsl(var(--sidebar-foreground) / 0.7)", fontSize: 12 }}
+            tick={{ fill: axisColor, fontSize: 12 }}
           />
 
           <YAxis
             axisLine={false}
             tickLine={false}
             tickMargin={10}
-            tick={{ fill: "hsl(var(--sidebar-foreground) / 0.5)", fontSize: 12 }}
+            tick={{ fill: axisColor, fontSize: 12 }}
           />
 
           <Tooltip />

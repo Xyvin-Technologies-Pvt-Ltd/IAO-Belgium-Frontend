@@ -10,16 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[#ff8904] text-white hover:bg-[#ff8904]/90 disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] disabled:hover:bg-[#EAEAEA]",
+          "bg-[#ff8904] text-white hover:bg-[#ff8904]/90 disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] disabled:hover:bg-[#EAEAEA] dark:bg-[#ff8904] dark:text-white dark:hover:bg-[#ff8904]/90 dark:disabled:bg-white/10 dark:disabled:text-white/40",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E]",
+          "bg-destructive text-white hover:bg-destructive/90 disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] dark:bg-red-600 dark:text-white dark:hover:bg-red-700 dark:disabled:bg-white/10 dark:disabled:text-white/40",
         outline:
-          "border border-[#ff8904] bg-transparent text-[#ff8904] disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] disabled:border-[#EAEAEA]",
+          "border border-[#ff8904] bg-transparent text-[#ff8904] disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] disabled:border-[#EAEAEA] dark:border-[#ff8904] dark:bg-transparent dark:text-[#ff8904] dark:hover:bg-[#ff8904]/10 dark:disabled:bg-white/5 dark:disabled:text-white/40 dark:disabled:border-white/20",
         secondary:
-          "border bg-white hover:bg-accent hover:text-accent-foreground disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E]",
+          "border bg-white hover:bg-accent hover:text-accent-foreground disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 dark:hover:text-white dark:disabled:bg-white/5 dark:disabled:text-white/40",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E]",
-        link: "text-[#ff8904] underline-offset-4 hover:underline disabled:text-[#8E8E8E] disabled:no-underline",
+          "hover:bg-accent hover:text-accent-foreground disabled:bg-[#EAEAEA] disabled:text-[#8E8E8E] dark:text-white dark:hover:bg-white/10 dark:hover:text-white dark:disabled:bg-transparent dark:disabled:text-white/40",
+        link: "text-[#ff8904] underline-offset-4 hover:underline disabled:text-[#8E8E8E] disabled:no-underline dark:text-[#ff8904] dark:hover:underline dark:disabled:text-white/40 dark:disabled:no-underline",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

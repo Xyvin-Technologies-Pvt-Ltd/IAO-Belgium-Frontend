@@ -160,7 +160,7 @@ const Login = () => {
                 </div>
               )}
 
-              <p className="text-[10px] text-[#005AC8] text-start bg-[#F5F7FF] rounded-[6px] px-2 py-1 flex items-center gap-2">
+              <p className="text-[10px] text-blue-700 dark:text-blue-300 text-start bg-blue-50 dark:bg-blue-950/30 rounded-[6px] px-2 py-1 flex items-center gap-2">
                 <CircleAlert className="h-3 w-3 shrink-0" />
                 {!otpSent
                   ? "We'll send you a one-time verification code to your email"

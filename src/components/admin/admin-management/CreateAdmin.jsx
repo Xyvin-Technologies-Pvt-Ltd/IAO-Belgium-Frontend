@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { adminSchema } from "@/validations/admin";
+import { useTranslation } from "react-i18next";
 
 const CreateAdmin = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -69,40 +71,40 @@ const CreateAdmin = ({ open, onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-150 max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          Create a new Admin
+          {t("adminManagement.modal.createTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          Let's create a new admin
+          {t("adminManagement.modal.createSubtitle")}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <FormField
-              label="First Name"
-              placeholder="Enter First Name"
+              label={t("adminManagement.modal.firstNameLabel")}
+              placeholder={t("adminManagement.modal.firstNamePlaceholder")}
               error={errors.first_name?.message}
               required
               {...register("first_name")}
             />
 
             <FormField
-              label="Last Name"
-              placeholder="Enter Last Name"
+              label={t("adminManagement.modal.lastNameLabel")}
+              placeholder={t("adminManagement.modal.lastNamePlaceholder")}
               error={errors.last_name?.message}
               required
               {...register("last_name")}
             />
 
             <FormField
-              label="Email"
-              placeholder="Enter Email"
+              label={t("adminManagement.modal.emailLabel")}
+              placeholder={t("adminManagement.modal.emailPlaceholder")}
               error={errors.email?.message}
               required
               {...register("email")}
             />
 
             <FormField
-              label="Phone"
-              placeholder="Enter Phone"
+              label={t("adminManagement.modal.phoneLabel")}
+              placeholder={t("adminManagement.modal.phonePlaceholder")}
               error={errors.phone?.message}
               required
               {...register("phone")}
@@ -110,17 +112,19 @@ const CreateAdmin = ({ open, onClose }) => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                Role <span className="text-red-500">*</span>
+                {t("adminManagement.modal.roleLabel")} <span className="text-red-500">*</span>
               </Label>
               {isLoadingRoles || isFetchingRoles ? (
-                <div className="text-sm text-gray-500">Loading roles...</div>
+                <div className="text-sm text-gray-500 dark:text-white/70">
+                  {t("adminManagement.modal.loadingRoles")}
+                </div>
               ) : (
                 <Select
                   value={selectedRole}
                   onValueChange={(value) => setValue("role_access", value, { shouldValidate: true })}
                 >
                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
+                    <SelectValue placeholder={t("adminManagement.modal.rolePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {roles.length > 0 ? (
@@ -130,7 +134,9 @@ const CreateAdmin = ({ open, onClose }) => {
                         </SelectItem>
                       ))
                     ) : (
-                      <div className="p-2 text-sm text-gray-500">No active roles found</div>
+                      <div className="p-2 text-sm text-gray-500 dark:text-white/70">
+                        {t("adminManagement.modal.noActiveRoles")}
+                      </div>
                     )}
                   </SelectContent>
                 </Select>

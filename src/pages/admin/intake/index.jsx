@@ -71,29 +71,32 @@ const Intakes = () => {
 
   return (
     <div className="space-y-6 mt-4">
+        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+       {t("intakeManagement.title")}
+      </h2>
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder={t("languageManagement.search")}
+          placeholder={t("intakeManagement.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate}>
-          {t("languageManagement.createLanguage")}
+          {t("intakeManagement.createIntake")}
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("languageManagement.table.name")}</TableHead>
-            <TableHead>Program</TableHead>
-            <TableHead>Admission Fee</TableHead>
-            <TableHead>Start Date</TableHead>
-            <TableHead>End Date</TableHead>
-            <TableHead>Registration Deadline</TableHead>
-            <TableHead>{t("languageManagement.table.status")}</TableHead>
-            <TableHead>{t("languageManagement.table.action")}</TableHead>
+            <TableHead>{t("intakeManagement.table.name")}</TableHead>
+            <TableHead>{t("intakeManagement.table.program")}</TableHead>
+            <TableHead>{t("intakeManagement.table.admissionFee")}</TableHead>
+            <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
+            <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
+            <TableHead>{t("intakeManagement.table.registrationDeadline")}</TableHead>
+            <TableHead>{t("intakeManagement.table.status")}</TableHead>
+            <TableHead>{t("intakeManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +108,7 @@ const Intakes = () => {
                 <ErrorMessage
                   message={
                     error?.message ||
-                    t("languageManagement.messages.loadFailed")
+                    t("intakeManagement.messages.loadFailed")
                   }
                   onRetry={refetch}
                   variant="inline"
@@ -140,12 +143,12 @@ const Intakes = () => {
                   <RowActionMenu
                     actions={[
                       {
-                        label: t("languageManagement.table.edit"),
+                        label: t("intakeManagement.table.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: t("languageManagement.delete"),
+                        label: t("intakeManagement.delete"),
                         icon: Trash2,
                         onClick: () => handleRowDeleteClick(i._id),
                       },
@@ -157,7 +160,7 @@ const Intakes = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={8} className="text-center">
-                {t("languageManagement.table.noLanguages")}
+                {t("intakeManagement.table.noIntakes")}
               </TableCell>
             </TableRow>
           )}
