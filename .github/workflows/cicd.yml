@@ -27,6 +27,7 @@ jobs:
       - name: Install Dependencies and Build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_APP_API_KEY: ${{ secrets.VITE_APP_API_KEY }}
         run: |
           npm ci
           npm run build
