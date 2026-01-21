@@ -1,12 +1,35 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft, BookOpen } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const NotFound = () => {
   const router = useRouter();
+  const { isAuthenticated, role } = useAuthStore();
 
   const handleGoBack = () => {
     router.history.back();
+  };
+
+  const getHomeRoute = () => {
+    if (!isAuthenticated) {
+      return "/login";
+    }
+    
+    if (role === "admin") {
+      return "/admin/dashboard";
+    } else if (role === "TEACHER") {
+      return "/teacher/dashboard";
+    } else {
+      return "/login"; // Default fallback for unknown roles
+    }
+  };
+
+  const getHomeButtonText = () => {
+    if (!isAuthenticated) {
+      return "Go to Login";
+    }
+    return "Go to Dashboard";
   };
 
   return (
@@ -28,9 +51,9 @@ const NotFound = () => {
 
         <div className="space-y-4">
           <Button asChild className="w-full">
-            <Link to="/login">
+            <Link to={getHomeRoute()}>
               <Home className="w-4 h-4 mr-2" />
-              Go to Login
+              {getHomeButtonText()}
             </Link>
           </Button>
 

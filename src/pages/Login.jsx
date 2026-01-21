@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +15,18 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
-  const { verifyOtp, isLoading, clearError } = useAuthStore();
+  const { verifyOtp, isLoading, clearError, isAuthenticated, role, isInitialized } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isInitialized && isAuthenticated) {
+      if (role === "admin") {
+        navigate({ to: "/admin/dashboard" });
+      } else if (role === "TEACHER") {
+        navigate({ to: "/teacher/dashboard" });
+      }
+    }
+  }, [isInitialized, isAuthenticated, role, navigate]);
 
   const handleSendOtp = async () => {
     if (!email) {
@@ -51,22 +61,12 @@ const Login = () => {
       const response = await verifyOtp(email, otp);
       const userRole = response?.data?.user?.role;
       toast.success("Login successful!");
-      console.log("OTP verified successfully:", response?.data?.user?.role);
 
       // Navigate based on user role
       if (userRole === "admin") {
         navigate({ to: "/admin/dashboard" });
       } else if (userRole === "TEACHER") {
         navigate({ to: "/teacher/dashboard" });
-      } else {
-        // For students, check if there's a saved step in localStorage
-        const savedStep = localStorage.getItem("currentStep");
-
-        if (savedStep) {
-          navigate({ to: "/review" });
-        } else {
-          navigate({ to: "/application" });
-        }
       }
     } catch (err) {
       toast.error(err.message || "Invalid OTP. Please try again.");

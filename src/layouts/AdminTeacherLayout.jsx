@@ -16,7 +16,6 @@ export default function AdminTeacherLayout() {
     }
 
     if (!isAuthenticated) {
-      console.log("[AdminTeacherLayout] redirecting to login")
       navigate({ to: "/login" })
       return
     }
@@ -28,7 +27,6 @@ export default function AdminTeacherLayout() {
     if (currentPath.startsWith("/admin")) {
       // Only ADMIN can access admin routes
       if (role !== "admin") {
-        console.log("[AdminTeacherLayout] Unauthorized access to admin routes")
         navigate({ to: "/login" })
         return
       }
