@@ -13,13 +13,14 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useGetBatchesByIntake } from "@/store/useIntakeStore";
 import StatusBadge from "@/components/StatusBadge";
 
 const BatchList = () => {
   const params = useParams({ strict: false });
   const id = params.id;
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -34,7 +35,12 @@ const BatchList = () => {
 
   const batches = data?.data || [];
   const totalRows = data?.total_count || 0;
-
+  const handleRowClick = (batchId) => {
+    navigate({
+      to: "/admin/admission-administration/intakes/batch/$id",
+      params: { id: batchId },
+    });
+  };
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
@@ -74,7 +80,11 @@ const BatchList = () => {
             </TableRow>
           ) : batches?.length > 0 ? (
             batches?.map((i) => (
-              <TableRow key={i._id}>
+              <TableRow
+                key={i._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(i._id)}
+              >
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.intake?.student_per_batch}</TableCell>

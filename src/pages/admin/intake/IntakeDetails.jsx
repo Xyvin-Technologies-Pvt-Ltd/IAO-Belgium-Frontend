@@ -1,4 +1,4 @@
-import BatchList from "@/components/admin/intake/batch/BatchList";
+import BatchList from "@/pages/admin/batch/BatchList";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -42,7 +42,7 @@ const IntakeDetails = () => {
           navigable: true,
         },
         {
-          label: intake.data.name,
+          label: "Application Intakes Details",
           path: `/admin/admission-administration/intakes/${id}`,
           navigable: false,
         },
@@ -118,26 +118,25 @@ const IntakeDetails = () => {
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <DashboardCard
             title={t("intakeManagement.details.cards.totalEnrollments")}
-            value={`${intakeData.total_student_count}/${intakeData.max_student_enrollment}`}
-            subtitle="+180.1% from last month"
+            value={`${intakeData?.total_student_count}/${intakeData?.max_student_enrollment || 0}`}
             icon={Users}
           />
 
           <DashboardCard
             title={t("intakeManagement.details.cards.totalBatches")}
-            value={intakeData.total_batch_count}
+            value={intakeData?.total_batch_count || 0}
             icon={Layers}
           />
 
           <DashboardCard
             title={t("intakeManagement.details.cards.startDate")}
-            value={moment(intakeData.start_date).format("DD/MM/YYYY")}
+            value={moment(intakeData?.start_date).format("DD/MM/YYYY")}
             icon={Calendar}
           />
 
           <DashboardCard
             title={t("intakeManagement.details.cards.endDate")}
-            value={moment(intakeData.end_date).format("DD/MM/YYYY")}
+            value={moment(intakeData?.end_date).format("DD/MM/YYYY")}
             icon={CalendarCheck}
           />
         </div>

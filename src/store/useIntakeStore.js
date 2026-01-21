@@ -31,7 +31,7 @@ export const useGetIntakeById = (id, options = {}) => {
 
 export const useGetBatchesByIntake = (intakeId, options = {}) => {
   return useQuery({
-    queryKey: ["batch", "intake", intakeId],
+    queryKey: ["batches", "intake", intakeId],
     queryFn: () => getBatchByIntake(intakeId),
     staleTime: 30000,
     enabled: !!intakeId,

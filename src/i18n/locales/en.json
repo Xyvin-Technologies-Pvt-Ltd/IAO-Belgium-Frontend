@@ -357,6 +357,33 @@
     },
     "messages": {
       "loadFailed": "Failed to load batches"
+    },
+    "details": {
+      "tabs": {
+        "overview": "Overview",
+        "students": "Students"
+      },
+      "cards": {
+        "enrolledStudents": "Enrolled Students",
+        "totalSessions": "Total Sessions",
+        "completed": "Completed",
+        "avgAttendance": "Avg. Attendance"
+      },
+      "badges": {
+        "batchId": "Batch ID",
+        "program": "Program"
+      },
+      "info": {
+        "title": "Batch Information",
+        "intakeName": "Intake Name",
+        "program": "Program",
+        "capacity": "Capacity",
+        "intakeStartDate": "Intake Start Date",
+        "intakeEndDate": "Intake End Date",
+        "students": "Students"
+      },
+      "loading": "Loading batch details...",
+      "loadFailed": "Failed to load batch details"
     }
   },
   "studentManagement": {

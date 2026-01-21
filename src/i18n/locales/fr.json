@@ -357,6 +357,33 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des lots"
+    },
+    "details": {
+      "tabs": {
+        "overview": "Aperçu",
+        "students": "Étudiants"
+      },
+      "cards": {
+        "enrolledStudents": "Étudiants inscrits",
+        "totalSessions": "Total des sessions",
+        "completed": "Terminé",
+        "avgAttendance": "Présence moy."
+      },
+      "badges": {
+        "batchId": "ID du lot",
+        "program": "Programme"
+      },
+      "info": {
+        "title": "Informations sur le lot",
+        "intakeName": "Nom de l'inscription",
+        "program": "Programme",
+        "capacity": "Capacité",
+        "intakeStartDate": "Date de début d'inscription",
+        "intakeEndDate": "Date de fin d'inscription",
+        "students": "Étudiants"
+      },
+      "loading": "Chargement des détails du lot...",
+      "loadFailed": "Échec du chargement des détails du lot"
     }
   },
   "studentManagement": {
