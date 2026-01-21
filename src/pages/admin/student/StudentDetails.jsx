@@ -1,0 +1,84 @@
+import { ErrorMessage, LoadingState } from "@/components/common";
+import StudentCard from "@/components/student/StudentCard";
+import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import { useGetStudentByApplication } from "@/store/useStudentStore";
+import { useParams } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
+const StudentDetails = () => {
+  const { t } = useTranslation();
+  const params = useParams({ strict: false });
+  const id = params.id;
+  const { updateBreadcrumbs } = useBreadcrumb();
+
+  const {
+    data: student,
+    isLoading,
+    error,
+    refetch,
+  } = useGetStudentByApplication(id);
+  useEffect(() => {
+    if (student?.data) {
+      updateBreadcrumbs([
+        {
+          label: "Admission administration",
+          path: "/admin/admission-administration",
+          navigable: false,
+        },
+        {
+          label: "Intakes",
+          path: "/admin/admission-administration/intakes",
+          navigable: true,
+        },
+        {
+          label: "Application Intakes Details",
+          path: `/admin/admission-administration/intakes/${student?.data?.intake_id}`,
+          navigable: true,
+        },
+        {
+          label: "Batch Details",
+          path: `/admin/admission-administration/intakes/batch/${student?.data?.batch_id}`,
+          navigable: true,
+        },
+        {
+          label: "Student Details",
+          path: `/admin/admission-administration/intakes/batch/student/${id}`,
+          navigable: false,
+        },
+      ]);
+    }
+    return () => {
+      updateBreadcrumbs([]);
+    };
+  }, [student?.data, id]);
+
+  if (isLoading) {
+    return (
+      <LoadingState text={t("intakeManagement.details.loading")} fullHeight />
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <ErrorMessage
+          message={error?.message || t("intakeManagement.details.loadFailed")}
+          onRetry={refetch}
+          variant="card"
+        />
+      </div>
+    );
+  }
+
+  const studentData = student?.data;
+  if (!studentData) return null;
+
+  return (
+    <div className="space-y-6 mt-4">
+      <StudentCard student={studentData} />
+    </div>
+  );
+};
+
+export default StudentDetails;

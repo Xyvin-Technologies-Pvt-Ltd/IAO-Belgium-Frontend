@@ -12,13 +12,15 @@ export const useBreadcrumb = () => {
 
 export const BreadcrumbProvider = ({ children }) => {
   const [breadcrumbs, setBreadcrumbs] = useState([]);
+  const [hasCustomBreadcrumbs, setHasCustomBreadcrumbs] = useState(false);
 
   const updateBreadcrumbs = (newBreadcrumbs) => {
     setBreadcrumbs(newBreadcrumbs);
+    setHasCustomBreadcrumbs(newBreadcrumbs.length > 0);
   };
 
   return (
-    <BreadcrumbContext.Provider value={{ breadcrumbs, updateBreadcrumbs }}>
+    <BreadcrumbContext.Provider value={{ breadcrumbs, updateBreadcrumbs, hasCustomBreadcrumbs }}>
       {children}
     </BreadcrumbContext.Provider>
   );

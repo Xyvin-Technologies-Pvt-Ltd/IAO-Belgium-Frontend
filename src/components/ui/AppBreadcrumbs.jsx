@@ -5,7 +5,7 @@ import { ChevronRight, Home } from 'lucide-react';
 export function AppBreadcrumbs() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { breadcrumbs } = useBreadcrumb();
+  const { breadcrumbs, hasCustomBreadcrumbs } = useBreadcrumb();
 
   // Helper function to check if a breadcrumb segment is a non-navigable parent
   const isNonNavigableParent = (segment) => {
@@ -40,6 +40,34 @@ export function AppBreadcrumbs() {
   const handleBreadcrumbClick = (path) => {
     navigate({ to: path });
   };
+
+  // Check if we're on a detail page that should have custom breadcrumbs
+  const isDetailPage = pathSegments.some(segment => 
+    segment.match(/^[a-f0-9]{24}$/) || // MongoDB ObjectId pattern
+    segment === 'student' ||
+    segment === 'batch' ||
+    segment === 'intake'
+  );
+
+  // If we're on a detail page but don't have custom breadcrumbs yet, show loading
+  if (isDetailPage && !hasCustomBreadcrumbs && breadcrumbs.length === 0) {
+    return (
+      <nav className="flex items-center space-x-1 text-sm text-muted-foreground min-w-0 overflow-hidden">
+        <div className="flex items-center min-w-0">
+          <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+          <div className="h-4 w-24 bg-muted animate-pulse rounded"></div>
+        </div>
+        <div className="flex items-center min-w-0">
+          <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+          <div className="h-4 w-20 bg-muted animate-pulse rounded"></div>
+        </div>
+        <div className="flex items-center min-w-0">
+          <ChevronRight className="h-4 w-4 mx-1 flex-shrink-0" />
+          <div className="h-4 w-16 bg-muted animate-pulse rounded"></div>
+        </div>
+      </nav>
+    );
+  }
 
   const displayBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : defaultBreadcrumbs;
 

@@ -12,6 +12,8 @@ import { getRequiredPermissions } from "@/utils/permissionUtils";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import IntakeDetails from "@/pages/admin/intake/IntakeDetails";
 import BatchDetails from "@/pages/admin/batch/BatchDetails";
+import StudentDetails from "@/pages/admin/student/StudentDetails";
+import EnrolledStudentDetails from "@/pages/admin/student/EnrolledStudentDetails";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -68,9 +70,23 @@ export const adminRoutes = [
     ),
   },
   {
+    path: "/admin/admission-administration/intakes/student/$id",
+    component: withPermissionProtection(
+      EnrolledStudentDetails,
+      "/admin/admission-administration/intakes",
+    ),
+  },
+  {
     path: "/admin/admission-administration/intakes/batch/$id",
     component: withPermissionProtection(
       BatchDetails,
+      "/admin/admission-administration/intakes",
+    ),
+  },
+  {
+    path: "/admin/admission-administration/intakes/batch/student/$id",
+    component: withPermissionProtection(
+      StudentDetails,
       "/admin/admission-administration/intakes",
     ),
   },

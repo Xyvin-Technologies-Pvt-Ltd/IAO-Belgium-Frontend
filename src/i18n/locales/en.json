@@ -390,7 +390,7 @@
     "title": "Student Management",
     "search": "Search students...",
     "table": {
-      "studentId": "Student ID",
+      "studentId": "Application ID",
       "studentName": "Student Name",
       "email": "Email",
       "batch": "Batch",

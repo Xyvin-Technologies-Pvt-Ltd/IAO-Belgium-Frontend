@@ -13,7 +13,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetEnrolledStudentsByIntake } from "@/store/useIntakeStore";
 import moment from "moment";
@@ -21,6 +21,7 @@ import moment from "moment";
 const StudentList = () => {
   const params = useParams({ strict: false });
   const id = params.id;
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -38,7 +39,12 @@ const StudentList = () => {
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
-
+  const handleRowClick = (appId) => {
+    navigate({
+      to: "/admin/admission-administration/intakes/student/$id",
+      params: { id: appId },
+    });
+  };
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
@@ -78,7 +84,11 @@ const StudentList = () => {
             </TableRow>
           ) : students?.length > 0 ? (
             students?.map((i) => (
-              <TableRow key={i._id}>
+              <TableRow
+                key={i._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(i._id)}
+              >
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>
                   {i?.first_name} {i?.last_name}

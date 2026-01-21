@@ -5,14 +5,7 @@ import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetBatchesById } from "@/store/useBatchStore";
 import { useParams } from "@tanstack/react-router";
-import {
-  Calendar,
-  CalendarCheck,
-  BookOpen,
-  Users,
-  BarChart3,
-} from "lucide-react";
-import moment from "moment";
+import { CalendarCheck, BookOpen, Users, BarChart3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -53,7 +46,7 @@ const BatchDetails = () => {
           navigable: true,
         },
         {
-          label: "Batch Deatils",
+          label: "Batch Details",
           path: `/admin/admission-administration/intakes/batch/${batch.data._id}`,
           navigable: false,
         },
@@ -62,7 +55,7 @@ const BatchDetails = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [batch?.data?.name, id]);
+  }, [batch?.data, id, updateBreadcrumbs]);
 
   if (isLoading) {
     return (

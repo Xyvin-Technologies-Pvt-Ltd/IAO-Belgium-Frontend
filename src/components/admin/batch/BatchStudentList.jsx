@@ -13,12 +13,13 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useGetStudentsByBatch } from "@/store/useBatchStore";
 
 const BatchStudentList = () => {
+  const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params.id;
   const { t } = useTranslation();
@@ -27,18 +28,20 @@ const BatchStudentList = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetStudentsByBatch(
-    id,
-    {
-      page: page,
-      limit: rowsPerPage,
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    },
-  );
+  const { data, isLoading, error, refetch } = useGetStudentsByBatch(id, {
+    page: page,
+    limit: rowsPerPage,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+  });
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
-
+  const handleRowClick = (appId) => {
+    navigate({
+      to: "/admin/admission-administration/intakes/batch/student/$id",
+      params: { id: appId },
+    });
+  };
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
@@ -77,7 +80,11 @@ const BatchStudentList = () => {
             </TableRow>
           ) : students?.length > 0 ? (
             students?.map((i) => (
-              <TableRow key={i._id}>
+              <TableRow
+                key={i._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(i._id)}
+              >
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>
                   {i?.first_name} {i?.last_name}
