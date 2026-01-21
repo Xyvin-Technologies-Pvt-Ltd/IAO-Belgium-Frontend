@@ -55,7 +55,7 @@ const BatchDetails = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [batch?.data, id, updateBreadcrumbs]);
+  }, [batch?.data?._id]);
 
   if (isLoading) {
     return (
