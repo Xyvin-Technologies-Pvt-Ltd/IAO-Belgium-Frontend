@@ -290,6 +290,25 @@
       "studentsPerBatchPlaceholder": "Enter students per batch",
       "maxStudentEnrollmentLabel": "Max Student Enrollment",
       "maxStudentEnrollmentPlaceholder": "Enter max enrollment"
+    },
+    "details": {
+      "tabs": {
+        "batches": "Batches",
+        "enrollments": "Enrollments"
+      },
+      "cards": {
+        "totalEnrollments": "Total Enrollments",
+        "totalBatches": "Total Batches",
+        "startDate": "Start Date",
+        "endDate": "End Date"
+      },
+      "badges": {
+        "intakeId": "Intake ID",
+        "registrationFee": "Registration Fee",
+        "registrationDeadline": "Registration Deadline"
+      },
+      "loading": "Loading intake details...",
+      "loadFailed": "Failed to load intake details"
     }
   },
   "adminManagement": {
@@ -322,6 +341,38 @@
       "rolePlaceholder": "Select a role",
       "loadingRoles": "Loading roles...",
       "noActiveRoles": "No active roles found"
+    }
+  },
+  "batchManagement": {
+    "title": "Batch Management",
+    "search": "Search batches...",
+    "table": {
+      "batchId": "Batch ID",
+      "batchName": "Batch Name",
+      "capacity": "Capacity",
+      "enrolled": "Enrolled",
+      "available": "Available",
+      "status": "Status",
+      "noBatches": "No Batches found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load batches"
+    }
+  },
+  "studentManagement": {
+    "title": "Student Management",
+    "search": "Search students...",
+    "table": {
+      "studentId": "Student ID",
+      "studentName": "Student Name",
+      "email": "Email",
+      "batch": "Batch",
+      "enrolledDate": "Enrolled Date",
+      "status": "Status",
+      "noStudents": "No Students found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load students"
     }
   },
   "locationManagement": {

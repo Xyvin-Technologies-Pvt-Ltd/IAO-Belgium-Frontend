@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -24,6 +25,7 @@ import moment from "moment";
 
 const Intakes = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -44,6 +46,13 @@ const Intakes = () => {
 
   const intakes = data?.data || [];
   const totalRows = data?.total_count || 0;
+
+  const handleRowClick = (intakeId) => {
+    navigate({ 
+      to: "/admin/admission-administration/intakes/$id", 
+      params: { id: intakeId } 
+    });
+  };
 
   const handleOpenCreate = () => {
     setSelectedIntake(null);
@@ -117,7 +126,11 @@ const Intakes = () => {
             </TableRow>
           ) : intakes?.length > 0 ? (
             intakes?.map((i) => (
-              <TableRow key={i._id}>
+              <TableRow 
+                key={i._id} 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(i._id)}
+              >
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.program?.name || "N/A"}</TableCell>
                 <TableCell>${i?.admission_fee || 0}</TableCell>

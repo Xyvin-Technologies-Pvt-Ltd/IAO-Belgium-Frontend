@@ -1,5 +1,12 @@
-
-import { createIntake, deleteIntake, getIntakes, updateintake } from "@/api/intakeApi";
+import {
+  createIntake,
+  deleteIntake,
+  getBatchByIntake,
+  getEnrolledStudentsByIntake,
+  getIntakeById,
+  getIntakes,
+  updateintake,
+} from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -12,7 +19,37 @@ export const useGetIntakes = (filter, options = {}) => {
     ...options,
   });
 };
+export const useGetIntakeById = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["intake", id],
+    queryFn: () => getIntakeById(id),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
 
+export const useGetBatchesByIntake = (intakeId, options = {}) => {
+  return useQuery({
+    queryKey: ["batch", "intake", intakeId],
+    queryFn: () => getBatchByIntake(intakeId),
+    staleTime: 30000,
+    enabled: !!intakeId,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetEnrolledStudentsByIntake = (intakeId, options = {}) => {
+  return useQuery({
+    queryKey: ["enrollments", "intake", intakeId],
+    queryFn: () => getEnrolledStudentsByIntake(intakeId),
+    staleTime: 30000,
+    enabled: !!intakeId, // Only run query if intakeId exists
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
 export const useCreateIntake = () => {
   const queryClient = useQueryClient();
 

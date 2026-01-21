@@ -290,6 +290,25 @@
       "studentsPerBatchPlaceholder": "Entrez le nombre d'étudiants par lot",
       "maxStudentEnrollmentLabel": "Inscription maximale d'étudiants",
       "maxStudentEnrollmentPlaceholder": "Entrez l'inscription maximale"
+    },
+    "details": {
+      "tabs": {
+        "batches": "Lots",
+        "enrollments": "Inscriptions"
+      },
+      "cards": {
+        "totalEnrollments": "Total des inscriptions",
+        "totalBatches": "Total des lots",
+        "startDate": "Date de début",
+        "endDate": "Date de fin"
+      },
+      "badges": {
+        "intakeId": "ID d'inscription",
+        "registrationFee": "Frais d'inscription",
+        "registrationDeadline": "Date limite d'inscription"
+      },
+      "loading": "Chargement des détails de l'inscription...",
+      "loadFailed": "Échec du chargement des détails de l'inscription"
     }
   },
   "adminManagement": {
@@ -322,6 +341,38 @@
       "rolePlaceholder": "Sélectionnez un rôle",
       "loadingRoles": "Chargement des rôles...",
       "noActiveRoles": "Aucun rôle actif trouvé"
+    }
+  },
+  "batchManagement": {
+    "title": "Gestion des lots",
+    "search": "Rechercher des lots...",
+    "table": {
+      "batchId": "ID du lot",
+      "batchName": "Nom du lot",
+      "capacity": "Capacité",
+      "enrolled": "Inscrits",
+      "available": "Disponible",
+      "status": "Statut",
+      "noBatches": "Aucun lot trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des lots"
+    }
+  },
+  "studentManagement": {
+    "title": "Gestion des étudiants",
+    "search": "Rechercher des étudiants...",
+    "table": {
+      "studentId": "ID étudiant",
+      "studentName": "Nom de l'étudiant",
+      "email": "Email",
+      "batch": "Lot",
+      "enrolledDate": "Date d'inscription",
+      "status": "Statut",
+      "noStudents": "Aucun étudiant trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des étudiants"
     }
   },
   "locationManagement": {

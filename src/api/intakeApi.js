@@ -11,6 +11,15 @@ export const getIntakes = async (filter) => {
   }
 };
 
+export const getIntakeById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/intake/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const createIntake = async (data) => {
   try {
     const response = await axiosInstance.post(`/intake`, data);
@@ -30,6 +39,23 @@ export const updateintake = async (id, data) => {
 export const deleteIntake = async (id) => {
   try {
     const response = await axiosInstance.delete(`/intake/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const getBatchByIntake = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/intake/batches/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getEnrolledStudentsByIntake = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/intake/enrollments/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;

@@ -44,13 +44,16 @@ export default function AdminTeacherLayoutComponent() {
         <main className="flex min-h-svh flex-1 flex-col overflow-hidden bg-sidebar">
           <div className="sticky top-0 z-10 flex h-14 items-center gap-2 bg-sidebar/80 backdrop-blur-sm border-b border-sidebar-border px-4">
             <SidebarTrigger className="-ml-1" />
-            <AppBreadcrumbs />
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <AppBreadcrumbs />
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-9 px-3 gap-2">
+                  <Button variant="ghost" size="sm" className="h-9 px-2 sm:px-3 gap-1 sm:gap-2">
                     <Languages className="h-4 w-4" />
-                    <span>{currentLanguage.name}</span>
+                    <span className="hidden sm:inline">{currentLanguage.name}</span>
+                    <span className="sm:hidden">{currentLanguage.flag}</span>
                     <ChevronDown className="h-4 w-4 opacity-60" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -72,9 +75,9 @@ export default function AdminTeacherLayoutComponent() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeToggle />
-              <p className="text-sm text-dashboard-text-secondary">
-              {moment().format("ddd, DD MMM, YYYY").toUpperCase()}</p>
-
+              <p className="text-xs sm:text-sm text-dashboard-text-secondary hidden md:block">
+                {moment().format("ddd, DD MMM, YYYY").toUpperCase()}
+              </p>
             </div>
           </div>
 
