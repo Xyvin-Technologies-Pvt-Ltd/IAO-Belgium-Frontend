@@ -38,10 +38,11 @@
       "programAdministration": "Program Administration",
       "locations": "Locations",
       "languages": "Languages",
-      "teacherData": "Teacher Data",
+      "teacherQualifications": "Teacher Qualifications",
+       "teacherData": "Teacher Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
-      "intakes": "Intakes",
+      "academics": "Academic Years",
       "planning": "Planning",
       "teacherManagement": "Teacher Management",
       "studentManagement": "Student Management",
@@ -407,6 +408,46 @@
     "tabs": {
       "countries": "Countries",
       "cities": "Cities"
+    }
+  },
+  "academicManagement": {
+    "title": "Academic Management",
+    "search": "Search academics...",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "createAcademic": "Create Academic",
+    "table": {
+      "name": "Name",
+      "registrationStartDate": "Registration Start Date",
+      "registrationEndDate": "Registration End Date",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noAcademics": "No Academic Years found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load academic years"
+    },
+    "modal": {
+      "createTitle": "Create a new Academic Year",
+      "editTitle": "Edit Academic Year",
+      "createSubtitle": "Let's create a new academic year",
+      "editSubtitle": "Update the academic year details",
+      "nameLabel": "Academic Year Name",
+      "namePlaceholder": "Enter academic year name (e.g., 2024-2025)",
+      "registrationStartDateLabel": "Registration Start Date",
+      "registrationEndDateLabel": "Registration End Date"
+    },
+    "emptyState": {
+      "title": "No Academic Years Created Yet",
+      "subtitle": "Start by creating an academic year to manage programs, batches, and admissions efficiently."
+    },
+    "card": {
+      "academicYear": "Academic Year",
+      "programs": "Programs",
+      "batches": "Batches",
+      "edit": "Edit",
+      "duplicate": "Duplicate"
     }
   },
   "applicationReview": {

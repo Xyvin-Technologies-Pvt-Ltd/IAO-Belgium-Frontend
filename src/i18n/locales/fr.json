@@ -38,10 +38,11 @@
       "programAdministration": "Administration des programmes",
       "locations": "Emplacements",
       "languages": "Langues",
-      "teacherData": "Données des enseignants",
+      "teacherQualifications": "Qualifications des enseignants",
       "admissionAdministration": "Administration des admissions",
       "applicationReview": "Examen des candidatures",
-      "intakes": "Inscriptions",
+      "academics": "Années académiques",
+      "academics": "Années académiques",
       "planning": "Planification",
       "teacherManagement": "Gestion des enseignants",
       "studentManagement": "Gestion des étudiants",
@@ -407,6 +408,46 @@
     "tabs": {
       "countries": "Pays",
       "cities": "Villes"
+    }
+  },
+  "academicManagement": {
+    "title": "Gestion académique",
+    "search": "Rechercher des années académiques...",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "createAcademic": "Créer une année académique",
+    "table": {
+      "name": "Nom",
+      "registrationStartDate": "Date de début d'inscription",
+      "registrationEndDate": "Date de fin d'inscription",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noAcademics": "Aucune année académique trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des années académiques"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle année académique",
+      "editTitle": "Modifier l'année académique",
+      "createSubtitle": "Créons une nouvelle année académique",
+      "editSubtitle": "Mettre à jour les détails de l'année académique",
+      "nameLabel": "Nom de l'année académique",
+      "namePlaceholder": "Entrez le nom de l'année académique (ex: 2024-2025)",
+      "registrationStartDateLabel": "Date de début d'inscription",
+      "registrationEndDateLabel": "Date de fin d'inscription"
+    },
+    "emptyState": {
+      "title": "Aucune année académique créée",
+      "subtitle": "Commencez par créer une année académique pour gérer efficacement les programmes, les lots et les admissions."
+    },
+    "card": {
+      "academicYear": "Année académique",
+      "programs": "Programmes",
+      "batches": "Lots",
+      "edit": "Modifier",
+      "duplicate": "Dupliquer"
     }
   },
   "applicationReview": {

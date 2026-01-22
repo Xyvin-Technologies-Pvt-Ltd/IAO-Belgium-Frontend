@@ -2,8 +2,6 @@ import {
   LayoutDashboard,
   NotebookText,
   BookUser,
-  BookMarked,
-  Calendars,
   Users,
   Shield,
   GraduationCap,
@@ -11,7 +9,8 @@ import {
   FileText,
   MapPin,
   Languages,
-  UserCog,
+  Calendars,
+  Award,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -37,7 +36,6 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/program",
             icon: NotebookText,
           },
-
           {
             title: t("sidebar.admin.admissionAdministration"),
             icon: BookUser,
@@ -47,12 +45,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
                 url: "/admin/admission-administration/application-review",
               },
               {
-                title: t("sidebar.admin.intakes"),
-                url: "/admin/admission-administration/intakes",
+                title: t("sidebar.admin.academics"),
+                url: "/admin/admission-administration/academics",
               },
             ],
           },
-
           {
             title: t("sidebar.admin.planning"),
             url: "/admin/planning",
@@ -88,11 +85,10 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/languages",
             icon: Languages,
           },
-
-          {
-            title: t("sidebar.admin.teacherData"),
-            url: "/admin/teacher-data",
-            icon: UserCog,
+           {
+            title: t("sidebar.admin.teacherQualifications"),
+            url: "/admin/teacher-qualifications",
+            icon: Award,
           },
         ],
       },

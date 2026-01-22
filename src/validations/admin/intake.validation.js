@@ -3,7 +3,7 @@ import { z } from "zod";
 export const intakeSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
-    program: z.string().min(1, "Program is required"),
+    program: z.array(z.string()).min(1, "At least one program is required"),
     admission_fee: z.coerce
       .number({ invalid_type_error: "Admission fee must be a number" })
       .min(0, "Must be a positive number"),

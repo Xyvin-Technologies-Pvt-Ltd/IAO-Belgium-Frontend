@@ -4,6 +4,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/dashboard": [], 
   "/admin/program": ["operations_management_view", "operations_management_modify"],
   "/admin/admission-administration/application-review": ["operations_management_view", "operations_management_modify"],
+  "/admin/admission-administration/academics": ["operations_management_view", "operations_management_modify"],
   "/admin/admission-administration/intakes": ["operations_management_view", "operations_management_modify"],
   "/admin/planning": ["operations_management_view", "operations_management_modify"],
   "/admin/teacher-management": ["academic_management_view", "academic_management_modify"],

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -14,11 +14,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { adminSchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
 
 const CreateAdmin = ({ open, onClose }) => {
   const { t } = useTranslation();
+  const [rolePage, setRolePage] = useState(1);
+  const roleLimit = 10;
+
   const {
     register,
     handleSubmit,
@@ -38,13 +43,27 @@ const CreateAdmin = ({ open, onClose }) => {
   });
 
   const { data: rolesData, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useGetRoles(
-    { limit: 100 },
+    { 
+      page: rolePage,
+      limit: roleLimit 
+    },
     { enabled: open }
   );
   const createAdmin = useCreateAdmin();
 
   const roles = rolesData?.data?.filter(role => role.status) || [];
+  const totalRoles = rolesData?.total_count || 0;
+  const totalRolePages = Math.ceil(totalRoles / roleLimit);
+  const hasRolePrev = rolePage > 1;
+  const hasRoleNext = rolePage < totalRolePages;
   const selectedRole = watch("role_access");
+
+  // Reset pagination when modal opens
+  useEffect(() => {
+    if (open) {
+      setRolePage(1);
+    }
+  }, [open]);
 
   const handleClose = () => {
     reset({
@@ -54,6 +73,7 @@ const CreateAdmin = ({ open, onClose }) => {
       phone: "",
       role_access: "",
     });
+    setRolePage(1);
     onClose();
   };
 
@@ -120,22 +140,59 @@ const CreateAdmin = ({ open, onClose }) => {
                 </div>
               ) : (
                 <Select
-                  value={selectedRole}
+                  key={selectedRole || 'empty-role'}
+                  value={selectedRole || ""}
                   onValueChange={(value) => setValue("role_access", value, { shouldValidate: true })}
                 >
                  <SelectTrigger>
                     <SelectValue placeholder={t("adminManagement.modal.rolePlaceholder")} />
                   </SelectTrigger>
-                  <SelectContent>
-                    {roles.length > 0 ? (
-                      roles.map((role) => (
-                        <SelectItem key={role._id} value={role._id}>
-                          {role.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="p-2 text-sm text-gray-500 dark:text-white/70">
-                        {t("adminManagement.modal.noActiveRoles")}
+                  <SelectContent
+                    position="popper"
+                    sideOffset={4}
+                    className="w-(--radix-select-trigger-width)"
+                  >
+                    <div className="max-h-75 overflow-y-auto">
+                      {roles.length > 0 ? (
+                        roles.map((role) => (
+                          <SelectItem key={role._id} value={role._id}>
+                            {role.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-gray-500 dark:text-white/70">
+                          {t("adminManagement.modal.noActiveRoles")}
+                        </div>
+                      )}
+                    </div>
+                    {totalRoles > roleLimit && (
+                      <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setRolePage((prev) => Math.max(1, prev - 1));
+                          }}
+                          disabled={!hasRolePrev}
+                          className="h-8 w-8"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setRolePage((prev) => prev + 1);
+                          }}
+                          disabled={!hasRoleNext}
+                          className="h-8 w-8"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                     )}
                   </SelectContent>

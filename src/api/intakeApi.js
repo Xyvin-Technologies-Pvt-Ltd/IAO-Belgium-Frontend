@@ -1,8 +1,8 @@
 import axiosInstance from "./axiosintercepter";
 
-export const getIntakes = async (filter) => {
+export const getIntakes = async (academicId, filter) => {
   try {
-    const response = await axiosInstance.get(`/intake`, {
+    const response = await axiosInstance.get(`/academic/intakes/${academicId}`, {
       params: filter,
     });
     return response.data;

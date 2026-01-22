@@ -158,12 +158,16 @@ function SidebarMenuCollapsedDropdown({ item, href }) {
 }
 
 function checkIsActive(href, item, mainNav = false) {
+  // Remove query parameters for comparison
+  const cleanHref = href.split('?')[0];
+  const cleanItemUrl = item.url;
+  
   return (
-    href === item.url || // /endpoint?search=param
-    href.split('?')[0] === item.url || // endpoint
-    !!item?.items?.filter((i) => i.url === href).length || // if child nav is active
+    cleanHref === cleanItemUrl || // exact match
+    cleanHref.startsWith(cleanItemUrl + '/') || // nested route match
+    !!item?.items?.filter((i) => checkIsActive(href, i)).length || // if child nav is active (recursive)
     (mainNav &&
-      href.split('/')[1] !== '' &&
-      href.split('/')[1] === item?.url?.split('/')[1])
+      cleanHref.split('/')[1] !== '' &&
+      cleanHref.split('/')[1] === cleanItemUrl?.split('/')[1])
   )
 }

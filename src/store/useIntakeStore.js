@@ -10,11 +10,12 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useGetIntakes = (filter, options = {}) => {
+export const useGetIntakes = (academicId, filter, options = {}) => {
   return useQuery({
-    queryKey: ["intakes", filter],
-    queryFn: () => getIntakes(filter),
+    queryKey: ["intakes", academicId, filter],
+    queryFn: () => getIntakes(academicId, filter),
     staleTime: 30000,
+    enabled: !!academicId, // Only run query if academicId exists
     placeholderData: (previousData) => previousData,
     ...options,
   });

@@ -17,6 +17,19 @@ const ViewApplication = ({ open, onClose, application }) => {
   
   const updateApplicationMutation = useUpdateApplication();
 
+  // Reset state when modal opens/closes or application changes
+  useEffect(() => {
+    if (open && application) {
+      // Reset all state when opening with a new application
+      setRequestAdditionalInfo(false);
+      setRemarks("");
+      setDocumentFlags({
+        id_card: false,
+        qualification_certificate: false
+      });
+    }
+  }, [open, application?._id]);
+
   // Initialize document flags when application changes
   const toggleDocumentFlag = (documentType) => {
     setDocumentFlags(prev => ({
@@ -53,6 +66,13 @@ const ViewApplication = ({ open, onClose, application }) => {
       data: updateData
     }, {
       onSuccess: () => {
+        // Reset state before closing
+        setRequestAdditionalInfo(false);
+        setRemarks("");
+        setDocumentFlags({
+          id_card: false,
+          qualification_certificate: false
+        });
         onClose(); // Close modal on success
       }
     });
@@ -89,7 +109,16 @@ const ViewApplication = ({ open, onClose, application }) => {
             </div>
           </div>
 
-          <button onClick={onClose}>
+          <button onClick={() => {
+            // Reset state when manually closing
+            setRequestAdditionalInfo(false);
+            setRemarks("");
+            setDocumentFlags({
+              id_card: false,
+              qualification_certificate: false
+            });
+            onClose();
+          }}>
             <X className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white" />
           </button>
         </div>

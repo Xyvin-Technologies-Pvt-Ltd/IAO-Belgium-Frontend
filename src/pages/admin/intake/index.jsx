@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Edit, Trash2, ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -22,10 +22,13 @@ import { useDeleteIntake, useGetIntakes } from "@/store/useIntakeStore";
 import CreateIntake from "@/components/admin/intake/CreateIntake";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
+import { useBreadcrumb } from "@/context/BreadCrumbContext";
 
 const Intakes = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const params = useParams({ strict: false });
+  const id = params.id;
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -33,10 +36,10 @@ const Intakes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIntake, setSelectedIntake] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-
+  const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetIntakes({
+  const { data, isLoading, error, refetch } = useGetIntakes(id, {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -48,9 +51,9 @@ const Intakes = () => {
   const totalRows = data?.total_count || 0;
 
   const handleRowClick = (intakeId) => {
-    navigate({ 
-      to: "/admin/admission-administration/intakes/$id", 
-      params: { id: intakeId } 
+    navigate({
+      to: "/admin/admission-administration/intakes/$id",
+      params: { id: intakeId },
     });
   };
 
@@ -77,12 +80,37 @@ const Intakes = () => {
       setOpenDelete(false);
     }
   };
-
+  useEffect(() => {
+    if (intakes) {
+      updateBreadcrumbs([
+        {
+          label: "Admission administration",
+          path: "/admin/admission-administration",
+          navigable: false,
+        },
+        {
+          label: "Academics",
+          path: "/admin/admission-administration/academics",
+          navigable: true,
+        },
+        {
+          label: "Intakes Details",
+          path: `/admin/admission-administration/intakes/batch/${intakes._id}`,
+          navigable: false,
+        },
+      ]);
+    }
+    return () => {
+      updateBreadcrumbs([]);
+    };
+  }, [intakes?.data?._id]);
   return (
     <div className="space-y-6 mt-4">
+      <div className="flex items-center gap-4">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-       {t("intakeManagement.title")}
-      </h2>
+          {t("intakeManagement.title")}
+        </h2>
+      </div>
       <div className="flex items-center justify-between gap-2">
         <Input
           placeholder={t("intakeManagement.search")}
@@ -103,7 +131,9 @@ const Intakes = () => {
             <TableHead>{t("intakeManagement.table.admissionFee")}</TableHead>
             <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
             <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
-            <TableHead>{t("intakeManagement.table.registrationDeadline")}</TableHead>
+            <TableHead>
+              {t("intakeManagement.table.registrationDeadline")}
+            </TableHead>
             <TableHead>{t("intakeManagement.table.status")}</TableHead>
             <TableHead>{t("intakeManagement.table.action")}</TableHead>
           </TableRow>
@@ -116,8 +146,7 @@ const Intakes = () => {
               <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={
-                    error?.message ||
-                    t("intakeManagement.messages.loadFailed")
+                    error?.message || t("intakeManagement.messages.loadFailed")
                   }
                   onRetry={refetch}
                   variant="inline"
@@ -126,14 +155,19 @@ const Intakes = () => {
             </TableRow>
           ) : intakes?.length > 0 ? (
             intakes?.map((i) => (
-              <TableRow 
-                key={i._id} 
+              <TableRow
+                key={i._id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.program?.name || "N/A"}</TableCell>
-                <TableCell>${i?.admission_fee || 0}</TableCell>
+                <TableCell>
+                  {Array.isArray(i?.program) 
+                    ? i.program.map(p => p.name || p).join(", ") 
+                    : i?.program?.name || "N/A"
+                  }
+                </TableCell>
+                <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
                     ? moment(i.start_date).format("MMM DD, YYYY")
@@ -190,6 +224,7 @@ const Intakes = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         intakeData={selectedIntake}
+        academicId={id}
       />
 
       <DeleteConfirm
