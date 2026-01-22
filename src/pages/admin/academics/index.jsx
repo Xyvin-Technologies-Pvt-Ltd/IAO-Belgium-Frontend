@@ -93,16 +93,16 @@ const Academics = () => {
       )}
 
       {!isLoading && academics.length === 0 && !debouncedSearch && (
-        <div className="flex flex-col items-center justify-center h-[80vh] text-center bg-white dark:bg-gray-800 rounded-lg">
+        <div className="flex flex-col items-center justify-center h-[80vh] text-center bg-sidebar rounded-xl p-5 border border-sidebar-border">
           <img
             src={image}
             alt="No academics"
             className="w-64 mb-4 opacity-80"
           />
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+          <h3 className="text-lg font-semibold text-sidebar-foreground">
             {t("academicManagement.emptyState.title")}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mt-1">
+          <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1">
             {t("academicManagement.emptyState.subtitle")}
           </p>
           <Button className="mt-4" onClick={handleOpenCreate}>

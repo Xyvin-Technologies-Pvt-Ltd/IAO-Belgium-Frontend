@@ -11,6 +11,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/student-management": ["academic_management_view", "academic_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-data": ["master_data_management_view", "master_data_management_modify"],
   "/admin/admin-management": ["admin_management_view", "admin_management_modify"],
   "/admin/role-management": ["roles_management_view", "roles_management_modify"],

@@ -15,6 +15,7 @@ import BatchDetails from "@/pages/admin/batch/BatchDetails";
 import StudentDetails from "@/pages/admin/student/StudentDetails";
 import EnrolledStudentDetails from "@/pages/admin/student/EnrolledStudentDetails";
 import Academics from "@/pages/admin/academics";
+import TeacherQualification from "@/pages/admin/teacher-qualification";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -48,6 +49,13 @@ export const adminRoutes = [
   {
     path: "/admin/languages",
     component: withPermissionProtection(Language, "/admin/languages"),
+  },
+  {
+    path: "/admin/teacher-qualifications",
+    component: withPermissionProtection(
+      TeacherQualification,
+      "/admin/teacher-qualification",
+    ),
   },
   {
     path: "/admin/admission-administration/application-review",

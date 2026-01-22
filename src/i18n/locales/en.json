@@ -499,5 +499,62 @@
       "unflagDocument": "Unflag document",
       "documentFlagged": "Document flagged"
     }
+  },
+  "teacherTitleManagement": {
+    "title": "Teacher Titles",
+    "search": "Search...",
+    "delete": "Delete",
+    "createTitle": "Create Teacher Title",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noTitles": "No Teacher Titles found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load teacher titles"
+    },
+    "modal": {
+      "createTitle": "Create a new Teacher Title",
+      "editTitle": "Edit Teacher Title",
+      "createSubtitle": "Let's create a new teacher title",
+      "editSubtitle": "Update the teacher title details",
+      "nameLabel": "Title Name",
+      "namePlaceholder": "Enter title name (e.g., Dr., Prof., Mr., Ms.)",
+      "nameRequired": "Title name is required"
+    }
+  },
+  "teacherQualification": {
+    "title": "Teacher Qualifications",
+    "tabs": {
+      "titles": "Titles",
+      "roles": "Roles"
+    }
+  },
+  "teacherRoleManagement": {
+    "title": "Teacher Roles",
+    "search": "Search...",
+    "delete": "Delete",
+    "createRole": "Create Teacher Role",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noRoles": "No Teacher Roles found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load teacher roles"
+    },
+    "modal": {
+      "createTitle": "Create a new Teacher Role",
+      "editTitle": "Edit Teacher Role",
+      "createSubtitle": "Let's create a new teacher role",
+      "editSubtitle": "Update the teacher role details",
+      "nameLabel": "Role Name",
+      "namePlaceholder": "Enter role name (e.g., Assistant Professor, Lecturer, Senior Teacher)",
+      "nameRequired": "Role name is required"
+    }
   }
 }
