@@ -27,18 +27,23 @@ const EnrolledStudentDetails = () => {
           navigable: false,
         },
         {
-          label: "Intakes",
-          path: "/admin/admission-administration/intakes",
+          label: "Academics",
+          path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Application Intakes Details",
-          path: `/admin/admission-administration/intakes/${student?.data?.intake_id}`,
+          label: "Intakes",
+          path: `/admin/admission-administration/academics/${student?.data?.academic}`,
+          navigable: true,
+        },
+        {
+          label: "Intakes Details",
+          path: `/admin/admission-administration/academics/intakes/${student?.data?.intake_id}`,
           navigable: true,
         },
         {
           label: "Student Details",
-          path: `/admin/admission-administration/intakes/batch/student/${id}`,
+          path: `/admin/admission-administration/academics/intakes/batch/student/${id}`,
           navigable: false,
         },
       ]);

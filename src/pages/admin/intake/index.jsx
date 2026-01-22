@@ -52,7 +52,7 @@ const Intakes = () => {
 
   const handleRowClick = (intakeId) => {
     navigate({
-      to: "/admin/admission-administration/intakes/$id",
+      to: "/admin/admission-administration/academics/intakes/$id",
       params: { id: intakeId },
     });
   };
@@ -94,7 +94,7 @@ const Intakes = () => {
           navigable: true,
         },
         {
-          label: "Intakes Details",
+          label: "Intakes",
           path: `/admin/admission-administration/intakes/batch/${intakes._id}`,
           navigable: false,
         },

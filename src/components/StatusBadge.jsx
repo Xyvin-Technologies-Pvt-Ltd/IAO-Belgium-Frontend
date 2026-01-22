@@ -4,6 +4,7 @@ const statusVariants = {
   success: "text-green-600",
   inactive: "text-red-500",
   pending_verification: "text-amber-600",
+  waitlisted: "text-amber-600",
   pending: "text-amber-600",
   approved: "text-green-600",
   suspended: "text-gray-500",

@@ -64,38 +64,38 @@ export const adminRoutes = [
     ),
   },
   {
-    path: "/admin/admission-administration/academics/intakes/$id",
+    path: "/admin/admission-administration/academics/$id",
     component: withPermissionProtection(
       Intakes,
-      "/admin/admission-administration/intakes",
+      "/admin/admission-administration/academics",
     ),
   },
   {
-    path: "/admin/admission-administration/intakes/$id",
+    path: "/admin/admission-administration/academics/intakes/$id",
     component: withPermissionProtection(
       IntakeDetails,
-      "/admin/admission-administration/intakes",
+      "/admin/admission-administration/academics",
     ),
   },
   {
-    path: "/admin/admission-administration/intakes/student/$id",
+    path: "/admin/admission-administration/academics/intakes/student/$id",
     component: withPermissionProtection(
       EnrolledStudentDetails,
-      "/admin/admission-administration/intakes",
+      "/admin/admission-administration/academics",
     ),
   },
   {
-    path: "/admin/admission-administration/intakes/batch/$id",
+    path: "/admin/admission-administration/academics/intakes/batch/$id",
     component: withPermissionProtection(
       BatchDetails,
-      "/admin/admission-administration/intakes",
+      "/admin/admission-administration/academics",
     ),
   },
   {
-    path: "/admin/admission-administration/intakes/batch/student/$id",
+    path: "/admin/admission-administration/academics/intakes/batch/student/$id",
     component: withPermissionProtection(
       StudentDetails,
-      "/admin/admission-administration/intakes",
+      "/admin/admission-administration/academics",
     ),
   },
   {

@@ -26,7 +26,7 @@ const AcademicCard = ({ academic, onEdit, onDuplicate }) => {
 
   const handleCardClick = () => {
     navigate({ 
-      to: "/admin/admission-administration/academics/intakes/$id", 
+      to: "/admin/admission-administration/academics/$id", 
       params: { id: academic._id  } 
     });
   };

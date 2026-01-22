@@ -36,18 +36,23 @@ const BatchDetails = () => {
           navigable: false,
         },
         {
-          label: "Intakes",
-          path: "/admin/admission-administration/intakes",
+          label: "Academics",
+          path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Application Intakes Details",
-          path: `/admin/admission-administration/intakes/${batch.data.intake_id}`,
+          label: "Intakes",
+          path: `/admin/admission-administration/academics/${batch.data.academic}`,
+          navigable: true,
+        },
+        {
+          label: "Intakes Details",
+          path: `/admin/admission-administration/academics/intakes/${batch.data.intake_id}`,
           navigable: true,
         },
         {
           label: "Batch Details",
-          path: `/admin/admission-administration/intakes/batch/${batch.data._id}`,
+          path: `/admin/admission-administration/academics/intakes/batch/${batch.data._id}`,
           navigable: false,
         },
       ]);

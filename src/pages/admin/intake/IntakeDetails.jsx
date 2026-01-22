@@ -36,14 +36,19 @@ const IntakeDetails = () => {
           path: "/admin/admission-administration",
           navigable: false,
         },
-        {
-          label: "Intakes",
-          path: "/admin/admission-administration/intakes",
+         {
+          label: "Academics",
+          path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Application Intakes Details",
-          path: `/admin/admission-administration/intakes/${id}`,
+          label: "Intakes",
+          path: `/admin/admission-administration/academics/${intake?.data?.academic}`,
+          navigable: true,
+        },
+        {
+          label: "Intakes Details",
+          path: `/admin/admission-administration/academics/intakes/${id}`,
           navigable: false,
         },
       ]);

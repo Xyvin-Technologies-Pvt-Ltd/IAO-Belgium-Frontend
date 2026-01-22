@@ -38,7 +38,7 @@ const BatchStudentList = () => {
   const totalRows = data?.total_count || 0;
   const handleRowClick = (appId) => {
     navigate({
-      to: "/admin/admission-administration/intakes/batch/student/$id",
+      to: "/admin/admission-administration/academics/intakes/batch/student/$id",
       params: { id: appId },
     });
   };

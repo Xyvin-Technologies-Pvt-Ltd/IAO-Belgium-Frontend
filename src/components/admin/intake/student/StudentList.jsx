@@ -41,7 +41,7 @@ const StudentList = () => {
   const totalRows = data?.total_count || 0;
   const handleRowClick = (appId) => {
     navigate({
-      to: "/admin/admission-administration/intakes/student/$id",
+      to: "/admin/admission-administration/academics/intakes/student/$id",
       params: { id: appId },
     });
   };
