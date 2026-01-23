@@ -12,21 +12,11 @@ import { useGetLanguages } from "@/store/useLanguageStore";
 import { useGetTitles } from "@/store/useTitleStore";
 import { useGetTeacherRole } from "@/store/useTeacherRoleStore";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
 import { teacherSchema } from "@/validations/admin";
 import PaginatedMultiSelect from "@/components/ui/forms/PaginationMultiSelect";
+import PaginatedSelect from "@/components/ui/forms/PaginatedSelect";
 
-const LIMIT = 10;
+const LIMIT = 1;
 
 const CreateTeacher = ({ open, onClose, teacherData }) => {
   const { t } = useTranslation();
@@ -347,161 +337,33 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
               error={errors.language?.message}
             />
 
-            <div className="space-y-2">
-              <Label>
-                {t("teacherManagement.modal.academicDegreeLabel")}{" "}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                key={watch("academic_degree") || "empty-degree"}
-                value={watch("academic_degree") || ""}
-                onValueChange={(v) =>
-                  setValue("academic_degree", v, { shouldValidate: true })
-                }
-              >
-                <SelectTrigger
-                  className={errors.academic_degree ? "border-red-500" : ""}
-                >
-                  <SelectValue
-                    placeholder={t(
-                      "teacherManagement.modal.academicDegreePlaceholder",
-                    )}
-                  />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-[var(--radix-select-trigger-width)]"
-                >
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {(allTitles.length > 0
-                      ? allTitles
-                      : titlesData?.data || []
-                    )?.map((title) => (
-                      <SelectItem key={title._id} value={title._id}>
-                        {title.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {(titlesData?.total_count || 0) > LIMIT && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setTitlePage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={titlePage <= 1}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setTitlePage((prev) => prev + 1);
-                        }}
-                        disabled={
-                          titlePage >=
-                          Math.ceil((titlesData?.total_count || 0) / LIMIT)
-                        }
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.academic_degree && (
-                <p className="text-sm text-red-500">
-                  {errors.academic_degree.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("teacherManagement.modal.academicDegreeLabel")}
+              placeholder={t("teacherManagement.modal.academicDegreePlaceholder")}
+              items={allTitles.length > 0 ? allTitles : titlesData?.data || []}
+              value={watch("academic_degree") || ""}
+              onChange={(v) => setValue("academic_degree", v, { shouldValidate: true })}
+              page={titlePage}
+              setPage={setTitlePage}
+              total={titlesData?.total_count || 0}
+              limit={LIMIT}
+              error={errors.academic_degree?.message}
+              required
+            />
 
-            <div className="space-y-2">
-              <Label>
-                {t("teacherManagement.modal.teacherRoleLabel")}{" "}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                key={watch("teacher_role") || "empty-role"}
-                value={watch("teacher_role") || ""}
-                onValueChange={(v) =>
-                  setValue("teacher_role", v, { shouldValidate: true })
-                }
-              >
-                <SelectTrigger
-                  className={errors.teacher_role ? "border-red-500" : ""}
-                >
-                  <SelectValue
-                    placeholder={t(
-                      "teacherManagement.modal.teacherRolePlaceholder",
-                    )}
-                  />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-[var(--radix-select-trigger-width)]"
-                >
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {(allRoles.length > 0
-                      ? allRoles
-                      : rolesData?.data || []
-                    )?.map((role) => (
-                      <SelectItem key={role._id} value={role._id}>
-                        {role.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {(rolesData?.total_count || 0) > LIMIT && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setRolePage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={rolePage <= 1}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setRolePage((prev) => prev + 1);
-                        }}
-                        disabled={
-                          rolePage >=
-                          Math.ceil((rolesData?.total_count || 0) / LIMIT)
-                        }
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.teacher_role && (
-                <p className="text-sm text-red-500">
-                  {errors.teacher_role.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("teacherManagement.modal.teacherRoleLabel")}
+              placeholder={t("teacherManagement.modal.teacherRolePlaceholder")}
+              items={allRoles.length > 0 ? allRoles : rolesData?.data || []}
+              value={watch("teacher_role") || ""}
+              onChange={(v) => setValue("teacher_role", v, { shouldValidate: true })}
+              page={rolePage}
+              setPage={setRolePage}
+              total={rolesData?.total_count || 0}
+              limit={LIMIT}
+              error={errors.teacher_role?.message}
+              required
+            />
 
             <FormField
               label={t("teacherManagement.modal.employmentStartDateLabel")}

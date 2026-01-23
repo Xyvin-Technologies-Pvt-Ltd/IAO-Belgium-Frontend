@@ -1,28 +1,21 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useCreateCity, useUpdateCity } from "@/store/useCityStore";
 import { useGetCountries } from "@/store/useCountryStore";
 import { citySchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
+import PaginatedSelect from "@/components/ui/forms/PaginatedSelect";
 
 const CreateCity = ({ open, onClose, cityData }) => {
   const { t } = useTranslation();
   const [countryPage, setCountryPage] = useState(1);
   const countryLimit = 10;
+
+  // Cache for storing all loaded data
+  const [allCountries, setAllCountries] = useState([]);
 
   const { data: countriesData } = useGetCountries(
     {
@@ -53,6 +46,20 @@ const CreateCity = ({ open, onClose, cityData }) => {
 
   const selectedCountry = watch("country");
 
+  // Cache management effect
+  useEffect(() => {
+    if (countriesData?.data) {
+      setAllCountries((prev) => {
+        const newCountries = countriesData.data;
+        const existingIds = prev.map((c) => c._id);
+        const uniqueNewCountries = newCountries.filter(
+          (c) => !existingIds.includes(c._id),
+        );
+        return [...prev, ...uniqueNewCountries];
+      });
+    }
+  }, [countriesData?.data]);
+
   // Reset pagination when modal opens
   useEffect(() => {
     if (open) {
@@ -66,15 +73,27 @@ const CreateCity = ({ open, onClose, cityData }) => {
       country: "",
     });
     setCountryPage(1);
+    setAllCountries([]);
     onClose();
   };
 
   useEffect(() => {
-    if (cityData && isEdit && open) {
-      setValue('name', cityData.name || '');
-      setValue('country', cityData.country?._id || '');
+    if (!open || !cityData) return;
+
+    // Handle country data for edit mode
+    if (cityData.country && cityData.country.name) {
+      setAllCountries((prev) => {
+        const exists = prev.some((c) => c._id === cityData.country._id);
+        if (!exists) {
+          return [...prev, cityData.country];
+        }
+        return prev;
+      });
     }
-  }, [cityData, isEdit, setValue, open]);
+
+    setValue('name', cityData.name || '');
+    setValue('country', cityData.country?._id || '');
+  }, [cityData, open, setValue]);
 
   const onSubmit = (formData) => {
     const payload = {
@@ -96,11 +115,8 @@ const CreateCity = ({ open, onClose, cityData }) => {
 
   const isSubmitting = createCity.isPending || updateCity.isPending;
 
-  const countries = countriesData?.data || [];
+  const countries = allCountries.length > 0 ? allCountries : countriesData?.data || [];
   const totalCountries = countriesData?.total_count || 0;
-  const totalCountryPages = Math.ceil(totalCountries / countryLimit);
-  const hasCountryPrev = countryPage > 1;
-  const hasCountryNext = countryPage < totalCountryPages;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -121,66 +137,19 @@ const CreateCity = ({ open, onClose, cityData }) => {
               {...register("name")}
             />
 
-            <div className="space-y-2">
-              <Label>{t("cityManagement.modal.countryLabel")} <span className="text-red-500">*</span></Label>
-              <Select
-                key={selectedCountry || 'empty'}
-                value={selectedCountry || ""}
-                onValueChange={(value) => setValue("country", value, { shouldValidate: true })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("cityManagement.modal.countryPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-[var(--radix-select-trigger-width)]"
-                >
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {countries?.map((country) => (
-                      <SelectItem key={country._id} value={country._id}>
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {totalCountries > countryLimit && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCountryPage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={!hasCountryPrev}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCountryPage((prev) => prev + 1);
-                        }}
-                        disabled={!hasCountryNext}
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.country && (
-                <p className="text-red-500 text-sm">
-                  {errors.country.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("cityManagement.modal.countryLabel")}
+              placeholder={t("cityManagement.modal.countryPlaceholder")}
+              items={countries}
+              value={selectedCountry || ""}
+              onChange={(value) => setValue("country", value, { shouldValidate: true })}
+              page={countryPage}
+              setPage={setCountryPage}
+              total={totalCountries}
+              limit={countryLimit}
+              error={errors.country?.message}
+              required
+            />
 
             <FormActions
               onCancel={handleClose}

@@ -17,9 +17,8 @@ import { useGetCities } from "@/store/useCityStore";
 import { useGetLanguages } from "@/store/useLanguageStore";
 import { useTranslation } from "react-i18next";
 import { useCreateProgram, useUpdateProgram } from "@/store/useProgramStore";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { programSchema } from "@/validations/admin";
+import PaginatedSelect from "@/components/ui/forms/PaginatedSelect";
 
 const CreateProgram = ({ open, onClose, programData }) => {
   const { t } = useTranslation();
@@ -29,6 +28,11 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const languageLimit = 10;
   const cityLimit = 10;
   const countryLimit = 10;
+
+  // Cache for storing all loaded data
+  const [allLanguages, setAllLanguages] = useState([]);
+  const [allCountries, setAllCountries] = useState([]);
+  const [allCities, setAllCities] = useState([]);
 
   const { data: countriesData } = useGetCountries(
     {
@@ -80,10 +84,51 @@ const CreateProgram = ({ open, onClose, programData }) => {
     ...(selectedCountry ? { country: selectedCountry } : {}),
   }, { enabled: open && !!selectedCountry });
 
+  // Cache management effects
+  useEffect(() => {
+    if (languagesData?.data) {
+      setAllLanguages((prev) => {
+        const newLanguages = languagesData.data;
+        const existingIds = prev.map((l) => l._id);
+        const uniqueNewLanguages = newLanguages.filter(
+          (l) => !existingIds.includes(l._id),
+        );
+        return [...prev, ...uniqueNewLanguages];
+      });
+    }
+  }, [languagesData?.data]);
+
+  useEffect(() => {
+    if (countriesData?.data) {
+      setAllCountries((prev) => {
+        const newCountries = countriesData.data;
+        const existingIds = prev.map((c) => c._id);
+        const uniqueNewCountries = newCountries.filter(
+          (c) => !existingIds.includes(c._id),
+        );
+        return [...prev, ...uniqueNewCountries];
+      });
+    }
+  }, [countriesData?.data]);
+
+  useEffect(() => {
+    if (citiesData?.data) {
+      setAllCities((prev) => {
+        const newCities = citiesData.data;
+        const existingIds = prev.map((c) => c._id);
+        const uniqueNewCities = newCities.filter(
+          (c) => !existingIds.includes(c._id),
+        );
+        return [...prev, ...uniqueNewCities];
+      });
+    }
+  }, [citiesData?.data]);
+
   // Reset cities when country changes
   useEffect(() => {
     setCityPage(1);
     setValue("city", "");
+    setAllCities([]); // Clear city cache when country changes
   }, [selectedCountry, setValue]);
 
   // Reset pagination when modal opens
@@ -100,28 +145,64 @@ const CreateProgram = ({ open, onClose, programData }) => {
     setLanguagePage(1);
     setCityPage(1);
     setCountryPage(1);
+    setAllLanguages([]);
+    setAllCountries([]);
+    setAllCities([]);
     onClose();
   };
 
   useEffect(() => {
-    if (programData && isEdit && open) {
-      setValue('name', programData.name || '');
-      setValue('description', programData.description || '');
-      setValue('program_type', programData.program_type || '');
-      setValue('year', programData.year || '');
-      setValue('language', programData.language?._id || '');
-      // Set country first, then city after a brief delay to ensure cities are fetched
-      if (programData.city?.country?._id) {
-        setValue('country', programData.city.country._id);
-        // Use setTimeout to ensure the country is set and cities query is triggered
-        setTimeout(() => {
-          if (programData.city?._id) {
-            setValue('city', programData.city._id);
-          }
-        }, 100);
-      }
+    if (!open || !programData) return;
+
+    // Handle language data for edit mode
+    if (programData.language && programData.language.name) {
+      setAllLanguages((prev) => {
+        const exists = prev.some((l) => l._id === programData.language._id);
+        if (!exists) {
+          return [...prev, programData.language];
+        }
+        return prev;
+      });
     }
-  }, [programData, isEdit, setValue, open]);
+
+    // Handle country data for edit mode
+    if (programData.city?.country && programData.city.country.name) {
+      setAllCountries((prev) => {
+        const exists = prev.some((c) => c._id === programData.city.country._id);
+        if (!exists) {
+          return [...prev, programData.city.country];
+        }
+        return prev;
+      });
+    }
+
+    // Handle city data for edit mode
+    if (programData.city && programData.city.name) {
+      setAllCities((prev) => {
+        const exists = prev.some((c) => c._id === programData.city._id);
+        if (!exists) {
+          return [...prev, programData.city];
+        }
+        return prev;
+      });
+    }
+
+    setValue('name', programData.name || '');
+    setValue('description', programData.description || '');
+    setValue('program_type', programData.program_type || '');
+    setValue('year', programData.year || '');
+    setValue('language', programData.language?._id || '');
+    // Set country first, then city after a brief delay to ensure cities are fetched
+    if (programData.city?.country?._id) {
+      setValue('country', programData.city.country._id);
+      // Use setTimeout to ensure the country is set and cities query is triggered
+      setTimeout(() => {
+        if (programData.city?._id) {
+          setValue('city', programData.city._id);
+        }
+      }, 100);
+    }
+  }, [programData, open, setValue]);
 
   const onSubmit = (formData) => {
     const payload = {
@@ -147,23 +228,14 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   const isSubmitting = createProgram.isPending || updateProgram.isPending;
 
-  const languages = languagesData?.data || [];
+  const languages = allLanguages.length > 0 ? allLanguages : languagesData?.data || [];
   const totalLanguages = languagesData?.total_count || 0;
-  const totalLanguagePages = Math.ceil(totalLanguages / languageLimit);
-  const hasLanguagePrev = languagePage > 1;
-  const hasLanguageNext = languagePage < totalLanguagePages;
 
-  const countries = countriesData?.data || [];
+  const countries = allCountries.length > 0 ? allCountries : countriesData?.data || [];
   const totalCountries = countriesData?.total_count || 0;
-  const totalCountryPages = Math.ceil(totalCountries / countryLimit);
-  const hasCountryPrev = countryPage > 1;
-  const hasCountryNext = countryPage < totalCountryPages;
 
-  const cities = citiesData?.data || [];
+  const cities = allCities.length > 0 ? allCities : citiesData?.data || [];
   const totalCities = citiesData?.total_count || 0;
-  const totalCityPages = Math.ceil(totalCities / cityLimit);
-  const hasCityPrev = cityPage > 1;
-  const hasCityNext = cityPage < totalCityPages;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
@@ -232,192 +304,51 @@ const CreateProgram = ({ open, onClose, programData }) => {
               {...register("year")}
             />
 
-            <div className="space-y-2">
-              <Label>{t("programManagement.modal.languageLabel")} <span className="text-red-500">*</span></Label>
-              <Select
-                key={selectedLanguage || 'empty-language'}
-                value={selectedLanguage || ""}
-                onValueChange={(value) => setValue("language", value, { shouldValidate: true })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("programManagement.modal.languagePlaceholder")} />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-(--radix-select-trigger-width)"
-                >
-                  <div className="max-h-75 overflow-y-auto">
-                    {languages?.map((language) => (
-                      <SelectItem key={language._id} value={language._id}>
-                        {language.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {totalLanguages > languageLimit && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setLanguagePage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={!hasLanguagePrev}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setLanguagePage((prev) => prev + 1);
-                        }}
-                        disabled={!hasLanguageNext}
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.language && (
-                <p className="text-red-500 text-sm">
-                  {errors.language.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("programManagement.modal.languageLabel")}
+              placeholder={t("programManagement.modal.languagePlaceholder")}
+              items={languages}
+              value={selectedLanguage || ""}
+              onChange={(value) => setValue("language", value, { shouldValidate: true })}
+              page={languagePage}
+              setPage={setLanguagePage}
+              total={totalLanguages}
+              limit={languageLimit}
+              error={errors.language?.message}
+              required
+            />
 
-            <div className="space-y-2">
-              <Label>{t("programManagement.modal.countryLabel")} <span className="text-red-500">*</span></Label>
-              <Select
-                key={selectedCountry || 'empty-country'}
-                value={selectedCountry || ""}
-                onValueChange={(value) => {
-                  setValue("country", value, { shouldValidate: true });
-                  setValue("city", ""); // Reset city when country changes
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("programManagement.modal.countryPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-(--radix-select-trigger-width)"
-                >
-                  <div className="max-h-75 overflow-y-auto">
-                    {countries?.map((country) => (
-                      <SelectItem key={country._id} value={country._id}>
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {totalCountries > countryLimit && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCountryPage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={!hasCountryPrev}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCountryPage((prev) => prev + 1);
-                        }}
-                        disabled={!hasCountryNext}
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.country && (
-                <p className="text-red-500 text-sm">
-                  {errors.country.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("programManagement.modal.countryLabel")}
+              placeholder={t("programManagement.modal.countryPlaceholder")}
+              items={countries}
+              value={selectedCountry || ""}
+              onChange={(value) => {
+                setValue("country", value, { shouldValidate: true });
+                setValue("city", ""); // Reset city when country changes
+              }}
+              page={countryPage}
+              setPage={setCountryPage}
+              total={totalCountries}
+              limit={countryLimit}
+              error={errors.country?.message}
+              required
+            />
 
-            <div className="space-y-2">
-              <Label>{t("programManagement.modal.cityLabel")} <span className="text-red-500">*</span></Label>
-              <Select
-                key={selectedCity || 'empty-city'}
-                value={selectedCity || ""}
-                onValueChange={(value) => setValue("city", value, { shouldValidate: true })}
-                disabled={!selectedCountry}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={selectedCountry ? t("programManagement.modal.cityPlaceholder") : t("programManagement.modal.cityPlaceholderDisabled")} />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  sideOffset={4}
-                  className="w-(--radix-select-trigger-width)"
-                >
-                  <div className="max-h-75 overflow-y-auto">
-                    {cities?.map((city) => (
-                      <SelectItem key={city._id} value={city._id}>
-                        {city.name}
-                      </SelectItem>
-                    ))}
-                  </div>
-                  {totalCities > cityLimit && (
-                    <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCityPage((prev) => Math.max(1, prev - 1));
-                        }}
-                        disabled={!hasCityPrev}
-                        className="h-8 w-8"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCityPage((prev) => prev + 1);
-                        }}
-                        disabled={!hasCityNext}
-                        className="h-8 w-8"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              {errors.city && (
-                <p className="text-red-500 text-sm">
-                  {errors.city.message}
-                </p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("programManagement.modal.cityLabel")}
+              placeholder={selectedCountry ? t("programManagement.modal.cityPlaceholder") : t("programManagement.modal.cityPlaceholderDisabled")}
+              items={cities}
+              value={selectedCity || ""}
+              onChange={(value) => setValue("city", value, { shouldValidate: true })}
+              page={cityPage}
+              setPage={setCityPage}
+              total={totalCities}
+              limit={cityLimit}
+              error={errors.city?.message}
+              required
+              disabled={!selectedCountry}
+            />
 
             <FormActions
               onCancel={handleClose}

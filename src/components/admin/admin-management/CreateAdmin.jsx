@@ -6,23 +6,17 @@ import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateAdmin } from "@/store/useAdminStore";
 import { useGetRoles } from "@/store/useRoleStore";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { adminSchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
+import PaginatedSelect from "@/components/ui/forms/PaginatedSelect";
 
 const CreateAdmin = ({ open, onClose }) => {
   const { t } = useTranslation();
   const [rolePage, setRolePage] = useState(1);
   const roleLimit = 10;
+
+  // Cache for storing all loaded data
+  const [allRoles, setAllRoles] = useState([]);
 
   const {
     register,
@@ -51,12 +45,21 @@ const CreateAdmin = ({ open, onClose }) => {
   );
   const createAdmin = useCreateAdmin();
 
-  const roles = rolesData?.data?.filter(role => role.status) || [];
-  const totalRoles = rolesData?.total_count || 0;
-  const totalRolePages = Math.ceil(totalRoles / roleLimit);
-  const hasRolePrev = rolePage > 1;
-  const hasRoleNext = rolePage < totalRolePages;
   const selectedRole = watch("role_access");
+
+  // Cache management effect
+  useEffect(() => {
+    if (rolesData?.data) {
+      setAllRoles((prev) => {
+        const newRoles = rolesData.data.filter(role => role.status); // Only active roles
+        const existingIds = prev.map((r) => r._id);
+        const uniqueNewRoles = newRoles.filter(
+          (r) => !existingIds.includes(r._id),
+        );
+        return [...prev, ...uniqueNewRoles];
+      });
+    }
+  }, [rolesData?.data]);
 
   useEffect(() => {
     if (open) {
@@ -73,6 +76,7 @@ const CreateAdmin = ({ open, onClose }) => {
       role_access: "",
     });
     setRolePage(1);
+    setAllRoles([]);
     onClose();
   };
 
@@ -85,6 +89,9 @@ const CreateAdmin = ({ open, onClose }) => {
   };
 
   if (!open) return null;
+
+  const roles = allRoles.length > 0 ? allRoles : rolesData?.data?.filter(role => role.status) || [];
+  const totalRoles = rolesData?.total_count || 0;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -129,78 +136,21 @@ const CreateAdmin = ({ open, onClose }) => {
               {...register("phone")}
             />
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                {t("adminManagement.modal.roleLabel")} <span className="text-red-500">*</span>
-              </Label>
-              {isLoadingRoles || isFetchingRoles ? (
-                <div className="text-sm text-gray-500 dark:text-white/70">
-                  {t("adminManagement.modal.loadingRoles")}
-                </div>
-              ) : (
-                <Select
-                  key={selectedRole || 'empty-role'}
-                  value={selectedRole || ""}
-                  onValueChange={(value) => setValue("role_access", value, { shouldValidate: true })}
-                >
-                 <SelectTrigger>
-                    <SelectValue placeholder={t("adminManagement.modal.rolePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent
-                    position="popper"
-                    sideOffset={4}
-                    className="w-(--radix-select-trigger-width)"
-                  >
-                    <div className="max-h-75 overflow-y-auto">
-                      {roles.length > 0 ? (
-                        roles.map((role) => (
-                          <SelectItem key={role._id} value={role._id}>
-                            {role.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="p-2 text-sm text-gray-500 dark:text-white/70">
-                          {t("adminManagement.modal.noActiveRoles")}
-                        </div>
-                      )}
-                    </div>
-                    {totalRoles > roleLimit && (
-                      <div className="flex items-center justify-center gap-2 px-2 py-2 border-t bg-background sticky bottom-0">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setRolePage((prev) => Math.max(1, prev - 1));
-                          }}
-                          disabled={!hasRolePrev}
-                          className="h-8 w-8"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setRolePage((prev) => prev + 1);
-                          }}
-                          disabled={!hasRoleNext}
-                          className="h-8 w-8"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-              {errors.role_access && (
-                <p className="text-sm text-red-500">{errors.role_access.message}</p>
-              )}
-            </div>
+            <PaginatedSelect
+              label={t("adminManagement.modal.roleLabel")}
+              placeholder={t("adminManagement.modal.rolePlaceholder")}
+              items={roles}
+              value={selectedRole || ""}
+              onChange={(value) => setValue("role_access", value, { shouldValidate: true })}
+              page={rolePage}
+              setPage={setRolePage}
+              total={totalRoles}
+              limit={roleLimit}
+              error={errors.role_access?.message}
+              required
+              disabled={isLoadingRoles || isFetchingRoles}
+              emptyMessage={t("adminManagement.modal.noActiveRoles")}
+            />
 
             <FormActions
               onCancel={handleClose}
