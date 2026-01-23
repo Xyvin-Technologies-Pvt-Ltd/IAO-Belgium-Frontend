@@ -1,11 +1,9 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import { hasPermission } from "@/utils/permissionUtils";
-import { useLocation, Navigate } from "@tanstack/react-router";
+import { Navigate } from "@tanstack/react-router";
 
 const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
   const { profile, isAuthenticated } = useAuthStore();
-  const location = useLocation();
-  
+
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -13,10 +11,13 @@ const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
 
   // Get user permissions
   const userPermissions = profile?.role_access?.permissions || [];
-  
+
   // Check if user has required permissions
-  const hasAccess = requiredPermissions.length === 0 || 
-    requiredPermissions.some(permission => userPermissions.includes(permission));
+  const hasAccess =
+    requiredPermissions.length === 0 ||
+    requiredPermissions.some((permission) =>
+      userPermissions.includes(permission),
+    );
 
   // If no access, show unauthorized page or redirect
   if (!hasAccess) {

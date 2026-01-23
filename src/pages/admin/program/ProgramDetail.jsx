@@ -1,41 +1,120 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { LoadingState, ErrorMessage } from "@/components/common";
-import { Users, DollarSign, Layers, Clock } from "lucide-react";
+import { DollarSign, Layers, Clock } from "lucide-react";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
-import LearningModule from "@/components/admin/programs/LearningModule";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetPrograms } from "@/store/useProgramStore";
-
+import { useGetProgramById } from "@/store/useProgramStore";
+import LearningModule from "@/components/admin/programs/LearningModule";
+import AppModule from "@/components/admin/programs/AppModule";
+import { Button } from "@/components/ui/button";
+import CreateComponent from "@/components/admin/programs/CreateComponent";
+import image from "../../../assets/images/no-component.png";
+import ResourceModule from "@/components/admin/programs/ResourceModule";
+import { useTranslation } from "react-i18next";
 const ProgramDetail = () => {
+  const { t } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [preselectedType, setPreselectedType] = useState(null);
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("programActiveTab") || "";
+  });
 
-  const { data: program, isLoading, error, refetch } = useGetPrograms(id);
-  const [activeTab, setActiveTab] = useState("Learning Modules");
+  const { data: program, isLoading, error, refetch } = useGetProgramById(id);
+
+  const handleOpenCreate = (componentType = null) => {
+    setPreselectedType(componentType);
+    setIsModalOpen(true);
+  };
+  const handleOpenCreateComponent = () => {
+    setPreselectedType(null);
+    setIsModalOpen(true);
+  };
+
+  const handleComponentCreated = (componentType) => {
+    // Switch to the tab corresponding to the created component type
+    if (componentType && tabs.some(tab => tab.id === componentType)) {
+      setActiveTab(componentType);
+      localStorage.setItem("programActiveTab", componentType);
+    }
+    setIsModalOpen(false);
+  };
+  // Component mapping for different types
+  const componentMap = {
+    module: {
+      label: t("programDetail.tabs.learningModules"),
+      component: () => <LearningModule programId={id} />,
+    },
+    app: {
+      label: t("programDetail.tabs.applications"),
+      component: () => <AppModule programId={id} />,
+    },
+    resource: {
+      label: t("programDetail.tabs.resources"),
+      component: () => <ResourceModule programId={id} />,
+    },
+  };
+
+  // Generate tabs based on program types
+  const tabs =
+    program?.data?.types?.length > 0
+      ? program.data.types
+          .map((type) => ({
+            id: type,
+            ...componentMap[type],
+          }))
+          .filter((tab) => tab.label) // Filter out any undefined mappings
+      : [];
+
+  // Set default active tab when tabs are available
+  useEffect(() => {
+    if (tabs.length > 0 && !activeTab) {
+      const defaultTab = tabs[0].id;
+      setActiveTab(defaultTab);
+      localStorage.setItem("programActiveTab", defaultTab);
+    }
+  }, [tabs.length, activeTab]);
+
+  useEffect(() => {
+    if (activeTab) {
+      localStorage.setItem("programActiveTab", activeTab);
+    }
+  }, [activeTab]);
+
+  const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component;
+
   useEffect(() => {
     if (program?.data) {
       updateBreadcrumbs([
-        { label: "Program Administration", path: "/admin/program-administration", navigable: false },
-        { label: "Program", path: "/admin/program", navigable: true },
-        { label: program.data.name, path: `/admin/program/${id}`, navigable: false }
+        {
+          label: t("sidebar.admin.programAdministration"),
+          path: "/admin/program",
+          navigable: false,
+        },
+        {
+          label: t("programDetail.title"),
+          path: `/admin/program/${id}`,
+          navigable: false,
+        },
       ]);
     }
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [program?.data?.name, id]);
+  }, [program?.data?.name, id, t]);
 
   if (isLoading) {
-    return <LoadingState text="Loading program details..." fullHeight />;
+    return <LoadingState text={t("programDetail.loading")} fullHeight />;
   }
 
   if (error) {
     return (
       <div className="p-6">
         <ErrorMessage
-          message={error?.message || "Failed to load program details"}
+          message={error?.message || t("programDetail.loadFailed")}
           onRetry={refetch}
           variant="card"
         />
@@ -46,84 +125,90 @@ const ProgramDetail = () => {
   const programData = program?.data;
   if (!programData) return null;
 
-  const { inclusions = [], modules = [] } = programData;
-
   return (
     <div className="space-y-6">
-      {/* ===== Dashboard Cards ===== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <DashboardCard
-          title="Program Type"
-          value={programData.type}
+          title={t("programDetail.cards.programName")}
+          value={programData?.name}
           icon={Layers}
         />
 
         <DashboardCard
-          title="Duration"
-          value={programData.duration}
+          title={t("programDetail.cards.duration")}
+          value={`${programData.year} ${t("programDetail.cards.years")}`}
           icon={Clock}
         />
 
         <DashboardCard
-          title="No of Modules"
-          value={programData.moduleCount || modules.length}
+          title={t("programDetail.cards.noOfModules")}
+          value={programData.moduleCount || 0}
           icon={Layers}
         />
 
         <DashboardCard
-          title="Registration Fee"
+          title={t("programDetail.cards.registrationFee")}
           value={
             programData.isRegistrationFee
-              ? `$${programData.registrationFee}`
-              : "Free"
+              ? `${programData.city?.country?.currency || "$"}${programData.registrationFee}`
+              : t("programDetail.cards.free")
           }
           icon={DollarSign}
         />
       </div>
 
-      <div className="border-b border-gray-200 dark:border-gray-700 flex gap-6">
-        {inclusions.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-3 text-sm font-medium transition ${
-              activeTab === tab
-                ? "border-b-2 border-gray-900 text-gray-900 dark:border-white dark:text-white"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-      <div className="pt-4">
-        {activeTab === "Learning Modules" && (
-          <LearningModule 
-            modules={modules}
-            isLoading={false}
-            error={null}
-            onRefetch={refetch}
+      {tabs.length > 0 && (
+        <>
+          <div className="border-b border-gray-200 dark:border-white/20">
+            <nav className="-mb-px flex space-x-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? "border-[#ff8904] text-[#ff8904]"
+                      : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={handleOpenCreateComponent} className="mt-4">
+              {t("programDetail.emptyState.createButton")}
+            </Button>
+          </div>
+          <div className="mt-6">{ActiveComponent && <ActiveComponent />}</div>
+        </>
+      )}
+
+      {tabs.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-[80vh] text-center bg-sidebar rounded-xl p-5 border border-sidebar-border">
+          <img
+            src={image}
+            alt="No academics"
+            className="w-64 mb-4 opacity-80"
           />
-        )}
-
-        {activeTab === "Exams" && (
-          <p className="text-sm text-gray-500">
-            Exams configuration will appear here.
+          <h3 className="text-lg font-semibold text-sidebar-foreground">
+            {t("programDetail.emptyState.title")}
+          </h3>
+          <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1">
+            {t("programDetail.emptyState.subtitle")}
           </p>
-        )}
-
-        {activeTab === "APP" && (
-          <p className="text-sm text-gray-500">
-            App-related content will appear here.
-          </p>
-        )}
-
-        {activeTab === "Research" && (
-          <p className="text-sm text-gray-500">
-            Research modules and details will appear here.
-          </p>
-        )}
-      </div>
+          <Button className="mt-4" onClick={handleOpenCreate}>
+            {t("programDetail.emptyState.createButton")}
+          </Button>
+        </div>
+      )}
+      <CreateComponent
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onComponentCreated={handleComponentCreated}
+        programId={id}
+      />
     </div>
   );
 };

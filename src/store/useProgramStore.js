@@ -1,5 +1,5 @@
 
-import { createProgram, deleteProgram, duplicateProgram, getPrograms, updateProgram } from "@/api/programApi";
+import { createProgram, deleteProgram, duplicateProgram, getProgramById, getPrograms, updateProgram } from "@/api/programApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -13,6 +13,15 @@ export const useGetPrograms = (filter, options = {}) => {
   });
 };
 
+export const useGetProgramById = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["program", id],
+    queryFn: () => getProgramById(id),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  })
+}
 export const useCreateProgram = () => {
   const queryClient = useQueryClient();
 

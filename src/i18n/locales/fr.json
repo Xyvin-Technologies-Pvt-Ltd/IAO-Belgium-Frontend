@@ -556,5 +556,126 @@
       "namePlaceholder": "Entrez le nom du rôle (ex: Professeur assistant, Chargé de cours, Enseignant senior)",
       "nameRequired": "Le nom du rôle est requis"
     }
+  },
+  "teacherManagement": {
+    "title": "Gestion des enseignants",
+    "search": "Rechercher des enseignants...",
+    "delete": "Supprimer",
+    "createTeacher": "Créer un enseignant",
+    "table": {
+      "teacherId": "ID enseignant",
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "academicDegree": "Diplôme académique",
+      "role": "Rôle",
+      "employmentStartDate": "Date de début d'emploi IAO",
+      "location": "Emplacement",
+      "language": "Langue",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noTeachers": "Aucun enseignant trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des enseignants"
+    },
+    "modal": {
+      "createTitle": "Créer un nouvel enseignant",
+      "editTitle": "Modifier l'enseignant",
+      "createSubtitle": "Créons un nouvel enseignant",
+      "editSubtitle": "Mettre à jour les détails de l'enseignant",
+      "firstNameLabel": "Prénom",
+      "firstNamePlaceholder": "Entrez le prénom",
+      "lastNameLabel": "Nom de famille",
+      "lastNamePlaceholder": "Entrez le nom de famille",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Entrez l'adresse email",
+      "phoneLabel": "Téléphone",
+      "phonePlaceholder": "Entrez le numéro de téléphone",
+      "locationLabel": "Emplacement",
+      "locationPlaceholder": "Sélectionnez l'emplacement",
+      "languageLabel": "Langue",
+      "languagePlaceholder": "Sélectionnez la langue",
+      "academicDegreeLabel": "Diplôme académique",
+      "academicDegreePlaceholder": "Sélectionnez le diplôme",
+      "teacherRoleLabel": "Rôle d'enseignant",
+      "teacherRolePlaceholder": "Sélectionnez le rôle",
+      "employmentStartDateLabel": "Date de début d'emploi",
+      "employmentStartDatePlaceholder": "Sélectionnez la date de début"
+    }
+  },
+  "programDetail": {
+    "title": "Détails du programme",
+    "cards": {
+      "programName": "Nom du programme",
+      "duration": "Durée",
+      "noOfModules": "Nombre de modules",
+      "registrationFee": "Frais d'inscription",
+      "years": "années",
+      "free": "Gratuit"
+    },
+    "tabs": {
+      "learningModules": "Modules d'apprentissage",
+      "applications": "Applications",
+      "resources": "Ressources"
+    },
+    "emptyState": {
+      "title": "Aucun composant de programme ajouté",
+      "subtitle": "Commencez par ajouter des modules, des applications, des ressources ou des examens pour construire et gérer ce programme efficacement.",
+      "createButton": "Créer un composant de programme"
+    },
+    "loading": "Chargement des détails du programme...",
+    "loadFailed": "Échec du chargement des détails du programme"
+  },
+  "learningModule": {
+    "search": "Rechercher des modules...",
+    "table": {
+      "learningUID": "UID d'apprentissage",
+      "moduleName": "Nom du module",
+      "year": "Année",
+      "files": "Fichiers",
+      "amount": "Montant",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noModules": "Aucun module d'apprentissage trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des modules d'apprentissage"
+    }
+  },
+  "appModule": {
+    "search": "Rechercher des applications...",
+    "table": {
+      "appId": "ID d'application",
+      "appName": "Nom de l'application",
+      "year": "Année",
+      "files": "Fichiers",
+      "deadline": "Date limite",
+      "status": "Statut",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "noApps": "Aucun composant d'application trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des composants d'application"
+    }
+  },
+  "resourceModule": {
+    "search": "Rechercher des ressources...",
+    "table": {
+      "resourceUID": "UID de ressource",
+      "resourceName": "Nom de la ressource",
+      "year": "Année",
+      "files": "Fichiers",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noResources": "Aucun composant de ressource trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des composants de ressource"
+    }
   }
 }

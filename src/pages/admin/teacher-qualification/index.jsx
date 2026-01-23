@@ -34,7 +34,6 @@ const TeacherQualification = () => {
         {t("teacherQualification.title")}
       </h2>
 
-      {/* Tab Navigation */}
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => (
@@ -53,7 +52,6 @@ const TeacherQualification = () => {
         </nav>
       </div>
 
-      {/* Tab Content */}
       <div className="mt-6">{ActiveComponent && <ActiveComponent />}</div>
     </div>
   );

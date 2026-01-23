@@ -20,8 +20,9 @@ import CreateComponent from "./CreateComponent";
 import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
+import moment from "moment";
 
-const LearningModule = ({ programId }) => {
+const AppModule = ({ programId }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -32,7 +33,7 @@ const LearningModule = ({ programId }) => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetComponents({
-    type: "module",
+    type: "app",
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -41,7 +42,8 @@ const LearningModule = ({ programId }) => {
   const modules = data?.data || [];
   const totalRows = data?.total_count || 0;
 
- 
+
+
   const handleOpenEdit = (i) => {
     setSelectedModule(i);
     setIsModalOpen(true);
@@ -56,7 +58,7 @@ const LearningModule = ({ programId }) => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder={t("learningModule.search")}
+          placeholder={t("appModule.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -67,13 +69,13 @@ const LearningModule = ({ programId }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("learningModule.table.learningUID")}</TableHead>
-            <TableHead>{t("learningModule.table.moduleName")}</TableHead>
-            <TableHead>{t("learningModule.table.year")}</TableHead>
-            <TableHead>{t("learningModule.table.files")}</TableHead>
-            <TableHead>{t("learningModule.table.amount")}</TableHead>
-            <TableHead>{t("learningModule.table.status")}</TableHead>
-            <TableHead>{t("learningModule.table.action")}</TableHead>
+            <TableHead>{t("appModule.table.appId")}</TableHead>
+            <TableHead>{t("appModule.table.appName")}</TableHead>
+            <TableHead>{t("appModule.table.year")}</TableHead>
+            <TableHead>{t("appModule.table.files")}</TableHead>
+            <TableHead>{t("appModule.table.deadline")}</TableHead>
+            <TableHead>{t("appModule.table.status")}</TableHead>
+            <TableHead>{t("appModule.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -81,10 +83,10 @@ const LearningModule = ({ programId }) => {
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={
-                    error?.message || t("learningModule.messages.loadFailed")
+                    error?.message || t("appModule.messages.loadFailed")
                   }
                   onRetry={refetch}
                   variant="inline"
@@ -94,7 +96,7 @@ const LearningModule = ({ programId }) => {
           ) : modules?.length > 0 ? (
             modules?.map((i) => (
               <TableRow 
-                key={i._id} 
+                key={i._id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleViewModule(i)}
               >
@@ -102,11 +104,7 @@ const LearningModule = ({ programId }) => {
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.year}</TableCell>
                 <TableCell>{i?.files?.length}</TableCell>
-                <TableCell>
-                  {i?.currency
-                    ? `${i.currency} ${i.amount || 0}`
-                    : i?.amount || 0}
-                </TableCell>
+                <TableCell>{moment(i?.submission_deadline || "").format("LL")}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -114,7 +112,7 @@ const LearningModule = ({ programId }) => {
                   <RowActionMenu
                     actions={[
                       {
-                        label: t("learningModule.table.edit"),
+                        label: t("appModule.table.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(i),
                       },
@@ -126,7 +124,7 @@ const LearningModule = ({ programId }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                {t("learningModule.table.noModules")}
+                {t("appModule.table.noApps")}
               </TableCell>
             </TableRow>
           )}
@@ -156,4 +154,4 @@ const LearningModule = ({ programId }) => {
   );
 };
 
-export default LearningModule;
+export default AppModule;

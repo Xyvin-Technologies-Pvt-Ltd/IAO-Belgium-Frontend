@@ -34,7 +34,6 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
   const createAcademic = useCreateAcademic();
   const updateAcademic = useUpdateAcademic();
   
-  // Watch the status value to update the label
   const statusValue = watch("status");
 
 

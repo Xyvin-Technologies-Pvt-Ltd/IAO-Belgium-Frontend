@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Copy } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -16,51 +16,43 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
-import CreateCountry from "@/components/admin/location/CreateCountry";
-import {
-  useDeleteProgram,
-  useGetPrograms,
-  useUpdateProgram,
-  useDuplicateProgram,
-} from "@/store/useProgramStore";
-import CreateProgram from "@/components/admin/programs/CreateProgram";
+import CreateTeacher from "@/components/admin/teacher/CreateTeacher";
+import { useDeleteTeacher, useGetTeachers } from "@/store/useTeacherStore";
+import StatusBadge from "@/components/StatusBadge";
+import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
 
-const Programs = () => {
-  const navigate = useNavigate();
+const Teachers = () => {
   const { t } = useTranslation();
+  const navigate=useNavigate()
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetPrograms({
+  const { data, isLoading, error, refetch } = useGetTeachers({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
-  const { mutateAsync: deleteProgram, isPending: isDeleting } =
-    useDeleteProgram();
-  const { mutate: updateProgram } = useUpdateProgram();
-  const { mutate: duplicateProgram } = useDuplicateProgram();
+  const { mutateAsync: deleteTeacher, isPending: isDeleting } =
+    useDeleteTeacher();
 
-  const programs = data?.data || [];
+  const teacher = data?.data || [];
   const totalRows = data?.total_count || 0;
-
   const handleOpenCreate = () => {
-    setSelectedProgram(null);
+    setSelectedTeacher(null);
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (program) => {
-    setSelectedProgram(program);
+  const handleOpenEdit = (teacher) => {
+    setSelectedTeacher(teacher);
     setIsModalOpen(true);
   };
 
@@ -71,115 +63,103 @@ const Programs = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await deleteProgram(deleteId);
+      await deleteTeacher(deleteId);
     } finally {
       setDeleteId(null);
       setOpenDelete(false);
     }
   };
-
-  const handleStatusToggle = (id, currentStatus) => {
-    updateProgram({ id, data: { status: !currentStatus } });
-  };
-
-  const handleDuplicate = (id) => {
-    duplicateProgram(id);
-  };
   const handleRowClick = (id) => {
     navigate({
-      to: "/admin/program/$id",
+      to: "/admin/teacher-management/$id",
       params: { id: id },
     });
   };
   return (
     <div className="space-y-6 mt-4">
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        {t("programManagement.title")}
+        {t("teacherManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder={t("programManagement.search")}
+          placeholder={t("teacherManagement.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate}>
-          {t("programManagement.createProgram")}
+          {t("teacherManagement.createTeacher")}
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("programManagement.table.uid")}</TableHead>
-            <TableHead>{t("programManagement.table.name")}</TableHead>
-            <TableHead>{t("programManagement.table.description")}</TableHead>
-            <TableHead>{t("programManagement.table.type")}</TableHead>
-            <TableHead>{t("programManagement.table.year")}</TableHead>
-            <TableHead>{t("programManagement.table.city")}</TableHead>
-            <TableHead>{t("programManagement.table.language")}</TableHead>
-            <TableHead>{t("programManagement.table.status")}</TableHead>
-            <TableHead>{t("programManagement.table.action")}</TableHead>
+            <TableHead>{t("teacherManagement.table.teacherId")}</TableHead>
+            <TableHead>{t("teacherManagement.table.name")}</TableHead>
+            <TableHead>{t("teacherManagement.table.email")}</TableHead>
+            <TableHead>{t("teacherManagement.table.phone")}</TableHead>
+            <TableHead>{t("teacherManagement.table.academicDegree")}</TableHead>
+            <TableHead>{t("teacherManagement.table.role")}</TableHead>
+            <TableHead>{t("teacherManagement.table.employmentStartDate")}</TableHead>
+            <TableHead>{t("teacherManagement.table.location")}</TableHead>
+            <TableHead>{t("teacherManagement.table.language")}</TableHead>
+            <TableHead>{t("teacherManagement.table.status")}</TableHead>
+            <TableHead>{t("teacherManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={11} className="text-center p-8">
                 <ErrorMessage
                   message={
-                    error?.message || t("programManagement.messages.loadFailed")
+                    error?.message || t("teacherManagement.messages.loadFailed")
                   }
                   onRetry={refetch}
                   variant="inline"
                 />
               </TableCell>
             </TableRow>
-          ) : programs?.length > 0 ? (
-            programs?.map((i) => (
-              <TableRow
-                key={i._id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleRowClick(i._id)}
-              >
+          ) : teacher?.length > 0 ? (
+            teacher?.map((i) => (
+              <TableRow key={i._id}  className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(i._id)}>
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell
-                  title={i?.description}
-                  className="max-w-38 overflow-hidden text-ellipsis whitespace-nowrap"
-                >
-                  {i?.description}
-                </TableCell>
-                <TableCell>{i?.program_type}</TableCell>
-                <TableCell>{i?.year}</TableCell>
-                <TableCell>{i?.city?.name}</TableCell>
-                <TableCell>{i?.language?.name}</TableCell>
+                <TableCell>{i?.first_name + " " + i?.last_name}</TableCell>
+                <TableCell>{i?.email}</TableCell>
+                <TableCell>{i?.phone}</TableCell>
+                <TableCell>{i?.academic_degree?.name}</TableCell>
+                <TableCell>{i?.teacher_role?.name}</TableCell>
                 <TableCell>
-                  <Switch
-                    checked={i?.status}
-                    onCheckedChange={(checked) => {
-                      handleStatusToggle(i._id, i?.status);
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
+                  {moment(i?.iao_employment_start_date).format("YYYY-MM-DD")}
+                </TableCell>
+                <TableCell>
+                  {i?.location?.length
+                    ? i.location.map((loc) => loc.name).join(", ")
+                    : "-"}
+                </TableCell>
+
+                <TableCell>
+                  {i?.language?.length
+                    ? i.language.map((lang) => lang.name).join(", ")
+                    : "-"}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
                       {
-                        label: t("programManagement.table.edit"),
+                        label: t("teacherManagement.table.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(i),
                       },
                       {
-                        label: t("programManagement.duplicate"),
-                        icon: Copy,
-                        onClick: () => handleDuplicate(i._id),
-                      },
-                      {
-                        label: t("programManagement.delete"),
+                        label: t("teacherManagement.delete"),
                         icon: Trash2,
                         onClick: () => handleRowDeleteClick(i._id),
                       },
@@ -190,8 +170,8 @@ const Programs = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center">
-                {t("programManagement.table.noPrograms")}
+              <TableCell colSpan={11} className="text-center">
+                {t("teacherManagement.table.noTeachers")}
               </TableCell>
             </TableRow>
           )}
@@ -205,10 +185,10 @@ const Programs = () => {
         totalRows={totalRows}
       />
 
-      <CreateProgram
+      <CreateTeacher
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        programData={selectedProgram}
+        teacherData={selectedTeacher}
       />
 
       <DeleteConfirm
@@ -217,10 +197,10 @@ const Programs = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="Program"
+        data="Teacher"
       />
     </div>
   );
 };
 
-export default Programs;
+export default Teachers;

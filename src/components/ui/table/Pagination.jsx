@@ -21,7 +21,7 @@ export function Pagination({
   totalRows,
   selected,
 }) {
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
+  const totalPages = totalRows > 0 ? Math.ceil(totalRows / rowsPerPage) : 1;
 
   return (
     <div className="flex items-center justify-between px-2 py-2">
@@ -55,7 +55,7 @@ export function Pagination({
           </Select>
         </div>
         <div className="text-sm">
-          Page {page} of {totalPages}
+          {totalRows > 0 ? `Page ${page} of ${totalPages}` : 'No data'}
         </div>
 
         <div className="flex items-center space-x-1">
@@ -64,7 +64,7 @@ export function Pagination({
             size="icon"
             className="h-8 w-8"
             onClick={() => setPage(1)}
-            disabled={page === 1}
+            disabled={page === 1 || totalRows === 0}
           >
             <ChevronsLeft className="h-4 w-4" />
           </Button>
@@ -73,7 +73,7 @@ export function Pagination({
             size="icon"
             className="h-8 w-8"
             onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page === 1}
+            disabled={page === 1 || totalRows === 0}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -82,7 +82,7 @@ export function Pagination({
             size="icon"
             className="h-8 w-8"
             onClick={() => setPage(Math.min(totalPages, page + 1))}
-            disabled={page === totalPages}
+            disabled={page === totalPages || totalRows === 0}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -91,7 +91,7 @@ export function Pagination({
             size="icon"
             className="h-8 w-8"
             onClick={() => setPage(totalPages)}
-            disabled={page === totalPages}
+            disabled={page === totalPages || totalRows === 0}
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>

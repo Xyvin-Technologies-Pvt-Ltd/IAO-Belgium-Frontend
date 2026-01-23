@@ -58,7 +58,6 @@ const CreateAdmin = ({ open, onClose }) => {
   const hasRoleNext = rolePage < totalRolePages;
   const selectedRole = watch("role_access");
 
-  // Reset pagination when modal opens
   useEffect(() => {
     if (open) {
       setRolePage(1);

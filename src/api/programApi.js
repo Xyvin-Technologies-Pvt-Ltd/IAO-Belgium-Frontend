@@ -10,7 +10,14 @@ export const getPrograms = async (filter) => {
     throw error.response.data;
   }
 };
-
+export const getProgramById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/program/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
 export const createProgram = async (data) => {
   try {
     const response = await axiosInstance.post(`/program`, data);

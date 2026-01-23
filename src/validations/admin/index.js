@@ -5,3 +5,5 @@ export { citySchema } from "./city.validation";
 export { adminSchema } from "./admin.validation";
 export { roleSchema } from "./role.validation";
 export { academicSchema } from "./academic.validation";
+export { teacherSchema } from "./teacher.validation";
+export { componentSchema } from "./component.validation";

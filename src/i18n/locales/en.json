@@ -556,5 +556,126 @@
       "namePlaceholder": "Enter role name (e.g., Assistant Professor, Lecturer, Senior Teacher)",
       "nameRequired": "Role name is required"
     }
+  },
+  "teacherManagement": {
+    "title": "Teacher Management",
+    "search": "Search teachers...",
+    "delete": "Delete",
+    "createTeacher": "Create Teacher",
+    "table": {
+      "teacherId": "Teacher ID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "academicDegree": "Academic Degree",
+      "role": "Role",
+      "employmentStartDate": "IAO Employment Start Date",
+      "location": "Location",
+      "language": "Language",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noTeachers": "No Teachers found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load teachers"
+    },
+    "modal": {
+      "createTitle": "Create a new Teacher",
+      "editTitle": "Edit Teacher",
+      "createSubtitle": "Let's create a new teacher",
+      "editSubtitle": "Update the teacher details",
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "Enter first name",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "Enter last name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter email address",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "Enter phone number",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Select location",
+      "languageLabel": "Language",
+      "languagePlaceholder": "Select language",
+      "academicDegreeLabel": "Academic Degree",
+      "academicDegreePlaceholder": "Select degree",
+      "teacherRoleLabel": "Teacher Role",
+      "teacherRolePlaceholder": "Select role",
+      "employmentStartDateLabel": "Employment Start Date",
+      "employmentStartDatePlaceholder": "Select start date"
+    }
+  },
+  "programDetail": {
+    "title": "Program Details",
+    "cards": {
+      "programName": "Program Name",
+      "duration": "Duration",
+      "noOfModules": "No of Modules",
+      "registrationFee": "Registration Fee",
+      "years": "years",
+      "free": "Free"
+    },
+    "tabs": {
+      "learningModules": "Learning Modules",
+      "applications": "Applications",
+      "resources": "Resources"
+    },
+    "emptyState": {
+      "title": "No Program Components Added Yet",
+      "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this program effectively.",
+      "createButton": "Create Program Component"
+    },
+    "loading": "Loading program details...",
+    "loadFailed": "Failed to load program details"
+  },
+  "learningModule": {
+    "search": "Search modules...",
+    "table": {
+      "learningUID": "Learning UID",
+      "moduleName": "Module Name",
+      "year": "Year",
+      "files": "Files",
+      "amount": "Amount",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noModules": "No Learning Modules found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load learning modules"
+    }
+  },
+  "appModule": {
+    "search": "Search applications...",
+    "table": {
+      "appId": "App ID",
+      "appName": "App Name",
+      "year": "Year",
+      "files": "Files",
+      "deadline": "Deadline",
+      "status": "Status",
+      "actions": "Actions",
+      "edit": "Edit",
+      "noApps": "No Application Components found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load application components"
+    }
+  },
+  "resourceModule": {
+    "search": "Search resources...",
+    "table": {
+      "resourceUID": "Resource UID",
+      "resourceName": "Resource Name",
+      "year": "Year",
+      "files": "Files",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noResources": "No Resource Components found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load resource components"
+    }
   }
 }

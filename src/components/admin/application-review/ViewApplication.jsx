@@ -17,10 +17,8 @@ const ViewApplication = ({ open, onClose, application }) => {
   
   const updateApplicationMutation = useUpdateApplication();
 
-  // Reset state when modal opens/closes or application changes
   useEffect(() => {
     if (open && application) {
-      // Reset all state when opening with a new application
       setRequestAdditionalInfo(false);
       setRemarks("");
       setDocumentFlags({
@@ -30,7 +28,6 @@ const ViewApplication = ({ open, onClose, application }) => {
     }
   }, [open, application?._id]);
 
-  // Initialize document flags when application changes
   const toggleDocumentFlag = (documentType) => {
     setDocumentFlags(prev => ({
       ...prev,
@@ -38,7 +35,6 @@ const ViewApplication = ({ open, onClose, application }) => {
     }));
   };
 
-  // Check if any document is flagged
   const hasAnyFlaggedDocument = Object.values(documentFlags).some(flag => flag);
 
   if (!open || !application) return null;

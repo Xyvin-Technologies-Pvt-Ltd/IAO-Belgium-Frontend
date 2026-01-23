@@ -28,7 +28,7 @@ import {
 
 export function NavGroup({ title, items }) {
   const { state, isMobile } = useSidebar()
-  const { href } = useLocation() // ✅ Correct usage
+  const { href } = useLocation() 
 
   return (
     <SidebarGroup>
