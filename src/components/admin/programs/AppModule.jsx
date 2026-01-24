@@ -34,6 +34,7 @@ const AppModule = ({ programId }) => {
 
   const { data, isLoading, error, refetch } = useGetComponents({
     type: "app",
+    program: programId,
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -41,8 +42,6 @@ const AppModule = ({ programId }) => {
 
   const modules = data?.data || [];
   const totalRows = data?.total_count || 0;
-
-
 
   const handleOpenEdit = (i) => {
     setSelectedModule(i);
@@ -63,7 +62,6 @@ const AppModule = ({ programId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-       
       </div>
 
       <Table>
@@ -85,9 +83,7 @@ const AppModule = ({ programId }) => {
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
-                  message={
-                    error?.message || t("appModule.messages.loadFailed")
-                  }
+                  message={error?.message || t("appModule.messages.loadFailed")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -95,7 +91,7 @@ const AppModule = ({ programId }) => {
             </TableRow>
           ) : modules?.length > 0 ? (
             modules?.map((i) => (
-              <TableRow 
+              <TableRow
                 key={i._id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleViewModule(i)}
@@ -104,7 +100,9 @@ const AppModule = ({ programId }) => {
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.year}</TableCell>
                 <TableCell>{i?.files?.length}</TableCell>
-                <TableCell>{moment(i?.submission_deadline || "").format("LL")}</TableCell>
+                <TableCell>
+                  {moment(i?.submission_deadline || "").format("LL")}
+                </TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>

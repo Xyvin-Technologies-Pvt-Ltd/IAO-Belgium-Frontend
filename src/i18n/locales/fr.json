@@ -593,8 +593,10 @@
       "emailPlaceholder": "Entrez l'adresse email",
       "phoneLabel": "Téléphone",
       "phonePlaceholder": "Entrez le numéro de téléphone",
-      "locationLabel": "Emplacement",
-      "locationPlaceholder": "Sélectionnez l'emplacement",
+      "countryLabel": "Pays",
+      "countryPlaceholder": "Sélectionnez un pays",
+      "citiesLabel": "Villes",
+      "citiesPlaceholder": "Sélectionnez des villes",
       "languageLabel": "Langue",
       "languagePlaceholder": "Sélectionnez la langue",
       "academicDegreeLabel": "Diplôme académique",
@@ -610,7 +612,7 @@
     "cards": {
       "programName": "Nom du programme",
       "duration": "Durée",
-      "noOfModules": "Nombre de modules",
+      "noOfComponents": "Nombre de composants",
       "registrationFee": "Frais d'inscription",
       "years": "années",
       "free": "Gratuit"

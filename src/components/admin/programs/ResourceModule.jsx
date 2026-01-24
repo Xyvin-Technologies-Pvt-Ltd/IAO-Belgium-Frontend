@@ -33,6 +33,7 @@ const ResourceModule = ({ programId }) => {
 
   const { data, isLoading, error, refetch } = useGetComponents({
     type: "resource",
+    program: programId,
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -40,8 +41,6 @@ const ResourceModule = ({ programId }) => {
 
   const modules = data?.data || [];
   const totalRows = data?.total_count || 0;
-
-
 
   const handleOpenEdit = (i) => {
     setSelectedModule(i);
@@ -62,7 +61,6 @@ const ResourceModule = ({ programId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-       
       </div>
 
       <Table>
@@ -93,7 +91,7 @@ const ResourceModule = ({ programId }) => {
             </TableRow>
           ) : modules?.length > 0 ? (
             modules?.map((i) => (
-              <TableRow 
+              <TableRow
                 key={i._id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleViewModule(i)}

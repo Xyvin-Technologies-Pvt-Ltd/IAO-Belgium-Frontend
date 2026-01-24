@@ -3,17 +3,24 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
+import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 import { useTranslation } from "react-i18next";
 import { useCreateIntake, useUpdateIntake } from "@/store/useIntakeStore";
-import { useGetPrograms } from "@/store/useProgramStore";
+import { useGetAllPrograms } from "@/store/useDropdownStore";
 import { intakeSchema } from "@/validations/admin";
-import PaginatedMultiSelect from "@/components/ui/forms/PaginationMultiSelect";
 
 const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
   const { t } = useTranslation();
-  const [programPage, setProgramPage] = useState(1);
-  const programLimit = 10;
-  const [allPrograms, setAllPrograms] = useState([]);
+  const isEdit = !!intakeData;
+
+  const [programSearchTerm, setProgramSearchTerm] = useState("");
+
+  const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
+    { 
+      ...(programSearchTerm && { search: programSearchTerm })
+    },
+    { enabled: open }
+  );
 
   const {
     register,
@@ -24,7 +31,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(intakeSchema),
-    mode: "onChange", 
+    mode: "onChange",
     defaultValues: {
       name: "",
       program: [],
@@ -37,114 +44,61 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     },
   });
 
-
-
-  const isEdit = !!intakeData;
   const createIntake = useCreateIntake();
   const updateIntake = useUpdateIntake();
-  const { data: programsData } = useGetPrograms(
-    {
-      status: true,
-      page: programPage,
-      limit: programLimit,
-    },
-    { enabled: open },
-  );
 
   const selectedPrograms = watch("program");
 
-  useEffect(() => {
-    if (open) {
-      setProgramPage(1);
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (programsData?.data) {
-      setAllPrograms((prev) => {
-        const newPrograms = programsData.data;
-        const existingIds = prev.map((p) => p._id);
-        const uniqueNewPrograms = newPrograms.filter(
-          (p) => !existingIds.includes(p._id),
-        );
-        return [...prev, ...uniqueNewPrograms];
-      });
-    }
-  }, [programsData?.data]);
-
   const handleClose = () => {
-    reset();
-    setProgramPage(1);
+    reset({
+      name: "",
+      program: [],
+      admission_fee: "",
+      start_date: "",
+      end_date: "",
+      registration_deadline: "",
+      student_per_batch: "",
+      max_student_enrollment: "",
+    });
+    // Reset search term
+    setProgramSearchTerm("");
     onClose();
   };
 
- 
   useEffect(() => {
-    if (intakeData && isEdit && open) {
-      setValue("name", intakeData.name || "");
-      let programData = [];
-      if (Array.isArray(intakeData.program)) {
-        programData = intakeData.program;
-        const programObjects = intakeData.program.filter(
-          (p) => p._id && p.name,
-        );
-        if (programObjects.length > 0) {
-          setAllPrograms((prev) => {
-            const existingIds = prev.map((p) => p._id);
-            const uniquePrograms = programObjects.filter(
-              (p) => !existingIds.includes(p._id),
-            );
-            return [...prev, ...uniquePrograms];
-          });
-        }
-      } else if (intakeData.program?._id) {
-        programData = [intakeData.program];
-        if (intakeData.program.name) {
-          setAllPrograms((prev) => {
-            const exists = prev.some((p) => p._id === intakeData.program._id);
-            if (!exists) {
-              return [...prev, intakeData.program];
-            }
-            return prev;
-          });
-        }
-      }
+    if (!open || !intakeData) return;
 
-      setValue("program", programData);
-      setValue("admission_fee", intakeData.admission_fee || "");
-      setValue(
-        "start_date",
-        intakeData.start_date ? intakeData.start_date.split("T")[0] : "",
-      );
-      setValue(
-        "end_date",
-        intakeData.end_date ? intakeData.end_date.split("T")[0] : "",
-      );
-      setValue(
-        "registration_deadline",
-        intakeData.registration_deadline
-          ? intakeData.registration_deadline.split("T")[0]
-          : "",
-      );
-      setValue("student_per_batch", intakeData.student_per_batch || "");
-      setValue(
-        "max_student_enrollment",
-        intakeData.max_student_enrollment || "",
-      );
-    }
-  }, [intakeData, isEdit, setValue, open]);
+    reset({
+      name: intakeData.name || "",
+      program: Array.isArray(intakeData.program)
+        ? intakeData.program
+        : intakeData.program?._id
+          ? [intakeData.program]
+          : [],
+      admission_fee: intakeData.admission_fee || "",
+      start_date: intakeData.start_date
+        ? intakeData.start_date.split("T")[0]
+        : "",
+      end_date: intakeData.end_date ? intakeData.end_date.split("T")[0] : "",
+      registration_deadline: intakeData.registration_deadline
+        ? intakeData.registration_deadline.split("T")[0]
+        : "",
+      student_per_batch: intakeData.student_per_batch || "",
+      max_student_enrollment: intakeData.max_student_enrollment || "",
+    });
+  }, [open, intakeData, reset]);
 
   const onSubmit = (formData) => {
     const payload = {
       name: formData.name,
-      program: formData.program.map((p) => p._id), 
+      program: formData.program.map((p) => p._id),
       admission_fee: Number(formData.admission_fee),
       start_date: formData.start_date,
       end_date: formData.end_date,
       registration_deadline: formData.registration_deadline,
       student_per_batch: Number(formData.student_per_batch),
       max_student_enrollment: Number(formData.max_student_enrollment),
-      academic: academicId, 
+      academic: academicId,
     };
 
     const mutation = isEdit ? updateIntake : createIntake;
@@ -186,21 +140,19 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
             {...register("name")}
           />
 
-          <PaginatedMultiSelect
+          <SearchableMultiSelect
             label={t("intakeManagement.modal.programLabel")}
             placeholder={t("intakeManagement.modal.programPlaceholder")}
-            items={
-              allPrograms.length > 0 ? allPrograms : programsData?.data || []
-            }
+            searchPlaceholder="Search programs..."
+            items={programsData?.data || []}
             selected={selectedPrograms}
             onChange={(val) =>
               setValue("program", val, { shouldValidate: true })
             }
-            page={programPage}
-            setPage={setProgramPage}
-            total={programsData?.total_count || 0}
-            limit={programLimit}
+            onSearch={setProgramSearchTerm}
+            isLoading={programsLoading}
             error={errors.program?.message}
+            required
           />
 
           <FormField

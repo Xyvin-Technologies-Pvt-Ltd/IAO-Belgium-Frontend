@@ -141,8 +141,8 @@ const ProgramDetail = () => {
         />
 
         <DashboardCard
-          title={t("programDetail.cards.noOfModules")}
-          value={programData.moduleCount || 0}
+          title={t("programDetail.cards.noOfComponents")}
+          value={programData?.components_count || 0}
           icon={Layers}
         />
 

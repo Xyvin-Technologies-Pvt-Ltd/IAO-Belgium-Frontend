@@ -593,8 +593,10 @@
       "emailPlaceholder": "Enter email address",
       "phoneLabel": "Phone",
       "phonePlaceholder": "Enter phone number",
-      "locationLabel": "Location",
-      "locationPlaceholder": "Select location",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select country",
+      "citiesLabel": "Cities",
+      "citiesPlaceholder": "Select cities",
       "languageLabel": "Language",
       "languagePlaceholder": "Select language",
       "academicDegreeLabel": "Academic Degree",
@@ -610,7 +612,7 @@
     "cards": {
       "programName": "Program Name",
       "duration": "Duration",
-      "noOfModules": "No of Modules",
+      "noOfComponents": "No of Components",
       "registrationFee": "Registration Fee",
       "years": "years",
       "free": "Free"

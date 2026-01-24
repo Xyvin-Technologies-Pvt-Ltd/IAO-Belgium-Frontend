@@ -33,6 +33,7 @@ const LearningModule = ({ programId }) => {
 
   const { data, isLoading, error, refetch } = useGetComponents({
     type: "module",
+    program: programId,
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
