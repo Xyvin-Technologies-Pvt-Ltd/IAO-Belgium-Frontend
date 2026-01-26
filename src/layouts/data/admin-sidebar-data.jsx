@@ -105,11 +105,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/role-management",
             icon: Shield,
           },
-          {
-            title: t("sidebar.admin.adminLogs"),
-            url: "/admin/admin-logs",
-            icon: FileText,
-          },
+          // {
+          //   title: t("sidebar.admin.adminLogs"),
+          //   url: "/admin/admin-logs",
+          //   icon: FileText,
+          // },
         ],
       },
     ],

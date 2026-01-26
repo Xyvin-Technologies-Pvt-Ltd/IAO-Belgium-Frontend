@@ -145,7 +145,7 @@ const ProgramDetail = () => {
           value={programData?.components_count || 0}
           icon={Layers}
         />
-
+{/* 
         <DashboardCard
           title={t("programDetail.cards.registrationFee")}
           value={
@@ -154,7 +154,7 @@ const ProgramDetail = () => {
               : t("programDetail.cards.free")
           }
           icon={DollarSign}
-        />
+        /> */}
       </div>
 
       {tabs.length > 0 && (

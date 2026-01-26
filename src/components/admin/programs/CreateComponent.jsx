@@ -74,7 +74,7 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
     { value: "module", label: "Module Component" },
     { value: "app", label: "Application Component" },
     { value: "resource", label: "Resource Component" },
-    { value: "exam", label: "Exam Component" },
+    // { value: "exam", label: "Exam Component" },
   ];
 
   const handleClose = () => {

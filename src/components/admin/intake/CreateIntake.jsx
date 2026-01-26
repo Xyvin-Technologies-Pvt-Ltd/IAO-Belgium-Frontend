@@ -16,10 +16,10 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
   const [programSearchTerm, setProgramSearchTerm] = useState("");
 
   const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
-    { 
-      ...(programSearchTerm && { search: programSearchTerm })
+    {
+      ...(programSearchTerm && { search: programSearchTerm }),
     },
-    { enabled: open }
+    { enabled: open },
   );
 
   const {
@@ -192,17 +192,6 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label={t("intakeManagement.modal.studentsPerBatchLabel")}
-              placeholder={t(
-                "intakeManagement.modal.studentsPerBatchPlaceholder",
-              )}
-              type="number"
-              error={errors.student_per_batch?.message}
-              required
-              {...register("student_per_batch")}
-            />
-
-            <FormField
               label={t("intakeManagement.modal.maxStudentEnrollmentLabel")}
               placeholder={t(
                 "intakeManagement.modal.maxStudentEnrollmentPlaceholder",
@@ -211,6 +200,16 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
               error={errors.max_student_enrollment?.message}
               required
               {...register("max_student_enrollment")}
+            />
+            <FormField
+              label={t("intakeManagement.modal.studentsPerBatchLabel")}
+              placeholder={t(
+                "intakeManagement.modal.studentsPerBatchPlaceholder",
+              )}
+              type="number"
+              error={errors.student_per_batch?.message}
+              required
+              {...register("student_per_batch")}
             />
           </div>
 
