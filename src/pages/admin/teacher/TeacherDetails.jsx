@@ -1,5 +1,5 @@
+import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
-import StudentCard from "@/components/student/StudentCard";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetTeacherById } from "@/store/useTeacherStore";
 import { useParams } from "@tanstack/react-router";
@@ -58,7 +58,7 @@ const TeacherDetails = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <StudentCard student={teacherData} />
+      <UserCard teacher={teacherData} isTeacher />
     </div>
   );
 };

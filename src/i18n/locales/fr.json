@@ -401,6 +401,23 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des étudiants"
+    },
+    "modal": {
+      "basicInfo": "Informations de base",
+      "phoneNumber": "Numéro de téléphone",
+      "emailAddress": "Adresse email",
+      "batch": "Lot",
+      "address": "Adresse",
+      "studentId": "ID étudiant",
+      "enrolledDate": "Date d'inscription",
+      "previousEducation": "Formation antérieure",
+      "documents": "Documents",
+      "noDocuments": "Aucun document disponible",
+      "academicDegree": "Diplôme académique",
+      "teacherRole": "Rôle d'enseignant",
+      "employmentStartDate": "Date de début d'emploi",
+      "languages": "Langues",
+      "locations": "Emplacements"
     }
   },
   "locationManagement": {

@@ -22,7 +22,7 @@ const Login = () => {
     if (isInitialized && isAuthenticated) {
       if (role === "admin") {
         navigate({ to: "/admin/dashboard" });
-      } else if (role === "TEACHER") {
+      } else if (role === "teacher") {
         navigate({ to: "/teacher/dashboard" });
       }
     }

@@ -401,6 +401,23 @@
     },
     "messages": {
       "loadFailed": "Failed to load students"
+    },
+    "modal": {
+      "basicInfo": "Basic Information",
+      "phoneNumber": "Phone Number",
+      "emailAddress": "Email Address",
+      "batch": "Batch",
+      "address": "Address",
+      "studentId": "Student ID",
+      "enrolledDate": "Enrolled Date",
+      "previousEducation": "Previous Education",
+      "documents": "Documents",
+      "noDocuments": "No documents available",
+      "academicDegree": "Academic Degree",
+      "teacherRole": "Teacher Role",
+      "employmentStartDate": "Employment Start Date",
+      "languages": "Languages",
+      "locations": "Locations"
     }
   },
   "locationManagement": {

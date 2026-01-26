@@ -1,5 +1,5 @@
+import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
-import StudentCard from "@/components/student/StudentCard";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useStudentStore";
 import { useParams } from "@tanstack/react-router";
@@ -76,7 +76,7 @@ const EnrolledStudentDetails = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <StudentCard student={studentData} />
+      <UserCard student={studentData} />
     </div>
   );
 };
