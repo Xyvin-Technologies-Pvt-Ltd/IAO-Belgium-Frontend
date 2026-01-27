@@ -59,7 +59,9 @@
   },
   "languages": {
     "en": "English",
-    "fr": "Français"
+    "fr": "Français",
+    "nl": "Dutch",
+    "de": "German"
   },
   "common": {
     "welcome": {

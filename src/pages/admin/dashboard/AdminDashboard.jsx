@@ -25,19 +25,7 @@ const AdminDashboard = () => {
       value: "+1500",
       changeText: "+90% compared to last month",
       icon: Users,
-    },
-    {
-      title: "Total Earnings",
-      value: "+8,500",
-      changeText: "+25% compared to last month",
-      icon: CreditCard,
-    },
-    {
-      title: "Total Disbursement",
-      value: "+300",
-      changeText: "+100 since last hour",
-      icon: TrendingUp,
-    },
+    }
   ];
   
   const data = [
@@ -68,15 +56,13 @@ const AdminDashboard = () => {
           {t("common.welcome.subtitle")}
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
         {stats.map((item, index) => (
           <DashboardCard key={index} {...item} />
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div>
         <DashboardGraph title="Course Enrollment Trend" data={data} />
-
-        <DashboardGraph title="Earnings Distribution" data={data} />
       </div>
     </div>
   );

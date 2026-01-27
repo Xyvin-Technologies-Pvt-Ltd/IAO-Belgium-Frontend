@@ -28,6 +28,8 @@ export default function AdminTeacherLayoutComponent() {
   const languages = [
     { code: "en", name: t("languages.en"), flag: "🇺🇸" },
     { code: "fr", name: t("languages.fr"), flag: "🇫🇷" },
+    { code: "nl", name: t("languages.nl"), flag: "🇳🇱" },
+    { code: "de", name: t("languages.de"), flag: "🇩🇪" },
   ];
 
   const changeLanguage = (langCode) => {

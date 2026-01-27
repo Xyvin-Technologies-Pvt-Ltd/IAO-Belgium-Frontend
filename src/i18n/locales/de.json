@@ -1,0 +1,697 @@
+{
+  "header": {
+    "location": "Standort",
+    "locationValue": "Niederlande",
+    "nav": {
+      "dashboard": "Dashboard",
+      "myCourses": "Meine Kurse",
+      "myApp": "Meine APP",
+      "invoices": "Rechnungen",
+      "assessment": "Bewertung"
+    },
+    "dropdown": {
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "language": "Sprache",
+      "signOut": "Abmelden"
+    }
+  },
+  "sidebar": {
+    "teacher": {
+      "title": "Lehrer Dashboard",
+      "main": "Hauptmenü",
+      "operations": "Operationen",
+      "dashboard": "Dashboard",
+      "schedules": "Stundenpläne",
+      "planning": "Planung",
+      "documents": "Dokumente",
+      "evaluations": "Bewertungen"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "main": "Hauptmenü",
+      "operations": "Operationen",
+      "academicManagement": "Akademische Verwaltung",
+      "masterData": "Stammdaten",
+      "settings": "Einstellungen",
+      "dashboard": "Dashboard",
+      "programAdministration": "Programm Administration",
+      "locations": "Standorte",
+      "languages": "Sprachen",
+      "teacherQualifications": "Lehrer Qualifikationen",
+      "teacherData": "Lehrer Daten",
+      "admissionAdministration": "Zulassungs Administration",
+      "applicationReview": "Bewerbung Prüfung",
+      "academics": "Akademische Jahre",
+      "planning": "Planung",
+      "teacherManagement": "Lehrer Verwaltung",
+      "studentManagement": "Studenten Verwaltung",
+      "adminManagement": "Admin Verwaltung",
+      "roleManagement": "Rollen Verwaltung",
+      "adminLogs": "Admin Logs"
+    },
+    "user": {
+      "loading": "Laden...",
+      "noRole": "Keine Rolle",
+      "signOut": "Abmelden"
+    },
+    "logo": "IAO Back office"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "Français",
+    "nl": "Dutch",
+    "de": "German"
+  },
+  "common": {
+    "welcome": {
+      "back": "Willkommen zurück!",
+      "backWithName": "Willkommen zurück, {name}!",
+      "subtitle": "Alle Ihre Kurse, Fortschritte und Updates an einem Ort."
+    },
+    "deleteConfirm": {
+      "title": "Löschbestätigung",
+      "message": "Sind Sie sicher, dass Sie löschen möchten",
+      "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "delete": "Löschen",
+      "deleting": "Löschen..."
+    }
+  },
+  "countryManagement": {
+    "title": "Länder Verwaltung",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createCountry": "Land Erstellen",
+    "table": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "code": "Code",
+      "currency": "Währung",
+      "status": "Status",
+      "action": "Aktion",
+      "view": "Anzeigen",
+      "edit": "Bearbeiten",
+      "noCountries": "Keine Länder gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Länder fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Ein neues Land erstellen",
+      "editTitle": "Land bearbeiten",
+      "createSubtitle": "Lassen Sie uns ein neues Land erstellen",
+      "editSubtitle": "Land Details aktualisieren",
+      "nameLabel": "Name",
+      "namePlaceholder": "Ländername eingeben",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben",
+      "codeLabel": "Ländercode",
+      "codePlaceholder": "Ländercode eingeben (z.B. DE, AT, CH)",
+      "currencyLabel": "Währung",
+      "currencyPlaceholder": "Währung auswählen",
+      "statusLabel": "Aktiv",
+      "loadingDetails": "Land Details laden..."
+    }
+  },
+  "cityManagement": {
+    "title": "Stadt Verwaltung",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createCity": "Stadt Erstellen",
+    "table": {
+      "name": "Name",
+      "country": "Land",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noCities": "Keine Städte gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Städte fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Stadt erstellen",
+      "editTitle": "Stadt bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Stadt erstellen",
+      "editSubtitle": "Stadt Details aktualisieren",
+      "nameLabel": "Stadtname",
+      "namePlaceholder": "Stadtname eingeben",
+      "countryLabel": "Land",
+      "countryPlaceholder": "Land auswählen"
+    }
+  },
+  "roleManagement": {
+    "title": "Rollen Verwaltung",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createRole": "Rolle Erstellen",
+    "table": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "permissions": "Berechtigungen",
+      "status": "Status",
+      "action": "Aktion",
+      "view": "Anzeigen",
+      "edit": "Bearbeiten",
+      "noRoles": "Keine Rollen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Rollen fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Rolle erstellen",
+      "editTitle": "Rolle bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Rolle erstellen",
+      "editSubtitle": "Rollen Details aktualisieren",
+      "nameLabel": "Name",
+      "namePlaceholder": "Rollenname eingeben",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben",
+      "permissionsLabel": "Berechtigungen",
+      "viewLabel": "Anzeigen",
+      "modifyLabel": "Ändern",
+      "loadingDetails": "Rollen Details laden..."
+    },
+    "view": {
+      "title": "Rollen Ansicht",
+      "subtitle": "Rollen Details und Berechtigungen"
+    },
+    "permissions": {
+      "rolesManagement": "Rollen Verwaltung",
+      "adminManagement": "Admin Verwaltung",
+      "operationsManagement": "Operations Verwaltung",
+      "academicManagement": "Akademische Verwaltung",
+      "financeManagement": "Finanz Verwaltung",
+      "masterDataManagement": "Stammdaten Verwaltung",
+      "logsManagement": "Log Verwaltung"
+    }
+  },
+  "languageManagement": {
+    "title": "Sprachen",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createLanguage": "Sprache Erstellen",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noLanguages": "Keine Sprachen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Sprachen fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Sprache erstellen",
+      "editTitle": "Sprache bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Sprache erstellen",
+      "editSubtitle": "Sprachen Details aktualisieren",
+      "nameLabel": "Sprachname",
+      "namePlaceholder": "Sprachname eingeben"
+    }
+  },
+  "programManagement": {
+    "title": "Programme",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "duplicate": "Duplizieren",
+    "createProgram": "Programm Erstellen",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "type": "Typ",
+      "year": "Jahr",
+      "city": "Stadt",
+      "language": "Sprache",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noPrograms": "Keine Programme gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Programme fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Ein neues Programm erstellen",
+      "editTitle": "Programm bearbeiten",
+      "createSubtitle": "Lassen Sie uns ein neues Programm erstellen",
+      "editSubtitle": "Programm Details aktualisieren",
+      "nameLabel": "Programmname",
+      "namePlaceholder": "Programmname eingeben",
+      "programTypeLabel": "Programmtyp",
+      "programTypePlaceholder": "Programmtyp auswählen",
+      "durationLabel": "Dauer des Programms",
+      "durationPlaceholder": "Dauer in Jahren eingeben (z.B. 1, 2, 3)",
+      "languageLabel": "Sprache",
+      "languagePlaceholder": "Sprache auswählen",
+      "countryLabel": "Land",
+      "countryPlaceholder": "Land auswählen",
+      "cityLabel": "Stadt",
+      "cityPlaceholder": "Stadt auswählen",
+      "cityPlaceholderDisabled": "Zuerst Land auswählen"
+    }
+  },
+  "intakeManagement": {
+    "title": "Aufnahmen",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createIntake": "Aufnahme Erstellen",
+    "table": {
+      "name": "Name",
+      "program": "Programm",
+      "registrationFee": "Anmeldegebühr",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "registrationDeadline": "Anmeldeschluss",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noIntakes": "Keine Aufnahmen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Aufnahmen fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Aufnahme erstellen",
+      "editTitle": "Aufnahme bearbeiten",
+      "nameLabel": "Aufnahmename",
+      "namePlaceholder": "Aufnahmename eingeben",
+      "programLabel": "Programm",
+      "programPlaceholder": "Programm auswählen",
+      "registrationFeeLabel": "Anmeldegebühr",
+      "registrationFeePlaceholder": "Anmeldegebühr eingeben",
+      "startDateLabel": "Startdatum",
+      "endDateLabel": "Enddatum",
+      "registrationDeadlineLabel": "Anmeldeschluss",
+      "studentsPerBatchLabel": "Studenten pro Gruppe",
+      "studentsPerBatchPlaceholder": "Studenten pro Gruppe eingeben",
+      "maxStudentEnrollmentLabel": "Max Studenten Anmeldung",
+      "maxStudentEnrollmentPlaceholder": "Max Anmeldung eingeben"
+    },
+    "details": {
+      "tabs": {
+        "batches": "Batches",
+        "enrollments": "Anmeldungen"
+      },
+      "cards": {
+        "totalEnrollments": "Gesamt Anmeldungen",
+        "totalBatches": "Gesamt Batches",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum"
+      },
+      "badges": {
+        "intakeId": "Aufnahme ID",
+        "registrationFee": "Anmeldegebühr",
+        "registrationDeadline": "Anmeldeschluss"
+      },
+      "loading": "Aufnahme Details laden...",
+      "loadFailed": "Laden der Aufnahme Details fehlgeschlagen"
+    }
+  },
+  "adminManagement": {
+    "title": "Admin Verwaltung",
+    "search": "Suchen...",
+    "createAdmin": "Admin Erstellen",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Telefon",
+      "roleName": "Rollenname",
+      "status": "Status",
+      "noAdmins": "Keine Admins gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Admins fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Einen neuen Admin erstellen",
+      "createSubtitle": "Lassen Sie uns einen neuen Admin erstellen",
+      "firstNameLabel": "Vorname",
+      "firstNamePlaceholder": "Vorname eingeben",
+      "lastNameLabel": "Nachname",
+      "lastNamePlaceholder": "Nachname eingeben",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email eingeben",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "Telefon eingeben",
+      "roleLabel": "Rolle",
+      "rolePlaceholder": "Rolle auswählen",
+      "loadingRoles": "Rollen laden...",
+      "noActiveRoles": "Keine aktiven Rollen gefunden"
+    }
+  },
+  "batchManagement": {
+    "title": "Batch Verwaltung",
+    "search": "Batches suchen...",
+    "table": {
+      "batchId": "Batch ID",
+      "batchName": "Batchname",
+      "capacity": "Kapazität",
+      "enrolled": "Eingeschrieben",
+      "available": "Verfügbar",
+      "status": "Status",
+      "noBatches": "Keine Batches gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Batches fehlgeschlagen"
+    },
+    "details": {
+      "tabs": {
+        "overview": "Übersicht",
+        "students": "Studenten"
+      },
+      "cards": {
+        "enrolledStudents": "Eingeschriebene Studenten",
+        "totalSessions": "Gesamt Sitzungen",
+        "completed": "Abgeschlossen",
+        "avgAttendance": "Durchschn. Anwesenheit"
+      },
+      "badges": {
+        "batchId": "Batch ID",
+        "program": "Programm"
+      },
+      "info": {
+        "title": "Batch Information",
+        "intakeName": "Aufnahmename",
+        "program": "Programm",
+        "capacity": "Kapazität",
+        "intakeStartDate": "Aufnahme Startdatum",
+        "intakeEndDate": "Aufnahme Enddatum",
+        "students": "Studenten"
+      },
+      "loading": "Batch Details laden...",
+      "loadFailed": "Laden der Batch Details fehlgeschlagen"
+    }
+  },
+  "studentManagement": {
+    "title": "Studenten Verwaltung",
+    "search": "Studenten suchen...",
+    "table": {
+      "studentId": "Bewerbungs ID",
+      "studentName": "Studentenname",
+      "email": "Email",
+      "batch": "Batch",
+      "enrolledDate": "Anmeldedatum",
+      "status": "Status",
+      "noStudents": "Keine Studenten gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Studenten fehlgeschlagen"
+    },
+    "modal": {
+      "basicInfo": "Grundinformationen",
+      "phoneNumber": "Telefonnummer",
+      "emailAddress": "Email Adresse",
+      "batch": "Batch",
+      "address": "Adresse",
+      "studentId": "Studenten ID",
+      "enrolledDate": "Anmeldedatum",
+      "previousEducation": "Vorherige Ausbildung",
+      "documents": "Dokumente",
+      "noDocuments": "Keine Dokumente verfügbar",
+      "academicDegree": "Akademischer Grad",
+      "teacherRole": "Lehrer Rolle",
+      "employmentStartDate": "Beschäftigung Startdatum",
+      "languages": "Sprachen",
+      "locations": "Standorte"
+    }
+  },
+  "locationManagement": {
+    "title": "Standorte",
+    "tabs": {
+      "countries": "Länder",
+      "cities": "Städte"
+    }
+  },
+  "academicManagement": {
+    "title": "Akademische Verwaltung",
+    "search": "Akademische Jahre suchen...",
+    "delete": "Löschen",
+    "duplicate": "Duplizieren",
+    "createAcademic": "Akademisches Jahr Erstellen",
+    "table": {
+      "name": "Name",
+      "registrationStartDate": "Anmeldung Startdatum",
+      "registrationEndDate": "Anmeldung Enddatum",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noAcademics": "Keine akademischen Jahre gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der akademischen Jahre fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Ein neues akademisches Jahr erstellen",
+      "editTitle": "Akademisches Jahr bearbeiten",
+      "nameLabel": "Akademisches Jahr Name",
+      "namePlaceholder": "Akademisches Jahr Name eingeben (z.B. 2024-2025)",
+      "startDateLabel": "Startdatum",
+      "endDateLabel": "Enddatum",
+      "registrationStartDateLabel": "Anmeldung Startdatum",
+      "registrationEndDateLabel": "Anmeldung Enddatum"
+    },
+    "emptyState": {
+      "title": "Noch keine akademischen Jahre erstellt",
+      "subtitle": "Beginnen Sie mit der Erstellung eines akademischen Jahres, um Programme, Batches und Zulassungen effizient zu verwalten."
+    },
+    "card": {
+      "academicYear": "Akademisches Jahr",
+      "programs": "Programme",
+      "batches": "Batches",
+      "edit": "Bearbeiten",
+      "duplicate": "Duplizieren"
+    }
+  },
+  "applicationReview": {
+    "title": "Bewerbung Prüfung",
+    "search": "Suchen...",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Telefon",
+      "previousEducation": "Vorherige Ausbildung",
+      "address": "Adresse",
+      "postalCode": "Postleitzahl",
+      "city": "Stadt",
+      "country": "Land",
+      "status": "Status",
+      "action": "Aktion",
+      "noApplications": "Keine Bewerbungen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Bewerbungen fehlgeschlagen"
+    },
+    "modal": {
+      "basicInfo": "Grundinformationen",
+      "attachedDocuments": "Angehängte Dokumente",
+      "actions": "Aktionen",
+      "phoneNumber": "Telefonnummer",
+      "emailAddress": "Email Adresse",
+      "previousEducation": "Vorherige Ausbildung",
+      "program": "Programm",
+      "address": "Adresse",
+      "applicationId": "Bewerbungs ID",
+      "noDocuments": "Keine Dokumente angehängt",
+      "requestAdditionalInfo": "Zusätzliche Informationen anfordern",
+      "remarks": "Bemerkungen",
+      "remarksPlaceholder": "Bemerkungen eingeben, die vor der Weiterleitung hinzugefügt werden sollen",
+      "processing": "Verarbeitung...",
+      "reject": "Ablehnen",
+      "waitlist": "Warteliste",
+      "accept": "Akzeptieren"
+    },
+    "documents": {
+      "idCard": "Personalausweis",
+      "qualificationCertificate": "Qualifikationszertifikat",
+      "pdfDocument": "PDF Dokument",
+      "view": "Anzeigen",
+      "download": "Herunterladen",
+      "flagDocument": "Dokument markieren",
+      "unflagDocument": "Markierung entfernen",
+      "documentFlagged": "Dokument markiert"
+    }
+  },
+  "teacherTitleManagement": {
+    "title": "Lehrer Titel",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createTitle": "Lehrer Titel Erstellen",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noTitles": "Keine Lehrer Titel gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Lehrer Titel fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Einen neuen Lehrer Titel erstellen",
+      "editTitle": "Lehrer Titel bearbeiten",
+      "createSubtitle": "Lassen Sie uns einen neuen Lehrer Titel erstellen",
+      "editSubtitle": "Lehrer Titel Details aktualisieren",
+      "nameLabel": "Titelname",
+      "namePlaceholder": "Titelname eingeben (z.B. Dr., Prof., Herr, Frau)",
+      "nameRequired": "Titelname ist erforderlich"
+    }
+  },
+  "teacherQualification": {
+    "title": "Lehrer Qualifikationen",
+    "tabs": {
+      "titles": "Titel",
+      "roles": "Rollen"
+    }
+  },
+  "teacherRoleManagement": {
+    "title": "Lehrer Rollen",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createRole": "Lehrer Rolle Erstellen",
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noRoles": "Keine Lehrer Rollen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Lehrer Rollen fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Lehrer Rolle erstellen",
+      "editTitle": "Lehrer Rolle bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Lehrer Rolle erstellen",
+      "editSubtitle": "Lehrer Rollen Details aktualisieren",
+      "nameLabel": "Rollenname",
+      "namePlaceholder": "Rollenname eingeben (z.B. Assistenzprofessor, Dozent, Senior Lehrer)",
+      "nameRequired": "Rollenname ist erforderlich"
+    }
+  },
+  "teacherManagement": {
+    "title": "Lehrer Verwaltung",
+    "search": "Lehrer suchen...",
+    "delete": "Löschen",
+    "createTeacher": "Lehrer Erstellen",
+    "table": {
+      "teacherId": "Lehrer ID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Telefon",
+      "academicDegree": "Akademischer Grad",
+      "role": "Rolle",
+      "employmentStartDate": "IAO Beschäftigung Startdatum",
+      "location": "Standort",
+      "language": "Sprache",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noTeachers": "Keine Lehrer gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Lehrer fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Einen neuen Lehrer erstellen",
+      "editTitle": "Lehrer bearbeiten",
+      "createSubtitle": "Lassen Sie uns einen neuen Lehrer erstellen",
+      "editSubtitle": "Lehrer Details aktualisieren",
+      "firstNameLabel": "Vorname",
+      "firstNamePlaceholder": "Vorname eingeben",
+      "lastNameLabel": "Nachname",
+      "lastNamePlaceholder": "Nachname eingeben",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email Adresse eingeben",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "Telefonnummer eingeben",
+      "countryLabel": "Land",
+      "countryPlaceholder": "Land auswählen",
+      "citiesLabel": "Städte",
+      "citiesPlaceholder": "Städte auswählen",
+      "languageLabel": "Sprache",
+      "languagePlaceholder": "Sprache auswählen",
+      "academicDegreeLabel": "Akademischer Grad",
+      "academicDegreePlaceholder": "Grad auswählen",
+      "teacherRoleLabel": "Lehrer Rolle",
+      "teacherRolePlaceholder": "Rolle auswählen",
+      "employmentStartDateLabel": "Beschäftigung Startdatum",
+      "employmentStartDatePlaceholder": "Startdatum auswählen"
+    }
+  },
+  "programDetail": {
+    "title": "Programm Details",
+    "cards": {
+      "programName": "Programmname",
+      "duration": "Dauer",
+      "noOfComponents": "Anzahl Komponenten",
+      "registrationFee": "Anmeldegebühr",
+      "years": "Jahre",
+      "free": "Kostenlos"
+    },
+    "tabs": {
+      "learningModules": "Lernmodule",
+      "applications": "Anwendungen",
+      "resources": "Ressourcen"
+    },
+    "emptyState": {
+      "title": "Noch keine Programm Komponenten hinzugefügt",
+      "subtitle": "Beginnen Sie mit dem Hinzufügen von Modulen, Apps, Ressourcen oder Prüfungen, um dieses Programm effektiv aufzubauen und zu verwalten.",
+      "createButton": "Programm Komponente Erstellen"
+    },
+    "loading": "Programm Details laden...",
+    "loadFailed": "Laden der Programm Details fehlgeschlagen"
+  },
+  "learningModule": {
+    "search": "Module suchen...",
+    "table": {
+      "learningUID": "Lern UID",
+      "moduleName": "Modulname",
+      "year": "Jahr",
+      "files": "Dateien",
+      "amount": "Betrag",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noModules": "Keine Lernmodule gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Lernmodule fehlgeschlagen"
+    }
+  },
+  "appModule": {
+    "search": "Anwendungen suchen...",
+    "table": {
+      "appId": "App ID",
+      "appName": "App Name",
+      "year": "Jahr",
+      "files": "Dateien",
+      "deadline": "Frist",
+      "status": "Status",
+      "actions": "Aktionen",
+      "edit": "Bearbeiten",
+      "noApps": "Keine Anwendungskomponenten gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Anwendungskomponenten fehlgeschlagen"
+    }
+  },
+  "resourceModule": {
+    "search": "Ressourcen suchen...",
+    "table": {
+      "resourceUID": "Ressourcen UID",
+      "resourceName": "Ressourcenname",
+      "year": "Jahr",
+      "files": "Dateien",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noResources": "Keine Ressourcenkomponenten gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Ressourcenkomponenten fehlgeschlagen"
+    }
+  }
+}

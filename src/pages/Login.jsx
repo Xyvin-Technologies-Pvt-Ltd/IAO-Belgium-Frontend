@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { sendOtp } from "@/api/authApi";
 import logo from "../assets/images/logo.png";
-import bg from "../assets/images/login-image.webp";
+import bg from "../assets/images/login.webp";
 
 const Login = () => {
   const [email, setEmail] = useState("");
