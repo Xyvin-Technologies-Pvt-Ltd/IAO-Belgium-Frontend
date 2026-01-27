@@ -95,7 +95,7 @@ const Login = () => {
       // Navigate based on user role
       if (userRole === "admin") {
         navigate({ to: "/admin/dashboard" });
-      } else if (userRole === "TEACHER") {
+      } else if (userRole === "teacher") {
         navigate({ to: "/teacher/dashboard" });
       }
     } catch (err) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -42,10 +43,13 @@ const SearchableSelect = ({
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <Label
+          className={
+            required ? "after:content-['*'] after:text-red-500 after:ml-1" : ""
+          }
+        >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        </Label>
       )}
 
       <Select

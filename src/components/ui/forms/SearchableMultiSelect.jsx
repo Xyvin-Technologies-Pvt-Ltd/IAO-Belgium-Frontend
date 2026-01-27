@@ -3,6 +3,7 @@ import { SearchIcon, X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 
 const SearchableMultiSelect = ({
   label,
@@ -78,10 +79,13 @@ const SearchableMultiSelect = ({
   return (
     <div className={cn("space-y-2 searchable-multiselect", className)}>
       {label && (
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <Label
+          className={
+            required ? "after:content-['*'] after:text-red-500 after:ml-1" : ""
+          }
+        >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        </Label>
       )}
       
       <div className="relative">
