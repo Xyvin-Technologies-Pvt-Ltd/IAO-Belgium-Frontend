@@ -15,7 +15,14 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
-  const { verifyOtp, isLoading, clearError, isAuthenticated, role, isInitialized } = useAuthStore();
+  const {
+    verifyOtp,
+    isLoading,
+    clearError,
+    isAuthenticated,
+    role,
+    isInitialized,
+  } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,11 +87,11 @@ const Login = () => {
         <div className="relative hidden lg:block rounded-2xl overflow-hidden">
           <img src={bg} alt="Login" className="h-full w-full object-cover" />
 
-          <div className="absolute bottom-10 left-10 right-10 text-white max-w-md">
+          <div className="absolute bottom-10 left-10 right-10 text-white max-w-lg">
             <img src={logo} alt="logo" className="h-20 mb-4" />
             <h2 className="text-2xl font-semibold leading-snug">
-              Take the next step in your academic journey and move closer to
-              your goals.
+              Login to our secure back office system to manage the day-to-day
+              operations of IAO
             </h2>
           </div>
         </div>
@@ -93,10 +100,7 @@ const Login = () => {
           <div className="w-full max-w-md space-y-6">
             <div className="flex flex-col items-start space-y-2 text-center">
               <img src={logo} alt="IAO Logo" className="h-20" />
-              <h1 className="text-3xl font-semibold">IAO Online Application</h1>
-              <p className="text-sm text-muted-foreground">
-                Create your account to get started
-              </p>
+              <h1 className="text-3xl font-semibold">IAO Back Office</h1>
             </div>
 
             <div className="space-y-4">
@@ -105,7 +109,7 @@ const Login = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your IAO email"
                   className="h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -115,11 +119,11 @@ const Login = () => {
 
               {otpSent && (
                 <div className="space-y-2">
-                  <Label htmlFor="otp">Enter OTP</Label>
+                  <Label htmlFor="otp">Enter Verification Code</Label>
                   <Input
                     id="otp"
                     type="text"
-                    placeholder="Enter 6-digit OTP"
+                    placeholder="Enter 6-digit Verification Code"
                     className="h-11"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
@@ -131,20 +135,20 @@ const Login = () => {
 
               {!otpSent ? (
                 <Button
-                  className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
+                  className="w-full h-11 "
                   onClick={handleSendOtp}
                   disabled={sendingOtp || !email}
                 >
-                  {sendingOtp ? "Sending OTP..." : "Send OTP"}
+                  {sendingOtp ? "Login Code Sending..." : "Login Code"}
                 </Button>
               ) : (
                 <div className="space-y-2">
                   <Button
-                    className="w-full h-11 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
+                    className="w-full h-11"
                     onClick={handleVerifyOtp}
                     disabled={isLoading || !otp}
                   >
-                    {isLoading ? "Verifying..." : "Verify OTP"}
+                    {isLoading ? "Verifying..." : "Verify Code"}
                   </Button>
                   <Button
                     variant="ghost"
@@ -163,7 +167,7 @@ const Login = () => {
               <p className="text-[10px] text-blue-700 dark:text-blue-300 text-start bg-blue-50 dark:bg-blue-950/30 rounded-[6px] px-2 py-1 flex items-center gap-2">
                 <CircleAlert className="h-3 w-3 shrink-0" />
                 {!otpSent
-                  ? "We'll send you a one-time verification code to your email"
+                  ? "We'll send you a one-time login code to your email"
                   : "Enter the 6-digit code sent to your email"}
               </p>
             </div>

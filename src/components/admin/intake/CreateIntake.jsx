@@ -33,7 +33,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     resolver: zodResolver(intakeSchema),
     mode: "onChange",
     defaultValues: {
-      name: "",
+      ...(isEdit && { name: "" }),
       program: [],
       admission_fee: "",
       start_date: "",
@@ -49,9 +49,19 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
 
   const selectedPrograms = watch("program");
 
+  const formatProgramData = (program) => {
+    if (!program) return null;
+    return {
+      ...program,
+      name: `${program.name} - ${program.city?.name || ""} - ${program.language?.name || ""}`,
+    };
+  };
+
+  const formattedProgramsData = programsData?.data?.map(formatProgramData) || [];
+
   const handleClose = () => {
     reset({
-      name: "",
+      ...(isEdit && { name: "" }),
       program: [],
       admission_fee: "",
       start_date: "",
@@ -71,9 +81,9 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     reset({
       name: intakeData.name || "",
       program: Array.isArray(intakeData.program)
-        ? intakeData.program
+        ? intakeData.program.map(formatProgramData)
         : intakeData.program?._id
-          ? [intakeData.program]
+          ? [formatProgramData(intakeData.program)]
           : [],
       admission_fee: intakeData.admission_fee || "",
       start_date: intakeData.start_date
@@ -90,7 +100,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
 
   const onSubmit = (formData) => {
     const payload = {
-      name: formData.name,
+      ...(isEdit && { name: formData.name }),
       program: formData.program.map((p) => p._id),
       admission_fee: Number(formData.admission_fee),
       start_date: formData.start_date,
@@ -125,26 +135,22 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
             ? t("intakeManagement.modal.editTitle")
             : t("intakeManagement.modal.createTitle")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          {isEdit
-            ? t("intakeManagement.modal.editSubtitle")
-            : t("intakeManagement.modal.createSubtitle")}
-        </p>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            label={t("intakeManagement.modal.nameLabel")}
-            placeholder={t("intakeManagement.modal.namePlaceholder")}
-            error={errors.name?.message}
-            required
-            {...register("name")}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-6">
+          {isEdit && (
+            <FormField
+              label={t("intakeManagement.modal.nameLabel")}
+              placeholder={t("intakeManagement.modal.namePlaceholder")}
+              error={errors.name?.message}
+              disabled={true}
+              {...register("name")}
+            />
+          )}
 
           <SearchableMultiSelect
             label={t("intakeManagement.modal.programLabel")}
             placeholder={t("intakeManagement.modal.programPlaceholder")}
             searchPlaceholder="Search programs..."
-            items={programsData?.data || []}
+            items={formattedProgramsData}
             selected={selectedPrograms}
             onChange={(val) =>
               setValue("program", val, { shouldValidate: true })
@@ -156,8 +162,8 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
           />
 
           <FormField
-            label={t("intakeManagement.modal.admissionFeeLabel")}
-            placeholder={t("intakeManagement.modal.admissionFeePlaceholder")}
+            label={t("intakeManagement.modal.registrationFeeLabel")}
+            placeholder={t("intakeManagement.modal.registrationFeePlaceholder")}
             type="number"
             error={errors.admission_fee?.message}
             required

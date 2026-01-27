@@ -8,6 +8,22 @@ export const academicSchema = z.object({
     .max(100, "Name must not exceed 100 characters")
     .trim(),
   
+  start_date: z
+    .string()
+    .min(1, "Start date is required")
+    .refine((date) => {
+      const parsedDate = new Date(date);
+      return !isNaN(parsedDate.getTime());
+    }, "Invalid date format"),
+
+  end_date: z
+    .string()
+    .min(1, "End date is required")
+    .refine((date) => {
+      const parsedDate = new Date(date);
+      return !isNaN(parsedDate.getTime());
+    }, "Invalid date format"),
+
   registartion_start_date: z
     .string()
     .min(1, "Registration start date is required")
@@ -32,4 +48,11 @@ export const academicSchema = z.object({
 }, {
   message: "Registration end date must be after start date",
   path: ["registartion_end_date"],
+}).refine((data) => {
+  const startDate = new Date(data.start_date);
+  const endDate = new Date(data.end_date);
+  return endDate > startDate;
+}, {
+  message: "End date must be after start date",
+  path: ["end_date"],
 });

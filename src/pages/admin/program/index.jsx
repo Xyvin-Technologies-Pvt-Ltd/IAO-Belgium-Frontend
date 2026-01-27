@@ -113,7 +113,7 @@ const Programs = () => {
           <TableRow>
             <TableHead>{t("programManagement.table.uid")}</TableHead>
             <TableHead>{t("programManagement.table.name")}</TableHead>
-            <TableHead>{t("programManagement.table.description")}</TableHead>
+
             <TableHead>{t("programManagement.table.type")}</TableHead>
             <TableHead>{t("programManagement.table.year")}</TableHead>
             <TableHead>{t("programManagement.table.city")}</TableHead>
@@ -124,10 +124,10 @@ const Programs = () => {
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("programManagement.messages.loadFailed")
@@ -146,12 +146,7 @@ const Programs = () => {
               >
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>{i?.name}</TableCell>
-                <TableCell
-                  title={i?.description}
-                  className="max-w-38 overflow-hidden text-ellipsis whitespace-nowrap"
-                >
-                  {i?.description}
-                </TableCell>
+
                 <TableCell>{i?.program_type}</TableCell>
                 <TableCell>{i?.year}</TableCell>
                 <TableCell>{i?.city?.name}</TableCell>
@@ -190,7 +185,7 @@ const Programs = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("programManagement.table.noPrograms")}
               </TableCell>
             </TableRow>

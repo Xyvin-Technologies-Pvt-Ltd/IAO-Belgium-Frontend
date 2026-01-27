@@ -24,6 +24,8 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
     resolver: zodResolver(academicSchema),
     defaultValues: {
       name: "",
+      start_date: "",
+      end_date: "",
       registartion_start_date: "",
       registartion_end_date: "",
       status: true,
@@ -35,7 +37,18 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
   const updateAcademic = useUpdateAcademic();
   
   const statusValue = watch("status");
+  const startDate = watch("start_date");
+  const endDate = watch("end_date");
 
+  useEffect(() => {
+    if (startDate && endDate) {
+      const startYear = new Date(startDate).getFullYear();
+      const endYear = new Date(endDate).getFullYear();
+      if (!isNaN(startYear) && !isNaN(endYear)) {
+        setValue("name", `${startYear}-${endYear}`);
+      }
+    }
+  }, [startDate, endDate, setValue]);
 
   const handleClose = () => {
     reset();
@@ -45,6 +58,8 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
   useEffect(() => {
     if (academicData && isEdit && open) {
       setValue("name", academicData.name || "");
+      setValue("start_date", academicData.start_date ? new Date(academicData.start_date).toISOString().split('T')[0] : "");
+      setValue("end_date", academicData.end_date ? new Date(academicData.end_date).toISOString().split('T')[0] : "");
       setValue("registartion_start_date", academicData.registartion_start_date ? new Date(academicData.registartion_start_date).toISOString().split('T')[0] : "");
       setValue("registartion_end_date", academicData.registartion_end_date ? new Date(academicData.registartion_end_date).toISOString().split('T')[0] : "");
       setValue("status", academicData.status ?? true);
@@ -54,6 +69,8 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
   const onSubmit = (formData) => {
     const payload = {
       name: formData.name,
+      start_date: formData.start_date,
+      end_date: formData.end_date,
       registartion_start_date: formData.registartion_start_date,
       registartion_end_date: formData.registartion_end_date,
       status: formData.status,
@@ -81,20 +98,35 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
             ? t("academicManagement.modal.editTitle")
             : t("academicManagement.modal.createTitle")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          {isEdit
-            ? t("academicManagement.modal.editSubtitle")
-            : t("academicManagement.modal.createSubtitle")}
-        </p>
+     
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           <FormField
             label={t("academicManagement.modal.nameLabel")}
             placeholder={t("academicManagement.modal.namePlaceholder")}
             error={errors.name?.message}
             required
+            disabled
             {...register("name")}
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              label={t("academicManagement.modal.startDateLabel")}
+              type="date"
+              error={errors.start_date?.message}
+              required
+              {...register("start_date")}
+            />
+
+            <FormField
+              label={t("academicManagement.modal.endDateLabel")}
+              type="date"
+              error={errors.end_date?.message}
+              required
+              {...register("end_date")}
+            />
+          </div>
 
           <FormField
             label={t("academicManagement.modal.registrationStartDateLabel")}

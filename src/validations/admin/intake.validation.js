@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const intakeSchema = z
   .object({
-    name: z.string().min(1, "Name is required"),
+    name: z.string().optional(),
     program: z.array(z.object({
       _id: z.string(),
       name: z.string()

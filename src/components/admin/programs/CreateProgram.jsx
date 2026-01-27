@@ -34,10 +34,10 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   const { data: countriesData, isLoading: countriesLoading } =
     useGetAllCountries(
-      { 
-        ...(countrySearchTerm && { search: countrySearchTerm })
+      {
+        ...(countrySearchTerm && { search: countrySearchTerm }),
       },
-      { enabled: open }
+      { enabled: open },
     );
 
   const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
@@ -50,10 +50,10 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   const { data: languagesData, isLoading: languagesLoading } =
     useGetAllLanguages(
-      { 
-        ...(languageSearchTerm && { search: languageSearchTerm })
+      {
+        ...(languageSearchTerm && { search: languageSearchTerm }),
       },
-      { enabled: open }
+      { enabled: open },
     );
 
   const {
@@ -67,7 +67,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
     resolver: zodResolver(programSchema),
     defaultValues: {
       name: "",
-      description: "",
       program_type: "",
       year: "",
       language: "",
@@ -96,7 +95,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const handleClose = () => {
     reset({
       name: "",
-      description: "",
       program_type: "",
       year: "",
       language: "",
@@ -115,7 +113,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
     reset({
       name: programData.name || "",
-      description: programData.description || "",
       program_type: programData.program_type || "",
       year: programData.year || "",
       language: programData.language?._id || "",
@@ -131,7 +128,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const onSubmit = (formData) => {
     const payload = {
       name: formData.name,
-      description: formData.description,
       program_type: formData.program_type,
       year: formData.year,
       language: formData.language,
@@ -180,24 +176,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               {...register("name")}
             />
 
-            <div className="space-y-2">
-              <Label>
-                {t("programManagement.modal.descriptionLabel")}{" "}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                placeholder={t(
-                  "programManagement.modal.descriptionPlaceholder",
-                )}
-                className="bg-white dark:bg-white/5"
-                {...register("description")}
-              />
-              {errors.description && (
-                <p className="text-red-500 text-sm">
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
+
 
             <div className="space-y-2">
               <Label>
@@ -219,8 +198,17 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="MSc">MSc</SelectItem>
-                  <SelectItem value="BSc">BSc</SelectItem>
+                  <SelectItem value="Master of Science">
+                    Master of Science
+                  </SelectItem>
+                  <SelectItem value="Lateral Entry Master of Science">
+                    Lateral Entry Master of Science
+                  </SelectItem>
+                  <SelectItem value="Diploma">Diploma</SelectItem>
+                  <SelectItem value="Manual Therapie">Manual Therapie</SelectItem>
+                  <SelectItem value="Post Academic Module">
+                    Post Academic Module
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {errors.program_type && (
@@ -231,8 +219,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
             </div>
 
             <FormField
-              label={t("programManagement.modal.yearLabel")}
-              placeholder={t("programManagement.modal.yearPlaceholder")}
+              label={t("programManagement.modal.durationLabel")}
+              placeholder={t("programManagement.modal.durationPlaceholder")}
               type="number"
               error={errors.year?.message}
               required

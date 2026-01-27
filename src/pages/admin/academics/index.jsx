@@ -4,14 +4,16 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAcademic, useDuplicateAcademic } from "@/store/useAcademicStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import image from "../../../assets/images/no-academic.png";
 import CreateAcademic from "@/components/admin/academic/CreateAcademic";
 import AcademicCard from "@/components/admin/academic/AcademicCard";
 
 const Academics = () => {
   const { t } = useTranslation();
+  const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -30,6 +32,25 @@ const Academics = () => {
 
   const academics = data?.data || [];
   const totalRows = data?.total || 0;
+
+  useEffect(() => {
+    updateBreadcrumbs([
+      {
+        label: "Admission administration",
+        path: "/admin/admission-administration",
+        navigable: false,
+      },
+      {
+        label: "Academic Years",
+        path: "/admin/admission-administration/academics",
+        navigable: false,
+      },
+    ]);
+
+    return () => {
+      updateBreadcrumbs([]);
+    };
+  }, []);
 
   const handleOpenCreate = () => {
     setEditingAcademic(null);

@@ -2,9 +2,14 @@ import { z } from "zod";
 
 export const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),
-  description: z.string().min(1, "Description is required"),
-  program_type: z.enum(["MSc", "BSc"], {
-    errorMap: () => ({ message: "Program type must be MSc or BSc" }),
+  program_type: z.enum([
+    "Master of Science",
+    "Lateral Entry Master of Science", 
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module"
+  ], {
+    errorMap: () => ({ message: "Please select a valid program type" }),
   }),
   year: z.coerce
     .number({ invalid_type_error: "Year must be a number" })
