@@ -1,5 +1,12 @@
-
-import { createProgram, deleteProgram, duplicateProgram, getProgramById, getPrograms, updateProgram } from "@/api/programApi";
+import {
+  createProgram,
+  deleteProgram,
+  duplicateProgram,
+  getProgramById,
+  getPrograms,
+  getProgramsForLogin,
+  updateProgram,
+} from "@/api/programApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -20,8 +27,8 @@ export const useGetProgramById = (id, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
-  })
-}
+  });
+};
 export const useCreateProgram = () => {
   const queryClient = useQueryClient();
 
@@ -80,5 +87,14 @@ export const useDeleteProgram = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to delete program");
     },
+  });
+};
+export const useGetProgramsList = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["programs-list", filter],
+    queryFn: () => getProgramsForLogin(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };

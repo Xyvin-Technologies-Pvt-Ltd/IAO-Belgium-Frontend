@@ -50,3 +50,14 @@ export const deleteProgram = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getProgramsForLogin = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/test/program`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

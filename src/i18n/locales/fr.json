@@ -693,5 +693,28 @@
     "messages": {
       "loadFailed": "Échec du chargement des composants de ressource"
     }
+  },
+  "login": {
+    "title": "Bureau IAO",
+    "subtitle": "Connectez-vous à notre système de back-office sécurisé pour gérer les opérations quotidiennes de l'IAO",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Entrez votre email IAO",
+    "otpLabel": "Entrez le code de vérification",
+    "otpPlaceholder": "Entrez le code de vérification à 6 chiffres",
+    "loginCodeButton": "Code de connexion",
+    "loginCodeSending": "Envoi du code de connexion...",
+    "verifyCodeButton": "Vérifier le code",
+    "verifyingCode": "Vérification...",
+    "changeEmail": "Changer d'email",
+    "otpInstructions": "Nous vous enverrons un code de connexion unique à votre adresse email",
+    "otpSentInstructions": "Entrez le code à 6 chiffres envoyé à votre adresse email",
+    "toast": {
+      "emailRequired": "Veuillez entrer votre adresse email",
+      "otpSentSuccess": "OTP envoyé à votre email !",
+      "otpSentError": "Échec de l'envoi de l'OTP. Veuillez réessayer.",
+      "otpRequired": "Veuillez entrer l'OTP",
+      "loginSuccess": "Connexion réussie !",
+      "otpInvalid": "OTP invalide. Veuillez réessayer."
+    }
   }
 }

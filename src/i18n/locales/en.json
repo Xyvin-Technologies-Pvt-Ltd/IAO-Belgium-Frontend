@@ -694,5 +694,28 @@
     "messages": {
       "loadFailed": "Failed to load resource components"
     }
+  },
+  "login": {
+    "title": "IAO Back Office",
+    "subtitle": "Login to our secure back office system to manage the day-to-day operations of IAO",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your IAO email",
+    "otpLabel": "Enter Verification Code",
+    "otpPlaceholder": "Enter 6-digit Verification Code",
+    "loginCodeButton": "Login Code",
+    "loginCodeSending": "Login Code Sending...",
+    "verifyCodeButton": "Verify Code",
+    "verifyingCode": "Verifying...",
+    "changeEmail": "Change Email",
+    "otpInstructions": "We'll send you a one-time login code to your email",
+    "otpSentInstructions": "Enter the 6-digit code sent to your email",
+    "toast": {
+      "emailRequired": "Please enter your email address",
+      "otpSentSuccess": "OTP sent to your email!",
+      "otpSentError": "Failed to send OTP. Please try again.",
+      "otpRequired": "Please enter the OTP",
+      "loginSuccess": "Login successful!",
+      "otpInvalid": "Invalid OTP. Please try again."
+    }
   }
 }

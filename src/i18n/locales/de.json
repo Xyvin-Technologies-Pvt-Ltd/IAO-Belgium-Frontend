@@ -693,5 +693,28 @@
     "messages": {
       "loadFailed": "Laden der Ressourcenkomponenten fehlgeschlagen"
     }
+  },
+  "login": {
+    "title": "IAO Back Office",
+    "subtitle": "Melden Sie sich bei unserem sicheren Back-Office-System an, um den täglichen Betrieb der IAO zu verwalten",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "Geben Sie Ihre IAO-E-Mail-Adresse ein",
+    "otpLabel": "Verifizierungscode eingeben",
+    "otpPlaceholder": "Geben Sie den 6-stelligen Verifizierungscode ein",
+    "loginCodeButton": "Anmeldecode",
+    "loginCodeSending": "Anmeldecode wird gesendet...",
+    "verifyCodeButton": "Code verifizieren",
+    "verifyingCode": "Verifizieren...",
+    "changeEmail": "E-Mail ändern",
+    "otpInstructions": "Wir senden Ihnen einen einmaligen Anmeldecode an Ihre E-Mail-Adresse",
+    "otpSentInstructions": "Geben Sie den 6-stelligen Code ein, der an Ihre E-Mail gesendet wurde",
+    "toast": {
+      "emailRequired": "Bitte geben Sie Ihre E-Mail-Adresse ein",
+      "otpSentSuccess": "OTP an Ihre E-Mail gesendet!",
+      "otpSentError": "Senden des OTP fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "otpRequired": "Bitte geben Sie das OTP ein",
+      "loginSuccess": "Anmeldung erfolgreich!",
+      "otpInvalid": "Ungültiges OTP. Bitte versuchen Sie es erneut."
+    }
   }
 }

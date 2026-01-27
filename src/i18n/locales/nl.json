@@ -693,5 +693,28 @@
     "messages": {
       "loadFailed": "Laden van bron componenten mislukt"
     }
+  },
+  "login": {
+    "title": "IAO Back Office",
+    "subtitle": "Log in op ons beveiligde backoffice-systeem om de dagelijkse activiteiten van IAO te beheren",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Voer uw IAO e-mailadres in",
+    "otpLabel": "Voer verificatiecode in",
+    "otpPlaceholder": "Voer 6-cijferige verificatiecode in",
+    "loginCodeButton": "Inlogcode",
+    "loginCodeSending": "Inlogcode wordt verzonden...",
+    "verifyCodeButton": "Verifieer code",
+    "verifyingCode": "Verifiëren...",
+    "changeEmail": "E-mail wijzigen",
+    "otpInstructions": "We sturen een eenmalige inlogcode naar uw e-mail",
+    "otpSentInstructions": "Voer de 6-cijferige code in die naar uw e-mail is verzonden",
+    "toast": {
+      "emailRequired": "Voer uw e-mailadres in",
+      "otpSentSuccess": "OTP verzonden naar uw e-mail!",
+      "otpSentError": "OTP verzenden mislukt. Probeer het opnieuw.",
+      "otpRequired": "Voer de OTP in",
+      "loginSuccess": "Inloggen succesvol!",
+      "otpInvalid": "Ongeldige OTP. Probeer het opnieuw."
+    }
   }
 }
