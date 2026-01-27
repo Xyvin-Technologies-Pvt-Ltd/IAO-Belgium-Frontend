@@ -128,7 +128,7 @@ const Intakes = () => {
           <TableRow>
             <TableHead>{t("intakeManagement.table.name")}</TableHead>
             <TableHead>{t("intakeManagement.table.program")}</TableHead>
-            <TableHead>{t("intakeManagement.table.admissionFee")}</TableHead>
+            <TableHead>{t("intakeManagement.table.registrationFee")}</TableHead>
             <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
             <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
             <TableHead>
