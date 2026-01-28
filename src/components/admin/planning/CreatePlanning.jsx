@@ -39,13 +39,13 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       batch: "",
       component: "",
       venue: "",
-      teachers: [], 
+      teachers: [],
       sessions: [
         {
           session_date: "",
           start_time: "",
           end_time: "",
-          teachers: [], 
+          teachers: [],
         },
       ],
     },
@@ -70,11 +70,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
   );
 
   const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
-    selectedProgram, 
+    selectedProgram,
     {
       ...(batchSearchTerm && { search: batchSearchTerm }),
     },
-    { enabled: open && !!selectedProgram }, 
+    { enabled: open && !!selectedProgram },
   );
 
   const { data: componentsData, isLoading: componentsLoading } =
@@ -82,15 +82,15 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       {
         ...(componentSearchTerm && { search: componentSearchTerm }),
         program: selectedProgram,
-        type: "module", 
+        type: "module",
       },
-      { enabled: open && !!selectedProgram }, 
+      { enabled: open && !!selectedProgram },
     );
 
   const { data: teachersData, isLoading: teachersLoading } = useGetUsers(
     {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
-      role: "teacher", 
+      role: "teacher",
     },
     { enabled: open },
   );
@@ -112,7 +112,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           session_date: "",
           start_time: "",
           end_time: "",
-          teachers: [], 
+          teachers: [],
         },
       ],
     });
@@ -197,9 +197,9 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           }));
 
       return {
-        session_date: sessionDate, 
+        session_date: sessionDate,
         start_time: startTime,
-        end_time: endTime, 
+        end_time: endTime,
         teachers: sessionTeachers,
       };
     });
@@ -228,7 +228,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       session_date: "",
       start_time: "",
       end_time: "",
-      teachers: [], 
+      teachers: [],
     });
   };
 
@@ -315,16 +315,6 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                 <Label className="text-base font-semibold">
                   {t("planningManagement.modal.sessionsLabel")}
                 </Label>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={addSession}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  {t("planningManagement.modal.addSession")}
-                </Button>
               </div>
 
               {fields.map((field, index) => (
@@ -431,6 +421,18 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                   </div>
                 </div>
               ))}
+              <div className="flex items-center justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={addSession}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  {t("planningManagement.modal.addSession")}
+                </Button>
+              </div>
             </div>
             {!isEdit && (
               <SearchableMultiSelect
