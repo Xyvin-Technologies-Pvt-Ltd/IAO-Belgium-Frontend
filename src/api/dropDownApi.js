@@ -72,3 +72,34 @@ export const getAllRoles= async (filter) => {
     throw error.response.data;
   }
 }
+
+export const getBatches= async (id,filter) => {
+  try {
+    const response = await axiosInstance.get(`/intake/batches/program/${id}`,{
+      params: filter
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+export const getComponents= async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/components/dropdown`,{
+      params: filter
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+export const getUsers= async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/user/dropdown`,{
+      params: filter
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

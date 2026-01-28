@@ -382,6 +382,10 @@
       },
       "loading": "Chargement des détails du lot...",
       "loadFailed": "Échec du chargement des détails du lot"
+    },
+    "modal": {
+      "batchLabel": "Lot",
+      "batchPlaceholder": "Sélectionnez un lot"
     }
   },
   "studentManagement": {
@@ -692,6 +696,59 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des composants de ressource"
+    }
+  },
+  "planningManagement": {
+    "title": "Gestion de la planification",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createPlanning": "Créer une planification",
+    "table": {
+      "program": "Programme",
+      "batch": "Lot",
+      "component": "Composant",
+      "teachers": "Enseignants",
+      "venue": "Lieu",
+      "sessions": "Sessions",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noPlannings": "Aucune planification trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des planifications"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle planification",
+      "editTitle": "Modifier la planification",
+      "createSubtitle": "Créons une nouvelle planification",
+      "editSubtitle": "Mettre à jour les détails de la planification",
+      "programLabel": "Programme",
+      "programPlaceholder": "Sélectionnez un programme",
+      "batchLabel": "Lot",
+      "batchPlaceholder": "Sélectionnez un lot",
+      "componentLabel": "Composant",
+      "componentPlaceholder": "Sélectionnez un composant",
+      "venueLabel": "Lieu",
+      "venuePlaceholder": "Entrez le nom du lieu",
+      "venueRequired": "Le lieu est requis",
+      "sessionsLabel": "Sessions",
+      "addSession": "Ajouter une session",
+      "sessionLabel": "Session",
+      "dateLabel": "Date",
+      "timeFromLabel": "Heure de début",
+      "timeTillLabel": "Heure de fin",
+      "teachersLabel": "Enseignants",
+      "teachersPlaceholder": "Sélectionnez des enseignants...",
+      "dateRequired": "La date est requise",
+      "startTimeRequired": "L'heure de début est requise",
+      "endTimeRequired": "L'heure de fin est requise"
+    }
+  },
+  "componentManagement": {
+    "modal": {
+      "componentLabel": "Composant",
+      "componentPlaceholder": "Sélectionnez un composant"
     }
   },
   "login": {

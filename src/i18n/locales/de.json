@@ -382,6 +382,10 @@
       },
       "loading": "Batch Details laden...",
       "loadFailed": "Laden der Batch Details fehlgeschlagen"
+    },
+    "modal": {
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Batch auswählen"
     }
   },
   "studentManagement": {
@@ -692,6 +696,59 @@
     },
     "messages": {
       "loadFailed": "Laden der Ressourcenkomponenten fehlgeschlagen"
+    }
+  },
+  "planningManagement": {
+    "title": "Planungs Verwaltung",
+    "search": "Suchen...",
+    "delete": "Löschen",
+    "createPlanning": "Planung Erstellen",
+    "table": {
+      "program": "Programm",
+      "batch": "Batch",
+      "component": "Komponente",
+      "teachers": "Lehrer",
+      "venue": "Veranstaltungsort",
+      "sessions": "Sitzungen",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "noPlannings": "Keine Planungen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Laden der Planungen fehlgeschlagen"
+    },
+    "modal": {
+      "createTitle": "Eine neue Planung erstellen",
+      "editTitle": "Planung bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Planung erstellen",
+      "editSubtitle": "Planungsdetails aktualisieren",
+      "programLabel": "Programm",
+      "programPlaceholder": "Programm auswählen",
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Batch auswählen",
+      "componentLabel": "Komponente",
+      "componentPlaceholder": "Komponente auswählen",
+      "venueLabel": "Veranstaltungsort",
+      "venuePlaceholder": "Veranstaltungsort eingeben",
+      "venueRequired": "Veranstaltungsort ist erforderlich",
+      "sessionsLabel": "Sitzungen",
+      "addSession": "Sitzung hinzufügen",
+      "sessionLabel": "Sitzung",
+      "dateLabel": "Datum",
+      "timeFromLabel": "Zeit von",
+      "timeTillLabel": "Zeit bis",
+      "teachersLabel": "Lehrer",
+      "teachersPlaceholder": "Lehrer auswählen...",
+      "dateRequired": "Datum ist erforderlich",
+      "startTimeRequired": "Startzeit ist erforderlich",
+      "endTimeRequired": "Endzeit ist erforderlich"
+    }
+  },
+  "componentManagement": {
+    "modal": {
+      "componentLabel": "Komponente",
+      "componentPlaceholder": "Komponente auswählen"
     }
   },
   "login": {

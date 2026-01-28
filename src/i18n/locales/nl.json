@@ -382,6 +382,10 @@
       },
       "loading": "Batch gegevens laden...",
       "loadFailed": "Laden van batch gegevens mislukt"
+    },
+    "modal": {
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Selecteer batch"
     }
   },
   "studentManagement": {
@@ -692,6 +696,59 @@
     },
     "messages": {
       "loadFailed": "Laden van bron componenten mislukt"
+    }
+  },
+  "planningManagement": {
+    "title": "Planning Beheer",
+    "search": "Zoeken...",
+    "delete": "Verwijderen",
+    "createPlanning": "Planning Aanmaken",
+    "table": {
+      "program": "Programma",
+      "batch": "Batch",
+      "component": "Component",
+      "teachers": "Docenten",
+      "venue": "Locatie",
+      "sessions": "Sessies",
+      "status": "Status",
+      "action": "Actie",
+      "edit": "Bewerken",
+      "noPlannings": "Geen planningen gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van planningen mislukt"
+    },
+    "modal": {
+      "createTitle": "Een nieuwe planning aanmaken",
+      "editTitle": "Planning bewerken",
+      "createSubtitle": "Laten we een nieuwe planning aanmaken",
+      "editSubtitle": "Planning gegevens bijwerken",
+      "programLabel": "Programma",
+      "programPlaceholder": "Selecteer programma",
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Selecteer batch",
+      "componentLabel": "Component",
+      "componentPlaceholder": "Selecteer component",
+      "venueLabel": "Locatie",
+      "venuePlaceholder": "Voer locatienaam in",
+      "venueRequired": "Locatie is verplicht",
+      "sessionsLabel": "Sessies",
+      "addSession": "Sessie toevoegen",
+      "sessionLabel": "Sessie",
+      "dateLabel": "Datum",
+      "timeFromLabel": "Tijd van",
+      "timeTillLabel": "Tijd tot",
+      "teachersLabel": "Docenten",
+      "teachersPlaceholder": "Selecteer docenten...",
+      "dateRequired": "Datum is verplicht",
+      "startTimeRequired": "Starttijd is verplicht",
+      "endTimeRequired": "Eindtijd is verplicht"
+    }
+  },
+  "componentManagement": {
+    "modal": {
+      "componentLabel": "Component",
+      "componentPlaceholder": "Selecteer component"
     }
   },
   "login": {

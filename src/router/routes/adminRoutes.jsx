@@ -18,6 +18,7 @@ import Academics from "@/pages/admin/academics";
 import TeacherQualification from "@/pages/admin/teacher-qualification";
 import Teachers from "@/pages/admin/teacher";
 import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
+import Planning from "@/pages/admin/planning";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -43,6 +44,10 @@ export const adminRoutes = [
   {
     path: "/admin/program/$id",
     component: withPermissionProtection(ProgramDetail, "/admin/program"),
+  },
+  {
+    path: "/admin/planning",
+    component: withPermissionProtection(Planning, "/admin/planning"),
   },
   {
     path: "/admin/locations",

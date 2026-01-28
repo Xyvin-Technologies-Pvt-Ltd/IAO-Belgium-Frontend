@@ -383,6 +383,10 @@
       },
       "loading": "Loading batch details...",
       "loadFailed": "Failed to load batch details"
+    },
+    "modal": {
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Select batch"
     }
   },
   "studentManagement": {
@@ -693,6 +697,59 @@
     },
     "messages": {
       "loadFailed": "Failed to load resource components"
+    }
+  },
+  "planningManagement": {
+    "title": "Planning Management",
+    "search": "Search...",
+    "delete": "Delete",
+    "createPlanning": "Create Planning",
+    "table": {
+      "program": "Program",
+      "batch": "Batch",
+      "component": "Component",
+      "teachers": "Teachers",
+      "venue": "Venue",
+      "sessions": "Sessions",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "noPlannings": "No Plannings found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load plannings"
+    },
+    "modal": {
+      "createTitle": "Create a new Planning",
+      "editTitle": "Edit Planning",
+      "createSubtitle": "Let's create a new planning",
+      "editSubtitle": "Update the planning details",
+      "programLabel": "Program",
+      "programPlaceholder": "Select program",
+      "batchLabel": "Batch",
+      "batchPlaceholder": "Select batch",
+      "componentLabel": "Component",
+      "componentPlaceholder": "Select component",
+      "venueLabel": "Venue",
+      "venuePlaceholder": "Enter venue name",
+      "venueRequired": "Venue is required",
+      "sessionsLabel": "Sessions",
+      "addSession": "Add Session",
+      "sessionLabel": "Session",
+      "dateLabel": "Date",
+      "timeFromLabel": "Time from",
+      "timeTillLabel": "Time till",
+      "teachersLabel": "Teachers",
+      "teachersPlaceholder": "Select teachers...",
+      "dateRequired": "Date is required",
+      "startTimeRequired": "Start time is required",
+      "endTimeRequired": "End time is required"
+    }
+  },
+  "componentManagement": {
+    "modal": {
+      "componentLabel": "Component",
+      "componentPlaceholder": "Select component"
     }
   },
   "login": {
