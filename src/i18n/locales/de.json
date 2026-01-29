@@ -706,7 +706,7 @@
     "table": {
       "program": "Programm",
       "batch": "Batch",
-      "component": "Komponente",
+      "module": "Modul",
       "teachers": "Lehrer",
       "venue": "Veranstaltungsort",
       "sessions": "Sitzungen",
@@ -727,14 +727,19 @@
       "programPlaceholder": "Programm auswählen",
       "batchLabel": "Batch",
       "batchPlaceholder": "Batch auswählen",
-      "componentLabel": "Komponente",
-      "componentPlaceholder": "Komponente auswählen",
+      "moduleLabel": "Modul",
+      "modulePlaceholder": "Modul auswählen",
       "venueLabel": "Veranstaltungsort",
       "venuePlaceholder": "Veranstaltungsort eingeben",
       "venueRequired": "Veranstaltungsort ist erforderlich",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Planungsbeschreibung oder zusätzliche Notizen eingeben...",
       "sessionsLabel": "Sitzungen",
       "addSession": "Sitzung hinzufügen",
       "sessionLabel": "Sitzung",
+      "sessionNameLabel": "Sitzungsname",
+      "sessionNamePlaceholder": "Sitzungsname eingeben",
+      "sessionNameRequired": "Sitzungsname ist erforderlich",
       "dateLabel": "Datum",
       "timeFromLabel": "Zeit von",
       "timeTillLabel": "Zeit bis",
@@ -743,12 +748,25 @@
       "dateRequired": "Datum ist erforderlich",
       "startTimeRequired": "Startzeit ist erforderlich",
       "endTimeRequired": "Endzeit ist erforderlich"
+    },
+    "view": {
+      "moduleLabel": "Modul",
+      "programLabel": "Programm",
+      "batchLabel": "Batch",
+      "descriptionLabel": "Beschreibung",
+      "sessionLabel": "Sitzung",
+      "sessionNameLabel": "Sitzungsname",
+      "dateLabel": "Datum",
+      "timeFromLabel": "Zeit von",
+      "timeTillLabel": "Zeit bis",
+      "teachersLabel": "Lehrer",
+      "venueLabel": "Veranstaltungsort"
     }
   },
-  "componentManagement": {
+  "moduleManagement": {
     "modal": {
-      "componentLabel": "Komponente",
-      "componentPlaceholder": "Komponente auswählen"
+      "moduleLabel": "Modul",
+      "modulePlaceholder": "Modul auswählen"
     }
   },
   "login": {

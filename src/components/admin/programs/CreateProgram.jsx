@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
@@ -12,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   useGetAllCountries,
   useGetAllCities,
@@ -154,16 +154,26 @@ const CreateProgram = ({ open, onClose, programData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md max-h-[90vh] flex flex-col">
         <div className="p-6 border-b dark:border-white/20">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {isEdit
-              ? t("programManagement.modal.editTitle")
-              : t("programManagement.modal.createTitle")}
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-white/70">
-            {isEdit
-              ? t("programManagement.modal.editSubtitle")
-              : t("programManagement.modal.createSubtitle")}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {isEdit
+                  ? t("programManagement.modal.editTitle")
+                  : t("programManagement.modal.createTitle")}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-white/70">
+                {isEdit
+                  ? t("programManagement.modal.editSubtitle")
+                  : t("programManagement.modal.createSubtitle")}
+              </p>
+            </div>
+            <button 
+              onClick={handleClose}
+              className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="overflow-y-auto flex-1 p-6">

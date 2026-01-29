@@ -706,7 +706,7 @@
     "table": {
       "program": "Programme",
       "batch": "Lot",
-      "component": "Composant",
+      "module": "Module",
       "teachers": "Enseignants",
       "venue": "Lieu",
       "sessions": "Sessions",
@@ -727,14 +727,19 @@
       "programPlaceholder": "Sélectionnez un programme",
       "batchLabel": "Lot",
       "batchPlaceholder": "Sélectionnez un lot",
-      "componentLabel": "Composant",
-      "componentPlaceholder": "Sélectionnez un composant",
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Sélectionnez un module",
       "venueLabel": "Lieu",
       "venuePlaceholder": "Entrez le nom du lieu",
       "venueRequired": "Le lieu est requis",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez la description de la planification ou des notes supplémentaires...",
       "sessionsLabel": "Sessions",
       "addSession": "Ajouter une session",
       "sessionLabel": "Session",
+      "sessionNameLabel": "Nom de la session",
+      "sessionNamePlaceholder": "Entrez le nom de la session",
+      "sessionNameRequired": "Le nom de la session est requis",
       "dateLabel": "Date",
       "timeFromLabel": "Heure de début",
       "timeTillLabel": "Heure de fin",
@@ -743,12 +748,25 @@
       "dateRequired": "La date est requise",
       "startTimeRequired": "L'heure de début est requise",
       "endTimeRequired": "L'heure de fin est requise"
+    },
+    "view": {
+      "moduleLabel": "Module",
+      "programLabel": "Programme",
+      "batchLabel": "Lot",
+      "descriptionLabel": "Description",
+      "sessionLabel": "Session",
+      "sessionNameLabel": "Nom de la session",
+      "dateLabel": "Date",
+      "timeFromLabel": "Heure de début",
+      "timeTillLabel": "Heure de fin",
+      "teachersLabel": "Enseignants",
+      "venueLabel": "Lieu"
     }
   },
-  "componentManagement": {
+  "moduleManagement": {
     "modal": {
-      "componentLabel": "Composant",
-      "componentPlaceholder": "Sélectionnez un composant"
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Sélectionnez un module"
     }
   },
   "login": {

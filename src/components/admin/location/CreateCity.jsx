@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateCity, useUpdateCity } from "@/store/useCityStore";
@@ -82,16 +83,26 @@ const CreateCity = ({ open, onClose, cityData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-96 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {isEdit
-            ? t("cityManagement.modal.editTitle")
-            : t("cityManagement.modal.createTitle")}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-white/70 mb-6">
-          {isEdit
-            ? t("cityManagement.modal.editSubtitle")
-            : t("cityManagement.modal.createSubtitle")}
-        </p>
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              {isEdit
+                ? t("cityManagement.modal.editTitle")
+                : t("cityManagement.modal.createTitle")}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-white/70">
+              {isEdit
+                ? t("cityManagement.modal.editSubtitle")
+                : t("cityManagement.modal.createSubtitle")}
+            </p>
+          </div>
+          <button 
+            onClick={handleClose}
+            className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FormField

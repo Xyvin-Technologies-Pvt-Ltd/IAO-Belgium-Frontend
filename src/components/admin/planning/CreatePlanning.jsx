@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
@@ -7,6 +8,7 @@ import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { X, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useCreatePlanning, useUpdatePlanning } from "@/store/usePlanningStore";
@@ -16,7 +18,9 @@ import {
   useGetAllPrograms,
   useGetUsers,
 } from "@/store/useDropdownStore";
+import { planningSchema } from "@/validations/admin";
 import moment from "moment";
+
 const CreatePlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
 
@@ -34,14 +38,17 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     control,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(planningSchema),
     defaultValues: {
       program: "",
       batch: "",
       component: "",
       venue: "",
+      description: "",
       teachers: [],
       sessions: [
         {
+          name: "",
           session_date: "",
           start_time: "",
           end_time: "",
@@ -106,9 +113,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       batch: "",
       component: "",
       venue: "",
+      description: "",
       teachers: [],
       sessions: [
         {
+          name: "",
           session_date: "",
           start_time: "",
           end_time: "",
@@ -131,9 +140,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       setValue("batch", planningData.batch?._id || "");
       setValue("component", planningData.component?._id || "");
       setValue("venue", planningData.venue || "");
+      setValue("description", planningData.description || "");
 
       if (planningData.sessions && planningData.sessions.length > 0) {
         const formattedSessions = planningData.sessions.map((session) => ({
+          name: session.name || "",
           session_date: session.session_date
             ? moment(session.session_date).format("YYYY-MM-DD")
             : "",
@@ -160,30 +171,14 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
   useEffect(() => {
     if (selectedProgram && !isEdit) {
-      setValue("batch", "");
-      setValue("component", "");
+      setValue("batch", "", { shouldValidate: true });
+      setValue("component", "", { shouldValidate: true });
       setBatchSearchTerm("");
       setComponentSearchTerm("");
     }
   }, [selectedProgram, setValue, isEdit]);
 
   const onSubmit = (formData) => {
-    if (!formData.program) {
-      setValue("program", "", { shouldValidate: true });
-      return;
-    }
-    if (!formData.batch) {
-      setValue("batch", "", { shouldValidate: true });
-      return;
-    }
-    if (!formData.component) {
-      setValue("component", "", { shouldValidate: true });
-      return;
-    }
-
-    if (!formData.sessions || formData.sessions.length === 0) {
-      return;
-    }
     const formattedSessions = formData.sessions.map((session) => {
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
 
@@ -197,6 +192,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           }));
 
       return {
+        name: session.name || "",
         session_date: sessionDate,
         start_time: startTime,
         end_time: endTime,
@@ -208,6 +204,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       batch: formData.batch,
       component: formData.component,
       venue: formData.venue,
+      ...(formData.description && { description: formData.description }),
       sessions: formattedSessions,
     };
 
@@ -225,6 +222,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
   const addSession = () => {
     append({
+      name: "",
       session_date: "",
       start_time: "",
       end_time: "",
@@ -246,16 +244,26 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
       <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="p-6 border-b dark:border-white/20">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            {isEdit
-              ? t("planningManagement.modal.editTitle")
-              : t("planningManagement.modal.createTitle")}
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-white/70">
-            {isEdit
-              ? t("planningManagement.modal.editSubtitle")
-              : t("planningManagement.modal.createSubtitle")}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {isEdit
+                  ? t("planningManagement.modal.editTitle")
+                  : t("planningManagement.modal.createTitle")}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-white/70">
+                {isEdit
+                  ? t("planningManagement.modal.editSubtitle")
+                  : t("planningManagement.modal.createSubtitle")}
+              </p>
+            </div>
+            <button 
+              onClick={handleClose}
+              className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="overflow-y-auto flex-1 p-6">
@@ -266,7 +274,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               searchPlaceholder="Search programs..."
               items={programs}
               value={watch("program")}
-              onChange={(value) => setValue("program", value)}
+              onChange={(value) => setValue("program", value, { shouldValidate: true })}
               onSearch={setProgramSearchTerm}
               isLoading={programsLoading}
               error={errors.program?.message}
@@ -279,7 +287,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               searchPlaceholder="Search batches..."
               items={batches}
               value={watch("batch")}
-              onChange={(value) => setValue("batch", value)}
+              onChange={(value) => setValue("batch", value, { shouldValidate: true })}
               onSearch={setBatchSearchTerm}
               isLoading={batchesLoading}
               error={errors.batch?.message}
@@ -288,12 +296,12 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
             />
 
             <SearchableSelect
-              label={t("planningManagement.modal.componentLabel")}
-              placeholder={t("planningManagement.modal.componentPlaceholder")}
+              label={t("planningManagement.modal.moduleLabel")}
+              placeholder={t("planningManagement.modal.modulePlaceholder")}
               searchPlaceholder="Search components..."
               items={components}
               value={watch("component")}
-              onChange={(value) => setValue("component", value)}
+              onChange={(value) => setValue("component", value, { shouldValidate: true })}
               onSearch={setComponentSearchTerm}
               isLoading={componentsLoading}
               error={errors.component?.message}
@@ -306,10 +314,23 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               placeholder={t("planningManagement.modal.venuePlaceholder")}
               error={errors.venue?.message}
               required
-              {...register("venue", {
-                required: t("planningManagement.modal.venueRequired"),
-              })}
+              {...register("venue")}
             />
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("planningManagement.modal.descriptionLabel")}
+              </Label>
+              <Textarea
+                placeholder={t("planningManagement.modal.descriptionPlaceholder")}
+                {...register("description")}
+                className="min-h-[100px]"
+              />
+              {errors.description && (
+                <p className="text-sm text-red-500">{errors.description.message}</p>
+              )}
+            </div>
+            
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold">
@@ -342,13 +363,27 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                   <div className="space-y-4">
                     <div>
                       <Label className="text-sm font-medium">
+                        {t("planningManagement.modal.sessionNameLabel")} *
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder={t("planningManagement.modal.sessionNamePlaceholder")}
+                        {...register(`sessions.${index}.name`)}
+                      />
+                      {errors.sessions?.[index]?.name && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {errors.sessions[index].name.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">
                         {t("planningManagement.modal.dateLabel")} *
                       </Label>
                       <Input
                         type="date"
-                        {...register(`sessions.${index}.session_date`, {
-                          required: t("planningManagement.modal.dateRequired"),
-                        })}
+                        {...register(`sessions.${index}.session_date`)}
                       />
                       {errors.sessions?.[index]?.session_date && (
                         <p className="text-sm text-red-500 mt-1">
@@ -364,11 +399,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                         </Label>
                         <Input
                           type="time"
-                          {...register(`sessions.${index}.start_time`, {
-                            required: t(
-                              "planningManagement.modal.startTimeRequired",
-                            ),
-                          })}
+                          {...register(`sessions.${index}.start_time`)}
                         />
                         {errors.sessions?.[index]?.start_time && (
                           <p className="text-sm text-red-500 mt-1">
@@ -383,11 +414,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                         </Label>
                         <Input
                           type="time"
-                          {...register(`sessions.${index}.end_time`, {
-                            required: t(
-                              "planningManagement.modal.endTimeRequired",
-                            ),
-                          })}
+                          {...register(`sessions.${index}.end_time`)}
                         />
                         {errors.sessions?.[index]?.end_time && (
                           <p className="text-sm text-red-500 mt-1">
@@ -411,6 +438,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                           setValue(
                             `sessions.${index}.teachers`,
                             selectedTeachers,
+                            { shouldValidate: true }
                           )
                         }
                         onSearch={setTeacherSearchTerm}
@@ -442,7 +470,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                 items={teachers}
                 selected={watch("teachers") || []}
                 onChange={(selectedTeachers) =>
-                  setValue("teachers", selectedTeachers)
+                  setValue("teachers", selectedTeachers, { shouldValidate: true })
                 }
                 onSearch={setTeacherSearchTerm}
                 isLoading={teachersLoading}

@@ -37,6 +37,9 @@ const SearchableSelect = ({
   const handleOpenChange = (open) => {
     if (!open) {
       setSearchTerm("");
+      if (onSearch) {
+        onSearch("");
+      }
     }
   };
 
@@ -53,7 +56,7 @@ const SearchableSelect = ({
       )}
 
       <Select
-        key={value || "empty"}
+        key={`${value || "empty"}-${items.length}`}
         value={value || ""}
         onValueChange={onChange}
         onOpenChange={handleOpenChange}

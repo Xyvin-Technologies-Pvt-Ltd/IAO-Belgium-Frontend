@@ -706,7 +706,7 @@
     "table": {
       "program": "Programma",
       "batch": "Batch",
-      "component": "Component",
+      "module": "Module",
       "teachers": "Docenten",
       "venue": "Locatie",
       "sessions": "Sessies",
@@ -727,14 +727,19 @@
       "programPlaceholder": "Selecteer programma",
       "batchLabel": "Batch",
       "batchPlaceholder": "Selecteer batch",
-      "componentLabel": "Component",
-      "componentPlaceholder": "Selecteer component",
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Selecteer module",
       "venueLabel": "Locatie",
       "venuePlaceholder": "Voer locatienaam in",
       "venueRequired": "Locatie is verplicht",
+      "descriptionLabel": "Beschrijving",
+      "descriptionPlaceholder": "Voer planningsbeschrijving of aanvullende notities in...",
       "sessionsLabel": "Sessies",
       "addSession": "Sessie toevoegen",
       "sessionLabel": "Sessie",
+      "sessionNameLabel": "Sessienaam",
+      "sessionNamePlaceholder": "Voer sessienaam in",
+      "sessionNameRequired": "Sessienaam is verplicht",
       "dateLabel": "Datum",
       "timeFromLabel": "Tijd van",
       "timeTillLabel": "Tijd tot",
@@ -743,12 +748,25 @@
       "dateRequired": "Datum is verplicht",
       "startTimeRequired": "Starttijd is verplicht",
       "endTimeRequired": "Eindtijd is verplicht"
+    },
+    "view": {
+      "moduleLabel": "Module",
+      "programLabel": "Programma",
+      "batchLabel": "Batch",
+      "descriptionLabel": "Beschrijving",
+      "sessionLabel": "Sessie",
+      "sessionNameLabel": "Sessienaam",
+      "dateLabel": "Datum",
+      "timeFromLabel": "Tijd van",
+      "timeTillLabel": "Tijd tot",
+      "teachersLabel": "Docenten",
+      "venueLabel": "Locatie"
     }
   },
-  "componentManagement": {
+  "moduleManagement": {
     "modal": {
-      "componentLabel": "Component",
-      "componentPlaceholder": "Selecteer component"
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Selecteer module"
     }
   },
   "login": {

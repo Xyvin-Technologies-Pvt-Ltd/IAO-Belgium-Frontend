@@ -707,7 +707,7 @@
     "table": {
       "program": "Program",
       "batch": "Batch",
-      "component": "Component",
+      "module": "Module",
       "teachers": "Teachers",
       "venue": "Venue",
       "sessions": "Sessions",
@@ -728,14 +728,19 @@
       "programPlaceholder": "Select program",
       "batchLabel": "Batch",
       "batchPlaceholder": "Select batch",
-      "componentLabel": "Component",
-      "componentPlaceholder": "Select component",
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Select module",
       "venueLabel": "Venue",
       "venuePlaceholder": "Enter venue name",
       "venueRequired": "Venue is required",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter planning description or additional notes...",
       "sessionsLabel": "Sessions",
       "addSession": "Add Session",
       "sessionLabel": "Session",
+      "sessionNameLabel": "Session Name",
+      "sessionNamePlaceholder": "Enter session name",
+      "sessionNameRequired": "Session name is required",
       "dateLabel": "Date",
       "timeFromLabel": "Time from",
       "timeTillLabel": "Time till",
@@ -744,12 +749,25 @@
       "dateRequired": "Date is required",
       "startTimeRequired": "Start time is required",
       "endTimeRequired": "End time is required"
+    },
+    "view": {
+      "moduleLabel": "Module",
+      "programLabel": "Program",
+      "batchLabel": "Batch",
+      "descriptionLabel": "Description",
+      "sessionLabel": "Session",
+      "sessionNameLabel": "Session Name",
+      "dateLabel": "Date",
+      "timeFromLabel": "Time from",
+      "timeTillLabel": "Time till",
+      "teachersLabel": "Teachers",
+      "venueLabel": "Venue"
     }
   },
-  "componentManagement": {
+  "moduleManagement": {
     "modal": {
-      "componentLabel": "Component",
-      "componentPlaceholder": "Select component"
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Select module"
     }
   },
   "login": {

@@ -7,3 +7,4 @@ export { roleSchema } from "./role.validation";
 export { academicSchema } from "./academic.validation";
 export { teacherSchema } from "./teacher.validation";
 export { componentSchema } from "./component.validation";
+export { planningSchema } from "./planning.validation";

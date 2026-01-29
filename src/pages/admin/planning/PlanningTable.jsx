@@ -20,6 +20,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useDeletePlanning, useGetPlanning } from "@/store/usePlanningStore";
 import CreatePlanning from "@/components/admin/planning/CreatePlanning";
+import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 
 const PlanningTable = () => {
@@ -29,7 +30,9 @@ const PlanningTable = () => {
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedPlanning, setSelectedPlanning] = useState(null);
+  const [viewPlanning, setViewPlanning] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
@@ -58,7 +61,8 @@ const PlanningTable = () => {
           if (teacher && teacher._id) {
             teacherMap.set(teacher._id, {
               _id: teacher._id,
-              name: `${teacher.first_name} ${teacher.last_name}`.trim()
+              name: `${teacher.first_name} ${teacher.last_name}`.trim(),
+              status: teacherObj.status || 'pending' // Default to pending if no status
             });
           }
         });
@@ -66,6 +70,19 @@ const PlanningTable = () => {
     });
     
     return Array.from(teacherMap.values());
+  };
+
+  // Helper function to get badge variant based on status
+  const getBadgeVariant = (status) => {
+    switch (status) {
+      case 'accepted':
+        return 'default'; // Green background
+      case 'rejected':
+        return 'destructive'; // Red background
+      case 'pending':
+      default:
+        return 'secondary'; // Gray background
+    }
   };
 
   // Helper function to render teacher chips
@@ -78,7 +95,7 @@ const PlanningTable = () => {
     
     if (teachers.length === 1) {
       return (
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant={getBadgeVariant(teachers[0].status)} className="text-xs">
           {teachers[0].name}
         </Badge>
       );
@@ -88,7 +105,7 @@ const PlanningTable = () => {
       return (
         <div className="flex flex-wrap gap-1">
           {teachers.map(teacher => (
-            <Badge key={teacher._id} variant="secondary" className="text-xs">
+            <Badge key={teacher._id} variant={getBadgeVariant(teacher.status)} className="text-xs">
               {teacher.name}
             </Badge>
           ))}
@@ -99,7 +116,7 @@ const PlanningTable = () => {
     // For 3 or more teachers, show first teacher + count
     return (
       <div className="flex flex-wrap gap-1">
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant={getBadgeVariant(teachers[0].status)} className="text-xs">
           {teachers[0].name}
         </Badge>
         <Badge variant="outline" className="text-xs">
@@ -117,6 +134,11 @@ const PlanningTable = () => {
   const handleOpenEdit = (plan) => {
     setSelectedPlanning(plan);
     setIsModalOpen(true);
+  };
+
+  const handleOpenView = (plan) => {
+    setViewPlanning(plan);
+    setIsViewModalOpen(true);
   };
 
   const handleRowDeleteClick = (id) => {
@@ -152,7 +174,7 @@ const PlanningTable = () => {
           <TableRow>
             <TableHead>{t("planningManagement.table.program")}</TableHead>
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
-            <TableHead>{t("planningManagement.table.component")}</TableHead>
+            <TableHead>{t("planningManagement.table.module")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
             <TableHead>{t("planningManagement.table.action")}</TableHead>
@@ -175,7 +197,11 @@ const PlanningTable = () => {
             </TableRow>
           ) : plannings?.length > 0 ? (
             plannings?.map((i) => (
-              <TableRow key={i._id}>
+              <TableRow 
+                key={i._id} 
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => handleOpenView(i)}
+              >
                 <TableCell>{i?.component?.program?.name}</TableCell>
                 <TableCell
                   className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
@@ -235,6 +261,12 @@ const PlanningTable = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         planningData={selectedPlanning}
+      />
+
+      <ViewPlanning
+        open={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        planningData={viewPlanning}
       />
 
       <DeleteConfirm

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -180,13 +181,23 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl rounded-xl bg-white shadow-lg max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold">
-            {isEdit
-              ? t("teacherManagement.modal.editTitle")
-              : t("teacherManagement.modal.createTitle")}
-          </h2>
+      <div className="w-full max-w-2xl rounded-xl bg-white dark:bg-black border dark:border-white/20 shadow-lg max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b dark:border-white/20">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {isEdit
+                  ? t("teacherManagement.modal.editTitle")
+                  : t("teacherManagement.modal.createTitle")}
+              </h2>
+            </div>
+            <button 
+              onClick={handleClose}
+              className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
