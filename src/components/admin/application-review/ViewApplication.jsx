@@ -16,14 +16,14 @@ const ViewApplication = ({ open, onClose, application }) => {
   });
   
   const updateApplicationMutation = useUpdateApplication();
-
   useEffect(() => {
     if (open && application) {
       setRequestAdditionalInfo(false);
-      setRemarks("");
+      setRemarks(application.remarks || "");
+      
       setDocumentFlags({
-        id_card: false,
-        qualification_certificate: false
+        id_card: application.id_card?.flag || false,
+        qualification_certificate: application.qualification_certificate?.flag || false
       });
     }
   }, [open, application?._id]);
@@ -44,12 +44,10 @@ const ViewApplication = ({ open, onClose, application }) => {
       status,
     };
 
-    // Add remarks if provided
     if (remarks.trim()) {
       updateData.remarks = remarks.trim();
     }
 
-    // Add document flags only if they are true
     if (application.id_card && documentFlags.id_card) {
       updateData.id_card = { flag: true };
     }
@@ -62,14 +60,9 @@ const ViewApplication = ({ open, onClose, application }) => {
       data: updateData
     }, {
       onSuccess: () => {
-        // Reset state before closing
         setRequestAdditionalInfo(false);
         setRemarks("");
-        setDocumentFlags({
-          id_card: false,
-          qualification_certificate: false
-        });
-        onClose(); // Close modal on success
+        onClose(); 
       }
     });
   };
@@ -94,6 +87,9 @@ const ViewApplication = ({ open, onClose, application }) => {
                 </h2>
                 <span className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
                   application?.status === 'pending' ? 'bg-[#DBA91C]' :
+                  application?.status === 'drafted' ? 'bg-gray-500' :
+                  application?.status === 'waitlisted' ? 'bg-blue-500' :
+                  application?.status === 'resubmitted' ? 'bg-orange-500' :
                   application?.status === 'approved' ? 'bg-green-500' :
                   application?.status === 'rejected' ? 'bg-red-500' :
                   'bg-gray-500'
@@ -109,9 +105,10 @@ const ViewApplication = ({ open, onClose, application }) => {
             // Reset state when manually closing
             setRequestAdditionalInfo(false);
             setRemarks("");
+            // Reset flags to original values from application data
             setDocumentFlags({
-              id_card: false,
-              qualification_certificate: false
+              id_card: application?.id_card?.flag || false,
+              qualification_certificate: application?.qualification_certificate?.flag || false
             });
             onClose();
           }}>
