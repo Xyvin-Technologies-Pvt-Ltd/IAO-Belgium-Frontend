@@ -118,14 +118,9 @@ const CreateComponent = ({
     const files = Array.from(event.target.files);
     const resourceName = watch("resource_name");
 
-    if (!resourceName) {
-      toast.error("Please provide a name for the resource.");
-      return;
-    }
-
     const newFiles = files.map((file) => ({
       file,
-      name: resourceName,
+      name: resourceName || file.name.split('.')[0], // Use file name without extension if no resource name provided
       originalFileName: file.name,
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       url: `https://example.com/uploads/${Date.now()}_${file.name}`, // mock url
@@ -142,16 +137,32 @@ const CreateComponent = ({
     );
 
     setValue("resource_name", "");
+    // Clear the file input after successful upload
+    event.target.value = "";
   };
 
   const addLinkResource = () => {
     const resourceName = watch("resource_name");
     const resourceUrl = watch("resource_url");
 
-    if (!resourceName || !resourceUrl) return;
+    if (!resourceUrl) return;
+
+    // Generate name from URL if no resource name provided
+    const generatedName = resourceName || (() => {
+      try {
+        const url = new URL(resourceUrl);
+        const pathname = url.pathname;
+        const filename = pathname.split('/').pop() || url.hostname;
+        // Remove file extension if present
+        return filename.split('.')[0] || url.hostname;
+      } catch {
+        // If URL parsing fails, use the URL itself (truncated)
+        return resourceUrl.length > 30 ? resourceUrl.substring(0, 30) + '...' : resourceUrl;
+      }
+    })();
 
     const newResource = {
-      name: resourceName,
+      name: generatedName,
       url: resourceUrl,
       size: "—",
     };
