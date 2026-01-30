@@ -630,20 +630,20 @@
     "cards": {
       "programName": "Programmname",
       "duration": "Dauer",
-      "noOfComponents": "Anzahl Komponenten",
+      "noOfModules": "Anzahl Module",
       "registrationFee": "Anmeldegebühr",
       "years": "Jahre",
       "free": "Kostenlos"
     },
     "tabs": {
-      "learningModules": "Lernmodule",
-      "applications": "Anwendungen",
-      "resources": "Ressourcen"
+      "learningModules": "Lernmodul",
+      "applications": "Angewandte Berufspraxis(APP)",
+      "resources": "Forschung"
     },
     "emptyState": {
-      "title": "Noch keine Programm Komponenten hinzugefügt",
+      "title": "Noch keine Programm Module hinzugefügt",
       "subtitle": "Beginnen Sie mit dem Hinzufügen von Modulen, Apps, Ressourcen oder Prüfungen, um dieses Programm effektiv aufzubauen und zu verwalten.",
-      "createButton": "Programm Komponente Erstellen"
+      "createButton": "Programm Modul Erstellen"
     },
     "loading": "Programm Details laden...",
     "loadFailed": "Laden der Programm Details fehlgeschlagen"
@@ -717,6 +717,13 @@
     },
     "messages": {
       "loadFailed": "Laden der Planungen fehlgeschlagen"
+    },
+    "teacher": {
+      "language": "Sprache",
+      "location": "Standort",
+      "actions": "Aktionen",
+      "accept": "Akzeptieren",
+      "reject": "Ablehnen"
     },
     "modal": {
       "createTitle": "Eine neue Planung erstellen",

@@ -72,11 +72,11 @@ const ViewApplication = ({ open, onClose, application }) => {
       <div className="bg-white dark:bg-black w-full max-w-4xl rounded-xl shadow-lg overflow-hidden border dark:border-white/20">
         <div className="flex items-start justify-between p-6 border-b dark:border-white/20">
           <div className="flex items-start gap-4">
-            <img
-              src="https://i.pravatar.cc/100?img=12"
-              alt="Applicant"
-              className="w-16 h-16 rounded-full object-cover"
-            />
+            <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl">
+              {application?.user?.first_name 
+                ? application.user.first_name.charAt(0).toUpperCase()
+                : application?.user?.email?.charAt(0).toUpperCase() || '?'}
+            </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">

@@ -28,7 +28,14 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
 
-const CreateComponent = ({ open, onClose, componentData, programId, preselectedType, onComponentCreated }) => {
+const CreateComponent = ({
+  open,
+  onClose,
+  componentData,
+  programId,
+  preselectedType,
+  onComponentCreated,
+}) => {
   const { t } = useTranslation();
   const isEdit = !!componentData;
 
@@ -71,9 +78,9 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
   const updateComponent = useUpdateComponent();
 
   const componentTypes = [
-    { value: "module", label: "Module Component" },
-    { value: "app", label: "APP Component" },
-    { value: "resource", label: "Resource Component" },
+    { value: "module", label: "Learning Module" },
+    { value: "app", label: "Applied Professional Practice(APP)" },
+    { value: "resource", label: "Research" },
     // { value: "exam", label: "Exam Component" },
   ];
 
@@ -112,7 +119,7 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
     const resourceName = watch("resource_name");
 
     if (!resourceName) {
-        toast.error("Please provide a name for the resource.");
+      toast.error("Please provide a name for the resource.");
       return;
     }
 
@@ -180,14 +187,14 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
     if (!componentData || !open) return;
 
     const componentType = componentData.type || "";
-    
-    const formattedDeadline = componentData.submission_deadline 
-      ? moment(componentData.submission_deadline).format('YYYY-MM-DD')
+
+    const formattedDeadline = componentData.submission_deadline
+      ? moment(componentData.submission_deadline).format("YYYY-MM-DD")
       : "";
-    
+
     // Handle submissions object format
     const submissions = componentData.submissions || {};
-    
+
     const formData = {
       type: componentType,
       name: componentData.name || "",
@@ -205,7 +212,7 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
       resource_name: "",
       resource_url: "",
     };
-    
+
     reset(formData);
     setSelectedType(componentType);
 
@@ -224,12 +231,19 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
     setSelectedType(watchedType);
   }, [watchedType]);
 
+  useEffect(() => {
+    if (preselectedType && !isEdit) {
+      setValue("type", preselectedType);
+      setSelectedType(preselectedType);
+    }
+  }, [preselectedType, isEdit, setValue]);
+
   const onSubmit = (data) => {
     const payload = {
       type: data.type,
       name: data.name,
       year: data.year,
-      program: programId, // Add program ID to payload
+      program: programId,
       files: uploadedFiles.map((f) => ({
         name: f.name,
         url: f.url,
@@ -243,7 +257,9 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
 
     if (data.type === "app") {
       payload.submission_deadline = data.submission_deadline;
-      payload.instruction = data.instruction;
+      if (data.instruction) {
+        payload.instruction = data.instruction;
+      }
       payload.submissions = data.submissions;
     }
 
@@ -265,24 +281,19 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border rounded-xl shadow-lg w-xl max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold">
-          {isEdit ? "Edit Component" : "Create Component"}
+          {isEdit ? "Edit Module" : "Create Module"}
         </h2>
-        <p className="text-sm text-muted-foreground mb-6">
-          {isEdit ? "Update component details" : "Create a new component"}
-        </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           <div className="space-y-2">
-            <Label>Component Type *</Label>
+            <Label>Module Type *</Label>
             <Select
-              key={watchedType || 'empty'}
               value={watchedType || ""}
               onValueChange={(v) => setValue("type", v)}
               disabled={isEdit}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select component type" />
+                <SelectValue placeholder="Select module type" />
               </SelectTrigger>
               <SelectContent>
                 {componentTypes.map((type) => (
@@ -297,20 +308,34 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
             )}
           </div>
           <FormField
-            label="Component Name"
-            placeholder="Enter component name"
+            label="Module Name"
+            placeholder="Enter module name"
             error={errors.name?.message}
             required
             {...register("name")}
           />
 
-          <FormField
-            label="In which year the component belongs"
-            type="number"
-            error={errors.year?.message}
-            required
-            {...register("year")}
-          />
+          <div className="space-y-2">
+            <Label>In which year the module belongs *</Label>
+            <Select
+              value={watch("year")?.toString() || ""}
+              onValueChange={(v) => setValue("year", parseInt(v))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select year" />
+              </SelectTrigger>
+              <SelectContent>
+                {[1, 2, 3, 4, 5].map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    Year {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.year && (
+              <p className="text-sm text-destructive">{errors.year.message}</p>
+            )}
+          </div>
 
           {selectedType === "module" && (
             <FormField
@@ -334,7 +359,7 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
               />
 
               <div className="space-y-2">
-                <Label>Instructions *</Label>
+                <Label>Instructions</Label>
                 <Textarea
                   placeholder="Enter instructions"
                   className={cn(errors.instruction && "border-destructive")}
@@ -428,10 +453,12 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
                       className="absolute inset-0 z-10 cursor-pointer opacity-0"
                     />
 
-                    <div className={cn(
-                      "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                      "bg-white dark:text-white flex items-center justify-between"
-                    )}>
+                    <div
+                      className={cn(
+                        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                        "bg-white dark:text-white flex items-center justify-between",
+                      )}
+                    >
                       <span className="text-muted-foreground">Upload</span>
                       <Cloud className="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -443,10 +470,15 @@ const CreateComponent = ({ open, onClose, componentData, programId, preselectedT
               type="button"
               variant="link"
               className="px-0"
-              onClick={resourceType === "link" ? addLinkResource : () => {
-                const fileInput = document.querySelector('input[type="file"]');
-                fileInput?.click();
-              }}
+              onClick={
+                resourceType === "link"
+                  ? addLinkResource
+                  : () => {
+                      const fileInput =
+                        document.querySelector('input[type="file"]');
+                      fileInput?.click();
+                    }
+              }
             >
               + Add
             </Button>

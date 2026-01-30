@@ -630,20 +630,20 @@
     "cards": {
       "programName": "Nom du programme",
       "duration": "Durée",
-      "noOfComponents": "Nombre de composants",
+      "noOfModules": "Nombre de modules",
       "registrationFee": "Frais d'inscription",
       "years": "années",
       "free": "Gratuit"
     },
     "tabs": {
-      "learningModules": "Modules d'apprentissage",
-      "applications": "Applications",
-      "resources": "Ressources"
+      "learningModules": "Module d'apprentissage",
+      "applications": "Pratique professionnelle appliquée(APP)",
+      "resources": "Recherche"
     },
     "emptyState": {
-      "title": "Aucun composant de programme ajouté",
+      "title": "Aucun module de programme ajouté",
       "subtitle": "Commencez par ajouter des modules, des applications, des ressources ou des examens pour construire et gérer ce programme efficacement.",
-      "createButton": "Créer un composant de programme"
+      "createButton": "Créer un module de programme"
     },
     "loading": "Chargement des détails du programme...",
     "loadFailed": "Échec du chargement des détails du programme"
@@ -717,6 +717,13 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des planifications"
+    },
+    "teacher": {
+      "language": "Langue",
+      "location": "Emplacement",
+      "actions": "Actions",
+      "accept": "Accepter",
+      "reject": "Rejeter"
     },
     "modal": {
       "createTitle": "Créer une nouvelle planification",

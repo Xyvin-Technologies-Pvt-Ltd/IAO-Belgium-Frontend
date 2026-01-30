@@ -81,7 +81,7 @@ export const useDeleteProgram = () => {
   return useMutation({
     mutationFn: deleteProgram,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["countries"] });
+      queryClient.invalidateQueries({ queryKey: ["programs"] });
       toast.success(response?.message || "Program deleted successfully!");
     },
     onError: (error) => {

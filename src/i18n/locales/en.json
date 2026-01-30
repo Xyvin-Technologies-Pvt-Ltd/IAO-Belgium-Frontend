@@ -631,20 +631,20 @@
     "cards": {
       "programName": "Program Name",
       "duration": "Duration",
-      "noOfComponents": "No of Components",
+      "noOfModules": "No of Modules",
       "registrationFee": "Registration Fee",
       "years": "years",
       "free": "Free"
     },
     "tabs": {
-      "learningModules": "Learning Modules",
-      "applications": "Applications",
-      "resources": "Resources"
+      "learningModules": "Learning Module",
+      "applications": "Applied Professional Practice(APP)",
+      "resources": "Research"
     },
     "emptyState": {
-      "title": "No Program Components Added Yet",
+      "title": "No Program Modules Added Yet",
       "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this program effectively.",
-      "createButton": "Create Program Component"
+      "createButton": "Create Program Module"
     },
     "loading": "Loading program details...",
     "loadFailed": "Failed to load program details"
@@ -718,6 +718,13 @@
     },
     "messages": {
       "loadFailed": "Failed to load plannings"
+    },
+    "teacher": {
+      "language": "Language",
+      "location": "Location",
+      "actions": "Actions",
+      "accept": "Accept",
+      "reject": "Reject"
     },
     "modal": {
       "createTitle": "Create a new Planning",

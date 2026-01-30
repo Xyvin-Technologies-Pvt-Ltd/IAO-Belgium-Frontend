@@ -6,118 +6,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
-import RowActionMenu from "@/components/ui/table/RowActionMenu";
-import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useDeleteProgram, useGetPrograms } from "@/store/useProgramStore";
+import { useGetPlanningByTeacher } from "@/store/usePlanningStore";
+import moment from "moment";
 
 const ListView = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState([]);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [deleteIds, setDeleteIds] = useState([]);
 
-  const { data, isLoading, error, refetch } = useGetPrograms({
+  const { data, isLoading, error, refetch } = useGetPlanningByTeacher({
     page: page,
     limit: rowsPerPage,
+    status: "accepted",
   });
-  const { mutateAsync: deleteCourse, isLoading: isDeleting } =
-    useDeleteProgram();
 
-  const schedules = data?.data || [];
+  const sessions = data?.data || [];
   const totalRows = data?.total_count || 0;
-
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(schedules?.map((p) => p._id));
-    } else {
-      setSelected([]);
-    }
-  };
-
-  const handleBulkDeleteClick = () => {
-    if (selected.length === 0) {
-      toast.error("Please select at least one schedule");
-      return;
-    }
-    setDeleteIds(selected);
-    setOpenDelete(true);
-  };
-
-  const handleRowDeleteClick = (id) => {
-    setDeleteIds([id]);
-    setOpenDelete(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    try {
-      if (deleteIds.length > 1) {
-        await Promise.all(deleteIds.map((id) => deleteCourse(id)));
-        toast.success("Selected schedules deleted successfully");
-      } else {
-        await deleteCourse(deleteIds[0]);
-        toast.success("Schedule deleted successfully");
-      }
-    } catch (e) {
-      toast.error(e.message || "Something went wrong");
-    } finally {
-      setSelected([]);
-      setDeleteIds([]);
-      setOpenDelete(false);
-    }
-  };
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 w-full">
-          {selected.length > 0 && (
-            <Button variant="destructive" onClick={handleBulkDeleteClick}>
-              <Trash2 size={16} className="mr-1" />
-              Delete
-            </Button>
-          )}
-        </div>
-      </div>
-
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <input
-                type="checkbox"
-                checked={
-                  selected.length === schedules?.length && schedules.length > 0
-                }
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Course ID</TableHead>
-            <TableHead>Course</TableHead>
+            <TableHead>Program UID</TableHead>
+            <TableHead>Program</TableHead>
             <TableHead>Module Name</TableHead>
-            <TableHead>Language</TableHead>
+            <TableHead>Session Name</TableHead>
+            <TableHead>Batch</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Time</TableHead>
             <TableHead>Location</TableHead>
-            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center p-8">
@@ -128,40 +54,36 @@ const ListView = () => {
                 />
               </TableCell>
             </TableRow>
-          ) : schedules?.length > 0 ? (
-            schedules?.map((i) => (
-              <TableRow key={i._id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(i._id)}
-                    onChange={() => handleCheckboxChange(i._id)}
-                  />
+          ) : sessions?.length > 0 ? (
+            sessions?.map((session) => (
+              <TableRow key={session._id}>
+                <TableCell>{session?.program_uid || "N/A"}</TableCell>
+                <TableCell>{session?.program_name || "N/A"}</TableCell>
+                <TableCell>{session?.module_name || "N/A"}</TableCell>
+                <TableCell>{session?.name || "N/A"}</TableCell>
+                <TableCell
+                  className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  title={session?.batch_name}
+                >
+                  {session?.batch_name || "N/A"}
                 </TableCell>
-                <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.description}</TableCell>
-                <TableCell>{i?.duration}</TableCell>
-                <TableCell>{i?.level}</TableCell>
-                <TableCell>{i?.time}</TableCell>
-                <TableCell>{i?.date}</TableCell>
-                <TableCell>{i?.location}</TableCell>
                 <TableCell>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: "Delete",
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {session.session_date
+                    ? moment(session.session_date).format("MMM DD, YYYY")
+                    : "N/A"}
                 </TableCell>
+                <TableCell>
+                  {session.start_time && session.end_time
+                    ? `${moment(session.start_time).format("HH:mm")} - ${moment(session.end_time).format("HH:mm")}`
+                    : "N/A"}
+                </TableCell>
+                <TableCell>{session?.venue || "N/A"}</TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
               <TableCell colSpan={7} className="text-center">
-                No schedules found
+                No accepted sessions found
               </TableCell>
             </TableRow>
           )}
@@ -173,16 +95,6 @@ const ListView = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
-        selected={selected?.length}
-      />
-
-      <DeleteConfirm
-        open={openDelete}
-        onClose={() => setOpenDelete(false)}
-        onConfirm={handleConfirmDelete}
-        count={deleteIds.length}
-        isLoading={isDeleting}
-        data={deleteIds.length > 1 ? "schedules" : "schedule"}
       />
     </div>
   );

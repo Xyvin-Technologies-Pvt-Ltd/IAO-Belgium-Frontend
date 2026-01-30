@@ -9,11 +9,11 @@ const UserCard= ({ student, teacher, isTeacher = false }) => {
   return (
     <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border  space-y-6">
       <div className="flex items-start gap-4 pb-4 border-b border-sidebar-border">
-        <img
-          src="https://i.pravatar.cc/100?img=12"
-          alt={isTeacher ? "Teacher" : "Student"}
-          className="w-16 h-16 rounded-full object-cover"
-        />
+        <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl">
+          {user?.first_name 
+            ? user.first_name.charAt(0).toUpperCase()
+            : user?.email?.charAt(0).toUpperCase() || '?'}
+        </div>
 
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
@@ -24,7 +24,12 @@ const UserCard= ({ student, teacher, isTeacher = false }) => {
                   `Unknown ${isTeacher ? "Teacher" : "Student"}`}
             </h2>
             <span
-              className={`px-1.5 py-0.5 text-xs font-medium rounded-full  bg-[#0A0A0A]/20`}
+              className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
+                user?.status === 'active' ? 'bg-green-500' :
+                user?.status === 'inactive' ? 'bg-gray-500' :
+                user?.status === 'deleted' ? 'bg-red-500' :
+                'bg-gray-500'
+              }`}
             >
               {user?.status?.charAt(0).toUpperCase() +
                 user?.status?.slice(1) || "Active"}

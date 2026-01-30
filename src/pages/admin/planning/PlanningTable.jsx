@@ -61,8 +61,7 @@ const PlanningTable = () => {
           if (teacher && teacher._id) {
             teacherMap.set(teacher._id, {
               _id: teacher._id,
-              name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-              status: teacherObj.status || 'pending' // Default to pending if no status
+              name: `${teacher.first_name} ${teacher.last_name}`.trim()
             });
           }
         });
@@ -70,19 +69,6 @@ const PlanningTable = () => {
     });
     
     return Array.from(teacherMap.values());
-  };
-
-  // Helper function to get badge variant based on status
-  const getBadgeVariant = (status) => {
-    switch (status) {
-      case 'accepted':
-        return 'default'; // Green background
-      case 'rejected':
-        return 'destructive'; // Red background
-      case 'pending':
-      default:
-        return 'secondary'; // Gray background
-    }
   };
 
   // Helper function to render teacher chips
@@ -95,7 +81,7 @@ const PlanningTable = () => {
     
     if (teachers.length === 1) {
       return (
-        <Badge variant={getBadgeVariant(teachers[0].status)} className="text-xs">
+        <Badge variant="secondary" className="text-xs">
           {teachers[0].name}
         </Badge>
       );
@@ -105,7 +91,7 @@ const PlanningTable = () => {
       return (
         <div className="flex flex-wrap gap-1">
           {teachers.map(teacher => (
-            <Badge key={teacher._id} variant={getBadgeVariant(teacher.status)} className="text-xs">
+            <Badge key={teacher._id} variant="secondary" className="text-xs">
               {teacher.name}
             </Badge>
           ))}
@@ -113,10 +99,9 @@ const PlanningTable = () => {
       );
     }
     
-    // For 3 or more teachers, show first teacher + count
     return (
       <div className="flex flex-wrap gap-1">
-        <Badge variant={getBadgeVariant(teachers[0].status)} className="text-xs">
+        <Badge variant="secondary" className="text-xs">
           {teachers[0].name}
         </Badge>
         <Badge variant="outline" className="text-xs">

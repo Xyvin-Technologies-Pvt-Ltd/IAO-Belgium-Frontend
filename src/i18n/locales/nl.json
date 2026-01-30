@@ -630,20 +630,20 @@
     "cards": {
       "programName": "Programmanaam",
       "duration": "Duur",
-      "noOfComponents": "Aantal Componenten",
+      "noOfModules": "Aantal Modules",
       "registrationFee": "Inschrijfgeld",
       "years": "jaren",
       "free": "Gratis"
     },
     "tabs": {
-      "learningModules": "Leermodules",
-      "applications": "Applicaties",
-      "resources": "Bronnen"
+      "learningModules": "Leermodule",
+      "applications": "Toegepaste Beroepspraktijk(APP)",
+      "resources": "Onderzoek"
     },
     "emptyState": {
-      "title": "Nog geen programma componenten toegevoegd",
+      "title": "Nog geen programma modules toegevoegd",
       "subtitle": "Begin met het toevoegen van modules, apps, bronnen of examens om dit programma effectief op te bouwen en te beheren.",
-      "createButton": "Programma Component Aanmaken"
+      "createButton": "Programma Module Aanmaken"
     },
     "loading": "Programma gegevens laden...",
     "loadFailed": "Laden van programma gegevens mislukt"
@@ -717,6 +717,13 @@
     },
     "messages": {
       "loadFailed": "Laden van planningen mislukt"
+    },
+    "teacher": {
+      "language": "Taal",
+      "location": "Locatie",
+      "actions": "Acties",
+      "accept": "Accepteren",
+      "reject": "Afwijzen"
     },
     "modal": {
       "createTitle": "Een nieuwe planning aanmaken",

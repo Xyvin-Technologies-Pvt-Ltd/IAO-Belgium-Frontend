@@ -21,7 +21,7 @@ import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 
-const ResourceModule = ({ programId }) => {
+const ResourceModule = ({ programId, onComponentCreated }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -61,6 +61,12 @@ const ResourceModule = ({ programId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <Button onClick={() => {
+          setSelectedModule(null);
+          setIsModalOpen(true);
+        }}>
+          {t("programDetail.emptyState.createButton")}
+        </Button>
       </div>
 
       <Table>
@@ -138,6 +144,16 @@ const ResourceModule = ({ programId }) => {
         onClose={() => setIsModalOpen(false)}
         componentData={selectedModule}
         programId={programId}
+        preselectedType="resource"
+        onComponentCreated={(componentType) => {
+          setSelectedModule(null);
+          setIsModalOpen(false);
+          refetch();
+          // Call parent callback if provided
+          if (onComponentCreated) {
+            onComponentCreated(componentType);
+          }
+        }}
       />
 
       <ViewComponent

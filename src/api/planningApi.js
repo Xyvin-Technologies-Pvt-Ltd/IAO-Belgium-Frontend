@@ -35,3 +35,26 @@ export const deletePlanning = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getPlanningByTeacher = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/planning/teacher`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateTeacherStatus = async (id, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/planning/session/${id}/teacher-status`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

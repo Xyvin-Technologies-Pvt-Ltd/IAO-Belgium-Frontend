@@ -20,7 +20,8 @@ const ProgramDetail = () => {
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("programActiveTab") || "";
+    const storageKey = `programActiveTab_${id}`;
+    return localStorage.getItem(storageKey) || "";
   });
 
   const { data: program, isLoading, error, refetch } = useGetProgramById(id);
@@ -29,16 +30,13 @@ const ProgramDetail = () => {
     setPreselectedType(componentType);
     setIsModalOpen(true);
   };
-  const handleOpenCreateComponent = () => {
-    setPreselectedType(null);
-    setIsModalOpen(true);
-  };
 
   const handleComponentCreated = (componentType) => {
     // Switch to the tab corresponding to the created component type
-    if (componentType && tabs.some(tab => tab.id === componentType)) {
+    if (componentType && tabs.some((tab) => tab.id === componentType)) {
       setActiveTab(componentType);
-      localStorage.setItem("programActiveTab", componentType);
+      const storageKey = `programActiveTab_${id}`;
+      localStorage.setItem(storageKey, componentType);
     }
     setIsModalOpen(false);
   };
@@ -46,19 +44,18 @@ const ProgramDetail = () => {
   const componentMap = {
     module: {
       label: t("programDetail.tabs.learningModules"),
-      component: () => <LearningModule programId={id} />,
+      component: () => <LearningModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
     app: {
       label: t("programDetail.tabs.applications"),
-      component: () => <AppModule programId={id} />,
+      component: () => <AppModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
     resource: {
       label: t("programDetail.tabs.resources"),
-      component: () => <ResourceModule programId={id} />,
+      component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
   };
 
-  // Generate tabs based on program types
   const tabs =
     program?.data?.types?.length > 0
       ? program.data.types
@@ -66,7 +63,7 @@ const ProgramDetail = () => {
             id: type,
             ...componentMap[type],
           }))
-          .filter((tab) => tab.label) // Filter out any undefined mappings
+          .filter((tab) => tab.label) 
       : [];
 
   // Set default active tab when tabs are available
@@ -74,15 +71,17 @@ const ProgramDetail = () => {
     if (tabs.length > 0 && !activeTab) {
       const defaultTab = tabs[0].id;
       setActiveTab(defaultTab);
-      localStorage.setItem("programActiveTab", defaultTab);
+      const storageKey = `programActiveTab_${id}`;
+      localStorage.setItem(storageKey, defaultTab);
     }
-  }, [tabs.length, activeTab]);
+  }, [tabs.length, activeTab, id]);
 
   useEffect(() => {
     if (activeTab) {
-      localStorage.setItem("programActiveTab", activeTab);
+      const storageKey = `programActiveTab_${id}`;
+      localStorage.setItem(storageKey, activeTab);
     }
-  }, [activeTab]);
+  }, [activeTab, id]);
 
   const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component;
 
@@ -131,6 +130,7 @@ const ProgramDetail = () => {
         <DashboardCard
           title={t("programDetail.cards.programName")}
           value={programData?.name}
+          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}`}
           icon={Layers}
         />
 
@@ -141,11 +141,11 @@ const ProgramDetail = () => {
         />
 
         <DashboardCard
-          title={t("programDetail.cards.noOfComponents")}
+          title={t("programDetail.cards.noOfModules")}
           value={programData?.components_count || 0}
           icon={Layers}
         />
-{/* 
+        {/* 
         <DashboardCard
           title={t("programDetail.cards.registrationFee")}
           value={
@@ -176,11 +176,7 @@ const ProgramDetail = () => {
               ))}
             </nav>
           </div>
-          <div className="flex justify-end">
-            <Button onClick={handleOpenCreateComponent} className="mt-4">
-              {t("programDetail.emptyState.createButton")}
-            </Button>
-          </div>
+
           <div className="mt-6">{ActiveComponent && <ActiveComponent />}</div>
         </>
       )}
@@ -208,6 +204,7 @@ const ProgramDetail = () => {
         onClose={() => setIsModalOpen(false)}
         onComponentCreated={handleComponentCreated}
         programId={id}
+        preselectedType={preselectedType}
       />
     </div>
   );
