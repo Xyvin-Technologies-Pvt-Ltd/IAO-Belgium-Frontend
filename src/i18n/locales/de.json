@@ -260,6 +260,7 @@
     "table": {
       "name": "Name",
       "program": "Programm",
+      "city": "Stadt",
       "registrationFee": "Anmeldegebühr",
       "startDate": "Startdatum",
       "endDate": "Enddatum",
@@ -481,6 +482,7 @@
       "postalCode": "Postleitzahl",
       "city": "Stadt",
       "country": "Land",
+      "paymentStatus": "Zahlungsstatus",
       "status": "Status",
       "action": "Aktion",
       "noApplications": "Keine Bewerbungen gefunden"

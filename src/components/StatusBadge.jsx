@@ -4,7 +4,7 @@ const statusVariants = {
   success: "text-green-600",
   inactive: "text-red-500",
   pending_verification: "text-amber-600",
-  waitlisted: "text-amber-600",
+  waitlisted: "text-blue-600",
   pending: "text-amber-600",
   approved: "text-green-600",
   suspended: "text-gray-500",
@@ -18,6 +18,9 @@ const statusVariants = {
   sended: "text-green-600",
   open: "text-green-600",
   closed: "text-red-500",
+  // Payment statuses
+  paid: "text-green-600",
+  failed: "text-red-600",
   // Ride statuses
   requested: "text-amber-600",
   accepted: "text-blue-600",
@@ -60,6 +63,8 @@ const StatusBadge = ({ status }) => {
     displayText = "Pending";
   } else if (status === "on_ride") {
     displayText = "On Ride";
+  } else if (status === "waitlisted") {
+    displayText = "In Progress";
   } else if (typeof status === "boolean") {
     displayText = status ? "Active" : "Inactive";
   } else {

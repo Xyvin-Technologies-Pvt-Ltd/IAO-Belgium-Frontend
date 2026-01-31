@@ -128,6 +128,7 @@ const Intakes = () => {
           <TableRow>
             <TableHead>{t("intakeManagement.table.name")}</TableHead>
             <TableHead>{t("intakeManagement.table.program")}</TableHead>
+            <TableHead>{t("intakeManagement.table.city")}</TableHead>
             <TableHead>{t("intakeManagement.table.registrationFee")}</TableHead>
             <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
             <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
@@ -140,10 +141,10 @@ const Intakes = () => {
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("intakeManagement.messages.loadFailed")
@@ -162,11 +163,10 @@ const Intakes = () => {
               >
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>
-                  {Array.isArray(i?.program) 
-                    ? i.program.map(p => p.name || p).join(", ") 
-                    : i?.program?.name || "N/A"
+                  {i?.program?.name || "N/A"
                   }
                 </TableCell>
+                <TableCell>{i?.program?.city?.name || "N/A"}</TableCell>
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
@@ -206,7 +206,7 @@ const Intakes = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("intakeManagement.table.noIntakes")}
               </TableCell>
             </TableRow>

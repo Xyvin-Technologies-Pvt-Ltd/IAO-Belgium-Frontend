@@ -260,6 +260,7 @@
     "table": {
       "name": "Naam",
       "program": "Programma",
+      "city": "Stad",
       "registrationFee": "Inschrijfgeld",
       "startDate": "Startdatum",
       "endDate": "Einddatum",
@@ -481,6 +482,7 @@
       "postalCode": "Postcode",
       "city": "Stad",
       "country": "Land",
+      "paymentStatus": "Betalingsstatus",
       "status": "Status",
       "action": "Actie",
       "noApplications": "Geen aanmeldingen gevonden"

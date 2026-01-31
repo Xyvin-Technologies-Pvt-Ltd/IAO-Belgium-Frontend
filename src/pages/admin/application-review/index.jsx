@@ -75,16 +75,17 @@ const ApplicationReview = () => {
             <TableHead>{t("applicationReview.table.postalCode")}</TableHead>
             <TableHead>{t("applicationReview.table.city")}</TableHead>
             <TableHead>{t("applicationReview.table.country")}</TableHead>
+            <TableHead>{t("applicationReview.table.paymentStatus")}</TableHead>
             <TableHead>{t("applicationReview.table.status")}</TableHead>
             <TableHead>{t("applicationReview.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={11} />
+            <TableSkeleton rows={rowsPerPage} columns={12} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={11} className="text-center p-8">
+              <TableCell colSpan={12} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("applicationReview.messages.loadFailed")}
                   onRetry={refetch}
@@ -110,6 +111,7 @@ const ApplicationReview = () => {
                 <TableCell>{i?.user?.postal_code}</TableCell>
                 <TableCell>{i?.user?.city}</TableCell>
                 <TableCell>{i?.user?.country}</TableCell>
+                <TableCell><StatusBadge status={i?.payment_status} /></TableCell>
                 <TableCell><StatusBadge status={i?.status} /></TableCell>
                 <TableCell>
                   <Button
@@ -127,7 +129,7 @@ const ApplicationReview = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={11} className="text-center">
+              <TableCell colSpan={12} className="text-center">
                 {t("applicationReview.table.noApplications")}
               </TableCell>
             </TableRow>

@@ -261,6 +261,7 @@
     "table": {
       "name": "Name",
       "program": "Program",
+      "city": "City",
       "registrationFee": "Registration Fee",
       "startDate": "Start Date",
       "endDate": "End Date",
@@ -482,6 +483,7 @@
       "postalCode": "Postal Code",
       "city": "City",
       "country": "Country",
+      "paymentStatus": "Payment Status",
       "status": "Status",
       "action": "Action",
       "noApplications": "No Applications found"

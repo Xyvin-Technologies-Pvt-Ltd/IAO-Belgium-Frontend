@@ -2,6 +2,7 @@ import { X, Eye, Download, Flag, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import { useState, useEffect } from "react";
 import { useUpdateApplication } from "@/store/useApplication";
 import { useTranslation } from "react-i18next";
@@ -180,11 +181,10 @@ const ViewApplication = ({ open, onClose, application }) => {
             {requestAdditionalInfo && (
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-white/70">{t("applicationReview.modal.remarks")}</label>
-                <Textarea
-                  placeholder={t("applicationReview.modal.remarksPlaceholder")}
-                  rows={4}
+                <RichTextEditor
                   value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
+                  onChange={setRemarks}
+                  placeholder={t("applicationReview.modal.remarksPlaceholder")}
                   className="bg-white dark:bg-white/5"
                 />
               </div>
