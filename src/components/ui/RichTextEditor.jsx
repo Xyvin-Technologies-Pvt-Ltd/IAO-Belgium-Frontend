@@ -26,7 +26,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[80px] outline-none text-base md:text-sm prose prose-sm max-w-none focus:outline-none',
+        class: 'min-h-[80px] outline-none text-base md:text-sm focus:outline-none',
       },
     },
   });
@@ -78,29 +78,49 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
           editor={editor} 
           className="tiptap-editor"
         />
-        {editor.isEmpty && (
-          <div className="absolute top-2 left-3 text-muted-foreground pointer-events-none text-base md:text-sm">
-            {placeholder}
-          </div>
-        )}
       </div>
 
       <style jsx>{`
         .tiptap-editor .ProseMirror {
           outline: none;
+          line-height: 1.5;
+          min-height: 80px;
         }
         .tiptap-editor .ProseMirror p {
           margin: 0.25rem 0;
         }
+        .tiptap-editor .ProseMirror p:first-child {
+          margin-top: 0;
+        }
+        .tiptap-editor .ProseMirror p:last-child {
+          margin-bottom: 0;
+        }
         .tiptap-editor .ProseMirror ul {
           margin: 0.5rem 0;
           padding-left: 1.5rem;
+          list-style-type: disc;
+        }
+        .tiptap-editor .ProseMirror ol {
+          margin: 0.5rem 0;
+          padding-left: 1.5rem;
+          list-style-type: decimal;
         }
         .tiptap-editor .ProseMirror li {
           margin: 0.125rem 0;
+          display: list-item;
+        }
+        .tiptap-editor .ProseMirror li p {
+          margin: 0;
+          display: inline;
         }
         .tiptap-editor .ProseMirror strong {
           font-weight: bold;
+        }
+        .tiptap-editor .ProseMirror ul ul,
+        .tiptap-editor .ProseMirror ol ol,
+        .tiptap-editor .ProseMirror ul ol,
+        .tiptap-editor .ProseMirror ol ul {
+          margin: 0.25rem 0;
         }
       `}</style>
     </div>
