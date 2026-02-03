@@ -28,6 +28,7 @@ const CURRENCIES = [
   { code: "INR", name: "Indian Rupee" },
   { code: "CHF", name: "Swiss Franc" },
   { code: "SEK", name: "Swedish Krona" },
+  { code: "DKK", name: "Danish Krone" },
 ];
 
 const CreateCountry = ({ open, onClose, countryData }) => {

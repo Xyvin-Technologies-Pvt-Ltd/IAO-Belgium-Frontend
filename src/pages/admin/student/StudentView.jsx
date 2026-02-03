@@ -1,12 +1,12 @@
 import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentByApplication } from "@/store/useStudentStore";
+import {  useGetStudentById } from "@/store/useStudentStore";
 import { useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-const StudentDetails = () => {
+const StudentView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
@@ -17,38 +17,18 @@ const StudentDetails = () => {
     isLoading,
     error,
     refetch,
-  } = useGetStudentByApplication(id);
+  } = useGetStudentById(id);
   useEffect(() => {
     if (student?.data) {
       updateBreadcrumbs([
-        {
-          label: "Admission administration",
-          path: "/admin/admission-administration",
-          navigable: false,
-        },
-         {
-          label: "Academics",
-          path: "/admin/admission-administration/academics",
-          navigable: true,
-        },
-        {
-          label: "Intakes",
-          path: `/admin/admission-administration/academics/${student?.data?.academic}`,
-          navigable: true,
-        },
-        {
-          label: "Intakes Details",
-          path: `/admin/admission-administration/academics/intakes/${student?.data?.intake_id}`,
-          navigable: true,
-        },
-        {
-          label: "Batch Details",
-          path: `/admin/admission-administration/academics/intakes/batch/${student?.data?.batch_id}`,
+       {
+          label: "Student Management",
+          path: "/admin/student-management",
           navigable: true,
         },
         {
           label: "Student Details",
-          path: `/admin/admission-administration/academics/intakes/batch/student/${id}`,
+          path: "/admin/student-management",
           navigable: false,
         },
       ]);
@@ -86,4 +66,4 @@ const StudentDetails = () => {
   );
 };
 
-export default StudentDetails;
+export default StudentView;

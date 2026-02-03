@@ -12,13 +12,15 @@ import { getRequiredPermissions } from "@/utils/permissionUtils";
 import AdminDashboard from "@/pages/admin/dashboard/AdminDashboard";
 import IntakeDetails from "@/pages/admin/intake/IntakeDetails";
 import BatchDetails from "@/pages/admin/batch/BatchDetails";
-import StudentDetails from "@/pages/admin/student/StudentDetails";
-import EnrolledStudentDetails from "@/pages/admin/student/EnrolledStudentDetails";
+import StudentDetails from "@/pages/admin/intake/StudentDetails";
+import EnrolledStudentDetails from "@/pages/admin/intake/EnrolledStudentDetails";
 import Academics from "@/pages/admin/academics";
 import TeacherQualification from "@/pages/admin/teacher-qualification";
 import Teachers from "@/pages/admin/teacher";
 import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
+import AllStudents from "@/pages/admin/student";
+import StudentView from "@/pages/admin/student/StudentView";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -73,6 +75,17 @@ export const adminRoutes = [
     component: withPermissionProtection(
       TeacherDetails,
       "/admin/teacher-management",
+    ),
+  },
+   {
+    path: "/admin/student-management",
+    component: withPermissionProtection(AllStudents, "/admin/student-management"),
+  },
+    {
+    path: "/admin/student-management/$id",
+    component: withPermissionProtection(
+      StudentView,
+      "/admin/student-management",
     ),
   },
   {

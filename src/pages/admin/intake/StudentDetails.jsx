@@ -1,12 +1,12 @@
 import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentByApplication } from "@/store/useStudentStore";
+import { useGetStudentByApplication } from "@/store/useIntakeStore";
 import { useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-const EnrolledStudentDetails = () => {
+const StudentDetails = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
@@ -26,7 +26,7 @@ const EnrolledStudentDetails = () => {
           path: "/admin/admission-administration",
           navigable: false,
         },
-        {
+         {
           label: "Academics",
           path: "/admin/admission-administration/academics",
           navigable: true,
@@ -39,6 +39,11 @@ const EnrolledStudentDetails = () => {
         {
           label: "Intakes Details",
           path: `/admin/admission-administration/academics/intakes/${student?.data?.intake_id}`,
+          navigable: true,
+        },
+        {
+          label: "Batch Details",
+          path: `/admin/admission-administration/academics/intakes/batch/${student?.data?.batch_id}`,
           navigable: true,
         },
         {
@@ -81,4 +86,4 @@ const EnrolledStudentDetails = () => {
   );
 };
 
-export default EnrolledStudentDetails;
+export default StudentDetails;

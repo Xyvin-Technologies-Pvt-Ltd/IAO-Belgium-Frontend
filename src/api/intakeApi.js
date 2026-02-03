@@ -61,3 +61,12 @@ export const getEnrolledStudentsByIntake = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getStudentByApplication = async (applicationId) => {
+  try {
+    const response = await axiosInstance.get(`/intake/application/student/${applicationId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  } 
+};

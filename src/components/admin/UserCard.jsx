@@ -107,6 +107,18 @@ const UserCard= ({ student, teacher, isTeacher = false }) => {
                 value={user?.address || "N/A"}
               />
               <InfoItem
+                label={t("studentManagement.modal.country")}
+                value={user?.country || "N/A"}
+              />
+              <InfoItem
+                label={t("studentManagement.modal.city")}
+                value={user?.city || "N/A"}
+              />
+              <InfoItem
+                label={t("studentManagement.modal.postalCode")}
+                value={user?.postal_code || "N/A"}
+              />
+              <InfoItem
                 label={t("studentManagement.modal.studentId")}
                 value={user?.uid || "N/A"}
               />

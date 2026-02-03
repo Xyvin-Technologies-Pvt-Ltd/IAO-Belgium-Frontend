@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const VALID_CURRENCIES = [
-  "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR", "CHF", "SEK"
+  "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR", "CHF", "SEK", "DKK"
 ];
 
 // ISO 3166-1 alpha-2 country codes

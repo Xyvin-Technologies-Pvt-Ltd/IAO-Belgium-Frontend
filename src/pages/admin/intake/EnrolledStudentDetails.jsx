@@ -1,29 +1,49 @@
 import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetTeacherById } from "@/store/useTeacherStore";
+import { useGetStudentByApplication } from "@/store/useIntakeStore";
 import { useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-const TeacherDetails = () => {
+const EnrolledStudentDetails = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
 
-  const { data: teacher, isLoading, error, refetch } = useGetTeacherById(id);
+  const {
+    data: student,
+    isLoading,
+    error,
+    refetch,
+  } = useGetStudentByApplication(id);
   useEffect(() => {
-    if (teacher?.data) {
+    if (student?.data) {
       updateBreadcrumbs([
         {
-          label: "Teacher Management",
-          path: "/admin/teacher-management",
+          label: "Admission administration",
+          path: "/admin/admission-administration",
+          navigable: false,
+        },
+        {
+          label: "Academics",
+          path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Teacher Details",
-          path: "/admin/teacher-management",
+          label: "Intakes",
+          path: `/admin/admission-administration/academics/${student?.data?.academic}`,
+          navigable: true,
+        },
+        {
+          label: "Intakes Details",
+          path: `/admin/admission-administration/academics/intakes/${student?.data?.intake_id}`,
+          navigable: true,
+        },
+        {
+          label: "Student Details",
+          path: `/admin/admission-administration/academics/intakes/batch/student/${id}`,
           navigable: false,
         },
       ]);
@@ -31,7 +51,7 @@ const TeacherDetails = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [teacher?.data, id]);
+  }, [student?.data, id]);
 
   if (isLoading) {
     return (
@@ -51,16 +71,14 @@ const TeacherDetails = () => {
     );
   }
 
-  const teacherData = teacher.data;
-  if (!teacherData) {
-    return null;
-  }
+  const studentData = student?.data;
+  if (!studentData) return null;
 
   return (
     <div className="space-y-6 mt-4">
-      <UserCard teacher={teacherData} isTeacher />
+      <UserCard student={studentData} />
     </div>
   );
 };
 
-export default TeacherDetails;
+export default EnrolledStudentDetails;

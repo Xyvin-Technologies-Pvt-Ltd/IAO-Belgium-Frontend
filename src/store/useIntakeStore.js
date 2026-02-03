@@ -5,6 +5,7 @@ import {
   getEnrolledStudentsByIntake,
   getIntakeById,
   getIntakes,
+  getStudentByApplication,
   updateintake,
 } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -94,5 +95,14 @@ export const useDeleteIntake = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to delete intake");
     },
+  });
+};
+export const useGetStudentByApplication = (applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["student", applicationId],
+    queryFn: () => getStudentByApplication(applicationId),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
