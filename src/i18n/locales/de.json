@@ -122,6 +122,8 @@
     "table": {
       "name": "Name",
       "country": "Land",
+      "times": "Zeiten",
+      "venues": "Veranstaltungsorte",
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
@@ -138,7 +140,12 @@
       "nameLabel": "Stadtname",
       "namePlaceholder": "Stadtname eingeben",
       "countryLabel": "Land",
-      "countryPlaceholder": "Land auswählen"
+      "countryPlaceholder": "Land auswählen",
+      "timeSlotsLabel": "Zeitfenster",
+      "startTimeLabel": "Startzeit",
+      "endTimeLabel": "Endzeit",
+      "venuesLabel": "Veranstaltungsorte",
+      "venueLabel": "Veranstaltungsort"
     }
   },
   "roleManagement": {
@@ -401,6 +408,7 @@
       "country": "Land",
       "city": "Stadt",
       "previousEducation": "Vorherige Ausbildung",
+      "program": "Programm",
       "batch": "Batch",
       "enrolledDate": "Anmeldedatum",
       "status": "Status",
@@ -764,7 +772,13 @@
       "teachersPlaceholder": "Lehrer auswählen...",
       "dateRequired": "Datum ist erforderlich",
       "startTimeRequired": "Startzeit ist erforderlich",
-      "endTimeRequired": "Endzeit ist erforderlich"
+      "endTimeRequired": "Endzeit ist erforderlich",
+      "searchPrograms": "Programme suchen...",
+      "searchBatches": "Batches suchen...",
+      "searchComponents": "Komponenten suchen...",
+      "searchTeachers": "Lehrer suchen...",
+      "preferredVenues": "Bevorzugte Veranstaltungsorte:",
+      "preferredTimes": "Bevorzugte Zeiten:"
     },
     "view": {
       "moduleLabel": "Modul",

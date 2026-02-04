@@ -122,6 +122,8 @@
     "table": {
       "name": "Name",
       "country": "Country",
+      "times": "Times",
+      "venues": "Venues",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
@@ -138,7 +140,12 @@
       "nameLabel": "City Name",
       "namePlaceholder": "Enter city name",
       "countryLabel": "Country",
-      "countryPlaceholder": "Select Country"
+      "countryPlaceholder": "Select Country",
+      "timeSlotsLabel": "Time Slots",
+      "startTimeLabel": "Start Time",
+      "endTimeLabel": "End Time",
+      "venuesLabel": "Venues",
+      "venueLabel": "Venue"
     }
   },
   "roleManagement": {
@@ -402,6 +409,7 @@
       "country": "Country",
       "city": "City",
       "previousEducation": "Previous Education",
+      "program": "Program",
       "batch": "Batch",
       "enrolledDate": "Enrolled Date",
       "status": "Status",
@@ -765,7 +773,13 @@
       "teachersPlaceholder": "Select teachers...",
       "dateRequired": "Date is required",
       "startTimeRequired": "Start time is required",
-      "endTimeRequired": "End time is required"
+      "endTimeRequired": "End time is required",
+      "searchPrograms": "Search programs...",
+      "searchBatches": "Search batches...",
+      "searchComponents": "Search components...",
+      "searchTeachers": "Search teachers...",
+      "preferredVenues": "Preferred Venues:",
+      "preferredTimes": "Preferred Times:"
     },
     "view": {
       "moduleLabel": "Module",

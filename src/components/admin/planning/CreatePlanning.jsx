@@ -48,7 +48,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       teachers: [],
       sessions: [
         {
-          name: "",
+          name: "Session 1",
           session_date: "",
           start_time: "",
           end_time: "",
@@ -117,7 +117,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       teachers: [],
       sessions: [
         {
-          name: "",
+          name: "Session 1",
           session_date: "",
           start_time: "",
           end_time: "",
@@ -171,8 +171,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
   useEffect(() => {
     if (selectedProgram && !isEdit) {
-      setValue("batch", "", { shouldValidate: true });
-      setValue("component", "", { shouldValidate: true });
+      setValue("batch", "");
+      setValue("component", "");
       setBatchSearchTerm("");
       setComponentSearchTerm("");
     }
@@ -220,10 +220,33 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     });
   };
 
+  const getDefaultSessionDate = (index) => {
+    if (index === 0) return ""; // First session has no default date
+    
+    const previousSessionDate = watch(`sessions.${index - 1}.session_date`);
+    if (previousSessionDate) {
+      const nextDate = moment(previousSessionDate).add(1, 'day');
+      return nextDate.format('YYYY-MM-DD');
+    }
+    return "";
+  };
+
   const addSession = () => {
+    const sessionNumber = fields.length + 1;
+    
+    // Get the date from the previous session and increment by 1 day
+    let defaultDate = "";
+    if (fields.length > 0) {
+      const previousSessionDate = watch(`sessions.${fields.length - 1}.session_date`);
+      if (previousSessionDate) {
+        const nextDate = moment(previousSessionDate).add(1, 'day');
+        defaultDate = nextDate.format('YYYY-MM-DD');
+      }
+    }
+    
     append({
-      name: "",
-      session_date: "",
+      name: `Session ${sessionNumber}`,
+      session_date: defaultDate,
       start_time: "",
       end_time: "",
       teachers: [],
@@ -257,7 +280,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                   : t("planningManagement.modal.createSubtitle")}
               </p>
             </div>
-            <button 
+            <button
               onClick={handleClose}
               className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
             >
@@ -270,11 +293,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <SearchableSelect
               label={t("planningManagement.modal.programLabel")}
-              placeholder={t("planningManagement.modal.programPlaceholder")}
-              searchPlaceholder="Search programs..."
+              placeholder={t("planningManagement.modal.searchPrograms")}
+              searchPlaceholder={t("planningManagement.modal.searchPrograms")}
               items={programs}
               value={watch("program")}
-              onChange={(value) => setValue("program", value, { shouldValidate: true })}
+              onChange={(value) => setValue("program", value)}
               onSearch={setProgramSearchTerm}
               isLoading={programsLoading}
               error={errors.program?.message}
@@ -284,10 +307,10 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
             <SearchableSelect
               label={t("planningManagement.modal.batchLabel")}
               placeholder={t("planningManagement.modal.batchPlaceholder")}
-              searchPlaceholder="Search batches..."
+              searchPlaceholder={t("planningManagement.modal.searchBatches")}
               items={batches}
               value={watch("batch")}
-              onChange={(value) => setValue("batch", value, { shouldValidate: true })}
+              onChange={(value) => setValue("batch", value)}
               onSearch={setBatchSearchTerm}
               isLoading={batchesLoading}
               error={errors.batch?.message}
@@ -298,10 +321,10 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
             <SearchableSelect
               label={t("planningManagement.modal.moduleLabel")}
               placeholder={t("planningManagement.modal.modulePlaceholder")}
-              searchPlaceholder="Search components..."
+              searchPlaceholder={t("planningManagement.modal.searchComponents")}
               items={components}
               value={watch("component")}
-              onChange={(value) => setValue("component", value, { shouldValidate: true })}
+              onChange={(value) => setValue("component", value)}
               onSearch={setComponentSearchTerm}
               isLoading={componentsLoading}
               error={errors.component?.message}
@@ -309,28 +332,58 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               required
             />
 
-            <FormField
-              label={t("planningManagement.modal.venueLabel")}
-              placeholder={t("planningManagement.modal.venuePlaceholder")}
-              error={errors.venue?.message}
-              required
-              {...register("venue")}
-            />
+            <div className="space-y-2">
+              <FormField
+                label={t("planningManagement.modal.venueLabel")}
+                placeholder={t("planningManagement.modal.venuePlaceholder")}
+                error={errors.venue?.message}
+                required
+                {...register("venue")}
+              />
+              {/* Preferred Venues */}
+              {selectedProgram &&
+                programs.find((p) => p._id === selectedProgram)?.city?.venue
+                  ?.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs text-gray-600 dark:text-gray-400">
+                      {t("planningManagement.modal.preferredVenues")}
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {programs
+                        .find((p) => p._id === selectedProgram)
+                        ?.city?.venue?.map((venue, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setValue("venue", venue)}
+                            className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
+                          >
+                            {venue}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+            </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
                 {t("planningManagement.modal.descriptionLabel")}
               </Label>
               <Textarea
-                placeholder={t("planningManagement.modal.descriptionPlaceholder")}
+                placeholder={t(
+                  "planningManagement.modal.descriptionPlaceholder",
+                )}
                 {...register("description")}
                 className="min-h-[100px]"
               />
               {errors.description && (
-                <p className="text-sm text-red-500">{errors.description.message}</p>
+                <p className="text-sm text-red-500">
+                  {errors.description.message}
+                </p>
               )}
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold">
@@ -367,7 +420,10 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                       </Label>
                       <Input
                         type="text"
-                        placeholder={t("planningManagement.modal.sessionNamePlaceholder")}
+                        placeholder={t(
+                          "planningManagement.modal.sessionNamePlaceholder",
+                        )}
+                        defaultValue={`Session ${index + 1}`}
                         {...register(`sessions.${index}.name`)}
                       />
                       {errors.sessions?.[index]?.name && (
@@ -383,6 +439,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                       </Label>
                       <Input
                         type="date"
+                        defaultValue={getDefaultSessionDate(index)}
                         {...register(`sessions.${index}.session_date`)}
                       />
                       {errors.sessions?.[index]?.session_date && (
@@ -393,7 +450,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
+                      <div className="space-y-2">
                         <Label className="text-sm font-medium">
                           {t("planningManagement.modal.timeFromLabel")} *
                         </Label>
@@ -406,9 +463,38 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                             {errors.sessions[index].start_time.message}
                           </p>
                         )}
+                        {/* Preferred Start Times */}
+                        {selectedProgram &&
+                          programs.find((p) => p._id === selectedProgram)?.city
+                            ?.times?.length > 0 && (
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-600 dark:text-gray-400">
+                                {t("planningManagement.modal.preferredTimes")}
+                              </Label>
+                              <div className="flex flex-wrap gap-1">
+                                {programs
+                                  .find((p) => p._id === selectedProgram)
+                                  ?.city?.times?.map((time, timeIndex) => (
+                                    <button
+                                      key={timeIndex}
+                                      type="button"
+                                      onClick={() =>
+                                        setValue(
+                                          `sessions.${index}.start_time`,
+                                          time.start,
+                                        )
+                                      }
+                                      className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
+                                    >
+                                      {time.start}
+                                    </button>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
                       </div>
 
-                      <div>
+                      <div className="space-y-2">
                         <Label className="text-sm font-medium">
                           {t("planningManagement.modal.timeTillLabel")} *
                         </Label>
@@ -421,6 +507,35 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                             {errors.sessions[index].end_time.message}
                           </p>
                         )}
+                        {/* Preferred End Times */}
+                        {selectedProgram &&
+                          programs.find((p) => p._id === selectedProgram)?.city
+                            ?.times?.length > 0 && (
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-600 dark:text-gray-400">
+                                {t("planningManagement.modal.preferredTimes")}
+                              </Label>
+                              <div className="flex flex-wrap gap-1">
+                                {programs
+                                  .find((p) => p._id === selectedProgram)
+                                  ?.city?.times?.map((time, timeIndex) => (
+                                    <button
+                                      key={timeIndex}
+                                      type="button"
+                                      onClick={() =>
+                                        setValue(
+                                          `sessions.${index}.end_time`,
+                                          time.end,
+                                        )
+                                      }
+                                      className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
+                                    >
+                                      {time.end}
+                                    </button>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
                       </div>
                     </div>
 
@@ -431,14 +546,13 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                         placeholder={t(
                           "planningManagement.modal.teachersPlaceholder",
                         )}
-                        searchPlaceholder="Search teachers..."
+                        searchPlaceholder={t("planningManagement.modal.searchTeachers")}
                         items={teachers}
                         selected={watch(`sessions.${index}.teachers`) || []}
                         onChange={(selectedTeachers) =>
                           setValue(
                             `sessions.${index}.teachers`,
                             selectedTeachers,
-                            { shouldValidate: true }
                           )
                         }
                         onSearch={setTeacherSearchTerm}
@@ -466,11 +580,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               <SearchableMultiSelect
                 label={t("planningManagement.modal.teachersLabel")}
                 placeholder={t("planningManagement.modal.teachersPlaceholder")}
-                searchPlaceholder="Search teachers..."
+                searchPlaceholder={t("planningManagement.modal.searchTeachers")}
                 items={teachers}
                 selected={watch("teachers") || []}
                 onChange={(selectedTeachers) =>
-                  setValue("teachers", selectedTeachers, { shouldValidate: true })
+                  setValue("teachers", selectedTeachers)
                 }
                 onSearch={setTeacherSearchTerm}
                 isLoading={teachersLoading}

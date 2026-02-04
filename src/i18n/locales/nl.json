@@ -122,6 +122,8 @@
     "table": {
       "name": "Naam",
       "country": "Land",
+      "times": "Tijden",
+      "venues": "Locaties",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
@@ -138,7 +140,12 @@
       "nameLabel": "Stadnaam",
       "namePlaceholder": "Voer stadnaam in",
       "countryLabel": "Land",
-      "countryPlaceholder": "Selecteer land"
+      "countryPlaceholder": "Selecteer land",
+      "timeSlotsLabel": "Tijdsloten",
+      "startTimeLabel": "Starttijd",
+      "endTimeLabel": "Eindtijd",
+      "venuesLabel": "Locaties",
+      "venueLabel": "Locatie"
     }
   },
   "roleManagement": {
@@ -401,6 +408,7 @@
       "country": "Land",
       "city": "Stad",
       "previousEducation": "Vorige Opleiding",
+      "program": "Programma",
       "batch": "Batch",
       "enrolledDate": "Inschrijfdatum",
       "status": "Status",
@@ -764,7 +772,13 @@
       "teachersPlaceholder": "Selecteer docenten...",
       "dateRequired": "Datum is verplicht",
       "startTimeRequired": "Starttijd is verplicht",
-      "endTimeRequired": "Eindtijd is verplicht"
+      "endTimeRequired": "Eindtijd is verplicht",
+      "searchPrograms": "Programma's zoeken...",
+      "searchBatches": "Batches zoeken...",
+      "searchComponents": "Componenten zoeken...",
+      "searchTeachers": "Docenten zoeken...",
+      "preferredVenues": "Voorkeurslocaties:",
+      "preferredTimes": "Voorkeurtijden:"
     },
     "view": {
       "moduleLabel": "Module",

@@ -61,15 +61,17 @@ const AllStudents = () => {
             <TableHead>{t("studentManagement.table.country")}</TableHead>
             <TableHead>{t("studentManagement.table.city")}</TableHead>
             <TableHead>{t("studentManagement.table.previousEducation")}</TableHead>
+            <TableHead>{t("studentManagement.table.program")}</TableHead>
+            <TableHead>{t("studentManagement.table.batch")}</TableHead>
             <TableHead>{t("studentManagement.table.status")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("studentManagement.messages.loadFailed")
@@ -96,6 +98,8 @@ const AllStudents = () => {
                 </TableCell>
                 <TableCell>{i?.city}</TableCell>
                 <TableCell>{i?.previous_education}</TableCell>
+                <TableCell>{i?.program_name}</TableCell>
+                <TableCell>{i?.batch_name}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -103,7 +107,7 @@ const AllStudents = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("studentManagement.table.noStudents")}
               </TableCell>
             </TableRow>

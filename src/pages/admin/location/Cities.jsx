@@ -95,16 +95,18 @@ const Cities = () => {
           <TableRow>
             <TableHead>{t("cityManagement.table.name")}</TableHead>
             <TableHead>{t("cityManagement.table.country")}</TableHead>
+            <TableHead>{t("cityManagement.table.times")}</TableHead>
+            <TableHead>{t("cityManagement.table.venues")}</TableHead>
             <TableHead>{t("cityManagement.table.status")}</TableHead>
             <TableHead>{t("cityManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={5} />
+            <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center p-8">
+              <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("cityManagement.messages.loadFailed")
@@ -119,6 +121,24 @@ const Cities = () => {
               <TableRow key={i._id}>
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.country?.name}</TableCell>
+                <TableCell>
+                  {i?.times?.length > 0 ? (
+                    i.times.map((time, index) => (
+                      <span key={index} className="inline-block bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1">
+                        {time.start}-{time.end}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-500 text-sm">No times</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {i?.venue?.length > 0 ? (
+                    i.venue.join(", ")
+                  ) : (
+                    <span className="text-gray-500 text-sm">No venues</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Switch
                     checked={i?.status}
@@ -148,7 +168,7 @@ const Cities = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={6} className="text-center">
                 {t("cityManagement.table.noCities")}
               </TableCell>
             </TableRow>

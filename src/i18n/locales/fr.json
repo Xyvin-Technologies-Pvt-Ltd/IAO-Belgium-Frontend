@@ -121,6 +121,8 @@
     "table": {
       "name": "Nom",
       "country": "Pays",
+      "times": "Horaires",
+      "venues": "Lieux",
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
@@ -137,7 +139,12 @@
       "nameLabel": "Nom de la ville",
       "namePlaceholder": "Entrez le nom de la ville",
       "countryLabel": "Pays",
-      "countryPlaceholder": "Sélectionnez un pays"
+      "countryPlaceholder": "Sélectionnez un pays",
+      "timeSlotsLabel": "Créneaux horaires",
+      "startTimeLabel": "Heure de début",
+      "endTimeLabel": "Heure de fin",
+      "venuesLabel": "Lieux",
+      "venueLabel": "Lieu"
     }
   },
   "roleManagement": {
@@ -401,6 +408,7 @@
       "country": "Pays",
       "city": "Ville",
       "previousEducation": "Formation antérieure",
+      "program": "Programme",
       "batch": "Lot",
       "enrolledDate": "Date d'inscription",
       "status": "Statut",
@@ -764,7 +772,13 @@
       "teachersPlaceholder": "Sélectionnez des enseignants...",
       "dateRequired": "La date est requise",
       "startTimeRequired": "L'heure de début est requise",
-      "endTimeRequired": "L'heure de fin est requise"
+      "endTimeRequired": "L'heure de fin est requise",
+      "searchPrograms": "Rechercher des programmes...",
+      "searchBatches": "Rechercher des lots...",
+      "searchComponents": "Rechercher des composants...",
+      "searchTeachers": "Rechercher des enseignants...",
+      "preferredVenues": "Lieux préférés :",
+      "preferredTimes": "Horaires préférés :"
     },
     "view": {
       "moduleLabel": "Module",
