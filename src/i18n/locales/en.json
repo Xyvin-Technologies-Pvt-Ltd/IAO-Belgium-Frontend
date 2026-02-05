@@ -353,6 +353,8 @@
   "batchManagement": {
     "title": "Batch Management",
     "search": "Search batches...",
+    "createBatch": "Create Batch",
+    "createBatchConfirmation": "Are you sure you want to create a new batch for this intake?",
     "table": {
       "batchId": "Batch ID",
       "batchName": "Batch Name",
@@ -394,7 +396,32 @@
     },
     "modal": {
       "batchLabel": "Batch",
-      "batchPlaceholder": "Select batch"
+      "batchPlaceholder": "Select batch",
+      "moveStudent": {
+        "title": "Move Student to Another Batch",
+        "description": "Review the student details and choose a new batch to continue.",
+        "studentId": "Student ID",
+        "studentName": "Student Name",
+        "currentBatch": "Current Batch",
+        "assignToBatch": "Assign to Batch",
+        "selectBatch": "Select a batch",
+        "noAvailableBatches": "No available batches",
+        "studentsCount": "students",
+        "warningMessage": "The student will be removed from the current batch.",
+        "cancel": "Cancel",
+        "move": "Move Student",
+        "moving": "Moving...",
+        "loadBatchesFailed": "Failed to load batches"
+      }
+    },
+    "actions": {
+      "actions": "Actions",
+      "view": "View",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "createBatch": "Create Batch",
+      "moveToAnotherBatch": "Move to another batch"
     }
   },
   "studentManagement": {
@@ -523,7 +550,7 @@
       "remarksPlaceholder": "Enter any remarks to add before forwarding",
       "processing": "Processing...",
       "reject": "Reject",
-      "waitlist": "Waitlist",
+      "waitlist": "On Progress",
       "accept": "Accept"
     },
     "documents": {

@@ -7,6 +7,7 @@ import {
   getIntakes,
   getStudentByApplication,
   updateintake,
+  moveStudentToAnotherBatch,
 } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -104,5 +105,22 @@ export const useGetStudentByApplication = (applicationId, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useMoveStudentToAnotherBatch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ applicationId, targetBatchId }) => 
+      moveStudentToAnotherBatch(applicationId, { target_batch_id: targetBatchId }),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      toast.success(response?.message || "Student moved successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to move student");
+    },
   });
 };

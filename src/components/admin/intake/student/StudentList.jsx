@@ -17,6 +17,8 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetEnrolledStudentsByIntake } from "@/store/useIntakeStore";
 import moment from "moment";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
+import MoveStudentDialog from "./MoveStudentDialog";
 
 const StudentList = () => {
   const params = useParams({ strict: false });
@@ -26,6 +28,8 @@ const StudentList = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch } = useGetEnrolledStudentsByIntake(
@@ -39,11 +43,17 @@ const StudentList = () => {
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
+  
   const handleRowClick = (appId) => {
     navigate({
       to: "/admin/admission-administration/academics/intakes/student/$id",
       params: { id: appId },
     });
+  };
+  
+  const handleMoveStudent = (student) => {
+    setSelectedStudent(student);
+    setMoveDialogOpen(true);
   };
   return (
     <div className="space-y-6 mt-4">
@@ -65,14 +75,15 @@ const StudentList = () => {
             <TableHead>{t("studentManagement.table.batch")}</TableHead>
             <TableHead>{t("studentManagement.table.enrolledDate")}</TableHead>
             <TableHead>{t("studentManagement.table.status")}</TableHead>
+            <TableHead>{t("batchManagement.actions.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("studentManagement.messages.loadFailed")
@@ -101,11 +112,24 @@ const StudentList = () => {
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
+                <TableCell>
+                <RowActionMenu
+                  actions={[
+                    {
+                      label: t("batchManagement.actions.moveToAnotherBatch"),
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        handleMoveStudent(i);
+                      },
+                    },
+                  ]}
+                />
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={7} className="text-center">
                 {t("studentManagement.table.noStudents")}
               </TableCell>
             </TableRow>
@@ -118,6 +142,13 @@ const StudentList = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
+      />
+
+      <MoveStudentDialog
+        open={moveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
+        student={selectedStudent}
+        intakeId={id}
       />
     </div>
   );

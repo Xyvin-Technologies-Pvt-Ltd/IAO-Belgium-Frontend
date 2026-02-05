@@ -352,6 +352,8 @@
   "batchManagement": {
     "title": "Batch Verwaltung",
     "search": "Batches suchen...",
+    "createBatch": "Batch Erstellen",
+    "createBatchConfirmation": "Sind Sie sicher, dass Sie einen neuen Batch für diese Aufnahme erstellen möchten?",
     "table": {
       "batchId": "Batch ID",
       "batchName": "Batchname",
@@ -393,7 +395,32 @@
     },
     "modal": {
       "batchLabel": "Batch",
-      "batchPlaceholder": "Batch auswählen"
+      "batchPlaceholder": "Batch auswählen",
+      "moveStudent": {
+        "title": "Student zu anderem Batch verschieben",
+        "description": "Überprüfen Sie die Studentendetails und wählen Sie einen neuen Batch zum Fortfahren.",
+        "studentId": "Studenten ID",
+        "studentName": "Studentenname",
+        "currentBatch": "Aktueller Batch",
+        "assignToBatch": "Zu Batch zuweisen",
+        "selectBatch": "Batch auswählen",
+        "noAvailableBatches": "Keine verfügbaren Batches",
+        "studentsCount": "Studenten",
+        "warningMessage": "Der Student wird aus dem aktuellen Batch entfernt.",
+        "cancel": "Abbrechen",
+        "move": "Student verschieben",
+        "moving": "Verschieben...",
+        "loadBatchesFailed": "Laden der Batches fehlgeschlagen"
+      }
+    },
+    "actions": {
+      "actions": "Aktionen",
+      "view": "Anzeigen",
+      "delete": "Löschen",
+      "cancel": "Abbrechen",
+      "creating": "Erstellen...",
+      "createBatch": "Batch Erstellen",
+      "moveToAnotherBatch": "Zu anderem Batch verschieben"
     }
   },
   "studentManagement": {
@@ -522,7 +549,7 @@
       "remarksPlaceholder": "Bemerkungen eingeben, die vor der Weiterleitung hinzugefügt werden sollen",
       "processing": "Verarbeitung...",
       "reject": "Ablehnen",
-      "waitlist": "Warteliste",
+      "waitlist": "In Bearbeitung",
       "accept": "Akzeptieren"
     },
     "documents": {

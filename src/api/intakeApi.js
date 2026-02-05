@@ -2,9 +2,12 @@ import axiosInstance from "./axiosintercepter";
 
 export const getIntakes = async (academicId, filter) => {
   try {
-    const response = await axiosInstance.get(`/academic/intakes/${academicId}`, {
-      params: filter,
-    });
+    const response = await axiosInstance.get(
+      `/academic/intakes/${academicId}`,
+      {
+        params: filter,
+      },
+    );
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -64,9 +67,23 @@ export const getEnrolledStudentsByIntake = async (id) => {
 
 export const getStudentByApplication = async (applicationId) => {
   try {
-    const response = await axiosInstance.get(`/intake/application/student/${applicationId}`);
+    const response = await axiosInstance.get(
+      `/intake/application/student/${applicationId}`,
+    );
     return response.data;
   } catch (error) {
     throw error.response.data;
-  } 
+  }
+};
+
+export const moveStudentToAnotherBatch = async (id, data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/application/${id}/move-batch`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
 };

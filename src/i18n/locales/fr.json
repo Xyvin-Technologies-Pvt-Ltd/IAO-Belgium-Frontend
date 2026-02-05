@@ -352,6 +352,8 @@
   "batchManagement": {
     "title": "Gestion des lots",
     "search": "Rechercher des lots...",
+    "createBatch": "Créer un lot",
+    "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau lot pour cette inscription ?",
     "table": {
       "batchId": "ID du lot",
       "batchName": "Nom du lot",
@@ -393,7 +395,32 @@
     },
     "modal": {
       "batchLabel": "Lot",
-      "batchPlaceholder": "Sélectionnez un lot"
+      "batchPlaceholder": "Sélectionnez un lot",
+      "moveStudent": {
+        "title": "Déplacer l'étudiant vers un autre lot",
+        "description": "Examinez les détails de l'étudiant et choisissez un nouveau lot pour continuer.",
+        "studentId": "ID étudiant",
+        "studentName": "Nom de l'étudiant",
+        "currentBatch": "Lot actuel",
+        "assignToBatch": "Assigner au lot",
+        "selectBatch": "Sélectionner un lot",
+        "noAvailableBatches": "Aucun lot disponible",
+        "studentsCount": "étudiants",
+        "warningMessage": "L'étudiant sera retiré du lot actuel.",
+        "cancel": "Annuler",
+        "move": "Déplacer l'étudiant",
+        "moving": "Déplacement...",
+        "loadBatchesFailed": "Échec du chargement des lots"
+      }
+    },
+    "actions": {
+      "actions": "Actions",
+      "view": "Voir",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "creating": "Création...",
+      "createBatch": "Créer un lot",
+      "moveToAnotherBatch": "Déplacer vers un autre lot"
     }
   },
   "studentManagement": {
@@ -522,7 +549,7 @@
       "remarksPlaceholder": "Entrez des remarques à ajouter avant de transmettre",
       "processing": "Traitement...",
       "reject": "Rejeter",
-      "waitlist": "Liste d'attente",
+      "waitlist": "En cours",
       "accept": "Accepter"
     },
     "documents": {

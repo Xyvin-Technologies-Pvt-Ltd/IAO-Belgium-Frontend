@@ -95,7 +95,9 @@ const ViewApplication = ({ open, onClose, application }) => {
                   application?.status === 'rejected' ? 'bg-red-500' :
                   'bg-gray-500'
                 }`}>
-                  {application?.status?.charAt(0).toUpperCase() + application?.status?.slice(1) || 'Pending'}
+                  {application?.status === 'waitlisted' 
+                    ? t("applicationReview.modal.waitlist")
+                    : application?.status?.charAt(0).toUpperCase() + application?.status?.slice(1) || 'Pending'}
                 </span>
               </div>
               <p className="text-sm font-medium text-gray-600 dark:text-white/70">{application?.uid || 'N/A'}</p>

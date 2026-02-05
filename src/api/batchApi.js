@@ -16,3 +16,21 @@ export const getStudentByBatch = async (id) => {
     throw error.response.data;
   }
 };
+
+export const createBatch = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/batch`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const deleteBatch = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/batch/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

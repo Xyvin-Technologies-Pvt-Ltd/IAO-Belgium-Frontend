@@ -352,6 +352,8 @@
   "batchManagement": {
     "title": "Batch Beheer",
     "search": "Batches zoeken...",
+    "createBatch": "Batch Aanmaken",
+    "createBatchConfirmation": "Weet je zeker dat je een nieuwe batch wilt aanmaken voor deze intake?",
     "table": {
       "batchId": "Batch ID",
       "batchName": "Batchnaam",
@@ -393,7 +395,32 @@
     },
     "modal": {
       "batchLabel": "Batch",
-      "batchPlaceholder": "Selecteer batch"
+      "batchPlaceholder": "Selecteer batch",
+      "moveStudent": {
+        "title": "Student naar andere batch verplaatsen",
+        "description": "Bekijk de studentgegevens en kies een nieuwe batch om door te gaan.",
+        "studentId": "Student ID",
+        "studentName": "Studentnaam",
+        "currentBatch": "Huidige Batch",
+        "assignToBatch": "Toewijzen aan Batch",
+        "selectBatch": "Selecteer een batch",
+        "noAvailableBatches": "Geen beschikbare batches",
+        "studentsCount": "studenten",
+        "warningMessage": "De student wordt uit de huidige batch verwijderd.",
+        "cancel": "Annuleren",
+        "move": "Student Verplaatsen",
+        "moving": "Verplaatsen...",
+        "loadBatchesFailed": "Laden van batches mislukt"
+      }
+    },
+    "actions": {
+      "actions": "Acties",
+      "view": "Bekijken",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "creating": "Aanmaken...",
+      "createBatch": "Batch Aanmaken",
+      "moveToAnotherBatch": "Naar andere batch verplaatsen"
     }
   },
   "studentManagement": {
@@ -522,7 +549,7 @@
       "remarksPlaceholder": "Voer opmerkingen in om toe te voegen voor doorsturen",
       "processing": "Verwerken...",
       "reject": "Afwijzen",
-      "waitlist": "Wachtlijst",
+      "waitlist": "In behandeling",
       "accept": "Accepteren"
     },
     "documents": {

@@ -1,5 +1,6 @@
-import { getBatchById, getStudentByBatch } from "@/api/batchApi";
-import { useQuery } from "@tanstack/react-query";
+import { getBatchById, getStudentByBatch, createBatch, deleteBatch } from "@/api/batchApi";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useGetBatchesById = (id, options = {}) => {
   return useQuery({
@@ -19,5 +20,38 @@ export const useGetStudentsByBatch = (id, options = {}) => {
     enabled: !!id,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useCreateBatch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createBatch,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["intake"] });
+      toast.success(response?.message || "Batch created successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to create batch");
+    },
+  });
+};
+
+export const useDeleteBatch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteBatch,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      toast.success(response?.message || "Batch deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete batch");
+    },
   });
 };
