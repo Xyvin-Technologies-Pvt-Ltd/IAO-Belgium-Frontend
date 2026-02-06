@@ -188,7 +188,6 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             </div>
           </div>
         </div>
-
         <div className="flex justify-end p-6 border-t">
           <Button variant="outline" onClick={onClose}>
             Close
