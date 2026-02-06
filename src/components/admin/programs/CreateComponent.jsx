@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import { cn } from "@/lib/utils";
 
 import {
@@ -42,6 +43,7 @@ const CreateComponent = ({
   const [selectedType, setSelectedType] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [resourceType, setResourceType] = useState("file"); // "file" or "link"
+  const [instructionContent, setInstructionContent] = useState("");
 
   const {
     register,
@@ -59,6 +61,7 @@ const CreateComponent = ({
       amount: 0,
       submission_deadline: "",
       instruction: "",
+      instruction_video: "",
       files: [],
       submissions: {
         case_studies: false,
@@ -86,12 +89,13 @@ const CreateComponent = ({
 
   const handleClose = () => {
     reset({
-      type: "",
+      type: preselectedType || "",
       name: "",
       year: 1,
       amount: 0,
       submission_deadline: "",
       instruction: "",
+      instruction_video: "",
       files: [],
       submissions: {
         case_studies: false,
@@ -102,9 +106,10 @@ const CreateComponent = ({
       resource_name: "",
       resource_url: "",
     });
-    setSelectedType("");
+    setSelectedType(preselectedType || "");
     setUploadedFiles([]);
     setResourceType("file");
+    setInstructionContent("");
     onClose();
   };
 
@@ -213,6 +218,7 @@ const CreateComponent = ({
       amount: componentData.amount || 0,
       submission_deadline: formattedDeadline,
       instruction: componentData.instruction || "",
+      instruction_video: componentData.instruction_video || "",
       files: componentData.files || [],
       submissions: {
         case_studies: submissions.case_studies || false,
@@ -224,8 +230,11 @@ const CreateComponent = ({
       resource_url: "",
     };
 
+    // Reset form and set type state together
     reset(formData);
     setSelectedType(componentType);
+    setValue("type", componentType);
+    setInstructionContent(componentData.instruction || "");
 
     if (componentData.files) {
       setUploadedFiles(
@@ -236,7 +245,7 @@ const CreateComponent = ({
         })),
       );
     }
-  }, [componentData, open, reset]);
+  }, [componentData, open, reset, setValue]);
 
   useEffect(() => {
     setSelectedType(watchedType);
@@ -268,8 +277,11 @@ const CreateComponent = ({
 
     if (data.type === "app") {
       payload.submission_deadline = data.submission_deadline;
-      if (data.instruction) {
-        payload.instruction = data.instruction;
+      if (instructionContent && instructionContent.trim()) {
+        payload.instruction = instructionContent.trim();
+      }
+      if (data.instruction_video) {
+        payload.instruction_video = data.instruction_video;
       }
       payload.submissions = data.submissions;
     }
@@ -371,10 +383,11 @@ const CreateComponent = ({
 
               <div className="space-y-2">
                 <Label>Instructions</Label>
-                <Textarea
+                <RichTextEditor
+                  value={instructionContent}
+                  onChange={setInstructionContent}
                   placeholder="Enter instructions"
                   className={cn(errors.instruction && "border-destructive")}
-                  {...register("instruction")}
                 />
                 {errors.instruction && (
                   <p className="text-sm text-destructive">
@@ -382,6 +395,14 @@ const CreateComponent = ({
                   </p>
                 )}
               </div>
+
+              <FormField
+                label="Instruction Video URL"
+                type="url"
+                placeholder="Enter instruction video URL"
+                error={errors.instruction_video?.message}
+                {...register("instruction_video")}
+              />
 
               <div className="space-y-3">
                 <Label className="text-sm font-medium">Submission Types</Label>

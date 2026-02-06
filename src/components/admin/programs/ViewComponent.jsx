@@ -25,7 +25,41 @@ const ViewComponent = ({ open, onClose, componentData }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <>
+      <style jsx>{`
+        .instruction-content p {
+          margin: 0.25rem 0;
+        }
+        .instruction-content p:first-child {
+          margin-top: 0;
+        }
+        .instruction-content p:last-child {
+          margin-bottom: 0;
+        }
+        .instruction-content ul {
+          margin: 0.5rem 0;
+          padding-left: 1.5rem;
+          list-style-type: disc;
+        }
+        .instruction-content ol {
+          margin: 0.5rem 0;
+          padding-left: 1.5rem;
+          list-style-type: decimal;
+        }
+        .instruction-content li {
+          margin: 0.125rem 0;
+        }
+        .instruction-content strong {
+          font-weight: 600;
+        }
+        .instruction-content ul ul,
+        .instruction-content ol ol,
+        .instruction-content ul ol,
+        .instruction-content ol ul {
+          margin: 0.25rem 0;
+        }
+      `}</style>
+      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white dark:bg-black border rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b">
           <div>
@@ -75,7 +109,10 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             <div>
               <h3 className="font-medium text-sm text-muted-foreground mb-2">Instructions</h3>
               <div className="bg-muted rounded-lg p-4">
-                <p className="text-sm leading-relaxed">{componentData.instruction}</p>
+                <div 
+                  className="text-sm leading-relaxed instruction-content"
+                  dangerouslySetInnerHTML={{ __html: componentData.instruction }}
+                />
               </div>
             </div>
           )}
@@ -158,7 +195,8 @@ const ViewComponent = ({ open, onClose, componentData }) => {
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
