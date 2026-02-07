@@ -59,6 +59,7 @@ const CreateComponent = ({
       name: "",
       year: 1,
       amount: 0,
+      module_number: 1,
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
@@ -93,6 +94,7 @@ const CreateComponent = ({
       name: "",
       year: 1,
       amount: 0,
+      module_number: 1,
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
@@ -216,6 +218,7 @@ const CreateComponent = ({
       name: componentData.name || "",
       year: componentData.year || 1,
       amount: componentData.amount || 0,
+      module_number: componentData.module_number || 1,
       submission_deadline: formattedDeadline,
       instruction: componentData.instruction || "",
       instruction_video: componentData.instruction_video || "",
@@ -273,6 +276,7 @@ const CreateComponent = ({
 
     if (data.type === "module") {
       payload.amount = data.amount;
+      payload.module_number = data.module_number;
     }
 
     if (data.type === "app") {
@@ -361,14 +365,24 @@ const CreateComponent = ({
           </div>
 
           {selectedType === "module" && (
-            <FormField
-              label="Amount"
-              type="number"
-              placeholder="Enter amount"
-              error={errors.amount?.message}
-              required
-              {...register("amount")}
-            />
+            <>
+              <FormField
+                label="Module Number"
+                type="number"
+                placeholder="Enter module number"
+                error={errors.module_number?.message}
+                required
+                {...register("module_number")}
+              />
+              <FormField
+                label="Amount"
+                type="number"
+                placeholder="Enter amount"
+                error={errors.amount?.message}
+                required
+                {...register("amount")}
+              />
+            </>
           )}
           {selectedType === "app" && (
             <>

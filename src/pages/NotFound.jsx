@@ -18,7 +18,7 @@ const NotFound = () => {
     
     if (role === "admin") {
       return "/admin/dashboard";
-    } else if (role === "TEACHER") {
+    } else if (role === "teacher") {
       return "/teacher/dashboard";
     } else {
       return "/login"; // Default fallback for unknown roles
