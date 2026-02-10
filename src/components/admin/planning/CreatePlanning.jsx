@@ -222,28 +222,30 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
   const getDefaultSessionDate = (index) => {
     if (index === 0) return ""; // First session has no default date
-    
+
     const previousSessionDate = watch(`sessions.${index - 1}.session_date`);
     if (previousSessionDate) {
-      const nextDate = moment(previousSessionDate).add(1, 'day');
-      return nextDate.format('YYYY-MM-DD');
+      const nextDate = moment(previousSessionDate).add(1, "day");
+      return nextDate.format("YYYY-MM-DD");
     }
     return "";
   };
 
   const addSession = () => {
     const sessionNumber = fields.length + 1;
-    
+
     // Get the date from the previous session and increment by 1 day
     let defaultDate = "";
     if (fields.length > 0) {
-      const previousSessionDate = watch(`sessions.${fields.length - 1}.session_date`);
+      const previousSessionDate = watch(
+        `sessions.${fields.length - 1}.session_date`,
+      );
       if (previousSessionDate) {
-        const nextDate = moment(previousSessionDate).add(1, 'day');
-        defaultDate = nextDate.format('YYYY-MM-DD');
+        const nextDate = moment(previousSessionDate).add(1, "day");
+        defaultDate = nextDate.format("YYYY-MM-DD");
       }
     }
-    
+
     append({
       name: `Session ${sessionNumber}`,
       session_date: defaultDate,
@@ -416,7 +418,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                   <div className="space-y-4">
                     <div>
                       <Label className="text-sm font-medium">
-                        {t("planningManagement.modal.sessionNameLabel")} *
+                        {t("planningManagement.modal.sessionNameLabel")}{" "}
+                        <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         type="text"
@@ -435,7 +438,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
                     <div>
                       <Label className="text-sm font-medium">
-                        {t("planningManagement.modal.dateLabel")} *
+                        {t("planningManagement.modal.dateLabel")}{" "}
+                        <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         type="date"
@@ -452,10 +456,12 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">
-                          {t("planningManagement.modal.timeFromLabel")} *
+                          {t("planningManagement.modal.timeFromLabel")}{" "}
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           type="time"
+                          className="dark:[color-scheme:dark]"
                           {...register(`sessions.${index}.start_time`)}
                         />
                         {errors.sessions?.[index]?.start_time && (
@@ -496,10 +502,11 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">
-                          {t("planningManagement.modal.timeTillLabel")} *
+                          {t("planningManagement.modal.timeTillLabel")}  <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           type="time"
+                          className="dark:[color-scheme:dark]"
                           {...register(`sessions.${index}.end_time`)}
                         />
                         {errors.sessions?.[index]?.end_time && (
@@ -546,7 +553,9 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                         placeholder={t(
                           "planningManagement.modal.teachersPlaceholder",
                         )}
-                        searchPlaceholder={t("planningManagement.modal.searchTeachers")}
+                        searchPlaceholder={t(
+                          "planningManagement.modal.searchTeachers",
+                        )}
                         items={teachers}
                         selected={watch(`sessions.${index}.teachers`) || []}
                         onChange={(selectedTeachers) =>

@@ -1,10 +1,33 @@
 import { z } from "zod";
 
 export const teacherSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().min(1, "Email is required"),
-  phone: z.string().min(1, "Phone number is required"),
+  first_name: z
+    .string()
+    .min(1, "First name is required")
+    .min(2, "First name must be at least 2 characters")
+    .max(20, "First name must not exceed 20 characters")
+    .regex(/^[a-zA-Z\s'-]+$/, "First name can only contain letters, spaces, hyphens, and apostrophes")
+    .refine((name) => name.trim().length > 0, "First name cannot be just whitespace")
+    .transform((name) => name.trim()),
+  last_name: z
+    .string()
+    .min(1, "Last name is required")
+    .min(2, "Last name must be at least 2 characters")
+    .max(20, "Last name must not exceed 20 characters")
+    .regex(/^[a-zA-Z\s'-]+$/, "Last name can only contain letters, spaces, hyphens, and apostrophes")
+    .refine((name) => name.trim().length > 0, "Last name cannot be just whitespace")
+    .transform((name) => name.trim()),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address")
+    .transform((email) => email.trim().toLowerCase()),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number must not exceed 15 digits"),
+  country: z.string().min(1, "Country is required"),
   location: z.array(z.object({
     _id: z.string(),
     name: z.string()

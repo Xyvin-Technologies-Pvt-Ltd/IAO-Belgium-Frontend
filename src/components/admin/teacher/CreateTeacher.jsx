@@ -132,12 +132,18 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   useEffect(() => {
     if (!open || !teacherData) return;
 
+    // Extract country from the first location if available
+    const countryId = teacherData.country?._id || 
+                      (Array.isArray(teacherData.location) && teacherData.location.length > 0 
+                        ? teacherData.location[0].country 
+                        : "");
+
     reset({
       first_name: teacherData.first_name || "",
       last_name: teacherData.last_name || "",
       email: teacherData.email || "",
       phone: teacherData.phone || "",
-      country: teacherData.country?._id || "",
+      country: countryId,
       academic_degree: teacherData.academic_degree?._id || "",
       teacher_role: teacherData.teacher_role?._id || "",
       iao_employment_start_date:
@@ -146,8 +152,8 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       language: Array.isArray(teacherData.language) ? teacherData.language : [],
     });
 
-    if (teacherData.country?._id) {
-      setSelectedCountry(teacherData.country._id);
+    if (countryId) {
+      setSelectedCountry(countryId);
     }
   }, [open, teacherData, reset]);
 
@@ -317,6 +323,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
               type="date"
               {...register("iao_employment_start_date")}
               error={errors.iao_employment_start_date?.message}
+              required
             />
 
             <FormActions

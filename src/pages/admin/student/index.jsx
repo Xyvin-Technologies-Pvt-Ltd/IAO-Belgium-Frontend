@@ -13,7 +13,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { useNavigate} from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetStudents } from "@/store/useStudentStore";
 
@@ -25,13 +25,11 @@ const AllStudents = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetStudents(
-    {
-      page: page,
-      limit: rowsPerPage,
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    },
-  );
+  const { data, isLoading, error, refetch } = useGetStudents({
+    page: page,
+    limit: rowsPerPage,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+  });
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -43,6 +41,9 @@ const AllStudents = () => {
   };
   return (
     <div className="space-y-6 mt-4">
+      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+        {t("studentManagement.title")}
+      </h2>
       <div className="flex items-center justify-between gap-2">
         <Input
           placeholder={t("studentManagement.search")}
@@ -60,7 +61,9 @@ const AllStudents = () => {
             <TableHead>{t("studentManagement.table.phone")}</TableHead>
             <TableHead>{t("studentManagement.table.country")}</TableHead>
             <TableHead>{t("studentManagement.table.city")}</TableHead>
-            <TableHead>{t("studentManagement.table.previousEducation")}</TableHead>
+            <TableHead>
+              {t("studentManagement.table.previousEducation")}
+            </TableHead>
             <TableHead>{t("studentManagement.table.program")}</TableHead>
             <TableHead>{t("studentManagement.table.batch")}</TableHead>
             <TableHead>{t("studentManagement.table.status")}</TableHead>
@@ -93,9 +96,7 @@ const AllStudents = () => {
                 </TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.phone}</TableCell>
-                <TableCell>
-                  {i?.country}
-                </TableCell>
+                <TableCell>{i?.country}</TableCell>
                 <TableCell>{i?.city}</TableCell>
                 <TableCell>{i?.previous_education}</TableCell>
                 <TableCell>{i?.program_name}</TableCell>

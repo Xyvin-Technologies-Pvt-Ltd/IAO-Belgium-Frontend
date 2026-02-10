@@ -261,6 +261,11 @@ const CreateComponent = ({
     }
   }, [preselectedType, isEdit, setValue]);
 
+  // Sync instruction content with form validation
+  useEffect(() => {
+    setValue("instruction", instructionContent);
+  }, [instructionContent, setValue]);
+
   const onSubmit = (data) => {
     const payload = {
       type: data.type,
@@ -281,12 +286,8 @@ const CreateComponent = ({
 
     if (data.type === "app") {
       payload.submission_deadline = data.submission_deadline;
-      if (instructionContent && instructionContent.trim()) {
-        payload.instruction = instructionContent.trim();
-      }
-      if (data.instruction_video) {
-        payload.instruction_video = data.instruction_video;
-      }
+      payload.instruction = instructionContent.trim();
+      payload.instruction_video = data.instruction_video;
       payload.submissions = data.submissions;
     }
 
@@ -343,7 +344,7 @@ const CreateComponent = ({
           />
 
           <div className="space-y-2">
-            <Label>In which year the module belongs *</Label>
+            <Label>In which year the module belongs <span className="text-red-500">*</span></Label>
             <Select
               value={watch("year")?.toString() || ""}
               onValueChange={(v) => setValue("year", parseInt(v))}
@@ -396,7 +397,7 @@ const CreateComponent = ({
               />
 
               <div className="space-y-2">
-                <Label>Instructions</Label>
+                <Label>Instructions <span className="text-red-500">*</span></Label>
                 <RichTextEditor
                   value={instructionContent}
                   onChange={setInstructionContent}
@@ -415,6 +416,7 @@ const CreateComponent = ({
                 type="url"
                 placeholder="Enter instruction video URL"
                 error={errors.instruction_video?.message}
+                required
                 {...register("instruction_video")}
               />
 

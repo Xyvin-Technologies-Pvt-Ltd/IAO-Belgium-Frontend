@@ -27,8 +27,8 @@ const moduleComponentSchema = baseComponentSchema.extend({
 
 const appComponentSchema = baseComponentSchema.extend({
   submission_deadline: z.string().min(1, "Submission deadline is required"),
-  instruction: z.string().optional(),
-  instruction_video: z.string().optional(),
+  instruction: z.string().min(1, "Instruction is required"),
+  instruction_video: z.string().min(1, "Instruction video URL is required").url("Please enter a valid URL"),
   submissions: z.object({
     case_studies: z.boolean(),
     essays: z.boolean(),
