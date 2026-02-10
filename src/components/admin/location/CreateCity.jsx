@@ -32,6 +32,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(citySchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       country: "",
@@ -202,8 +203,10 @@ const CreateCity = ({ open, onClose, cityData }) => {
                 )}
               </div>
             ))}
-            {errors.times?.message && (
-              <p className="text-sm text-red-500">{errors.times.message}</p>
+            {(errors.times?.message || errors.times?.root?.message) && (
+              <p className="text-sm text-red-500">
+                {errors.times?.message || errors.times?.root?.message}
+              </p>
             )}
           </div>
 
@@ -241,8 +244,10 @@ const CreateCity = ({ open, onClose, cityData }) => {
                 )}
               </div>
             ))}
-            {errors.venue?.message && (
-              <p className="text-sm text-red-500">{errors.venue.message}</p>
+            {(errors.venue?.message || errors.venue?.root?.message) && (
+              <p className="text-sm text-red-500">
+                {errors.venue?.message || errors.venue?.root?.message}
+              </p>
             )}
           </div>
 

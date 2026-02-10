@@ -216,7 +216,7 @@ const CreateComponent = ({
     const formData = {
       type: componentType,
       name: componentData.name || "",
-      year: componentData.year || 1,
+      year: Number(componentData.year) || 1,
       amount: componentData.amount || 0,
       module_number: componentData.module_number || 1,
       submission_deadline: formattedDeadline,
@@ -237,7 +237,11 @@ const CreateComponent = ({
     reset(formData);
     setSelectedType(componentType);
     setValue("type", componentType);
-    setInstructionContent(componentData.instruction || "");
+    
+    // Set instruction content separately to ensure RichTextEditor updates
+    const instructionText = componentData.instruction || "";
+    setInstructionContent(instructionText);
+    setValue("instruction", instructionText);
 
     if (componentData.files) {
       setUploadedFiles(
@@ -346,8 +350,9 @@ const CreateComponent = ({
           <div className="space-y-2">
             <Label>In which year the module belongs <span className="text-red-500">*</span></Label>
             <Select
+              key={`year-${watch("year")}`}
               value={watch("year")?.toString() || ""}
-              onValueChange={(v) => setValue("year", parseInt(v))}
+              onValueChange={(v) => setValue("year", parseInt(v), { shouldValidate: true })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select year" />
