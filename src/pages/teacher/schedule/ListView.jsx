@@ -17,7 +17,7 @@ const ListView = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const { data, isLoading, error, refetch } = useGetPlanningByTeacher({
+  const { data, isLoading, error, refetch,isFetching } = useGetPlanningByTeacher({
     page: page,
     limit: rowsPerPage,
     status: "accepted",
@@ -41,7 +41,7 @@ const ListView = () => {
             <TableHead>Location</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (

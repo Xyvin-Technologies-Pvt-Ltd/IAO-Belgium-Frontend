@@ -27,7 +27,7 @@ const AdminManagement = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetAdmins({
+  const { data, isLoading, error, refetch,isFetching } = useGetAdmins({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -73,7 +73,7 @@ const AdminManagement = () => {
             <TableHead>{t("adminManagement.table.status")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

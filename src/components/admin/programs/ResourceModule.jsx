@@ -31,7 +31,7 @@ const ResourceModule = ({ programId, onComponentCreated }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetComponents({
+  const { data, isLoading, error, refetch, isFetching } = useGetComponents({
     type: "resource",
     program: programId,
     page: page,
@@ -61,10 +61,12 @@ const ResourceModule = ({ programId, onComponentCreated }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={() => {
-          setSelectedModule(null);
-          setIsModalOpen(true);
-        }}>
+        <Button
+          onClick={() => {
+            setSelectedModule(null);
+            setIsModalOpen(true);
+          }}
+        >
           {t("programDetail.emptyState.createButton")}
         </Button>
       </div>
@@ -80,7 +82,9 @@ const ResourceModule = ({ programId, onComponentCreated }) => {
             <TableHead>{t("resourceModule.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

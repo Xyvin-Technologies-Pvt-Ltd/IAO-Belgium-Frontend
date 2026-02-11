@@ -33,7 +33,7 @@ const TeacherRole = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetTeacherRole({
+  const { data, isLoading, error, refetch,isFetching } = useGetTeacherRole({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -95,7 +95,7 @@ const TeacherRole = () => {
             <TableHead>{t("teacherRoleManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+       <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={3} />
           ) : error ? (

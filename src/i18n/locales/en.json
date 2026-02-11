@@ -269,6 +269,7 @@
       "name": "Name",
       "program": "Program",
       "city": "City",
+      "language": "Language",
       "registrationFee": "Registration Fee",
       "startDate": "Start Date",
       "endDate": "End Date",

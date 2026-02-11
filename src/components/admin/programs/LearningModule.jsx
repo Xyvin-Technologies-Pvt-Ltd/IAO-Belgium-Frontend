@@ -31,7 +31,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetComponents({
+  const { data, isLoading, error, refetch,isFetching } = useGetComponents({
     type: "module",
     program: programId,
     page: page,
@@ -82,7 +82,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
             <TableHead>{t("learningModule.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

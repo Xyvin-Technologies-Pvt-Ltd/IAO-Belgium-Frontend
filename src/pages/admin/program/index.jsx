@@ -41,7 +41,7 @@ const Programs = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetPrograms({
+  const { data, isLoading, error, refetch ,isFetching} = useGetPrograms({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -122,7 +122,7 @@ const Programs = () => {
             <TableHead>{t("programManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (

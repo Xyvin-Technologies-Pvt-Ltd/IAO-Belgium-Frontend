@@ -37,7 +37,7 @@ const Cities = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetCities({
+  const { data, isLoading, error, refetch,isFetching } = useGetCities({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -101,7 +101,7 @@ const Cities = () => {
             <TableHead>{t("cityManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (

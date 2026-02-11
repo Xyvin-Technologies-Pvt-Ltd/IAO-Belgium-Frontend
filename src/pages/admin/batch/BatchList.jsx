@@ -43,7 +43,7 @@ const BatchList = () => {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetBatchesByIntake(id, {
+  const { data, isLoading, error, refetch,isFetching } = useGetBatchesByIntake(id, {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -127,7 +127,7 @@ const BatchList = () => {
             <TableHead className="w-[50px]">{t("batchManagement.actions.actions")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+       <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (

@@ -37,7 +37,7 @@ const PlanningTable = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetPlanning({
+  const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -165,7 +165,7 @@ const PlanningTable = () => {
             <TableHead>{t("planningManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

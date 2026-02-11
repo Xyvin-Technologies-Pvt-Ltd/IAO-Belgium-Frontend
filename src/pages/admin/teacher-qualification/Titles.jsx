@@ -33,7 +33,7 @@ const Titles = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetTitles({
+  const { data, isLoading, error, refetch,isFetching } = useGetTitles({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -95,7 +95,7 @@ const Titles = () => {
             <TableHead>{t("teacherTitleManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+       <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={3} />
           ) : error ? (

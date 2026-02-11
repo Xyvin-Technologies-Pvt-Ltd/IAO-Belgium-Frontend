@@ -39,7 +39,7 @@ const Intakes = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetIntakes(id, {
+  const { data, isLoading, error, refetch,isFetching } = useGetIntakes(id, {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -129,6 +129,7 @@ const Intakes = () => {
             <TableHead>{t("intakeManagement.table.name")}</TableHead>
             <TableHead>{t("intakeManagement.table.program")}</TableHead>
             <TableHead>{t("intakeManagement.table.city")}</TableHead>
+            <TableHead>{t("intakeManagement.table.language")}</TableHead>
             <TableHead>{t("intakeManagement.table.registrationFee")}</TableHead>
             <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
             <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
@@ -139,12 +140,12 @@ const Intakes = () => {
             <TableHead>{t("intakeManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("intakeManagement.messages.loadFailed")
@@ -167,6 +168,7 @@ const Intakes = () => {
                   }
                 </TableCell>
                 <TableCell>{i?.program?.city?.name || "N/A"}</TableCell>
+                <TableCell>{i?.program?.language?.name || "N/A"}</TableCell>
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
@@ -206,7 +208,7 @@ const Intakes = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center">
+              <TableCell colSpan={10} className="text-center">
                 {t("intakeManagement.table.noIntakes")}
               </TableCell>
             </TableRow>

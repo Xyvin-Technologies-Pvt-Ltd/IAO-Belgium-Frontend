@@ -37,7 +37,7 @@ const Countries = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetCountries({
+  const { data, isLoading, error, refetch,isFetching } = useGetCountries({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -101,7 +101,7 @@ const Countries = () => {
             <TableHead>{t("countryManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+       <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

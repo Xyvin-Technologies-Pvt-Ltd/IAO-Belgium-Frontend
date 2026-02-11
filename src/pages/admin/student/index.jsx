@@ -25,7 +25,7 @@ const AllStudents = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetStudents({
+  const { data, isLoading, error, refetch,isFetching } = useGetStudents({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -69,7 +69,7 @@ const AllStudents = () => {
             <TableHead>{t("studentManagement.table.status")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+      <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (

@@ -37,7 +37,7 @@ const Language = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetLanguages({
+  const { data, isLoading, error, refetch,isFetching } = useGetLanguages({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -102,7 +102,7 @@ const Language = () => {
             <TableHead>{t("languageManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={3} />
           ) : error ? (

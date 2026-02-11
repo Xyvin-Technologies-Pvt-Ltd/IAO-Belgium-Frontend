@@ -102,7 +102,12 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     { enabled: open },
   );
 
-  const programs = programsData?.data || [];
+  const programsRaw = programsData?.data || [];
+  const programs = programsRaw.map(program => ({
+    _id: program._id,
+    name: `${program.name} - ${program.city?.name || 'N/A'} - ${program.language?.name || 'N/A'}`,
+    city: program.city // Keep original city data for venue/times access
+  }));
   const batches = batchesData?.data || [];
   const components = componentsData?.data || [];
   const teachers = teachersData?.data || [];

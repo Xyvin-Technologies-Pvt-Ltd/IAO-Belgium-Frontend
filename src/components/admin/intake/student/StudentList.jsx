@@ -32,25 +32,23 @@ const StudentList = () => {
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetEnrolledStudentsByIntake(
-    id,
-    {
+  const { data, isLoading, error, refetch, isFetching } =
+    useGetEnrolledStudentsByIntake(id, {
       page: page,
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    },
-  );
+    });
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
-  
+
   const handleRowClick = (appId) => {
     navigate({
       to: "/admin/admission-administration/academics/intakes/student/$id",
       params: { id: appId },
     });
   };
-  
+
   const handleMoveStudent = (student) => {
     setSelectedStudent(student);
     setMoveDialogOpen(true);
@@ -78,7 +76,9 @@ const StudentList = () => {
             <TableHead>{t("batchManagement.actions.actions")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
@@ -113,17 +113,17 @@ const StudentList = () => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell>
-                <RowActionMenu
-                  actions={[
-                    {
-                      label: t("batchManagement.actions.moveToAnotherBatch"),
-                      onClick: (e) => {
-                        e.stopPropagation();
-                        handleMoveStudent(i);
+                  <RowActionMenu
+                    actions={[
+                      {
+                        label: t("batchManagement.actions.moveToAnotherBatch"),
+                        onClick: (e) => {
+                          e.stopPropagation();
+                          handleMoveStudent(i);
+                        },
                       },
-                    },
-                  ]}
-                />
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))

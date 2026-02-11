@@ -29,7 +29,7 @@ const ApplicationReview = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetApplications({
+  const { data, isLoading, error, refetch,isFetching } = useGetApplications({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -80,7 +80,7 @@ const ApplicationReview = () => {
             <TableHead>{t("applicationReview.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={12} />
           ) : error ? (

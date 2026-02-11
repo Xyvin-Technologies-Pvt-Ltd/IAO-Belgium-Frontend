@@ -28,7 +28,7 @@ const BatchStudentList = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetStudentsByBatch(id, {
+  const { data, isLoading, error, refetch,isFetching } = useGetStudentsByBatch(id, {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -63,7 +63,7 @@ const BatchStudentList = () => {
             <TableHead>{t("studentManagement.table.status")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (

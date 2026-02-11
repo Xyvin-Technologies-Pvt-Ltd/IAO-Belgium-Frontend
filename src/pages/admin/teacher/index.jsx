@@ -36,7 +36,7 @@ const Teachers = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch } = useGetTeachers({
+  const { data, isLoading, error, refetch,isFetching } = useGetTeachers({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -108,7 +108,7 @@ const Teachers = () => {
             <TableHead>{t("teacherManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+       <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
