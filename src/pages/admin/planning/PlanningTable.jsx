@@ -55,6 +55,7 @@ const PlanningTable = () => {
     const teacherMap = new Map();
     
     sessions.forEach(session => {
+      // Add teachers
       if (session.teachers && session.teachers.length > 0) {
         session.teachers.forEach(teacherObj => {
           const teacher = teacherObj.teacher;
@@ -62,6 +63,32 @@ const PlanningTable = () => {
             teacherMap.set(teacher._id, {
               _id: teacher._id,
               name: `${teacher.first_name} ${teacher.last_name}`.trim()
+            });
+          }
+        });
+      }
+      
+      // Add assistants
+      if (session.assistants && session.assistants.length > 0) {
+        session.assistants.forEach(assistantObj => {
+          const assistant = assistantObj.assistant;
+          if (assistant && assistant._id) {
+            teacherMap.set(assistant._id, {
+              _id: assistant._id,
+              name: `${assistant.first_name} ${assistant.last_name}`.trim()
+            });
+          }
+        });
+      }
+      
+      // Add trainees
+      if (session.trainees && session.trainees.length > 0) {
+        session.trainees.forEach(traineeObj => {
+          const trainee = traineeObj.trainee;
+          if (trainee && trainee._id) {
+            teacherMap.set(trainee._id, {
+              _id: trainee._id,
+              name: `${trainee.first_name} ${trainee.last_name}`.trim()
             });
           }
         });

@@ -28,6 +28,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
   const [batchSearchTerm, setBatchSearchTerm] = useState("");
   const [componentSearchTerm, setComponentSearchTerm] = useState("");
   const [teacherSearchTerm, setTeacherSearchTerm] = useState("");
+  const [assistantSearchTerm, setAssistantSearchTerm] = useState("");
+  const [traineeSearchTerm, setTraineeSearchTerm] = useState("");
 
   const {
     register,
@@ -46,6 +48,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       venue: "",
       description: "",
       teachers: [],
+      assistants: [],
+      trainees: [],
       sessions: [
         {
           name: "Session 1",
@@ -53,6 +57,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           start_time: "",
           end_time: "",
           teachers: [],
+          assistants: [],
+          trainees: [],
         },
       ],
     },
@@ -98,6 +104,25 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
       role: "teacher",
+      teacher_role: "Teacher",
+    },
+    { enabled: open },
+  );
+
+  const { data: assistantsData, isLoading: assistantsLoading } = useGetUsers(
+    {
+      ...(assistantSearchTerm && { search: assistantSearchTerm }),
+      role: "teacher",
+      teacher_role: "Assistant",
+    },
+    { enabled: open },
+  );
+
+  const { data: traineesData, isLoading: traineesLoading } = useGetUsers(
+    {
+      ...(traineeSearchTerm && { search: traineeSearchTerm }),
+      role: "teacher",
+      teacher_role: "Trainee",
     },
     { enabled: open },
   );
@@ -111,6 +136,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
   const batches = batchesData?.data || [];
   const components = componentsData?.data || [];
   const teachers = teachersData?.data || [];
+  const assistants = assistantsData?.data || [];
+  const trainees = traineesData?.data || [];
 
   const handleClose = () => {
     reset({
@@ -120,6 +147,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       venue: "",
       description: "",
       teachers: [],
+      assistants: [],
+      trainees: [],
       sessions: [
         {
           name: "Session 1",
@@ -127,6 +156,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
           start_time: "",
           end_time: "",
           teachers: [],
+          assistants: [],
+          trainees: [],
         },
       ],
     });
@@ -134,6 +165,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
     setBatchSearchTerm("");
     setComponentSearchTerm("");
     setTeacherSearchTerm("");
+    setAssistantSearchTerm("");
+    setTraineeSearchTerm("");
     onClose();
   };
 
@@ -168,6 +201,24 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
                 };
               })
             : [],
+          assistants: session.assistants
+            ? session.assistants.map((a) => {
+                const assistant = a.assistant || a;
+                return {
+                  _id: assistant._id,
+                  name: `${assistant.first_name} ${assistant.last_name}`.trim(),
+                };
+              })
+            : [],
+          trainees: session.trainees
+            ? session.trainees.map((t) => {
+                const trainee = t.trainee || t;
+                return {
+                  _id: trainee._id,
+                  name: `${trainee.first_name} ${trainee.last_name}`.trim(),
+                };
+              })
+            : [],
         }));
         setValue("sessions", formattedSessions);
       }
@@ -186,15 +237,24 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
   const onSubmit = (formData) => {
     const formattedSessions = formData.sessions.map((session) => {
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
-
       const startTime = moment(session.start_time, "HH:mm").format("HH:mm");
       const endTime = moment(session.end_time, "HH:mm").format("HH:mm");
 
-      const sessionTeachers = isEdit
-        ? (session.teachers || []).map((teacher) => ({ teacher: teacher._id }))
-        : (formData.teachers || []).map((teacher) => ({
-            teacher: teacher._id,
-          }));
+      let sessionTeachers = [];
+      let sessionAssistants = [];
+      let sessionTrainees = [];
+      
+      if (isEdit) {
+        // In edit mode, use session-specific teachers/assistants/trainees
+        sessionTeachers = (session.teachers || []).map((teacher) => ({ teacher: teacher._id }));
+        sessionAssistants = (session.assistants || []).map((assistant) => ({ assistant: assistant._id }));
+        sessionTrainees = (session.trainees || []).map((trainee) => ({ trainee: trainee._id }));
+      } else {
+        // In create mode, use form-level teachers/assistants/trainees for all sessions
+        sessionTeachers = (formData.teachers || []).map((teacher) => ({ teacher: teacher._id }));
+        sessionAssistants = (formData.assistants || []).map((assistant) => ({ assistant: assistant._id }));
+        sessionTrainees = (formData.trainees || []).map((trainee) => ({ trainee: trainee._id }));
+      }
 
       return {
         name: session.name || "",
@@ -202,6 +262,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
         start_time: startTime,
         end_time: endTime,
         teachers: sessionTeachers,
+        assistants: sessionAssistants,
+        trainees: sessionTrainees,
       };
     });
 
@@ -257,6 +319,8 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
       start_time: "",
       end_time: "",
       teachers: [],
+      assistants: [],
+      trainees: [],
     });
   };
 
@@ -553,26 +617,71 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
 
                     {/* Individual Teachers Selection - Only for Edit Mode */}
                     {isEdit && (
-                      <SearchableMultiSelect
-                        label={t("planningManagement.modal.teachersLabel")}
-                        placeholder={t(
-                          "planningManagement.modal.teachersPlaceholder",
-                        )}
-                        searchPlaceholder={t(
-                          "planningManagement.modal.searchTeachers",
-                        )}
-                        items={teachers}
-                        selected={watch(`sessions.${index}.teachers`) || []}
-                        onChange={(selectedTeachers) =>
-                          setValue(
-                            `sessions.${index}.teachers`,
-                            selectedTeachers,
-                          )
-                        }
-                        onSearch={setTeacherSearchTerm}
-                        isLoading={teachersLoading}
-                        error={errors.sessions?.[index]?.teachers?.message}
-                      />
+                      <>
+                        <SearchableMultiSelect
+                          label={t("planningManagement.modal.teachersLabel")}
+                          placeholder={t(
+                            "planningManagement.modal.teachersPlaceholder",
+                          )}
+                          searchPlaceholder={t(
+                            "planningManagement.modal.searchTeachers",
+                          )}
+                          items={teachers}
+                          selected={watch(`sessions.${index}.teachers`) || []}
+                          onChange={(selectedTeachers) =>
+                            setValue(
+                              `sessions.${index}.teachers`,
+                              selectedTeachers,
+                              { shouldValidate: true, shouldDirty: true }
+                            )
+                          }
+                          onSearch={setTeacherSearchTerm}
+                          isLoading={teachersLoading}
+                          error={errors.sessions?.[index]?.teachers?.message}
+                        />
+                        <SearchableMultiSelect
+                          label={t("planningManagement.modal.assistantsLabel")}
+                          placeholder={t(
+                            "planningManagement.modal.assistantsPlaceholder",
+                          )}
+                          searchPlaceholder={t(
+                            "planningManagement.modal.searchAssistants",
+                          )}
+                          items={assistants}
+                          selected={watch(`sessions.${index}.assistants`) || []}
+                          onChange={(selectedAssistants) =>
+                            setValue(
+                              `sessions.${index}.assistants`,
+                              selectedAssistants,
+                              { shouldValidate: true, shouldDirty: true }
+                            )
+                          }
+                          onSearch={setAssistantSearchTerm}
+                          isLoading={assistantsLoading}
+                          error={errors.sessions?.[index]?.assistants?.message}
+                        />
+                        <SearchableMultiSelect
+                          label={t("planningManagement.modal.traineesLabel")}
+                          placeholder={t(
+                            "planningManagement.modal.traineesPlaceholder",
+                          )}
+                          searchPlaceholder={t(
+                            "planningManagement.modal.searchTrainees",
+                          )}
+                          items={trainees}
+                          selected={watch(`sessions.${index}.trainees`) || []}
+                          onChange={(selectedTrainees) =>
+                            setValue(
+                              `sessions.${index}.trainees`,
+                              selectedTrainees,
+                              { shouldValidate: true, shouldDirty: true }
+                            )
+                          }
+                          onSearch={setTraineeSearchTerm}
+                          isLoading={traineesLoading}
+                          error={errors.sessions?.[index]?.trainees?.message}
+                        />
+                      </>
                     )}
                   </div>
                 </div>
@@ -591,19 +700,47 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
               </div>
             </div>
             {!isEdit && (
-              <SearchableMultiSelect
-                label={t("planningManagement.modal.teachersLabel")}
-                placeholder={t("planningManagement.modal.teachersPlaceholder")}
-                searchPlaceholder={t("planningManagement.modal.searchTeachers")}
-                items={teachers}
-                selected={watch("teachers") || []}
-                onChange={(selectedTeachers) =>
-                  setValue("teachers", selectedTeachers)
-                }
-                onSearch={setTeacherSearchTerm}
-                isLoading={teachersLoading}
-                error={errors.teachers?.message}
-              />
+              <>
+                <SearchableMultiSelect
+                  label={t("planningManagement.modal.teachersLabel")}
+                  placeholder={t("planningManagement.modal.teachersPlaceholder")}
+                  searchPlaceholder={t("planningManagement.modal.searchTeachers")}
+                  items={teachers}
+                  selected={watch("teachers") || []}
+                  onChange={(selectedTeachers) =>
+                    setValue("teachers", selectedTeachers)
+                  }
+                  onSearch={setTeacherSearchTerm}
+                  isLoading={teachersLoading}
+                  error={errors.teachers?.message}
+                />
+                <SearchableMultiSelect
+                  label={t("planningManagement.modal.assistantsLabel")}
+                  placeholder={t("planningManagement.modal.assistantsPlaceholder")}
+                  searchPlaceholder={t("planningManagement.modal.searchAssistants")}
+                  items={assistants}
+                  selected={watch("assistants") || []}
+                  onChange={(selectedAssistants) =>
+                    setValue("assistants", selectedAssistants)
+                  }
+                  onSearch={setAssistantSearchTerm}
+                  isLoading={assistantsLoading}
+                  error={errors.assistants?.message}
+                />
+                <SearchableMultiSelect
+                  label={t("planningManagement.modal.traineesLabel")}
+                  placeholder={t("planningManagement.modal.traineesPlaceholder")}
+                  searchPlaceholder={t("planningManagement.modal.searchTrainees")}
+                  items={trainees}
+                  selected={watch("trainees") || []}
+                  onChange={(selectedTrainees) =>
+                    setValue("trainees", selectedTrainees)
+                  }
+                  onSearch={setTraineeSearchTerm}
+                  isLoading={traineesLoading}
+                  error={errors.trainees?.message}
+                />
+              </>
             )}
             <FormActions
               onCancel={handleClose}

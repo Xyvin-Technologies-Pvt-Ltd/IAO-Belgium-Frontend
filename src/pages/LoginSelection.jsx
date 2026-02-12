@@ -22,7 +22,6 @@ const LoginSelection = () => {
 
   const { data: programsData, isLoading, error, refetch } = useGetProgramsList();
   const programs = programsData?.data || [];
-
   const handleAdminLogin = () => {
     // Navigate to admin login (existing login page)
     navigate({ to: "/login" });
@@ -105,7 +104,7 @@ const LoginSelection = () => {
                     <SelectContent>
                       {programs.map((program) => (
                         <SelectItem key={program._id} value={program._id}>
-                          {program.name} - {program.program_type}
+                          {program.name} - {program?.city?.name} - {program?.language?.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
