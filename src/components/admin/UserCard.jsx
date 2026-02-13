@@ -153,19 +153,24 @@ const UserCard= ({ student, teacher, isTeacher = false }) => {
             />
           )}
 
-          {user?.qualification_certificate?.url && (
-            <DocumentRow
-              title={t("applicationReview.documents.qualificationCertificate")}
-              size={t("applicationReview.documents.pdfDocument")}
-              url={user.qualification_certificate.url}
-            />
-          )}
+          {Array.isArray(user?.qualification_certificate) &&
+            user.qualification_certificate.length > 0 &&
+            user.qualification_certificate.map((cert, index) => (
+              <DocumentRow
+                key={index}
+                title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`}
+                size={t("applicationReview.documents.pdfDocument")}
+                url={cert.url}
+              />
+            ))}
 
-          {!user?.id_card?.url && !user?.qualification_certificate?.url && (
-            <p className="text-sm text-sidebar-foreground/70">
-              {t("studentManagement.modal.noDocuments")}
-            </p>
-          )}
+          {!user?.id_card?.url &&
+            (!Array.isArray(user?.qualification_certificate) ||
+              user.qualification_certificate.length === 0) && (
+              <p className="text-sm text-sidebar-foreground/70">
+                {t("studentManagement.modal.noDocuments")}
+              </p>
+            )}
         </div>
       )}
     </div>

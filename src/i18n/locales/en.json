@@ -701,6 +701,7 @@
       "learningUID": "Learning UID",
       "moduleName": "Module Name",
       "year": "Year",
+      "moduleNumber": "Module Number",
       "files": "Files",
       "amount": "Amount",
       "status": "Status",

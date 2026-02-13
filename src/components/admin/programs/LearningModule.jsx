@@ -76,6 +76,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
             <TableHead>{t("learningModule.table.learningUID")}</TableHead>
             <TableHead>{t("learningModule.table.moduleName")}</TableHead>
             <TableHead>{t("learningModule.table.year")}</TableHead>
+            <TableHead>{t("learningModule.table.moduleNumber")}</TableHead>
             <TableHead>{t("learningModule.table.files")}</TableHead>
             <TableHead>{t("learningModule.table.amount")}</TableHead>
             <TableHead>{t("learningModule.table.status")}</TableHead>
@@ -84,10 +85,10 @@ const LearningModule = ({ programId, onComponentCreated }) => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={5} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("learningModule.messages.loadFailed")
@@ -107,6 +108,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.year}</TableCell>
+                <TableCell>{i?.module_number}</TableCell>
                 <TableCell>{i?.files?.length}</TableCell>
                 <TableCell>
                   {i?.currency
@@ -131,7 +133,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("learningModule.table.noModules")}
               </TableCell>
             </TableRow>

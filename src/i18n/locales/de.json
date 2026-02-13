@@ -700,6 +700,7 @@
       "learningUID": "Lern UID",
       "moduleName": "Modulname",
       "year": "Jahr",
+      "moduleNumber": "Modulnummer",
       "files": "Dateien",
       "amount": "Betrag",
       "status": "Status",

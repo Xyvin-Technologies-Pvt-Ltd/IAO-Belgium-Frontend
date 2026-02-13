@@ -13,7 +13,7 @@ const ViewApplication = ({ open, onClose, application }) => {
   const [remarks, setRemarks] = useState("");
   const [documentFlags, setDocumentFlags] = useState({
     id_card: false,
-    qualification_certificate: false
+    qualification_certificate: []
   });
   
   const updateApplicationMutation = useUpdateApplication();
@@ -24,19 +24,32 @@ const ViewApplication = ({ open, onClose, application }) => {
       
       setDocumentFlags({
         id_card: application.id_card?.flag || false,
-        qualification_certificate: application.qualification_certificate?.flag || false
+        qualification_certificate: Array.isArray(application.qualification_certificate)
+          ? application.qualification_certificate.map(cert => cert?.flag || false)
+          : []
       });
     }
   }, [open, application?._id]);
 
-  const toggleDocumentFlag = (documentType) => {
-    setDocumentFlags(prev => ({
-      ...prev,
-      [documentType]: !prev[documentType]
-    }));
+  const toggleDocumentFlag = (documentType, index = null) => {
+    if (documentType === 'qualification_certificate' && index !== null) {
+      setDocumentFlags(prev => ({
+        ...prev,
+        qualification_certificate: prev.qualification_certificate.map((flag, i) => 
+          i === index ? !flag : flag
+        )
+      }));
+    } else {
+      setDocumentFlags(prev => ({
+        ...prev,
+        [documentType]: !prev[documentType]
+      }));
+    }
   };
 
-  const hasAnyFlaggedDocument = Object.values(documentFlags).some(flag => flag);
+  const hasAnyFlaggedDocument = documentFlags.id_card || 
+    (Array.isArray(documentFlags.qualification_certificate) && 
+     documentFlags.qualification_certificate.some(flag => flag));
 
   if (!open || !application) return null;
 
@@ -52,8 +65,16 @@ const ViewApplication = ({ open, onClose, application }) => {
     if (application.id_card && documentFlags.id_card) {
       updateData.id_card = { flag: true };
     }
-    if (application.qualification_certificate && documentFlags.qualification_certificate) {
-      updateData.qualification_certificate = { flag: true };
+    
+    // Only send flags for qualification certificates, not the full objects
+    if (Array.isArray(documentFlags.qualification_certificate) && 
+        documentFlags.qualification_certificate.length > 0) {
+      const hasFlaggedCerts = documentFlags.qualification_certificate.some(flag => flag);
+      if (hasFlaggedCerts) {
+        updateData.qualification_certificate = documentFlags.qualification_certificate.map(flag => ({
+          flag: flag
+        }));
+      }
     }
 
     updateApplicationMutation.mutate({
@@ -111,7 +132,9 @@ const ViewApplication = ({ open, onClose, application }) => {
             // Reset flags to original values from application data
             setDocumentFlags({
               id_card: application?.id_card?.flag || false,
-              qualification_certificate: application?.qualification_certificate?.flag || false
+              qualification_certificate: Array.isArray(application?.qualification_certificate)
+                ? application.qualification_certificate.map(cert => cert?.flag || false)
+                : []
             });
             onClose();
           }}>
@@ -149,17 +172,22 @@ const ViewApplication = ({ open, onClose, application }) => {
               />
             )}
             
-            {application?.qualification_certificate?.url && (
+            {Array.isArray(application?.qualification_certificate) && 
+             application.qualification_certificate.length > 0 && 
+             application.qualification_certificate.map((cert, index) => (
               <DocumentRow 
-                title={t("applicationReview.documents.qualificationCertificate")} 
+                key={index}
+                title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`} 
                 size={t("applicationReview.documents.pdfDocument")} 
-                url={application.qualification_certificate.url}
-                flagged={documentFlags.qualification_certificate}
-                onToggleFlag={() => toggleDocumentFlag('qualification_certificate')}
+                url={cert.url}
+                flagged={documentFlags.qualification_certificate[index] || false}
+                onToggleFlag={() => toggleDocumentFlag('qualification_certificate', index)}
               />
-            )}
+            ))}
 
-            {!application?.id_card?.url && !application?.qualification_certificate?.url && (
+            {!application?.id_card?.url && 
+             (!Array.isArray(application?.qualification_certificate) || 
+              application.qualification_certificate.length === 0) && (
               <p className="text-sm text-muted-foreground dark:text-white/70">{t("applicationReview.modal.noDocuments")}</p>
             )}
           </div>

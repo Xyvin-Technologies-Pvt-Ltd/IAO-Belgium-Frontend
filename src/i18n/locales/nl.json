@@ -700,6 +700,7 @@
       "learningUID": "Leer UID",
       "moduleName": "Modulenaam",
       "year": "Jaar",
+      "moduleNumber": "Modulenummer",
       "files": "Bestanden",
       "amount": "Bedrag",
       "status": "Status",
