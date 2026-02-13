@@ -24,10 +24,12 @@ import { cn } from "@/lib/utils";
 import {
   useCreateComponent,
   useUpdateComponent,
+  useGetComponents,
 } from "@/store/useComponentStore";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const CreateComponent = ({
   open,
@@ -44,6 +46,10 @@ const CreateComponent = ({
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [resourceType, setResourceType] = useState("file"); // "file" or "link"
   const [instructionContent, setInstructionContent] = useState("");
+  const [moduleNameSearch, setModuleNameSearch] = useState("");
+  const [showModuleSuggestions, setShowModuleSuggestions] = useState(false);
+  const [selectedSystemId, setSelectedSystemId] = useState(null);
+  const debouncedModuleName = useDebounce(moduleNameSearch, 200);
 
   const {
     register,
@@ -81,6 +87,41 @@ const CreateComponent = ({
   const createComponent = useCreateComponent();
   const updateComponent = useUpdateComponent();
 
+  // Search for existing modules when typing module name
+  const { data: existingModulesData } = useGetComponents(
+    {
+      type: "module",
+      search: debouncedModuleName,
+      limit: 10,
+    },
+    {
+      enabled: selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
+    }
+  );
+
+  // Filter modules to show only unique system_ids (or modules without system_id)
+  // Group by system_id and take the first one from each group
+  const existingModules = (() => {
+    const modules = existingModulesData?.data || [];
+    const seenSystemIds = new Set();
+    const uniqueModules = [];
+
+    for (const module of modules) {
+      if (module.system_id) {
+        // If module has system_id, only add if we haven't seen this system_id before
+        if (!seenSystemIds.has(module.system_id)) {
+          seenSystemIds.add(module.system_id);
+          uniqueModules.push(module);
+        }
+      } else {
+        // If module doesn't have system_id, always add it
+        uniqueModules.push(module);
+      }
+    }
+
+    return uniqueModules; // Limit to 5 results
+  })();
+
   const componentTypes = [
     { value: "module", label: "Learning Module" },
     { value: "app", label: "Applied Professional Practice(APP)" },
@@ -112,6 +153,9 @@ const CreateComponent = ({
     setUploadedFiles([]);
     setResourceType("file");
     setInstructionContent("");
+    setModuleNameSearch("");
+    setShowModuleSuggestions(false);
+    setSelectedSystemId(null);
     onClose();
   };
 
@@ -286,6 +330,10 @@ const CreateComponent = ({
     if (data.type === "module") {
       payload.amount = data.amount;
       payload.module_number = data.module_number;
+      // Include system_id if a module was selected from suggestions
+      if (selectedSystemId) {
+        payload.system_id = selectedSystemId;
+      }
     }
 
     if (data.type === "app") {
@@ -310,8 +358,18 @@ const CreateComponent = ({
   const isSubmitting = createComponent.isPending || updateComponent.isPending;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white dark:bg-black border rounded-xl shadow-lg w-xl max-h-[90vh] overflow-y-auto p-6">
+    <div 
+      className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowModuleSuggestions(false);
+        }
+      }}
+    >
+      <div 
+        className="bg-white dark:bg-black border rounded-xl shadow-lg w-xl max-h-[90vh] overflow-y-auto p-6"
+        onClick={() => setShowModuleSuggestions(false)}
+      >
         <h2 className="text-xl font-bold">
           {isEdit ? "Edit Module" : "Create Module"}
         </h2>
@@ -339,13 +397,56 @@ const CreateComponent = ({
               <p className="text-sm text-destructive">{errors.type.message}</p>
             )}
           </div>
-          <FormField
-            label="Module Name"
-            placeholder="Enter module name"
-            error={errors.name?.message}
-            required
-            {...register("name")}
-          />
+          <div className="space-y-2 relative">
+            <Label>
+              Module Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              placeholder="Enter module name"
+              {...register("name")}
+              onChange={(e) => {
+                register("name").onChange(e);
+                if (selectedType === "module" && !isEdit) {
+                  setModuleNameSearch(e.target.value);
+                  setShowModuleSuggestions(true);
+                  // Clear selected system_id when user types manually
+                  setSelectedSystemId(null);
+                }
+              }}
+              onFocus={() => {
+                if (selectedType === "module" && !isEdit && moduleNameSearch) {
+                  setShowModuleSuggestions(true);
+                }
+              }}
+            />
+            {errors.name && (
+              <p className="text-sm text-destructive">{errors.name.message}</p>
+            )}
+
+            {/* Module suggestions dropdown */}
+            {selectedType === "module" &&
+              !isEdit &&
+              showModuleSuggestions &&
+              moduleNameSearch.length > 2 &&
+              existingModules.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-y-auto">
+                  {existingModules.map((module) => (
+                    <div
+                      key={module._id}
+                      className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
+                      onClick={() => {
+                        setValue("name", module.name);
+                        setModuleNameSearch(module.name);
+                        setSelectedSystemId(module.system_id || null);
+                        setShowModuleSuggestions(false);
+                      }}
+                    >
+                      <p className="font-medium text-sm">{module.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+          </div>
 
           <div className="space-y-2">
             <Label>In which year the module belongs <span className="text-red-500">*</span></Label>
