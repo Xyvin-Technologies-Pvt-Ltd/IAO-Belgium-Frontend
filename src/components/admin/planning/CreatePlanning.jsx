@@ -21,7 +21,7 @@ import {
 import { planningSchema } from "@/validations/admin";
 import moment from "moment";
 
-const CreatePlanning = ({ open, onClose, planningData }) => {
+const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const { t } = useTranslation();
 
   const [programSearchTerm, setProgramSearchTerm] = useState("");
@@ -78,6 +78,7 @@ const CreatePlanning = ({ open, onClose, planningData }) => {
   const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
     {
       ...(programSearchTerm && { search: programSearchTerm }),
+      ...(activeCity && activeCity !== "all" && { city: activeCity }),
     },
     { enabled: open },
   );

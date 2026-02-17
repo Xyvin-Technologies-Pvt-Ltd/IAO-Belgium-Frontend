@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -22,6 +22,7 @@ import { useDeletePlanning, useGetPlanning } from "@/store/usePlanningStore";
 import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
+import { useGetAllCities } from "@/store/useDropdownStore";
 
 const PlanningTable = () => {
   const { t } = useTranslation();
@@ -34,13 +35,31 @@ const PlanningTable = () => {
   const [selectedPlanning, setSelectedPlanning] = useState(null);
   const [viewPlanning, setViewPlanning] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeCity, setActiveCity] = useState(() => {
+    return localStorage.getItem("planningActiveCity") || "all";
+  });
 
   const debouncedSearch = useDebounce(search, 500);
+
+  // Fetch all cities for tabs
+  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities({});
+  const cities = citiesData?.data || [];
+
+  // Update localStorage when active city changes
+  useEffect(() => {
+    localStorage.setItem("planningActiveCity", activeCity);
+  }, [activeCity]);
+
+  // Reset page when city or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeCity, debouncedSearch]);
 
   const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(activeCity !== "all" ? { city: activeCity } : {}),
   });
   const { mutateAsync: deletePlanning, isPending: isDeleting } =
     useDeletePlanning();
@@ -169,6 +188,41 @@ const PlanningTable = () => {
 
   return (
     <div className="space-y-6 mt-4">
+      {/* City Tabs */}
+      <div className="border-b border-gray-200 dark:border-white/20">
+        <nav className="-mb-px flex space-x-8 overflow-x-auto">
+          <button
+            onClick={() => setActiveCity("all")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+              activeCity === "all"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+           All Cities
+          </button>
+          {citiesLoading ? (
+            <div className="py-2 px-1 text-sm text-gray-400">
+              {t("common.loading") || "Loading..."}
+            </div>
+          ) : (
+            cities.map((city) => (
+              <button
+                key={city._id}
+                onClick={() => setActiveCity(city._id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                  activeCity === city._id
+                    ? "border-[#ff8904] text-[#ff8904]"
+                    : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+                }`}
+              >
+                {city.name}
+              </button>
+            ))
+          )}
+        </nav>
+      </div>
+
       <div className="flex items-center justify-between gap-2">
         <Input
           placeholder={t("planningManagement.search")}
@@ -273,6 +327,7 @@ const PlanningTable = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         planningData={selectedPlanning}
+        activeCity={activeCity}
       />
 
       <ViewPlanning
