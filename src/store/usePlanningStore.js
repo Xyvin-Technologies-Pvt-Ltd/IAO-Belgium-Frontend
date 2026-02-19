@@ -5,6 +5,8 @@ import {
   updatePlanning,
   getPlanningByTeacher,
   updateTeacherStatus,
+  getPlanningByModule,
+  getPlanningById,
 } from "@/api/planningApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -89,3 +91,22 @@ export const useUpdateTeacherStatus = () => {
   });
 };
 
+export const useGetPlanningByModule = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["planning-module", filter],
+    queryFn: () => getPlanningByModule(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetPlanningById=(id, options = {}) => {
+  return useQuery({
+    queryKey: ["planning", id],
+    queryFn: () => getPlanningById(id),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+}

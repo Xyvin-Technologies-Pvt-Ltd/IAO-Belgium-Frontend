@@ -1,5 +1,5 @@
 
-import { createComponent, getComponents, updateComponent } from "@/api/componentApi";
+import { createComponent, getComponentById, getComponents, getStudentsByComponent, updateComponent } from "@/api/componentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -45,3 +45,24 @@ export const useUpdateComponent = () => {
   });
 };
 
+export const useGetStudentsByComponent=(id,filter,options={})=>{
+  return useQuery({
+    queryKey: ["student-component", id, filter],
+    queryFn: () => getStudentsByComponent(id,filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id, // Only run query when id is provided
+    ...options,
+  });
+}
+
+export const useGetComponentById=(id,options={})=>{
+  return useQuery({
+    queryKey: ["component", id],
+    queryFn: () => getComponentById(id),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id, // Only run query when id is provided
+    ...options,
+  });
+}

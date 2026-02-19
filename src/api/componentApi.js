@@ -28,3 +28,22 @@ export const updateComponent = async (id, data) => {
     throw error.response.data;
   }
 };
+export const getStudentsByComponent = async (id,filter) => {
+  try {
+    const response = await axiosInstance.get(`/student/component/${id}/students`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getComponentById= async (id) => {
+  try {
+    const response = await axiosInstance.get(`/components/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

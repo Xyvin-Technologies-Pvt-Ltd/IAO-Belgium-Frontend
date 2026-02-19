@@ -139,6 +139,62 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                         </div>
                       </div>
                     )}
+
+                    {session.assistants && session.assistants.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
+                          Assistant
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {session.assistants.map((assistantObj, assistantIndex) => {
+                            const assistant = assistantObj.assistant || assistantObj;
+                            const assistantName =
+                              assistant.first_name && assistant.last_name
+                                ? `${assistant.first_name} ${assistant.last_name}`.trim()
+                                : assistant.name || "Unknown Assistant";
+                            const status = assistantObj.status || "pending";
+
+                            return (
+                              <Badge
+                                key={assistant._id || assistantIndex}
+                                variant="outline"
+                                className={`text-xs ${getBadgeStyles(status)}`}
+                              >
+                                {assistantName}
+                              </Badge>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {session.trainees && session.trainees.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
+                          Trainee
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {session.trainees.map((traineeObj, traineeIndex) => {
+                            const trainee = traineeObj.trainee || traineeObj;
+                            const traineeName =
+                              trainee.first_name && trainee.last_name
+                                ? `${trainee.first_name} ${trainee.last_name}`.trim()
+                                : trainee.name || "Unknown Trainee";
+                            const status = traineeObj.status || "pending";
+
+                            return (
+                              <Badge
+                                key={trainee._id || traineeIndex}
+                                variant="outline"
+                                className={`text-xs ${getBadgeStyles(status)}`}
+                              >
+                                {traineeName}
+                              </Badge>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

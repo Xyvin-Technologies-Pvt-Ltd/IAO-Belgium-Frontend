@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Trash } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useCreatePlanning, useUpdatePlanning } from "@/store/usePlanningStore";
 import {
@@ -123,7 +123,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     {
       ...(traineeSearchTerm && { search: traineeSearchTerm }),
       role: "teacher",
-      teacher_role: "Trainee",
+      teacher_role: "Trainees",
     },
     { enabled: open },
   );
@@ -480,7 +480,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                         onClick={() => removeSession(index)}
                         className="text-red-500 hover:text-red-700 hover:bg-red-50"
                       >
-                        <X className="h-4 w-4" />
+                        <Trash className="h-4 w-4" />
                       </Button>
                     )}
                   </div>

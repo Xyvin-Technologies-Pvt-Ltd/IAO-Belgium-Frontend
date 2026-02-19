@@ -58,3 +58,23 @@ export const updateTeacherStatus = async (id, data) => {
     throw error.response.data;
   }
 };
+
+export const getPlanningByModule = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/planning/teacher/modules`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getPlanningById= async (id) => {
+  try {
+    const response = await axiosInstance.get(`/planning/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
