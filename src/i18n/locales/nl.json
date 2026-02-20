@@ -32,6 +32,7 @@
       "main": "Hoofdmenu",
       "operations": "Operaties",
       "academicManagement": "Academisch Beheer",
+      "financeManagement": "Financieel Beheer",
       "masterData": "Basisgegevens",
       "settings": "Instellingen",
       "dashboard": "Dashboard",
@@ -46,6 +47,7 @@
       "planning": "Planning",
       "teacherManagement": "Docent Beheer",
       "studentManagement": "Student Beheer",
+      "financeReports": "Financiële Rapporten",
       "adminManagement": "Admin Beheer",
       "roleManagement": "Rol Beheer",
       "adminLogs": "Admin Logs"

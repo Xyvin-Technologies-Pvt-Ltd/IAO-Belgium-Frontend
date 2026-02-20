@@ -73,6 +73,16 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
         ],
       },
       {
+        title: t("sidebar.admin.financeManagement"),
+        items: [
+          {
+            title: t("sidebar.admin.financeReports"),
+            url: "/admin/finance-reports",
+            icon: FileText,
+          },
+        ],
+      },
+      {
         title: t("sidebar.admin.masterData"),
         items: [
           {

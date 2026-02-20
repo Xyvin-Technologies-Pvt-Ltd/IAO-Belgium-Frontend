@@ -32,6 +32,7 @@
       "main": "Hauptmenü",
       "operations": "Operationen",
       "academicManagement": "Akademische Verwaltung",
+      "financeManagement": "Finanz Verwaltung",
       "masterData": "Stammdaten",
       "settings": "Einstellungen",
       "dashboard": "Dashboard",
@@ -46,6 +47,7 @@
       "planning": "Planung",
       "teacherManagement": "Lehrer Verwaltung",
       "studentManagement": "Studenten Verwaltung",
+      "financeReports": "Finanzberichte",
       "adminManagement": "Admin Verwaltung",
       "roleManagement": "Rollen Verwaltung",
       "adminLogs": "Admin Logs"

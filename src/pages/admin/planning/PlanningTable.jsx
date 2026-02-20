@@ -241,6 +241,7 @@ const PlanningTable = () => {
             <TableHead>{t("planningManagement.table.program")}</TableHead>
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
             <TableHead>{t("planningManagement.table.module")}</TableHead>
+            <TableHead>{t("planningManagement.table.venue")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
             <TableHead>{t("planningManagement.table.action")}</TableHead>
@@ -248,10 +249,10 @@ const PlanningTable = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={5} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("planningManagement.messages.loadFailed")
@@ -281,6 +282,12 @@ const PlanningTable = () => {
                 >
                   {i?.component?.name}
                 </TableCell>
+                <TableCell
+                  className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  title={i?.venue}
+                >
+                  {i?.venue || "N/A"}
+                </TableCell>
                 <TableCell>
                   {renderTeacherChips(i?.sessions)}
                 </TableCell>
@@ -308,7 +315,7 @@ const PlanningTable = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={7} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>

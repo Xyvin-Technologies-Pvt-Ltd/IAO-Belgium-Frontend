@@ -9,6 +9,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/planning": ["operations_management_view", "operations_management_modify"],
   "/admin/teacher-management": ["academic_management_view", "academic_management_modify"],
   "/admin/student-management": ["academic_management_view", "academic_management_modify"],
+  "/admin/finance-reports": ["finance_management_view", "finance_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"],

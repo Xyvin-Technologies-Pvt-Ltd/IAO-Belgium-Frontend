@@ -32,6 +32,7 @@
       "main": "Principal",
       "operations": "Opérations",
       "academicManagement": "Gestion académique",
+      "financeManagement": "Gestion financière",
       "masterData": "Données de base",
       "settings": "Paramètres",
       "dashboard": "Tableau de bord",
@@ -45,6 +46,7 @@
       "planning": "Planification",
       "teacherManagement": "Gestion des enseignants",
       "studentManagement": "Gestion des étudiants",
+      "financeReports": "Rapports financiers",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
       "adminLogs": "Journaux d'administration"

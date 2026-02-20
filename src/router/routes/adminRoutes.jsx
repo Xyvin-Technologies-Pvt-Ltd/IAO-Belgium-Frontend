@@ -21,6 +21,7 @@ import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
+import FinanceReports from "@/pages/admin/finance-management/FinanceReports";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -86,6 +87,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       StudentView,
       "/admin/student-management",
+    ),
+  },
+  {
+    path: "/admin/finance-reports",
+    component: withPermissionProtection(
+      FinanceReports,
+      "/admin/finance-reports",
     ),
   },
   {

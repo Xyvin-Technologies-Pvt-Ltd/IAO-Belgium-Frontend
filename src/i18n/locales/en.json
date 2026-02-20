@@ -32,6 +32,7 @@
       "main": "Main",
       "operations": "Operations",
       "academicManagement": "Academic Management",
+      "financeManagement": "Finance Management",
       "masterData": "Master Data",
       "settings": "Settings",
       "dashboard": "Dashboard",
@@ -46,6 +47,7 @@
       "planning": "Planning",
       "teacherManagement": "Teacher Management",
       "studentManagement": "Student Management",
+      "financeReports": "Finance Reports",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "adminLogs": "Admin Logs"
