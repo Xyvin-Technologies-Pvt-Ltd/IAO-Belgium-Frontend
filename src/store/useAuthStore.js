@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { verifyOtp, refreshToken as refreshTokenApi, logout as logoutApi, getProfile } from "../api/authApi";
+import { queryClient } from "../main";
 
 export const useAuthStore = create((set, get) => ({
   token: null, 
@@ -70,6 +71,9 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
+      // Clear React Query cache to prevent showing previous user's data
+      queryClient.clear();
+      
       set({
         token: null,
         role: null,
