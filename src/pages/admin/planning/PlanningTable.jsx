@@ -23,6 +23,7 @@ import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetAllCities } from "@/store/useDropdownStore";
+import moment from "moment";
 
 const PlanningTable = () => {
   const { t } = useTranslation();
@@ -66,6 +67,39 @@ const PlanningTable = () => {
 
   const plannings = data?.data || [];
   const totalRows = data?.total_count || 0;
+
+  // Helper function to get session date range
+  const getSessionDateRange = (sessions) => {
+    if (!sessions || sessions.length === 0) return "N/A";
+    
+    const dates = sessions
+      .map(session => session.session_date)
+      .filter(date => date)
+      .map(date => moment(date))
+      .sort((a, b) => a - b);
+    
+    if (dates.length === 0) return "N/A";
+    
+    if (dates.length === 1) {
+      return dates[0].format('MMM D, YYYY');
+    }
+    
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+    
+    // If same month and year, show: "Mar 13-14, 2026"
+    if (firstDate.isSame(lastDate, 'month') && firstDate.isSame(lastDate, 'year')) {
+      return `${firstDate.format('MMM D')}-${lastDate.format('D, YYYY')}`;
+    }
+    
+    // If same year but different months, show: "Nov 27 - Dec 14, 2025"
+    if (firstDate.isSame(lastDate, 'year')) {
+      return `${firstDate.format('MMM D')} - ${lastDate.format('MMM D, YYYY')}`;
+    }
+    
+    // Different years, show full dates: "Dec 27, 2025 - Jan 14, 2026"
+    return `${firstDate.format('MMM D, YYYY')} - ${lastDate.format('MMM D, YYYY')}`;
+  };
 
   // Helper function to get unique teachers from all sessions
   const getUniqueTeachers = (sessions) => {
@@ -241,6 +275,8 @@ const PlanningTable = () => {
             <TableHead>{t("planningManagement.table.program")}</TableHead>
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
             <TableHead>{t("planningManagement.table.module")}</TableHead>
+            <TableHead>Year</TableHead>
+            <TableHead>Session Dates</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
@@ -249,10 +285,10 @@ const PlanningTable = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("planningManagement.messages.loadFailed")
@@ -281,6 +317,12 @@ const PlanningTable = () => {
                   title={i?.component?.name}
                 >
                   {i?.component?.name}
+                </TableCell>
+                <TableCell>
+                  {i?.cohort_year || "N/A"}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {getSessionDateRange(i?.sessions)}
                 </TableCell>
                 <TableCell
                   className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap"
@@ -315,7 +357,7 @@ const PlanningTable = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>
