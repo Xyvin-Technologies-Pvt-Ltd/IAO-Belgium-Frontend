@@ -11,6 +11,7 @@ import {
   Languages,
   Calendars,
   Award,
+  ClipboardCheck,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -54,6 +55,24 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.planning"),
             url: "/admin/planning",
             icon: Calendars,
+          },
+          {
+            title: t("sidebar.admin.examination"),
+            icon: ClipboardCheck,
+            items: [
+              {
+                title: t("sidebar.admin.questionBanks"),
+                url: "/admin/examination/question-banks",
+              },
+              {
+                title: t("sidebar.admin.exams"),
+                url: "/admin/examination/exams",
+              },
+              {
+                title: t("sidebar.admin.examAssignments"),
+                url: "/admin/examination/assignments",
+              },
+            ],
           },
         ],
       },

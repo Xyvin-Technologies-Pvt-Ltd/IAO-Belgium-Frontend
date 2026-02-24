@@ -1,0 +1,203 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table/table";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
+import { useState } from "react";
+import TableSkeleton from "@/components/ui/table/TableSkeleton";
+import { Pagination } from "@/components/ui/table/Pagination";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
+import ErrorMessage from "@/components/common/ErrorMessage";
+import { useTranslation } from "react-i18next";
+import QuestionForm from "./QuestionForm";
+import BulkUploadDialog from "./BulkUploadDialog";
+import DeleteConfirm from "@/components/DeleteConfirm";
+import {
+  useGetQuestions,
+  useDeleteQuestion,
+} from "@/store/useQuestionBankStore";
+
+const DIFFICULTY_LABELS = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+};
+
+const QuestionList = ({ questionBankId }) => {
+  const { t } = useTranslation();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [difficulty, setDifficulty] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deleteIds, setDeleteIds] = useState({ bankId: null, questionId: null });
+
+  const { data, isLoading, error, refetch, isFetching } = useGetQuestions(
+    questionBankId,
+    {
+      page,
+      limit: rowsPerPage,
+      ...(difficulty ? { difficulty } : {}),
+    },
+  );
+  const { mutateAsync: deleteQuestion, isPending: isDeleting } =
+    useDeleteQuestion();
+
+  const questions = data?.data || [];
+  const totalRows = data?.total_count || 0;
+
+  const handleOpenAdd = () => {
+    setSelectedQuestion(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (q) => {
+    setSelectedQuestion(q);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClick = (q) => {
+    setDeleteIds({ bankId: questionBankId, questionId: q._id });
+    setOpenDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteQuestion({
+        questionBankId: deleteIds.bankId,
+        questionId: deleteIds.questionId,
+      });
+    } finally {
+      setDeleteIds({ bankId: null, questionId: null });
+      setOpenDelete(false);
+    }
+  };
+
+  const handleFormSuccess = () => {
+    setSelectedQuestion(null);
+    setIsFormOpen(false);
+    refetch();
+  };
+
+  const handleBulkSuccess = () => {
+    setIsBulkOpen(false);
+    refetch();
+  };
+
+  return (
+    <div className="space-y-6 mt-4">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex gap-2">
+          <Button onClick={handleOpenAdd}>
+            {t("questionBank.questionList.addQuestion")}
+          </Button>
+          <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
+            {t("questionBank.questionList.bulkUpload")}
+          </Button>
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t("questionBank.questionList.uid")}</TableHead>
+            <TableHead>{t("questionBank.questionList.question")}</TableHead>
+            <TableHead>{t("questionBank.questionList.difficulty")}</TableHead>
+            <TableHead>{t("questionBank.questionList.marks")}</TableHead>
+            <TableHead>{t("questionBank.questionList.action")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+          {isLoading ? (
+            <TableSkeleton rows={rowsPerPage} columns={5} />
+          ) : error ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center p-8">
+                <ErrorMessage
+                  message={error?.message || t("questionBank.messages.loadFailed")}
+                  onRetry={refetch}
+                  variant="inline"
+                />
+              </TableCell>
+            </TableRow>
+          ) : questions?.length > 0 ? (
+            questions?.map((i) => (
+              <TableRow key={i._id}>
+                <TableCell>{i?.uid}</TableCell>
+                <TableCell className="max-w-[300px] truncate">
+                  {i?.question_text || "-"}
+                </TableCell>
+                <TableCell>
+                  {t(`questionBank.questionForm.${i?.difficulty || "medium"}`)}
+                </TableCell>
+                <TableCell>{i?.marks ?? 1}</TableCell>
+                <TableCell>
+                  <RowActionMenu
+                    actions={[
+                      {
+                        label: t("questionBank.questionList.edit"),
+                        icon: Edit,
+                        onClick: () => handleOpenEdit(i),
+                      },
+                      {
+                        label: t("questionBank.questionList.delete"),
+                        icon: Trash2,
+                        onClick: () => handleDeleteClick(i),
+                      },
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">
+                {t("questionBank.questionList.noQuestions")}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <Pagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={totalRows}
+      />
+
+      <QuestionForm
+        open={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        questionBankId={questionBankId}
+        questionData={selectedQuestion}
+        onSuccess={handleFormSuccess}
+      />
+
+      <BulkUploadDialog
+        open={isBulkOpen}
+        onClose={() => setIsBulkOpen(false)}
+        questionBankId={questionBankId}
+        onSuccess={handleBulkSuccess}
+      />
+
+      <DeleteConfirm
+        open={openDelete}
+        onClose={() => setOpenDelete(false)}
+        onConfirm={handleConfirmDelete}
+        count={1}
+        isLoading={isDeleting}
+        data="Question"
+      />
+    </div>
+  );
+};
+
+export default QuestionList;

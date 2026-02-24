@@ -22,6 +22,13 @@ import Planning from "@/pages/admin/planning";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
 import FinanceReports from "@/pages/admin/finance-management/FinanceReports";
+import QuestionBanks from "@/pages/admin/question-bank";
+import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
+import Exams from "@/pages/admin/exam";
+import ExamDetail from "@/pages/admin/exam/ExamDetail";
+import ExamAssignments from "@/pages/admin/exam-assignment";
+import AssignmentDetail from "@/pages/admin/exam-assignment/AssignmentDetail";
+
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -157,6 +164,45 @@ export const adminRoutes = [
     component: withPermissionProtection(
       RoleManagement,
       "/admin/role-management",
+    ),
+  },
+  {
+    path: "/admin/examination/question-banks",
+    component: withPermissionProtection(
+      QuestionBanks,
+      "/admin/examination/question-banks",
+    ),
+  },
+  {
+    path: "/admin/examination/question-banks/$id",
+    component: withPermissionProtection(
+      QuestionBankDetail,
+      "/admin/examination/question-banks",
+    ),
+  },
+  {
+    path: "/admin/examination/exams",
+    component: withPermissionProtection(Exams, "/admin/examination/exams"),
+  },
+  {
+    path: "/admin/examination/exams/$id",
+    component: withPermissionProtection(
+      ExamDetail,
+      "/admin/examination/exams",
+    ),
+  },
+  {
+    path: "/admin/examination/assignments",
+    component: withPermissionProtection(
+      ExamAssignments,
+      "/admin/examination/assignments",
+    ),
+  },
+  {
+    path: "/admin/examination/assignments/$id",
+    component: withPermissionProtection(
+      AssignmentDetail,
+      "/admin/examination/assignments",
     ),
   },
 ];

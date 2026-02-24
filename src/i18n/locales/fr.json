@@ -49,7 +49,11 @@
       "financeReports": "Rapports financiers",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
-      "adminLogs": "Journaux d'administration"
+      "adminLogs": "Journaux d'administration",
+      "examination": "Examen",
+      "questionBanks": "Banques de questions",
+      "exams": "Examens",
+      "examAssignments": "Attributions d'examens"
     },
     "user": {
       "loading": "Chargement...",
@@ -77,7 +81,15 @@
       "cancel": "Annuler",
       "delete": "Supprimer",
       "deleting": "Suppression..."
-    }
+    },
+    "create": "Créer",
+    "update": "Modifier",
+    "cancel": "Annuler",
+    "add": "Ajouter",
+    "uploading": "Téléchargement...",
+    "yes": "Oui",
+    "no": "Non",
+    "none": "Aucun"
   },
   "countryManagement": {
     "title": "Gestion des pays",
@@ -836,6 +848,50 @@
       "moduleLabel": "Module",
       "modulePlaceholder": "Sélectionnez un module"
     }
+  },
+  "questionBank": {
+    "title": "Banques de questions",
+    "search": "Rechercher...",
+    "createQuestionBank": "Créer une banque de questions",
+    "editQuestionBank": "Modifier la banque de questions",
+    "loading": "Chargement...",
+    "questions": "questions",
+    "table": { "uid": "UID", "name": "Nom", "description": "Description", "questionCount": "Questions", "status": "Statut", "action": "Action", "edit": "Modifier", "delete": "Supprimer", "noQuestionBanks": "Aucune banque trouvée" },
+    "messages": { "loadFailed": "Échec du chargement" },
+    "form": { "name": "Nom", "namePlaceholder": "Nom de la banque", "description": "Description", "descriptionPlaceholder": "Description" },
+    "questionForm": { "addQuestion": "Ajouter une question", "editQuestion": "Modifier la question", "questionText": "Question", "questionTextPlaceholder": "Texte de la question", "options": "Options", "correct": "Correct", "addOption": "Ajouter une option", "explanation": "Explication", "explanationPlaceholder": "Explication", "difficulty": "Difficulté", "easy": "Facile", "medium": "Moyen", "hard": "Difficile", "marks": "Points" },
+    "questionList": { "addQuestion": "Ajouter une question", "bulkUpload": "Import en masse", "uid": "UID", "question": "Question", "difficulty": "Difficulté", "marks": "Points", "action": "Action", "edit": "Modifier", "delete": "Supprimer", "noQuestions": "Aucune question" },
+    "bulkUpload": { "title": "Import en masse", "description": "Importer un fichier CSV", "downloadTemplate": "Télécharger le modèle", "selectFile": "Sélectionner un fichier", "upload": "Importer" }
+  },
+  "exam": {
+    "title": "Examens",
+    "search": "Rechercher...",
+    "createExam": "Créer un examen",
+    "editExam": "Modifier l'examen",
+    "loading": "Chargement...",
+    "questions": "questions",
+    "minutes": "min",
+    "cannotEditPublished": "Impossible de modifier un examen publié",
+    "edit": "Modifier",
+    "publish": "Publier",
+    "archive": "Archiver",
+    "allStatuses": "Tous les statuts",
+    "status": { "draft": "Brouillon", "published": "Publié", "archived": "Archivé" },
+    "table": { "uid": "UID", "name": "Nom", "questions": "Questions", "duration": "Durée", "passingMarks": "Réussite", "status": "Statut", "action": "Action", "edit": "Modifier", "publish": "Publier", "archive": "Archiver", "noExams": "Aucun examen" },
+    "messages": { "loadFailed": "Échec du chargement" },
+    "form": { "name": "Nom", "namePlaceholder": "Nom de l'examen", "description": "Description", "descriptionPlaceholder": "Description", "instructions": "Instructions", "instructionsPlaceholder": "Instructions", "questionSources": "Sources de questions", "addQuestionSource": "Ajouter une source", "selectQuestionBank": "Sélectionner une banque", "questionsAvailable": "disponibles", "questions": "questions", "totalQuestions": "Total des questions", "noQuestionBanks": "Aucune banque", "duration": "Durée (minutes)", "marksPerQuestion": "Points par question", "passingMarks": "Seuil de réussite", "passingType": "Type", "marks": "Points", "percentage": "Pourcentage", "settings": "Paramètres", "randomizeQuestions": "Mélanger les questions", "randomizeOptions": "Mélanger les réponses", "autoSubmitOnTimeout": "Soumission automatique", "maxAttempts": "Tentatives max" },
+    "detail": { "totalQuestions": "Total des questions", "totalMarks": "Total des points", "passingMarks": "Seuil de réussite", "duration": "Durée", "questionSources": "Sources", "available": "disponibles" }
+  },
+  "examAssignment": {
+    "title": "Attributions d'examens",
+    "createAssignment": "Créer une attribution",
+    "loading": "Chargement...",
+    "allStatuses": "Tous les statuts",
+    "status": { "scheduled": "Programmé", "active": "Actif", "completed": "Terminé", "cancelled": "Annulé" },
+    "table": { "uid": "UID", "exam": "Examen", "program": "Programme", "batch": "Groupe", "startDate": "Début", "endDate": "Fin", "status": "Statut", "action": "Action", "edit": "Modifier", "cancel": "Annuler", "noAssignments": "Aucune attribution" },
+    "messages": { "loadFailed": "Échec du chargement" },
+    "form": { "createAssignment": "Créer une attribution", "editAssignment": "Modifier l'attribution", "exam": "Examen", "selectExam": "Sélectionner un examen", "noPublishedExams": "Aucun examen publié", "program": "Programme", "selectProgram": "Sélectionner un programme", "batch": "Groupe", "selectBatch": "Sélectionner un groupe", "prerequisiteModules": "Modules prérequis", "selectPrerequisiteModules": "Sélectionner les modules à compléter d'abord", "searchModules": "Rechercher des modules...", "prerequisiteModulesHelp": "Les étudiants doivent compléter ces modules avant que l'examen soit disponible.", "startDate": "Date de début", "endDate": "Date de fin" },
+    "results": { "title": "Résultats", "exportCsv": "Exporter CSV", "student": "Étudiant", "email": "Email", "score": "Score", "total": "Total", "percentage": "Pourcentage", "passed": "Réussi", "status": "Statut", "action": "Action", "viewDetail": "Détails", "noAttempts": "Aucune tentative", "loadFailed": "Échec du chargement", "attemptDetail": "Détails de la tentative", "questionsAnswered": "Questions", "correct": "Correct", "incorrect": "Incorrect", "marks": "Points", "noData": "Aucune donnée" }
   },
   "login": {
     "title": "Bureau IAO",

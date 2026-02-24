@@ -50,7 +50,11 @@
       "financeReports": "Finance Reports",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
-      "adminLogs": "Admin Logs"
+      "adminLogs": "Admin Logs",
+      "examination": "Examination",
+      "questionBanks": "Question Banks",
+      "exams": "Exams",
+      "examAssignments": "Exam Assignments"
     },
     "user": {
       "loading": "Loading...",
@@ -78,7 +82,15 @@
       "cancel": "Cancel",
       "delete": "Delete",
       "deleting": "Deleting..."
-    }
+    },
+    "create": "Create",
+    "update": "Update",
+    "cancel": "Cancel",
+    "add": "Add",
+    "uploading": "Uploading...",
+    "yes": "Yes",
+    "no": "No",
+    "none": "None"
   },
   "countryManagement": {
     "title": "Country Management",
@@ -836,6 +848,204 @@
     "modal": {
       "moduleLabel": "Module",
       "modulePlaceholder": "Select module"
+    }
+  },
+  "questionBank": {
+    "title": "Question Banks",
+    "search": "Search question banks...",
+    "createQuestionBank": "Create Question Bank",
+    "editQuestionBank": "Edit Question Bank",
+    "loading": "Loading question bank...",
+    "questions": "questions",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "description": "Description",
+      "questionCount": "Questions",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noQuestionBanks": "No question banks found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load question banks"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter question bank name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description"
+    },
+    "questionForm": {
+      "addQuestion": "Add Question",
+      "editQuestion": "Edit Question",
+      "questionText": "Question Text",
+      "questionTextPlaceholder": "Enter the question",
+      "options": "Options",
+      "correct": "Correct",
+      "addOption": "Add Option",
+      "explanation": "Explanation",
+      "explanationPlaceholder": "Optional explanation shown after attempt",
+      "difficulty": "Difficulty",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "marks": "Marks"
+    },
+    "questionList": {
+      "addQuestion": "Add Question",
+      "bulkUpload": "Bulk Upload",
+      "uid": "UID",
+      "question": "Question",
+      "difficulty": "Difficulty",
+      "marks": "Marks",
+      "action": "Action",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noQuestions": "No questions found"
+    },
+    "bulkUpload": {
+      "title": "Bulk Upload Questions",
+      "description": "Upload a CSV file with columns: question_text, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D), explanation, difficulty",
+      "downloadTemplate": "Download Template",
+      "selectFile": "Select CSV File",
+      "upload": "Upload"
+    }
+  },
+  "exam": {
+    "title": "Exams",
+    "search": "Search exams...",
+    "createExam": "Create Exam",
+    "editExam": "Edit Exam",
+    "loading": "Loading exam...",
+    "questions": "questions",
+    "minutes": "min",
+    "cannotEditPublished": "Cannot edit a published exam. Archive it first.",
+    "edit": "Edit",
+    "publish": "Publish",
+    "archive": "Archive",
+    "allStatuses": "All Statuses",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "questions": "Questions",
+      "duration": "Duration",
+      "passingMarks": "Passing",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "publish": "Publish",
+      "archive": "Archive",
+      "noExams": "No exams found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load exams"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter exam name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "instructions": "Instructions",
+      "instructionsPlaceholder": "Instructions shown before exam starts",
+      "questionSources": "Question Sources",
+      "addQuestionSource": "Add Source",
+      "selectQuestionBank": "Select question bank",
+      "questionsAvailable": "available",
+      "questions": "questions",
+      "totalQuestions": "Total questions",
+      "noQuestionBanks": "No question banks available",
+      "duration": "Duration (minutes)",
+      "marksPerQuestion": "Marks per question",
+      "passingMarks": "Passing marks",
+      "passingType": "Passing type",
+      "marks": "Marks",
+      "percentage": "Percentage",
+      "settings": "Settings",
+      "randomizeQuestions": "Randomize questions",
+      "randomizeOptions": "Randomize answer options",
+      "autoSubmitOnTimeout": "Auto-submit on timeout",
+      "maxAttempts": "Max attempts"
+    },
+    "detail": {
+      "totalQuestions": "Total Questions",
+      "totalMarks": "Total Marks",
+      "passingMarks": "Passing Marks",
+      "duration": "Duration",
+      "questionSources": "Question Sources",
+      "available": "available"
+    }
+  },
+  "examAssignment": {
+    "title": "Exam Assignments",
+    "createAssignment": "Create Assignment",
+    "loading": "Loading assignment...",
+    "allStatuses": "All Statuses",
+    "status": {
+      "scheduled": "Scheduled",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "uid": "UID",
+      "exam": "Exam",
+      "program": "Program",
+      "batch": "Batch",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "noAssignments": "No assignments found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load assignments"
+    },
+    "form": {
+      "createAssignment": "Create Assignment",
+      "editAssignment": "Edit Assignment",
+      "exam": "Exam",
+      "selectExam": "Select exam",
+      "noPublishedExams": "No published exams available",
+      "program": "Program",
+      "selectProgram": "Select program",
+      "batch": "Batch",
+      "selectBatch": "Select batch",
+      "prerequisiteModules": "Prerequisite Modules",
+      "selectPrerequisiteModules": "Select modules that must be completed first",
+      "searchModules": "Search modules...",
+      "prerequisiteModulesHelp": "Students must complete these modules before the exam becomes available.",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "results": {
+      "title": "Results",
+      "exportCsv": "Export CSV",
+      "student": "Student",
+      "email": "Email",
+      "score": "Score",
+      "total": "Total",
+      "percentage": "Percentage",
+      "passed": "Passed",
+      "status": "Status",
+      "action": "Action",
+      "viewDetail": "View Detail",
+      "noAttempts": "No attempts yet",
+      "loadFailed": "Failed to load results",
+      "attemptDetail": "Attempt Details",
+      "questionsAnswered": "Questions",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "marks": "Marks",
+      "noData": "No attempt data found"
     }
   },
   "login": {
