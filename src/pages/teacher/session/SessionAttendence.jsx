@@ -19,6 +19,7 @@ import { useGetStudentsByComponent, useGetComponentById } from "@/store/useCompo
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import moment from "moment";
 
 const SessionAttendence = () => {
   const { t } = useTranslation();
@@ -48,8 +49,12 @@ const SessionAttendence = () => {
 
   const markAttendanceMutation = useMarkAttendance();
 
-  const students = data?.data || [];
+  const students = data?.data?.students || [];
+  const sessionDate = data?.data?.session_date;
   const totalRows = data?.total_count || 0;
+
+  // Check if session date is in the future (before today)
+  const isSessionFuture = sessionDate ? moment(sessionDate).isAfter(moment(), 'day') : false;
 
   useEffect(() => {
     if (component) {
@@ -97,6 +102,14 @@ const SessionAttendence = () => {
               )}
             </div>
           ) : null}
+
+          {isSessionFuture && (
+            <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-sm text-yellow-800">
+                Attendance marking is not available yet. You can mark attendance on or after the session date.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -161,7 +174,7 @@ const SessionAttendence = () => {
                             "present",
                           )
                         }
-                        disabled={markAttendanceMutation.isPending}
+                        disabled={markAttendanceMutation.isPending || isSessionFuture}
                       >
                         <Check className="h-4 w-4 mr-1" />
                         Present
@@ -182,7 +195,7 @@ const SessionAttendence = () => {
                             "absent",
                           )
                         }
-                        disabled={markAttendanceMutation.isPending}
+                        disabled={markAttendanceMutation.isPending || isSessionFuture}
                       >
                         <X className="h-4 w-4 mr-1" />
                         Absent
