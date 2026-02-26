@@ -21,7 +21,11 @@ import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
-import FinanceReports from "@/pages/admin/finance-management/FinanceReports";
+import AllReports from "@/pages/admin/finance-management/AllReports";
+import CityReports from "@/pages/admin/finance-management/CityReports";
+import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
+import BatchReports from "@/pages/admin/finance-management/BatchReports";
+import FinanceManagement from "@/pages/admin/finance-management";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -92,7 +96,35 @@ export const adminRoutes = [
   {
     path: "/admin/finance-reports",
     component: withPermissionProtection(
-      FinanceReports,
+      FinanceManagement,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/all",
+    component: withPermissionProtection(
+      AllReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/city",
+    component: withPermissionProtection(
+      CityReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/program",
+    component: withPermissionProtection(
+      ProgramReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/batch",
+    component: withPermissionProtection(
+      BatchReports,
       "/admin/finance-reports",
     ),
   },

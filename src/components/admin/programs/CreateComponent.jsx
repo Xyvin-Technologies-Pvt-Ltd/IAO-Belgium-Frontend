@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { X, FileText, Cloud, Link } from "lucide-react";
+import { X, FileText, Cloud, Link, Loader2 } from "lucide-react";
 import moment from "moment";
+import { uploadFile } from "@/api/uploadApi";
 
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -44,6 +45,7 @@ const CreateComponent = ({
 
   const [selectedType, setSelectedType] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
   const [resourceType, setResourceType] = useState("file"); // "file" or "link"
   const [instructionContent, setInstructionContent] = useState("");
   const [moduleNameSearch, setModuleNameSearch] = useState("");
@@ -165,31 +167,42 @@ const CreateComponent = ({
       onComponentCreated(componentType);
     }
   };
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
+    if (files.length === 0) return;
     const resourceName = watch("resource_name");
+    const inputRef = event.target;
+    setIsUploading(true);
 
-    const newFiles = files.map((file) => ({
-      file,
-      name: resourceName || file.name.split('.')[0], // Use file name without extension if no resource name provided
-      originalFileName: file.name,
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      url: `https://example.com/uploads/${Date.now()}_${file.name}`, // mock url
-    }));
+    try {
+      const newFiles = [];
+      for (const file of files) {
+        const response = await uploadFile(file);
+        const fileUrl = response?.data?.file_url || response?.data?.url || response?.url || "";
+        newFiles.push({
+          name: resourceName || file.name.split('.')[0],
+          originalFileName: file.name,
+          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+          url: fileUrl,
+        });
+      }
 
-    setUploadedFiles((prev) => [...prev, ...newFiles]);
+      setUploadedFiles((prev) => {
+        const updated = [...prev, ...newFiles];
+        setValue(
+          "files",
+          updated.map((f) => ({ name: f.name, url: f.url })),
+        );
+        return updated;
+      });
 
-    setValue(
-      "files",
-      [...uploadedFiles, ...newFiles].map((f) => ({
-        name: f.name,
-        url: f.url,
-      })),
-    );
-
-    setValue("resource_name", "");
-    // Clear the file input after successful upload
-    event.target.value = "";
+      setValue("resource_name", "");
+    } catch (error) {
+      toast.error(error?.message || "Failed to upload file");
+    } finally {
+      setIsUploading(false);
+      inputRef.value = "";
+    }
   };
 
   const addLinkResource = () => {
@@ -613,8 +626,14 @@ const CreateComponent = ({
                         "bg-white dark:text-white flex items-center justify-between",
                       )}
                     >
-                      <span className="text-muted-foreground">Upload</span>
-                      <Cloud className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {isUploading ? "Uploading..." : "Upload"}
+                      </span>
+                      {isUploading ? (
+                        <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
+                      ) : (
+                        <Cloud className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
                   </div>
                 </div>

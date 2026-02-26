@@ -286,9 +286,27 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
         <Action 
           icon={Download} 
           label={t("applicationReview.documents.download")} 
-          onClick={() => {
-            if (url) {
-              window.open(url, '_blank');
+          onClick={async () => {
+            if (!url) return;
+            try {
+              const response = await fetch(url);
+              const blob = await response.blob();
+              const blobUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = blobUrl;
+              link.download = url.split("/").pop() || "document";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(blobUrl);
+            } catch {
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = url.split("/").pop() || "document";
+              link.target = "_blank";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
             }
           }}
         />
