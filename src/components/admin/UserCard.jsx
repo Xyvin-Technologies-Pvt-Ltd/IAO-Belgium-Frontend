@@ -214,7 +214,15 @@ const DocumentRow = ({ title, size, url }) => {
           onClick={async () => {
             if (!url) return;
             try {
-              const response = await axiosInstance.get(url, {
+              // Extract path from full URL so axios uses its configured baseURL
+              let downloadPath = url;
+              try {
+                const parsedUrl = new URL(url);
+                downloadPath = parsedUrl.pathname;
+              } catch {
+                // url is already a relative path
+              }
+              const response = await axiosInstance.get(downloadPath, {
                 responseType: "blob",
               });
               const blobUrl = window.URL.createObjectURL(response.data);
