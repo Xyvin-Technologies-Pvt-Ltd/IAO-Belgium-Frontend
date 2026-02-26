@@ -1,6 +1,7 @@
 import { Eye, Download, FileText } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/api/axiosintercepter";
 
 const UserCard= ({ student, teacher, isTeacher = false }) => {
   const { t } = useTranslation();
@@ -213,9 +214,10 @@ const DocumentRow = ({ title, size, url }) => {
           onClick={async () => {
             if (!url) return;
             try {
-              const response = await fetch(url);
-              const blob = await response.blob();
-              const blobUrl = window.URL.createObjectURL(blob);
+              const response = await axiosInstance.get(url, {
+                responseType: "blob",
+              });
+              const blobUrl = window.URL.createObjectURL(response.data);
               const link = document.createElement("a");
               link.href = blobUrl;
               link.download = url.split("/").pop() || "document";
@@ -224,13 +226,7 @@ const DocumentRow = ({ title, size, url }) => {
               document.body.removeChild(link);
               window.URL.revokeObjectURL(blobUrl);
             } catch {
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = url.split("/").pop() || "document";
-              link.target = "_blank";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
+              window.open(url, "_blank");
             }
           }}
         />

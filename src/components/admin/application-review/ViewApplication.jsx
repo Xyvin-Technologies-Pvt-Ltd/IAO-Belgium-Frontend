@@ -6,6 +6,7 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import { useState, useEffect } from "react";
 import { useUpdateApplication } from "@/store/useApplication";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/api/axiosintercepter";
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t } = useTranslation();
@@ -289,9 +290,10 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
           onClick={async () => {
             if (!url) return;
             try {
-              const response = await fetch(url);
-              const blob = await response.blob();
-              const blobUrl = window.URL.createObjectURL(blob);
+              const response = await axiosInstance.get(url, {
+                responseType: "blob",
+              });
+              const blobUrl = window.URL.createObjectURL(response.data);
               const link = document.createElement("a");
               link.href = blobUrl;
               link.download = url.split("/").pop() || "document";
@@ -300,13 +302,7 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
               document.body.removeChild(link);
               window.URL.revokeObjectURL(blobUrl);
             } catch {
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = url.split("/").pop() || "document";
-              link.target = "_blank";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
+              window.open(url, "_blank");
             }
           }}
         />
