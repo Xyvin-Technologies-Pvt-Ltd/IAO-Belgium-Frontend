@@ -27,21 +27,14 @@ import {
 } from "recharts";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import ErrorMessage from "@/components/common/ErrorMessage";
 import { TrendingUp, CreditCard, CheckCircle } from "lucide-react";
+import { ErrorMessage, LoadingState } from "@/components/common";
 
-// ── Theme-aligned color palette ──────────────────────────────────────────────
-// Primary orange: #ff8904  (--primary)
-// Blue accent:    #3b82f6
-// Green:          #22c55e
-// Amber:          #f59e0b
-// Muted:          #94a3b8
-// Revenue bar 2:  #6ee7b7 (soft teal to complement blue)
+
 
 const COLORS = ["#3b82f6", "#ff8904", "#22c55e", "#f59e0b", "#8b5cf6"];
 const PIE_OTHERS_COLOR = "#94a3b8";
 
-// ── Custom Tooltips ──────────────────────────────────────────────────────────
 
 const TooltipWrapper = ({ children }) => (
   <div style={{
@@ -99,7 +92,6 @@ const CustomTooltipPie = ({ active, payload }) => {
   );
 };
 
-// ── Axis Tick ────────────────────────────────────────────────────────────────
 
 const splitLabel = (str) => {
   if (!str || str.length <= 16) return [str];
@@ -123,8 +115,6 @@ const CustomTick = ({ x, y, payload }) => {
   );
 };
 
-// ── Donut center label ───────────────────────────────────────────────────────
-
 const DonutCenter = ({ viewBox, total }) => {
   const { cx, cy } = viewBox;
   const fmt = total >= 1000 ? `EUR ${(total / 1000).toFixed(1)}k` : `EUR ${total.toFixed(0)}`;
@@ -136,7 +126,6 @@ const DonutCenter = ({ viewBox, total }) => {
   );
 };
 
-// ── Legends ──────────────────────────────────────────────────────────────────
 
 const InlineLegend = ({ items }) => (
   <div className="flex gap-4 pl-2 pt-2">
@@ -149,7 +138,6 @@ const InlineLegend = ({ items }) => (
   </div>
 );
 
-// ── Main Component ───────────────────────────────────────────────────────────
 
 const AnalyticsChartView = ({
   data,
@@ -167,17 +155,17 @@ const AnalyticsChartView = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--primary, #ff8904)" }} />
-      </div>
+      <LoadingState text="Loading analytics data..." size="lg" />
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64 text-red-500">
-        Failed to load analytics data
-      </div>
+      <ErrorMessage
+        message={error?.message || "Failed to load analytics data"} 
+        variant="card" 
+        showRetry={false} 
+      />
     );
   }
 
@@ -204,7 +192,6 @@ const AnalyticsChartView = ({
     failed: item.failed_count,
   }));
 
-  // Pie: top 5 non-zero + "Others"
   const sortedNonZero = [...data].filter((i) => i.total_amount > 0).sort((a, b) => b.total_amount - a.total_amount);
   const top5 = sortedNonZero.slice(0, 5);
   const othersAmt = sortedNonZero.slice(5).reduce((s, i) => s + i.total_amount, 0);
@@ -217,12 +204,10 @@ const AnalyticsChartView = ({
   const displayTableData = tableData || data;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
-      {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
 
-        {/* Revenue — primary orange gradient (matches --primary: #ff8904) */}
         <div style={{
           background: "linear-gradient(135deg, #e07500 0%, #ff8904 55%, #ffaa44 100%)",
           borderRadius: 20,
@@ -245,7 +230,6 @@ const AnalyticsChartView = ({
           </div>
         </div>
 
-        {/* Transactions */}
         <div style={{
           background: "var(--sidebar, #fff)",
           border: "1px solid var(--sidebar-border, #e8edf3)",
@@ -268,8 +252,6 @@ const AnalyticsChartView = ({
             <CreditCard size={22} color="#ff8904" />
           </div>
         </div>
-
-        {/* Paid */}
         <div style={{
           background: "var(--sidebar, #fff)",
           border: "1px solid var(--sidebar-border, #e8edf3)",
@@ -294,7 +276,6 @@ const AnalyticsChartView = ({
         </div>
       </div>
 
-      {/* ── Revenue Breakdown ─────────────────────────────────────────────── */}
       <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
         <CardHeader className="p-0 mb-4">
           <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
@@ -316,10 +297,8 @@ const AnalyticsChartView = ({
         </CardContent>
       </Card>
 
-      {/* ── Donut + Payment Status ────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[5fr_8fr] gap-[24px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[4fr_8fr] gap-[12px]">
 
-        {/* Donut */}
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
@@ -351,7 +330,6 @@ const AnalyticsChartView = ({
           </CardContent>
         </Card>
 
-        {/* Payment Status */}
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none flex flex-col">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
@@ -375,7 +353,6 @@ const AnalyticsChartView = ({
         </Card>
       </div>
 
-      {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">Detailed Data</h3>
         <Table>
