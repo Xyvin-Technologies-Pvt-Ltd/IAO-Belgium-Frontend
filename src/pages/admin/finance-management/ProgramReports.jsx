@@ -32,6 +32,7 @@ const ProgramReports = () => {
       </div>
       <AnalyticsChartView
         data={data?.data}
+        totalCount={data?.total_count}
         isLoading={isLoading}
         error={error}
         labelKey="program_name"

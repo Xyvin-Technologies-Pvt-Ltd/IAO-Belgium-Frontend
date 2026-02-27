@@ -49,7 +49,10 @@ const BatchReports = () => {
       <AnalyticsChartView
         data={chartDataFull?.data}
         tableData={tableDataFull?.data}
-        totalCount={tableDataFull?.total_count}
+        totalCount={{
+          ...chartDataFull?.total_count,
+          total: tableDataFull?.total_count
+        }}
         page={page}
         limit={limit}
         onPageChange={setPage}

@@ -32,6 +32,7 @@ const CityReports = () => {
       </div>
       <AnalyticsChartView
         data={data?.data}
+        totalCount={data?.total_count}
         isLoading={isLoading}
         error={error}
         labelKey="city_name"

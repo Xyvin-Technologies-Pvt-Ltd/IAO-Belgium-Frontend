@@ -161,7 +161,7 @@ const AnalyticsChartView = ({
 
   if (error) {
     return (
-      <ErrorMessage
+      <ErrorMessage 
         message={error?.message || "Failed to load analytics data"} 
         variant="card" 
         showRetry={false} 
@@ -179,9 +179,9 @@ const AnalyticsChartView = ({
 
   const getLabel = (item) => labelFn ? labelFn(item) : item[labelKey] || "Unknown";
 
-  const totalRevenue = data.reduce((sum, item) => sum + item.total_amount, 0);
-  const totalTransactions = data.reduce((sum, item) => sum + item.total_count, 0);
-  const totalPaid = data.reduce((sum, item) => sum + item.paid_count, 0);
+  const totalRevenue = totalCount?.amount || 0;
+  const totalTransactions = totalCount?.transactions || 0;
+  const totalPaid = totalCount?.paid || 0;
 
   const chartData = data.map((item) => ({
     name: getLabel(item),
@@ -222,7 +222,7 @@ const AnalyticsChartView = ({
               Total Revenue
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.1 }}>
-              EUR {totalRevenue.toLocaleString("en-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              EUR {totalRevenue.toLocaleString({maximumFractionDigits: 2})}
             </h2>
           </div>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.20)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -398,14 +398,14 @@ const AnalyticsChartView = ({
           </TableBody>
         </Table>
 
-        {onPageChange && totalCount > 0 && limit > 0 && (
+        {onPageChange && totalCount?.total > 0 && limit > 0 && (
           <div className="mt-4">
             <Pagination
               page={page}
               setPage={onPageChange}
               rowsPerPage={limit}
               setRowsPerPage={setLimit || (() => {})}
-              totalRows={totalCount}
+              totalRows={totalCount.total}
               selected={0}
             />
           </div>
