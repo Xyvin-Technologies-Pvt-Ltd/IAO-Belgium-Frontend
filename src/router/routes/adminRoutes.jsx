@@ -26,6 +26,7 @@ import CityReports from "@/pages/admin/finance-management/CityReports";
 import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
 import BatchReports from "@/pages/admin/finance-management/BatchReports";
 import FinanceManagement from "@/pages/admin/finance-management";
+import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseReport";
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
   return () => (
@@ -112,6 +113,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       CityReports,
       "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/student",
+    component: withPermissionProtection(
+      StudentwiseReport,
+      "/admin/student-reports",
     ),
   },
   {

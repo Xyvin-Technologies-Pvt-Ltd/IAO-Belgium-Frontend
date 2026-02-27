@@ -43,3 +43,25 @@ export const getAnalyticsByBatch = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const getAnalyticsByBatchList = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/payment/analytics/batch/list`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAnalyticsByStudent = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/payment/analytics/student`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

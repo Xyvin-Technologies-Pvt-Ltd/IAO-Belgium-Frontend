@@ -16,13 +16,8 @@ import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetPayments } from "@/store/usePaymentStore";
 import moment from "moment";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "@tanstack/react-router";
-
 const AllReports = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -66,13 +61,6 @@ const AllReports = () => {
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate({ to: "/admin/finance-reports" })}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           All Reports
         </h2>
