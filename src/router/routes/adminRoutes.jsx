@@ -1,5 +1,6 @@
 import { Navigate } from "@tanstack/react-router";
 import Programs from "@/pages/admin/program";
+import Submissions from "@/pages/admin/submission";
 import ProgramDetail from "@/pages/admin/program/ProgramDetail";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
@@ -141,6 +142,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       ApplicationReview,
       "/admin/admission-administration/application-review",
+    ),
+  },
+  {
+    path: "/admin/submissions",
+    component: withPermissionProtection(
+      Submissions,
+      "/admin/submissions",
     ),
   },
   {
