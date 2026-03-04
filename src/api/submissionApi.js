@@ -49,3 +49,12 @@ export const getSubmissionById = async (id) => {
   }
 };
 
+export const bulkEnableResubmission = async (payload) => {
+  try {
+    const response = await axiosInstance.put(`/submission/bulk-enable-resubmission`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+

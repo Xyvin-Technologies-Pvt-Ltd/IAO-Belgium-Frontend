@@ -38,7 +38,7 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
   const totalRows = data?.total_count || 0;
 
   const handleRowClick = (submission) => {
-    // navigate({ to: "/teacher/evaluations/$id", params: { id: submission._id } });
+    navigate({ to: "/teacher/evaluations/$id", params: { id: submission._id } });
   };
 
   return (

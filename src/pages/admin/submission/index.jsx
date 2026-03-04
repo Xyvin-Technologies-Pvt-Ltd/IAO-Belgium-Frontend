@@ -12,7 +12,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useGetSubmissions, useBulkAssignTeacher } from "@/store/useSubmission";
+import { useGetSubmissions, useBulkAssignTeacher, useBulkEnableResubmission } from "@/store/useSubmission";
 import { useGetUsers } from "@/store/useDropdownStore";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
@@ -35,7 +35,7 @@ const Submissions = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [draftFilters, setDraftFilters] = useState({
-    status: "all",
+    status: "submitted",
     submission_type: "all",
     program: "all",
     batch: "all",
@@ -44,7 +44,7 @@ const Submissions = () => {
   });
 
   const [appliedFilters, setAppliedFilters] = useState({
-    status: "all",
+    status: "submitted",
     submission_type: "all",
     program: "all",
     batch: "all",
@@ -81,6 +81,7 @@ const Submissions = () => {
   const teachers = teachersData?.data || [];
 
   const { mutate: bulkAssign, isPending: isBulkAssigning } = useBulkAssignTeacher();
+  const { mutate: enableResubmission, isPending: isEnablingResubmission } = useBulkEnableResubmission();
 
   const submissionsData = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -129,6 +130,21 @@ const Submissions = () => {
     );
   };
 
+  const handleEnableResubmission = () => {
+    enableResubmission(
+      { submission_ids: selectedSubmissions },
+      {
+        onSuccess: () => {
+          toast.success("Resubmission enabled for selected submissions.");
+          setSelectedSubmissions([]);
+        },
+        onError: (err) => {
+          toast.error(err.message || "Failed to enable resubmissions");
+        },
+      }
+    );
+  };
+
   return (
     <div className="space-y-6 mt-4">
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
@@ -154,26 +170,45 @@ const Submissions = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-            <SelectTrigger className="w-[200px] bg-white dark:bg-sidebar">
-              <SelectValue placeholder="Select Teacher to Assign" />
-            </SelectTrigger>
-            <SelectContent>
-              {teachers.map((teacher) => (
-                <SelectItem key={teacher._id} value={teacher._id}>
-                  {teacher.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={handleBulkAssign}
-            disabled={
-              isBulkAssigning || selectedSubmissions.length === 0 || !selectedTeacher
-            }
-          >
-            {isBulkAssigning ? "Assigning..." : "Assign Checked"}
-          </Button>
+          {!selectedSubmissions.some(id => {
+            const sub = submissionsData.find(s => s._id === id);
+            return sub && sub.status === "failed";
+          }) && (
+            <>
+              <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                <SelectTrigger className="w-[200px] bg-white dark:bg-sidebar">
+                  <SelectValue placeholder="Select Teacher to Assign" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teachers.map((teacher) => (
+                    <SelectItem key={teacher._id} value={teacher._id}>
+                      {teacher.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={handleBulkAssign}
+                disabled={
+                  isBulkAssigning || selectedSubmissions.length === 0 || !selectedTeacher
+                }
+              >
+                {isBulkAssigning ? "Assigning..." : "Assign Checked"}
+              </Button>
+            </>
+          )}
+          {selectedSubmissions.length > 0 && selectedSubmissions.every(id => {
+            const sub = submissionsData.find(s => s._id === id);
+            return sub && sub.status === "failed";
+          }) && (
+            <Button
+              onClick={handleEnableResubmission}
+              disabled={isEnablingResubmission}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isEnablingResubmission ? "Enabling..." : "Enable Resubmission"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -199,6 +234,7 @@ const Submissions = () => {
               <TableHead>City</TableHead>
               <TableHead>Language</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Resubmission</TableHead>
               <TableHead>Assigned Teacher</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -271,6 +307,9 @@ const Submissions = () => {
                   </TableCell>
                   <TableCell className="capitalize">
                     {item?.submission_type}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={item?.resubmission_enabled ? true : false} />
                   </TableCell>
                   <TableCell>
                     {item?.assigned_teacher && Object.keys(item.assigned_teacher).length > 0

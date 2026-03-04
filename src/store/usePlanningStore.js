@@ -23,7 +23,7 @@ export const useGetPlanning = (filter, options = {}) => {
 
 export const useGetPlanningByTeacher = (filter, options = {}) => {
   return useQuery({
-    queryKey: ["planning-teacher", filter],
+    queryKey: ["planning-teacher",filter],
     queryFn: () => getPlanningByTeacher(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
@@ -83,6 +83,7 @@ export const useUpdateTeacherStatus = () => {
     mutationFn: ({ id, data }) => updateTeacherStatus(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["planning-teacher"] });
+      queryClient.invalidateQueries({ queryKey: ["planning-module"] });
       toast.success(response?.message || "Status updated successfully!");
     },
     onError: (error) => {

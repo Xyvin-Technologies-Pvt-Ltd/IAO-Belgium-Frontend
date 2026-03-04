@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSubmissions, bulkAssignTeacher, getTeacherSubmissions, evaluateSubmission, getSubmissionById } from "@/api/submissionApi";
+import { getSubmissions, bulkAssignTeacher, getTeacherSubmissions, evaluateSubmission, getSubmissionById, bulkEnableResubmission } from "@/api/submissionApi";
 
 export const useGetSubmissions = (filters) => {
   return useQuery({
@@ -44,7 +44,18 @@ export const useGetSubmissionById = (id, options = {}) => {
     queryKey: ["submission", id],
     queryFn: () => getSubmissionById(id),
     enabled: !!id,
+    retry: false,
     ...options
+  });
+};
+
+export const useBulkEnableResubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkEnableResubmission,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["submissions"]);
+    },
   });
 };
 

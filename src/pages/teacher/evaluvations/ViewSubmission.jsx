@@ -11,10 +11,13 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import { useAuthStore } from "@/store/useAuthStore";
+import image from "../../../assets/images/no-academic.png";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Info } from "lucide-react";
 
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
@@ -31,6 +34,8 @@ const ViewSubmission = () => {
   const { id } = useParams({ strict: false });
   const navigate = useNavigate();
   const { t } = useTranslation();
+  
+  const { user } = useAuthStore();
 
   const { data, isLoading, error } = useGetSubmissionById(id);
   const submissionData = data?.data;
@@ -162,8 +167,33 @@ const ViewSubmission = () => {
   }
 
   if (error || !submissionData) {
+    const isReassigned = error?.message === "Submission has been reassigned to another teacher.";
+    
+    if (isReassigned) {
+      return (
+        <div className="h-[calc(100vh-80px)] p-6 bg-[#F9F9F9] dark:bg-[#0B0F19]">
+          <div className="flex flex-col items-center justify-center h-full text-center bg-sidebar rounded-xl p-5 border border-sidebar-border">
+            <img
+              src={image}
+              alt="Reassigned"
+              className="w-64 mb-4 opacity-80"
+            />
+            <h3 className="text-lg font-semibold text-sidebar-foreground">
+              Submission Reassigned
+            </h3>
+            <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1 mb-4">
+              The submission previously assigned to you has been reassigned to a new teacher. You don't have to evaluate it.
+            </p>
+            <Button className="mt-4" onClick={() => navigate({ to: "/teacher/evaluations" })}>
+              Return to Evaluations
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="h-[calc(100vh-80px)] flex items-center justify-center bg-white">
+      <div className="h-[calc(100vh-80px)] flex items-center justify-center bg-white dark:bg-sidebar">
         <ErrorMessage 
           message={error?.message || "Failed to load submission data"} 
           showRetry={false} 
