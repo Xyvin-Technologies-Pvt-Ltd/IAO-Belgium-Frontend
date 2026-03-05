@@ -34,7 +34,7 @@ const ExamDetail = () => {
         {
           label: t("sidebar.admin.exams"),
           path: "/admin/examination/exams",
-          navigable: false,
+          navigable: true,
         },
         {
           label: examData.data.name,
@@ -46,9 +46,7 @@ const ExamDetail = () => {
     return () => updateBreadcrumbs([]);
   }, [examData?.data?.name, id, t]);
 
-  const handleBack = () => {
-    navigate({ to: "/admin/examination/exams" });
-  };
+
 
   const handlePublish = async () => {
     try {
@@ -98,9 +96,6 @@ const ExamDetail = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">

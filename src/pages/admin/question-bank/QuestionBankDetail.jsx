@@ -24,7 +24,7 @@ const QuestionBankDetail = () => {
         {
           label: t("sidebar.admin.questionBanks"),
           path: "/admin/examination/question-banks",
-          navigable: false,
+          navigable: true,
         },
         {
           label: bank.data.name,
@@ -36,9 +36,6 @@ const QuestionBankDetail = () => {
     return () => updateBreadcrumbs([]);
   }, [bank?.data?.name, id, t]);
 
-  const handleBack = () => {
-    navigate({ to: "/admin/examination/question-banks" });
-  };
 
   if (isLoading) {
     return <LoadingState text={t("questionBank.loading")} fullHeight />;
@@ -61,9 +58,6 @@ const QuestionBankDetail = () => {
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
         <div>
           <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
             {b.name}

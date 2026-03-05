@@ -25,7 +25,8 @@
       "schedules": "Stundenpläne",
       "planning": "Planung",
       "documents": "Dokumente",
-      "evaluations": "Bewertungen"
+      "evaluations": "Bewertungen",
+      "exams": "Prüfungen"
     },
     "admin": {
       "title": "Admin Dashboard",

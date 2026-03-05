@@ -25,7 +25,8 @@
       "schedules": "Horaires",
       "planning": "Planification",
       "documents": "Documents",
-      "evaluations": "Évaluations"
+      "evaluations": "Évaluations",
+      "exams": "Examens"
     },
     "admin": {
       "title": "Tableau de bord administrateur",

@@ -7,6 +7,8 @@ import SessionScheduleList from "@/pages/teacher/schedule/SessionScheduleList";
 import ModuleView from "@/pages/teacher/schedule/ModuleView";
 import Evaluations from "@/pages/teacher/evaluvations";
 import ViewSubmission from "@/pages/teacher/evaluvations/ViewSubmission";
+import ExamList from "@/pages/teacher/exam";
+import ExamDetail from "@/pages/teacher/exam/ExamDetail";
 
 export const teacherRoutes = [
   {
@@ -19,6 +21,8 @@ export const teacherRoutes = [
   { path: "/teacher/schedules/module/$id", component: SessionScheduleList },
   { path: "/teacher/schedules", component: ModuleScheduleList },
   { path: "/teacher/schedules/$id", component: ModuleView },
-  {path:"/teacher/evaluations",component:Evaluations},
-  {path:"/teacher/evaluations/$id",component:ViewSubmission},
+  { path: "/teacher/evaluations", component: Evaluations },
+  { path: "/teacher/evaluations/$id", component: ViewSubmission },
+  { path: "/teacher/exams", component: ExamList },
+  { path: "/teacher/exams/$id", component: ExamDetail },
 ];

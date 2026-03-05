@@ -34,3 +34,13 @@ export const archiveExam = async (id) => {
   const response = await axiosInstance.put(`/exam/${id}/archive`);
   return response.data;
 };
+
+export const getTeacherExams = async (params) => {
+  const response = await axiosInstance.get("/exam/teacher", { params });
+  return response.data;
+};
+
+export const getTeacherExamById = async (id) => {
+  const response = await axiosInstance.get(`/exam/teacher/${id}`);
+  return response.data;
+};

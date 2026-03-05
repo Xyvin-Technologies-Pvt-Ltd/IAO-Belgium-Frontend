@@ -84,6 +84,7 @@ export const useUpdateTeacherStatus = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["planning-teacher"] });
       queryClient.invalidateQueries({ queryKey: ["planning-module"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
       toast.success(response?.message || "Status updated successfully!");
     },
     onError: (error) => {

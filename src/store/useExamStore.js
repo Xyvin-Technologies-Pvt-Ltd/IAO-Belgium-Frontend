@@ -6,6 +6,8 @@ import {
   updateExam,
   publishExam,
   archiveExam,
+  getTeacherExams,
+  getTeacherExamById,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -99,5 +101,25 @@ export const useArchiveExam = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to archive exam");
     },
+  });
+};
+
+export const useGetTeacherExams = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-exams", params],
+    queryFn: () => getTeacherExams(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetTeacherExamById = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-exam", id],
+    queryFn: () => getTeacherExamById(id),
+    enabled: !!id,
+    staleTime: 30000,
+    ...options,
   });
 };

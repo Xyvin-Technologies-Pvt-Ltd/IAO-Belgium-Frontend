@@ -4,6 +4,7 @@ import {
   Calendars,
   FileMinus,
   BookOpenCheck,
+  ClipboardCheck,
 } from "lucide-react";
 
 export const getTeacherSidebarData = (t) => ({
@@ -40,6 +41,11 @@ export const getTeacherSidebarData = (t) => ({
           title: t("sidebar.teacher.evaluations"),
           url: "/teacher/evaluations",
           icon: BookOpenCheck,
+        },
+        {
+          title: t("sidebar.teacher.exams"),
+          url: "/teacher/exams",
+          icon: ClipboardCheck,
         },
       ],
     },

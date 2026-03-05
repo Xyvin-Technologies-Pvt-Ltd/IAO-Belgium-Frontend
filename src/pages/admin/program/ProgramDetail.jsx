@@ -7,6 +7,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetProgramById } from "@/store/useProgramStore";
 import LearningModule from "@/components/admin/programs/LearningModule";
 import AppModule from "@/components/admin/programs/AppModule";
+import ExamModule from "@/components/admin/programs/ExamModule";
 import { Button } from "@/components/ui/button";
 import CreateComponent from "@/components/admin/programs/CreateComponent";
 import image from "../../../assets/images/no-component.png";
@@ -53,6 +54,10 @@ const ProgramDetail = () => {
     resource: {
       label: t("programDetail.tabs.resources"),
       component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated} />,
+    },
+    exam: {
+      label: t("programDetail.tabs.examComponents") || "Exam Components",
+      component: () => <ExamModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
   };
 

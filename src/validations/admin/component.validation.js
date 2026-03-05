@@ -37,11 +37,16 @@ const appComponentSchema = baseComponentSchema.extend({
 });
 
 const resourceComponentSchema = baseComponentSchema;
-const examComponentSchema = baseComponentSchema;
+const examComponentSchema = z.object({
+  type: z.literal("exam"),
+  linked_module: z.string().min(1, "Module selection is required"),
+  linked_exam: z.string().min(1, "Exam selection is required"),
+  status: z.boolean(),
+});
 
 export const componentSchema = z.discriminatedUnion("type", [
   moduleComponentSchema.extend({ type: z.literal("module") }),
   appComponentSchema.extend({ type: z.literal("app") }),
   resourceComponentSchema.extend({ type: z.literal("resource") }),
-  examComponentSchema.extend({ type: z.literal("exam") }),
+  examComponentSchema,
 ]);

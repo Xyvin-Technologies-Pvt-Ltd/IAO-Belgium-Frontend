@@ -25,7 +25,8 @@
       "schedules": "Schedules",
       "planning": "Planning",
       "documents": "Documents",
-      "evaluations": "Evaluations"
+      "evaluations": "Evaluations",
+      "exams": "Exams"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -880,10 +881,16 @@
     "questionForm": {
       "addQuestion": "Add Question",
       "editQuestion": "Edit Question",
+      "editSubtitle": "Update the question details",
+      "createSubtitle": "Fill in the question details",
       "questionText": "Question Text",
       "questionTextPlaceholder": "Enter the question",
       "options": "Options",
+      "option": "Option",
+      "enterOption": "Enter option",
       "correct": "Correct",
+      "correctAnswer": "Correct Answer",
+      "markAsCorrect": "Mark as Correct",
       "addOption": "Add Option",
       "explanation": "Explanation",
       "explanationPlaceholder": "Optional explanation shown after attempt",

@@ -27,6 +27,7 @@ import {
   useUpdateComponent,
   useGetComponents,
 } from "@/store/useComponentStore";
+import { useGetExamsDropdown } from "@/store/useExamStore";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
@@ -80,6 +81,8 @@ const CreateComponent = ({
       status: true,
       resource_name: "",
       resource_url: "",
+      linked_module: "",
+      linked_exam: "",
     },
   });
 
@@ -100,6 +103,28 @@ const CreateComponent = ({
       enabled: selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
     }
   );
+
+  // Fetch modules for this program (for exam type)
+  const { data: programModulesData } = useGetComponents(
+    {
+      type: "module",
+      program: programId,
+      limit: 100,
+    },
+    {
+      enabled: selectedType === "exam" && !!programId,
+    }
+  );
+  const programModules = programModulesData?.data || [];
+
+  // Fetch published exams (for exam type)
+  const { data: publishedExamsData } = useGetExamsDropdown(
+    { status: "published" },
+    {
+      enabled: selectedType === "exam",
+    }
+  );
+  const publishedExams = publishedExamsData?.data || [];
 
   // Filter modules to show only unique system_ids (or modules without system_id)
   // Group by system_id and take the first one from each group
@@ -128,7 +153,7 @@ const CreateComponent = ({
     { value: "module", label: "Learning Module" },
     { value: "app", label: "Applied Professional Practice(APP)" },
     { value: "resource", label: "Research" },
-    // { value: "exam", label: "Exam Component" },
+    { value: "exam", label: "Exam Component" },
   ];
 
   const handleClose = () => {
@@ -150,6 +175,8 @@ const CreateComponent = ({
       status: true,
       resource_name: "",
       resource_url: "",
+      linked_module: "",
+      linked_exam: "",
     });
     setSelectedType(preselectedType || "");
     setUploadedFiles([]);
@@ -288,6 +315,8 @@ const CreateComponent = ({
       status: componentData.status ?? true,
       resource_name: "",
       resource_url: "",
+      linked_module: componentData.linked_module?._id || componentData.linked_module || "",
+      linked_exam: componentData.linked_exam?._id || componentData.linked_exam || "",
     };
 
     // Reset form and set type state together
@@ -330,15 +359,18 @@ const CreateComponent = ({
   const onSubmit = (data) => {
     const payload = {
       type: data.type,
-      name: data.name,
-      year: data.year,
       program: programId,
-      files: uploadedFiles.map((f) => ({
-        name: f.name,
-        url: f.url,
-      })),
       status: data.status,
     };
+
+    if (data.type !== "exam") {
+      payload.name = data.name;
+      payload.year = data.year;
+      payload.files = uploadedFiles.map((f) => ({
+        name: f.name,
+        url: f.url,
+      }));
+    }
 
     if (data.type === "module") {
       payload.amount = data.amount;
@@ -354,6 +386,11 @@ const CreateComponent = ({
       payload.instruction = instructionContent.trim();
       payload.instruction_video = data.instruction_video;
       payload.submissions = data.submissions;
+    }
+
+    if (data.type === "exam") {
+      payload.linked_module = data.linked_module;
+      payload.linked_exam = data.linked_exam;
     }
 
     const mutation = isEdit ? updateComponent : createComponent;
@@ -410,79 +447,83 @@ const CreateComponent = ({
               <p className="text-sm text-destructive">{errors.type.message}</p>
             )}
           </div>
-          <div className="space-y-2 relative">
-            <Label>
-              Module Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              placeholder="Enter module name"
-              {...register("name")}
-              onChange={(e) => {
-                register("name").onChange(e);
-                if (selectedType === "module" && !isEdit) {
-                  setModuleNameSearch(e.target.value);
-                  setShowModuleSuggestions(true);
-                  // Clear selected system_id when user types manually
-                  setSelectedSystemId(null);
-                }
-              }}
-              onFocus={() => {
-                if (selectedType === "module" && !isEdit && moduleNameSearch) {
-                  setShowModuleSuggestions(true);
-                }
-              }}
-            />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
+          {selectedType !== "exam" && (
+            <>
+              <div className="space-y-2 relative">
+                <Label>
+                  Module Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  placeholder="Enter module name"
+                  {...register("name")}
+                  onChange={(e) => {
+                    register("name").onChange(e);
+                    if (selectedType === "module" && !isEdit) {
+                      setModuleNameSearch(e.target.value);
+                      setShowModuleSuggestions(true);
+                      // Clear selected system_id when user types manually
+                      setSelectedSystemId(null);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (selectedType === "module" && !isEdit && moduleNameSearch) {
+                      setShowModuleSuggestions(true);
+                    }
+                  }}
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive">{errors.name.message}</p>
+                )}
 
-            {/* Module suggestions dropdown */}
-            {selectedType === "module" &&
-              !isEdit &&
-              showModuleSuggestions &&
-              moduleNameSearch.length > 2 &&
-              existingModules.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-y-auto">
-                  {existingModules.map((module) => (
-                    <div
-                      key={module._id}
-                      className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
-                      onClick={() => {
-                        setValue("name", module.name);
-                        setModuleNameSearch(module.name);
-                        setSelectedSystemId(module.system_id || null);
-                        setShowModuleSuggestions(false);
-                      }}
-                    >
-                      <p className="font-medium text-sm">{module.name}</p>
+                {/* Module suggestions dropdown */}
+                {selectedType === "module" &&
+                  !isEdit &&
+                  showModuleSuggestions &&
+                  moduleNameSearch.length > 2 &&
+                  existingModules.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-y-auto">
+                      {existingModules.map((module) => (
+                        <div
+                          key={module._id}
+                          className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
+                          onClick={() => {
+                            setValue("name", module.name);
+                            setModuleNameSearch(module.name);
+                            setSelectedSystemId(module.system_id || null);
+                            setShowModuleSuggestions(false);
+                          }}
+                        >
+                          <p className="font-medium text-sm">{module.name}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-          </div>
+                  )}
+              </div>
 
-          <div className="space-y-2">
-            <Label>In which year the module belongs <span className="text-red-500">*</span></Label>
-            <Select
-              key={`year-${watch("year")}`}
-              value={watch("year")?.toString() || ""}
-              onValueChange={(v) => setValue("year", parseInt(v), { shouldValidate: true })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select year" />
-              </SelectTrigger>
-              <SelectContent>
-                {[1, 2, 3, 4, 5].map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    Year {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.year && (
-              <p className="text-sm text-destructive">{errors.year.message}</p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <Label>In which year the module belongs <span className="text-red-500">*</span></Label>
+                <Select
+                  key={`year-${watch("year")}`}
+                  value={watch("year")?.toString() || ""}
+                  onValueChange={(v) => setValue("year", parseInt(v), { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5].map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        Year {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.year && (
+                  <p className="text-sm text-destructive">{errors.year.message}</p>
+                )}
+              </div>
+            </>
+          )}
 
           {selectedType === "module" && (
             <>
@@ -502,6 +543,67 @@ const CreateComponent = ({
                 required
                 {...register("amount")}
               />
+            </>
+          )}
+          {selectedType === "exam" && (
+            <>
+              <div className="space-y-2">
+                <Label>
+                  Module <span className="text-xs text-muted-foreground">(Exam scheduled before this module)</span> <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={watch("linked_module") || ""}
+                  onValueChange={(v) => setValue("linked_module", v, { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select module" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {programModules.map((mod) => (
+                      <SelectItem key={mod._id} value={mod._id}>
+                        {mod.name}
+                      </SelectItem>
+                    ))}
+                    {programModules.length === 0 && (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        No modules found for this program
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+                {errors.linked_module && (
+                  <p className="text-sm text-destructive">{errors.linked_module.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  Exam <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={watch("linked_exam") || ""}
+                  onValueChange={(v) => setValue("linked_exam", v, { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select exam" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {publishedExams.map((exam) => (
+                      <SelectItem key={exam._id} value={exam._id}>
+                        {exam.name} ({exam.uid})
+                      </SelectItem>
+                    ))}
+                    {publishedExams.length === 0 && (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        No published exams available
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+                {errors.linked_exam && (
+                  <p className="text-sm text-destructive">{errors.linked_exam.message}</p>
+                )}
+              </div>
             </>
           )}
           {selectedType === "app" && (
@@ -579,108 +681,110 @@ const CreateComponent = ({
               </div>
             </>
           )}
-          <div className="border rounded-xl p-4 space-y-4">
-            <div className="space-y-1">
-              <Label>Resource Type</Label>
-              <Select value={resourceType} onValueChange={setResourceType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select resource type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="link">URL</SelectItem>
-                  <SelectItem value="file">File</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {selectedType !== "exam" && (
+            <div className="border rounded-xl p-4 space-y-4">
+              <div className="space-y-1">
+                <Label>Resource Type</Label>
+                <Select value={resourceType} onValueChange={setResourceType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select resource type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="link">URL</SelectItem>
+                    <SelectItem value="file">File</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                label="Resource Name"
-                placeholder="Create resource name"
-                {...register("resource_name")}
-              />
-
-              {resourceType === "link" ? (
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  label="Enter URL"
-                  placeholder="Enter URL"
-                  type="url"
-                  {...register("resource_url")}
+                  label="Resource Name"
+                  placeholder="Create resource name"
+                  {...register("resource_name")}
                 />
-              ) : (
-                <div className="space-y-2">
-                  <Label>Upload Resource</Label>
 
-                  <div className="relative">
-                    <Input
-                      type="file"
-                      multiple
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleFileUpload}
-                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
-                    />
+                {resourceType === "link" ? (
+                  <FormField
+                    label="Enter URL"
+                    placeholder="Enter URL"
+                    type="url"
+                    {...register("resource_url")}
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Upload Resource</Label>
 
-                    <div
-                      className={cn(
-                        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                        "bg-white dark:text-white flex items-center justify-between",
-                      )}
-                    >
-                      <span className="text-muted-foreground">
-                        {isUploading ? "Uploading..." : "Upload"}
-                      </span>
-                      {isUploading ? (
-                        <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
-                      ) : (
-                        <Cloud className="h-4 w-4 text-muted-foreground" />
-                      )}
+                    <div className="relative">
+                      <Input
+                        type="file"
+                        multiple
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleFileUpload}
+                        className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                      />
+
+                      <div
+                        className={cn(
+                          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                          "bg-white dark:text-white flex items-center justify-between",
+                        )}
+                      >
+                        <span className="text-muted-foreground">
+                          {isUploading ? "Uploading..." : "Upload"}
+                        </span>
+                        {isUploading ? (
+                          <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
+                        ) : (
+                          <Cloud className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
                     </div>
                   </div>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="link"
+                className="px-0"
+                onClick={
+                  resourceType === "link"
+                    ? addLinkResource
+                    : () => {
+                        const fileInput =
+                          document.querySelector('input[type="file"]');
+                        fileInput?.click();
+                      }
+                }
+              >
+                + Add
+              </Button>
+
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-2">
+                  {uploadedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between rounded-md bg-muted px-3 py-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Link className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{file.name}</span>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeFile(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-            <Button
-              type="button"
-              variant="link"
-              className="px-0"
-              onClick={
-                resourceType === "link"
-                  ? addLinkResource
-                  : () => {
-                      const fileInput =
-                        document.querySelector('input[type="file"]');
-                      fileInput?.click();
-                    }
-              }
-            >
-              + Add
-            </Button>
-
-            {uploadedFiles.length > 0 && (
-              <div className="space-y-2">
-                {uploadedFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between rounded-md bg-muted px-3 py-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{file.name}</span>
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeFile(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
           <div className="flex items-center justify-between">
             <Label>Active Status</Label>

@@ -25,7 +25,8 @@
       "schedules": "Roosters",
       "planning": "Planning",
       "documents": "Documenten",
-      "evaluations": "Evaluaties"
+      "evaluations": "Evaluaties",
+      "exams": "Examens"
     },
     "admin": {
       "title": "Admin Dashboard",
