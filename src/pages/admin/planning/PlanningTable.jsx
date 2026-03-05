@@ -23,6 +23,7 @@ import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetAllCities } from "@/store/useDropdownStore";
+import moment from "moment";
 
 const PlanningTable = () => {
   const { t } = useTranslation();
@@ -66,6 +67,35 @@ const PlanningTable = () => {
 
   const plannings = data?.data || [];
   const totalRows = data?.total_count || 0;
+
+  // Helper function to get session start and end dates
+  const getSessionStartDate = (sessions) => {
+    if (!sessions || sessions.length === 0) return "N/A";
+    
+    const dates = sessions
+      .map(session => session.session_date)
+      .filter(date => date)
+      .map(date => moment(date))
+      .sort((a, b) => a - b);
+    
+    if (dates.length === 0) return "N/A";
+    
+    return dates[0].format('MMM D, YYYY');
+  };
+
+  const getSessionEndDate = (sessions) => {
+    if (!sessions || sessions.length === 0) return "N/A";
+    
+    const dates = sessions
+      .map(session => session.session_date)
+      .filter(date => date)
+      .map(date => moment(date))
+      .sort((a, b) => a - b);
+    
+    if (dates.length === 0) return "N/A";
+    
+    return dates[dates.length - 1].format('MMM D, YYYY');
+  };
 
   // Helper function to get unique teachers from all sessions
   const getUniqueTeachers = (sessions) => {
@@ -241,6 +271,9 @@ const PlanningTable = () => {
             <TableHead>{t("planningManagement.table.program")}</TableHead>
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
             <TableHead>{t("planningManagement.table.module")}</TableHead>
+            <TableHead>Year</TableHead>
+            <TableHead>Session Start Date</TableHead>
+            <TableHead>Session End Date</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
@@ -249,10 +282,10 @@ const PlanningTable = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("planningManagement.messages.loadFailed")
@@ -281,6 +314,15 @@ const PlanningTable = () => {
                   title={i?.component?.name}
                 >
                   {i?.component?.name}
+                </TableCell>
+                <TableCell>
+                  {i?.cohort_year || "N/A"}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {getSessionStartDate(i?.sessions)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {getSessionEndDate(i?.sessions)}
                 </TableCell>
                 <TableCell
                   className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap"
@@ -315,7 +357,7 @@ const PlanningTable = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={10} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>

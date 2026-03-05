@@ -6,6 +6,7 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import { useState, useEffect } from "react";
 import { useUpdateApplication } from "@/store/useApplication";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "@/api/axiosintercepter";
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t } = useTranslation();
@@ -286,9 +287,30 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
         <Action 
           icon={Download} 
           label={t("applicationReview.documents.download")} 
-          onClick={() => {
-            if (url) {
-              window.open(url, '_blank');
+          onClick={async () => {
+            if (!url) return;
+            try {
+              // Extract path from full URL so axios uses its configured baseURL
+              let downloadPath = url;
+              try {
+                const parsedUrl = new URL(url);
+                downloadPath = parsedUrl.pathname;
+              } catch {
+                // url is already a relative path
+              }
+              const response = await axiosInstance.get(downloadPath, {
+                responseType: "blob",
+              });
+              const blobUrl = window.URL.createObjectURL(response.data);
+              const link = document.createElement("a");
+              link.href = blobUrl;
+              link.download = url.split("/").pop() || "document";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(blobUrl);
+            } catch {
+              window.open(url, "_blank");
             }
           }}
         />
@@ -305,7 +327,7 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
 
 const Action = ({ icon: Icon, label, onClick, className = "" }) => (
   <button 
-    className={`flex items-center gap-1 text-sm font-semibold text-muted-foreground dark:text-white/70 hover:text-black dark:hover:text-white ${className}`}
+    className={`flex items-center gap-1 text-sm font-semibold cursor-pointer text-muted-foreground dark:text-white/70 hover:text-black dark:hover:text-white ${className}`}
     onClick={onClick}
   >
     <Icon size={16} />

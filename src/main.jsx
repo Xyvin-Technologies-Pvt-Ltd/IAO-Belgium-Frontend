@@ -16,7 +16,7 @@ useThemeStore.getState().initializeTheme();
 // Initialize auth state on app start (check for refresh token)
 useAuthStore.getState().initializeAuth();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

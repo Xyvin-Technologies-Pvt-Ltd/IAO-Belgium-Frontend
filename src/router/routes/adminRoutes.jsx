@@ -1,5 +1,6 @@
 import { Navigate } from "@tanstack/react-router";
 import Programs from "@/pages/admin/program";
+import Submissions from "@/pages/admin/submission";
 import ProgramDetail from "@/pages/admin/program/ProgramDetail";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
@@ -21,7 +22,12 @@ import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
-import FinanceReports from "@/pages/admin/finance-management/FinanceReports";
+import AllReports from "@/pages/admin/finance-management/AllReports";
+import CityReports from "@/pages/admin/finance-management/CityReports";
+import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
+import BatchReports from "@/pages/admin/finance-management/BatchReports";
+import FinanceManagement from "@/pages/admin/finance-management";
+import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseReport";
 import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
@@ -99,7 +105,42 @@ export const adminRoutes = [
   {
     path: "/admin/finance-reports",
     component: withPermissionProtection(
-      FinanceReports,
+      FinanceManagement,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/all",
+    component: withPermissionProtection(
+      AllReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/city",
+    component: withPermissionProtection(
+      CityReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/student",
+    component: withPermissionProtection(
+      StudentwiseReport,
+      "/admin/student-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/program",
+    component: withPermissionProtection(
+      ProgramReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/batch",
+    component: withPermissionProtection(
+      BatchReports,
       "/admin/finance-reports",
     ),
   },
@@ -108,6 +149,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       ApplicationReview,
       "/admin/admission-administration/application-review",
+    ),
+  },
+  {
+    path: "/admin/submissions",
+    component: withPermissionProtection(
+      Submissions,
+      "/admin/submissions",
     ),
   },
   {

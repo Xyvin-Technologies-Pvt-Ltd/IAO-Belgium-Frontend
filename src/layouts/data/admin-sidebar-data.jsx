@@ -52,6 +52,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             ],
           },
           {
+            title: t("sidebar.admin.submissions", { defaultValue: "Submissions" }),
+            url: "/admin/submissions",
+            icon: FileText,
+          },
+          {
             title: t("sidebar.admin.planning"),
             url: "/admin/planning",
             icon: Calendars,
