@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Outlet } from "@tanstack/react-router";
 import { BreadcrumbProvider } from "@/context/BreadCrumbContext";
 import { useThemeStore } from "@/store/useThemeStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,11 +21,14 @@ import TeacherNotificationDrawer from "./TeacherNotificationDrawer";
 
 export default function AdminTeacherLayoutComponent() {
   const { initializeTheme } = useThemeStore();
+  const { user } = useAuthStore();
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
     initializeTheme();
   }, [initializeTheme]);
+
+  const isTeacher = user?.role === "teacher";
 
   const languages = [
     { code: "en", name: t("languages.en"), flag: "🇺🇸" },
@@ -77,7 +81,7 @@ export default function AdminTeacherLayoutComponent() {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <TeacherNotificationDrawer />
+              {isTeacher && <TeacherNotificationDrawer />}
               <ThemeToggle />
               <p className="text-xs sm:text-sm text-dashboard-text-secondary hidden md:block">
                 {moment().format("ddd, DD MMM, YYYY").toUpperCase()}
