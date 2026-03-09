@@ -56,7 +56,7 @@ const ProgramDetail = () => {
       component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
     exam: {
-      label: t("programDetail.tabs.examComponents") || "Exam Components",
+      label: t("programDetail.tabs.examComponents"),
       component: () => <ExamModule programId={id} onComponentCreated={handleComponentCreated} />,
     },
   };

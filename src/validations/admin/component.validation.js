@@ -14,6 +14,12 @@ const baseComponentSchema = z.object({
     name: z.string(),
     url: z.string(),
   })).optional(),
+  resources: z.array(z.object({
+    type: z.enum(["file", "link"]),
+    name: z.string().optional(),
+    url: z.string().optional(),
+    file: z.any().optional(),
+  })).optional(),
 });
 
 const moduleComponentSchema = baseComponentSchema.extend({
