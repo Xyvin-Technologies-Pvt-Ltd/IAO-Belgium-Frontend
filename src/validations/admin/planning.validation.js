@@ -3,9 +3,11 @@ import { z } from "zod";
 const teacherSchema = z.object({
   _id: z.string(),
   name: z.string(),
+  status: z.string().optional(), // Include status to preserve acceptance state
 });
 
 const sessionSchema = z.object({
+  _id: z.string().optional(), // Include _id for edit mode
   name: z.string().min(1, "Session name is required"),
   session_date: z.string().min(1, "Session date is required"),
   start_time: z.string().min(1, "Start time is required"),

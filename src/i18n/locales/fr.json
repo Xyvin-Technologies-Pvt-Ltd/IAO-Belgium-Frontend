@@ -370,6 +370,7 @@
     "search": "Rechercher des lots...",
     "createBatch": "Créer un lot",
     "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau lot pour cette inscription ?",
+    "searchStudent": "Rechercher des étudiants...",
     "table": {
       "batchId": "ID du lot",
       "batchName": "Nom du lot",
@@ -377,7 +378,9 @@
       "enrolled": "Inscrits",
       "available": "Disponible",
       "status": "Statut",
-      "noBatches": "Aucun lot trouvé"
+      "student": "Étudiant",
+      "noBatches": "Aucun lot trouvé",
+      "noStudents": "Aucun étudiant trouvé"
     },
     "messages": {
       "loadFailed": "Échec du chargement des lots"
@@ -385,7 +388,8 @@
     "details": {
       "tabs": {
         "overview": "Aperçu",
-        "students": "Étudiants"
+        "students": "Étudiants",
+        "attendence": "Présence"
       },
       "cards": {
         "enrolledStudents": "Étudiants inscrits",

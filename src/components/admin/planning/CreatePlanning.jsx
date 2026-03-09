@@ -132,7 +132,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const programs = programsRaw.map(program => ({
     _id: program._id,
     name: `${program.name} - ${program.city?.name || 'N/A'} - ${program.language?.name || 'N/A'}`,
-    city: program.city // Keep original city data for venue/times access
+    city: program.city 
   }));
   const batches = batchesData?.data || [];
   const components = componentsData?.data || [];
@@ -182,45 +182,52 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       setValue("description", planningData.description || "");
 
       if (planningData.sessions && planningData.sessions.length > 0) {
-        const formattedSessions = planningData.sessions.map((session) => ({
-          name: session.name || "",
-          session_date: session.session_date
-            ? moment(session.session_date).format("YYYY-MM-DD")
-            : "",
-          start_time: session.start_time
-            ? moment(session.start_time).format("HH:mm")
-            : "",
-          end_time: session.end_time
-            ? moment(session.end_time).format("HH:mm")
-            : "",
-          teachers: session.teachers
-            ? session.teachers.map((t) => {
-                const teacher = t.teacher || t;
-                return {
-                  _id: teacher._id,
-                  name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-                };
-              })
-            : [],
-          assistants: session.assistants
-            ? session.assistants.map((a) => {
-                const assistant = a.assistant || a;
-                return {
-                  _id: assistant._id,
-                  name: `${assistant.first_name} ${assistant.last_name}`.trim(),
-                };
-              })
-            : [],
-          trainees: session.trainees
-            ? session.trainees.map((t) => {
-                const trainee = t.trainee || t;
-                return {
-                  _id: trainee._id,
-                  name: `${trainee.first_name} ${trainee.last_name}`.trim(),
-                };
-              })
-            : [],
-        }));
+        const formattedSessions = planningData.sessions.map((session) => {        
+          return {
+            _id: session._id, 
+            name: session.name || "",
+            session_date: session.session_date
+              ? moment(session.session_date).format("YYYY-MM-DD")
+              : "",
+            start_time: session.start_time
+              ? moment(session.start_time).format("HH:mm")
+              : "",
+            end_time: session.end_time
+              ? moment(session.end_time).format("HH:mm")
+              : "",
+            teachers: session.teachers
+              ? session.teachers.map((t) => {
+                  const teacher = t.teacher || t;
+                  const teacherData = {
+                    _id: teacher._id,
+                    name: `${teacher.first_name} ${teacher.last_name}`.trim(),
+                    status: t.status || "pending", 
+                  };
+                  return teacherData;
+                })
+              : [],
+            assistants: session.assistants
+              ? session.assistants.map((a) => {
+                  const assistant = a.assistant || a;
+                  return {
+                    _id: assistant._id,
+                    name: `${assistant.first_name} ${assistant.last_name}`.trim(),
+                    status: a.status || "pending", 
+                  };
+                })
+              : [],
+            trainees: session.trainees
+              ? session.trainees.map((t) => {
+                  const trainee = t.trainee || t;
+                  return {
+                    _id: trainee._id,
+                    name: `${trainee.first_name} ${trainee.last_name}`.trim(),
+                    status: t.status || "pending", 
+                  };
+                })
+              : [],
+          };
+        });
         setValue("sessions", formattedSessions);
       }
     }
@@ -236,7 +243,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   }, [selectedProgram, setValue, isEdit]);
 
   const onSubmit = (formData) => {
+    
     const formattedSessions = formData.sessions.map((session) => {
+   
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
       const startTime = moment(session.start_time, "HH:mm").format("HH:mm");
       const endTime = moment(session.end_time, "HH:mm").format("HH:mm");
@@ -246,18 +255,29 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       let sessionTrainees = [];
       
       if (isEdit) {
-        // In edit mode, use session-specific teachers/assistants/trainees
-        sessionTeachers = (session.teachers || []).map((teacher) => ({ teacher: teacher._id }));
-        sessionAssistants = (session.assistants || []).map((assistant) => ({ assistant: assistant._id }));
-        sessionTrainees = (session.trainees || []).map((trainee) => ({ trainee: trainee._id }));
+        sessionTeachers = (session.teachers || []).map((teacher) => {
+          const formatted = { 
+            teacher: teacher._id,
+            status: teacher.status || "pending"
+          };
+          return formatted;
+        });
+        sessionAssistants = (session.assistants || []).map((assistant) => ({ 
+          assistant: assistant._id,
+          status: assistant.status || "pending" 
+        }));
+        sessionTrainees = (session.trainees || []).map((trainee) => ({ 
+          trainee: trainee._id,
+          status: trainee.status || "pending" 
+        }));
       } else {
-        // In create mode, use form-level teachers/assistants/trainees for all sessions
         sessionTeachers = (formData.teachers || []).map((teacher) => ({ teacher: teacher._id }));
         sessionAssistants = (formData.assistants || []).map((assistant) => ({ assistant: assistant._id }));
         sessionTrainees = (formData.trainees || []).map((trainee) => ({ trainee: trainee._id }));
       }
 
       return {
+        ...(session._id && { _id: session._id }), 
         name: session.name || "",
         session_date: sessionDate,
         start_time: startTime,
@@ -289,7 +309,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   };
 
   const getDefaultSessionDate = (index) => {
-    if (index === 0) return ""; // First session has no default date
+    if (index === 0) return ""; 
 
     const previousSessionDate = watch(`sessions.${index - 1}.session_date`);
     if (previousSessionDate) {
@@ -302,7 +322,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const addSession = () => {
     const sessionNumber = fields.length + 1;
 
-    // Get the date from the previous session and increment by 1 day
     let defaultDate = "";
     if (fields.length > 0) {
       const previousSessionDate = watch(
@@ -486,6 +505,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                   </div>
 
                   <div className="space-y-4">
+                    {/* Hidden field to preserve session _id */}
+                    <input
+                      type="hidden"
+                      {...register(`sessions.${index}._id`)}
+                    />
+                    
                     <div>
                       <Label className="text-sm font-medium">
                         {t("planningManagement.modal.sessionNameLabel")}{" "}
@@ -629,13 +654,21 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           )}
                           items={teachers}
                           selected={watch(`sessions.${index}.teachers`) || []}
-                          onChange={(selectedTeachers) =>
+                          onChange={(selectedTeachers) => {
+                            const currentTeachers = watch(`sessions.${index}.teachers`) || [];
+                            const teachersWithStatus = selectedTeachers.map(teacher => {
+                              const existing = currentTeachers.find(t => t._id === teacher._id);
+                              return {
+                                ...teacher,
+                                status: existing?.status || "pending"
+                              };
+                            });
                             setValue(
                               `sessions.${index}.teachers`,
-                              selectedTeachers,
+                              teachersWithStatus,
                               { shouldValidate: true, shouldDirty: true }
-                            )
-                          }
+                            );
+                          }}
                           onSearch={setTeacherSearchTerm}
                           isLoading={teachersLoading}
                           error={errors.sessions?.[index]?.teachers?.message}
@@ -650,13 +683,21 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           )}
                           items={assistants}
                           selected={watch(`sessions.${index}.assistants`) || []}
-                          onChange={(selectedAssistants) =>
+                          onChange={(selectedAssistants) => {
+                            const currentAssistants = watch(`sessions.${index}.assistants`) || [];
+                            const assistantsWithStatus = selectedAssistants.map(assistant => {
+                              const existing = currentAssistants.find(a => a._id === assistant._id);
+                              return {
+                                ...assistant,
+                                status: existing?.status || "pending"
+                              };
+                            });
                             setValue(
                               `sessions.${index}.assistants`,
-                              selectedAssistants,
+                              assistantsWithStatus,
                               { shouldValidate: true, shouldDirty: true }
-                            )
-                          }
+                            );
+                          }}
                           onSearch={setAssistantSearchTerm}
                           isLoading={assistantsLoading}
                           error={errors.sessions?.[index]?.assistants?.message}
@@ -671,13 +712,21 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           )}
                           items={trainees}
                           selected={watch(`sessions.${index}.trainees`) || []}
-                          onChange={(selectedTrainees) =>
+                          onChange={(selectedTrainees) => {
+                            const currentTrainees = watch(`sessions.${index}.trainees`) || [];
+                            const traineesWithStatus = selectedTrainees.map(trainee => {
+                              const existing = currentTrainees.find(t => t._id === trainee._id);
+                              return {
+                                ...trainee,
+                                status: existing?.status || "pending"
+                              };
+                            });
                             setValue(
                               `sessions.${index}.trainees`,
-                              selectedTrainees,
+                              traineesWithStatus,
                               { shouldValidate: true, shouldDirty: true }
-                            )
-                          }
+                            );
+                          }}
                           onSearch={setTraineeSearchTerm}
                           isLoading={traineesLoading}
                           error={errors.sessions?.[index]?.trainees?.message}

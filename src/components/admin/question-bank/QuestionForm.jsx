@@ -72,12 +72,11 @@ const QuestionForm = ({
 
   useEffect(() => {
     if (questionData && open) {
-      reset({
+      const formData = {
         question_text: questionData.question_text || "",
         options:
           questionData.options?.map((o) => ({
             option_text: o.option_text || "",
-            option_image: o.option_image || "",
             is_correct: o.is_correct || false,
           })) || [
           { option_text: "", is_correct: false },
@@ -86,7 +85,10 @@ const QuestionForm = ({
         explanation: questionData.explanation || "",
         difficulty: questionData.difficulty || "medium",
         marks: questionData.marks ?? 1,
-      });
+      };
+      
+      reset(formData);
+      setValue("difficulty", questionData.difficulty || "medium", { shouldValidate: true });
     } else if (!questionData && open) {
       reset({
         question_text: "",
@@ -99,13 +101,13 @@ const QuestionForm = ({
         marks: 1,
       });
     }
-  }, [questionData, reset, open]);
+  }, [questionData, reset, open, setValue]);
 
   const addOption = () => {
     if (options.length < 6) {
       setValue("options", [
         ...options,
-        { option_text: "", option_image: "", is_correct: false },
+        { option_text: "", is_correct: false },
       ]);
     }
   };
@@ -309,11 +311,16 @@ const QuestionForm = ({
                   {t("questionBank.questionForm.difficulty")}
                 </Label>
                 <Select
-                  value={watch("difficulty")}
-                  onValueChange={(v) => setValue("difficulty", v)}
+                  key={`difficulty-${questionData?._id || 'new'}-${watch("difficulty")}`}
+                  value={watch("difficulty") || "medium"}
+                  onValueChange={(v) => {
+                    if (v && (v === "easy" || v === "medium" || v === "hard")) {
+                      setValue("difficulty", v, { shouldValidate: true });
+                    }
+                  }}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select difficulty" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="easy">

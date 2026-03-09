@@ -34,3 +34,12 @@ export const deleteBatch = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getBatchAttendance = async (batchId, params) => {
+  try {
+    const response = await axiosInstance.get(`/planning/batch/${batchId}/attendance`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

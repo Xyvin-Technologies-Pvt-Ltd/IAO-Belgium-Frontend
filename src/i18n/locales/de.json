@@ -358,6 +358,7 @@
     "search": "Batches suchen...",
     "createBatch": "Batch Erstellen",
     "createBatchConfirmation": "Sind Sie sicher, dass Sie einen neuen Batch für diese Aufnahme erstellen möchten?",
+    "searchStudent": "Studenten suchen...",
     "table": {
       "batchId": "Batch ID",
       "batchName": "Batchname",
@@ -365,7 +366,9 @@
       "enrolled": "Eingeschrieben",
       "available": "Verfügbar",
       "status": "Status",
-      "noBatches": "Keine Batches gefunden"
+      "student": "Student",
+      "noBatches": "Keine Batches gefunden",
+      "noStudents": "Keine Studenten gefunden"
     },
     "messages": {
       "loadFailed": "Laden der Batches fehlgeschlagen"
@@ -373,7 +376,8 @@
     "details": {
       "tabs": {
         "overview": "Übersicht",
-        "students": "Studenten"
+        "students": "Studenten",
+        "attendence": "Anwesenheit"
       },
       "cards": {
         "enrolledStudents": "Eingeschriebene Studenten",

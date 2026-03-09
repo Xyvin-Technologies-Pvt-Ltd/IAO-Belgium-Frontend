@@ -27,7 +27,6 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
     defaultValues: {
       name: "",
       description: "",
-      tags: [],
     },
   });
 
@@ -39,13 +38,11 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
       reset({
         name: bankData.name || "",
         description: bankData.description || "",
-        tags: bankData.tags || [],
       });
     } else {
       reset({
         name: "",
         description: "",
-        tags: [],
       });
     }
   }, [bankData, reset, open]);

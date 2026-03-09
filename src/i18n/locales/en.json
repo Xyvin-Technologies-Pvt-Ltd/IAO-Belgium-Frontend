@@ -371,6 +371,7 @@
     "search": "Search batches...",
     "createBatch": "Create Batch",
     "createBatchConfirmation": "Are you sure you want to create a new batch for this intake?",
+    "searchStudent": "Search students...",
     "table": {
       "batchId": "Batch ID",
       "batchName": "Batch Name",
@@ -378,7 +379,9 @@
       "enrolled": "Enrolled",
       "available": "Available",
       "status": "Status",
-      "noBatches": "No Batches found"
+      "student": "Student",
+      "noBatches": "No Batches found",
+      "noStudents": "No students found"
     },
     "messages": {
       "loadFailed": "Failed to load batches"
@@ -386,7 +389,8 @@
     "details": {
       "tabs": {
         "overview": "Overview",
-        "students": "Students"
+        "students": "Students",
+        "attendence": "Attendance"
       },
       "cards": {
         "enrolledStudents": "Enrolled Students",

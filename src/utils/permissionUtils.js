@@ -19,6 +19,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/admin-logs": ["logs_management_view"],
   "/admin/examination/question-banks": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/exams": ["operations_management_view", "operations_management_modify"],
+  "/admin/submissions": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/assignments": ["operations_management_view", "operations_management_modify"],
 };
 

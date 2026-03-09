@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
-import { ArrowLeft, Clock, Calendar, PlayCircle, StopCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  Calendar,
+  PlayCircle,
+  StopCircle,
+  HelpCircle,
+  GraduationCap,
+  Timer,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { useGetTeacherExamById } from "@/store/useExamStore";
+import {
+  useGetTeacherExamById,
+  useStartExamSession,
+  useEndExamSession,
+} from "@/store/useExamStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
-import { useNavigate } from "@tanstack/react-router";
+import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
 import moment from "moment";
 
@@ -16,13 +29,20 @@ const ExamDetail = () => {
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
-  
+
   const [examStarted, setExamStarted] = useState(false);
   const [examEnded, setExamEnded] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [activeSessionId, setActiveSessionId] = useState(null);
   const [canStart, setCanStart] = useState(false);
 
-  const { data: examData, isLoading, error, refetch } = useGetTeacherExamById(id);
+  const {
+    data: examData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetTeacherExamById(id);
+  const startSessionMutation = useStartExamSession();
+  const endSessionMutation = useEndExamSession();
 
   useEffect(() => {
     if (examData?.data) {
@@ -38,87 +58,60 @@ const ExamDetail = () => {
           navigable: false,
         },
       ]);
+
+      if (examData.data.exam_session_status === "started") {
+        setExamStarted(true);
+        setExamEnded(false);
+        if (examData.data.exam_session_id) {
+          setActiveSessionId(examData.data.exam_session_id);
+        }
+      } else if (examData.data.exam_session_status === "ended") {
+        setExamStarted(false);
+        setExamEnded(true);
+        setActiveSessionId(null);
+      }
     }
     return () => updateBreadcrumbs([]);
-  }, [examData?.data?.name, id, t]);
+  }, [examData?.data?.name, examData?.data?.exam_session_status, examData?.data?.exam_session_id, id, t]);
 
   useEffect(() => {
-    if (!examData?.data?.first_session || !examData?.data?.duration) return;
+    if (!examData?.data?.first_session) return;
 
-    const session = examData.data.first_session;
-
-    const updateTimer = () => {
+    const checkSessionDate = () => {
       const now = moment();
-      const sessionDate = moment(session.session_date);
-      
-      // Check if today is the session date
-      const isSessionDay = now.isSame(sessionDate, 'day');
-
-      if (isSessionDay) {
-        setCanStart(true);
-        
-        // If exam is started, calculate remaining time based on exam duration
-        if (examStarted) {
-          // Calculate time remaining from when exam was started
-          const examDurationMs = examData.data.duration * 60 * 1000;
-          // You might want to store the actual start time when exam begins
-          // For now, we'll just show the full duration
-          if (timeRemaining === null) {
-            setTimeRemaining(examDurationMs);
-          } else {
-            const remaining = timeRemaining - 1000; // Decrease by 1 second
-            if (remaining <= 0) {
-              setTimeRemaining(0);
-              setExamEnded(true);
-            } else {
-              setTimeRemaining(remaining);
-            }
-          }
-        }
-      } else {
-        setCanStart(false);
-      }
+      const sessionDate = moment(examData.data.first_session.session_date);
+      setCanStart(
+        now.isSame(sessionDate, "day") &&
+          examData.data.exam_session_status !== "started",
+      );
     };
 
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
+    checkSessionDate();
+    const interval = setInterval(checkSessionDate, 60000);
 
     return () => clearInterval(interval);
-  }, [examData, examStarted, timeRemaining]);
-
+  }, [examData]);
 
   const handleStartExam = () => {
-    if (!canStart) {
-      toast.error(t("exam.cannotStartYet", { defaultValue: "Exam can only be started on the session date" }));
+    if (!examData?.data?.first_session?.planning_id) {
+      toast.error("Missing planning session data to start the exam.");
       return;
     }
-    // Initialize timer with full exam duration
-    const examDurationMs = examData.data.duration * 60 * 1000;
-    setTimeRemaining(examDurationMs);
-    setExamStarted(true);
-    toast.success(t("exam.examStarted", { defaultValue: "Exam started successfully" }));
+    const payload = {
+      planning: examData.data.first_session.planning_id,
+      exam: id,
+    };
+
+    startSessionMutation.mutate(payload);
   };
 
   const handleEndExam = () => {
-    setExamEnded(true);
-    setExamStarted(false);
-    toast.success(t("exam.examEnded", { defaultValue: "Exam ended successfully" }));
+    if (!activeSessionId) {
+      toast.error("No active session to end.");
+      return;
+    }
+    endSessionMutation.mutate(activeSessionId);
   };
-
-  const formatTime = (ms) => {
-    if (ms === null || ms === undefined) return "--:--:--";
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "-";
-    return moment(dateString).format('MMM DD, YYYY');
-  };
-
 
   if (isLoading) {
     return <LoadingState text={t("exam.loading")} fullHeight />;
@@ -137,134 +130,133 @@ const ExamDetail = () => {
   }
 
   const exam = examData.data;
-  const firstSession = exam.first_session;
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-       
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+              <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
                 {exam.name}
               </h2>
               <ExamStatusBadge status={exam.status} />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {exam.uid} · {exam.total_questions} {t("exam.questions")} ·{" "}
-              {exam.duration} {t("exam.minutes")}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Exam Session Card */}
-      {firstSession && (
-        <div className="border rounded-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">{t("exam.examSession", { defaultValue: "Exam Session" })}</h3>
-            {examStarted && !examEnded && (
-              <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-                <Clock className="h-5 w-5 animate-pulse" />
-                <span className="text-2xl font-mono font-bold">
-                  {formatTime(timeRemaining)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">{t("exam.sessionDate", { defaultValue: "Session Date" })}</p>
-                <p className="font-medium">{formatDate(firstSession.session_date)}</p>
-              </div>
+            <div className="mt-2">
+              <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
+                {exam.uid}
+              </span>
             </div>
           </div>
+        </div>
 
-          <div className="flex gap-2">
-            {!examStarted && !examEnded && (
-              <Button 
-                onClick={handleStartExam}
-                disabled={!canStart}
-                className="flex items-center gap-2"
-              >
-                <PlayCircle className="h-4 w-4" />
-                {t("exam.startExam", { defaultValue: "Start Exam" })}
-              </Button>
-            )}
-            {examStarted && !examEnded && (
-              <Button 
-                onClick={handleEndExam}
-                variant="destructive"
-                className="flex items-center gap-2"
-              >
-                <StopCircle className="h-4 w-4" />
-                {t("exam.endExam", { defaultValue: "End Exam" })}
-              </Button>
-            )}
-            {examEnded && (
-              <div className="text-sm text-muted-foreground">
-                {t("exam.examCompleted", { defaultValue: "Exam has been completed" })}
-              </div>
-            )}
-            {!canStart && !examStarted && !examEnded && (
-              <div className="text-sm text-muted-foreground">
-                {t("exam.waitingForSession", { defaultValue: "Exam can only be started on the session date" })}
-              </div>
-            )}
+        <div className="flex items-center gap-2">
+          {!examStarted && !examEnded && (
+            <Button
+              onClick={handleStartExam}
+              disabled={!canStart || startSessionMutation.isPending}
+            >
+              <PlayCircle className="h-4 w-4" />
+              {startSessionMutation.isPending
+                ? "Starting..."
+                : t("exam.startExam", { defaultValue: "Start Exam" })}
+            </Button>
+          )}
+          {examStarted && !examEnded && (
+            <Button
+              onClick={handleEndExam}
+              disabled={endSessionMutation.isPending}
+              variant="destructive"
+              className="flex items-center gap-2"
+            >
+              <StopCircle className="h-4 w-4" />
+              {endSessionMutation.isPending
+                ? "Ending..."
+                : t("exam.endExam", { defaultValue: "End Exam" })}
+            </Button>
+          )}
+          {examEnded && (
+            <div className="text-sm font-medium text-green-600 dark:text-green-500 px-4 py-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+              {t("exam.examCompleted", { defaultValue: "Exam Completed" })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <DashboardCard
+          title={t("exam.detail.totalQuestions", {
+            defaultValue: "Total Questions",
+          })}
+          value={exam.total_questions?.toString()}
+          icon={HelpCircle}
+        />
+        <DashboardCard
+          title={t("exam.detail.totalMarks", { defaultValue: "Total Marks" })}
+          value={exam.total_marks?.toString()}
+          icon={GraduationCap}
+        />
+        <DashboardCard
+          title={t("exam.detail.passingMarks", { defaultValue: "Pass Mark" })}
+          value={`${exam.passing_marks || 0} ${exam.passing_type === "percentage" ? "%" : ""}`}
+        />
+        <DashboardCard
+          title={t("exam.detail.duration", { defaultValue: "Duration" })}
+          value={`${exam.duration || 0} mins`}
+          icon={Timer}
+        />
+      </div>
+
+      {exam.description && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">Description:</p>
+          <p className="text-sm text-card-foreground/80">{exam.description}</p>
+        </div>
+      )}
+
+      {exam.instructions && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">Instructions:</p>
+          <div className="text-sm text-card-foreground/80 whitespace-pre-wrap">
+            {exam.instructions}
           </div>
         </div>
       )}
 
-      {exam.description && (
-        <div className="p-4 border rounded-lg bg-muted/50">
-          <p className="text-sm font-medium mb-1">{t("exam.detail.description")}</p>
-          <p className="text-muted-foreground">{exam.description}</p>
+      {exam.question_sources && exam.question_sources.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-dashboard-text dark:text-white mb-4">
+            Question Sources
+          </h3>
+          <div className="border rounded-lg overflow-hidden bg-white dark:bg-card text-card-foreground shadow-sm">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-[#f4f4f5] dark:bg-muted text-muted-foreground text-xs font-semibold">
+                <tr>
+                  <th className="px-6 py-4 border-b">Source</th>
+                  <th className="px-6 py-4 border-b">Number of Questions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {exam.question_sources.map((source, index) => (
+                  <tr key={index} className="transition-colors">
+                    <td className="px-6 py-4">
+                      {source.question_bank?.name ||
+                        source.question_bank ||
+                        "Osteopathic principles"}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground">
+                      {source.count} questions{" "}
+                      {source.question_bank?.total_questions
+                        ? `(${source.question_bank.total_questions} questions available)`
+                        : ""}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
-
-      {exam.module_name && (
-        <div className="p-4 border rounded-lg bg-muted/50">
-          <p className="text-sm font-medium mb-1">{t("exam.detail.module")}</p>
-          <p className="text-lg">{exam.module_name}</p>
-          <p className="text-sm text-muted-foreground">{exam.module_uid}</p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.totalQuestions")}
-          </p>
-          <p className="text-xl font-semibold">{exam.total_questions}</p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.totalMarks")}
-          </p>
-          <p className="text-xl font-semibold">{exam.total_marks}</p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.passingMarks")}
-          </p>
-          <p className="text-xl font-semibold">
-            {exam.passing_marks}{" "}
-            {exam.passing_type === "percentage" ? "%" : ""}
-          </p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.duration")}
-          </p>
-          <p className="text-xl font-semibold">{exam.duration} min</p>
-        </div>
-      </div>
-
-
     </div>
   );
 };

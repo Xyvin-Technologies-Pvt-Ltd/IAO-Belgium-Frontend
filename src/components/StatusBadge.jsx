@@ -21,10 +21,12 @@ const statusVariants = {
   // Submission statuses
   submitted: "text-blue-600",
   passed: "text-green-600",
+  pass: "text-green-600",
+  fail: "text-red-600",
+  failed: "text-red-600",
 
   // Payment statuses
   paid: "text-green-600",
-  failed: "text-red-600",
 
   // Ride statuses
   requested: "text-amber-600",

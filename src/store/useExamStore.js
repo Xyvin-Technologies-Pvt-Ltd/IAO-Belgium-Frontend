@@ -8,6 +8,8 @@ import {
   archiveExam,
   getTeacherExams,
   getTeacherExamById,
+  startExamSession,
+  endExamSession,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -121,5 +123,35 @@ export const useGetTeacherExamById = (id, options = {}) => {
     enabled: !!id,
     staleTime: 30000,
     ...options,
+  });
+};
+
+export const useStartExamSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: startExamSession,
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher-exam"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
+      toast.success(response?.message || "Exam session started successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to start exam session");
+    },
+  });
+};
+
+export const useEndExamSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: endExamSession,
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher-exam"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
+      toast.success(response?.message || "Exam session ended successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to end exam session");
+    },
   });
 };

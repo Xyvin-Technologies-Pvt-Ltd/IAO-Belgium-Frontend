@@ -1,3 +1,4 @@
+import BatchAttendence from "@/components/admin/batch/BatchAttendence";
 import BatchDetailCard from "@/components/admin/batch/BatchDetailCard";
 import BatchStudentList from "@/components/admin/batch/BatchStudentList";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
@@ -145,6 +146,10 @@ const BatchDetails = () => {
             key: "Students",
             label: t("batchManagement.details.tabs.students"),
           },
+          // {
+          //   key: "Attendence",
+          //   label: t("batchManagement.details.tabs.attendence"),
+          // },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -162,6 +167,7 @@ const BatchDetails = () => {
       <div>
         {activeTab === "Overview" && <BatchDetailCard batch={batchData} />}
         {activeTab === "Students" && <BatchStudentList />}
+        {activeTab==="Attendence" && <BatchAttendence />}
       </div>
     </div>
   );

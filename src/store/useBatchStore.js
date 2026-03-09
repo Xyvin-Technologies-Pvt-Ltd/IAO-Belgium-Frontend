@@ -1,4 +1,4 @@
-import { getBatchById, getStudentByBatch, createBatch, deleteBatch } from "@/api/batchApi";
+import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance } from "@/api/batchApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -53,5 +53,16 @@ export const useDeleteBatch = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to delete batch");
     },
+  });
+};
+
+export const useGetBatchAttendance = (batchId, params = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["batch-attendance", batchId, params],
+    queryFn: () => getBatchAttendance(batchId, params),
+    staleTime: 30000,
+    enabled: !!batchId,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };

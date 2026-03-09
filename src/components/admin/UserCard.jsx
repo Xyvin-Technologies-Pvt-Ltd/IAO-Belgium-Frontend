@@ -3,12 +3,12 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/api/axiosintercepter";
 
-const UserCard= ({ student, teacher, isTeacher = false }) => {
+const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
   const { t } = useTranslation();
   const user = isTeacher ? teacher : student;
 
   return (
-    <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border  space-y-6">
+    <div className={`${hide ? '' : 'rounded-xl p-5 border border-sidebar-border'} bg-sidebar   space-y-6`}>
       <div className="flex items-start gap-4 pb-4 border-b border-sidebar-border">
         <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl">
           {user?.first_name 
