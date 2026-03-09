@@ -53,8 +53,7 @@
       "adminLogs": "Journaux d'administration",
       "examination": "Examen",
       "questionBanks": "Banques de questions",
-      "exams": "Examens",
-      "examAssignments": "Attributions d'examens"
+      "exams": "Examens"
     },
     "user": {
       "loading": "Chargement...",
@@ -886,17 +885,6 @@
     "messages": { "loadFailed": "Échec du chargement" },
     "form": { "name": "Nom", "namePlaceholder": "Nom de l'examen", "description": "Description", "descriptionPlaceholder": "Description", "instructions": "Instructions", "instructionsPlaceholder": "Instructions", "questionSources": "Sources de questions", "addQuestionSource": "Ajouter une source", "selectQuestionBank": "Sélectionner une banque", "questionsAvailable": "disponibles", "questions": "questions", "totalQuestions": "Total des questions", "noQuestionBanks": "Aucune banque", "duration": "Durée (minutes)", "marksPerQuestion": "Points par question", "passingMarks": "Seuil de réussite", "passingType": "Type", "marks": "Points", "percentage": "Pourcentage", "settings": "Paramètres", "randomizeQuestions": "Mélanger les questions", "randomizeOptions": "Mélanger les réponses", "autoSubmitOnTimeout": "Soumission automatique", "maxAttempts": "Tentatives max" },
     "detail": { "totalQuestions": "Total des questions", "totalMarks": "Total des points", "passingMarks": "Seuil de réussite", "duration": "Durée", "questionSources": "Sources", "available": "disponibles" }
-  },
-  "examAssignment": {
-    "title": "Attributions d'examens",
-    "createAssignment": "Créer une attribution",
-    "loading": "Chargement...",
-    "allStatuses": "Tous les statuts",
-    "status": { "scheduled": "Programmé", "active": "Actif", "completed": "Terminé", "cancelled": "Annulé" },
-    "table": { "uid": "UID", "exam": "Examen", "program": "Programme", "batch": "Groupe", "startDate": "Début", "endDate": "Fin", "status": "Statut", "action": "Action", "edit": "Modifier", "cancel": "Annuler", "noAssignments": "Aucune attribution" },
-    "messages": { "loadFailed": "Échec du chargement" },
-    "form": { "createAssignment": "Créer une attribution", "editAssignment": "Modifier l'attribution", "exam": "Examen", "selectExam": "Sélectionner un examen", "noPublishedExams": "Aucun examen publié", "program": "Programme", "selectProgram": "Sélectionner un programme", "batch": "Groupe", "selectBatch": "Sélectionner un groupe", "prerequisiteModules": "Modules prérequis", "selectPrerequisiteModules": "Sélectionner les modules à compléter d'abord", "searchModules": "Rechercher des modules...", "prerequisiteModulesHelp": "Les étudiants doivent compléter ces modules avant que l'examen soit disponible.", "startDate": "Date de début", "endDate": "Date de fin" },
-    "results": { "title": "Résultats", "exportCsv": "Exporter CSV", "student": "Étudiant", "email": "Email", "score": "Score", "total": "Total", "percentage": "Pourcentage", "passed": "Réussi", "status": "Statut", "action": "Action", "viewDetail": "Détails", "noAttempts": "Aucune tentative", "loadFailed": "Échec du chargement", "attemptDetail": "Détails de la tentative", "questionsAnswered": "Questions", "correct": "Correct", "incorrect": "Incorrect", "marks": "Points", "noData": "Aucune donnée" }
   },
   "login": {
     "title": "Bureau IAO",

@@ -32,8 +32,6 @@ import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
 import ExamDetail from "@/pages/admin/exam/ExamDetail";
-import ExamAssignments from "@/pages/admin/exam-assignment";
-import AssignmentDetail from "@/pages/admin/exam-assignment/AssignmentDetail";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -237,20 +235,6 @@ export const adminRoutes = [
     component: withPermissionProtection(
       ExamDetail,
       "/admin/examination/exams",
-    ),
-  },
-  {
-    path: "/admin/examination/assignments",
-    component: withPermissionProtection(
-      ExamAssignments,
-      "/admin/examination/assignments",
-    ),
-  },
-  {
-    path: "/admin/examination/assignments/$id",
-    component: withPermissionProtection(
-      AssignmentDetail,
-      "/admin/examination/assignments",
     ),
   },
 ];

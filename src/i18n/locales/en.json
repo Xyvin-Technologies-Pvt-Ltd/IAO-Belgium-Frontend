@@ -54,8 +54,7 @@
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
-      "exams": "Exams",
-      "examAssignments": "Exam Assignments"
+      "exams": "Exams"
     },
     "user": {
       "loading": "Loading...",
@@ -991,72 +990,6 @@
       "duration": "Duration",
       "questionSources": "Question Sources",
       "available": "available"
-    }
-  },
-  "examAssignment": {
-    "title": "Exam Assignments",
-    "createAssignment": "Create Assignment",
-    "loading": "Loading assignment...",
-    "allStatuses": "All Statuses",
-    "status": {
-      "scheduled": "Scheduled",
-      "active": "Active",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
-    "table": {
-      "uid": "UID",
-      "exam": "Exam",
-      "program": "Program",
-      "batch": "Batch",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "status": "Status",
-      "action": "Action",
-      "edit": "Edit",
-      "cancel": "Cancel",
-      "noAssignments": "No assignments found"
-    },
-    "messages": {
-      "loadFailed": "Failed to load assignments"
-    },
-    "form": {
-      "createAssignment": "Create Assignment",
-      "editAssignment": "Edit Assignment",
-      "exam": "Exam",
-      "selectExam": "Select exam",
-      "noPublishedExams": "No published exams available",
-      "program": "Program",
-      "selectProgram": "Select program",
-      "batch": "Batch",
-      "selectBatch": "Select batch",
-      "prerequisiteModules": "Prerequisite Modules",
-      "selectPrerequisiteModules": "Select modules that must be completed first",
-      "searchModules": "Search modules...",
-      "prerequisiteModulesHelp": "Students must complete these modules before the exam becomes available.",
-      "startDate": "Start Date",
-      "endDate": "End Date"
-    },
-    "results": {
-      "title": "Results",
-      "exportCsv": "Export CSV",
-      "student": "Student",
-      "email": "Email",
-      "score": "Score",
-      "total": "Total",
-      "percentage": "Percentage",
-      "passed": "Passed",
-      "status": "Status",
-      "action": "Action",
-      "viewDetail": "View Detail",
-      "noAttempts": "No attempts yet",
-      "loadFailed": "Failed to load results",
-      "attemptDetail": "Attempt Details",
-      "questionsAnswered": "Questions",
-      "correct": "Correct",
-      "incorrect": "Incorrect",
-      "marks": "Marks",
-      "noData": "No attempt data found"
     }
   },
   "login": {

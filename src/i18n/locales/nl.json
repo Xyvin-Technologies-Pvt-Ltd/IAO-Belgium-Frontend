@@ -54,8 +54,7 @@
       "adminLogs": "Admin Logs",
       "examination": "Examinatie",
       "questionBanks": "Vragenbanken",
-      "exams": "Examens",
-      "examAssignments": "Examen Toewijzingen"
+      "exams": "Examens"
     },
     "user": {
       "loading": "Laden...",
@@ -886,17 +885,6 @@
     "messages": { "loadFailed": "Laden mislukt" },
     "form": { "name": "Naam", "namePlaceholder": "Examennaam", "description": "Beschrijving", "descriptionPlaceholder": "Beschrijving", "instructions": "Instructies", "instructionsPlaceholder": "Instructies", "questionSources": "Vragenbronnen", "addQuestionSource": "Bron toevoegen", "selectQuestionBank": "Selecteer vragenbank", "questionsAvailable": "beschikbaar", "questions": "vragen", "totalQuestions": "Totaal vragen", "noQuestionBanks": "Geen vragenbanken", "duration": "Duur (minuten)", "marksPerQuestion": "Punten per vraag", "passingMarks": "Slagingscijfer", "passingType": "Type", "marks": "Punten", "percentage": "Percentage", "settings": "Instellingen", "randomizeQuestions": "Vragen randomiseren", "randomizeOptions": "Antwoorden randomiseren", "autoSubmitOnTimeout": "Auto-inzenden bij timeout", "maxAttempts": "Max pogingen" },
     "detail": { "totalQuestions": "Totaal vragen", "totalMarks": "Totaal punten", "passingMarks": "Slagingscijfer", "duration": "Duur", "questionSources": "Bronnen", "available": "beschikbaar" }
-  },
-  "examAssignment": {
-    "title": "Examen toewijzingen",
-    "createAssignment": "Toewijzing aanmaken",
-    "loading": "Laden...",
-    "allStatuses": "Alle statussen",
-    "status": { "scheduled": "Gepland", "active": "Actief", "completed": "Voltooid", "cancelled": "Geannuleerd" },
-    "table": { "uid": "UID", "exam": "Examen", "program": "Programma", "batch": "Groep", "startDate": "Start", "endDate": "Einde", "status": "Status", "action": "Actie", "edit": "Bewerken", "cancel": "Annuleren", "noAssignments": "Geen toewijzingen" },
-    "messages": { "loadFailed": "Laden mislukt" },
-    "form": { "createAssignment": "Toewijzing aanmaken", "editAssignment": "Toewijzing bewerken", "exam": "Examen", "selectExam": "Selecteer examen", "noPublishedExams": "Geen gepubliceerde examens", "program": "Programma", "selectProgram": "Selecteer programma", "batch": "Groep", "selectBatch": "Selecteer groep", "prerequisiteModules": "Vereiste modules", "selectPrerequisiteModules": "Selecteer modules die eerst voltooid moeten worden", "searchModules": "Zoek modules...", "prerequisiteModulesHelp": "Studenten moeten deze modules voltooien voordat het examen beschikbaar wordt.", "startDate": "Startdatum", "endDate": "Einddatum" },
-    "results": { "title": "Resultaten", "exportCsv": "Exporteer CSV", "student": "Student", "email": "Email", "score": "Score", "total": "Totaal", "percentage": "Percentage", "passed": "Geslaagd", "status": "Status", "action": "Actie", "viewDetail": "Details", "noAttempts": "Geen pogingen", "loadFailed": "Laden mislukt", "attemptDetail": "Poging details", "questionsAnswered": "Vragen", "correct": "Correct", "incorrect": "Incorrect", "marks": "Punten", "noData": "Geen gegevens" }
   },
   "login": {
     "title": "IAO Back Office",
