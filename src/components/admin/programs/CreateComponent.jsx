@@ -659,16 +659,6 @@ const CreateComponent = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold">Resources</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addResource}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Resource
-                </Button>
               </div>
 
               {fields.length === 0 && (
@@ -819,6 +809,18 @@ const CreateComponent = ({
                   </div>
                 </div>
               ))}
+              <div className="flex items-center justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={addResource}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Resource
+                </Button>
+              </div>
             </div>
           )}
 
