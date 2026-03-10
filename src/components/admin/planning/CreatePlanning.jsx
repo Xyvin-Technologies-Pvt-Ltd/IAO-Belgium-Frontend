@@ -123,7 +123,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     {
       ...(traineeSearchTerm && { search: traineeSearchTerm }),
       role: "teacher",
-      teacher_role: "Trainees",
+      teacher_role: "Trainee",
     },
     { enabled: open },
   );
