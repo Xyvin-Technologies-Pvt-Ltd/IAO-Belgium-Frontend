@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { X, FileText, Cloud, Link, Loader2, Plus, Trash } from "lucide-react";
+import { X, FileText, Cloud, Link, Loader2, Plus, Trash, ExternalLink, Pencil, Check } from "lucide-react";
 import moment from "moment";
 import { uploadFile } from "@/api/uploadApi";
 
@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
 import { useDebounce } from "@/hooks/useDebounce";
+import ResourceSection from "./resources/ResourceSection";
 
 const CreateComponent = ({
   open,
@@ -193,19 +194,7 @@ const CreateComponent = ({
     }
   };
 
-  const addResource = () => {
-    const newResource = {
-      type: "link",
-      name: "",
-      url: "",
-      file: null,
-    };
-    append(newResource);
-  };
 
-  const removeResource = (index) => {
-    remove(index);
-  };
 
   useEffect(() => {
     if (!componentData || !open) return;
@@ -230,9 +219,9 @@ const CreateComponent = ({
       instruction_video: componentData.instruction_video || "",
       resources: componentData.files
         ? componentData.files.map((file) => ({
-            type: "link",
             name: file.name,
             url: file.url,
+            type: file.type || "file",
             file: null,
           }))
         : [],
@@ -287,51 +276,43 @@ const CreateComponent = ({
         payload.name = data.name;
         payload.year = data.year;
 
-        // Process resources: upload files and collect all URLs
-        const processedFiles = [];
+        // Process resources: upload files in parallel using Promise.all
         const resources = data.resources || [];
         
-        
-        for (let i = 0; i < resources.length; i++) {
-          const resource = resources[i];
-          
-          if (resource.type === "file" && resource.file) {
-            // Upload file
-            try {
-              const response = await uploadFile(resource.file);
-              const fileUrl = response?.data?.file_url || null;
-              
-              if (!fileUrl) {
-                throw new Error("No file URL returned from upload");
-              }
-              
-              processedFiles.push({
-                name: resource.name || resource.file.name.split(".")[0],
-                url: fileUrl,
-              });
-            } catch (uploadError) {
-              console.error("File upload error:", uploadError);
-              toast.error(`Failed to upload ${resource.file.name}: ${uploadError.message}`);
-              throw uploadError;
-            }
-          } else if (resource.type === "link" && resource.url) {
-            // Use existing URL
-            processedFiles.push({
-              name: resource.name || (() => {
-                try {
-                  const url = new URL(resource.url);
-                  const pathname = url.pathname;
-                  const filename = pathname.split('/').pop() || url.hostname;
-                  return filename.split('.')[0] || url.hostname;
-                } catch {
-                  return resource.url.length > 30 ? resource.url.substring(0, 30) + '...' : resource.url;
+        const processedFiles = await Promise.all(
+          resources.map(async (resource) => {
+            if (resource.type === "file" && resource.file) {
+              // Upload new file
+              try {
+                const response = await uploadFile(resource.file);
+                const fileUrl = response?.data?.file_url;
+                
+                if (!fileUrl) {
+                  throw new Error(`Upload failed for ${resource.file.name}`);
                 }
-              })(),
-              url: resource.url,
-            });
-          }
-        }
-        payload.files = processedFiles;
+                
+                return {
+                  name: resource.name || resource.file.name.split(".")[0],
+                  url: fileUrl,
+                  type: "file",
+                };
+              } catch (error) {
+                toast.error(`Failed to upload ${resource.file.name}`);
+                throw error;
+              }
+            } else if (resource.url) {
+              // Existing resource or manually entered link
+              return {
+                name: resource.name || (resource.type === "file" ? "Existing File" : resource.url),
+                url: resource.url,
+                type: resource.type || "file",
+              };
+            }
+            return null;
+          })
+        );
+
+        payload.files = processedFiles.filter(Boolean);
       }
 
       if (data.type === "module") {
@@ -656,172 +637,14 @@ const CreateComponent = ({
             </>
           )}
           {selectedType !== "exam" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Resources</Label>
-              </div>
-
-              {fields.length === 0 && (
-                <div className="border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    No resources added yet. Click "Add Resource" to add files or links.
-                  </p>
-                </div>
-              )}
-
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      Resource {index + 1}
-                    </h4>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeResource(index)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm font-medium">
-                        Resource Type <span className="text-red-500">*</span>
-                      </Label>
-                      <Select
-                        value={watch(`resources.${index}.type`) || "link"}
-                        onValueChange={(v) => {
-                          setValue(`resources.${index}.type`, v);
-                          // Clear file/url when switching types
-                          if (v === "link") {
-                            setValue(`resources.${index}.file`, null);
-                          } else {
-                            setValue(`resources.${index}.url`, "");
-                          }
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select resource type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="link">URL</SelectItem>
-                          <SelectItem value="file">File</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">
-                        Resource Name
-                      </Label>
-                      <Input
-                        type="text"
-                        placeholder="Enter resource name (optional)"
-                        {...register(`resources.${index}.name`)}
-                      />
-                      {errors.resources?.[index]?.name && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {errors.resources[index].name.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {watch(`resources.${index}.type`) === "link" ? (
-                      <div>
-                        <Label className="text-sm font-medium">
-                          URL <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          type="url"
-                          placeholder="Enter URL"
-                          {...register(`resources.${index}.url`)}
-                        />
-                        {errors.resources?.[index]?.url && (
-                          <p className="text-sm text-red-500 mt-1">
-                            {errors.resources[index].url.message}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Upload File <span className="text-red-500">*</span>
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            type="file"
-                            id={`file-upload-${index}`}
-                            accept=".pdf,.doc,.docx"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                setValue(`resources.${index}.file`, file, { shouldValidate: true });
-                                // Auto-fill name if empty
-                                if (!watch(`resources.${index}.name`)) {
-                                  setValue(
-                                    `resources.${index}.name`,
-                                    file.name.split(".")[0],
-                                    { shouldValidate: true }
-                                  );
-                                }
-                              }
-                            }}
-                            className="hidden"
-                          />
-                          <label
-                            htmlFor={`file-upload-${index}`}
-                            className={cn(
-                              "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                              "bg-white dark:text-white cursor-pointer",
-                              "flex items-center justify-between",
-                              watch(`resources.${index}.file`) && "text-foreground"
-                            )}
-                          >
-                            <span className={cn(
-                              "flex items-center gap-2 text-sm",
-                              !watch(`resources.${index}.file`) && "text-muted-foreground"
-                            )}>
-                              <Cloud className="h-4 w-4" />
-                              {watch(`resources.${index}.file`)
-                                ? watch(`resources.${index}.file`).name
-                                : "Choose file"}
-                            </span>
-                            {watch(`resources.${index}.file`) && (
-                              <span className="text-xs text-muted-foreground">
-                                {(watch(`resources.${index}.file`).size / 1024).toFixed(1)} KB
-                              </span>
-                            )}
-                          </label>
-                        </div>
-                        {errors.resources?.[index]?.file && (
-                          <p className="text-sm text-red-500 mt-1">
-                            {errors.resources[index].file.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              <div className="flex items-center justify-end">
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={addResource}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Resource
-                </Button>
-              </div>
-            </div>
+            <ResourceSection
+              control={control}
+              register={register}
+              setValue={setValue}
+              append={append}
+              remove={remove}
+              errors={errors}
+            />
           )}
 
           <div className="flex items-center justify-between">
