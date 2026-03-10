@@ -13,13 +13,31 @@ const baseComponentSchema = z.object({
   files: z.array(z.object({
     name: z.string(),
     url: z.string(),
+    type: z.string().optional(),
   })).optional(),
-  resources: z.array(z.object({
-    type: z.enum(["file", "link"]),
-    name: z.string().optional(),
-    url: z.string().optional(),
-    file: z.any().optional(),
-  })).optional(),
+  resources: z.array(
+    z.object({
+      type: z.enum(["file", "link"]),
+      name: z.string().optional(),
+      url: z.string().optional(),
+      file: z.any().optional(),
+    }).superRefine((data, ctx) => {
+      if (data.type === "file" && !data.file && !data.url) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "File is required",
+          path: ["file"],
+        });
+      }
+      if (data.type === "link" && !data.url) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "URL is required",
+          path: ["url"],
+        });
+      }
+    })
+  ).optional(),
 });
 
 const moduleComponentSchema = baseComponentSchema.extend({
@@ -34,7 +52,7 @@ const moduleComponentSchema = baseComponentSchema.extend({
 const appComponentSchema = baseComponentSchema.extend({
   submission_deadline: z.string().min(1, "Submission deadline is required"),
   instruction: z.string().min(1, "Instruction is required"),
-  instruction_video: z.string().min(1, "Instruction video URL is required").url("Please enter a valid URL"),
+  instruction_video: z.string().optional().or(z.literal("")),
   submissions: z.object({
     case_studies: z.boolean(),
     essays: z.boolean(),
