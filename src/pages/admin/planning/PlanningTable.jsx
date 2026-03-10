@@ -75,7 +75,7 @@ const PlanningTable = () => {
     const dates = sessions
       .map(session => session.session_date)
       .filter(date => date)
-      .map(date => moment(date))
+      .map(date => moment.utc(date))
       .sort((a, b) => a - b);
     
     if (dates.length === 0) return "N/A";
@@ -89,7 +89,7 @@ const PlanningTable = () => {
     const dates = sessions
       .map(session => session.session_date)
       .filter(date => date)
-      .map(date => moment(date))
+      .map(date => moment.utc(date))
       .sort((a, b) => a - b);
     
     if (dates.length === 0) return "N/A";

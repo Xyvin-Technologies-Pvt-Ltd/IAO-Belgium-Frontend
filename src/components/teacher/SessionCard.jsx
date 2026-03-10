@@ -4,13 +4,13 @@ import moment from "moment";
 const SessionCard = ({ sessions = [], isLoading = false }) => {
   // Helper function to format date
   const formatDate = (dateString) => {
-    return moment(dateString).format("MMMM DD, YYYY");
+    return moment.utc(dateString).format("MMMM DD, YYYY");
   };
 
   // Helper function to format time
   const formatTime = (startTime, endTime) => {
-    const start = moment(startTime);
-    const end = moment(endTime);
+    const start = moment.utc(startTime);
+    const end = moment.utc(endTime);
 
     return `${start.format("HH:mm")} - ${end.format("HH:mm")}`;
   };
