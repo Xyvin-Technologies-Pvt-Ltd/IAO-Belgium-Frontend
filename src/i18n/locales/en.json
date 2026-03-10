@@ -703,7 +703,8 @@
     "tabs": {
       "learningModules": "Learning Module",
       "applications": "Applied Professional Practice(APP)",
-      "resources": "Research"
+      "resources": "Research",
+      "examComponents": "Exam"
     },
     "emptyState": {
       "title": "No Program Modules Added Yet",

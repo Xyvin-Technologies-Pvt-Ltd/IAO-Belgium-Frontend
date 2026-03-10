@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { X, FileText, Cloud, Link, Loader2 } from "lucide-react";
+import { X, FileText, Cloud, Link, Loader2, Plus, Trash } from "lucide-react";
 import moment from "moment";
 import { uploadFile } from "@/api/uploadApi";
 
@@ -45,9 +45,7 @@ const CreateComponent = ({
   const isEdit = !!componentData;
 
   const [selectedType, setSelectedType] = useState("");
-  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [resourceType, setResourceType] = useState("file"); // "file" or "link"
   const [instructionContent, setInstructionContent] = useState("");
   const [moduleNameSearch, setModuleNameSearch] = useState("");
   const [showModuleSuggestions, setShowModuleSuggestions] = useState(false);
@@ -60,6 +58,7 @@ const CreateComponent = ({
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(componentSchema),
@@ -72,18 +71,21 @@ const CreateComponent = ({
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
-      files: [],
+      resources: [],
       submissions: {
         case_studies: false,
         essays: false,
         internships: false,
       },
       status: true,
-      resource_name: "",
-      resource_url: "",
       linked_module: "",
       linked_exam: "",
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "resources",
   });
 
   const watchedType = watch("type");
@@ -166,21 +168,17 @@ const CreateComponent = ({
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
-      files: [],
+      resources: [],
       submissions: {
         case_studies: false,
         essays: false,
         internships: false,
       },
       status: true,
-      resource_name: "",
-      resource_url: "",
       linked_module: "",
       linked_exam: "",
     });
     setSelectedType(preselectedType || "");
-    setUploadedFiles([]);
-    setResourceType("file");
     setInstructionContent("");
     setModuleNameSearch("");
     setShowModuleSuggestions(false);
@@ -194,95 +192,19 @@ const CreateComponent = ({
       onComponentCreated(componentType);
     }
   };
-  const handleFileUpload = async (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0) return;
-    const resourceName = watch("resource_name");
-    const inputRef = event.target;
-    setIsUploading(true);
 
-    try {
-      const newFiles = [];
-      for (const file of files) {
-        const response = await uploadFile(file);
-        const fileUrl = response?.data?.file_url || response?.data?.url || response?.url || "";
-        newFiles.push({
-          name: resourceName || file.name.split('.')[0],
-          originalFileName: file.name,
-          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-          url: fileUrl,
-        });
-      }
-
-      setUploadedFiles((prev) => {
-        const updated = [...prev, ...newFiles];
-        setValue(
-          "files",
-          updated.map((f) => ({ name: f.name, url: f.url })),
-        );
-        return updated;
-      });
-
-      setValue("resource_name", "");
-    } catch (error) {
-      toast.error(error?.message || "Failed to upload file");
-    } finally {
-      setIsUploading(false);
-      inputRef.value = "";
-    }
-  };
-
-  const addLinkResource = () => {
-    const resourceName = watch("resource_name");
-    const resourceUrl = watch("resource_url");
-
-    if (!resourceUrl) return;
-
-    // Generate name from URL if no resource name provided
-    const generatedName = resourceName || (() => {
-      try {
-        const url = new URL(resourceUrl);
-        const pathname = url.pathname;
-        const filename = pathname.split('/').pop() || url.hostname;
-        // Remove file extension if present
-        return filename.split('.')[0] || url.hostname;
-      } catch {
-        // If URL parsing fails, use the URL itself (truncated)
-        return resourceUrl.length > 30 ? resourceUrl.substring(0, 30) + '...' : resourceUrl;
-      }
-    })();
-
+  const addResource = () => {
     const newResource = {
-      name: generatedName,
-      url: resourceUrl,
-      size: "—",
+      type: "link",
+      name: "",
+      url: "",
+      file: null,
     };
-
-    setUploadedFiles((prev) => [...prev, newResource]);
-
-    setValue(
-      "files",
-      [...uploadedFiles, newResource].map((f) => ({
-        name: f.name,
-        url: f.url,
-      })),
-    );
-
-    setValue("resource_name", "");
-    setValue("resource_url", "");
+    append(newResource);
   };
 
-  const removeFile = (index) => {
-    const newFiles = uploadedFiles.filter((_, i) => i !== index);
-    setUploadedFiles(newFiles);
-
-    setValue(
-      "files",
-      newFiles.map((f) => ({
-        name: f.name,
-        url: f.url,
-      })),
-    );
+  const removeResource = (index) => {
+    remove(index);
   };
 
   useEffect(() => {
@@ -306,15 +228,20 @@ const CreateComponent = ({
       submission_deadline: formattedDeadline,
       instruction: componentData.instruction || "",
       instruction_video: componentData.instruction_video || "",
-      files: componentData.files || [],
+      resources: componentData.files
+        ? componentData.files.map((file) => ({
+            type: "link",
+            name: file.name,
+            url: file.url,
+            file: null,
+          }))
+        : [],
       submissions: {
         case_studies: submissions.case_studies || false,
         essays: submissions.essays || false,
         internships: submissions.internships || false,
       },
       status: componentData.status ?? true,
-      resource_name: "",
-      resource_url: "",
       linked_module: componentData.linked_module?._id || componentData.linked_module || "",
       linked_exam: componentData.linked_exam?._id || componentData.linked_exam || "",
     };
@@ -328,16 +255,6 @@ const CreateComponent = ({
     const instructionText = componentData.instruction || "";
     setInstructionContent(instructionText);
     setValue("instruction", instructionText);
-
-    if (componentData.files) {
-      setUploadedFiles(
-        componentData.files.map((file) => ({
-          name: file.name,
-          url: file.url,
-          size: "—",
-        })),
-      );
-    }
   }, [componentData, open, reset, setValue]);
 
   useEffect(() => {
@@ -356,56 +273,113 @@ const CreateComponent = ({
     setValue("instruction", instructionContent);
   }, [instructionContent, setValue]);
 
-  const onSubmit = (data) => {
-    const payload = {
-      type: data.type,
-      program: programId,
-      status: data.status,
-    };
+  const onSubmit = async (data) => {
+    setIsUploading(true);
 
-    if (data.type !== "exam") {
-      payload.name = data.name;
-      payload.year = data.year;
-      payload.files = uploadedFiles.map((f) => ({
-        name: f.name,
-        url: f.url,
-      }));
-    }
+    try {
+      const payload = {
+        type: data.type,
+        program: programId,
+        status: data.status,
+      };
 
-    if (data.type === "module") {
-      payload.amount = data.amount;
-      payload.module_number = data.module_number;
-      // Include system_id if a module was selected from suggestions
-      if (selectedSystemId) {
-        payload.system_id = selectedSystemId;
+      if (data.type !== "exam") {
+        payload.name = data.name;
+        payload.year = data.year;
+
+        // Process resources: upload files and collect all URLs
+        const processedFiles = [];
+        const resources = data.resources || [];
+        
+        
+        for (let i = 0; i < resources.length; i++) {
+          const resource = resources[i];
+          
+          if (resource.type === "file" && resource.file) {
+            // Upload file
+            try {
+              const response = await uploadFile(resource.file);
+              const fileUrl = response?.data?.file_url || null;
+              
+              if (!fileUrl) {
+                throw new Error("No file URL returned from upload");
+              }
+              
+              processedFiles.push({
+                name: resource.name || resource.file.name.split(".")[0],
+                url: fileUrl,
+              });
+            } catch (uploadError) {
+              console.error("File upload error:", uploadError);
+              toast.error(`Failed to upload ${resource.file.name}: ${uploadError.message}`);
+              throw uploadError;
+            }
+          } else if (resource.type === "link" && resource.url) {
+            // Use existing URL
+            processedFiles.push({
+              name: resource.name || (() => {
+                try {
+                  const url = new URL(resource.url);
+                  const pathname = url.pathname;
+                  const filename = pathname.split('/').pop() || url.hostname;
+                  return filename.split('.')[0] || url.hostname;
+                } catch {
+                  return resource.url.length > 30 ? resource.url.substring(0, 30) + '...' : resource.url;
+                }
+              })(),
+              url: resource.url,
+            });
+          }
+        }
+        payload.files = processedFiles;
       }
+
+      if (data.type === "module") {
+        payload.amount = data.amount;
+        payload.module_number = data.module_number;
+        // Include system_id if a module was selected from suggestions
+        if (selectedSystemId) {
+          payload.system_id = selectedSystemId;
+        }
+      }
+
+      if (data.type === "app") {
+        payload.submission_deadline = data.submission_deadline;
+        payload.instruction = instructionContent.trim();
+        payload.instruction_video = data.instruction_video;
+        payload.submissions = data.submissions;
+      }
+
+      if (data.type === "exam") {
+        payload.linked_module = data.linked_module;
+        payload.linked_exam = data.linked_exam;
+      }
+
+
+      const mutation = isEdit ? updateComponent : createComponent;
+      const args = isEdit ? { id: componentData._id, data: payload } : payload;
+
+      mutation.mutate(args, {
+        onSuccess: () => {
+          setIsUploading(false);
+          handleSuccessfulSubmit(data.type);
+        },
+        onError: (error) => {
+          console.error("Save error:", error);
+          setIsUploading(false);
+          toast.error(error?.message || "Failed to save component");
+        },
+      });
+    } catch (error) {
+      console.error("Submit error:", error);
+      setIsUploading(false);
+      toast.error(error?.message || "Failed to upload files");
     }
-
-    if (data.type === "app") {
-      payload.submission_deadline = data.submission_deadline;
-      payload.instruction = instructionContent.trim();
-      payload.instruction_video = data.instruction_video;
-      payload.submissions = data.submissions;
-    }
-
-    if (data.type === "exam") {
-      payload.linked_module = data.linked_module;
-      payload.linked_exam = data.linked_exam;
-    }
-
-    const mutation = isEdit ? updateComponent : createComponent;
-    const args = isEdit ? { id: componentData._id, data: payload } : payload;
-
-    mutation.mutate(args, {
-      onSuccess: () => {
-        handleSuccessfulSubmit(data.type);
-      },
-    });
   };
 
   if (!open) return null;
 
-  const isSubmitting = createComponent.isPending || updateComponent.isPending;
+  const isSubmitting = createComponent.isPending || updateComponent.isPending || isUploading;
 
   return (
     <div 
@@ -682,107 +656,169 @@ const CreateComponent = ({
             </>
           )}
           {selectedType !== "exam" && (
-            <div className="border rounded-xl p-4 space-y-4">
-              <div className="space-y-1">
-                <Label>Resource Type</Label>
-                <Select value={resourceType} onValueChange={setResourceType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select resource type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="link">URL</SelectItem>
-                    <SelectItem value="file">File</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">Resources</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addResource}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Resource
+                </Button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  label="Resource Name"
-                  placeholder="Create resource name"
-                  {...register("resource_name")}
-                />
-
-                {resourceType === "link" ? (
-                  <FormField
-                    label="Enter URL"
-                    placeholder="Enter URL"
-                    type="url"
-                    {...register("resource_url")}
-                  />
-                ) : (
-                  <div className="space-y-2">
-                    <Label>Upload Resource</Label>
-
-                    <div className="relative">
-                      <Input
-                        type="file"
-                        multiple
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileUpload}
-                        className="absolute inset-0 z-10 cursor-pointer opacity-0"
-                      />
-
-                      <div
-                        className={cn(
-                          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                          "bg-white dark:text-white flex items-center justify-between",
-                        )}
-                      >
-                        <span className="text-muted-foreground">
-                          {isUploading ? "Uploading..." : "Upload"}
-                        </span>
-                        {isUploading ? (
-                          <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
-                        ) : (
-                          <Cloud className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="link"
-                className="px-0"
-                onClick={
-                  resourceType === "link"
-                    ? addLinkResource
-                    : () => {
-                        const fileInput =
-                          document.querySelector('input[type="file"]');
-                        fileInput?.click();
-                      }
-                }
-              >
-                + Add
-              </Button>
-
-              {uploadedFiles.length > 0 && (
-                <div className="space-y-2">
-                  {uploadedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between rounded-md bg-muted px-3 py-2"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Link className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{file.name}</span>
-                      </div>
-
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+              {fields.length === 0 && (
+                <div className="border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    No resources added yet. Click "Add Resource" to add files or links.
+                  </p>
                 </div>
               )}
+
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-gray-900 dark:text-white">
+                      Resource {index + 1}
+                    </h4>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeResource(index)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">
+                        Resource Type <span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        value={watch(`resources.${index}.type`) || "link"}
+                        onValueChange={(v) => {
+                          setValue(`resources.${index}.type`, v);
+                          // Clear file/url when switching types
+                          if (v === "link") {
+                            setValue(`resources.${index}.file`, null);
+                          } else {
+                            setValue(`resources.${index}.url`, "");
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select resource type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="link">URL</SelectItem>
+                          <SelectItem value="file">File</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium">
+                        Resource Name
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="Enter resource name (optional)"
+                        {...register(`resources.${index}.name`)}
+                      />
+                      {errors.resources?.[index]?.name && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {errors.resources[index].name.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {watch(`resources.${index}.type`) === "link" ? (
+                      <div>
+                        <Label className="text-sm font-medium">
+                          URL <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          type="url"
+                          placeholder="Enter URL"
+                          {...register(`resources.${index}.url`)}
+                        />
+                        {errors.resources?.[index]?.url && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {errors.resources[index].url.message}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <Label className="text-sm font-medium">
+                          Upload File <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            id={`file-upload-${index}`}
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setValue(`resources.${index}.file`, file, { shouldValidate: true });
+                                // Auto-fill name if empty
+                                if (!watch(`resources.${index}.name`)) {
+                                  setValue(
+                                    `resources.${index}.name`,
+                                    file.name.split(".")[0],
+                                    { shouldValidate: true }
+                                  );
+                                }
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor={`file-upload-${index}`}
+                            className={cn(
+                              "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-[6px] border-[0.5px] px-3 py-1 text-base transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                              "bg-white dark:text-white cursor-pointer",
+                              "flex items-center justify-between",
+                              watch(`resources.${index}.file`) && "text-foreground"
+                            )}
+                          >
+                            <span className={cn(
+                              "flex items-center gap-2 text-sm",
+                              !watch(`resources.${index}.file`) && "text-muted-foreground"
+                            )}>
+                              <Cloud className="h-4 w-4" />
+                              {watch(`resources.${index}.file`)
+                                ? watch(`resources.${index}.file`).name
+                                : "Choose file"}
+                            </span>
+                            {watch(`resources.${index}.file`) && (
+                              <span className="text-xs text-muted-foreground">
+                                {(watch(`resources.${index}.file`).size / 1024).toFixed(1)} KB
+                              </span>
+                            )}
+                          </label>
+                        </div>
+                        {errors.resources?.[index]?.file && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {errors.resources[index].file.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -798,6 +834,7 @@ const CreateComponent = ({
             onCancel={handleClose}
             isLoading={isSubmitting}
             isEdit={isEdit}
+            submitText={isUploading ? "Uploading files..." : undefined}
           />
         </form>
       </div>

@@ -702,7 +702,8 @@
     "tabs": {
       "learningModules": "Module d'apprentissage",
       "applications": "Pratique professionnelle appliquée(APP)",
-      "resources": "Recherche"
+      "resources": "Recherche",
+      "examComponents": "Examen"
     },
     "emptyState": {
       "title": "Aucun module de programme ajouté",

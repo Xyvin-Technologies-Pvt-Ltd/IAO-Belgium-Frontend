@@ -691,7 +691,8 @@
     "tabs": {
       "learningModules": "Lernmodul",
       "applications": "Angewandte Berufspraxis(APP)",
-      "resources": "Forschung"
+      "resources": "Forschung",
+      "examComponents": "Prüfung"
     },
     "emptyState": {
       "title": "Noch keine Programm Module hinzugefügt",

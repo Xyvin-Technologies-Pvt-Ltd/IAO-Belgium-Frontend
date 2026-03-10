@@ -702,7 +702,8 @@
     "tabs": {
       "learningModules": "Leermodule",
       "applications": "Toegepaste Beroepspraktijk(APP)",
-      "resources": "Onderzoek"
+      "resources": "Onderzoek",
+      "examComponents": "Examen"
     },
     "emptyState": {
       "title": "Nog geen programma modules toegevoegd",
