@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const ResourceSection = ({ control, register, setValue, append, remove, errors }) => {
+const ResourceSection = ({ control, register, setValue, append, remove, fields, errors }) => {
   const resources = useWatch({
     control,
     name: "resources",
@@ -42,61 +42,63 @@ const ResourceSection = ({ control, register, setValue, append, remove, errors }
       </div>
 
       <div className="space-y-2">
-        {resources.map((field, index) => (
-          <div
-            key={field.id || index}
-            className="flex flex-col gap-2 p-3 border rounded-lg bg-gray-50/50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {field.type === "link" ? (
-                  <LinkIcon className="h-4 w-4 text-blue-500 shrink-0" />
-                ) : (
-                  <FileText className="h-4 w-4 text-orange-500 shrink-0" />
-                )}
-                
-                {field.type === "link" ? (
-                  <div className="flex-1 space-y-1">
-                    <Input
-                      size="sm"
-                      placeholder="Enter URL (Link)"
-                      className="h-8"
-                      {...register(`resources.${index}.url`)}
-                    />
-                    {errors?.resources?.[index]?.url && (
-                      <p className="text-[10px] text-red-500">
-                        {errors.resources[index].url.message}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex-1 truncate">
-                    <span className="text-sm font-medium">
-                      {field.file ? field.file.name : field.name || "Existing File"}
-                    </span>
-                    {field.file && (
-                      <span className="ml-2 text-[10px] text-muted-foreground">
-                        ({(field.file.size / 1024).toFixed(1)} KB)
+        {fields.map((field, index) => {
+          const resource = resources[index] || field;
+          return (
+            <div
+              key={field.id}
+              className="flex flex-col gap-2 p-3 border rounded-lg bg-gray-50/50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  {resource.type === "link" ? (
+                    <LinkIcon className="h-4 w-4 text-blue-500 shrink-0" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-orange-500 shrink-0" />
+                  )}
+                  
+                  {resource.type === "link" ? (
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        size="sm"
+                        placeholder="Enter URL (Link)"
+                        className="h-8"
+                        {...register(`resources.${index}.url`)}
+                      />
+                      {errors?.resources?.[index]?.url && (
+                        <p className="text-[10px] text-red-500">
+                          {errors.resources[index].url.message}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex-1 truncate">
+                      <span className="text-sm font-medium">
+                        {resource.file ? resource.file.name : resource.name || "Existing File"}
                       </span>
-                    )}
-                  </div>
-                )}
-              </div>
+                      {resource.file && (
+                        <span className="ml-2 text-[10px] text-muted-foreground">
+                          ({(resource.file.size / 1024).toFixed(1)} KB)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-              <div className="flex items-center gap-1 shrink-0">
-                {field.url && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-blue-500 hover:text-blue-600"
-                    asChild
-                  >
-                    <a href={field.url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
-                )}
+                <div className="flex items-center gap-1 shrink-0">
+                  {resource.url && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-blue-500 hover:text-blue-600"
+                      asChild
+                    >
+                      <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 <Button
                   type="button"
                   variant="ghost"
@@ -118,7 +120,8 @@ const ResourceSection = ({ control, register, setValue, append, remove, errors }
               />
             </div>
           </div>
-        ))}
+          );
+        })}
         
         {resources.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed rounded-lg border-gray-100 dark:border-gray-800">

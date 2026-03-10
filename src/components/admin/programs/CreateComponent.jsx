@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -184,6 +184,7 @@ const CreateComponent = ({
     setModuleNameSearch("");
     setShowModuleSuggestions(false);
     setSelectedSystemId(null);
+    lastLoadedId.current = null;
     onClose();
   };
 
@@ -196,8 +197,13 @@ const CreateComponent = ({
 
 
 
+  const lastLoadedId = useRef(null);
+
   useEffect(() => {
     if (!componentData || !open) return;
+
+    if (lastLoadedId.current === componentData._id) return;
+    lastLoadedId.current = componentData._id;
 
     const componentType = componentData.type || "";
 
@@ -507,6 +513,7 @@ const CreateComponent = ({
                   Module <span className="text-xs text-muted-foreground">(Exam scheduled before this module)</span> <span className="text-red-500">*</span>
                 </Label>
                 <Select
+                  key={`linked_module-${watch("linked_module")}`}
                   value={watch("linked_module") || ""}
                   onValueChange={(v) => setValue("linked_module", v, { shouldValidate: true })}
                 >
@@ -536,6 +543,7 @@ const CreateComponent = ({
                   Exam <span className="text-red-500">*</span>
                 </Label>
                 <Select
+                  key={`linked_exam-${watch("linked_exam")}`}
                   value={watch("linked_exam") || ""}
                   onValueChange={(v) => setValue("linked_exam", v, { shouldValidate: true })}
                 >
@@ -636,6 +644,7 @@ const CreateComponent = ({
               </div>
             </>
           )}
+          
           {selectedType !== "exam" && (
             <ResourceSection
               control={control}
@@ -643,6 +652,7 @@ const CreateComponent = ({
               setValue={setValue}
               append={append}
               remove={remove}
+              fields={fields}
               errors={errors}
             />
           )}
