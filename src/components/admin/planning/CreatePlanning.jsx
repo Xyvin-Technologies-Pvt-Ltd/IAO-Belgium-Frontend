@@ -23,7 +23,6 @@ import moment from "moment";
 
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const { t } = useTranslation();
-
   const [programSearchTerm, setProgramSearchTerm] = useState("");
   const [batchSearchTerm, setBatchSearchTerm] = useState("");
   const [componentSearchTerm, setComponentSearchTerm] = useState("");
@@ -187,13 +186,13 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
             _id: session._id, 
             name: session.name || "",
             session_date: session.session_date
-              ? moment(session.session_date).format("YYYY-MM-DD")
+              ? moment.utc(session.session_date).format("YYYY-MM-DD")
               : "",
             start_time: session.start_time
-              ? moment(session.start_time).format("HH:mm")
+              ? moment.utc(session.start_time).format("HH:mm")
               : "",
             end_time: session.end_time
-              ? moment(session.end_time).format("HH:mm")
+              ? moment.utc(session.end_time).format("HH:mm")
               : "",
             teachers: session.teachers
               ? session.teachers.map((t) => {

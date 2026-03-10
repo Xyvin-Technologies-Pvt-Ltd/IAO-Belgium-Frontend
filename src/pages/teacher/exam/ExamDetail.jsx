@@ -78,10 +78,10 @@ const ExamDetail = () => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      const now = moment();
-      const sessionDate = moment(examData.data.first_session.session_date);
+      const now = moment.utc().startOf('day');
+      const sessionDate = moment.utc(examData.data.first_session.session_date).startOf('day');
       setCanStart(
-        now.isSame(sessionDate, "day") &&
+        now.isSame(sessionDate) &&
           examData.data.exam_session_status !== "started",
       );
     };

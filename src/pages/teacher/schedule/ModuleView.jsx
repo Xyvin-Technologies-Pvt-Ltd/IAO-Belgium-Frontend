@@ -50,7 +50,7 @@ const ModuleView = () => {
   const getSessionDateRange = () => {
     if (!sessions || sessions.length === 0) return "N/A";
 
-    const dates = sessions.map((s) => moment(s.session_date));
+    const dates = sessions.map((s) => moment.utc(s.session_date));
     const startDate = moment.min(dates);
     const endDate = moment.max(dates);
 

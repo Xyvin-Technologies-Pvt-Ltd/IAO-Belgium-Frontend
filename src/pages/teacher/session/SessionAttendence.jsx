@@ -54,7 +54,7 @@ const SessionAttendence = () => {
   const totalRows = data?.total_count || 0;
 
   // Check if session date is in the future (before today)
-  const isSessionFuture = sessionDate ? moment(sessionDate).isAfter(moment(), 'day') : false;
+  const isSessionFuture = sessionDate ? moment.utc(sessionDate).startOf('day').isAfter(moment.utc().startOf('day')) : false;
 
   useEffect(() => {
     if (component) {

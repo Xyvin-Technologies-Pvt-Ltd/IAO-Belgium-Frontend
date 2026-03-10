@@ -90,7 +90,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                         label={t("planningManagement.view.dateLabel")}
                         value={
                           session.session_date
-                            ? moment(session.session_date).format("YYYY-MM-DD")
+                            ? moment.utc(session.session_date).format("YYYY-MM-DD")
                             : "N/A"
                         }
                       />
@@ -98,7 +98,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                         label={t("planningManagement.view.timeFromLabel")}
                         value={
                           session.start_time
-                            ? moment(session.start_time).format("HH:mm")
+                            ? moment.utc(session.start_time).format("HH:mm")
                             : "N/A"
                         }
                       />
@@ -106,7 +106,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                         label={t("planningManagement.view.timeTillLabel")}
                         value={
                           session.end_time
-                            ? moment(session.end_time).format("HH:mm")
+                            ? moment.utc(session.end_time).format("HH:mm")
                             : "N/A"
                         }
                       />

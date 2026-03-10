@@ -130,7 +130,7 @@ const SessionScheduleList = () => {
                 label="Date"
                 value={
                   session.session_date
-                    ? moment(session.session_date).format("MMM DD, YYYY")
+                    ? moment.utc(session.session_date).format("MMM DD, YYYY")
                     : "N/A"
                 }
               />
@@ -139,7 +139,7 @@ const SessionScheduleList = () => {
                 label="Time"
                 value={
                   session.start_time && session.end_time
-                    ? `${moment(session.start_time).format("HH:mm")} - ${moment(session.end_time).format("HH:mm")}`
+                    ? `${moment.utc(session.start_time).format("HH:mm")} - ${moment.utc(session.end_time).format("HH:mm")}`
                     : "N/A"
                 }
               />
