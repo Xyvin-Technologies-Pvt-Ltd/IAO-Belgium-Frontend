@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useDeleteIntake, useGetIntakes } from "@/store/useIntakeStore";
 import CreateIntake from "@/components/admin/intake/CreateIntake";
 import StatusBadge from "@/components/StatusBadge";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 
@@ -40,7 +40,7 @@ const Intakes = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch,isFetching } = useGetIntakes(id, {
+  const { data, isLoading, error, refetch, isFetching } = useGetIntakes(id, {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
@@ -141,7 +141,9 @@ const Intakes = () => {
             <TableHead>{t("intakeManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
@@ -164,26 +166,21 @@ const Intakes = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>
-                  {i?.program?.name || "N/A"
-                  }
-                </TableCell>
+                <TableCell>{i?.program?.name || "N/A"}</TableCell>
                 <TableCell>{i?.program?.city?.name || "N/A"}</TableCell>
                 <TableCell>{i?.program?.language?.name || "N/A"}</TableCell>
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
-                    ? formatInKolkataTZ(i.start_date, "MMM DD, YYYY")
+                    ? formatTZ(i.start_date, "MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {i?.end_date
-                    ? formatInKolkataTZ(i.end_date, "MMM DD, YYYY")
-                    : "N/A"}
+                  {i?.end_date ? formatTZ(i.end_date, "MMM DD, YYYY") : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.registration_deadline
-                    ? formatInKolkataTZ(i.registration_deadline, "MMM DD, YYYY")
+                    ? formatTZ(i.registration_deadline, "MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>

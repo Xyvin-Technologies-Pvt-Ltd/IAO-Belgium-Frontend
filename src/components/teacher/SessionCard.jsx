@@ -1,16 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatInKolkataTZ, getKolkataMoment } from "@/utils/dateUtils";
+import { formatTZ, getMoment } from "@/utils/dateUtils";
 
 const SessionCard = ({ sessions = [], isLoading = false }) => {
   // Helper function to format date
   const formatDate = (dateString) => {
-    return formatInKolkataTZ(dateString, "MMMM DD, YYYY");
+    return formatTZ(dateString, "MMMM DD, YYYY");
   };
 
   // Helper function to format time
   const formatTime = (startTime, endTime) => {
-    const start = getKolkataMoment(startTime);
-    const end = getKolkataMoment(endTime);
+    const start = getMoment(startTime);
+    const end = getMoment(endTime);
 
     return `${start.format("HH:mm")} - ${end.format("HH:mm")}`;
   };
@@ -60,14 +60,14 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
         {sessions.map((session, index) => {
           // Extract teachers from different roles
           const teachers = [
-            ...(session.teachers?.map(
-              (t) => `${t.teacher?.first_name || ""} ${t.teacher?.last_name || ""}`.trim()
+            ...(session.teachers?.map((t) =>
+              `${t.teacher?.first_name || ""} ${t.teacher?.last_name || ""}`.trim(),
             ) || []),
-            ...(session.assistants?.map(
-              (a) => `${a.assistant?.first_name || ""} ${a.assistant?.last_name || ""}`.trim()
+            ...(session.assistants?.map((a) =>
+              `${a.assistant?.first_name || ""} ${a.assistant?.last_name || ""}`.trim(),
             ) || []),
-            ...(session.trainees?.map(
-              (t) => `${t.trainee?.first_name || ""} ${t.trainee?.last_name || ""}`.trim()
+            ...(session.trainees?.map((t) =>
+              `${t.trainee?.first_name || ""} ${t.trainee?.last_name || ""}`.trim(),
             ) || []),
           ].filter(Boolean);
 

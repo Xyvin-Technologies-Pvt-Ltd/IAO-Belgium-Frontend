@@ -5,7 +5,7 @@ import { useGetStudentById } from "@/store/useStudentStore";
 import { useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import {
   Table,
   TableBody,
@@ -78,11 +78,10 @@ const StudentView = () => {
   const apps = studentData?.completed_submissions || [];
   const attendance = studentData?.attendance_percentage || 0;
 
-
-const attendanceData = [
-  { name: "Present", value: attendance, color: "#FFCD71" },
-  { name: "Absent", value: 100 - attendance, color: "#FFF7E8" },
-].filter((item) => item.value > 0); 
+  const attendanceData = [
+    { name: "Present", value: attendance, color: "#FFCD71" },
+    { name: "Absent", value: 100 - attendance, color: "#FFF7E8" },
+  ].filter((item) => item.value > 0);
 
   return (
     <div className="space-y-6 mt-4 bg-sidebar  rounded-xl p-5 border border-sidebar-border">
@@ -170,7 +169,7 @@ const attendanceData = [
                     <TableCell>{app.name}</TableCell>
                     <TableCell>{app.score || "-"}</TableCell>
                     <TableCell>
-                      {formatInKolkataTZ(app.submitted_at, "DD MMM YYYY") || "-"}
+                      {formatTZ(app.submitted_at, "DD MMM YYYY") || "-"}
                     </TableCell>
                   </TableRow>
                 ))

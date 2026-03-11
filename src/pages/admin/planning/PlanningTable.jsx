@@ -23,7 +23,7 @@ import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetAllCities } from "@/store/useDropdownStore";
-import { getKolkataMoment } from "@/utils/dateUtils";
+import { getMoment } from "@/utils/dateUtils";
 
 const PlanningTable = () => {
   const { t } = useTranslation();
@@ -71,90 +71,92 @@ const PlanningTable = () => {
   // Helper function to get session start and end dates
   const getSessionStartDate = (sessions) => {
     if (!sessions || sessions.length === 0) return "N/A";
-    
+
     const dates = sessions
-      .map(session => session.session_date)
-      .filter(date => date)
-      .map(date => getKolkataMoment(date))
+      .map((session) => session.session_date)
+      .filter((date) => date)
+      .map((date) => getMoment(date))
       .sort((a, b) => a - b);
-    
+
     if (dates.length === 0) return "N/A";
-    
-    return dates[0].format('MMM D, YYYY');
+
+    return dates[0].format("MMM D, YYYY");
   };
 
   const getSessionEndDate = (sessions) => {
     if (!sessions || sessions.length === 0) return "N/A";
-    
+
     const dates = sessions
-      .map(session => session.session_date)
-      .filter(date => date)
-      .map(date => getKolkataMoment(date))
+      .map((session) => session.session_date)
+      .filter((date) => date)
+      .map((date) => getMoment(date))
       .sort((a, b) => a - b);
-    
+
     if (dates.length === 0) return "N/A";
-    
-    return dates[dates.length - 1].format('MMM D, YYYY');
+
+    return dates[dates.length - 1].format("MMM D, YYYY");
   };
 
   // Helper function to get unique teachers from all sessions
   const getUniqueTeachers = (sessions) => {
     if (!sessions || sessions.length === 0) return [];
-    
+
     const teacherMap = new Map();
-    
-    sessions.forEach(session => {
+
+    sessions.forEach((session) => {
       // Add teachers
       if (session.teachers && session.teachers.length > 0) {
-        session.teachers.forEach(teacherObj => {
+        session.teachers.forEach((teacherObj) => {
           const teacher = teacherObj.teacher;
           if (teacher && teacher._id) {
             teacherMap.set(teacher._id, {
               _id: teacher._id,
-              name: `${teacher.first_name} ${teacher.last_name}`.trim()
+              name: `${teacher.first_name} ${teacher.last_name}`.trim(),
             });
           }
         });
       }
-      
+
       // Add assistants
       if (session.assistants && session.assistants.length > 0) {
-        session.assistants.forEach(assistantObj => {
+        session.assistants.forEach((assistantObj) => {
           const assistant = assistantObj.assistant;
           if (assistant && assistant._id) {
             teacherMap.set(assistant._id, {
               _id: assistant._id,
-              name: `${assistant.first_name} ${assistant.last_name}`.trim()
+              name: `${assistant.first_name} ${assistant.last_name}`.trim(),
             });
           }
         });
       }
-      
+
       // Add trainees
       if (session.trainees && session.trainees.length > 0) {
-        session.trainees.forEach(traineeObj => {
+        session.trainees.forEach((traineeObj) => {
           const trainee = traineeObj.trainee;
           if (trainee && trainee._id) {
             teacherMap.set(trainee._id, {
               _id: trainee._id,
-              name: `${trainee.first_name} ${trainee.last_name}`.trim()
+              name: `${trainee.first_name} ${trainee.last_name}`.trim(),
             });
           }
         });
       }
     });
-    
+
     return Array.from(teacherMap.values());
   };
 
   // Helper function to render teacher chips
   const renderTeacherChips = (sessions) => {
     const teachers = getUniqueTeachers(sessions);
-    
+
     if (teachers.length === 0) {
-      return <span className="text-gray-500 text-sm">No teachers assigned</span>;
+      return (
+        <span className="text-gray-500 text-sm">No teachers assigned</span>
+      );
     }
-    
+
     if (teachers.length === 1) {
       return (
         <Badge variant="secondary" className="text-xs">
@@ -162,11 +164,11 @@ const PlanningTable = () => {
         </Badge>
       );
     }
-    
+
     if (teachers.length === 2) {
       return (
         <div className="flex flex-wrap gap-1">
-          {teachers.map(teacher => (
+          {teachers.map((teacher) => (
             <Badge key={teacher._id} variant="secondary" className="text-xs">
               {teacher.name}
             </Badge>
@@ -174,7 +176,7 @@ const PlanningTable = () => {
         </div>
       );
     }
-    
+
     return (
       <div className="flex flex-wrap gap-1">
         <Badge variant="secondary" className="text-xs">
@@ -229,7 +231,7 @@ const PlanningTable = () => {
                 : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
             }`}
           >
-           All Cities
+            All Cities
           </button>
           {citiesLoading ? (
             <div className="py-2 px-1 text-sm text-gray-400">
@@ -280,7 +282,9 @@ const PlanningTable = () => {
             <TableHead>{t("planningManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
@@ -288,7 +292,8 @@ const PlanningTable = () => {
               <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={
-                    error?.message || t("planningManagement.messages.loadFailed")
+                    error?.message ||
+                    t("planningManagement.messages.loadFailed")
                   }
                   onRetry={refetch}
                   variant="inline"
@@ -297,8 +302,8 @@ const PlanningTable = () => {
             </TableRow>
           ) : plannings?.length > 0 ? (
             plannings?.map((i) => (
-              <TableRow 
-                key={i._id} 
+              <TableRow
+                key={i._id}
                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                 onClick={() => handleOpenView(i)}
               >
@@ -315,9 +320,7 @@ const PlanningTable = () => {
                 >
                   {i?.component?.name}
                 </TableCell>
-                <TableCell>
-                  {i?.cohort_year || "N/A"}
-                </TableCell>
+                <TableCell>{i?.cohort_year || "N/A"}</TableCell>
                 <TableCell className="whitespace-nowrap">
                   {getSessionStartDate(i?.sessions)}
                 </TableCell>
@@ -330,9 +333,7 @@ const PlanningTable = () => {
                 >
                   {i?.venue || "N/A"}
                 </TableCell>
-                <TableCell>
-                  {renderTeacherChips(i?.sessions)}
-                </TableCell>
+                <TableCell>{renderTeacherChips(i?.sessions)}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>

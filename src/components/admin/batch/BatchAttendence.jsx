@@ -16,8 +16,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetBatchAttendance } from "@/store/useBatchStore";
 import { Check, X } from "lucide-react";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
-import moment from "moment";
+import { formatTZ } from "@/utils/dateUtils";
 
 const BatchAttendence = () => {
   const params = useParams({ strict: false });
@@ -34,7 +33,7 @@ const BatchAttendence = () => {
       page: page,
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    }
+    },
   );
 
   const modules = data?.data?.modules || [];
@@ -107,23 +106,29 @@ const BatchAttendence = () => {
                     className="text-center min-w-[70px] border-l px-2"
                   >
                     <div className="text-xs font-normal">
-                      {formatInKolkataTZ(session.session_date, "D MMM")}
+                      {formatTZ(session.session_date, "D MMM")}
                     </div>
                   </TableHead>
-                ))
+                )),
               )}
             </TableRow>
           </TableHeader>
-          <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+          <TableBody
+            className={isFetching ? "opacity-50 pointer-events-none" : ""}
+          >
             {isLoading ? (
               <TableSkeleton
                 rows={rowsPerPage}
-                columns={1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)}
+                columns={
+                  1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                }
               />
             ) : error ? (
               <TableRow>
                 <TableCell
-                  colSpan={1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)}
+                  colSpan={
+                    1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                  }
                   className="text-center p-8"
                 >
                   <ErrorMessage
@@ -139,7 +144,7 @@ const BatchAttendence = () => {
               students.map((student) => (
                 <TableRow key={student._id} className="hover:bg-muted/30">
                   <TableCell className="sticky left-0 z-10 border-r w-[180px] truncate">
-                      {student.student_name}
+                    {student.student_name}
                   </TableCell>
                   {modules.map((module) =>
                     module.sessions.map((session) => {
@@ -153,14 +158,16 @@ const BatchAttendence = () => {
                           {getAttendanceIcon(attendance)}
                         </TableCell>
                       );
-                    })
+                    }),
                   )}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)}
+                  colSpan={
+                    1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                  }
                   className="text-center"
                 >
                   {t("batchManagement.table.noStudents")}

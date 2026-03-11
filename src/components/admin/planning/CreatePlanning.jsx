@@ -19,7 +19,7 @@ import {
   useGetUsers,
 } from "@/store/useDropdownStore";
 import { planningSchema } from "@/validations/admin";
-import { formatInKolkataTZ, getKolkataMoment } from "@/utils/dateUtils";
+import { formatTZ, getMoment } from "@/utils/dateUtils";
 import moment from "moment";
 
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
@@ -129,10 +129,10 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   );
 
   const programsRaw = programsData?.data || [];
-  const programs = programsRaw.map(program => ({
+  const programs = programsRaw.map((program) => ({
     _id: program._id,
-    name: `${program.name} - ${program.city?.name || 'N/A'} - ${program.language?.name || 'N/A'}`,
-    city: program.city 
+    name: `${program.name} - ${program.city?.name || "N/A"} - ${program.language?.name || "N/A"}`,
+    city: program.city,
   }));
   const batches = batchesData?.data || [];
   const components = componentsData?.data || [];
@@ -182,20 +182,20 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       setValue("description", planningData.description || "");
 
       if (planningData.sessions && planningData.sessions.length > 0) {
-        const formattedSessions = planningData.sessions.map((session) => {        
+        const formattedSessions = planningData.sessions.map((session) => {
           return {
-            _id: session._id, 
+            _id: session._id,
             name: session.name || "",
-            session_date: formatInKolkataTZ(session.session_date, "YYYY-MM-DD"),
-            start_time: formatInKolkataTZ(session.start_time, "HH:mm"),
-            end_time: formatInKolkataTZ(session.end_time, "HH:mm"),
+            session_date: formatTZ(session.session_date, "YYYY-MM-DD"),
+            start_time: formatTZ(session.start_time, "HH:mm"),
+            end_time: formatTZ(session.end_time, "HH:mm"),
             teachers: session.teachers
               ? session.teachers.map((t) => {
                   const teacher = t.teacher || t;
                   const teacherData = {
                     _id: teacher._id,
                     name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-                    status: t.status || "pending", 
+                    status: t.status || "pending",
                   };
                   return teacherData;
                 })
@@ -206,7 +206,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                   return {
                     _id: assistant._id,
                     name: `${assistant.first_name} ${assistant.last_name}`.trim(),
-                    status: a.status || "pending", 
+                    status: a.status || "pending",
                   };
                 })
               : [],
@@ -216,7 +216,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                   return {
                     _id: trainee._id,
                     name: `${trainee.first_name} ${trainee.last_name}`.trim(),
-                    status: t.status || "pending", 
+                    status: t.status || "pending",
                   };
                 })
               : [],
@@ -237,9 +237,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   }, [selectedProgram, setValue, isEdit]);
 
   const onSubmit = (formData) => {
-    
     const formattedSessions = formData.sessions.map((session) => {
-   
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
       const startTime = moment(session.start_time, "HH:mm").format("HH:mm");
       const endTime = moment(session.end_time, "HH:mm").format("HH:mm");
@@ -247,31 +245,37 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       let sessionTeachers = [];
       let sessionAssistants = [];
       let sessionTrainees = [];
-      
+
       if (isEdit) {
         sessionTeachers = (session.teachers || []).map((teacher) => {
-          const formatted = { 
+          const formatted = {
             teacher: teacher._id,
-            status: teacher.status || "pending"
+            status: teacher.status || "pending",
           };
           return formatted;
         });
-        sessionAssistants = (session.assistants || []).map((assistant) => ({ 
+        sessionAssistants = (session.assistants || []).map((assistant) => ({
           assistant: assistant._id,
-          status: assistant.status || "pending" 
+          status: assistant.status || "pending",
         }));
-        sessionTrainees = (session.trainees || []).map((trainee) => ({ 
+        sessionTrainees = (session.trainees || []).map((trainee) => ({
           trainee: trainee._id,
-          status: trainee.status || "pending" 
+          status: trainee.status || "pending",
         }));
       } else {
-        sessionTeachers = (formData.teachers || []).map((teacher) => ({ teacher: teacher._id }));
-        sessionAssistants = (formData.assistants || []).map((assistant) => ({ assistant: assistant._id }));
-        sessionTrainees = (formData.trainees || []).map((trainee) => ({ trainee: trainee._id }));
+        sessionTeachers = (formData.teachers || []).map((teacher) => ({
+          teacher: teacher._id,
+        }));
+        sessionAssistants = (formData.assistants || []).map((assistant) => ({
+          assistant: assistant._id,
+        }));
+        sessionTrainees = (formData.trainees || []).map((trainee) => ({
+          trainee: trainee._id,
+        }));
       }
 
       return {
-        ...(session._id && { _id: session._id }), 
+        ...(session._id && { _id: session._id }),
         name: session.name || "",
         session_date: sessionDate,
         start_time: startTime,
@@ -303,11 +307,11 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   };
 
   const getDefaultSessionDate = (index) => {
-    if (index === 0) return ""; 
+    if (index === 0) return "";
 
     const previousSessionDate = watch(`sessions.${index - 1}.session_date`);
     if (previousSessionDate) {
-      const nextDate = getKolkataMoment(previousSessionDate).add(1, "day");
+      const nextDate = getMoment(previousSessionDate).add(1, "day");
       return nextDate.format("YYYY-MM-DD");
     }
     return "";
@@ -322,7 +326,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         `sessions.${fields.length - 1}.session_date`,
       );
       if (previousSessionDate) {
-        const nextDate = getKolkataMoment(previousSessionDate).add(1, "day");
+        const nextDate = getMoment(previousSessionDate).add(1, "day");
         defaultDate = nextDate.format("YYYY-MM-DD");
       }
     }
@@ -504,7 +508,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                       type="hidden"
                       {...register(`sessions.${index}._id`)}
                     />
-                    
+
                     <div>
                       <Label className="text-sm font-medium">
                         {t("planningManagement.modal.sessionNameLabel")}{" "}
@@ -591,7 +595,8 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">
-                          {t("planningManagement.modal.timeTillLabel")}  <span className="text-red-500">*</span>
+                          {t("planningManagement.modal.timeTillLabel")}{" "}
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           type="time"
@@ -649,18 +654,23 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           items={teachers}
                           selected={watch(`sessions.${index}.teachers`) || []}
                           onChange={(selectedTeachers) => {
-                            const currentTeachers = watch(`sessions.${index}.teachers`) || [];
-                            const teachersWithStatus = selectedTeachers.map(teacher => {
-                              const existing = currentTeachers.find(t => t._id === teacher._id);
-                              return {
-                                ...teacher,
-                                status: existing?.status || "pending"
-                              };
-                            });
+                            const currentTeachers =
+                              watch(`sessions.${index}.teachers`) || [];
+                            const teachersWithStatus = selectedTeachers.map(
+                              (teacher) => {
+                                const existing = currentTeachers.find(
+                                  (t) => t._id === teacher._id,
+                                );
+                                return {
+                                  ...teacher,
+                                  status: existing?.status || "pending",
+                                };
+                              },
+                            );
                             setValue(
                               `sessions.${index}.teachers`,
                               teachersWithStatus,
-                              { shouldValidate: true, shouldDirty: true }
+                              { shouldValidate: true, shouldDirty: true },
                             );
                           }}
                           onSearch={setTeacherSearchTerm}
@@ -678,18 +688,23 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           items={assistants}
                           selected={watch(`sessions.${index}.assistants`) || []}
                           onChange={(selectedAssistants) => {
-                            const currentAssistants = watch(`sessions.${index}.assistants`) || [];
-                            const assistantsWithStatus = selectedAssistants.map(assistant => {
-                              const existing = currentAssistants.find(a => a._id === assistant._id);
-                              return {
-                                ...assistant,
-                                status: existing?.status || "pending"
-                              };
-                            });
+                            const currentAssistants =
+                              watch(`sessions.${index}.assistants`) || [];
+                            const assistantsWithStatus = selectedAssistants.map(
+                              (assistant) => {
+                                const existing = currentAssistants.find(
+                                  (a) => a._id === assistant._id,
+                                );
+                                return {
+                                  ...assistant,
+                                  status: existing?.status || "pending",
+                                };
+                              },
+                            );
                             setValue(
                               `sessions.${index}.assistants`,
                               assistantsWithStatus,
-                              { shouldValidate: true, shouldDirty: true }
+                              { shouldValidate: true, shouldDirty: true },
                             );
                           }}
                           onSearch={setAssistantSearchTerm}
@@ -707,18 +722,23 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           items={trainees}
                           selected={watch(`sessions.${index}.trainees`) || []}
                           onChange={(selectedTrainees) => {
-                            const currentTrainees = watch(`sessions.${index}.trainees`) || [];
-                            const traineesWithStatus = selectedTrainees.map(trainee => {
-                              const existing = currentTrainees.find(t => t._id === trainee._id);
-                              return {
-                                ...trainee,
-                                status: existing?.status || "pending"
-                              };
-                            });
+                            const currentTrainees =
+                              watch(`sessions.${index}.trainees`) || [];
+                            const traineesWithStatus = selectedTrainees.map(
+                              (trainee) => {
+                                const existing = currentTrainees.find(
+                                  (t) => t._id === trainee._id,
+                                );
+                                return {
+                                  ...trainee,
+                                  status: existing?.status || "pending",
+                                };
+                              },
+                            );
                             setValue(
                               `sessions.${index}.trainees`,
                               traineesWithStatus,
-                              { shouldValidate: true, shouldDirty: true }
+                              { shouldValidate: true, shouldDirty: true },
                             );
                           }}
                           onSearch={setTraineeSearchTerm}
@@ -747,8 +767,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               <>
                 <SearchableMultiSelect
                   label={t("planningManagement.modal.teachersLabel")}
-                  placeholder={t("planningManagement.modal.teachersPlaceholder")}
-                  searchPlaceholder={t("planningManagement.modal.searchTeachers")}
+                  placeholder={t(
+                    "planningManagement.modal.teachersPlaceholder",
+                  )}
+                  searchPlaceholder={t(
+                    "planningManagement.modal.searchTeachers",
+                  )}
                   items={teachers}
                   selected={watch("teachers") || []}
                   onChange={(selectedTeachers) =>
@@ -760,8 +784,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 />
                 <SearchableMultiSelect
                   label={t("planningManagement.modal.assistantsLabel")}
-                  placeholder={t("planningManagement.modal.assistantsPlaceholder")}
-                  searchPlaceholder={t("planningManagement.modal.searchAssistants")}
+                  placeholder={t(
+                    "planningManagement.modal.assistantsPlaceholder",
+                  )}
+                  searchPlaceholder={t(
+                    "planningManagement.modal.searchAssistants",
+                  )}
                   items={assistants}
                   selected={watch("assistants") || []}
                   onChange={(selectedAssistants) =>
@@ -773,8 +801,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 />
                 <SearchableMultiSelect
                   label={t("planningManagement.modal.traineesLabel")}
-                  placeholder={t("planningManagement.modal.traineesPlaceholder")}
-                  searchPlaceholder={t("planningManagement.modal.searchTrainees")}
+                  placeholder={t(
+                    "planningManagement.modal.traineesPlaceholder",
+                  )}
+                  searchPlaceholder={t(
+                    "planningManagement.modal.searchTrainees",
+                  )}
                   items={trainees}
                   selected={watch("trainees") || []}
                   onChange={(selectedTrainees) =>

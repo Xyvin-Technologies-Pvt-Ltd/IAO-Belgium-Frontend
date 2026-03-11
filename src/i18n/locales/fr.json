@@ -377,8 +377,14 @@
       "available": "Disponible",
       "status": "Statut",
       "student": "Étudiant",
+      "exam": "Examen",
+      "score": "Score",
+      "percentage": "Pourcentage",
+      "result": "Résultat",
+      "submittedAt": "Soumis le",
       "noBatches": "Aucun lot trouvé",
-      "noStudents": "Aucun étudiant trouvé"
+      "noStudents": "Aucun étudiant trouvé",
+      "noResults": "Aucun résultat d'examen trouvé pour ce lot."
     },
     "messages": {
       "loadFailed": "Échec du chargement des lots"
@@ -387,7 +393,8 @@
       "tabs": {
         "overview": "Aperçu",
         "students": "Étudiants",
-        "attendence": "Présence"
+        "attendence": "Présence",
+        "results": "Résultats"
       },
       "cards": {
         "enrolledStudents": "Étudiants inscrits",
@@ -853,39 +860,7 @@
       "modulePlaceholder": "Sélectionnez un module"
     }
   },
-  "questionBank": {
-    "title": "Banques de questions",
-    "search": "Rechercher...",
-    "createQuestionBank": "Créer une banque de questions",
-    "editQuestionBank": "Modifier la banque de questions",
-    "loading": "Chargement...",
-    "questions": "questions",
-    "table": { "uid": "UID", "name": "Nom", "description": "Description", "questionCount": "Questions", "status": "Statut", "action": "Action", "edit": "Modifier", "delete": "Supprimer", "noQuestionBanks": "Aucune banque trouvée" },
-    "messages": { "loadFailed": "Échec du chargement" },
-    "form": { "name": "Nom", "namePlaceholder": "Nom de la banque", "description": "Description", "descriptionPlaceholder": "Description" },
-    "questionForm": { "addQuestion": "Ajouter une question", "editQuestion": "Modifier la question", "questionText": "Question", "questionTextPlaceholder": "Texte de la question", "options": "Options", "correct": "Correct", "addOption": "Ajouter une option", "explanation": "Explication", "explanationPlaceholder": "Explication", "difficulty": "Difficulté", "easy": "Facile", "medium": "Moyen", "hard": "Difficile", "marks": "Points" },
-    "questionList": { "addQuestion": "Ajouter une question", "bulkUpload": "Import en masse", "uid": "UID", "question": "Question", "difficulty": "Difficulté", "marks": "Points", "action": "Action", "edit": "Modifier", "delete": "Supprimer", "noQuestions": "Aucune question" },
-    "bulkUpload": { "title": "Import en masse", "description": "Importer un fichier CSV", "downloadTemplate": "Télécharger le modèle", "selectFile": "Sélectionner un fichier", "upload": "Importer" }
-  },
-  "exam": {
-    "title": "Examens",
-    "search": "Rechercher...",
-    "createExam": "Créer un examen",
-    "editExam": "Modifier l'examen",
-    "loading": "Chargement...",
-    "questions": "questions",
-    "minutes": "min",
-    "cannotEditPublished": "Impossible de modifier un examen publié",
-    "edit": "Modifier",
-    "publish": "Publier",
-    "archive": "Archiver",
-    "allStatuses": "Tous les statuts",
-    "status": { "draft": "Brouillon", "published": "Publié", "archived": "Archivé" },
-    "table": { "uid": "UID", "name": "Nom", "questions": "Questions", "duration": "Durée", "passingMarks": "Réussite", "module": "Module", "status": "Statut", "action": "Action", "edit": "Modifier", "publish": "Publier", "archive": "Archiver", "noExams": "Aucun examen" },
-    "messages": { "loadFailed": "Échec du chargement" },
-    "form": { "name": "Nom", "namePlaceholder": "Nom de l'examen", "description": "Description", "descriptionPlaceholder": "Description", "instructions": "Instructions", "instructionsPlaceholder": "Instructions", "questionSources": "Sources de questions", "addQuestionSource": "Ajouter une source", "selectQuestionBank": "Sélectionner une banque", "questionsAvailable": "disponibles", "questions": "questions", "totalQuestions": "Total des questions", "noQuestionBanks": "Aucune banque", "duration": "Durée (minutes)", "marksPerQuestion": "Points par question", "passingMarks": "Seuil de réussite", "passingType": "Type", "marks": "Points", "percentage": "Pourcentage", "settings": "Paramètres", "randomizeQuestions": "Mélanger les questions", "randomizeOptions": "Mélanger les réponses", "autoSubmitOnTimeout": "Soumission automatique", "maxAttempts": "Tentatives max" },
-    "detail": { "totalQuestions": "Total des questions", "totalMarks": "Total des points", "passingMarks": "Seuil de réussite", "duration": "Durée", "questionSources": "Sources", "available": "disponibles" }
-  },
+
   "exam": {
     "title": "Examens",
     "search": "Rechercher des examens...",

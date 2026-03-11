@@ -377,8 +377,14 @@
       "available": "Beschikbaar",
       "status": "Status",
       "student": "Student",
+      "exam": "Examen",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Resultaat",
+      "submittedAt": "Ingezonden op",
       "noBatches": "Geen batches gevonden",
-      "noStudents": "Geen studenten gevonden"
+      "noStudents": "Geen studenten gevonden",
+      "noResults": "Geen examenresultaten gevonden voor deze batch."
     },
     "messages": {
       "loadFailed": "Laden van batches mislukt"
@@ -387,7 +393,8 @@
       "tabs": {
         "overview": "Overzicht",
         "students": "Studenten",
-        "attendence": "Aanwezigheid"
+        "attendence": "Aanwezigheid",
+        "results": "Resultaten"
       },
       "cards": {
         "enrolledStudents": "Ingeschreven Studenten",
@@ -853,39 +860,7 @@
       "modulePlaceholder": "Selecteer module"
     }
   },
-  "questionBank": {
-    "title": "Vragenbanken",
-    "search": "Zoeken...",
-    "createQuestionBank": "Vragenbank aanmaken",
-    "editQuestionBank": "Vragenbank bewerken",
-    "loading": "Laden...",
-    "questions": "vragen",
-    "table": { "uid": "UID", "name": "Naam", "description": "Beschrijving", "questionCount": "Vragen", "status": "Status", "action": "Actie", "edit": "Bewerken", "delete": "Verwijderen", "noQuestionBanks": "Geen vragenbanken" },
-    "messages": { "loadFailed": "Laden mislukt" },
-    "form": { "name": "Naam", "namePlaceholder": "Naam vragenbank", "description": "Beschrijving", "descriptionPlaceholder": "Beschrijving" },
-    "questionForm": { "addQuestion": "Vraag toevoegen", "editQuestion": "Vraag bewerken", "questionText": "Vraag", "questionTextPlaceholder": "Vraagtekst", "options": "Opties", "correct": "Correct", "addOption": "Optie toevoegen", "explanation": "Uitleg", "explanationPlaceholder": "Uitleg", "difficulty": "Moeilijkheid", "easy": "Makkelijk", "medium": "Gemiddeld", "hard": "Moeilijk", "marks": "Punten" },
-    "questionList": { "addQuestion": "Vraag toevoegen", "bulkUpload": "Bulk upload", "uid": "UID", "question": "Vraag", "difficulty": "Moeilijkheid", "marks": "Punten", "action": "Actie", "edit": "Bewerken", "delete": "Verwijderen", "noQuestions": "Geen vragen" },
-    "bulkUpload": { "title": "Bulk upload", "description": "CSV bestand uploaden", "downloadTemplate": "Sjabloon downloaden", "selectFile": "Bestand selecteren", "upload": "Uploaden" }
-  },
-  "exam": {
-    "title": "Examens",
-    "search": "Zoeken...",
-    "createExam": "Examen aanmaken",
-    "editExam": "Examen bewerken",
-    "loading": "Laden...",
-    "questions": "vragen",
-    "minutes": "min",
-    "cannotEditPublished": "Gepubliceerd examen kan niet worden bewerkt",
-    "edit": "Bewerken",
-    "publish": "Publiceren",
-    "archive": "Archiveren",
-    "allStatuses": "Alle statussen",
-    "status": { "draft": "Concept", "published": "Gepubliceerd", "archived": "Gearchiveerd" },
-    "table": { "uid": "UID", "name": "Naam", "questions": "Vragen", "duration": "Duur", "passingMarks": "Slagingscijfer", "module": "Module", "status": "Status", "action": "Actie", "edit": "Bewerken", "publish": "Publiceren", "archive": "Archiveren", "noExams": "Geen examens" },
-    "messages": { "loadFailed": "Laden mislukt" },
-    "form": { "name": "Naam", "namePlaceholder": "Examennaam", "description": "Beschrijving", "descriptionPlaceholder": "Beschrijving", "instructions": "Instructies", "instructionsPlaceholder": "Instructies", "questionSources": "Vragenbronnen", "addQuestionSource": "Bron toevoegen", "selectQuestionBank": "Selecteer vragenbank", "questionsAvailable": "beschikbaar", "questions": "vragen", "totalQuestions": "Totaal vragen", "noQuestionBanks": "Geen vragenbanken", "duration": "Duur (minuten)", "marksPerQuestion": "Punten per vraag", "passingMarks": "Slagingscijfer", "passingType": "Type", "marks": "Punten", "percentage": "Percentage", "settings": "Instellingen", "randomizeQuestions": "Vragen randomiseren", "randomizeOptions": "Antwoorden randomiseren", "autoSubmitOnTimeout": "Auto-inzenden bij timeout", "maxAttempts": "Max pogingen" },
-    "detail": { "totalQuestions": "Totaal vragen", "totalMarks": "Totaal punten", "passingMarks": "Slagingscijfer", "duration": "Duur", "questionSources": "Bronnen", "available": "beschikbaar" }
-  },
+
   "exam": {
     "title": "Examens",
     "search": "Examens zoeken...",

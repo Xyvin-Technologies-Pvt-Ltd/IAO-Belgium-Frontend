@@ -43,3 +43,12 @@ export const getBatchAttendance = async (batchId, params) => {
     throw error.response.data;
   }
 };
+
+export const getBatchExamResults = async (batchId, params) => {
+  try {
+    const response = await axiosInstance.get(`/exam/teacher/batch/${batchId}/results`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

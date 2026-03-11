@@ -15,11 +15,14 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
-import { useGetStudentsByComponent, useGetComponentById } from "@/store/useComponentStore";
+import {
+  useGetStudentsByComponent,
+  useGetComponentById,
+} from "@/store/useComponentStore";
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { getKolkataMoment } from "@/utils/dateUtils";
+import { getMoment } from "@/utils/dateUtils";
 
 const SessionAttendence = () => {
   const { t } = useTranslation();
@@ -28,7 +31,7 @@ const SessionAttendence = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
 
   const sessionId = params.id;
-  const componentId = search.component_id; 
+  const componentId = search.component_id;
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -36,14 +39,15 @@ const SessionAttendence = () => {
 
   const debouncedSearch = useDebounce(searchText, 500);
 
-  const { data: componentData, isLoading: isComponentLoading } = useGetComponentById(componentId);
+  const { data: componentData, isLoading: isComponentLoading } =
+    useGetComponentById(componentId);
   const component = componentData?.data;
 
   const { data, isLoading, error, refetch, isFetching } =
     useGetStudentsByComponent(componentId, {
       page: page,
       limit: rowsPerPage,
-      session_id: sessionId, 
+      session_id: sessionId,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
     });
 
@@ -54,7 +58,9 @@ const SessionAttendence = () => {
   const totalRows = data?.total_count || 0;
 
   // Check if session date is in the future (before today)
-  const isSessionFuture = sessionDate ? getKolkataMoment(sessionDate).startOf('day').isAfter(getKolkataMoment().startOf('day')) : false;
+  const isSessionFuture = sessionDate
+    ? getMoment(sessionDate).startOf("day").isAfter(getMoment().startOf("day"))
+    : false;
 
   useEffect(() => {
     if (component) {
@@ -106,7 +112,8 @@ const SessionAttendence = () => {
           {isSessionFuture && (
             <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md">
               <p className="text-sm text-yellow-800">
-                Attendance marking is not available yet. You can mark attendance on or after the session date.
+                Attendance marking is not available yet. You can mark attendance
+                on or after the session date.
               </p>
             </div>
           )}
@@ -174,7 +181,9 @@ const SessionAttendence = () => {
                             "present",
                           )
                         }
-                        disabled={markAttendanceMutation.isPending || isSessionFuture}
+                        disabled={
+                          markAttendanceMutation.isPending || isSessionFuture
+                        }
                       >
                         <Check className="h-4 w-4 mr-1" />
                         Present
@@ -195,7 +204,9 @@ const SessionAttendence = () => {
                             "absent",
                           )
                         }
-                        disabled={markAttendanceMutation.isPending || isSessionFuture}
+                        disabled={
+                          markAttendanceMutation.isPending || isSessionFuture
+                        }
                       >
                         <X className="h-4 w-4 mr-1" />
                         Absent

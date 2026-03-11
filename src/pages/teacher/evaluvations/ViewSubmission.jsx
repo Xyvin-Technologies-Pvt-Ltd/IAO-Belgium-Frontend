@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import {
   useEvaluateSubmission,

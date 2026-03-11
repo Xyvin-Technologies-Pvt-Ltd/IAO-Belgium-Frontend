@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetEnrolledStudentsByIntake } from "@/store/useIntakeStore";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import MoveStudentDialog from "./MoveStudentDialog";
 
@@ -107,7 +107,7 @@ const StudentList = () => {
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.batch_name}</TableCell>
                 <TableCell>
-                  {formatInKolkataTZ(i?.enrolled_date, "DD-MM-YYYY") || "N/A"}
+                  {formatTZ(i?.enrolled_date, "DD-MM-YYYY") || "N/A"}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />

@@ -20,7 +20,7 @@ import {
 } from "@/store/usePlanningStore";
 import StatusBadge from "@/components/StatusBadge";
 import { Check, X } from "lucide-react";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 
 const Plannings = () => {
   const { t } = useTranslation();
@@ -30,11 +30,12 @@ const Plannings = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch,isFetching } = useGetPlanningByTeacher({
-    page: page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  });
+  const { data, isLoading, error, refetch, isFetching } =
+    useGetPlanningByTeacher({
+      page: page,
+      limit: rowsPerPage,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    });
 
   const updateStatusMutation = useUpdateTeacherStatus();
 
@@ -81,7 +82,9 @@ const Plannings = () => {
             <TableHead>{t("planningManagement.teacher.actions")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
@@ -114,13 +117,13 @@ const Plannings = () => {
                   {session.name}
                 </TableCell>
                 <TableCell>
-                  {formatInKolkataTZ(session.session_date, "MMM DD, YYYY") || "N/A"}
+                  {formatTZ(session.session_date, "MMM DD, YYYY") || "N/A"}
                 </TableCell>
                 <TableCell>
-                  {formatInKolkataTZ(session.start_time, "HH:mm") || "N/A"}
+                  {formatTZ(session.start_time, "HH:mm") || "N/A"}
                 </TableCell>
                 <TableCell>
-                  {formatInKolkataTZ(session.end_time, "HH:mm") || "N/A"}
+                  {formatTZ(session.end_time, "HH:mm") || "N/A"}
                 </TableCell>
                 <TableCell>{session.venue || "N/A"}</TableCell>
                 <TableCell>{session.language || "N/A"}</TableCell>
