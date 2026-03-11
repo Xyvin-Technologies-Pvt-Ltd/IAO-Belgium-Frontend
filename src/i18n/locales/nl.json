@@ -886,6 +886,76 @@
     "form": { "name": "Naam", "namePlaceholder": "Examennaam", "description": "Beschrijving", "descriptionPlaceholder": "Beschrijving", "instructions": "Instructies", "instructionsPlaceholder": "Instructies", "questionSources": "Vragenbronnen", "addQuestionSource": "Bron toevoegen", "selectQuestionBank": "Selecteer vragenbank", "questionsAvailable": "beschikbaar", "questions": "vragen", "totalQuestions": "Totaal vragen", "noQuestionBanks": "Geen vragenbanken", "duration": "Duur (minuten)", "marksPerQuestion": "Punten per vraag", "passingMarks": "Slagingscijfer", "passingType": "Type", "marks": "Punten", "percentage": "Percentage", "settings": "Instellingen", "randomizeQuestions": "Vragen randomiseren", "randomizeOptions": "Antwoorden randomiseren", "autoSubmitOnTimeout": "Auto-inzenden bij timeout", "maxAttempts": "Max pogingen" },
     "detail": { "totalQuestions": "Totaal vragen", "totalMarks": "Totaal punten", "passingMarks": "Slagingscijfer", "duration": "Duur", "questionSources": "Bronnen", "available": "beschikbaar" }
   },
+  "exam": {
+    "title": "Examens",
+    "search": "Examens zoeken...",
+    "createExam": "Examen aanmaken",
+    "editExam": "Examen bewerken",
+    "loading": "Examen laden...",
+    "questions": "vragen",
+    "minutes": "min",
+    "cannotEditPublished": "Kan een gepubliceerd examen niet bewerken. Archiveer het eerst.",
+    "edit": "Bewerken",
+    "publish": "Publiceren",
+    "archive": "Archiveren",
+    "allStatuses": "Alle statussen",
+    "status": {
+      "draft": "Concept",
+      "published": "Gepubliceerd",
+      "archived": "Gearchiveerd"
+    },
+    "table": {
+      "uid": "UID",
+      "name": "Naam",
+      "questions": "Vragen",
+      "duration": "Duur",
+      "passingMarks": "Geslaagd",
+      "module": "Module",
+      "status": "Status",
+      "action": "Actie",
+      "edit": "Bewerken",
+      "publish": "Publiceren",
+      "archive": "Archiveren",
+      "noExams": "Geen examens gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van examens mislukt"
+    },
+    "form": {
+      "name": "Naam",
+      "namePlaceholder": "Voer examennaam in",
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Voer beschrijving in",
+      "instructions": "Instructies",
+      "instructionsPlaceholder": "Instructies getoond voor aanvang examen",
+      "questionSources": "Vragenbronnen",
+      "addQuestionSource": "Bron toevoegen",
+      "selectQuestionBank": "Selecteer vragenbank",
+      "questionsAvailable": "beschikbaar",
+      "questions": "vragen",
+      "totalQuestions": "Totaal aantal vragen",
+      "noQuestionBanks": "Geen vragenbanken beschikbaar",
+      "duration": "Duur (minuten)",
+      "marksPerQuestion": "Punten per vraag",
+      "passingMarks": "Slagingsgrens",
+      "passingType": "Type slagingsgrens",
+      "marks": "Punten",
+      "percentage": "Percentage",
+      "settings": "Instellingen",
+      "randomizeQuestions": "Vragen husselen",
+      "randomizeOptions": "Antwoordopties husselen",
+      "autoSubmitOnTimeout": "Automatisch indienen bij tijdslimiet",
+      "maxAttempts": "Maximaal aantal pogingen"
+    },
+    "detail": {
+      "totalQuestions": "Totaal aantal vragen",
+      "totalMarks": "Totaal aantal punten",
+      "passingMarks": "Slagingsgrens",
+      "duration": "Duur",
+      "questionSources": "Vragenbronnen",
+      "available": "beschikbaar"
+    }
+  },
   "login": {
     "title": "IAO Back Office",
     "subtitle": "Log in op ons beveiligde backoffice-systeem om de dagelijkse activiteiten van IAO te beheren",

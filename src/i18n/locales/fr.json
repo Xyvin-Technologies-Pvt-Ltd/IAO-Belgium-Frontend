@@ -886,6 +886,76 @@
     "form": { "name": "Nom", "namePlaceholder": "Nom de l'examen", "description": "Description", "descriptionPlaceholder": "Description", "instructions": "Instructions", "instructionsPlaceholder": "Instructions", "questionSources": "Sources de questions", "addQuestionSource": "Ajouter une source", "selectQuestionBank": "Sélectionner une banque", "questionsAvailable": "disponibles", "questions": "questions", "totalQuestions": "Total des questions", "noQuestionBanks": "Aucune banque", "duration": "Durée (minutes)", "marksPerQuestion": "Points par question", "passingMarks": "Seuil de réussite", "passingType": "Type", "marks": "Points", "percentage": "Pourcentage", "settings": "Paramètres", "randomizeQuestions": "Mélanger les questions", "randomizeOptions": "Mélanger les réponses", "autoSubmitOnTimeout": "Soumission automatique", "maxAttempts": "Tentatives max" },
     "detail": { "totalQuestions": "Total des questions", "totalMarks": "Total des points", "passingMarks": "Seuil de réussite", "duration": "Durée", "questionSources": "Sources", "available": "disponibles" }
   },
+  "exam": {
+    "title": "Examens",
+    "search": "Rechercher des examens...",
+    "createExam": "Créer un examen",
+    "editExam": "Modifier l'examen",
+    "loading": "Chargement de l'examen...",
+    "questions": "questions",
+    "minutes": "min",
+    "cannotEditPublished": "Impossible de modifier un examen publié. Archivez-le d'abord.",
+    "edit": "Modifier",
+    "publish": "Publier",
+    "archive": "Archiver",
+    "allStatuses": "Tous les statuts",
+    "status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "archived": "Archivé"
+    },
+    "table": {
+      "uid": "UID",
+      "name": "Nom",
+      "questions": "Questions",
+      "duration": "Durée",
+      "passingMarks": "Passage",
+      "module": "Module",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "publish": "Publier",
+      "archive": "Archiver",
+      "noExams": "Aucun examen trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des examens"
+    },
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Entrez le nom de l'examen",
+      "description": "Description",
+      "descriptionPlaceholder": "Entrez une description",
+      "instructions": "Instructions",
+      "instructionsPlaceholder": "Instructions affichées avant le début de l'examen",
+      "questionSources": "Sources de questions",
+      "addQuestionSource": "Ajouter une source",
+      "selectQuestionBank": "Sélectionner une banque de questions",
+      "questionsAvailable": "disponibles",
+      "questions": "questions",
+      "totalQuestions": "Total des questions",
+      "noQuestionBanks": "Aucune banque de questions disponible",
+      "duration": "Durée (minutes)",
+      "marksPerQuestion": "Points par question",
+      "passingMarks": "Note de passage",
+      "passingType": "Type de passage",
+      "marks": "Points",
+      "percentage": "Pourcentage",
+      "settings": "Paramètres",
+      "randomizeQuestions": "Randomiser les questions",
+      "randomizeOptions": "Randomiser les options de réponse",
+      "autoSubmitOnTimeout": "Soumission automatique en cas de dépassement de délai",
+      "maxAttempts": "Tentatives maximales"
+    },
+    "detail": {
+      "totalQuestions": "Total des questions",
+      "totalMarks": "Total des points",
+      "passingMarks": "Note de passage",
+      "duration": "Durée",
+      "questionSources": "Sources de questions",
+      "available": "disponible"
+    }
+  },
   "login": {
     "title": "Bureau IAO",
     "subtitle": "Connectez-vous à notre système de back-office sécurisé pour gérer les opérations quotidiennes de l'IAO",

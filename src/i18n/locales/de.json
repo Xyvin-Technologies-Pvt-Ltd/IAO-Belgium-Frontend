@@ -863,6 +863,76 @@
       "otpRequired": "Bitte geben Sie das OTP ein",
       "loginSuccess": "Anmeldung erfolgreich!",
       "otpInvalid": "Ungültiges OTP. Bitte versuchen Sie es erneut."
+    },
+    "exam": {
+    "title": "Prüfungen",
+    "search": "Prüfungen suchen...",
+    "createExam": "Prüfung erstellen",
+    "editExam": "Prüfung bearbeiten",
+    "loading": "Prüfung wird geladen...",
+    "questions": "Fragen",
+    "minutes": "min",
+    "cannotEditPublished": "Veröffentlichte Prüfung kann nicht bearbeitet werden. Zuerst archivieren.",
+    "edit": "Bearbeiten",
+    "publish": "Veröffentlichen",
+    "archive": "Archivieren",
+    "allStatuses": "Alle Status",
+    "status": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert"
+    },
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "questions": "Fragen",
+      "duration": "Dauer",
+      "passingMarks": "Bestehen",
+      "module": "Modul",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "publish": "Veröffentlichen",
+      "archive": "Archivieren",
+      "noExams": "Keine Prüfungen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Fehler beim Laden der Prüfungen"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Prüfungsnamen eingeben",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben",
+      "instructions": "Anweisungen",
+      "instructionsPlaceholder": "Anweisungen vor Prüfungsbeginn",
+      "questionSources": "Fragenquellen",
+      "addQuestionSource": "Quelle hinzufügen",
+      "selectQuestionBank": "Fragenbank auswählen",
+      "questionsAvailable": "verfügbar",
+      "questions": "Fragen",
+      "totalQuestions": "Fragen insgesamt",
+      "noQuestionBanks": "Keine Fragenbanken verfügbar",
+      "duration": "Dauer (Minuten)",
+      "marksPerQuestion": "Punkte pro Frage",
+      "passingMarks": "Mindestpunktzahl",
+      "passingType": "Mindesttyp",
+      "marks": "Punkte",
+      "percentage": "Prozentsatz",
+      "settings": "Einstellungen",
+      "randomizeQuestions": "Fragen randomisieren",
+      "randomizeOptions": "Antwortoptionen randomisieren",
+      "autoSubmitOnTimeout": "Automatische Abgabe bei Zeitüberschreitung",
+      "maxAttempts": "Maximale Versuche"
+    },
+    "detail": {
+      "totalQuestions": "Fragen insgesamt",
+      "totalMarks": "Gesamtpunktzahl",
+      "passingMarks": "Mindestpunktzahl",
+      "duration": "Dauer",
+      "questionSources": "Fragenquellen",
+      "available": "verfügbar"
     }
   }
+}
 }
