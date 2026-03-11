@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import {
-  ArrowLeft,
-  Clock,
-  Calendar,
   PlayCircle,
   StopCircle,
   HelpCircle,
@@ -11,18 +8,32 @@ import {
   Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table/table";
 import {
   useGetTeacherExamById,
   useStartExamSession,
   useEndExamSession,
+  useGetExamResults,
 } from "@/store/useExamStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
+import StatusBadge from "@/components/StatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
-import { getKolkataMoment } from "@/utils/dateUtils";
+import { getMoment } from "@/utils/dateUtils";
+import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/table/Pagination";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const ExamDetail = () => {
   const { t } = useTranslation();
@@ -35,12 +46,36 @@ const ExamDetail = () => {
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [canStart, setCanStart] = useState(false);
 
+  // Pagination and Search states
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Reset page when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
   const {
     data: examData,
     isLoading,
     error,
     refetch,
   } = useGetTeacherExamById(id);
+
+  const planningId = examData?.data?.first_session?.planning_id;
+
+  const {
+    data: resultsData,
+    isLoading: resultsLoading,
+    error: resultsError,
+  } = useGetExamResults(id, planningId, {
+    page,
+    limit: rowsPerPage,
+    search: debouncedSearch,
+  });
+
   const startSessionMutation = useStartExamSession();
   const endSessionMutation = useEndExamSession();
 
@@ -72,14 +107,22 @@ const ExamDetail = () => {
       }
     }
     return () => updateBreadcrumbs([]);
-  }, [examData?.data?.name, examData?.data?.exam_session_status, examData?.data?.exam_session_id, id, t]);
+  }, [
+    examData?.data?.name,
+    examData?.data?.exam_session_status,
+    examData?.data?.exam_session_id,
+    id,
+    t,
+  ]);
 
   useEffect(() => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      const now = getKolkataMoment().startOf('day');
-      const sessionDate = getKolkataMoment(examData.data.first_session.session_date).startOf('day');
+      const now = getMoment().startOf("day");
+      const sessionDate = getMoment(
+        examData.data.first_session.session_date,
+      ).startOf("day");
       setCanStart(
         now.isSame(sessionDate) &&
           examData.data.exam_session_status !== "started",
@@ -255,6 +298,96 @@ const ExamDetail = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {(exam.exam_session_status === "ended" ||
+        resultsData?.data?.length > 0) && (
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-dashboard-text dark:text-white">
+              Student Results
+            </h3>
+            <Input
+              placeholder="Search students..."
+              className="max-w-xs"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-6">Student</TableHead>
+                <TableHead className="text-center">Score</TableHead>
+                <TableHead className="text-center">Percentage</TableHead>
+                <TableHead className="text-center">Result</TableHead>
+                <TableHead className="text-center px-6">Submitted At</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {resultsLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    {t("common.loading") || "Loading results..."}
+                  </TableCell>
+                </TableRow>
+              ) : resultsData?.data?.length > 0 ? (
+                resultsData.data.map((result) => (
+                  <TableRow
+                    key={result._id}
+                    className="transition-colors hover:bg-muted/50"
+                  >
+                    <TableCell className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {result.student?.first_name}{" "}
+                          {result.student?.last_name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {result.student?.uid}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center font-medium">
+                      {result.score}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {result.percentage?.toFixed(2)}%
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <StatusBadge status={result.result} />
+                    </TableCell>
+                    <TableCell className="text-center text-muted-foreground px-6 py-4">
+                      {getMoment(result.submitted_at).format("MMM D, HH:mm")}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    {t("common.noResultsFound") ||
+                      "No results found for this exam session."}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          {resultsData?.total_count > 0 && (
+            <Pagination
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              totalRows={resultsData?.total_count || 0}
+            />
+          )}
         </div>
       )}
     </div>

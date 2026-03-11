@@ -5,7 +5,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetIntakeById } from "@/store/useIntakeStore";
 import { useParams } from "@tanstack/react-router";
 import { Calendar, CalendarCheck, Layers, MapPin, Users } from "lucide-react";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +37,7 @@ const IntakeDetails = () => {
           path: "/admin/admission-administration",
           navigable: false,
         },
-         {
+        {
           label: "Academics",
           path: "/admin/admission-administration/academics",
           navigable: true,
@@ -112,7 +112,7 @@ const IntakeDetails = () => {
               {intakeData.registration_deadline && (
                 <span className="px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-xs">
                   {t("intakeManagement.details.badges.registrationDeadline")}:{" "}
-                  {formatInKolkataTZ(intakeData.registration_deadline, "DD/MM/YYYY")}
+                  {formatTZ(intakeData.registration_deadline, "DD/MM/YYYY")}
                 </span>
               )}
             </div>
@@ -134,13 +134,13 @@ const IntakeDetails = () => {
 
           <DashboardCard
             title={t("intakeManagement.details.cards.startDate")}
-            value={formatInKolkataTZ(intakeData?.start_date, "DD/MM/YYYY")}
+            value={formatTZ(intakeData?.start_date, "DD/MM/YYYY")}
             icon={Calendar}
           />
 
           <DashboardCard
             title={t("intakeManagement.details.cards.endDate")}
-            value={formatInKolkataTZ(intakeData?.end_date, "DD/MM/YYYY")}
+            value={formatTZ(intakeData?.end_date, "DD/MM/YYYY")}
             icon={CalendarCheck}
           />
         </div>

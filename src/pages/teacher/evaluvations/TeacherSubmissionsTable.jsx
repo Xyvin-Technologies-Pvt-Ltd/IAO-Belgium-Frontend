@@ -15,7 +15,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useGetTeacherSubmissions } from "@/store/useSubmission";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -28,18 +28,22 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch, isFetching } = useGetTeacherSubmissions({
-    page: page,
-    limit: rowsPerPage,
-    submission_type: submissionType,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  });
+  const { data, isLoading, error, refetch, isFetching } =
+    useGetTeacherSubmissions({
+      page: page,
+      limit: rowsPerPage,
+      submission_type: submissionType,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    });
 
   const submissionsData = data?.data || [];
   const totalRows = data?.total_count || 0;
 
   const handleRowClick = (submission) => {
-    navigate({ to: "/teacher/evaluations/$id", params: { id: submission._id } });
+    navigate({
+      to: "/teacher/evaluations/$id",
+      params: { id: submission._id },
+    });
   };
 
   return (
@@ -67,7 +71,9 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+          <TableBody
+            className={isFetching ? "opacity-50 pointer-events-none" : ""}
+          >
             {isLoading ? (
               <TableSkeleton rows={rowsPerPage} columns={6} />
             ) : error ? (
@@ -82,14 +88,17 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
               </TableRow>
             ) : submissionsData?.length > 0 ? (
               submissionsData?.map((item) => (
-                <TableRow 
-                  key={item._id} 
+                <TableRow
+                  key={item._id}
                   className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                   onClick={() => handleRowClick(item)}
                 >
                   <TableCell>
-                    {item?.student ? `${item.student.first_name || ''} ${item.student.last_name || ''}` : 
-                     item?.application?.user ? `${item.application.user.first_name || ''} ${item.application.user.last_name || ''}` : "-"}
+                    {item?.student
+                      ? `${item.student.first_name || ""} ${item.student.last_name || ""}`
+                      : item?.application?.user
+                        ? `${item.application.user.first_name || ""} ${item.application.user.last_name || ""}`
+                        : "-"}
                   </TableCell>
                   <TableCell
                     className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
@@ -110,7 +119,7 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
                     {item?.batch?.name || "-"}
                   </TableCell>
                   <TableCell>
-                    {formatInKolkataTZ(item?.createdAt, "MMM DD, YYYY")}
+                    {formatTZ(item?.createdAt, "MMM DD, YYYY")}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={item?.status} />

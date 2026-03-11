@@ -10,6 +10,7 @@ import {
   getTeacherExamById,
   startExamSession,
   endExamSession,
+  getExamResults,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -153,5 +154,20 @@ export const useEndExamSession = () => {
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to end exam session");
     },
+  });
+};
+
+export const useGetExamResults = (
+  exam_id,
+  planning_id,
+  params,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: ["exam-results", exam_id, planning_id, params],
+    queryFn: () => getExamResults(exam_id, planning_id, params),
+    enabled: !!exam_id && !!planning_id,
+    staleTime: 30000,
+    ...options,
   });
 };

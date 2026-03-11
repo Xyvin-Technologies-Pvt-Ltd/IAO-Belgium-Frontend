@@ -366,8 +366,14 @@
       "available": "Verfügbar",
       "status": "Status",
       "student": "Student",
+      "exam": "Prüfung",
+      "score": "Punktzahl",
+      "percentage": "Prozentsatz",
+      "result": "Ergebnis",
+      "submittedAt": "Eingereicht am",
       "noBatches": "Keine Batches gefunden",
-      "noStudents": "Keine Studenten gefunden"
+      "noStudents": "Keine Studenten gefunden",
+      "noResults": "Keine Prüfungsergebnisse für diesen Batch gefunden."
     },
     "messages": {
       "loadFailed": "Laden der Batches fehlgeschlagen"
@@ -376,7 +382,8 @@
       "tabs": {
         "overview": "Übersicht",
         "students": "Studenten",
-        "attendence": "Anwesenheit"
+        "attendence": "Anwesenheit",
+        "results": "Ergebnisse"
       },
       "cards": {
         "enrolledStudents": "Eingeschriebene Studenten",

@@ -1,5 +1,6 @@
 import BatchAttendence from "@/components/admin/batch/BatchAttendence";
 import BatchDetailCard from "@/components/admin/batch/BatchDetailCard";
+import BatchResult from "@/components/admin/batch/BatchResult";
 import BatchStudentList from "@/components/admin/batch/BatchStudentList";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
@@ -150,6 +151,10 @@ const BatchDetails = () => {
             key: "Attendence",
             label: t("batchManagement.details.tabs.attendence"),
           },
+          {
+            key:"Results",
+            label: t("batchManagement.details.tabs.results"),
+          }
         ].map((tab) => (
           <button
             key={tab.key}
@@ -168,6 +173,7 @@ const BatchDetails = () => {
         {activeTab === "Overview" && <BatchDetailCard batch={batchData} />}
         {activeTab === "Students" && <BatchStudentList />}
         {activeTab==="Attendence" && <BatchAttendence />}
+        {activeTab==="Results" && <BatchResult />}
       </div>
     </div>
   );

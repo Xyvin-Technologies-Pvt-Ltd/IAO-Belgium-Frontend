@@ -378,8 +378,14 @@
       "available": "Available",
       "status": "Status",
       "student": "Student",
+      "exam": "Exam",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Result",
+      "submittedAt": "Submitted At",
       "noBatches": "No Batches found",
-      "noStudents": "No students found"
+      "noStudents": "No students found",
+      "noResults": "No exam results found for this batch."
     },
     "messages": {
       "loadFailed": "Failed to load batches"
@@ -388,7 +394,8 @@
       "tabs": {
         "overview": "Overview",
         "students": "Students",
-        "attendence": "Attendance"
+        "attendence": "Attendance",
+        "results": "Results"
       },
       "cards": {
         "enrolledStudents": "Enrolled Students",

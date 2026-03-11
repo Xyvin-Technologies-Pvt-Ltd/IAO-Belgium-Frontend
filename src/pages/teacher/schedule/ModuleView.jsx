@@ -7,7 +7,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
 import { MapPin, Languages, Calendar } from "lucide-react";
 import { useEffect } from "react";
-import { getKolkataMoment } from "@/utils/dateUtils";
+import { getMoment } from "@/utils/dateUtils";
 import moment from "moment";
 
 const ModuleView = () => {
@@ -51,20 +51,23 @@ const ModuleView = () => {
   const getSessionDateRange = () => {
     if (!sessions || sessions.length === 0) return "N/A";
 
-    const dates = sessions.map((s) => getKolkataMoment(s.session_date));
+    const dates = sessions.map((s) => getMoment(s.session_date));
     const startDate = moment.min(dates);
     const endDate = moment.max(dates);
 
     // Check if start and end are the same day
-    if (startDate.isSame(endDate, 'day')) {
+    if (startDate.isSame(endDate, "day")) {
       return startDate.format("MMMM DD, YYYY");
     }
-    
+
     // Check if start and end are in the same month and year
-    if (startDate.isSame(endDate, 'month') && startDate.isSame(endDate, 'year')) {
+    if (
+      startDate.isSame(endDate, "month") &&
+      startDate.isSame(endDate, "year")
+    ) {
       return `${startDate.format("MMMM DD")}-${endDate.format("DD, YYYY")}`;
     }
-    
+
     // Different months or years
     return `${startDate.format("MMMM DD, YYYY")} - ${endDate.format("MMMM DD, YYYY")}`;
   };
@@ -90,10 +93,7 @@ const ModuleView = () => {
           </p>
         </div>
         <div className="flex-shrink-0">
-          <Button
-            onClick={handleMarkAttendance}
-            className="w-full sm:w-auto"
-          >
+          <Button onClick={handleMarkAttendance} className="w-full sm:w-auto">
             Mark Attendance
           </Button>
         </div>

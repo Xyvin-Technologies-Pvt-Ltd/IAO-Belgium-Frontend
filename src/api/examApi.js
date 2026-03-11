@@ -54,3 +54,10 @@ export const endExamSession = async (id) => {
   const response = await axiosInstance.post(`/exam-session/${id}/end`);
   return response.data;
 };
+export const getExamResults = async (exam_id, planning_id, params) => {
+  const response = await axiosInstance.get(
+    `/exam/teacher/${exam_id}/${planning_id}/results`,
+    { params },
+  );
+  return response.data;
+};

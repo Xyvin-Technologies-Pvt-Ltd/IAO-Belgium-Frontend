@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, FileText } from "lucide-react";
 import { useGetPlanningByTeacher } from "@/store/usePlanningStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import { useNavigate, useParams } from "@tanstack/react-router";
 
 const SessionScheduleList = () => {
@@ -33,7 +33,10 @@ const SessionScheduleList = () => {
       updateBreadcrumbs([
         { label: "Dashboard", path: "/teacher/dashboard" },
         { label: "Modules", path: "/teacher/schedules" },
-        { label: firstSession.module_name || "Module", path: "/teacher/schedules/$id" },
+        {
+          label: firstSession.module_name || "Module",
+          path: "/teacher/schedules/$id",
+        },
         { label: "Sessions", path: "" },
       ]);
     } else {
@@ -125,20 +128,20 @@ const SessionScheduleList = () => {
 
             <div className="my-4 h-px bg-sidebar-border" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                <Detail
-                  icon={<Calendar className="h-4 w-4 text-primary" />}
-                  label="Date"
-                  value={formatInKolkataTZ(session.session_date, "MMM DD, YYYY") || "N/A"}
-                />
-                <Detail
-                  icon={<Clock className="h-4 w-4 text-primary" />}
-                  label="Time"
-                  value={
-                    session.start_time && session.end_time
-                      ? `${formatInKolkataTZ(session.start_time, "HH:mm")} - ${formatInKolkataTZ(session.end_time, "HH:mm")}`
-                      : "N/A"
-                  }
-                />
+              <Detail
+                icon={<Calendar className="h-4 w-4 text-primary" />}
+                label="Date"
+                value={formatTZ(session.session_date, "MMM DD, YYYY") || "N/A"}
+              />
+              <Detail
+                icon={<Clock className="h-4 w-4 text-primary" />}
+                label="Time"
+                value={
+                  session.start_time && session.end_time
+                    ? `${formatTZ(session.start_time, "HH:mm")} - ${formatTZ(session.end_time, "HH:mm")}`
+                    : "N/A"
+                }
+              />
               <Detail
                 icon={<MapPin className="h-4 w-4 text-primary" />}
                 label="Location"

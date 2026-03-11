@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { formatInKolkataTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 
 const ViewPlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
@@ -88,15 +88,17 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <InfoItem
                         label={t("planningManagement.view.dateLabel")}
-                        value={formatInKolkataTZ(session.session_date, "YYYY-MM-DD") || "N/A"}
+                        value={
+                          formatTZ(session.session_date, "YYYY-MM-DD") || "N/A"
+                        }
                       />
                       <InfoItem
                         label={t("planningManagement.view.timeFromLabel")}
-                        value={formatInKolkataTZ(session.start_time, "HH:mm") || "N/A"}
+                        value={formatTZ(session.start_time, "HH:mm") || "N/A"}
                       />
                       <InfoItem
                         label={t("planningManagement.view.timeTillLabel")}
-                        value={formatInKolkataTZ(session.end_time, "HH:mm") || "N/A"}
+                        value={formatTZ(session.end_time, "HH:mm") || "N/A"}
                       />
                     </div>
 
@@ -134,24 +136,27 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                           Assistant
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {session.assistants.map((assistantObj, assistantIndex) => {
-                            const assistant = assistantObj.assistant || assistantObj;
-                            const assistantName =
-                              assistant.first_name && assistant.last_name
-                                ? `${assistant.first_name} ${assistant.last_name}`.trim()
-                                : assistant.name || "Unknown Assistant";
-                            const status = assistantObj.status || "pending";
+                          {session.assistants.map(
+                            (assistantObj, assistantIndex) => {
+                              const assistant =
+                                assistantObj.assistant || assistantObj;
+                              const assistantName =
+                                assistant.first_name && assistant.last_name
+                                  ? `${assistant.first_name} ${assistant.last_name}`.trim()
+                                  : assistant.name || "Unknown Assistant";
+                              const status = assistantObj.status || "pending";
 
-                            return (
-                              <Badge
-                                key={assistant._id || assistantIndex}
-                                variant="outline"
-                                className={`text-xs ${getBadgeStyles(status)}`}
-                              >
-                                {assistantName}
-                              </Badge>
-                            );
-                          })}
+                              return (
+                                <Badge
+                                  key={assistant._id || assistantIndex}
+                                  variant="outline"
+                                  className={`text-xs ${getBadgeStyles(status)}`}
+                                >
+                                  {assistantName}
+                                </Badge>
+                              );
+                            },
+                          )}
                         </div>
                       </div>
                     )}

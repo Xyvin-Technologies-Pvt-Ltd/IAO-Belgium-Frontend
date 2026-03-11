@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Languages } from "lucide-react";
-import { getKolkataMoment } from "@/utils/dateUtils";
+import { getMoment } from "@/utils/dateUtils";
 import moment from "moment";
 import TeacherNotificationDrawer from "./TeacherNotificationDrawer";
 
@@ -58,9 +58,15 @@ export default function AdminTeacherLayoutComponent() {
             <div className="flex items-center gap-1 sm:gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-9 px-2 sm:px-3 gap-1 sm:gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 px-2 sm:px-3 gap-1 sm:gap-2"
+                  >
                     <Languages className="h-4 w-4" />
-                    <span className="hidden sm:inline">{currentLanguage.name}</span>
+                    <span className="hidden sm:inline">
+                      {currentLanguage.name}
+                    </span>
                     <span className="sm:hidden">{currentLanguage.flag}</span>
                     <ChevronDown className="h-4 w-4 opacity-60" />
                   </Button>
@@ -85,7 +91,7 @@ export default function AdminTeacherLayoutComponent() {
               {isTeacher && <TeacherNotificationDrawer />}
               <ThemeToggle />
               <p className="text-xs sm:text-sm text-dashboard-text-secondary hidden md:block">
-                {getKolkataMoment().format("ddd, DD MMM, YYYY").toUpperCase()}
+                {getMoment().format("ddd, DD MMM, YYYY").toUpperCase()}
               </p>
             </div>
           </div>

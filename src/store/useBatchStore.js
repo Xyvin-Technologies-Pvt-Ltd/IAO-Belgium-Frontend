@@ -1,4 +1,4 @@
-import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance } from "@/api/batchApi";
+import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults } from "@/api/batchApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -63,6 +63,16 @@ export const useGetBatchAttendance = (batchId, params = {}, options = {}) => {
     staleTime: 30000,
     enabled: !!batchId,
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetBatchExamResults = (batchId, params = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["batch-exam-results", batchId, params],
+    queryFn: () => getBatchExamResults(batchId, params),
+    staleTime: 30000,
+    enabled: !!batchId,
     ...options,
   });
 };
