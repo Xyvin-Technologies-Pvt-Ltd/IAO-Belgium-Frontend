@@ -191,7 +191,7 @@ const ExamDetail = () => {
                           : "text-destructive ml-1"
                       }
                     >
-                      ({src.available_count} {t("exam.available")})
+                      ({src.available_count} {t("exam.detail.available")})
                     </span>
                   )}
                 </span>
