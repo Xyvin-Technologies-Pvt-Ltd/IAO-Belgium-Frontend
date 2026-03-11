@@ -19,7 +19,7 @@ import { useGetStudentsByComponent, useGetComponentById } from "@/store/useCompo
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import moment from "moment";
+import { getKolkataMoment } from "@/utils/dateUtils";
 
 const SessionAttendence = () => {
   const { t } = useTranslation();
@@ -54,7 +54,7 @@ const SessionAttendence = () => {
   const totalRows = data?.total_count || 0;
 
   // Check if session date is in the future (before today)
-  const isSessionFuture = sessionDate ? moment.utc(sessionDate).startOf('day').isAfter(moment.utc().startOf('day')) : false;
+  const isSessionFuture = sessionDate ? getKolkataMoment(sessionDate).startOf('day').isAfter(getKolkataMoment().startOf('day')) : false;
 
   useEffect(() => {
     if (component) {

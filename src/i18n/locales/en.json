@@ -24,7 +24,6 @@
       "dashboard": "Dashboard",
       "schedules": "Schedules",
       "planning": "Planning",
-      "documents": "Documents",
       "evaluations": "Evaluations",
       "exams": "Exams"
     },
@@ -948,6 +947,7 @@
       "questions": "Questions",
       "duration": "Duration",
       "passingMarks": "Passing",
+      "module": "Module",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",

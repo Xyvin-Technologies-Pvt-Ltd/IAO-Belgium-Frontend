@@ -1,16 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import moment from "moment";
+import { formatInKolkataTZ, getKolkataMoment } from "@/utils/dateUtils";
 
 const SessionCard = ({ sessions = [], isLoading = false }) => {
   // Helper function to format date
   const formatDate = (dateString) => {
-    return moment.utc(dateString).format("MMMM DD, YYYY");
+    return formatInKolkataTZ(dateString, "MMMM DD, YYYY");
   };
 
   // Helper function to format time
   const formatTime = (startTime, endTime) => {
-    const start = moment.utc(startTime);
-    const end = moment.utc(endTime);
+    const start = getKolkataMoment(startTime);
+    const end = getKolkataMoment(endTime);
 
     return `${start.format("HH:mm")} - ${end.format("HH:mm")}`;
   };

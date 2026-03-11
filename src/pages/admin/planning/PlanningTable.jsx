@@ -23,7 +23,7 @@ import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetAllCities } from "@/store/useDropdownStore";
-import moment from "moment";
+import { getKolkataMoment } from "@/utils/dateUtils";
 
 const PlanningTable = () => {
   const { t } = useTranslation();
@@ -75,7 +75,7 @@ const PlanningTable = () => {
     const dates = sessions
       .map(session => session.session_date)
       .filter(date => date)
-      .map(date => moment.utc(date))
+      .map(date => getKolkataMoment(date))
       .sort((a, b) => a - b);
     
     if (dates.length === 0) return "N/A";
@@ -89,7 +89,7 @@ const PlanningTable = () => {
     const dates = sessions
       .map(session => session.session_date)
       .filter(date => date)
-      .map(date => moment.utc(date))
+      .map(date => getKolkataMoment(date))
       .sort((a, b) => a - b);
     
     if (dates.length === 0) return "N/A";

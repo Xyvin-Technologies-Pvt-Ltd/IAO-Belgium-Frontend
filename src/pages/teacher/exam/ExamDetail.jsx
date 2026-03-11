@@ -22,7 +22,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
-import moment from "moment";
+import { getKolkataMoment } from "@/utils/dateUtils";
 
 const ExamDetail = () => {
   const { t } = useTranslation();
@@ -78,8 +78,8 @@ const ExamDetail = () => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      const now = moment.utc().startOf('day');
-      const sessionDate = moment.utc(examData.data.first_session.session_date).startOf('day');
+      const now = getKolkataMoment().startOf('day');
+      const sessionDate = getKolkataMoment(examData.data.first_session.session_date).startOf('day');
       setCanStart(
         now.isSame(sessionDate) &&
           examData.data.exam_session_status !== "started",

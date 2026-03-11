@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useDeleteIntake, useGetIntakes } from "@/store/useIntakeStore";
 import CreateIntake from "@/components/admin/intake/CreateIntake";
 import StatusBadge from "@/components/StatusBadge";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 
@@ -172,17 +173,17 @@ const Intakes = () => {
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
-                    ? moment(i.start_date).format("MMM DD, YYYY")
+                    ? formatInKolkataTZ(i.start_date, "MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.end_date
-                    ? moment(i.end_date).format("MMM DD, YYYY")
+                    ? formatInKolkataTZ(i.end_date, "MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.registration_deadline
-                    ? moment(i.registration_deadline).format("MMM DD, YYYY")
+                    ? formatInKolkataTZ(i.registration_deadline, "MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>

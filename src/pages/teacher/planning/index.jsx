@@ -20,7 +20,7 @@ import {
 } from "@/store/usePlanningStore";
 import StatusBadge from "@/components/StatusBadge";
 import { Check, X } from "lucide-react";
-import moment from "moment";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 
 const Plannings = () => {
   const { t } = useTranslation();
@@ -114,19 +114,13 @@ const Plannings = () => {
                   {session.name}
                 </TableCell>
                 <TableCell>
-                  {session.session_date
-                    ? moment(session.session_date).format("MMM DD, YYYY")
-                    : "N/A"}
+                  {formatInKolkataTZ(session.session_date, "MMM DD, YYYY") || "N/A"}
                 </TableCell>
                 <TableCell>
-                  {session.start_time
-                    ? moment(session.start_time).format("HH:mm")
-                    : "N/A"}
+                  {formatInKolkataTZ(session.start_time, "HH:mm") || "N/A"}
                 </TableCell>
                 <TableCell>
-                  {session.end_time
-                    ? moment(session.end_time).format("HH:mm")
-                    : "N/A"}
+                  {formatInKolkataTZ(session.end_time, "HH:mm") || "N/A"}
                 </TableCell>
                 <TableCell>{session.venue || "N/A"}</TableCell>
                 <TableCell>{session.language || "N/A"}</TableCell>

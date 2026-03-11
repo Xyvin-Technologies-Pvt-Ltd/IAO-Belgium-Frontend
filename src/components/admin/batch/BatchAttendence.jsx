@@ -16,6 +16,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetBatchAttendance } from "@/store/useBatchStore";
 import { Check, X } from "lucide-react";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
 
 const BatchAttendence = () => {
@@ -106,7 +107,7 @@ const BatchAttendence = () => {
                     className="text-center min-w-[70px] border-l px-2"
                   >
                     <div className="text-xs font-normal">
-                      {moment(session.session_date).format("D MMM")}
+                      {formatInKolkataTZ(session.session_date, "D MMM")}
                     </div>
                   </TableHead>
                 ))

@@ -24,7 +24,6 @@
       "dashboard": "Tableau de bord",
       "schedules": "Horaires",
       "planning": "Planification",
-      "documents": "Documents",
       "evaluations": "Évaluations",
       "exams": "Examens"
     },
@@ -882,7 +881,7 @@
     "archive": "Archiver",
     "allStatuses": "Tous les statuts",
     "status": { "draft": "Brouillon", "published": "Publié", "archived": "Archivé" },
-    "table": { "uid": "UID", "name": "Nom", "questions": "Questions", "duration": "Durée", "passingMarks": "Réussite", "status": "Statut", "action": "Action", "edit": "Modifier", "publish": "Publier", "archive": "Archiver", "noExams": "Aucun examen" },
+    "table": { "uid": "UID", "name": "Nom", "questions": "Questions", "duration": "Durée", "passingMarks": "Réussite", "module": "Module", "status": "Statut", "action": "Action", "edit": "Modifier", "publish": "Publier", "archive": "Archiver", "noExams": "Aucun examen" },
     "messages": { "loadFailed": "Échec du chargement" },
     "form": { "name": "Nom", "namePlaceholder": "Nom de l'examen", "description": "Description", "descriptionPlaceholder": "Description", "instructions": "Instructions", "instructionsPlaceholder": "Instructions", "questionSources": "Sources de questions", "addQuestionSource": "Ajouter une source", "selectQuestionBank": "Sélectionner une banque", "questionsAvailable": "disponibles", "questions": "questions", "totalQuestions": "Total des questions", "noQuestionBanks": "Aucune banque", "duration": "Durée (minutes)", "marksPerQuestion": "Points par question", "passingMarks": "Seuil de réussite", "passingType": "Type", "marks": "Points", "percentage": "Pourcentage", "settings": "Paramètres", "randomizeQuestions": "Mélanger les questions", "randomizeOptions": "Mélanger les réponses", "autoSubmitOnTimeout": "Soumission automatique", "maxAttempts": "Tentatives max" },
     "detail": { "totalQuestions": "Total des questions", "totalMarks": "Total des points", "passingMarks": "Seuil de réussite", "duration": "Durée", "questionSources": "Sources", "available": "disponibles" }

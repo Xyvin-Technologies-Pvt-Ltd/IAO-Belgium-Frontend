@@ -3,6 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { X, FileText, Cloud, Link, Loader2, Plus, Trash, ExternalLink, Pencil, Check } from "lucide-react";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { uploadFile } from "@/api/uploadApi";
 
@@ -208,7 +209,7 @@ const CreateComponent = ({
     const componentType = componentData.type || "";
 
     const formattedDeadline = componentData.submission_deadline
-      ? moment(componentData.submission_deadline).format("YYYY-MM-DD")
+      ? formatInKolkataTZ(componentData.submission_deadline, "YYYY-MM-DD")
       : "";
 
     // Handle submissions object format
@@ -354,7 +355,7 @@ const CreateComponent = ({
         onError: (error) => {
           console.error("Save error:", error);
           setIsUploading(false);
-          toast.error(error?.message || "Failed to save component");
+          // toast.error(error?.message || "Failed to save component");
         },
       });
     } catch (error) {
@@ -378,14 +379,27 @@ const CreateComponent = ({
       }}
     >
       <div 
-        className="bg-white dark:bg-black border rounded-xl shadow-lg w-xl max-h-[90vh] overflow-y-auto p-6"
+        className="bg-white dark:bg-black border rounded-xl shadow-lg w-xl max-h-[90vh] flex flex-col"
         onClick={() => setShowModuleSuggestions(false)}
       >
-        <h2 className="text-xl font-bold">
-          {isEdit ? "Edit Module" : "Create Module"}
-        </h2>
+        <div className="p-6 border-b dark:border-white/20">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {isEdit ? "Edit Module" : "Create Module"}
+              </h2>
+            </div>
+            <button 
+              onClick={handleClose}
+              className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
+        <div className="overflow-y-auto flex-1 p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             <Label>Module Type *</Label>
             <Select
@@ -672,6 +686,7 @@ const CreateComponent = ({
             submitText={isUploading ? "Uploading files..." : undefined}
           />
         </form>
+        </div>
       </div>
     </div>
   );

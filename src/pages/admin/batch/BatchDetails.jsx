@@ -146,10 +146,10 @@ const BatchDetails = () => {
             key: "Students",
             label: t("batchManagement.details.tabs.students"),
           },
-          // {
-          //   key: "Attendence",
-          //   label: t("batchManagement.details.tabs.attendence"),
-          // },
+          {
+            key: "Attendence",
+            label: t("batchManagement.details.tabs.attendence"),
+          },
         ].map((tab) => (
           <button
             key={tab.key}

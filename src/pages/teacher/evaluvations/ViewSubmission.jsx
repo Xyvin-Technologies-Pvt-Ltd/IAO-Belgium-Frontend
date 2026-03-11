@@ -1,7 +1,11 @@
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
-import { useEvaluateSubmission, useGetSubmissionById } from "@/store/useSubmission";
+import {
+  useEvaluateSubmission,
+  useGetSubmissionById,
+} from "@/store/useSubmission";
 import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,13 +15,12 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useAuthStore } from "@/store/useAuthStore";
+import StatusBadge from "@/components/StatusBadge";
 import image from "../../../assets/images/no-academic.png";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Info } from "lucide-react";
 
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
@@ -26,7 +29,10 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 const evaluationSchema = z.object({
-  score: z.coerce.number().min(0, "Score must be a positive number"),
+  score: z.coerce
+    .number()
+    .min(0, "Score must be at least 0")
+    .max(100, "Score cannot exceed 100"),
   feedback: z.string().optional(),
 });
 
@@ -34,9 +40,6 @@ const ViewSubmission = () => {
   const { id } = useParams({ strict: false });
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const { user } = useAuthStore();
-
   const { data, isLoading, error } = useGetSubmissionById(id);
   const submissionData = data?.data;
 
@@ -142,20 +145,13 @@ const ViewSubmission = () => {
   }, []);
 
   const onSubmit = (formData) => {
-    evaluate(
-      {
-        id: submissionData._id,
-        data: {
-          score: formData.score,
-          feedback: formData.feedback,
-        },
+    evaluate({
+      id: submissionData._id,
+      data: {
+        score: formData.score,
+        feedback: formData.feedback,
       },
-      {
-        onSuccess: () => toast.success("Submission evaluated successfully"),
-        onError: (err) =>
-          toast.error(err.message || "Failed to evaluate submission"),
-      }
-    );
+    });
   };
 
   if (isLoading) {
@@ -167,8 +163,9 @@ const ViewSubmission = () => {
   }
 
   if (error || !submissionData) {
-    const isReassigned = error?.message === "Submission has been reassigned to another teacher.";
-    
+    const isReassigned =
+      error?.message === "Submission has been reassigned to another teacher.";
+
     if (isReassigned) {
       return (
         <div className="h-[calc(100vh-80px)] p-6 bg-[#F9F9F9] dark:bg-[#0B0F19]">
@@ -182,9 +179,13 @@ const ViewSubmission = () => {
               Submission Reassigned
             </h3>
             <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1 mb-4">
-              The submission previously assigned to you has been reassigned to a new teacher. You don't have to evaluate it.
+              The submission previously assigned to you has been reassigned to a
+              new teacher. You don't have to evaluate it.
             </p>
-            <Button className="mt-4" onClick={() => navigate({ to: "/teacher/evaluations" })}>
+            <Button
+              className="mt-4"
+              onClick={() => navigate({ to: "/teacher/evaluations" })}
+            >
               Return to Evaluations
             </Button>
           </div>
@@ -194,19 +195,18 @@ const ViewSubmission = () => {
 
     return (
       <div className="h-[calc(100vh-80px)] flex items-center justify-center bg-white dark:bg-sidebar">
-        <ErrorMessage 
-          message={error?.message || "Failed to load submission data"} 
-          showRetry={false} 
-          variant="card" 
+        <ErrorMessage
+          message={error?.message || "Failed to load submission data"}
+          showRetry={false}
+          variant="card"
         />
       </div>
     );
   }
 
-  const studentName =
-    submissionData?.student
-      ? `${submissionData.student.first_name || ""} ${submissionData.student.last_name || ""}`
-      : submissionData?.application?.user
+  const studentName = submissionData?.student
+    ? `${submissionData.student.first_name || ""} ${submissionData.student.last_name || ""}`
+    : submissionData?.application?.user
       ? `${submissionData.application.user.first_name || ""} ${submissionData.application.user.last_name || ""}`
       : "N/A";
 
@@ -216,10 +216,8 @@ const ViewSubmission = () => {
   return (
     <div className="p-6 h-[calc(100vh-80px)] bg-white dark:bg-sidebar overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-
         {/* LEFT SIDE PDF VIEWER */}
         <div className="col-span-1 lg:col-span-7 bg-[#F9F9F9] dark:bg-sidebar border-none shadow-sm flex flex-col h-full overflow-hidden">
-
           {documentFile ? (
             <>
               {/* Header */}
@@ -255,26 +253,29 @@ const ViewSubmission = () => {
 
         {/* RIGHT SIDE EVALUATION */}
         <div className="col-span-1 lg:col-span-5 bg-white dark:bg-sidebar flex flex-col h-full overflow-y-auto">
-
           {/* Student Info */}
           <div className="bg-[#F9F9F9] dark:bg-gray-800/50 p-5 mb-8">
             <div className="flex justify-between items-start mb-4">
               <h1 className="text-2xl font-bold text-[#374151] dark:text-white">
                 {studentName}
               </h1>
-              <span className="text-[#ff9800] text-sm font-medium capitalize">
-                {submissionData?.status || "Pending"}
-              </span>
+              <StatusBadge status={submissionData?.status || "pending"} />
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 dark:text-gray-300 text-[15px]">
               <div className="flex items-center gap-2">
                 <span>{submissionData?.program?.name || "MSc osteopathy"}</span>
-                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">IN-101</span>
+                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">
+                  IN-101
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <span>{submissionData?.batch?.name || "MSc 2025 Intake A"}</span>
-                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">IN-101</span>
+                <span>
+                  {submissionData?.batch?.name || "MSc 2025 Intake A"}
+                </span>
+                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">
+                  IN-101
+                </span>
               </div>
             </div>
           </div>
@@ -284,18 +285,26 @@ const ViewSubmission = () => {
           </h3>
 
           {isEvolvable ? (
-            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col space-y-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex-1 flex flex-col space-y-6"
+            >
               <div>
                 <label className="text-sm font-semibold mb-2 block text-gray-900 dark:text-gray-200">
-                  Score
+                  Score (0-100)
                 </label>
                 <Input
                   type="number"
-                  placeholder="Enter score"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  placeholder="Enter score (0-100)"
                   {...register("score")}
                 />
                 {errors.score && (
-                  <p className="text-red-500 text-xs mt-1">{errors.score.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.score.message}
+                  </p>
                 )}
               </div>
 
@@ -309,7 +318,9 @@ const ViewSubmission = () => {
                   className="h-32 resize-none dark:bg-gray-800 dark:border-gray-700"
                 />
                 {errors.feedback && (
-                  <p className="text-red-500 text-xs mt-1">{errors.feedback.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.feedback.message}
+                  </p>
                 )}
               </div>
 
@@ -325,13 +336,23 @@ const ViewSubmission = () => {
             </form>
           ) : (
             <div className="space-y-4 text-gray-700 dark:text-gray-300">
-              <div><strong className="text-gray-900 dark:text-white">Score:</strong> {submissionData?.score}</div>
-              <div><strong className="text-gray-900 dark:text-white">Feedback:</strong> {submissionData?.feedback}</div>
+              <div>
+                <strong className="text-gray-900 dark:text-white">
+                  Score:
+                </strong>{" "}
+                {submissionData?.score}
+              </div>
+              <div>
+                <strong className="text-gray-900 dark:text-white">
+                  Feedback:
+                </strong>{" "}
+                {submissionData?.feedback}
+              </div>
               {submissionData?.reviewed_at && (
                 <div className="text-xs text-gray-400 mt-4">
                   Evaluated on{" "}
                   {moment(submissionData.reviewed_at).format(
-                    "MMM Do YYYY, h:mm a"
+                    "MMM Do YYYY, h:mm a",
                   )}
                 </div>
               )}

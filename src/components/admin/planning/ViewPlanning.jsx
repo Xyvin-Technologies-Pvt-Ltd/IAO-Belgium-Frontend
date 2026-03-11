@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 
 const ViewPlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
@@ -88,27 +88,15 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <InfoItem
                         label={t("planningManagement.view.dateLabel")}
-                        value={
-                          session.session_date
-                            ? moment.utc(session.session_date).format("YYYY-MM-DD")
-                            : "N/A"
-                        }
+                        value={formatInKolkataTZ(session.session_date, "YYYY-MM-DD") || "N/A"}
                       />
                       <InfoItem
                         label={t("planningManagement.view.timeFromLabel")}
-                        value={
-                          session.start_time
-                            ? moment.utc(session.start_time).format("HH:mm")
-                            : "N/A"
-                        }
+                        value={formatInKolkataTZ(session.start_time, "HH:mm") || "N/A"}
                       />
                       <InfoItem
                         label={t("planningManagement.view.timeTillLabel")}
-                        value={
-                          session.end_time
-                            ? moment.utc(session.end_time).format("HH:mm")
-                            : "N/A"
-                        }
+                        value={formatInKolkataTZ(session.end_time, "HH:mm") || "N/A"}
                       />
                     </div>
 
