@@ -33,11 +33,6 @@ export const getTeacherSidebarData = (t) => ({
           icon: Calendars,
         },
         {
-          title: t("sidebar.teacher.documents"),
-          url: "/teacher/documents",
-          icon: FileMinus,
-        },
-        {
           title: t("sidebar.teacher.evaluations"),
           url: "/teacher/evaluations",
           icon: BookOpenCheck,

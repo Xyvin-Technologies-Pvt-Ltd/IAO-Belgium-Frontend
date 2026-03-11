@@ -19,6 +19,7 @@ import {
   useGetUsers,
 } from "@/store/useDropdownStore";
 import { planningSchema } from "@/validations/admin";
+import { formatInKolkataTZ, getKolkataMoment } from "@/utils/dateUtils";
 import moment from "moment";
 
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
@@ -185,15 +186,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           return {
             _id: session._id, 
             name: session.name || "",
-            session_date: session.session_date
-              ? moment.utc(session.session_date).format("YYYY-MM-DD")
-              : "",
-            start_time: session.start_time
-              ? moment.utc(session.start_time).format("HH:mm")
-              : "",
-            end_time: session.end_time
-              ? moment.utc(session.end_time).format("HH:mm")
-              : "",
+            session_date: formatInKolkataTZ(session.session_date, "YYYY-MM-DD"),
+            start_time: formatInKolkataTZ(session.start_time, "HH:mm"),
+            end_time: formatInKolkataTZ(session.end_time, "HH:mm"),
             teachers: session.teachers
               ? session.teachers.map((t) => {
                   const teacher = t.teacher || t;
@@ -312,7 +307,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
     const previousSessionDate = watch(`sessions.${index - 1}.session_date`);
     if (previousSessionDate) {
-      const nextDate = moment(previousSessionDate).add(1, "day");
+      const nextDate = getKolkataMoment(previousSessionDate).add(1, "day");
       return nextDate.format("YYYY-MM-DD");
     }
     return "";
@@ -327,7 +322,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         `sessions.${fields.length - 1}.session_date`,
       );
       if (previousSessionDate) {
-        const nextDate = moment(previousSessionDate).add(1, "day");
+        const nextDate = getKolkataMoment(previousSessionDate).add(1, "day");
         defaultDate = nextDate.format("YYYY-MM-DD");
       }
     }

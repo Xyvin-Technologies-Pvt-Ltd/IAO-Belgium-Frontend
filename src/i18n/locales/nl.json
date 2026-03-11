@@ -24,7 +24,6 @@
       "dashboard": "Dashboard",
       "schedules": "Roosters",
       "planning": "Planning",
-      "documents": "Documenten",
       "evaluations": "Evaluaties",
       "exams": "Examens"
     },
@@ -882,7 +881,7 @@
     "archive": "Archiveren",
     "allStatuses": "Alle statussen",
     "status": { "draft": "Concept", "published": "Gepubliceerd", "archived": "Gearchiveerd" },
-    "table": { "uid": "UID", "name": "Naam", "questions": "Vragen", "duration": "Duur", "passingMarks": "Slagingscijfer", "status": "Status", "action": "Actie", "edit": "Bewerken", "publish": "Publiceren", "archive": "Archiveren", "noExams": "Geen examens" },
+    "table": { "uid": "UID", "name": "Naam", "questions": "Vragen", "duration": "Duur", "passingMarks": "Slagingscijfer", "module": "Module", "status": "Status", "action": "Actie", "edit": "Bewerken", "publish": "Publiceren", "archive": "Archiveren", "noExams": "Geen examens" },
     "messages": { "loadFailed": "Laden mislukt" },
     "form": { "name": "Naam", "namePlaceholder": "Examennaam", "description": "Beschrijving", "descriptionPlaceholder": "Beschrijving", "instructions": "Instructies", "instructionsPlaceholder": "Instructies", "questionSources": "Vragenbronnen", "addQuestionSource": "Bron toevoegen", "selectQuestionBank": "Selecteer vragenbank", "questionsAvailable": "beschikbaar", "questions": "vragen", "totalQuestions": "Totaal vragen", "noQuestionBanks": "Geen vragenbanken", "duration": "Duur (minuten)", "marksPerQuestion": "Punten per vraag", "passingMarks": "Slagingscijfer", "passingType": "Type", "marks": "Punten", "percentage": "Percentage", "settings": "Instellingen", "randomizeQuestions": "Vragen randomiseren", "randomizeOptions": "Antwoorden randomiseren", "autoSubmitOnTimeout": "Auto-inzenden bij timeout", "maxAttempts": "Max pogingen" },
     "detail": { "totalQuestions": "Totaal vragen", "totalMarks": "Totaal punten", "passingMarks": "Slagingscijfer", "duration": "Duur", "questionSources": "Bronnen", "available": "beschikbaar" }

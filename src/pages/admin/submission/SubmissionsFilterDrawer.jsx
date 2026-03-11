@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Filter, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 import {
   useGetAllPrograms,
   useGetAllCities,
@@ -46,13 +47,15 @@ const SubmissionsFilterDrawer = ({
   setAppliedFilters,
   setPage,
 }) => {
-  const { data: programsData } = useGetAllPrograms();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { data: programsData } = useGetAllPrograms({}, { enabled: isOpen });
   const programs = programsData?.data || [];
 
-  const { data: citiesData } = useGetAllCities();
+  const { data: citiesData } = useGetAllCities({}, { enabled: isOpen });
   const cities = citiesData?.data || [];
 
-  const { data: languagesData } = useGetAllLanguages();
+  const { data: languagesData } = useGetAllLanguages({}, { enabled: isOpen });
   const languages = languagesData?.data || [];
 
   const selectedProgramId =
@@ -69,7 +72,7 @@ const SubmissionsFilterDrawer = ({
   ).length;
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
           variant={activeFiltersCount > 0 ? "default" : "outline"}

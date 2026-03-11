@@ -5,7 +5,7 @@ import { useGetStudentById } from "@/store/useStudentStore";
 import { useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import {
   Table,
   TableBody,
@@ -87,7 +87,7 @@ const attendanceData = [
   return (
     <div className="space-y-6 mt-4 bg-sidebar  rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} hide />
-      {/* <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-6">
           <h3 className="font-semibold mb-4">Completed Modules</h3>
           <Table>
@@ -133,7 +133,7 @@ const attendanceData = [
                 exams.map((exam) => (
                   <TableRow key={exam._id}>
                     <TableCell>{exam.exam_name}</TableCell>
-                    <TableCell>{exam.percentage}/100</TableCell>
+                    <TableCell>{exam.percentage?.toFixed(2)}/100</TableCell>
                     <TableCell>
                       <StatusBadge status={exam.result} />
                     </TableCell>
@@ -170,9 +170,7 @@ const attendanceData = [
                     <TableCell>{app.name}</TableCell>
                     <TableCell>{app.score || "-"}</TableCell>
                     <TableCell>
-                      {app.submitted_at
-                        ? moment(app.submitted_at).format("DD MMM YYYY")
-                        : "-"}
+                      {formatInKolkataTZ(app.submitted_at, "DD MMM YYYY") || "-"}
                     </TableCell>
                   </TableRow>
                 ))
@@ -217,7 +215,7 @@ const attendanceData = [
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

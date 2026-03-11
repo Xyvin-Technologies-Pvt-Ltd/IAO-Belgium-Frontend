@@ -7,6 +7,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
 import { MapPin, Languages, Calendar } from "lucide-react";
 import { useEffect } from "react";
+import { getKolkataMoment } from "@/utils/dateUtils";
 import moment from "moment";
 
 const ModuleView = () => {
@@ -50,7 +51,7 @@ const ModuleView = () => {
   const getSessionDateRange = () => {
     if (!sessions || sessions.length === 0) return "N/A";
 
-    const dates = sessions.map((s) => moment.utc(s.session_date));
+    const dates = sessions.map((s) => getKolkataMoment(s.session_date));
     const startDate = moment.min(dates);
     const endDate = moment.max(dates);
 

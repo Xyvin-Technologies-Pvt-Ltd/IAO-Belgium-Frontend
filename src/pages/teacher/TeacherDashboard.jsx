@@ -1,8 +1,17 @@
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import DashboardGraph from "@/components/admin/dashboard/DashboardGraph";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Activity, Users, CreditCard, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const TeacherDashboard= () => {
+    const { profile, isLoading } = useAuthStore();
+    const { t } = useTranslation();
+    
+    const firstName = profile?.first_name || "";
+    const lastName = profile?.last_name || "";
+    const fullName = `${firstName} ${lastName}`.trim();
+    const displayName = fullName || "Teacher";
   const stats = [
     {
       title: "Ongoing Courses",
@@ -47,10 +56,13 @@ const TeacherDashboard= () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-4xl font-semibold">Welcome back, Maria!</h1>
-        <p className="text-muted-foreground text-lg">
-          All your courses, progress, and updates in one place.
-        </p>
+         <h1 className="text-4xl font-semibold">
+          {isLoading 
+            ? t("common.welcome.back") 
+            : t("common.welcome.backWithName").replace("{name}", displayName)
+          }
+        </h1>
+     
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((item, index) => (

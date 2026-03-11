@@ -15,6 +15,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useGetTeacherSubmissions } from "@/store/useSubmission";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -109,7 +110,7 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
                     {item?.batch?.name || "-"}
                   </TableCell>
                   <TableCell>
-                    {moment(item?.createdAt).format("MMM DD, YYYY")}
+                    {formatInKolkataTZ(item?.createdAt, "MMM DD, YYYY")}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={item?.status} />

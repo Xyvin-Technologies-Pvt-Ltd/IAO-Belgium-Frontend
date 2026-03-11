@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Languages } from "lucide-react";
+import { getKolkataMoment } from "@/utils/dateUtils";
 import moment from "moment";
 import TeacherNotificationDrawer from "./TeacherNotificationDrawer";
 
@@ -84,7 +85,7 @@ export default function AdminTeacherLayoutComponent() {
               {isTeacher && <TeacherNotificationDrawer />}
               <ThemeToggle />
               <p className="text-xs sm:text-sm text-dashboard-text-secondary hidden md:block">
-                {moment().format("ddd, DD MMM, YYYY").toUpperCase()}
+                {getKolkataMoment().format("ddd, DD MMM, YYYY").toUpperCase()}
               </p>
             </div>
           </div>

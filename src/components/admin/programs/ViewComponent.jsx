@@ -2,6 +2,7 @@ import { X, FileText, CheckCircle, XCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { formatInKolkataTZ } from "@/utils/dateUtils";
 import moment from "moment";
 
 const ViewComponent = ({ open, onClose, componentData }) => {
@@ -64,7 +65,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
         <div className="flex items-center justify-between p-6 border-b">
           <div>
             <h2 className="text-xl font-bold">
-              {componentData.name} - {componentData.uid}
+              {componentData.name || componentData.linked_exam?.name} - {componentData.uid}
             </h2>
             <p className="text-sm text-muted-foreground">
               {getTypeLabel(componentData.type)}
@@ -88,7 +89,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             {componentData.submission_deadline && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground">Submission Deadline</h3>
-                <p className="text-lg">{moment(componentData.submission_deadline).format("DD-MM-YYYY")}</p>
+                <p className="text-lg">{formatInKolkataTZ(componentData.submission_deadline, "DD-MM-YYYY")}</p>
               </div>
             )}
 
@@ -104,6 +105,26 @@ const ViewComponent = ({ open, onClose, componentData }) => {
               </div>
             )}
           </div>
+
+          {componentData.type === "exam" && (
+            <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-dashed border-muted-foreground/30">
+              <div>
+                <h3 className="font-medium text-sm text-muted-foreground">Linked Module</h3>
+                <p className="text-base font-semibold">
+                  {componentData.linked_module?.name || "N/A"}
+                  {componentData.linked_module?.module_number && ` (Module ${componentData.linked_module.module_number})`}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 italic">Exam scheduled before this module</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-sm text-muted-foreground">Linked Exam</h3>
+                <p className="text-base font-semibold">
+                  {componentData.linked_exam?.name || "N/A"}
+                  {componentData.linked_exam?.uid && ` (${componentData.linked_exam.uid})`}
+                </p>
+              </div>
+            </div>
+          )}
 
           {componentData.instruction && (
             <div>
