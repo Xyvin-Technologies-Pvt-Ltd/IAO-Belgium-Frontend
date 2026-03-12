@@ -8,28 +8,15 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
 
   if (!open || !planningData) return null;
 
-  // Helper function to get badge variant based on teacher status
-  const getBadgeVariant = (status) => {
-    switch (status) {
-      case "accepted":
-        return "default"; // Green background
-      case "rejected":
-        return "destructive"; // Red background
-      case "pending":
-      default:
-        return "secondary"; // Gray background
-    }
-  };
-
   const getBadgeStyles = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "accepted":
-        return "bg-green-100 text-green-800 border-none hover:bg-green-200";
+        return "bg-green-100 text-green-800 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
       case "rejected":
-        return "bg-orange-100 text-orange-800 border-none hover:bg-orange-200";
+        return "bg-red-100 text-red-800 hover:bg-red-200 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
       case "pending":
       default:
-        return "bg-gray-100 text-gray-800 border-none hover:bg-gray-200";
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
     }
   };
 

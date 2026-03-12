@@ -110,7 +110,7 @@ const Teachers = () => {
         </TableHeader>
        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
             <TableRow>
               <TableCell colSpan={11} className="text-center p-8">

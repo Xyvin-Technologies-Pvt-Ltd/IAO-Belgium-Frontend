@@ -15,6 +15,9 @@ const statusVariants = {
   on_ride: "text-blue-600",
   offline: "text-red-500",
   drafted: "text-amber-600",
+  draft: "text-amber-600",
+  published: "text-green-600",
+  archived: "text-gray-500",
   sended: "text-green-600",
   closed: "text-red-500",
 
