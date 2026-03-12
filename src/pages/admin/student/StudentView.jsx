@@ -166,7 +166,7 @@ const StudentView = () => {
               {apps.length > 0 ? (
                 apps.map((app) => (
                   <TableRow key={app._id}>
-                    <TableCell>{app.name}</TableCell>
+                    <TableCell>{app.component_name}</TableCell>
                     <TableCell>{app.score || "-"}</TableCell>
                     <TableCell>
                       {formatTZ(app.submitted_at, "DD MMM YYYY") || "-"}

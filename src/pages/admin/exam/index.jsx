@@ -17,7 +17,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import ExamForm from "@/components/admin/exam/ExamForm";
-import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
+import StatusBadge from "@/components/StatusBadge";
 import {
   useGetExams,
   usePublishExam,
@@ -154,7 +154,7 @@ const Exams = () => {
                 <TableCell>{i?.duration ?? 0} min</TableCell>
                 <TableCell>{i?.passing_marks ?? 0}</TableCell>
                 <TableCell>
-                  <ExamStatusBadge status={i?.status} />
+                  <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu

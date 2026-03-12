@@ -11,6 +11,8 @@ import {
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
+import DashboardCard from "@/components/admin/dashboard/DashboardCard";
+import { HelpCircle, GraduationCap, Timer } from "lucide-react";
 import ExamForm from "@/components/admin/exam/ExamForm";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -98,15 +100,16 @@ const ExamDetail = () => {
         <div className="flex items-center gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+              <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
                 {exam.name}
               </h2>
               <ExamStatusBadge status={exam.status} />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {exam.uid} · {exam.total_questions} {t("exam.questions")} ·{" "}
-              {exam.duration} {t("exam.minutes")}
-            </p>
+            <div className="mt-2">
+              <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
+                {exam.uid}
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex gap-2">
@@ -135,68 +138,81 @@ const ExamDetail = () => {
         </div>
       </div>
 
-      {exam.description && (
-        <p className="text-muted-foreground">{exam.description}</p>
-      )}
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.totalQuestions")}
-          </p>
-          <p className="text-xl font-semibold">{exam.total_questions}</p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.totalMarks")}
-          </p>
-          <p className="text-xl font-semibold">{exam.total_marks}</p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.passingMarks")}
-          </p>
-          <p className="text-xl font-semibold">
-            {exam.passing_marks}{" "}
-            {exam.passing_type === "percentage" ? "%" : ""}
-          </p>
-        </div>
-        <div className="p-4 border rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            {t("exam.detail.duration")}
-          </p>
-          <p className="text-xl font-semibold">{exam.duration} min</p>
-        </div>
+        <DashboardCard
+          title={t("exam.detail.totalQuestions")}
+          value={exam.total_questions?.toString()}
+          icon={HelpCircle}
+        />
+        <DashboardCard
+          title={t("exam.detail.totalMarks")}
+          value={exam.total_marks?.toString()}
+          icon={GraduationCap}
+        />
+        <DashboardCard
+          title={t("exam.detail.passingMarks")}
+          value={`${exam.passing_marks || 0} ${exam.passing_type === "percentage" ? "%" : ""}`}
+        />
+        <DashboardCard
+          title={t("exam.detail.duration")}
+          value={`${exam.duration || 0} mins`}
+          icon={Timer}
+        />
       </div>
 
+      {exam.description && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">Description:</p>
+          <p className="text-sm text-card-foreground/80">{exam.description}</p>
+        </div>
+      )}
+
+      {exam.instructions && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">Instructions:</p>
+          <div className="text-sm text-card-foreground/80 whitespace-pre-wrap">
+            {exam.instructions}
+          </div>
+        </div>
+      )}
+
       {exam.question_sources && exam.question_sources.length > 0 && (
-        <div>
-          <h3 className="font-medium mb-2">{t("exam.detail.questionSources")}</h3>
-          <div className="border rounded-lg divide-y">
-            {exam.question_sources.map((src, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between items-center p-3"
-              >
-                <span>
-                  {src.question_bank?.name || src.bank_name || "-"}
-                </span>
-                <span className="text-muted-foreground">
-                  {src.count} {t("exam.questions")}
-                  {src.available_count !== undefined && (
-                    <span
-                      className={
-                        src.sufficient
-                          ? "text-green-600 ml-1"
-                          : "text-destructive ml-1"
-                      }
-                    >
-                      ({src.available_count} {t("exam.detail.available")})
-                    </span>
-                  )}
-                </span>
-              </div>
-            ))}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-dashboard-text dark:text-white mb-4">
+            {t("exam.detail.questionSources")}
+          </h3>
+          <div className="border rounded-lg overflow-hidden bg-white dark:bg-card text-card-foreground shadow-sm">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-[#f4f4f5] dark:bg-muted text-muted-foreground text-xs font-semibold">
+                <tr>
+                  <th className="px-6 py-4 border-b">Source</th>
+                  <th className="px-6 py-4 border-b">Number of Questions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {exam.question_sources.map((src, idx) => (
+                  <tr key={idx} className="transition-colors">
+                    <td className="px-6 py-4">
+                      {src.question_bank?.name || src.bank_name || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground">
+                      {src.count} {t("exam.questions")}{" "}
+                      {src.available_count !== undefined && (
+                        <span
+                          className={
+                            src.sufficient
+                              ? "text-green-600 ml-1"
+                              : "text-destructive ml-1"
+                          }
+                        >
+                          ({src.available_count} {t("exam.detail.available")})
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

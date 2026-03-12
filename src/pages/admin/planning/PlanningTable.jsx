@@ -97,80 +97,73 @@ const PlanningTable = () => {
     return dates[dates.length - 1].format("MMM D, YYYY");
   };
 
-  // Helper function to get unique teachers from all sessions
-  const getUniqueTeachers = (sessions) => {
+  // Helper function to get personnel from the first session
+  const getPersonnelFromFirstSession = (sessions, role) => {
     if (!sessions || sessions.length === 0) return [];
-
-    const teacherMap = new Map();
-
-    sessions.forEach((session) => {
-      // Add teachers
-      if (session.teachers && session.teachers.length > 0) {
-        session.teachers.forEach((teacherObj) => {
-          const teacher = teacherObj.teacher;
-          if (teacher && teacher._id) {
-            teacherMap.set(teacher._id, {
-              _id: teacher._id,
-              name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-            });
-          }
-        });
-      }
-
-      // Add assistants
-      if (session.assistants && session.assistants.length > 0) {
-        session.assistants.forEach((assistantObj) => {
-          const assistant = assistantObj.assistant;
-          if (assistant && assistant._id) {
-            teacherMap.set(assistant._id, {
-              _id: assistant._id,
-              name: `${assistant.first_name} ${assistant.last_name}`.trim(),
-            });
-          }
-        });
-      }
-
-      // Add trainees
-      if (session.trainees && session.trainees.length > 0) {
-        session.trainees.forEach((traineeObj) => {
-          const trainee = traineeObj.trainee;
-          if (trainee && trainee._id) {
-            teacherMap.set(trainee._id, {
-              _id: trainee._id,
-              name: `${trainee.first_name} ${trainee.last_name}`.trim(),
-            });
-          }
-        });
-      }
+    
+    // Find the first session by date
+    const sortedSessions = [...sessions].filter(s => s.session_date).sort((a, b) => {
+      const dateA = new Date(a.session_date).getTime();
+      const dateB = new Date(b.session_date).getTime();
+      return dateA - dateB;
     });
 
-    return Array.from(teacherMap.values());
+    const firstSession = sortedSessions.length > 0 ? sortedSessions[0] : sessions[0];
+    if (!firstSession || !firstSession[role] || firstSession[role].length === 0) return [];
+
+    const roleSingular = role.slice(0, -1); // 'teachers' -> 'teacher'
+
+    return firstSession[role].map((item) => {
+      const person = item[roleSingular];
+      if (person && person._id) {
+        return {
+          _id: person._id,
+          name: `${person.first_name || ""} ${person.last_name || ""}`.trim(),
+          status: item.status || "pending",
+        };
+      }
+      return null;
+    }).filter(Boolean);
   };
 
-  // Helper function to render teacher chips
-  const renderTeacherChips = (sessions) => {
-    const teachers = getUniqueTeachers(sessions);
+  // Helper function to render personnel chips with status colors
+  const renderPersonnelChips = (sessions, role) => {
+    const personnel = getPersonnelFromFirstSession(sessions, role);
 
-    if (teachers.length === 0) {
+    if (personnel.length === 0) {
       return (
-        <span className="text-gray-500 text-sm">No teachers assigned</span>
+        <span className="text-gray-500 text-sm">
+          {role === 'teachers' ? 'No teachers' : role === 'assistants' ? 'No assistants' : 'No trainees'}
+        </span>
       );
     }
 
-    if (teachers.length === 1) {
+    const getBadgeColor = (status) => {
+      switch (status?.toLowerCase()) {
+        case "accepted":
+          return "bg-green-100 text-green-800 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+        case "rejected":
+          return "bg-red-100 text-red-800 hover:bg-red-200 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
+        case "pending":
+        default:
+          return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
+      }
+    };
+
+    if (personnel.length === 1) {
       return (
-        <Badge variant="secondary" className="text-xs">
-          {teachers[0].name}
+        <Badge variant="outline" className={`text-xs whitespace-nowrap ${getBadgeColor(personnel[0].status)}`}>
+          {personnel[0].name}
         </Badge>
       );
     }
 
-    if (teachers.length === 2) {
+    if (personnel.length === 2) {
       return (
         <div className="flex flex-wrap gap-1">
-          {teachers.map((teacher) => (
-            <Badge key={teacher._id} variant="secondary" className="text-xs">
-              {teacher.name}
+          {personnel.map((p) => (
+            <Badge key={p._id} variant="outline" className={`text-xs whitespace-nowrap ${getBadgeColor(p.status)}`}>
+              {p.name}
             </Badge>
           ))}
         </div>
@@ -178,12 +171,12 @@ const PlanningTable = () => {
     }
 
     return (
-      <div className="flex flex-wrap gap-1">
-        <Badge variant="secondary" className="text-xs">
-          {teachers[0].name}
+      <div className="flex items-center gap-1">
+        <Badge variant="outline" className={`text-xs whitespace-nowrap ${getBadgeColor(personnel[0].status)}`}>
+          {personnel[0].name}
         </Badge>
-        <Badge variant="outline" className="text-xs">
-          +{teachers.length - 1} more
+        <Badge variant="secondary" className="text-xs px-1 whitespace-nowrap">
+          +{personnel.length - 1}
         </Badge>
       </div>
     );
@@ -278,6 +271,8 @@ const PlanningTable = () => {
             <TableHead>Session End Date</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
+            <TableHead>{t("planningManagement.table.assistants", "Assistants")}</TableHead>
+            <TableHead>{t("planningManagement.table.trainees", "Trainees")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
             <TableHead>{t("planningManagement.table.action")}</TableHead>
           </TableRow>
@@ -286,10 +281,10 @@ const PlanningTable = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={10} />
+            <TableSkeleton rows={rowsPerPage} columns={12} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center p-8">
+              <TableCell colSpan={12} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -333,7 +328,9 @@ const PlanningTable = () => {
                 >
                   {i?.venue || "N/A"}
                 </TableCell>
-                <TableCell>{renderTeacherChips(i?.sessions)}</TableCell>
+                <TableCell>{renderPersonnelChips(i?.sessions, 'teachers')}</TableCell>
+                <TableCell>{renderPersonnelChips(i?.sessions, 'assistants')}</TableCell>
+                <TableCell>{renderPersonnelChips(i?.sessions, 'trainees')}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -358,7 +355,7 @@ const PlanningTable = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={10} className="text-center">
+              <TableCell colSpan={12} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>
