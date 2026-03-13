@@ -33,7 +33,7 @@ const ProgramConfigDrawer = ({ programId }) => {
   const [formData, setFormData] = useState({
     year: 1,
     exams: {
-      min_pass_percentage: 50,
+      required: true,
     },
     attendance: {
       overall_min_percentage: 80,
@@ -84,7 +84,7 @@ const ProgramConfigDrawer = ({ programId }) => {
       setFormData({
         year: existingConfig.year || 1,
         exams: {
-          min_pass_percentage: existingConfig.exams?.min_pass_percentage || 50,
+          required: existingConfig.exams?.required ?? true,
         },
         attendance: {
           overall_min_percentage: existingConfig.attendance?.overall_min_percentage || 80,
@@ -115,7 +115,7 @@ const ProgramConfigDrawer = ({ programId }) => {
       const nextYear = Math.max(0, ...existingYears) + 1;
       setFormData({
         year: nextYear,
-        exams: { min_pass_percentage: 50 },
+        exams: { required: true },
         attendance: { overall_min_percentage: 80, per_module_min_percentage: 60 },
         submissions: {
           case_studies: { required: false, min_pass_percentage: 50 },
@@ -298,16 +298,17 @@ const ProgramConfigDrawer = ({ programId }) => {
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
                   Exam Requirements
                 </p>
-                <div className="space-y-2">
-                  <Label htmlFor="exam-pass">Minimum Pass Percentage (%)</Label>
-                  <Input
-                    id="exam-pass"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={formData.exams.min_pass_percentage}
-                    onChange={(e) => updateField("exams.min_pass_percentage", parseFloat(e.target.value))}
-                    className="bg-sidebar border-sidebar-border"
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="exams-required" className="font-medium">Exams Required</Label>
+                    <p className="text-xs text-dashboard-text-secondary mt-1">
+                      Students must pass all module exams to progress
+                    </p>
+                  </div>
+                  <Switch
+                    id="exams-required"
+                    checked={formData.exams.required}
+                    onCheckedChange={(checked) => updateField("exams.required", checked)}
                   />
                 </div>
               </div>
@@ -354,79 +355,88 @@ const ProgramConfigDrawer = ({ programId }) => {
                 {/* Case Studies */}
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="case-studies-required" className="font-medium">Case Studies</Label>
+                    <div>
+                      <Label htmlFor="case-studies-required" className="font-medium">Case Studies</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                    </div>
                     <Switch
                       id="case-studies-required"
                       checked={formData.submissions.case_studies.required}
                       onCheckedChange={(checked) => updateField("submissions.case_studies.required", checked)}
                     />
                   </div>
-                  {formData.submissions.case_studies.required && (
-                    <div className="space-y-2">
-                      <Label htmlFor="case-studies-pass" className="text-xs">Minimum Pass Percentage (%)</Label>
-                      <Input
-                        id="case-studies-pass"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={formData.submissions.case_studies.min_pass_percentage}
-                        onChange={(e) => updateField("submissions.case_studies.min_pass_percentage", parseFloat(e.target.value))}
-                        className="bg-sidebar border-sidebar-border"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
+                    <Label htmlFor="case-studies-pass" className="text-xs">
+                      {formData.submissions.case_studies.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                    </Label>
+                    <Input
+                      id="case-studies-pass"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.submissions.case_studies.min_pass_percentage}
+                      onChange={(e) => updateField("submissions.case_studies.min_pass_percentage", parseFloat(e.target.value))}
+                      className="bg-sidebar border-sidebar-border"
+                    />
+                  </div>
                 </div>
 
                 {/* Essays */}
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="essays-required" className="font-medium">Essays</Label>
+                    <div>
+                      <Label htmlFor="essays-required" className="font-medium">Essays</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                    </div>
                     <Switch
                       id="essays-required"
                       checked={formData.submissions.essays.required}
                       onCheckedChange={(checked) => updateField("submissions.essays.required", checked)}
                     />
                   </div>
-                  {formData.submissions.essays.required && (
-                    <div className="space-y-2">
-                      <Label htmlFor="essays-pass" className="text-xs">Minimum Pass Percentage (%)</Label>
-                      <Input
-                        id="essays-pass"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={formData.submissions.essays.min_pass_percentage}
-                        onChange={(e) => updateField("submissions.essays.min_pass_percentage", parseFloat(e.target.value))}
-                        className="bg-sidebar border-sidebar-border"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
+                    <Label htmlFor="essays-pass" className="text-xs">
+                      {formData.submissions.essays.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                    </Label>
+                    <Input
+                      id="essays-pass"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.submissions.essays.min_pass_percentage}
+                      onChange={(e) => updateField("submissions.essays.min_pass_percentage", parseFloat(e.target.value))}
+                      className="bg-sidebar border-sidebar-border"
+                    />
+                  </div>
                 </div>
 
                 {/* Internships */}
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="internships-required" className="font-medium">Internships</Label>
+                    <div>
+                      <Label htmlFor="internships-required" className="font-medium">Internships</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                    </div>
                     <Switch
                       id="internships-required"
                       checked={formData.submissions.internships.required}
                       onCheckedChange={(checked) => updateField("submissions.internships.required", checked)}
                     />
                   </div>
-                  {formData.submissions.internships.required && (
-                    <div className="space-y-2">
-                      <Label htmlFor="internships-pass" className="text-xs">Minimum Pass Percentage (%)</Label>
-                      <Input
-                        id="internships-pass"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={formData.submissions.internships.min_pass_percentage}
-                        onChange={(e) => updateField("submissions.internships.min_pass_percentage", parseFloat(e.target.value))}
-                        className="bg-sidebar border-sidebar-border"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
+                    <Label htmlFor="internships-pass" className="text-xs">
+                      {formData.submissions.internships.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                    </Label>
+                    <Input
+                      id="internships-pass"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.submissions.internships.min_pass_percentage}
+                      onChange={(e) => updateField("submissions.internships.min_pass_percentage", parseFloat(e.target.value))}
+                      className="bg-sidebar border-sidebar-border"
+                    />
+                  </div>
                 </div>
               </div>
 

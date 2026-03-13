@@ -2,6 +2,7 @@ import BatchAttendence from "@/components/admin/batch/BatchAttendence";
 import BatchDetailCard from "@/components/admin/batch/BatchDetailCard";
 import BatchResult from "@/components/admin/batch/BatchResult";
 import BatchStudentList from "@/components/admin/batch/BatchStudentList";
+import BatchYearLog from "@/components/admin/batch/BatchYearLog";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -154,6 +155,10 @@ const BatchDetails = () => {
           {
             key:"Results",
             label: t("batchManagement.details.tabs.results"),
+          },
+          {
+            key: "Year",
+            label: "Year Log",
           }
         ].map((tab) => (
           <button
@@ -174,6 +179,7 @@ const BatchDetails = () => {
         {activeTab === "Students" && <BatchStudentList />}
         {activeTab==="Attendence" && <BatchAttendence />}
         {activeTab==="Results" && <BatchResult />}
+        {activeTab==="Year" && <BatchYearLog />}
       </div>
     </div>
   );

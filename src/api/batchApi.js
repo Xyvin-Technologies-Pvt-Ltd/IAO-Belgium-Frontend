@@ -52,3 +52,20 @@ export const getBatchExamResults = async (batchId, params) => {
     throw error.response.data;
   }
 };
+export const getBatchYearLog = async (batchId, params) => {
+  try {
+    const response = await axiosInstance.get(`/intake/year-completion-log/batch/${batchId}`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const recalculateYearCompletion = async (application_id) => {
+  try {
+    const response = await axiosInstance.post(`/student/year-completion/recalculate`, { application_id });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

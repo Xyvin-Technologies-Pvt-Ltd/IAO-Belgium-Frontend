@@ -47,18 +47,22 @@ export const deleteIntake = async (id) => {
     throw error.response.data;
   }
 };
-export const getBatchByIntake = async (id) => {
+export const getBatchByIntake = async (id, filter) => {
   try {
-    const response = await axiosInstance.get(`/intake/batches/${id}`);
+    const response = await axiosInstance.get(`/intake/batches/${id}`, {
+      params: filter,
+    });
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
 
-export const getEnrolledStudentsByIntake = async (id) => {
+export const getEnrolledStudentsByIntake = async (id,filter) => {
   try {
-    const response = await axiosInstance.get(`/intake/enrollments/${id}`);
+    const response = await axiosInstance.get(`/intake/enrollments/${id}`,{
+      params: filter
+    });
     return response.data;
   } catch (error) {
     throw error.response.data;
