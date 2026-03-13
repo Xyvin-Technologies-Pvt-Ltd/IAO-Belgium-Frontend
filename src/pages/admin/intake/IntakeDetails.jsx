@@ -6,7 +6,6 @@ import { useGetIntakeById } from "@/store/useIntakeStore";
 import { useParams } from "@tanstack/react-router";
 import { Calendar, CalendarCheck, Layers, MapPin, Users } from "lucide-react";
 import { formatTZ } from "@/utils/dateUtils";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import StudentList from "@/components/admin/intake/student/StudentList";

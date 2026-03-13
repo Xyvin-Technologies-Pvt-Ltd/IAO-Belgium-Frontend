@@ -1,4 +1,4 @@
-import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults } from "@/api/batchApi";
+import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults, getBatchYearLog, recalculateYearCompletion } from "@/api/batchApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -74,5 +74,31 @@ export const useGetBatchExamResults = (batchId, params = {}, options = {}) => {
     staleTime: 30000,
     enabled: !!batchId,
     ...options,
+  });
+};
+export const useGetBatchYearLog = (batchId, params = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["batch-year-log", batchId, params],
+    queryFn: () => getBatchYearLog(batchId, params),
+    staleTime: 30000,
+    enabled: !!batchId,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useRecalculateYearCompletion = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: recalculateYearCompletion,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast.success(response?.message || "Year completion recalculated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to recalculate year completion");
+    },
   });
 };

@@ -98,22 +98,20 @@ const Academics = () => {
         {t("academicManagement.title")}
       </h2>
 
-      {academics.length > 0 && (
-        <div className="flex items-center justify-between gap-2">
-          <Input
-            placeholder={t("academicManagement.search")}
-            className="max-w-xs"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      <div className="flex items-center justify-between gap-2">
+        <Input
+          placeholder={t("academicManagement.search")}
+          className="max-w-xs"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-          <Button onClick={handleOpenCreate}>
-            {t("academicManagement.createAcademic")}
-          </Button>
-        </div>
-      )}
+        <Button onClick={handleOpenCreate}>
+          {t("academicManagement.createAcademic")}
+        </Button>
+      </div>
 
-      {!isLoading && academics.length === 0 && !debouncedSearch && (
+      {!isLoading && academics.length === 0 && (
         <div className="flex flex-col items-center justify-center h-[80vh] text-center bg-sidebar rounded-xl p-5 border border-sidebar-border">
           <img
             src={image}
@@ -126,9 +124,6 @@ const Academics = () => {
           <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1">
             {t("academicManagement.emptyState.subtitle")}
           </p>
-          <Button className="mt-4" onClick={handleOpenCreate}>
-            {t("academicManagement.createAcademic")}
-          </Button>
         </div>
       )}
 

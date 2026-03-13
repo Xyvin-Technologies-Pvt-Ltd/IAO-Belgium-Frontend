@@ -32,10 +32,10 @@ export const useGetIntakeById = (id, options = {}) => {
   });
 };
 
-export const useGetBatchesByIntake = (intakeId, options = {}) => {
+export const useGetBatchesByIntake = (intakeId,filter, options = {}) => {
   return useQuery({
-    queryKey: ["batches", "intake", intakeId],
-    queryFn: () => getBatchByIntake(intakeId),
+    queryKey: ["batches", "intake", intakeId,filter],
+    queryFn: () => getBatchByIntake(intakeId,filter),
     staleTime: 30000,
     enabled: !!intakeId,
     placeholderData: (previousData) => previousData,
@@ -43,10 +43,10 @@ export const useGetBatchesByIntake = (intakeId, options = {}) => {
   });
 };
 
-export const useGetEnrolledStudentsByIntake = (intakeId, options = {}) => {
+export const useGetEnrolledStudentsByIntake = (intakeId,filter, options = {}) => {
   return useQuery({
-    queryKey: ["enrollments", "intake", intakeId],
-    queryFn: () => getEnrolledStudentsByIntake(intakeId),
+    queryKey: ["enrollments", "intake", intakeId,filter],
+    queryFn: () => getEnrolledStudentsByIntake(intakeId,filter),
     staleTime: 30000,
     enabled: !!intakeId, // Only run query if intakeId exists
     placeholderData: (previousData) => previousData,
