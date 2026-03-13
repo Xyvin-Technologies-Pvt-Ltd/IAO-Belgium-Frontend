@@ -212,6 +212,7 @@ const ViewSubmission = () => {
 
   const isEvolvable = submissionData?.status === "submitted";
   const documentFile = submissionData?.documents?.[0];
+  const pdfUrl = documentFile?.url ? encodeURI(documentFile.url) : null;
 
   return (
     <div className="p-6 h-[calc(100vh-80px)] bg-white dark:bg-sidebar overflow-hidden">
@@ -238,7 +239,7 @@ const ViewSubmission = () => {
               <div className="flex-1 overflow-hidden bg-gray-100 dark:bg-gray-900">
                 <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                   <Viewer
-                    fileUrl={documentFile.url}
+                    fileUrl={pdfUrl}
                     plugins={[defaultLayoutPluginInstance]}
                   />
                 </Worker>
