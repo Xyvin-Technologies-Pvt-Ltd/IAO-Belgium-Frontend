@@ -23,7 +23,7 @@ const BatchAttendence = () => {
   const batchId = params.id;
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 

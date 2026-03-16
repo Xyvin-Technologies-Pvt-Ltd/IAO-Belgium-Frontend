@@ -98,6 +98,7 @@ export const useRecalculateYearCompletion = () => {
       toast.success(response?.message || "Year completion recalculated successfully!");
     },
     onError: (error) => {
+      queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
       toast.error(error?.message || "Failed to recalculate year completion");
     },
   });
