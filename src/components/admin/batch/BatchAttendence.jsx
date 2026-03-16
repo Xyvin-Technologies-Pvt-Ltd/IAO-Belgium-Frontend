@@ -44,28 +44,27 @@ const BatchAttendence = () => {
     if (status === "present") {
       return (
         <div className="flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-            <Check className="w-4 h-4 text-white" />
+          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+            <Check className="w-2 h-2 text-white stroke-[3]" />
           </div>
         </div>
       );
     } else if (status === "absent") {
       return (
         <div className="flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
-            <X className="w-4 h-4 text-white" />
+          <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
+            <X className="w-2 h-2 text-white stroke-[3]" />
           </div>
         </div>
       );
     }
     return (
       <div className="flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-          <span className="text-gray-600 text-xs">-</span>
-        </div>
+        <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
       </div>
     );
   };
+
 
   return (
     <div className="space-y-6 mt-4">
@@ -88,7 +87,7 @@ const BatchAttendence = () => {
               {modules.map((module) => (
                 <TableHead
                   key={module.module_id}
-                  colSpan={module.sessions.length}
+                  colSpan={Math.max(1, module.sessions.length)}
                   className="text-center border-l bg-muted/50"
                 >
                   <div className="font-semibold text-sm">
@@ -100,16 +99,27 @@ const BatchAttendence = () => {
             <TableRow className="bg-muted/30">
               <TableHead className="sticky left-0 bg-muted/30 z-10 border-r"></TableHead>
               {modules.map((module) =>
-                module.sessions.map((session) => (
+                module.sessions.length > 0 ? (
+                  module.sessions.map((session) => (
+                    <TableHead
+                      key={String(session.session_id)}
+                      className="text-center min-w-[70px] border-l px-2"
+                    >
+                      <div className="text-xs font-normal">
+                        {formatTZ(session.session_date, "D MMM")}
+                      </div>
+                    </TableHead>
+                  ))
+                ) : (
                   <TableHead
-                    key={session.session_id}
+                    key={`${module.module_id}-no-session`}
                     className="text-center min-w-[70px] border-l px-2"
                   >
-                    <div className="text-xs font-normal">
-                      {formatTZ(session.session_date, "D MMM")}
+                    <div className="text-xs font-normal text-muted-foreground italic">
+                      -
                     </div>
                   </TableHead>
-                )),
+                ),
               )}
             </TableRow>
           </TableHeader>
@@ -120,14 +130,14 @@ const BatchAttendence = () => {
               <TableSkeleton
                 rows={rowsPerPage}
                 columns={
-                  1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                  1 + modules.reduce((acc, m) => acc + Math.max(1, m.sessions.length), 0)
                 }
               />
             ) : error ? (
               <TableRow>
                 <TableCell
                   colSpan={
-                    1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                    1 + modules.reduce((acc, m) => acc + Math.max(1, m.sessions.length), 0)
                   }
                   className="text-center p-8"
                 >
@@ -147,18 +157,27 @@ const BatchAttendence = () => {
                     {student.student_name}
                   </TableCell>
                   {modules.map((module) =>
-                    module.sessions.map((session) => {
-                      const attendance =
-                        student.attendance?.[session.session_id.toString()];
-                      return (
-                        <TableCell
-                          key={session.session_id}
-                          className="text-center border-l py-2"
-                        >
-                          {getAttendanceIcon(attendance)}
-                        </TableCell>
-                      );
-                    }),
+                    module.sessions.length > 0 ? (
+                      module.sessions.map((session) => {
+                        const sid = String(session.session_id);
+                        const attendance = student.attendance?.[sid];
+                        return (
+                          <TableCell
+                            key={sid}
+                            className="text-center border-l py-2"
+                          >
+                            {getAttendanceIcon(attendance)}
+                          </TableCell>
+                        );
+                      })
+                    ) : (
+                      <TableCell
+                        key={`${module.module_id}-no-session`}
+                        className="text-center border-l py-2 text-muted-foreground italic"
+                      >
+                        -
+                      </TableCell>
+                    ),
                   )}
                 </TableRow>
               ))
@@ -166,7 +185,7 @@ const BatchAttendence = () => {
               <TableRow>
                 <TableCell
                   colSpan={
-                    1 + modules.reduce((acc, m) => acc + m.sessions.length, 0)
+                    1 + modules.reduce((acc, m) => acc + Math.max(1, m.sessions.length), 0)
                   }
                   className="text-center"
                 >

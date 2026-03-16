@@ -2,8 +2,8 @@ import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentById } from "@/store/useStudentStore";
-import { useParams } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useParams, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
 import {
@@ -28,9 +28,16 @@ const StudentView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
+  const navigate = useNavigate();
   const { updateBreadcrumbs } = useBreadcrumb();
+  const [filter, setFilter] = useState({ year: 1 });
 
-  const { data: student, isLoading, error, refetch } = useGetStudentById(id);
+  const {
+    data: student,
+    isLoading,
+    error,
+    refetch,
+  } = useGetStudentById(id, filter);
 
   useEffect(() => {
     if (student?.data) {
@@ -73,6 +80,9 @@ const StudentView = () => {
   const studentData = student?.data;
   if (!studentData) return null;
 
+  const totalYears = studentData?.year || 1;
+  const years = Array.from({ length: totalYears }, (_, i) => i + 1);
+
   const modules = studentData?.completed_modules || [];
   const exams = studentData?.completed_exams || [];
   const apps = studentData?.completed_submissions || [];
@@ -86,6 +96,26 @@ const StudentView = () => {
   return (
     <div className="space-y-6 mt-4 bg-sidebar  rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} hide />
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200 dark:border-white/20">
+        <nav className="-mb-px flex space-x-8">
+          {years.map((y) => (
+            <button
+              key={y}
+              onClick={() => setFilter({ ...filter, year: y })}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                filter.year === y
+                  ? "border-[#ff8904] text-[#ff8904]"
+                  : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+              }`}
+            >
+              Year {y}
+            </button>
+          ))}
+        </nav>
+      </div>
+
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-6">
           <h3 className="font-semibold mb-4">Completed Modules</h3>
@@ -187,8 +217,15 @@ const StudentView = () => {
           </Table>
         </div>
         <div className="col-span-12 lg:col-span-4">
-          <h3 className="font-semibold mb-4">Attendance</h3>
-
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold">Attendance</h3>
+            <button 
+              onClick={() => navigate({ to: `/admin/student-management/${id}/attendence` })}
+              className="text-blue-500 hover:text-blue-700 font-medium text-sm transition-colors cursor-pointer"
+            >
+              See more
+            </button>
+          </div>
           <div className="border border-sidebar-border rounded-lg p-6 flex items-center justify-center relative">
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
