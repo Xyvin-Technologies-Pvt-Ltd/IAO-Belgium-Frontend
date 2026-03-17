@@ -32,6 +32,7 @@ import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
 import ExamDetail from "@/pages/admin/exam/ExamDetail";
+import AttendenceView from "@/pages/admin/student/AttendenceView";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -99,6 +100,19 @@ export const adminRoutes = [
       StudentView,
       "/admin/student-management",
     ),
+  },
+  {path:"/admin/student-management/$id/attendence",
+  component:withPermissionProtection(
+    AttendenceView,
+    "/admin/student-management",
+  )},
+  {
+    path: "/admin/submission",
+    component: withPermissionProtection(Submissions, "/admin/submission"),
+  },
+  {
+    path: "/admin/submission/$id",
+    component: withPermissionProtection(Submissions, "/admin/submission"),
   },
   {
     path: "/admin/finance-reports",

@@ -117,11 +117,11 @@ export const useGetTeacherExams = (params, options = {}) => {
   });
 };
 
-export const useGetTeacherExamById = (id, options = {}) => {
+export const useGetTeacherExamById = (exam_id, planning_id, options = {}) => {
   return useQuery({
-    queryKey: ["teacher-exam", id],
-    queryFn: () => getTeacherExamById(id),
-    enabled: !!id,
+    queryKey: ["teacher-exam", exam_id, planning_id],
+    queryFn: () => getTeacherExamById(exam_id, planning_id),
+    enabled: !!exam_id && !!planning_id,
     staleTime: 30000,
     ...options,
   });

@@ -24,5 +24,5 @@ export const teacherRoutes = [
   { path: "/teacher/evaluations", component: Evaluations },
   { path: "/teacher/evaluations/$id", component: ViewSubmission },
   { path: "/teacher/exams", component: ExamList },
-  { path: "/teacher/exams/$id", component: ExamDetail },
+  { path: "/teacher/exams/$exam_id/$planning_id", component: ExamDetail },
 ];

@@ -1,4 +1,4 @@
-import { getStudentById, getStudents } from "@/api/studentApi";
+import { getStudentAttendance, getStudentById, getStudents } from "@/api/studentApi";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetStudents = (filter, options = {}) => {
@@ -10,12 +10,22 @@ export const useGetStudents = (filter, options = {}) => {
     ...options,
   });
 };
-export const useGetStudentById = (id, options = {}) => {
+export const useGetStudentById = (id, filter, options = {}) => {
   return useQuery({
-    queryKey: ["student", id],
-    queryFn: () => getStudentById(id),
+    queryKey: ["student", id, filter],
+    queryFn: () => getStudentById(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
   });
 };
+
+export const useGetStudentAttendance = (id, filter, options = {}) => {
+  return useQuery({
+    queryKey: ["student-attendance", id, filter],
+    queryFn: () => getStudentAttendance(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
