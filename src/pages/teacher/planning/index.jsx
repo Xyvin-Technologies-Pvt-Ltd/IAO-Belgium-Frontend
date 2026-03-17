@@ -105,13 +105,13 @@ const Plannings = () => {
               <TableRow key={session._id}>
                 <TableCell>{session.program_name}</TableCell>
                 <TableCell
-                  className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                   title={session.module_name}
                 >
                   {session.module_name}
                 </TableCell>
                 <TableCell
-                  className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                   title={session.name}
                 >
                   {session.name}

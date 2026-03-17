@@ -45,7 +45,7 @@ const BatchAttendence = () => {
       return (
         <div className="flex items-center justify-center">
           <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-            <Check className="w-2 h-2 text-white stroke-[3]" />
+            <Check className="w-2 h-2 text-white stroke-3" />
           </div>
         </div>
       );
@@ -53,7 +53,7 @@ const BatchAttendence = () => {
       return (
         <div className="flex items-center justify-center">
           <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
-            <X className="w-2 h-2 text-white stroke-[3]" />
+            <X className="w-2 h-2 text-white stroke-3" />
           </div>
         </div>
       );
@@ -81,7 +81,7 @@ const BatchAttendence = () => {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="sticky left-0 bg-muted/50 z-10 w-[180px] border-r">
+              <TableHead className="sticky left-0 bg-muted/50 z-10 w-45 border-r">
                 {t("batchManagement.table.student")}
               </TableHead>
               {modules.map((module) => (
@@ -103,7 +103,7 @@ const BatchAttendence = () => {
                   module.sessions.map((session) => (
                     <TableHead
                       key={String(session.session_id)}
-                      className="text-center min-w-[70px] border-l px-2"
+                      className="text-center min-w-17.5 border-l px-2"
                     >
                       <div className="text-xs font-normal">
                         {formatTZ(session.session_date, "D MMM")}
@@ -113,7 +113,7 @@ const BatchAttendence = () => {
                 ) : (
                   <TableHead
                     key={`${module.module_id}-no-session`}
-                    className="text-center min-w-[70px] border-l px-2"
+                    className="text-center min-w-17.5 border-l px-2"
                   >
                     <div className="text-xs font-normal text-muted-foreground italic">
                       -
@@ -153,7 +153,7 @@ const BatchAttendence = () => {
             ) : students?.length > 0 ? (
               students.map((student) => (
                 <TableRow key={student._id} className="hover:bg-muted/30">
-                  <TableCell className="sticky left-0 z-10 border-r w-[180px] truncate">
+                  <TableCell className="sticky left-0 z-10 border-r w-45 truncate">
                     {student.student_name}
                   </TableCell>
                   {modules.map((module) =>

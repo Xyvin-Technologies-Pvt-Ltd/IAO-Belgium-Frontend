@@ -107,7 +107,7 @@ const SubmissionsFilterDrawer = ({
 
       <SheetContent
         side="right"
-        className="w-[400px] sm:w-[480px] p-0 bg-sidebar flex flex-col h-full max-h-screen"
+        className="w-100 sm:w-120 p-0 bg-sidebar flex flex-col h-full max-h-screen"
       >
         {/* Header */}
         <SheetHeader
@@ -214,7 +214,7 @@ const SubmissionsFilterDrawer = ({
                     }))
                   }
                 >
-                  <SelectTrigger className="w-full bg-sidebar border-sidebar-border h-auto">
+                  <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
                     <span className="block truncate max-w-[90%] text-left">
                       <SelectValue placeholder="All Programs" />
                     </span>

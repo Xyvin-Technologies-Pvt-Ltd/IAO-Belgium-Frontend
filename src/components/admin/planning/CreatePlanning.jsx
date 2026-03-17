@@ -464,7 +464,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                   "planningManagement.modal.descriptionPlaceholder",
                 )}
                 {...register("description")}
-                className="min-h-[100px]"
+                className="min-h-25"
               />
               {errors.description && (
                 <p className="text-sm text-red-500">
@@ -554,7 +554,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                         </Label>
                         <Input
                           type="time"
-                          className="dark:[color-scheme:dark]"
+                          className="dark:scheme-dark"
                           {...register(`sessions.${index}.start_time`)}
                         />
                         {errors.sessions?.[index]?.start_time && (
@@ -600,7 +600,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                         </Label>
                         <Input
                           type="time"
-                          className="dark:[color-scheme:dark]"
+                          className="dark:scheme-dark"
                           {...register(`sessions.${index}.end_time`)}
                         />
                         {errors.sessions?.[index]?.end_time && (

@@ -27,6 +27,7 @@ import {
 } from "@/store/useProgramStore";
 import CreateProgram from "@/components/admin/programs/CreateProgram";
 import { useNavigate } from "@tanstack/react-router";
+import ProgramsFilterDrawer from "./ProgramsFilterDrawer";
 
 const Programs = () => {
   const navigate = useNavigate();
@@ -38,13 +39,37 @@ const Programs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [appliedFilters, setAppliedFilters] = useState({
+    program_type: "all",
+    language: "all",
+    city: "all",
+    country: "all",
+    status: "all",
+  });
+  const [draftFilters, setDraftFilters] = useState({
+    program_type: "all",
+    language: "all",
+    city: "all",
+    country: "all",
+    status: "all",
+  });
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch ,isFetching} = useGetPrograms({
+  const { data, isLoading, error, refetch, isFetching } = useGetPrograms({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.program_type !== "all"
+      ? { program_type: appliedFilters.program_type }
+      : {}),
+    ...(appliedFilters.language !== "all"
+      ? { language: appliedFilters.language }
+      : {}),
+    ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
+    ...(appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
   });
   const { mutateAsync: deleteProgram, isPending: isDeleting } =
     useDeleteProgram();
@@ -97,12 +122,21 @@ const Programs = () => {
         {t("programManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("programManagement.search")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder={t("programManagement.search")}
+            className="max-w-xs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <ProgramsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
+        </div>
         <Button onClick={handleOpenCreate}>
           {t("programManagement.createProgram")}
         </Button>

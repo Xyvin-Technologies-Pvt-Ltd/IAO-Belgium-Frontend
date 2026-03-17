@@ -22,6 +22,7 @@ import { useDeleteTeacher, useGetTeachers } from "@/store/useTeacherStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
+import TeacherFilterDrawer from "./TeacherFilterDrawer";
 
 const Teachers = () => {
   const { t } = useTranslation();
@@ -34,12 +35,30 @@ const Teachers = () => {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
+  // Filter States
+  const [appliedFilters, setAppliedFilters] = useState({
+    location: "all",
+    language: "all",
+    teacher_role: "all",
+    academic_degree: "all",
+    country: "all",
+    status: "all",
+  });
+  const [draftFilters, setDraftFilters] = useState({ ...appliedFilters });
+
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch,isFetching } = useGetTeachers({
+  const { data, isLoading, error, refetch, isFetching } = useGetTeachers({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.location !== "all" && { location: appliedFilters.location }),
+    ...(appliedFilters.language !== "all" && { language: appliedFilters.language }),
+    ...(appliedFilters.teacher_role !== "all" && { teacher_role: appliedFilters.teacher_role }),
+    ...(appliedFilters.academic_degree !== "all" && {
+      academic_degree: appliedFilters.academic_degree,
+    }),
+    ...(appliedFilters.status !== "all" && { status: appliedFilters.status }),
   });
   const { mutateAsync: deleteTeacher, isPending: isDeleting } =
     useDeleteTeacher();
@@ -81,12 +100,21 @@ const Teachers = () => {
         {t("teacherManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("teacherManagement.search")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="flex items-center gap-2 flex-1">
+          <Input
+            placeholder={t("teacherManagement.search")}
+            className="max-w-xs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <TeacherFilterDrawer
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            setPage={setPage}
+          />
+        </div>
         <Button onClick={handleOpenCreate}>
           {t("teacherManagement.createTeacher")}
         </Button>
