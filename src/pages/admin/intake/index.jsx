@@ -24,6 +24,9 @@ import StatusBadge from "@/components/StatusBadge";
 import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import IntakesFilterDrawer from "./IntakesFilterDrawer";
+
+const DEFAULT_FILTERS = { status: "all", city: "all", language: "all", country: "all" };
 
 const Intakes = () => {
   const { t } = useTranslation();
@@ -37,6 +40,8 @@ const Intakes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIntake, setSelectedIntake] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
   const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
 
@@ -44,6 +49,9 @@ const Intakes = () => {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
+    ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
+    ...(appliedFilters.language !== "all" ? { language: appliedFilters.language } : {}),
   });
   const { mutateAsync: deleteIntake, isPending: isDeleting } =
     useDeleteIntake();
@@ -113,12 +121,21 @@ const Intakes = () => {
         </h2>
       </div>
       <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("intakeManagement.search")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder={t("intakeManagement.search")}
+            className="max-w-xs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <IntakesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
+        </div>
         <Button onClick={handleOpenCreate}>
           {t("intakeManagement.createIntake")}
         </Button>

@@ -62,7 +62,7 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
           >
             {/* File Name */}
             <div className="flex items-center gap-2 text-base">
-              <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
               <span className="truncate font-medium md:font-normal">
                 {item.name}
               </span>

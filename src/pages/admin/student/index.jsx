@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetStudents } from "@/store/useStudentStore";
+import StudentFilterDrawer from "./StudentFilterDrawer";
 
 const AllStudents = () => {
   const navigate = useNavigate();
@@ -25,10 +26,27 @@ const AllStudents = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch,isFetching } = useGetStudents({
+  const [appliedFilters, setAppliedFilters] = useState({
+    program: "all",
+    batch: "all",
+    status: "all",
+    city: "all",
+  });
+
+  const [draftFilters, setDraftFilters] = useState({
+    program: "all",
+    batch: "all",
+    status: "all",
+    city: "all",
+  });
+
+  const { data, isLoading, error, refetch, isFetching } = useGetStudents({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.batch !== "all" && { batch: appliedFilters.batch }),
+    ...(appliedFilters.status !== "all" && { status: appliedFilters.status }),
+    ...(appliedFilters.city !== "all" && { city: appliedFilters.city }),
   });
 
   const students = data?.data || [];
@@ -45,12 +63,21 @@ const AllStudents = () => {
         {t("studentManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("studentManagement.search")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="flex items-center gap-2 flex-1">
+          <Input
+            placeholder={t("studentManagement.search")}
+            className="max-w-xs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <StudentFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
+        </div>
       </div>
 
       <Table>

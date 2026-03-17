@@ -35,10 +35,11 @@ function SelectTrigger({
         "bg-white",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         "flex items-center justify-between gap-2 data-placeholder:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "text-left",
         className
       )}
       {...props}>
-      {children}
+      <span className="truncate flex-1">{children}</span>
       <SelectPrimitive.Icon asChild>
         <ChevronDownIcon className="size-4 opacity-50" />
       </SelectPrimitive.Icon>

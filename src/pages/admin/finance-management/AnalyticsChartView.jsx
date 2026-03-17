@@ -183,7 +183,11 @@ const AnalyticsChartView = ({
   const totalTransactions = totalCount?.transactions || 0;
   const totalPaid = totalCount?.paid || 0;
 
-  const chartData = data.map((item) => ({
+  const top4Data = [...data]
+    .sort((a, b) => (b.total_amount || 0) - (a.total_amount || 0))
+    .slice(0, 4);
+
+  const chartData = top4Data.map((item) => ({
     name: getLabel(item),
     admission_fee: item.admission_fee_amount || 0,
     module_purchase: item.module_purchase_amount || 0,
@@ -297,7 +301,7 @@ const AnalyticsChartView = ({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[4fr_8fr] gap-[12px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[4fr_8fr] gap-3">
 
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
           <CardHeader className="p-0 mb-4">
