@@ -38,7 +38,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 const ExamDetail = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
-  const id = params.id;
+  const exam_id = params.exam_id;
+  const planning_id = params.planning_id;
   const { updateBreadcrumbs } = useBreadcrumb();
 
   const [examStarted, setExamStarted] = useState(false);
@@ -62,15 +63,15 @@ const ExamDetail = () => {
     isLoading,
     error,
     refetch,
-  } = useGetTeacherExamById(id);
+  } = useGetTeacherExamById(exam_id, planning_id);
 
-  const planningId = examData?.data?.first_session?.planning_id;
+  // exam_id is also available directly from params now
 
   const {
     data: resultsData,
     isLoading: resultsLoading,
     error: resultsError,
-  } = useGetExamResults(id, planningId, {
+  } = useGetExamResults(exam_id, planning_id, {
     page,
     limit: rowsPerPage,
     search: debouncedSearch,
@@ -85,11 +86,11 @@ const ExamDetail = () => {
         {
           label: t("sidebar.teacher.exams", { defaultValue: "Exams" }),
           path: "/teacher/exams",
-          navigable: false,
+          navigable: true,
         },
         {
           label: examData.data.name,
-          path: `/teacher/exams/${id}`,
+          path: `/teacher/exams/${exam_id}/${planning_id}`,
           navigable: false,
         },
       ]);
@@ -111,7 +112,7 @@ const ExamDetail = () => {
     examData?.data?.name,
     examData?.data?.exam_session_status,
     examData?.data?.exam_session_id,
-    id,
+    planning_id,
     t,
   ]);
 
@@ -142,7 +143,7 @@ const ExamDetail = () => {
     }
     const payload = {
       planning: examData.data.first_session.planning_id,
-      exam: id,
+      exam: exam_id,
     };
 
     startSessionMutation.mutate(payload);

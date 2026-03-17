@@ -37,8 +37,8 @@ const ExamList = () => {
 
   const handleRowClick = (exam) => {
     navigate({
-      to: "/teacher/exams/$id",
-      params: { id: exam._id },
+      to: "/teacher/exams/$exam_id/$planning_id",
+      params: { exam_id: exam.exam_id, planning_id: exam.planning_id },
     });
   };
 
@@ -84,7 +84,7 @@ const ExamList = () => {
           ) : exams?.length > 0 ? (
             exams?.map((exam) => (
               <TableRow
-                key={exam._id}
+                key={exam.exam_component_id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(exam)}
               >

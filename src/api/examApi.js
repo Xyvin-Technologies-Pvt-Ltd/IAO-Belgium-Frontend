@@ -40,8 +40,8 @@ export const getTeacherExams = async (params) => {
   return response.data;
 };
 
-export const getTeacherExamById = async (id) => {
-  const response = await axiosInstance.get(`/exam/teacher/${id}`);
+export const getTeacherExamById = async (exam_id, planning_id) => {
+  const response = await axiosInstance.get(`/exam/teacher/${exam_id}/${planning_id}`);
   return response.data;
 };
 
