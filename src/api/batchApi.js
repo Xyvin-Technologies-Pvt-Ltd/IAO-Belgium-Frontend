@@ -8,9 +8,11 @@ export const getBatchById = async (id) => {
     throw error.response.data;
   }
 };
-export const getStudentByBatch = async (id) => {
+export const getStudentByBatch = async (id,filter) => {
   try {
-    const response = await axiosInstance.get(`/intake/batch/students/${id}`);
+    const response = await axiosInstance.get(`/intake/batch/students/${id}`,{
+      params: filter
+    });
     return response.data;
   } catch (error) {
     throw error.response.data;

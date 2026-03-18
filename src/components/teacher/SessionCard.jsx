@@ -2,32 +2,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatTZ, getMoment } from "@/utils/dateUtils";
 
 const SessionCard = ({ sessions = [], isLoading = false }) => {
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    return formatTZ(dateString, "MMMM DD, YYYY");
-  };
+  const formatDate = (dateString) => formatTZ(dateString, "MMMM DD, YYYY");
 
-  // Helper function to format time
   const formatTime = (startTime, endTime) => {
     const start = getMoment(startTime);
     const end = getMoment(endTime);
-
     return `${start.format("HH:mm")} - ${end.format("HH:mm")}`;
   };
 
-  // Skeleton loading state
   if (isLoading) {
     return (
-      <div className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-6">
+      <div className="border rounded-lg bg-card text-card-foreground shadow-sm p-6">
         <div className="grid grid-cols-4 text-base font-semibold pb-4 gap-4">
-          <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-6 w-24" />
-          <Skeleton className="h-6 w-24" />
-          <Skeleton className="h-6 w-32" />
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-6 w-24" />)}
         </div>
         <div className="space-y-4">
-          {[...Array(3)].map((_, index) => (
-            <div key={index} className="grid grid-cols-4 items-center gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="grid grid-cols-4 items-center gap-4">
               <Skeleton className="h-5 w-24" />
               <Skeleton className="h-5 w-32" />
               <Skeleton className="h-5 w-28" />
@@ -39,26 +30,24 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
     );
   }
 
-  // Empty state
   if (sessions.length === 0) {
     return (
-      <div className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-8 text-center">
-        <p className="text-gray-500">No sessions scheduled</p>
+      <div className="border rounded-lg bg-card text-card-foreground shadow-sm p-8 text-center">
+        <p className="text-muted-foreground">No sessions scheduled</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/60 rounded-[6px] border border-[#EFEFEF] p-6">
-      <div className="grid grid-cols-4 text-base font-semibold pb-4 gap-4">
+    <div className="border rounded-lg bg-card text-card-foreground shadow-sm p-6">
+      <div className="grid grid-cols-4 text-base font-semibold pb-4 gap-4 border-b border-border">
         <span>Session Name</span>
         <span>Date</span>
         <span>Time</span>
         <span>Teachers</span>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 mt-4">
         {sessions.map((session, index) => {
-          // Extract teachers from different roles
           const teachers = [
             ...(session.teachers?.map((t) =>
               `${t.teacher?.first_name || ""} ${t.teacher?.last_name || ""}`.trim(),
@@ -74,22 +63,14 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
           return (
             <div
               key={session._id || index}
-              className="grid grid-cols-4 items-center gap-4 text-base"
+              className="grid grid-cols-4 items-center gap-4 text-base text-card-foreground"
             >
-              <div className="flex items-center gap-2">
-                <span>{session.name || `Session ${index + 1}`}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>{formatDate(session.session_date)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>{formatTime(session.start_time, session.end_time)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="truncate">
-                  {teachers.length > 0 ? teachers.join(", ") : "TBA"}
-                </span>
-              </div>
+              <span>{session.name || `Session ${index + 1}`}</span>
+              <span>{formatDate(session.session_date)}</span>
+              <span>{formatTime(session.start_time, session.end_time)}</span>
+              <span className="truncate text-muted-foreground">
+                {teachers.length > 0 ? teachers.join(", ") : "TBA"}
+              </span>
             </div>
           );
         })}
