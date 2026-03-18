@@ -173,6 +173,7 @@ const Plannings = () => {
           )}
         </TableBody>
       </Table>
+      
       <Pagination
         page={page}
         setPage={setPage}
