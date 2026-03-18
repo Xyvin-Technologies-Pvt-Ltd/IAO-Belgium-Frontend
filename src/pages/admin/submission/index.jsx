@@ -151,7 +151,7 @@ const Submissions = () => {
         Submissions
       </h2>
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <Input
             placeholder={t("applicationReview.search", {
               defaultValue: "Search name, email, UID...",

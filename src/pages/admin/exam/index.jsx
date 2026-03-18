@@ -95,7 +95,7 @@ const Exams = () => {
         {t("exam.title")}
       </h2>
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex gap-2">
+        <div className="flex-1 flex gap-2">
           <Input
             placeholder={t("exam.search")}
             className="max-w-xs"
