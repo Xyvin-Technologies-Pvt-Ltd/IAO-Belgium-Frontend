@@ -151,7 +151,7 @@ const Submissions = () => {
         Submissions
       </h2>
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <Input
             placeholder={t("applicationReview.search", {
               defaultValue: "Search name, email, UID...",
@@ -176,7 +176,7 @@ const Submissions = () => {
           }) && (
             <>
               <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                <SelectTrigger className="w-[200px] bg-white dark:bg-sidebar">
+                <SelectTrigger className="w-50 bg-white dark:bg-sidebar">
                   <SelectValue placeholder="Select Teacher to Assign" />
                 </SelectTrigger>
                 <SelectContent>
@@ -216,7 +216,7 @@ const Submissions = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">
+              <TableHead className="w-12.5">
                 <Checkbox
                   checked={
                     submissionsData.length > 0 &&
@@ -270,37 +270,37 @@ const Submissions = () => {
                     {item?.student?.first_name} {item?.student?.last_name}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.component?.name}
                   >
                     {item?.component?.name || "-"}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.program?.name}
                   >
                     {item?.program?.name || "-"}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.intake?.name}
                   >
                     {item?.intake?.name || "-"}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.batch?.name}
                   >
                     {item?.batch?.name || "-"}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.city?.name}
                   >
                     {item?.city?.name || "-"}
                   </TableCell>
                   <TableCell
-                    className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
                     title={item?.language?.name}
                   >
                     {item?.language?.name || "-"}

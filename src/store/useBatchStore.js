@@ -12,10 +12,10 @@ export const useGetBatchesById = (id, options = {}) => {
     ...options,
   });
 };
-export const useGetStudentsByBatch = (id, options = {}) => {
+export const useGetStudentsByBatch = (id,filter, options = {}) => {
   return useQuery({
-    queryKey: ["students", "batch", id],
-    queryFn: () => getStudentByBatch(id),
+    queryKey: ["students", "batch", id, filter],
+    queryFn: () => getStudentByBatch(id,filter),
     staleTime: 30000,
     enabled: !!id,
     placeholderData: (previousData) => previousData,

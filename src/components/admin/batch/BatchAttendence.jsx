@@ -78,10 +78,10 @@ const BatchAttendence = () => {
       </div>
 
       <div className="overflow-x-auto border rounded-lg">
-        <Table>
+        <Table className="relative">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="sticky left-0 bg-muted/50 z-10 w-45 border-r">
+              <TableHead className="sticky left-0 bg-background z-10 w-45 border-r shadow-[1px_0_0_0_hsl(var(--border))]">
                 {t("batchManagement.table.student")}
               </TableHead>
               {modules.map((module) => (
@@ -97,7 +97,7 @@ const BatchAttendence = () => {
               ))}
             </TableRow>
             <TableRow className="bg-muted/30">
-              <TableHead className="sticky left-0 bg-muted/30 z-10 border-r"></TableHead>
+              <TableHead className="sticky left-0 bg-background z-10 border-r shadow-[1px_0_0_0_hsl(var(--border))]"></TableHead>
               {modules.map((module) =>
                 module.sessions.length > 0 ? (
                   module.sessions.map((session) => (
@@ -153,7 +153,7 @@ const BatchAttendence = () => {
             ) : students?.length > 0 ? (
               students.map((student) => (
                 <TableRow key={student._id} className="hover:bg-muted/30">
-                  <TableCell className="sticky left-0 z-10 border-r w-45 truncate">
+                  <TableCell className="sticky left-0 z-10 border-r w-45 truncate bg-background shadow-[1px_0_0_0_hsl(var(--border))]">
                     {student.student_name}
                   </TableCell>
                   {modules.map((module) =>

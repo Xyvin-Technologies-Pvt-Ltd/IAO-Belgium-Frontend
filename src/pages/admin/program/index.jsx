@@ -122,7 +122,7 @@ const Programs = () => {
         {t("programManagement.title")}
       </h2>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex-1 flex items-center gap-2">
           <Input
             placeholder={t("programManagement.search")}
             className="max-w-xs"
