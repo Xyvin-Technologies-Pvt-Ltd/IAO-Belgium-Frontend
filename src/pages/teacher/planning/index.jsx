@@ -21,20 +21,26 @@ import {
 import StatusBadge from "@/components/StatusBadge";
 import { Check, X } from "lucide-react";
 import { formatTZ } from "@/utils/dateUtils";
+import ModuleScheduleFilterDrawer from "@/pages/teacher/schedule/ModuleScheduleFilterDrawer";
+
+const defaultFilters = { program: "all", batch: "all" };
 
 const Plannings = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [draftFilters, setDraftFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
 
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch, isFetching } =
     useGetPlanningByTeacher({
-      page: page,
+      page,
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(appliedFilters.batch !== "all" ? { batch_id: appliedFilters.batch } : {}),
     });
 
   const updateStatusMutation = useUpdateTeacherStatus();
@@ -55,12 +61,19 @@ const Plannings = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex  flex-1 items-center gap-2">
         <Input
           placeholder={t("planningManagement.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+        />
+        <ModuleScheduleFilterDrawer
+          draftFilters={draftFilters}
+          setDraftFilters={setDraftFilters}
+          appliedFilters={appliedFilters}
+          setAppliedFilters={setAppliedFilters}
+          setPage={setPage}
         />
       </div>
 
