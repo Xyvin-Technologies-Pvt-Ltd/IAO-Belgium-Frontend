@@ -12,6 +12,7 @@ import { getMoment } from "@/utils/dateUtils";
 const Planning = () => {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState("table");
+  const [calendarViewType, setCalendarViewType] = useState("month"); // "month" | "week"
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewPlanning, setViewPlanning] = useState(null);
   const [activeCity, setActiveCity] = useState(() => {
@@ -19,20 +20,30 @@ const Planning = () => {
   });
   const [currentMonth, setCurrentMonth] = useState(getMoment().month() + 1);
   const [currentYear, setCurrentYear] = useState(getMoment().year());
+  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
+    getMoment().startOf("week")
+  );
 
   const { data: citiesData, isLoading: citiesLoading } = useGetAllCities({});
   const cities = citiesData?.data || [];
+
   useEffect(() => {
     localStorage.setItem("planningActiveCity", activeCity);
   }, [activeCity]);
 
+  const calendarApiParams = {
+    ...(activeCity !== "all" ? { city: activeCity } : {}),
+    ...(calendarViewType === "week"
+      ? {
+          week_start: currentWeekStart.toISOString(),
+          week_end: getMoment(currentWeekStart).endOf("week").toISOString(),
+        }
+      : { month: currentMonth, year: currentYear }),
+    is_all: true,
+  };
+
   const { data: calendarData, isLoading: calendarLoading } = useGetPlanning(
-    {
-      ...(activeCity !== "all" ? { city: activeCity } : {}),
-      month: currentMonth,
-      year: currentYear,
-      limit: 20, 
-    },
+    calendarApiParams,
     { enabled: viewMode === "calendar" }
   );
 
@@ -44,6 +55,10 @@ const Planning = () => {
   const handleMonthChange = (month, year) => {
     setCurrentMonth(month);
     setCurrentYear(year);
+  };
+
+  const handleWeekChange = (weekStart) => {
+    setCurrentWeekStart(weekStart);
   };
 
   return (
@@ -117,6 +132,10 @@ const Planning = () => {
           isLoading={calendarLoading}
           onSessionClick={handleSessionClick}
           onMonthChange={handleMonthChange}
+          viewType={calendarViewType}
+          onViewTypeChange={setCalendarViewType}
+          currentWeekStart={currentWeekStart}
+          onWeekChange={handleWeekChange}
         />
       )}
 
