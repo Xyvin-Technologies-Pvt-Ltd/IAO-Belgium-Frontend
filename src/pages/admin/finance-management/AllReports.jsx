@@ -16,17 +16,26 @@ import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetPayments } from "@/store/usePaymentStore";
 import moment from "moment";
+import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
+
 const AllReports = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState({ status: "all", purpose: "all", from: "", to: "" });
+  const [draftFilters, setDraftFilters] = useState({ status: "all", purpose: "all", from: "", to: "" });
+
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, error, refetch, isFetching } = useGetPayments({
-    page: page,
+    page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
+    ...(appliedFilters.purpose !== "all" ? { purpose: appliedFilters.purpose } : {}),
+    ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
+    ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
   });
 
   const payments = data?.data || [];
@@ -67,12 +76,22 @@ const AllReports = () => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex  flex-1 items-center  gap-2">
           <Input
             placeholder={t("studentManagement.search")}
             className="max-w-xs"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
+          <AllReportsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
           />
         </div>
 
