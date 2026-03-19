@@ -37,8 +37,8 @@ import { cn } from "@/lib/utils";
 import {
   useCreateComponent,
   useUpdateComponent,
-  useGetComponents,
 } from "@/store/useComponentStore";
+import { useGetComponents } from "@/store/useDropdownStore";
 import { useGetExamsDropdown } from "@/store/useExamStore";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -51,6 +51,7 @@ const CreateComponent = ({
   onClose,
   componentData,
   programId,
+  programLanguageId,
   preselectedType,
   onComponentCreated,
 }) => {
@@ -106,13 +107,13 @@ const CreateComponent = ({
 
   const createComponent = useCreateComponent();
   const updateComponent = useUpdateComponent();
-
+// console.log("programlanguageid",programLanguageId)
   // Search for existing modules when typing module name
   const { data: existingModulesData } = useGetComponents(
     {
       type: "module",
       search: debouncedModuleName,
-      limit: 10,
+      ...(programLanguageId && { language: programLanguageId }),
     },
     {
       enabled:
@@ -125,7 +126,6 @@ const CreateComponent = ({
     {
       type: "module",
       program: programId,
-      limit: 100,
     },
     {
       enabled: selectedType === "exam" && !!programId,

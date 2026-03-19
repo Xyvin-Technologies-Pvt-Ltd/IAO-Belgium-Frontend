@@ -46,19 +46,19 @@ const ProgramDetail = () => {
   const componentMap = {
     module: {
       label: t("programDetail.tabs.learningModules"),
-      component: () => <LearningModule programId={id} onComponentCreated={handleComponentCreated} />,
+      component: () => <LearningModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id}/>,
     },
     app: {
       label: t("programDetail.tabs.applications"),
-      component: () => <AppModule programId={id} onComponentCreated={handleComponentCreated} />,
+      component: () => <AppModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id} />,
     },
     resource: {
       label: t("programDetail.tabs.resources"),
-      component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated} />,
+      component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated}languageId={program?.data?.language?._id} />,
     },
     exam: {
       label: t("programDetail.tabs.examComponents"),
-      component: () => <ExamModule programId={id} onComponentCreated={handleComponentCreated} />,
+      component: () => <ExamModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id}/>,
     },
   };
 
@@ -129,7 +129,6 @@ const ProgramDetail = () => {
 
   const programData = program?.data;
   if (!programData) return null;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -215,6 +214,7 @@ const ProgramDetail = () => {
         onClose={() => setIsModalOpen(false)}
         onComponentCreated={handleComponentCreated}
         programId={id}
+        programLanguageId={programData?.language?._id}
         preselectedType={preselectedType}
       />
     </div>

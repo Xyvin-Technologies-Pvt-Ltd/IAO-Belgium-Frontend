@@ -34,8 +34,8 @@ const Submissions = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [activeStatus, setActiveStatus] = useState("submitted");
   const [draftFilters, setDraftFilters] = useState({
-    status: "submitted",
     submission_type: "all",
     program: "all",
     batch: "all",
@@ -44,7 +44,6 @@ const Submissions = () => {
   });
 
   const [appliedFilters, setAppliedFilters] = useState({
-    status: "submitted",
     submission_type: "all",
     program: "all",
     batch: "all",
@@ -61,9 +60,7 @@ const Submissions = () => {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(appliedFilters.status !== "all"
-      ? { status: appliedFilters.status }
-      : {}),
+    ...(activeStatus !== "all" ? { status: activeStatus } : {}),
     ...(appliedFilters.submission_type !== "all"
       ? { submission_type: appliedFilters.submission_type }
       : {}),
@@ -150,6 +147,25 @@ const Submissions = () => {
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
         Submissions
       </h2>
+
+      {/* Status Tabs */}
+      <div className="border-b border-gray-200 dark:border-white/20">
+        <nav className="-mb-px flex space-x-8 overflow-x-auto">
+          {["all", "submitted", "passed", "failed"].map((status) => (
+            <button
+              key={status}
+              onClick={() => { setActiveStatus(status); setPage(1); }}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap capitalize ${
+                activeStatus === status
+                  ? "border-[#ff8904] text-[#ff8904]"
+                  : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+              }`}
+            >
+              {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
+            </button>
+          ))}
+        </nav>
+      </div>
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-1">
           <Input

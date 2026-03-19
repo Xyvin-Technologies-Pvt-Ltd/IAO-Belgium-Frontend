@@ -22,7 +22,7 @@ import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 
-const ExamModule = ({ programId, onComponentCreated }) => {
+const ExamModule = ({ programId, onComponentCreated,languageId }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -154,6 +154,7 @@ const ExamModule = ({ programId, onComponentCreated }) => {
             onComponentCreated(componentType);
           }
         }}
+        programLanguageId={languageId}
       />
 
       <ViewComponent
