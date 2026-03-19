@@ -7,10 +7,16 @@ import {
   SheetTrigger,
   SheetFooter,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
-import { useGetAllPrograms, useGetBatches, useGetAllCities } from "@/store/useDropdownStore";
-import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import { Input } from "@/components/ui/input";
 
 const FilterSection = ({ label, children }) => (
   <div className="space-y-2">
@@ -21,7 +27,7 @@ const FilterSection = ({ label, children }) => (
   </div>
 );
 
-const ModuleScheduleFilterDrawer = ({
+const AllReportsFilterDrawer = ({
   draftFilters,
   setDraftFilters,
   appliedFilters,
@@ -29,34 +35,13 @@ const ModuleScheduleFilterDrawer = ({
   setPage,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [programSearch, setProgramSearch] = useState("");
-  const [batchSearch, setBatchSearch] = useState("");
-  const [citySearch, setCitySearch] = useState("");
-
-  const selectedProgram = draftFilters.program !== "all" ? draftFilters.program : null;
-
-  const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
-    { ...(programSearch && { search: programSearch }) },
-    { enabled: isOpen }
-  );
-
-  const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
-    selectedProgram,
-    { ...(batchSearch && { search: batchSearch }) },
-    { enabled: isOpen && !!selectedProgram }
-  );
-
-  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
-    { ...(citySearch && { search: citySearch }) },
-    { enabled: isOpen }
-  );
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(
-    ([key, val]) => key !== "program" && val !== "all"
+    ([, val]) => val !== "all" && val !== ""
   ).length;
 
   const handleClearAll = () => {
-    const reset = { program: "all", batch: "all", city: "all" };
+    const reset = { status: "all", purpose: "all", from: "", to: "" };
     setDraftFilters(reset);
     setAppliedFilters(reset);
     setPage(1);
@@ -103,10 +88,10 @@ const ModuleScheduleFilterDrawer = ({
             </div>
             <div>
               <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                Filter Modules
+                Filter Reports
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Narrow down the module list
+                Narrow down the payments list
               </p>
             </div>
           </div>
@@ -114,53 +99,60 @@ const ModuleScheduleFilterDrawer = ({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label="Program">
-              <SearchableSelect
-                placeholder="All Programs"
-                searchPlaceholder="Search programs..."
-                items={(programsData?.data || []).map((p) => ({
-                  ...p,
-                  name: `${p.name} - ${p.city?.name || "N/A"} - ${p.language?.name || "N/A"}`,
-                }))}
-                value={draftFilters.program === "all" ? "" : draftFilters.program}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({
-                    ...prev,
-                    program: val || "all",
-                    batch: "all",
-                  }))
-                }
-                onSearch={setProgramSearch}
-                isLoading={programsLoading}
-              />
+            <FilterSection label="Status">
+              <Select
+                value={draftFilters.status}
+                onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, status: val }))}
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="canceled">Canceled</SelectItem>
+                </SelectContent>
+              </Select>
             </FilterSection>
 
-            <FilterSection label="Batch">
-              <SearchableSelect
-                placeholder="All Batches"
-                searchPlaceholder="Search batches..."
-                items={batchesData?.data || []}
-                value={draftFilters.batch === "all" ? "" : draftFilters.batch}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, batch: val || "all" }))
-                }
-                onSearch={setBatchSearch}
-                isLoading={batchesLoading}
-                disabled={!selectedProgram}
+            <FilterSection label="Purpose">
+              <Select
+                value={draftFilters.purpose}
+                onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, purpose: val }))}
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue placeholder="All Purposes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Purposes</SelectItem>
+                  <SelectItem value="admission-fee">Admission Fee</SelectItem>
+                  <SelectItem value="module-purchase">Module Purchase</SelectItem>
+                </SelectContent>
+              </Select>
+            </FilterSection>
+          </div>
+
+          <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+              Date Range
+            </p>
+            <FilterSection label="From">
+              <Input
+                type="date"
+                className="bg-sidebar border-sidebar-border"
+                value={draftFilters.from}
+                onChange={(e) => setDraftFilters((prev) => ({ ...prev, from: e.target.value }))}
               />
             </FilterSection>
-
-            <FilterSection label="City">
-              <SearchableSelect
-                placeholder="All Cities"
-                searchPlaceholder="Search cities..."
-                items={citiesData?.data || []}
-                value={draftFilters.city === "all" ? "" : draftFilters.city}
-                onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, city: val || "all" }))
-                }
-                onSearch={setCitySearch}
-                isLoading={citiesLoading}
+            <FilterSection label="To">
+              <Input
+                type="date"
+                className="bg-sidebar border-sidebar-border"
+                value={draftFilters.to}
+                min={draftFilters.from || undefined}
+                onChange={(e) => setDraftFilters((prev) => ({ ...prev, to: e.target.value }))}
               />
             </FilterSection>
           </div>
@@ -187,4 +179,4 @@ const ModuleScheduleFilterDrawer = ({
   );
 };
 
-export default ModuleScheduleFilterDrawer;
+export default AllReportsFilterDrawer;

@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import TeacherCalendarView from "@/components/teacher/schedule/TeacherCalendarView";
 import ModuleScheduleFilterDrawer from "./ModuleScheduleFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getMoment } from "@/utils/dateUtils";
 
 const ModuleScheduleList = () => {
   const navigate = useNavigate();
@@ -25,24 +26,69 @@ const ModuleScheduleList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [view, setView] = useState("list");
   const [search, setSearch] = useState("");
-  const [appliedFilters, setAppliedFilters] = useState({ program: "all", batch: "all" });
-  const [draftFilters, setDraftFilters] = useState({ program: "all", batch: "all" });
+  const [appliedFilters, setAppliedFilters] = useState({ program: "all", batch: "all", city: "all" });
+  const [draftFilters, setDraftFilters] = useState({ program: "all", batch: "all", city: "all" });
+
+  // Calendar state
+  const [calendarViewType, setCalendarViewType] = useState("month");
+  const [calendarMonth, setCalendarMonth] = useState(getMoment().month() + 1);
+  const [calendarYear, setCalendarYear] = useState(getMoment().year());
+  const [weekStart, setWeekStart] = useState(getMoment().startOf("week"));
 
   const debouncedSearch = useDebounce(search, 500);
 
+  // Shared filter params (no pagination, no date)
+  const baseParams = {
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.batch !== "all" ? { batch_id: appliedFilters.batch } : {}),
+    ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
+  };
+
+  // List query — paginated, only active when in list view
   const { data, isLoading, error, refetch, isFetching } =
-    useGetPlanningByModule({
-      page,
-      limit: rowsPerPage,
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-      ...(appliedFilters.batch !== "all" ? { batch_id: appliedFilters.batch } : {}),
-    });
+    useGetPlanningByModule(
+      { ...baseParams, page, limit: rowsPerPage },
+      { enabled: view === "list" }
+    );
+
+  // Calendar query — no pagination, is_all, date-filtered, only active when in calendar view
+  const calendarDateParams =
+    calendarViewType === "week"
+      ? {
+          week_start: weekStart.toISOString(),
+          week_end: getMoment(weekStart).endOf("week").toISOString(),
+        }
+      : { month: calendarMonth, year: calendarYear };
+
+  const {
+    data: calendarData,
+    isLoading: calendarLoading,
+    error: calendarError,
+    refetch: calendarRefetch,
+  } = useGetPlanningByModule(
+    { ...baseParams, is_all: true, ...calendarDateParams },
+    { enabled: view === "calendar" }
+  );
 
   const sessions = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const calendarSessions = calendarData?.data || [];
 
   const handleView = (id) => {
     navigate({ to: "/teacher/schedules/$id", params: { id } });
+  };
+
+  const handleMonthChange = (month, year) => {
+    setCalendarMonth(month);
+    setCalendarYear(year);
+  };
+
+  const handleWeekChange = (newWeekStart) => {
+    setWeekStart(newWeekStart);
+  };
+
+  const handleViewTypeChange = (type) => {
+    setCalendarViewType(type);
   };
 
   return (
@@ -85,19 +131,24 @@ const ModuleScheduleList = () => {
         </div>
       </div>
 
-      {error ? (
+      {(view === "list" ? error : calendarError) ? (
         <div className="p-8 text-center">
           <ErrorMessage
-            message={error?.message || "Failed to load schedules"}
-            onRetry={refetch}
+            message={(view === "list" ? error : calendarError)?.message || "Failed to load schedules"}
+            onRetry={view === "list" ? refetch : calendarRefetch}
             variant="inline"
           />
         </div>
       ) : view === "calendar" ? (
         <TeacherCalendarView
-          sessions={sessions}
-          isLoading={isLoading}
+          sessions={calendarSessions}
+          isLoading={calendarLoading}
           onSessionClick={(session) => handleView(session.planning_id)}
+          onMonthChange={handleMonthChange}
+          viewType={calendarViewType}
+          onViewTypeChange={handleViewTypeChange}
+          currentWeekStart={weekStart}
+          onWeekChange={handleWeekChange}
         />
       ) : (
         <>
