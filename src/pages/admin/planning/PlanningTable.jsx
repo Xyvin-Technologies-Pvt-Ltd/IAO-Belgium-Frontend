@@ -48,6 +48,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(activeCity !== "all" ? { city: activeCity } : {}),
+    status: "active",
   });
   const { mutateAsync: deletePlanning, isPending: isDeleting } =
     useDeletePlanning();

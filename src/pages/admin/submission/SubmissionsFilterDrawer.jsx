@@ -67,8 +67,8 @@ const SubmissionsFilterDrawer = ({
   );
   const batches = batchesData?.data || [];
 
-  const activeFiltersCount = Object.values(appliedFilters).filter(
-    (val) => val !== "all",
+  const activeFiltersCount = Object.entries(appliedFilters).filter(
+    ([, val]) => val !== "all",
   ).length;
 
   return (
@@ -150,26 +150,7 @@ const SubmissionsFilterDrawer = ({
             >
               Submission
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FilterSection label="Status">
-                <Select
-                  value={draftFilters.status}
-                  onValueChange={(val) =>
-                    setDraftFilters((prev) => ({ ...prev, status: val }))
-                  }
-                >
-                  <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                    <SelectValue placeholder="All Statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="submitted">Submitted</SelectItem>
-                    <SelectItem value="passed">Passed</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FilterSection>
-
+            <div className="grid grid-cols-1 gap-4">
               <FilterSection label="Type">
                 <Select
                   value={draftFilters.submission_type}
@@ -185,9 +166,9 @@ const SubmissionsFilterDrawer = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="document">Document</SelectItem>
-                    <SelectItem value="link">Link</SelectItem>
-                    <SelectItem value="text">Text</SelectItem>
+                    <SelectItem value="case_studies">Case Studies</SelectItem>
+                    <SelectItem value="essays">Essays</SelectItem>
+                    <SelectItem value="internships">Internships</SelectItem>
                   </SelectContent>
                 </Select>
               </FilterSection>
@@ -331,7 +312,6 @@ const SubmissionsFilterDrawer = ({
             className="w-full border-sidebar-border"
             onClick={() => {
               const resetObj = {
-                status: "all",
                 submission_type: "all",
                 program: "all",
                 batch: "all",

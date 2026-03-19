@@ -21,7 +21,7 @@ import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 
-const LearningModule = ({ programId, onComponentCreated }) => {
+const LearningModule = ({ programId, onComponentCreated,languageId }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -162,6 +162,7 @@ const LearningModule = ({ programId, onComponentCreated }) => {
             onComponentCreated(componentType);
           }
         }}
+        programLanguageId={languageId}
       />
 
       <ViewComponent
