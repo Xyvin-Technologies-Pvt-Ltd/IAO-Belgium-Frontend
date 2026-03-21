@@ -85,33 +85,28 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
     return dates[dates.length - 1].format("MMM D, YYYY");
   };
 
-  // Helper function to get personnel from the first session
+  // Helper function to get unique personnel across all sessions
   const getPersonnelFromFirstSession = (sessions, role) => {
     if (!sessions || sessions.length === 0) return [];
-    
-    // Find the first session by date
-    const sortedSessions = [...sessions].filter(s => s.session_date).sort((a, b) => {
-      const dateA = new Date(a.session_date).getTime();
-      const dateB = new Date(b.session_date).getTime();
-      return dateA - dateB;
-    });
-
-    const firstSession = sortedSessions.length > 0 ? sortedSessions[0] : sessions[0];
-    if (!firstSession || !firstSession[role] || firstSession[role].length === 0) return [];
 
     const roleSingular = role.slice(0, -1); // 'teachers' -> 'teacher'
+    const seen = new Map();
 
-    return firstSession[role].map((item) => {
-      const person = item[roleSingular];
-      if (person && person._id) {
-        return {
-          _id: person._id,
-          name: `${person.first_name || ""} ${person.last_name || ""}`.trim(),
-          status: item.status || "pending",
-        };
-      }
-      return null;
-    }).filter(Boolean);
+    sessions.forEach((session) => {
+      if (!session[role]) return;
+      session[role].forEach((item) => {
+        const person = item[roleSingular];
+        if (person && person._id && !seen.has(person._id)) {
+          seen.set(person._id, {
+            _id: person._id,
+            name: `${person.first_name || ""} ${person.last_name || ""}`.trim(),
+            status: item.status || "pending",
+          });
+        }
+      });
+    });
+
+    return Array.from(seen.values());
   };
 
   // Helper function to render personnel chips with status colors

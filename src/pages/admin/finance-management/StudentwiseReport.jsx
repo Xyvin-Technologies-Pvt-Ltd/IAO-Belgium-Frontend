@@ -15,6 +15,18 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useGetAnalyticsByStudent } from "@/store/usePaymentStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
+
+const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
+
+const buildQueryFilters = (filters) => {
+  const query = {};
+  if (filters.status && filters.status !== "all") query.status = filters.status;
+  if (filters.purpose && filters.purpose !== "all") query.purpose = filters.purpose;
+  if (filters.from) query.from = filters.from;
+  if (filters.to) query.to = filters.to;
+  return query;
+};
 
 const StudentwiseReport = () => {
   const { t } = useTranslation();
@@ -22,6 +34,8 @@ const StudentwiseReport = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [draftFilters, setDraftFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
   const debouncedSearch = useDebounce(search, 500);
   useEffect(() => {
     updateBreadcrumbs([
@@ -40,9 +54,10 @@ const StudentwiseReport = () => {
   }, []);
   const { data, isLoading, error, refetch, isFetching } =
     useGetAnalyticsByStudent({
-      page: page,
+      page,
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...buildQueryFilters(appliedFilters),
     });
 
   const students = data?.data || [];
@@ -63,6 +78,12 @@ const StudentwiseReport = () => {
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+          <CityReportsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
           />
         </div>
 

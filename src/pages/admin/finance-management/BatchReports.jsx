@@ -5,53 +5,62 @@ import {
 } from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
+
+const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
+
+const buildQueryFilters = (filters) => {
+  const query = {};
+  if (filters.status && filters.status !== "all") query.status = filters.status;
+  if (filters.purpose && filters.purpose !== "all") query.purpose = filters.purpose;
+  if (filters.from) query.from = filters.from;
+  if (filters.to) query.to = filters.to;
+  return query;
+};
 
 const BatchReports = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [draftFilters, setDraftFilters] = useState(defaultFilters);
+  const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
 
   useEffect(() => {
     updateBreadcrumbs([
       { label: "Dashboard", path: "/admin/dashboard", navigable: false },
-      {
-        label: "Finance Reports",
-        path: "/admin/finance-reports",
-        navigable: true,
-      },
+      { label: "Finance Reports", path: "/admin/finance-reports", navigable: true },
       { label: "Batch Reports" },
     ]);
-
-    return () => {
-      updateBreadcrumbs([]);
-    };
+    return () => updateBreadcrumbs([]);
   }, []);
 
-  const {
-    data: chartDataFull,
-    isLoading: isLoadingChart,
-    error: errorChart,
-  } = useGetAnalyticsByBatch({});
+  const queryFilters = buildQueryFilters(appliedFilters);
 
-  const {
-    data: tableDataFull,
-    isLoading: isLoadingTable,
-    error: errorTable,
-  } = useGetAnalyticsByBatchList({ page, limit });
+  const { data: chartDataFull, isLoading: isLoadingChart, error: errorChart } =
+    useGetAnalyticsByBatch(queryFilters);
+
+  const { data: tableDataFull, isLoading: isLoadingTable, error: errorTable } =
+    useGetAnalyticsByBatchList({ ...queryFilters, page, limit });
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           Batch Reports
         </h2>
+        <CityReportsFilterDrawer
+          draftFilters={draftFilters}
+          setDraftFilters={setDraftFilters}
+          appliedFilters={appliedFilters}
+          setAppliedFilters={setAppliedFilters}
+        />
       </div>
       <AnalyticsChartView
         data={chartDataFull?.data}
         tableData={tableDataFull?.data}
         totalCount={{
           ...chartDataFull?.total_count,
-          total: tableDataFull?.total_count
+          total: tableDataFull?.total_count,
         }}
         page={page}
         limit={limit}

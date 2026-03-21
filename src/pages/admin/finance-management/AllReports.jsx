@@ -76,7 +76,7 @@ const AllReports = () => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex  flex-1 items-center  gap-2">
+        <div className="flex items-center justify-between gap-2">
           <Input
             placeholder={t("studentManagement.search")}
             className="max-w-xs"
