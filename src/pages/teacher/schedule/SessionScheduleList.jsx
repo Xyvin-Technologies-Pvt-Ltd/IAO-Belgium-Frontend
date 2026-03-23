@@ -66,11 +66,11 @@ const SessionScheduleList = () => {
     );
   }
 
-  const handleAttendence = (sessionId, componentId) => {
+  const handleAttendence = (sessionId, planningId) => {
     navigate({
       to: "/teacher/mark-attendance/$id",
       params: { id: sessionId },
-      search: { component_id: componentId },
+      search: { planning_id: planningId },
     });
   };
 
@@ -117,7 +117,7 @@ const SessionScheduleList = () => {
                 </Button>
                 <Button
                   onClick={() =>
-                    handleAttendence(session?._id, session?.component_id)
+                    handleAttendence(session?._id, session?.planning_id)
                   }
                   className="w-full sm:w-auto text-sm whitespace-nowrap"
                 >

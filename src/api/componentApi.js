@@ -30,7 +30,7 @@ export const updateComponent = async (id, data) => {
 };
 export const getStudentsByComponent = async (id,filter) => {
   try {
-    const response = await axiosInstance.get(`/student/component/${id}/students`, {
+    const response = await axiosInstance.get(`/student/planning/${id}/students`, {
       params: filter,
     });
     return response.data;
