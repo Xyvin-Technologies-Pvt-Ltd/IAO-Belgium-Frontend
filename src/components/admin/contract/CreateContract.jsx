@@ -1,0 +1,195 @@
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { X, Upload, FileText, ExternalLink } from "lucide-react";
+import FormField from "@/components/ui/forms/FormField";
+import FormActions from "@/components/ui/forms/FormActions";
+import { Label } from "@/components/ui/label";
+import { contractSchema } from "@/validations/admin/contract.validation";
+import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
+import { uploadFile } from "@/api/uploadApi";
+import { toast } from "sonner";
+
+const CreateContract = ({ open, onClose, contractData }) => {
+  const isEdit = !!contractData;
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null); // raw File object, not yet uploaded
+  const [fileName, setFileName] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(contractSchema),
+    defaultValues: { name: "", file: "" },
+  });
+
+  const fileValue = watch("file");
+  const createContract = useCreateContract();
+  const updateContract = useUpdateContract();
+
+  const handleClose = () => {
+    reset({ name: "", file: "" });
+    setFileName("");
+    setPendingFile(null);
+    setIsUploading(false);
+    onClose();
+  };
+
+  useEffect(() => {
+    if (open) {
+      if (contractData && isEdit) {
+        reset({ name: contractData.name || "", file: contractData.file || "" });
+        if (contractData.file) {
+          const urlFileName = contractData.file.split("/").pop().split("?")[0];
+          setFileName(urlFileName || "Current file");
+        } else {
+          setFileName("");
+        }
+      } else {
+        reset({ name: "", file: "" });
+        setFileName("");
+      }
+      setPendingFile(null);
+    }
+  }, [open, contractData, isEdit, reset]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Just store the file locally, don't upload yet
+    setPendingFile(file);
+    setFileName(file.name);
+    // Set a placeholder so validation knows a file is selected
+    setValue("file", "__pending__", { shouldValidate: true });
+  };
+
+  const onSubmit = async (formData) => {
+    setIsUploading(true);
+    try {
+      let fileUrl = formData.file;
+
+      // Upload only now, on submit
+      if (pendingFile) {
+        const response = await uploadFile(pendingFile);
+        fileUrl = response?.data?.file_url;
+        if (!fileUrl) throw new Error("Upload failed");
+      }
+
+      const payload = { name: formData.name, file: fileUrl };
+
+      if (isEdit) {
+        updateContract.mutate(
+          { id: contractData._id, data: payload },
+          { onSuccess: handleClose }
+        );
+      } else {
+        createContract.mutate(payload, { onSuccess: handleClose });
+      }
+    } catch {
+      toast.error("Failed to upload file");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  if (!open) return null;
+
+  const isSubmitting = createContract.isPending || updateContract.isPending || isUploading;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-96 p-6">
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              {isEdit ? "Edit Contract" : "Create Contract"}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-white/70">
+              {isEdit ? "Update contract details" : "Upload a new contract version"}
+            </p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <FormField
+            label="Contract Name"
+            placeholder="Enter contract name"
+            error={errors.name?.message}
+            required
+            {...register("name")}
+          />
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-900 dark:text-white">
+              Contract File <span className="text-red-500">*</span>
+            </Label>
+            <div
+              className="border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-primary transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <div className="flex flex-col items-center gap-2 text-center">
+                {fileValue ? (
+                  <>
+                    <FileText className="h-8 w-8 text-primary" />
+                    <p className="text-sm text-gray-600 dark:text-white/70 truncate max-w-full">
+                      {fileName || "File selected"}
+                    </p>
+                    {isEdit && contractData?.file && !pendingFile && (
+                      <a
+                        href={contractData.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-xs text-primary hover:underline"
+                      >
+                        View current document <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                    <p className="text-xs text-gray-400">Click to replace</p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-8 w-8 text-gray-400" />
+                    <p className="text-sm text-gray-500">
+                      Click to upload PDF or Word document
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+            {errors.file && (
+              <p className="text-sm text-red-500">{errors.file.message}</p>
+            )}
+          </div>
+
+          <FormActions
+            onCancel={handleClose}
+            isLoading={isSubmitting}
+            isEdit={isEdit}
+          />
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CreateContract;
