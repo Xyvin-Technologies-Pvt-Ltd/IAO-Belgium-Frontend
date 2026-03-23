@@ -31,7 +31,7 @@ const SessionAttendence = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
 
   const sessionId = params.id;
-  const componentId = search.component_id;
+  const planningId = search.planning_id;
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -39,12 +39,9 @@ const SessionAttendence = () => {
 
   const debouncedSearch = useDebounce(searchText, 500);
 
-  const { data: componentData, isLoading: isComponentLoading } =
-    useGetComponentById(componentId);
-  const component = componentData?.data;
 
   const { data, isLoading, error, refetch, isFetching } =
-    useGetStudentsByComponent(componentId, {
+    useGetStudentsByComponent(planningId, {
       page: page,
       limit: rowsPerPage,
       session_id: sessionId,
@@ -56,7 +53,7 @@ const SessionAttendence = () => {
   const students = data?.data?.students || [];
   const sessionDate = data?.data?.session_date;
   const totalRows = data?.total_count || 0;
-
+  const component = data?.data?.component_name;
   // Check if session date is in the future (before today)
   const isSessionFuture = sessionDate
     ? getMoment(sessionDate).startOf("day").isAfter(getMoment().startOf("day"))
@@ -67,7 +64,7 @@ const SessionAttendence = () => {
       updateBreadcrumbs([
         { label: "Dashboard", path: "/teacher/dashboard" },
         { label: "Modules", path: "/teacher/schedules" },
-        { label: component.name || "Module", path: "" },
+        { label: component || "Module", path: `/teacher/schedules/module/${planningId}` },
         { label: "Mark Attendance", path: "" },
       ]);
     }
@@ -93,21 +90,15 @@ const SessionAttendence = () => {
             Attendance Marking
           </h1>
 
-          {isComponentLoading ? (
+          {isLoading ? (
             <div className="h-8 w-64 bg-gray-200 animate-pulse rounded" />
-          ) : component ? (
+          ) : (
             <div className="flex items-center gap-4 flex-wrap">
               <h2 className="text-lg text-gray-700 font-medium">
-                {component.name || "N/A"}
+                {component || "N/A"}
               </h2>
-
-              {component.system_id && (
-                <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-                  {component.system_id}
-                </span>
-              )}
             </div>
-          ) : null}
+          )}
 
           {isSessionFuture && (
             <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md">

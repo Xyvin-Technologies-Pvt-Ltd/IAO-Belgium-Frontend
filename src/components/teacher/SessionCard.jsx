@@ -68,7 +68,7 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
               <span>{session.name || `Session ${index + 1}`}</span>
               <span>{formatDate(session.session_date)}</span>
               <span>{formatTime(session.start_time, session.end_time)}</span>
-              <span className="truncate text-muted-foreground">
+              <span className="text-muted-foreground line-clamp-2">
                 {teachers.length > 0 ? teachers.join(", ") : "TBA"}
               </span>
             </div>
