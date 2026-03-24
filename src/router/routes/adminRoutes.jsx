@@ -34,6 +34,7 @@ import Exams from "@/pages/admin/exam";
 import ExamDetail from "@/pages/admin/exam/ExamDetail";
 import AttendenceView from "@/pages/admin/student/AttendenceView";
 import AllContracts from "@/pages/admin/contract/AllContracts";
+import StudentContracts from "@/pages/admin/contract/StudentContracts";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -255,5 +256,9 @@ export const adminRoutes = [
   {
     path: "/admin/contracts",
     component: withPermissionProtection(AllContracts, "/admin/contracts"),
+  },
+  {
+    path: "/admin/student-contracts",
+    component: withPermissionProtection(StudentContracts, "/admin/contracts"),
   },
 ];

@@ -123,8 +123,17 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
           },
           {
             title: "Contracts",
-            url: "/admin/contracts",
             icon: ScrollText,
+            items: [
+              {
+                title: "All Contracts",
+                url: "/admin/contracts",
+              },
+              {
+                title: "Student Contracts",
+                url: "/admin/student-contracts",
+              },
+            ],
           },
         ],
       },
