@@ -12,6 +12,7 @@ import {
   Calendars,
   Award,
   ClipboardCheck,
+  ScrollText,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -119,6 +120,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.teacherQualifications"),
             url: "/admin/teacher-qualifications",
             icon: Award,
+          },
+          {
+            title: "Contracts",
+            url: "/admin/contracts",
+            icon: ScrollText,
           },
         ],
       },

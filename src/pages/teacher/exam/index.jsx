@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import { useGetTeacherExams } from "@/store/useExamStore";
 import { useNavigate } from "@tanstack/react-router";
+import StatusBadge from "@/components/StatusBadge";
 
 const ExamList = () => {
   const navigate = useNavigate();
@@ -59,9 +60,9 @@ const ExamList = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("exam.table.uid")}</TableHead>
             <TableHead>{t("exam.table.name")}</TableHead>
             <TableHead>{t("exam.table.module")}</TableHead>
+            <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
@@ -84,11 +85,10 @@ const ExamList = () => {
           ) : exams?.length > 0 ? (
             exams?.map((exam) => (
               <TableRow
-                key={exam.exam_component_id}
+                key={`${exam._id?.exam_component_id}-${exam._id?.planning_id}`}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(exam)}
               >
-                <TableCell>{exam?.uid}</TableCell>
                 <TableCell>{exam?.name}</TableCell>
                 <TableCell>
                   <div className="flex flex-col">
@@ -98,11 +98,12 @@ const ExamList = () => {
                     </span>
                   </div>
                 </TableCell>
+                <TableCell>{exam?.batch_name ?? "—"}</TableCell>
                 <TableCell>{exam?.total_questions ?? 0}</TableCell>
                 <TableCell>{exam?.duration ?? 0} min</TableCell>
                 <TableCell>{exam?.passing_marks ?? 0}</TableCell>
                 <TableCell>
-                  <ExamStatusBadge status={exam?.status} />
+                  <StatusBadge status={exam?.exam_session_status ?? "not_started"} />
                 </TableCell>
               </TableRow>
             ))
