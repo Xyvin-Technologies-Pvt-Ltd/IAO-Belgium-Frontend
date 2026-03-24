@@ -27,6 +27,9 @@ const statusVariants = {
   pass: "text-green-600",
   fail: "text-red-600",
   failed: "text-red-600",
+  started: "text-indigo-600",
+  not_started: "text-gray-500",
+  ended: "text-green-600",
 
   // Payment statuses
   paid: "text-green-600",
@@ -77,6 +80,8 @@ const StatusBadge = ({ status }) => {
     displayText = "In Progress";
   } else if (typeof status === "boolean") {
     displayText = status ? "Active" : "Inactive";
+  } else if (status === "not_started") {
+    displayText = "Not Started";
   } else {
     displayText = status;
   }
