@@ -6,7 +6,9 @@ export const uploadFile = async (file) => {
     formData.append("file", file);
 
     const response = await axiosInstance.post("/upload", formData, {
-      skipAuthRefresh: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     return response.data;
