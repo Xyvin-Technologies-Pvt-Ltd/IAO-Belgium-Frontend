@@ -28,3 +28,12 @@ export const updateContract = async (id, data) => {
   }
 };
 
+export const getStudentsContracts = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/contract/students`, { params: filter });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+

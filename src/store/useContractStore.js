@@ -2,6 +2,7 @@ import {
   getContracts,
   createContract,
   updateContract,
+  getStudentsContracts,
 } from "@/api/contractApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -42,6 +43,16 @@ export const useUpdateContract = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to update contract");
     },
+  });
+};
+
+export const useGetStudentsContracts = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["students-contracts", filter],
+    queryFn: () => getStudentsContracts(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
 
