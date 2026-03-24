@@ -12,11 +12,28 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     config.headers["x-api-key"] = apiKey;
-    
+
     const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // 4. Log request config for multipart requests
+    if (config.data instanceof FormData) {
+      console.log("[interceptor] 📦 Request is FormData — Content-Type will be set by browser");
+      console.log("[interceptor] FormData entries:");
+      for (const [key, value] of config.data.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: File { name: "${value.name}", size: ${value.size}, type: "${value.type}" }`);
+          if (value.size === 0) {
+            console.warn(`  ⚠️ File "${value.name}" has size 0 — this will cause an empty upload`);
+          }
+        } else {
+          console.log(`  ${key}:`, value);
+        }
+      }
+    }
+
     return config;
   },
   (error) => {

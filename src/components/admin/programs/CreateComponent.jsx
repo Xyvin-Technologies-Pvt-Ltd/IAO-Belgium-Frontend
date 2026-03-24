@@ -303,6 +303,15 @@ const CreateComponent = ({
             if (resource.type === "file" && resource.file) {
               // Upload new file
               try {
+                // 2. Log before calling upload API
+                console.log("[CreateComponent] 📤 About to upload resource file:", {
+                  name: resource.file.name,
+                  size: resource.file.size,
+                  type: resource.file.type,
+                });
+                if (resource.file.size === 0) {
+                  console.error("[CreateComponent] ❌ resource.file.size is 0 — empty file");
+                }
                 const response = await uploadFile(resource.file);
                 const fileUrl = response?.data?.file_url;
 

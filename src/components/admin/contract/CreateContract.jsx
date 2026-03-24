@@ -60,8 +60,22 @@ const CreateContract = ({ open, onClose, contractData }) => {
   }, [open, contractData, isEdit, reset]);
 
   const handleFileChange = (e) => {
+    // 1. Log the event and file details
+    console.log("[CreateContract] handleFileChange event:", e);
+    console.log("[CreateContract] e.target.files:", e.target.files);
+
     const file = e.target.files?.[0];
+    console.log("[CreateContract] Selected file:", file
+      ? { name: file.name, size: file.size, type: file.type }
+      : "null — no file selected"
+    );
+
     if (!file) return;
+
+    if (file.size === 0) {
+      console.warn("[CreateContract] ⚠️ Selected file has size 0 — empty file");
+    }
+
     // Just store the file locally, don't upload yet
     setPendingFile(file);
     setFileName(file.name);
@@ -76,6 +90,15 @@ const CreateContract = ({ open, onClose, contractData }) => {
 
       // Upload only now, on submit
       if (pendingFile) {
+        // 2. Log before calling upload API
+        console.log("[CreateContract] 📤 About to upload file:", {
+          name: pendingFile.name,
+          size: pendingFile.size,
+          type: pendingFile.type,
+        });
+        if (pendingFile.size === 0) {
+          console.error("[CreateContract] ❌ pendingFile.size is 0 — empty file, upload will fail");
+        }
         const response = await uploadFile(pendingFile);
         fileUrl = response?.data?.file_url;
         if (!fileUrl) throw new Error("Upload failed");
