@@ -31,6 +31,15 @@ export default function AdminTeacherLayout() {
         return
       }
     }
+
+    // Check if user is trying to access teacher routes
+    if (currentPath.startsWith("/teacher")) {
+      // Only TEACHER can access teacher routes
+      if (role !== "teacher") {
+        navigate({ to: "/login" })
+        return
+      }
+    }
   }, [isAuthenticated, role, isInitialized, navigate, location.pathname])
 
   // Show loading while initializing

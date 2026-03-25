@@ -21,7 +21,6 @@ import { useTranslation } from "react-i18next";
 import { useDeleteIntake, useGetIntakes } from "@/store/useIntakeStore";
 import CreateIntake from "@/components/admin/intake/CreateIntake";
 import StatusBadge from "@/components/StatusBadge";
-import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import IntakesFilterDrawer from "./IntakesFilterDrawer";
@@ -189,15 +188,17 @@ const Intakes = () => {
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
-                    ? formatTZ(i.start_date, "MMM DD, YYYY")
+                    ? moment.utc(i.start_date).format("MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {i?.end_date ? formatTZ(i.end_date, "MMM DD, YYYY") : "N/A"}
+                  {i?.end_date
+                    ? moment.utc(i.end_date).format("MMM DD, YYYY")
+                    : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.registration_deadline
-                    ? formatTZ(i.registration_deadline, "MMM DD, YYYY")
+                    ? moment.utc(i.registration_deadline).format("MMM DD, YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
