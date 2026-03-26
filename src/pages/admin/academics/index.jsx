@@ -22,6 +22,10 @@ const Academics = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
   const { data, isLoading, error, refetch } = useGetAcademic({
     page,
     limit: rowsPerPage,

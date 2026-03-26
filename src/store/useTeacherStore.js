@@ -4,6 +4,7 @@ import {
   getTeacher,
   getTeacherById,
   updateTeacher,
+  getSessionsByTeacherId,
 } from "@/api/teacherApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -70,5 +71,16 @@ export const useDeleteTeacher = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to delete teacher");
     },
+  });
+};
+
+export const useGetSessionsByTeacherId = (teacherId, params, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-sessions", teacherId, params],
+    queryFn: () => getSessionsByTeacherId(teacherId, params),
+    staleTime: 30000,
+    enabled: !!teacherId,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };

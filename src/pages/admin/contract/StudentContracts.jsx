@@ -14,12 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetStudentsContracts } from "@/store/useContractStore";
+import { set } from "zod";
 
 const StudentContracts = () => {
   const [page, setPage] = useState(1);
@@ -29,12 +30,17 @@ const StudentContracts = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, error, refetch, isFetching } = useGetStudentsContracts({
-    page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(status ? { status } : {}),
-  });
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, status]);
+
+  const { data, isLoading, error, refetch, isFetching } =
+    useGetStudentsContracts({
+      page,
+      limit: rowsPerPage,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(status ? { status } : {}),
+    });
 
   const contracts = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -48,7 +54,13 @@ const StudentContracts = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Select value={status} onValueChange={(val) => { setStatus(val === "all" ? "" : val); setPage(1); }}>
+        <Select
+          value={status}
+          onValueChange={(val) => {
+            setStatus(val === "all" ? "" : val);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-36">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
@@ -71,7 +83,9 @@ const StudentContracts = () => {
             <TableHead>Signed At</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
@@ -88,11 +102,14 @@ const StudentContracts = () => {
             contracts.map((item) => (
               <TableRow key={item._id}>
                 <TableCell>
-                  {item.application?.user?.first_name} {item.application?.user?.last_name}
+                  {item.application?.user?.first_name}{" "}
+                  {item.application?.user?.last_name}
                 </TableCell>
                 <TableCell>{item.application?.user?.email}</TableCell>
                 <TableCell>{item.contract?.name ?? "—"}</TableCell>
-                <TableCell>{item.contract?.version ? `v${item.contract.version}` : "—"}</TableCell>
+                <TableCell>
+                  {item.contract?.version ? `v${item.contract.version}` : "—"}
+                </TableCell>
                 <TableCell>
                   <span
                     className={`text-xs font-medium px-2 py-1 rounded-full ${
@@ -105,9 +122,11 @@ const StudentContracts = () => {
                   </span>
                 </TableCell>
                 <TableCell>
-                  {item.signed_at
-                    ? new Date(item.signed_at).toLocaleDateString()
-                    : <span className="text-gray-400">—</span>}
+                  {item.signed_at ? (
+                    new Date(item.signed_at).toLocaleDateString()
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))

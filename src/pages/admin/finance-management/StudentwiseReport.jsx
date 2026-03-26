@@ -37,6 +37,11 @@ const StudentwiseReport = () => {
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
   const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
   useEffect(() => {
     updateBreadcrumbs([
       { label: "Dashboard", path: "/admin/dashboard", navigable: false },
