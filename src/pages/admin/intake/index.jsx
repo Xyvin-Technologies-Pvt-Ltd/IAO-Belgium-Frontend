@@ -25,6 +25,7 @@ import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import IntakesFilterDrawer from "./IntakesFilterDrawer";
 
+
 const DEFAULT_FILTERS = { status: "all", city: "all", language: "all", country: "all" };
 
 const Intakes = () => {
@@ -43,7 +44,9 @@ const Intakes = () => {
   const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
   const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
-
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
   const { data, isLoading, error, refetch, isFetching } = useGetIntakes(id, {
     page: page,
     limit: rowsPerPage,

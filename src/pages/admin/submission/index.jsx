@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -55,6 +55,10 @@ const Submissions = () => {
   const [selectedTeacher, setSelectedTeacher] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetSubmissions({
     page: page,

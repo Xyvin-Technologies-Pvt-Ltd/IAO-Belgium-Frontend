@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Copy } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -55,6 +55,10 @@ const Programs = () => {
   });
 
   const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetPrograms({
     page: page,

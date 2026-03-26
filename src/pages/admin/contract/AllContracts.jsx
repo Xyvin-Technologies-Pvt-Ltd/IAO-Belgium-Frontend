@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -27,6 +27,10 @@ const AllContracts = () => {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+  
   const { data, isLoading, error, refetch, isFetching } = useGetContracts({
     page,
     limit: rowsPerPage,

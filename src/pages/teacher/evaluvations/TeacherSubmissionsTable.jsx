@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,7 +16,6 @@ import { useGetTeacherSubmissions } from "@/store/useSubmission";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
-import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
 
 const TeacherSubmissionsTable = ({ submissionType }) => {
@@ -28,6 +27,9 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
   const { data, isLoading, error, refetch, isFetching } =
     useGetTeacherSubmissions({
       page: page,

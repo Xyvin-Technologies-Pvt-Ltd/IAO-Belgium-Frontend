@@ -43,3 +43,12 @@ export const deleteTeacher = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getSessionsByTeacherId = async (teacherId, params) => {
+  try {
+    const response = await axiosInstance.get(`/planning/teacher/${teacherId}/sessions`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

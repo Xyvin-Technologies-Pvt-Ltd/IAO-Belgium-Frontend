@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -23,17 +23,35 @@ const AllReports = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [appliedFilters, setAppliedFilters] = useState({ status: "all", purpose: "all", from: "", to: "" });
-  const [draftFilters, setDraftFilters] = useState({ status: "all", purpose: "all", from: "", to: "" });
+  const [appliedFilters, setAppliedFilters] = useState({
+    status: "all",
+    purpose: "all",
+    from: "",
+    to: "",
+  });
+  const [draftFilters, setDraftFilters] = useState({
+    status: "all",
+    purpose: "all",
+    from: "",
+    to: "",
+  });
 
   const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, appliedFilters]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetPayments({
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
-    ...(appliedFilters.purpose !== "all" ? { purpose: appliedFilters.purpose } : {}),
+    ...(appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
+    ...(appliedFilters.purpose !== "all"
+      ? { purpose: appliedFilters.purpose }
+      : {}),
     ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
     ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
   });
