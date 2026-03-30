@@ -13,6 +13,7 @@ import {
   Award,
   ClipboardCheck,
   ScrollText,
+  Bell,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -90,6 +91,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.studentManagement"),
             url: "/admin/student-management",
             icon: Users,
+          },
+          {
+            title: "Notification Management",
+            url: "/admin/notification-management",
+            icon: Bell,
           },
         ],
       },

@@ -35,6 +35,7 @@ import ExamDetail from "@/pages/admin/exam/ExamDetail";
 import AttendenceView from "@/pages/admin/student/AttendenceView";
 import AllContracts from "@/pages/admin/contract/AllContracts";
 import StudentContracts from "@/pages/admin/contract/StudentContracts";
+import Notifications from "@/pages/admin/notification";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -260,5 +261,9 @@ export const adminRoutes = [
   {
     path: "/admin/student-contracts",
     component: withPermissionProtection(StudentContracts, "/admin/contracts"),
+  },
+  {
+    path: "/admin/notification-management",
+    component: withPermissionProtection(Notifications, "/admin/notification-management"),
   },
 ];

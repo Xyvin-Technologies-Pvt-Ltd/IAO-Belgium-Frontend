@@ -19,6 +19,8 @@ const statusVariants = {
   published: "text-green-600",
   archived: "text-gray-500",
   sended: "text-green-600",
+  scheduled: "text-blue-600",
+  sent: "text-green-600",
   closed: "text-red-500",
 
   // Submission statuses
