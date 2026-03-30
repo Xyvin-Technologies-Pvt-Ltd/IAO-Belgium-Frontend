@@ -1,5 +1,17 @@
-import { getTeacherNotifications, markNotificationAsRead, getUnreadTeacherNotificationsCount } from "@/api/notificationApi";
+import {
+  getTeacherNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  clearNotification,
+  getUnreadTeacherNotificationsCount,
+  getAdminNotifications,
+  createAdminNotification,
+  updateAdminNotification,
+  deleteAdminNotification,
+  sendAdminNotification,
+} from "@/api/notificationApi";
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useGetTeacherNotifications = (filter, options = {}) => {
   return useQuery({
@@ -8,20 +20,6 @@ export const useGetTeacherNotifications = (filter, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
-  });
-};
-
-export const useMarkNotificationAsRead = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id) => markNotificationAsRead(id),
-    onSuccess: () => {
-      // Invalidate both caches to refresh the UI immediately
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-infinite"] });
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-unread"] });
-    },
   });
 };
 
@@ -45,5 +43,122 @@ export const useInfiniteTeacherNotifications = (filter, options = {}) => {
       return currentCount < lastPage.total_count ? allPages.length + 1 : undefined;
     },
     ...options,
+  });
+};
+
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => markNotificationAsRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-infinite"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-unread"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark notification as read");
+    },
+  });
+};
+
+export const useMarkAllNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => markAllNotificationsAsRead(),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-infinite"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-unread"] });
+      toast.success(response?.message || "All notifications marked as read");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark all notifications as read");
+    },
+  });
+};
+
+export const useClearNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => clearNotification(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-infinite"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-unread"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to clear notification");
+    },
+  });
+};
+
+// ─── Admin hooks ─────────────────────────────────────────────────────────────
+
+export const useGetAdminNotifications = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-notifications", params],
+    queryFn: () => getAdminNotifications(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useCreateAdminNotification = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createAdminNotification,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
+      toast.success(response?.message || "Notification created successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to create notification");
+    },
+  });
+};
+
+export const useUpdateAdminNotification = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => updateAdminNotification(id, data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
+      toast.success(response?.message || "Notification updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update notification");
+    },
+  });
+};
+
+export const useDeleteAdminNotification = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAdminNotification,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
+      toast.success(response?.message || "Notification deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete notification");
+    },
+  });
+};
+
+export const useSendAdminNotification = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendAdminNotification,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
+      toast.success(response?.message || "Notification sent successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to send notification");
+    },
   });
 };

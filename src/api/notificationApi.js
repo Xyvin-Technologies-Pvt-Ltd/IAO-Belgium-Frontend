@@ -2,7 +2,7 @@ import axiosInstance from "./axiosintercepter";
 
 export const getTeacherNotifications = async (filter) => {
   try {
-    const response = await axiosInstance.get(`/notification/teacher`, {
+    const response = await axiosInstance.get(`/notification/me`, {
       params: filter,
     });
     return response.data;
@@ -20,9 +20,74 @@ export const markNotificationAsRead = async (id) => {
   }
 };
 
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const response = await axiosInstance.patch(`/notification/read-all`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const clearNotification = async (id) => {
+  try {
+    const response = await axiosInstance.patch(`/notification/${id}/clear`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getUnreadTeacherNotificationsCount = async () => {
   try {
-    const response = await axiosInstance.get(`/notification/teacher/unread-count`);
+    const response = await axiosInstance.get(`/notification/me/unread-count`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── Admin-facing ─────────────────────────────────────────────────────────────
+
+export const getAdminNotifications = async (params) => {
+  try {
+    const response = await axiosInstance.get(`/notification`, { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const createAdminNotification = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/notification`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateAdminNotification = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/notification/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteAdminNotification = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/notification/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const sendAdminNotification = async (id) => {
+  try {
+    const response = await axiosInstance.post(`/notification/${id}/send`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
