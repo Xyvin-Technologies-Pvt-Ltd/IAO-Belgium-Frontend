@@ -99,21 +99,21 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               label="Tool Name"
-              placeholder="e.g. Enatom 3D Anatomy"
+              placeholder="Enter a display name for this tool"
               error={errors.name?.message}
               required
               {...register("name", { required: "Name is required" })}
             />
             <FormField
               label="Client ID"
-              placeholder="Provided by the tool (Enatom)"
+              placeholder="Unique identifier provided by the external tool"
               error={errors.client_id?.message}
               required
               {...register("client_id", { required: "Client ID is required" })}
             />
             <FormField
               label="Deployment ID"
-              placeholder="e.g. 1"
+              placeholder="Deployment identifier from the tool provider"
               error={errors.deployment_id?.message}
               required
               {...register("deployment_id", {
@@ -122,7 +122,7 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
             />
             <FormField
               label="OIDC Login URL"
-              placeholder="https://app.enatom.com/lti/launch"
+              placeholder="https://tool-provider.com/lti/login"
               error={errors.oidc_login_url?.message}
               required
               {...register("oidc_login_url", {
@@ -135,7 +135,7 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
             />
             <FormField
               label="Redirect URI"
-              placeholder="https://app.enatom.com/lti/callback"
+              placeholder="https://tool-provider.com/lti/callback"
               error={errors.redirect_uri?.message}
               required
               {...register("redirect_uri", {
@@ -148,7 +148,7 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
             />
             <FormField
               label="JWKS URL"
-              placeholder="https://app.enatom.com/oauth/v2/.well-known/jwks.json"
+              placeholder="https://tool-provider.com/.well-known/jwks.json"
               error={errors.jwks_url?.message}
               required
               {...register("jwks_url", {
@@ -160,8 +160,8 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
               })}
             />
             <FormField
-              label="Launch URL (optional)"
-              placeholder="https://app.enatom.com/app"
+              label="Launch URL"
+              placeholder="https://tool-provider.com/app (optional)"
               error={errors.launch_url?.message}
               {...register("launch_url", {
                 pattern: {
