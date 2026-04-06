@@ -22,6 +22,7 @@ const LtiManagement = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPlatformConfigOpen, setIsPlatformConfigOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState(null);
+  const [platformConfigToolId, setPlatformConfigToolId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -39,6 +40,11 @@ const LtiManagement = () => {
   const handleOpenEdit = (tool) => {
     setSelectedTool(tool);
     setIsRegisterOpen(true);
+  };
+
+  const handleOpenPlatformConfig = (toolId) => {
+    setPlatformConfigToolId(toolId || null);
+    setIsPlatformConfigOpen(true);
   };
 
   const handleDeleteClick = (id) => {
@@ -71,13 +77,6 @@ const LtiManagement = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsPlatformConfigOpen(true)}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Platform Config
-          </Button>
           <Button onClick={handleOpenCreate}>
             <Plus className="h-4 w-4 mr-2" />
             Register Tool
@@ -135,6 +134,11 @@ const LtiManagement = () => {
                         onClick: () => handleOpenEdit(tool),
                       },
                       {
+                        label: "Platform Config",
+                        icon: Settings,
+                        onClick: () => handleOpenPlatformConfig(tool._id),
+                      },
+                      {
                         label: "Deactivate",
                         icon: Trash2,
                         onClick: () => handleDeleteClick(tool._id),
@@ -168,6 +172,7 @@ const LtiManagement = () => {
       <PlatformConfigModal
         open={isPlatformConfigOpen}
         onClose={() => setIsPlatformConfigOpen(false)}
+        toolId={platformConfigToolId}
       />
 
       <DeleteConfirm

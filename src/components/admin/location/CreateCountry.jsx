@@ -161,7 +161,7 @@ const CreateCountry = ({ open, onClose, countryData }) => {
                 <SelectContent>
                   {CURRENCIES.map((currency) => (
                     <SelectItem key={currency.code} value={currency.code}>
-                      {currency.code} - {currency.name}
+                      {currency.code} - {t(`currencies.${currency.code}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 import { Settings, Loader2, Plus } from "lucide-react";
 import {
   useGetProgramConfigs,
@@ -27,6 +28,7 @@ import {
 } from "@/store/useProgramConfigStore";
 
 const ProgramConfigDrawer = ({ programId }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -187,7 +189,7 @@ const ProgramConfigDrawer = ({ programId }) => {
       <SheetTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Settings className="h-4 w-4" />
-          Program Configuration
+          {t("programConfig.title")}
         </Button>
       </SheetTrigger>
 
@@ -216,10 +218,10 @@ const ProgramConfigDrawer = ({ programId }) => {
             </div>
             <div className="flex-1">
               <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                Program Configuration
+                {t("programConfig.title")}
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Configure academic requirements and thresholds
+                {t("programConfig.subtitle")}
               </p>
             </div>
           </div>
@@ -236,7 +238,7 @@ const ProgramConfigDrawer = ({ programId }) => {
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                    Select Year
+                    {t("programConfig.selectYear")}
                   </p>
                   <Button
                     size="sm"
@@ -245,13 +247,13 @@ const ProgramConfigDrawer = ({ programId }) => {
                     className="h-8 gap-1.5"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    New Year
+                    {t("programConfig.newYear")}
                   </Button>
                 </div>
                 
                 {isCreatingNew ? (
                   <div className="space-y-2">
-                    <Label htmlFor="year">Year (1st, 2nd, 3rd, etc.)</Label>
+                    <Label htmlFor="year">{t("programConfig.yearLabel")}</Label>
                     <Input
                       id="year"
                       type="number"
@@ -259,35 +261,35 @@ const ProgramConfigDrawer = ({ programId }) => {
                       value={formData.year}
                       onChange={(e) => updateField("year", parseInt(e.target.value))}
                       className="bg-sidebar border-sidebar-border"
-                      placeholder="e.g., 1 for first year"
+                      placeholder={t("programConfig.yearPlaceholder")}
                     />
                     <p className="text-xs text-dashboard-text-secondary">
-                      Creating configuration for a new program year
+                      {t("programConfig.yearHint")}
                     </p>
                   </div>
                 ) : allConfigs.length > 0 ? (
                   <div className="space-y-2">
-                    <Label htmlFor="year-select">Program Year</Label>
+                    <Label htmlFor="year-select">{t("programConfig.programYear")}</Label>
                     <Select value={selectedYear?.toString()} onValueChange={handleYearChange}>
                       <SelectTrigger className="bg-sidebar border-sidebar-border">
-                        <SelectValue placeholder="Select a year" />
+                        <SelectValue placeholder={t("programConfig.yearPlaceholderSelect")} />
                       </SelectTrigger>
                       <SelectContent>
                         {allConfigs.map((config) => (
                           <SelectItem key={config._id} value={config.year.toString()}>
-                            Year {config.year} {!config.status && "(Inactive)"}
+                            {t("programConfig.yearDisplay", { year: config.year })} {!config.status && `(${t("common.inactive")})`}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-dashboard-text-secondary">
-                      Viewing configuration for Year {selectedYear}
+                      {t("programConfig.yearViewing", { year: selectedYear })}
                     </p>
                   </div>
                 ) : (
                   <div className="text-center py-4">
                     <p className="text-sm text-dashboard-text-secondary">
-                      No configurations yet. Click "New Year" to create one.
+                      {t("programConfig.noConfigs")}
                     </p>
                   </div>
                 )}
@@ -296,13 +298,13 @@ const ProgramConfigDrawer = ({ programId }) => {
               {/* Exams */}
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                  Exam Requirements
+                  {t("programConfig.requirements.exam.title")}
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="exams-required" className="font-medium">Exams Required</Label>
+                    <Label htmlFor="exams-required" className="font-medium">{t("programConfig.requirements.exam.required")}</Label>
                     <p className="text-xs text-dashboard-text-secondary mt-1">
-                      Students must pass all module exams to progress
+                      {t("programConfig.requirements.exam.hint")}
                     </p>
                   </div>
                   <Switch
@@ -316,11 +318,11 @@ const ProgramConfigDrawer = ({ programId }) => {
               {/* Attendance */}
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                  Attendance Requirements
+                  {t("programConfig.requirements.attendance.title")}
                 </p>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="overall-attendance">Overall Minimum Percentage (%)</Label>
+                    <Label htmlFor="overall-attendance">{t("programConfig.requirements.attendance.overallMin")}</Label>
                     <Input
                       id="overall-attendance"
                       type="number"
@@ -332,7 +334,7 @@ const ProgramConfigDrawer = ({ programId }) => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="module-attendance">Per Module Minimum Percentage (%)</Label>
+                    <Label htmlFor="module-attendance">{t("programConfig.requirements.attendance.perModuleMin")}</Label>
                     <Input
                       id="module-attendance"
                       type="number"
@@ -349,15 +351,15 @@ const ProgramConfigDrawer = ({ programId }) => {
               {/* Submissions */}
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                  Submission Requirements
+                  {t("programConfig.requirements.submission.title")}
                 </p>
 
                 {/* Case Studies */}
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="case-studies-required" className="font-medium">Case Studies</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                      <Label htmlFor="case-studies-required" className="font-medium">{t("programConfig.requirements.submission.caseStudies")}</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
                     </div>
                     <Switch
                       id="case-studies-required"
@@ -367,7 +369,7 @@ const ProgramConfigDrawer = ({ programId }) => {
                   </div>
                   <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
                     <Label htmlFor="case-studies-pass" className="text-xs">
-                      {formData.submissions.case_studies.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                      {formData.submissions.case_studies.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
                     </Label>
                     <Input
                       id="case-studies-pass"
@@ -385,8 +387,8 @@ const ProgramConfigDrawer = ({ programId }) => {
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="essays-required" className="font-medium">Essays</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                      <Label htmlFor="essays-required" className="font-medium">{t("programConfig.requirements.submission.essays")}</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
                     </div>
                     <Switch
                       id="essays-required"
@@ -396,7 +398,7 @@ const ProgramConfigDrawer = ({ programId }) => {
                   </div>
                   <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
                     <Label htmlFor="essays-pass" className="text-xs">
-                      {formData.submissions.essays.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                      {formData.submissions.essays.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
                     </Label>
                     <Input
                       id="essays-pass"
@@ -414,8 +416,8 @@ const ProgramConfigDrawer = ({ programId }) => {
                 <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="internships-required" className="font-medium">Internships</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">Mandatory for Year Completion</p>
+                      <Label htmlFor="internships-required" className="font-medium">{t("programConfig.requirements.submission.internships")}</Label>
+                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
                     </div>
                     <Switch
                       id="internships-required"
@@ -425,7 +427,7 @@ const ProgramConfigDrawer = ({ programId }) => {
                   </div>
                   <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
                     <Label htmlFor="internships-pass" className="text-xs">
-                      {formData.submissions.internships.required ? "Min. Passing Percentage (%)" : "Pass Mark (%)"}
+                      {formData.submissions.internships.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
                     </Label>
                     <Input
                       id="internships-pass"
@@ -443,10 +445,10 @@ const ProgramConfigDrawer = ({ programId }) => {
               {/* Internship */}
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                  Internship Requirements
+                  {t("programConfig.requirements.internship.title")}
                 </p>
                 <div className="space-y-2">
-                  <Label htmlFor="min-cases">Minimum Cases</Label>
+                  <Label htmlFor="min-cases">{t("programConfig.requirements.internship.minCases")}</Label>
                   <Input
                     id="min-cases"
                     type="number"
@@ -462,9 +464,9 @@ const ProgramConfigDrawer = ({ programId }) => {
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="status" className="font-medium">Active Status</Label>
+                    <Label htmlFor="status" className="font-medium">{t("programConfig.activeStatus")}</Label>
                     <p className="text-xs text-dashboard-text-secondary mt-1">
-                      Enable or disable this configuration
+                      {t("programConfig.activeStatusHint")}
                     </p>
                   </div>
                   <Switch
@@ -491,7 +493,7 @@ const ProgramConfigDrawer = ({ programId }) => {
         >
           <SheetClose asChild>
             <Button variant="outline" className="flex-1 border-sidebar-border" disabled={isSaving}>
-              Cancel
+              {t("common.cancel")}
             </Button>
           </SheetClose>
           <Button 
@@ -502,10 +504,10 @@ const ProgramConfigDrawer = ({ programId }) => {
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("programConfig.actions.saving")}
               </>
             ) : (
-              <>{isEditing ? "Update" : "Create"} Configuration</>
+              <>{isEditing ? t("programConfig.actions.update") : t("programConfig.actions.create")}</>
             )}
           </Button>
         </SheetFooter>

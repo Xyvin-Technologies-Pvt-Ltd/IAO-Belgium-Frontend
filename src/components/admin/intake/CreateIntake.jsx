@@ -160,7 +160,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
           <SearchableMultiSelect
             label={t("intakeManagement.modal.programLabel")}
             placeholder={t("intakeManagement.modal.programPlaceholder")}
-            searchPlaceholder="Search programs..."
+            searchPlaceholder={t("intakeManagement.modal.searchPrograms")}
             items={formattedProgramsData}
             selected={selectedPrograms}
             onChange={(val) =>

@@ -148,7 +148,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
           <SearchableSelect
             label={t("cityManagement.modal.countryLabel")}
             placeholder={t("cityManagement.modal.countryPlaceholder")}
-            searchPlaceholder="Search countries..."
+            searchPlaceholder={t("cityManagement.modal.searchCountries")}
             items={countries}
             value={selectedCountry || ""}
             onChange={(value) =>

@@ -49,12 +49,12 @@ const BatchYearLog = () => {
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead>{t("batchManagement.table.student")}</TableHead>
-              <TableHead className="text-center">Year</TableHead>
-              <TableHead className="text-center">Action</TableHead>
-              <TableHead className="text-center">Source</TableHead>
-              <TableHead>Details</TableHead>
-              <TableHead className="text-center">Date</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.year")}</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.action")}</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.source")}</TableHead>
+              <TableHead>{t("batchManagement.yearLog.details")}</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.date")}</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -91,7 +91,7 @@ const BatchYearLog = () => {
                     <span className="capitalize">{log.trigger_source}</span>
                   </TableCell>
                   <TableCell className="max-w-xs truncate" title={log.details}>
-                    {log.details || "-"}
+                    {log.details || t("common.dash")}
                   </TableCell>
                   <TableCell className="text-center text-muted-foreground whitespace-nowrap">
                     {getMoment(log.createdAt).format("MMM D, YYYY HH:mm")}
@@ -103,12 +103,12 @@ const BatchYearLog = () => {
                         variant="outline"
                         onClick={() => handleRecalculate(log.application._id)}
                         disabled={recalculateMutation.isPending}
-                        title="Recalculate year completion"
+                        title={t("batchManagement.yearLog.recalculate")}
                       >
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                     ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
+                      <span className="text-xs text-muted-foreground">{t("common.dash")}</span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -116,7 +116,7 @@ const BatchYearLog = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
-                  No year completion logs found for this batch.
+                  {t("batchManagement.yearLog.noLogs")}
                 </TableCell>
               </TableRow>
             )}

@@ -52,7 +52,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       trainees: [],
       sessions: [
         {
-          name: "Session 1",
+          name: `${t("planningManagement.calendar.session")} 1`,
           session_date: "",
           start_time: "",
           end_time: "",
@@ -152,7 +152,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       trainees: [],
       sessions: [
         {
-          name: "Session 1",
+          name: `${t("planningManagement.calendar.session")} 1`,
           session_date: "",
           start_time: "",
           end_time: "",
@@ -332,7 +332,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     }
 
     append({
-      name: `Session ${sessionNumber}`,
+      name: `${t("planningManagement.calendar.session")} ${sessionNumber}`,
       session_date: defaultDate,
       start_time: "",
       end_time: "",

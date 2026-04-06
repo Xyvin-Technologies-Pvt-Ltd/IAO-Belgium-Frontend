@@ -120,7 +120,7 @@ const BatchAttendence = () => {
                     className="text-center min-w-17.5 border-l px-2"
                   >
                     <div className="text-xs font-normal text-muted-foreground italic">
-                      -
+                      {t("common.dash")}
                     </div>
                   </TableHead>
                 ),
@@ -179,7 +179,7 @@ const BatchAttendence = () => {
                         key={`${module.module_id}-no-session`}
                         className="text-center border-l py-2 text-muted-foreground italic"
                       >
-                        -
+                        {t("common.dash")}
                       </TableCell>
                     ),
                   )}

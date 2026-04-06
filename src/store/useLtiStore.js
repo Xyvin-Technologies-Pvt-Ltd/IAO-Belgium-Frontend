@@ -25,10 +25,10 @@ export const useGetLtiToolById = (id, options = {}) =>
     ...options,
   });
 
-export const useGetLtiPlatformConfig = (options = {}) =>
+export const useGetLtiPlatformConfig = (toolId, options = {}) =>
   useQuery({
-    queryKey: ["lti-platform-config"],
-    queryFn: getLtiPlatformConfig,
+    queryKey: ["lti-platform-config", toolId],
+    queryFn: () => getLtiPlatformConfig(toolId),
     staleTime: 60000,
     ...options,
   });

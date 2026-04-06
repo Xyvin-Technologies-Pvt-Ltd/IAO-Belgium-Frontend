@@ -4,8 +4,10 @@ import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateLtiTool, useUpdateLtiTool } from "@/store/useLtiStore";
+import { useTranslation } from "react-i18next";
 
 const RegisterLtiTool = ({ open, onClose, toolData }) => {
+  const { t } = useTranslation();
   const isEdit = !!toolData;
   const { mutate: createTool, isPending: isCreating } = useCreateLtiTool();
   const { mutate: updateTool, isPending: isUpdating } = useUpdateLtiTool();
@@ -18,8 +20,6 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
   } = useForm({
     defaultValues: {
       name: "",
-      client_id: "",
-      deployment_id: "",
       oidc_login_url: "",
       redirect_uri: "",
       jwks_url: "",
@@ -32,8 +32,6 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
     if (toolData) {
       reset({
         name: toolData.name || "",
-        client_id: toolData.client_id || "",
-        deployment_id: toolData.deployment_id || "",
         oidc_login_url: toolData.oidc_login_url || "",
         redirect_uri: toolData.redirect_uri || "",
         jwks_url: toolData.jwks_url || "",
@@ -42,8 +40,6 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
     } else {
       reset({
         name: "",
-        client_id: "",
-        deployment_id: "",
         oidc_login_url: "",
         redirect_uri: "",
         jwks_url: "",
@@ -77,12 +73,14 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isEdit ? "Edit LTI Tool" : "Register LTI Tool"}
+                {isEdit
+                  ? t("lti.registerTool.editTitle")
+                  : t("lti.registerTool.createTitle")}
               </h2>
               <p className="text-sm text-gray-500 dark:text-white/70 mt-1">
                 {isEdit
-                  ? "Update the LTI 1.3 tool credentials"
-                  : "Add a new LTI 1.3 external tool (e.g. Enatom)"}
+                  ? t("lti.registerTool.editSubtitle")
+                  : t("lti.registerTool.createSubtitle")}
               </p>
             </div>
             <button
@@ -98,75 +96,87 @@ const RegisterLtiTool = ({ open, onClose, toolData }) => {
         <div className="overflow-y-auto flex-1 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <FormField
-              label="Tool Name"
-              placeholder="Enter a display name for this tool"
+              label={t("lti.registerTool.nameLabel")}
+              placeholder={t("lti.registerTool.namePlaceholder")}
               error={errors.name?.message}
               required
-              {...register("name", { required: "Name is required" })}
-            />
-            <FormField
-              label="Client ID"
-              placeholder="Unique identifier provided by the external tool"
-              error={errors.client_id?.message}
-              required
-              {...register("client_id", { required: "Client ID is required" })}
-            />
-            <FormField
-              label="Deployment ID"
-              placeholder="Deployment identifier from the tool provider"
-              error={errors.deployment_id?.message}
-              required
-              {...register("deployment_id", {
-                required: "Deployment ID is required",
+              {...register("name", {
+                required: t("lti.registerTool.errors.nameRequired"),
               })}
             />
+            {isEdit && (
+              <>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-gray-500 dark:text-white/50 uppercase tracking-wide">
+                    {t("lti.registerTool.clientIdLabel")}
+                  </p>
+                  <div className="bg-gray-50 dark:bg-white/5 border dark:border-white/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-mono text-gray-500 dark:text-white/50 break-all">
+                      {toolData?.client_id}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t("lti.registerTool.generatedByPlatform")}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-gray-500 dark:text-white/50 uppercase tracking-wide">
+                    {t("lti.registerTool.deploymentIdLabel")}
+                  </p>
+                  <div className="bg-gray-50 dark:bg-white/5 border dark:border-white/10 rounded-lg px-3 py-2">
+                    <span className="text-sm font-mono text-gray-500 dark:text-white/50 break-all">
+                      {toolData?.deployment_id}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t("lti.registerTool.generatedByPlatform")}</p>
+                </div>
+              </>
+            )}
             <FormField
-              label="OIDC Login URL"
-              placeholder="https://tool-provider.com/lti/login"
+              label={t("lti.registerTool.oidcLoginUrlLabel")}
+              placeholder={t("lti.registerTool.oidcLoginUrlPlaceholder")}
               error={errors.oidc_login_url?.message}
               required
               {...register("oidc_login_url", {
-                required: "OIDC Login URL is required",
+                required: t("lti.registerTool.errors.oidcLoginUrlRequired"),
                 pattern: {
                   value: /^https:\/\/.+/,
-                  message: "Must be a valid HTTPS URL",
+                  message: t("lti.registerTool.errors.invalidHttps"),
                 },
               })}
             />
             <FormField
-              label="Redirect URI"
-              placeholder="https://tool-provider.com/lti/callback"
+              label={t("lti.registerTool.redirectUriLabel")}
+              placeholder={t("lti.registerTool.redirectUriPlaceholder")}
               error={errors.redirect_uri?.message}
               required
               {...register("redirect_uri", {
-                required: "Redirect URI is required",
+                required: t("lti.registerTool.errors.redirectUriRequired"),
                 pattern: {
                   value: /^https:\/\/.+/,
-                  message: "Must be a valid HTTPS URL",
+                  message: t("lti.registerTool.errors.invalidHttps"),
                 },
               })}
             />
             <FormField
-              label="JWKS URL"
-              placeholder="https://tool-provider.com/.well-known/jwks.json"
+              label={t("lti.registerTool.jwksUrlLabel")}
+              placeholder={t("lti.registerTool.jwksUrlPlaceholder")}
               error={errors.jwks_url?.message}
               required
               {...register("jwks_url", {
-                required: "JWKS URL is required",
+                required: t("lti.registerTool.errors.jwksUrlRequired"),
                 pattern: {
                   value: /^https:\/\/.+/,
-                  message: "Must be a valid HTTPS URL",
+                  message: t("lti.registerTool.errors.invalidHttps"),
                 },
               })}
             />
             <FormField
-              label="Launch URL"
-              placeholder="https://tool-provider.com/app (optional)"
+              label={t("lti.registerTool.launchUrlLabel")}
+              placeholder={t("lti.registerTool.launchUrlPlaceholder")}
               error={errors.launch_url?.message}
               {...register("launch_url", {
                 pattern: {
                   value: /^https:\/\/.+/,
-                  message: "Must be a valid HTTPS URL",
+                  message: t("lti.registerTool.errors.invalidHttps"),
                 },
               })}
             />

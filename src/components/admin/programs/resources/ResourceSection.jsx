@@ -1,5 +1,5 @@
-import React from "react";
 import { useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Plus, Trash, FileText, Link as LinkIcon, ExternalLink, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const ResourceSection = ({ control, register, setValue, append, remove, fields, errors }) => {
+  const { t } = useTranslation();
   const resources = useWatch({
     control,
     name: "resources",
@@ -38,7 +39,9 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-base font-semibold">Resources</Label>
+        <Label className="text-base font-semibold">
+          {t("resourceModule.resources.title")}
+        </Label>
       </div>
 
       <div className="space-y-2">
@@ -59,12 +62,12 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
                   
                   {resource.type === "link" ? (
                     <div className="flex-1 space-y-1">
-                      <Input
-                        size="sm"
-                        placeholder="Enter URL (Link)"
-                        className="h-8"
-                        {...register(`resources.${index}.url`)}
-                      />
+                        <Input
+                          size="sm"
+                          placeholder={t("resourceModule.resources.enterUrl")}
+                          className="h-8"
+                          {...register(`resources.${index}.url`)}
+                        />
                       {errors?.resources?.[index]?.url && (
                         <p className="text-[10px] text-red-500">
                           {errors.resources[index].url.message}
@@ -74,7 +77,10 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
                   ) : (
                     <div className="flex-1 truncate">
                       <span className="text-sm font-medium">
-                        {resource.file ? resource.file.name : resource.name || "Existing File"}
+                        {resource.file
+                          ? resource.file.name
+                          : resource.name ||
+                            t("resourceModule.resources.existingFile")}
                       </span>
                       {resource.file && (
                         <span className="ml-2 text-[10px] text-muted-foreground">
@@ -114,8 +120,10 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
             <div className="flex items-center gap-2 pl-7">
                <Input
                 size="sm"
-                placeholder="Resource Name (Optional)"
-                className="h-7 text-xs"
+                  placeholder={t(
+                    "resourceModule.resources.resourceNameOptional",
+                  )}
+                  className="h-7 text-xs"
                 {...register(`resources.${index}.name`)}
               />
             </div>
@@ -125,7 +133,9 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
         
         {resources.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed rounded-lg border-gray-100 dark:border-gray-800">
-            <p className="text-sm text-muted-foreground">No resources added yet</p>
+            <p className="text-sm text-muted-foreground">
+              {t("resourceModule.resources.noResources")}
+            </p>
           </div>
         )}
       </div>
@@ -147,7 +157,7 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
             onClick={() => document.getElementById("resource-file-upload").click()}
           >
             <Cloud className="h-4 w-4" />
-            Upload File
+            {t("resourceModule.resources.uploadFile")}
           </Button>
         </div>
         <Button
@@ -158,7 +168,7 @@ const ResourceSection = ({ control, register, setValue, append, remove, fields, 
           onClick={addLink}
         >
           <Plus className="h-4 w-4" />
-          Add Link
+          {t("resourceModule.resources.addLink")}
         </Button>
       </div>
     </div>

@@ -106,7 +106,7 @@ const ViewApplication = ({ open, onClose, application }) => {
                 <h2 className="text-lg font-bold text-dashboard-text dark:text-white">
                   {application?.user?.first_name && application?.user?.last_name 
                     ? `${application.user.first_name} ${application.user.last_name}`
-                    : application?.user?.email || 'Unknown Applicant'}
+                    : application?.user?.email || t("applicationReview.modal.unknownApplicant")}
                 </h2>
                 <span className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
                   application?.status === 'pending' ? 'bg-[#DBA91C]' :
@@ -117,12 +117,10 @@ const ViewApplication = ({ open, onClose, application }) => {
                   application?.status === 'rejected' ? 'bg-red-500' :
                   'bg-gray-500'
                 }`}>
-                  {application?.status === 'waitlisted' 
-                    ? t("applicationReview.modal.waitlist")
-                    : application?.status?.charAt(0).toUpperCase() + application?.status?.slice(1) || 'Pending'}
+                  {t(`applicationReview.status.${application?.status || 'pending'}`)}
                 </span>
               </div>
-              <p className="text-sm font-medium text-gray-600 dark:text-white/70">{application?.uid || 'N/A'}</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-white/70">{application?.uid || t("common.notAvailable")}</p>
             </div>
           </div>
 
@@ -149,12 +147,12 @@ const ViewApplication = ({ open, onClose, application }) => {
               {t("applicationReview.modal.basicInfo")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <InfoItem label={t("applicationReview.modal.phoneNumber")} value={application?.user?.phone || 'N/A'} />
-              <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || 'N/A'} />
-              <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || 'N/A'} />
-              <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || 'N/A'} />
-              <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || 'N/A'} />
-              <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || 'N/A'} />
+              <InfoItem label={t("applicationReview.modal.phoneNumber")} value={application?.user?.phone || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
             </div>
           </div>
 

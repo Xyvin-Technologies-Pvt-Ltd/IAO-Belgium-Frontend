@@ -60,7 +60,7 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder={t("appModule.search") || "Search exam components..."}
+          placeholder={t("examModule.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -71,18 +71,18 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
             setIsModalOpen(true);
           }}
         >
-          {t("programDetail.emptyState.createButton") || "Add Exam Component"}
+          {t("programDetail.emptyState.createButton")}
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Exam Module ID</TableHead>
-            <TableHead>Linked Exam</TableHead>
-            <TableHead>Linked Module</TableHead>
-             <TableHead>{t("appModule.table.status") || "Status"}</TableHead>
-            <TableHead>{t("appModule.table.actions") || "Actions"}</TableHead>
+            <TableHead>{t("examModule.table.examModuleId")}</TableHead>
+            <TableHead>{t("examModule.table.linkedExam")}</TableHead>
+            <TableHead>{t("examModule.table.linkedModule")}</TableHead>
+             <TableHead>{t("examModule.table.status")}</TableHead>
+            <TableHead>{t("examModule.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody
@@ -94,7 +94,7 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
             <TableRow>
               <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || t("appModule.messages.loadFailed") || "Failed to load"}
+                  message={error?.message || t("examModule.messages.loadFailed")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -108,8 +108,8 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
                 onClick={() => handleViewModule(i)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.linked_exam?.name || "N/A"}</TableCell>
-                <TableCell>{i?.linked_module?.name || "N/A"}</TableCell>
+                <TableCell>{i?.linked_exam?.name || t("common.notAvailable")}</TableCell>
+                <TableCell>{i?.linked_module?.name || t("common.notAvailable")}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -117,7 +117,7 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
                   <RowActionMenu
                     actions={[
                       {
-                        label: t("appModule.table.edit") || "Edit",
+                        label: t("examModule.table.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(i),
                       },
@@ -129,7 +129,7 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center">
-                {"No Exam Components Found"}
+                {t("examModule.table.noComponents")}
               </TableCell>
             </TableRow>
           )}

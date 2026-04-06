@@ -120,7 +120,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                     {session.assistants && session.assistants.length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
-                          Assistant
+                          {t("planningManagement.modal.assistantsLabel")}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {session.assistants.map(
@@ -151,7 +151,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                     {session.trainees && session.trainees.length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
-                          Trainee
+                          {t("planningManagement.modal.traineesLabel")}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {session.trainees.map((traineeObj, traineeIndex) => {

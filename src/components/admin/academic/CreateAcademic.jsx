@@ -168,7 +168,7 @@ const CreateAcademic = ({ open, onClose, academicData }) => {
               )}
             />
             <Label htmlFor="status" className="text-sm font-medium">
-              {statusValue ? "Active" : "Inactive"}
+              {statusValue ? t("common.active") : t("common.inactive")}
             </Label>
           </div>
 

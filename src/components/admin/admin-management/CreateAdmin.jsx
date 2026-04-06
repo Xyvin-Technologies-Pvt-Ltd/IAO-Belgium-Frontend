@@ -127,7 +127,7 @@ const CreateAdmin = ({ open, onClose }) => {
             <SearchableSelect
               label={t("adminManagement.modal.roleLabel")}
               placeholder={t("adminManagement.modal.rolePlaceholder")}
-              searchPlaceholder="Search roles..."
+              searchPlaceholder={t("adminManagement.modal.searchRoles")}
               items={rolesData?.data || []}
               value={selectedRole || ""}
               onChange={(value) => setValue("role_access", value, { shouldValidate: true })}

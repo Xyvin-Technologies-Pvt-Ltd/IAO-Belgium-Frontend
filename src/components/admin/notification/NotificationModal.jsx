@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,13 +21,14 @@ import {
 } from "@/store/useNotificationStore";
 
 // "all" → all users, "teacher" → teachers, "student" → students
-const ROLE_OPTIONS = [
-  { value: "all", label: "All Users" },
-  { value: "teacher", label: "Teachers" },
-  { value: "student", label: "Students" },
+const ROLE_OPTIONS = (t) => [
+  { value: "all", label: t("notification.modal.allUsers") },
+  { value: "teacher", label: t("notification.modal.teachers") },
+  { value: "student", label: t("notification.modal.students") },
 ];
 
 const NotificationModal = ({ open, onClose, notification = null }) => {
+  const { t } = useTranslation();
   const isEdit = !!notification;
 
   const [targetRole, setTargetRole] = useState(() => notification?.target_role || "all");
@@ -111,10 +113,14 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {isEdit ? "Edit Notification" : "Create Notification"}
+              {isEdit
+                ? t("notification.modal.editTitle")
+                : t("notification.modal.createTitle")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-white/70">
-              {isEdit ? "Update the notification details" : "Draft a new notification"}
+              {isEdit
+                ? t("notification.modal.editSubtitle")
+                : t("notification.modal.createSubtitle")}
             </p>
           </div>
           <button onClick={handleClose} className="cursor-pointer text-muted-foreground hover:text-gray-700 dark:hover:text-white">
@@ -124,58 +130,89 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
-            <Label>Subject <span className="text-red-500">*</span></Label>
+            <Label>
+              {t("notification.modal.subjectLabel")}{" "}
+              <span className="text-red-500">*</span>
+            </Label>
             <Input
-              placeholder="Notification subject"
-              {...register("subject", { required: "Subject is required" })}
+              placeholder={t("notification.modal.subjectPlaceholder")}
+              {...register("subject", {
+                required: t("notification.modal.errors.subjectRequired"),
+              })}
             />
-            {errors.subject && <p className="text-xs text-red-500">{errors.subject.message}</p>}
+            {errors.subject && (
+              <p className="text-xs text-red-500">{errors.subject.message}</p>
+            )}
           </div>
 
           <div className="space-y-1.5">
-            <Label>Message <span className="text-red-500">*</span></Label>
+            <Label>
+              {t("notification.modal.messageLabel")}{" "}
+              <span className="text-red-500">*</span>
+            </Label>
             <Textarea
-              placeholder="Notification message"
+              placeholder={t("notification.modal.messagePlaceholder")}
               rows={4}
-              {...register("message", { required: "Message is required" })}
+              {...register("message", {
+                required: t("notification.modal.errors.messageRequired"),
+              })}
             />
-            {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
+            {errors.message && (
+              <p className="text-xs text-red-500">{errors.message.message}</p>
+            )}
           </div>
 
           {/* Type checkboxes */}
           <div className="space-y-2">
-            <Label>Type <span className="text-red-500">*</span></Label>
+            <Label>
+              {t("notification.modal.typeLabel")}{" "}
+              <span className="text-red-500">*</span>
+            </Label>
             <div className="flex items-center gap-6">
               {["in-app", "email"].map((type) => (
-                <label key={type} className="flex items-center gap-2 cursor-pointer select-none">
+                <label
+                  key={type}
+                  className="flex items-center gap-2 cursor-pointer select-none"
+                >
                   <input
                     type="checkbox"
                     checked={selectedTypes.includes(type)}
                     onChange={(e) =>
                       setSelectedTypes((prev) =>
-                        e.target.checked ? [...prev, type] : prev.filter((t) => t !== type)
+                        e.target.checked
+                          ? [...prev, type]
+                          : prev.filter((t) => t !== type),
                       )
                     }
                     className="w-4 h-4 rounded border-input accent-primary"
                   />
-                  <span className="text-sm">{type === "in-app" ? "In-App" : "Email"}</span>
+                  <span className="text-sm">
+                    {type === "in-app"
+                      ? t("notification.modal.typeInApp")
+                      : t("notification.modal.typeEmail")}
+                  </span>
                 </label>
               ))}
             </div>
             {selectedTypes.length === 0 && (
-              <p className="text-xs text-red-500">Select at least one type</p>
+              <p className="text-xs text-red-500">
+                {t("notification.modal.errors.typeRequired")}
+              </p>
             )}
           </div>
 
           {/* Target role — Select */}
           <div className="space-y-1.5">
-            <Label>Send To <span className="text-red-500">*</span></Label>
+            <Label>
+              {t("notification.modal.sendToLabel")}{" "}
+              <span className="text-red-500">*</span>
+            </Label>
             <Select value={targetRole} onValueChange={handleRoleChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select recipients..." />
+                <SelectValue placeholder={t("notification.modal.sendToPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                {ROLE_OPTIONS.map((opt) => (
+                {ROLE_OPTIONS(t).map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
@@ -198,20 +235,38 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                   className="w-4 h-4 rounded border-input accent-primary"
                 />
                 <span className="text-sm">
-                  Send to all {targetRole === "teacher" ? "teachers" : "students"}
+                  {t("notification.modal.sendToAll", {
+                    role:
+                      targetRole === "teacher"
+                        ? t("notification.modal.teachers")
+                        : t("notification.modal.students"),
+                  })}
                 </span>
               </label>
 
               {!isAll && (
                 <SearchableMultiSelect
-                  label={targetRole === "teacher" ? "Select Teachers" : "Select Students"}
-                  placeholder={`Search ${targetRole === "teacher" ? "teachers" : "students"}...`}
+                  label={
+                    targetRole === "teacher"
+                      ? t("notification.modal.selectTeachers")
+                      : t("notification.modal.selectStudents")
+                  }
+                  placeholder={t("notification.modal.searchPlaceholder", {
+                    role:
+                      targetRole === "teacher"
+                        ? t("notification.modal.teachers")
+                        : t("notification.modal.students"),
+                  })}
                   items={usersData?.data || []}
                   selected={selectedUsers}
                   onChange={setSelectedUsers}
                   onSearch={setUserSearch}
                   isLoading={usersLoading}
-                  error={!selectedUsers.length ? "Select at least one recipient" : null}
+                  error={
+                    !selectedUsers.length
+                      ? t("notification.modal.errors.recipientRequired")
+                      : null
+                  }
                 />
               )}
             </div>
@@ -219,10 +274,14 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isPending || !canSubmit}>
-              {isPending ? "Saving..." : isEdit ? "Update" : "Create"}
+              {isPending
+                ? t("common.uploading")
+                : isEdit
+                  ? t("common.update")
+                  : t("common.create")}
             </Button>
           </div>
         </form>

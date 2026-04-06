@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X, Copy, Check, Download } from "lucide-react";
 import { useGetLtiPlatformConfig } from "@/store/useLtiStore";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const ConfigRow = ({ label, value }) => {
   const [copied, setCopied] = useState(false);
@@ -24,7 +25,7 @@ const ConfigRow = ({ label, value }) => {
         <button
           onClick={handleCopy}
           className="shrink-0 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
-          title="Copy to clipboard"
+          title={label}
         >
           {copied ? (
             <Check className="h-4 w-4 text-green-500" />
@@ -37,8 +38,9 @@ const ConfigRow = ({ label, value }) => {
   );
 };
 
-const PlatformConfigModal = ({ open, onClose }) => {
-  const { data, isLoading } = useGetLtiPlatformConfig({ enabled: open });
+const PlatformConfigModal = ({ open, onClose, toolId }) => {
+  const { t } = useTranslation();
+  const { data, isLoading } = useGetLtiPlatformConfig(toolId, { enabled: open });
   const config = data?.data;
 
   const handleExportJson = () => {
@@ -64,11 +66,10 @@ const PlatformConfigModal = ({ open, onClose }) => {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                LTI Platform Configuration
+                {t("lti.platformConfig.title")}
               </h2>
               <p className="text-sm text-gray-500 dark:text-white/70 mt-1">
-                Share these values with Enatom to register the HUB as a trusted
-                platform.
+                {t("lti.platformConfig.subtitle")}
               </p>
             </div>
             <button
@@ -93,21 +94,33 @@ const PlatformConfigModal = ({ open, onClose }) => {
             </div>
           ) : (
             <>
-              <ConfigRow label="Issuer (iss)" value={config?.issuer} />
-              <ConfigRow label="Client ID" value={config?.client_id} />
-              <ConfigRow label="Deployment ID" value={config?.deployment_id} />
-              <ConfigRow label="JWKS URL" value={config?.jwks_url} />
               <ConfigRow
-                label="OIDC Authentication Endpoint"
+                label={t("lti.platformConfig.issuer")}
+                value={config?.issuer}
+              />
+              <ConfigRow
+                label={t("lti.platformConfig.clientId")}
+                value={config?.client_id}
+              />
+              <ConfigRow
+                label={t("lti.platformConfig.deploymentId")}
+                value={config?.deployment_id}
+              />
+              <ConfigRow
+                label={t("lti.platformConfig.jwksUrl")}
+                value={config?.jwks_url}
+              />
+              <ConfigRow
+                label={t("lti.platformConfig.oidcAuthEndpoint")}
                 value={config?.oidc_auth_endpoint}
               />
               <ConfigRow
-                label="Access Token URL"
+                label={t("lti.platformConfig.accessTokenUrl")}
                 value={config?.access_token_url}
               />
               {config?.openid_configuration_url && (
                 <ConfigRow
-                  label="OpenID Configuration URL (Dynamic Registration)"
+                  label={t("lti.platformConfig.oidcConfigUrl")}
                   value={config?.openid_configuration_url}
                 />
               )}
@@ -118,11 +131,11 @@ const PlatformConfigModal = ({ open, onClose }) => {
         {/* Footer */}
         <div className="p-6 border-t dark:border-white/20 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
-            Close
+            {t("common.cancel")}
           </Button>
           <Button onClick={handleExportJson} disabled={isLoading || !config}>
             <Download className="h-4 w-4 mr-2" />
-            Export JSON
+            {t("lti.platformConfig.exportJson")}
           </Button>
         </div>
       </div>

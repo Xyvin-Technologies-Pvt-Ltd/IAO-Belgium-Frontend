@@ -49,9 +49,10 @@ export const deactivateLtiTool = async (id) => {
 
 // ── Platform Config ────────────────────────────────────────────────────────
 
-export const getLtiPlatformConfig = async () => {
+export const getLtiPlatformConfig = async (toolId) => {
   try {
-    const response = await axiosInstance.get("/lti/platform-config");
+    const params = toolId ? { tool_id: toolId } : {};
+    const response = await axiosInstance.get("/lti/platform-config", { params });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
