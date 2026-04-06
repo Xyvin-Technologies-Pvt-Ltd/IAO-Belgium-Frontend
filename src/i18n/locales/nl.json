@@ -860,7 +860,46 @@
       "modulePlaceholder": "Selecteer module"
     }
   },
-
+  "componentManagement": {
+    "createTitle": "Module Aanmaken",
+    "editTitle": "Module Bewerken",
+    "typeLabel": "Moduletype",
+    "typePlaceholder": "Selecteer moduletype",
+    "types": {
+      "module": "Leermodule",
+      "app": "Toegepaste Beroepspraktijk(APP)",
+      "resource": "Onderzoek",
+      "exam": "Examencomponent"
+    },
+    "nameLabel": "Modulenaam",
+    "namePlaceholder": "Voer modulenaam in",
+    "yearLabel": "In welk jaar hoort de module",
+    "yearPlaceholder": "Selecteer jaar",
+    "year": "Jaar",
+    "moduleNumberLabel": "Modulenummer",
+    "moduleNumberPlaceholder": "Voer modulenummer in",
+    "amountLabel": "Bedrag",
+    "amountPlaceholder": "Voer bedrag in",
+    "linkedModuleLabel": "Module",
+    "linkedModuleHint": "(Examen gepland vóór deze module)",
+    "linkedModulePlaceholder": "Selecteer module",
+    "noModulesFound": "Geen modules gevonden voor dit programma",
+    "linkedExamLabel": "Examen",
+    "linkedExamPlaceholder": "Selecteer examen",
+    "noPublishedExams": "Geen gepubliceerde examens beschikbaar",
+    "submissionDeadlineLabel": "Inleverdeadline",
+    "submissionDeadlinePlaceholder": "Selecteer deadline",
+    "instructionsLabel": "Instructies",
+    "instructionsPlaceholder": "Voer instructies in",
+    "instructionVideoLabel": "Instructievideo URL",
+    "instructionVideoPlaceholder": "Voer instructievideo URL in",
+    "submissionTypesLabel": "Inlevertypen",
+    "caseStudies": "Casestudies",
+    "essays": "Essays",
+    "internships": "Stages",
+    "activeStatus": "Actieve Status",
+    "uploadingFiles": "Bestanden uploaden..."
+  },
   "exam": {
     "title": "Examens",
     "search": "Examens zoeken...",

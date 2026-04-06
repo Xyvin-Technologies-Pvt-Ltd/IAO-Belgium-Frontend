@@ -860,7 +860,46 @@
       "modulePlaceholder": "Sélectionnez un module"
     }
   },
-
+  "componentManagement": {
+    "createTitle": "Créer un module",
+    "editTitle": "Modifier le module",
+    "typeLabel": "Type de module",
+    "typePlaceholder": "Sélectionnez le type de module",
+    "types": {
+      "module": "Module d'apprentissage",
+      "app": "Pratique professionnelle appliquée(APP)",
+      "resource": "Recherche",
+      "exam": "Composant d'examen"
+    },
+    "nameLabel": "Nom du module",
+    "namePlaceholder": "Entrez le nom du module",
+    "yearLabel": "À quelle année appartient le module",
+    "yearPlaceholder": "Sélectionnez l'année",
+    "year": "Année",
+    "moduleNumberLabel": "Numéro de module",
+    "moduleNumberPlaceholder": "Entrez le numéro de module",
+    "amountLabel": "Montant",
+    "amountPlaceholder": "Entrez le montant",
+    "linkedModuleLabel": "Module",
+    "linkedModuleHint": "(Examen prévu avant ce module)",
+    "linkedModulePlaceholder": "Sélectionnez un module",
+    "noModulesFound": "Aucun module trouvé pour ce programme",
+    "linkedExamLabel": "Examen",
+    "linkedExamPlaceholder": "Sélectionnez un examen",
+    "noPublishedExams": "Aucun examen publié disponible",
+    "submissionDeadlineLabel": "Date limite de soumission",
+    "submissionDeadlinePlaceholder": "Sélectionnez la date limite",
+    "instructionsLabel": "Instructions",
+    "instructionsPlaceholder": "Entrez les instructions",
+    "instructionVideoLabel": "URL de la vidéo d'instructions",
+    "instructionVideoPlaceholder": "Entrez l'URL de la vidéo d'instructions",
+    "submissionTypesLabel": "Types de soumission",
+    "caseStudies": "Études de cas",
+    "essays": "Dissertations",
+    "internships": "Stages",
+    "activeStatus": "Statut actif",
+    "uploadingFiles": "Téléchargement des fichiers..."
+  },
   "exam": {
     "title": "Examens",
     "search": "Rechercher des examens...",
