@@ -71,7 +71,7 @@
   "common": {
     "welcome": {
       "back": "Welcome back!",
-      "backWithName": "Welcome back, {name}!",
+      "backWithName": "Welcome back, {{name}}!",
       "subtitle": "All your courses, progress, and updates in one place."
     },
     "deleteConfirm": {
@@ -92,10 +92,56 @@
     "none": "None",
     "active": "Active",
     "inactive": "Inactive",
+    "deleted": "Deleted",
+    "archived": "Archived",
     "unknown": "Unknown",
     "notAvailable": "N/A",
     "dash": "-",
-    "document": "document"
+    "document": "document",
+    "today": "Today",
+    "more": "more",
+    "tba": "TBA",
+    "view": "View",
+    "download": "Download",
+    "loading": "Loading...",
+    "teacher": "Teacher",
+    "student": "Student",
+    "selectCountryFirst": "Please select a country first",
+    "searchCountries": "Search countries...",
+    "searchCities": "Search cities...",
+    "searchLanguages": "Search languages...",
+    "searchTitles": "Search academic degrees...",
+    "searchRoles": "Search teacher roles..."
+  },
+  "userCard": {
+    "intake": "Intake",
+    "unknownUser": "Unknown {{type}}"
+  },
+  "calendar": {
+    "viewType": {
+      "month": "Month",
+      "week": "Week"
+    },
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "session": "Session",
+    "loading": "Loading...",
+    "more": "more"
+  },
+  "sessionCard": {
+    "noSessions": "No sessions scheduled",
+    "sessionName": "Session Name",
+    "date": "Date",
+    "time": "Time",
+    "teachers": "Teachers",
+    "sessionPrefix": "Session"
   },
   "countryManagement": {
     "title": "Country Management",
@@ -946,7 +992,7 @@
     "ongoingCourses": "Ongoing Courses",
     "finishedCourses": "Finished Courses",
     "courseEnrollmentTrend": "Course Enrollment Trend",
-    "comparedToLastMonth": "{percent} compared to last month"
+    "comparedToLastMonth": "{{percent}} compared to last month"
   },
   "exam": {
     "title": "Exams",
@@ -1081,10 +1127,11 @@
       "allUsers": "All Users",
       "teachers": "Teachers",
       "students": "Students",
-      "sendToAll": "Send to all {role}",
-      "selectTeachers": "Select Teachers",
-      "selectStudents": "Select Students",
-      "searchPlaceholder": "Search {role}...",
+      "sendToAll": "Send to all {{role}}",
+      "noContactsSelected": "Please select at least one contact",
+      "sendSuccess": "Emails sent successfully!",
+      "sendError": "Failed to send emails",
+      "searchPlaceholder": "Search {{role}}...",
       "errors": {
         "subjectRequired": "Subject is required",
         "messageRequired": "Message is required",
@@ -1158,8 +1205,8 @@
     "yearHint": "Creating configuration for a new program year",
     "programYear": "Program Year",
     "yearPlaceholderSelect": "Select a year",
-    "yearDisplay": "Year {year}",
-    "yearViewing": "Viewing configuration for Year {year}",
+    "yearDisplay": "Year {{year}}",
+    "yearViewing": "Viewing configuration for Year {{year}}",
     "activeStatus": "Active Status",
     "activeStatusHint": "Enable or disable this configuration",
     "noConfigs": "No configurations yet. Click \"New Year\" to create one.",
@@ -1197,6 +1244,19 @@
   "questionBank": {
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
+    "question": "Question",
+    "questionList": {
+      "addQuestion": "Add Question",
+      "bulkUpload": "Bulk Upload",
+      "uid": "UID",
+      "question": "Question",
+      "difficulty": "Difficulty",
+      "marks": "Marks",
+      "action": "Action",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noQuestions": "No Questions Found"
+    },
     "form": {
       "name": "Name",
       "namePlaceholder": "Enter name",

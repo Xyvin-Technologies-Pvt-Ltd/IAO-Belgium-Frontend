@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMoment } from "@/utils/dateUtils";
+import { useTranslation } from "react-i18next";
 
 const TeacherCalendarView = ({
   sessions = [],
@@ -12,6 +13,7 @@ const TeacherCalendarView = ({
   currentWeekStart,
   onWeekChange,
 }) => {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(getMoment());
 
   const daysInMonth = currentDate.daysInMonth();
@@ -137,7 +139,7 @@ const TeacherCalendarView = ({
           </div>
         )}
         <p className={`text-sm font-semibold leading-tight ${colors.text}`}>
-          {session.component_name || "Session"}
+          {session.component_name || t("calendar.session")}
         </p>
         {session.batch_name && (
           <p className={`text-xs mt-0.5 ${colors.text} opacity-60`}>{session.batch_name}</p>
@@ -186,7 +188,7 @@ const TeacherCalendarView = ({
             ))}
             {daySessions.length > 3 && (
               <p className="text-xs pl-1 text-gray-400 dark:text-sidebar-foreground/40">
-                +{daySessions.length - 3} more
+                +{daySessions.length - 3} {t("calendar.more")}
               </p>
             )}
           </div>
@@ -253,7 +255,7 @@ const TeacherCalendarView = ({
           onClick={handleToday}
           className="px-3.5 py-1 rounded-md border border-gray-300 dark:border-sidebar-border text-sm font-medium text-gray-700 dark:text-sidebar-foreground/70 bg-white dark:bg-sidebar hover:bg-gray-50 dark:hover:bg-sidebar-border/20 transition-colors"
         >
-          Today
+          {t("common.today")}
         </button>
         <button
           onClick={handlePrev}
@@ -285,7 +287,7 @@ const TeacherCalendarView = ({
                     : "bg-white dark:bg-sidebar text-gray-600 dark:text-sidebar-foreground/60 hover:bg-gray-50 dark:hover:bg-sidebar-border/20"
                 }`}
               >
-                {type}
+                {t(`calendar.viewType.${type}`)}
               </button>
             ))}
           </div>
@@ -298,9 +300,12 @@ const TeacherCalendarView = ({
         ) : (
           <>
             <div className="grid grid-cols-7 bg-gray-50 dark:bg-sidebar/60 border-b border-gray-100 dark:border-sidebar-border">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                <div key={d} className="py-2.5 text-center text-xs font-medium tracking-wide uppercase text-gray-400 dark:text-sidebar-foreground/40">
-                  {d}
+              {["sun", "mon", "tue", "wed", "thu", "fri", "sat"].map((d) => (
+                <div
+                  key={d}
+                  className="py-2.5 text-center text-xs font-medium tracking-wide uppercase text-gray-400 dark:text-sidebar-foreground/40"
+                >
+                  {t(`calendar.days.${d}`)}
                 </div>
               ))}
             </div>
@@ -311,7 +316,7 @@ const TeacherCalendarView = ({
 
       {isLoading && (
         <p className="text-center text-sm text-gray-400 dark:text-sidebar-foreground/40 py-2">
-          Loading…
+          {t("calendar.loading")}
         </p>
       )}
     </div>

@@ -71,7 +71,7 @@
   "common": {
     "welcome": {
       "back": "Welkom terug!",
-      "backWithName": "Welkom terug, {name}!",
+      "backWithName": "Welkom terug, {{name}}!",
       "subtitle": "Al je cursussen, voortgang en updates op één plek."
     },
     "deleteConfirm": {
@@ -92,10 +92,56 @@
     "none": "Geen",
     "active": "Actief",
     "inactive": "Inactief",
+    "deleted": "Verwijderd",
+    "archived": "Gearchiveerd",
     "unknown": "Onbekend",
     "notAvailable": "N/V",
     "dash": "-",
-    "document": "document"
+    "document": "document",
+    "today": "Vandaag",
+    "more": "meer",
+    "tba": "TBA",
+    "view": "Bekijken",
+    "download": "Downloaden",
+    "loading": "Laden...",
+    "teacher": "Docent",
+    "student": "Student",
+    "selectCountryFirst": "Selecteer eerst een land",
+    "searchCountries": "Landen zoeken...",
+    "searchCities": "Steden zoeken...",
+    "searchLanguages": "Talen zoeken...",
+    "searchTitles": "Academische graden zoeken...",
+    "searchRoles": "Docentrollen zoeken..."
+  },
+  "userCard": {
+    "intake": "Intake",
+    "unknownUser": "Onbekende {{type}}"
+  },
+  "calendar": {
+    "viewType": {
+      "month": "Maand",
+      "week": "Week"
+    },
+    "days": {
+      "sun": "Zo",
+      "mon": "Ma",
+      "tue": "Di",
+      "wed": "Wo",
+      "thu": "Do",
+      "fri": "Vr",
+      "sat": "Za"
+    },
+    "session": "Sessie",
+    "loading": "Laden...",
+    "more": "meer"
+  },
+  "sessionCard": {
+    "noSessions": "Geen sessies gepland",
+    "sessionName": "Sessienaam",
+    "date": "Datum",
+    "time": "Tijd",
+    "teachers": "Docenten",
+    "sessionPrefix": "Sessie"
   },
   "countryManagement": {
     "title": "Landenbeheer",
@@ -1073,10 +1119,11 @@
       "allUsers": "Alle Gebruikers",
       "teachers": "Docenten",
       "students": "Studenten",
-      "sendToAll": "Verzenden naar alle {role}",
-      "selectTeachers": "Selecteer Docenten",
-      "selectStudents": "Selecteer Studenten",
-      "searchPlaceholder": "Zoek {role}...",
+      "sendToAll": "Verzenden naar alle {{role}}",
+      "noContactsSelected": "Selecteer ten minste één contactpersoon",
+      "sendSuccess": "E-mails succesvol verzonden!",
+      "sendError": "Verzenden van e-mails mislukt",
+      "searchPlaceholder": "Zoek {{role}}...",
       "errors": {
         "subjectRequired": "Onderwerp is verplicht",
         "messageRequired": "Bericht is verplicht",
@@ -1150,8 +1197,8 @@
     "yearHint": "Configuratie aanmaken voor een nieuw programma-jaar",
     "programYear": "Programma jaar",
     "yearPlaceholderSelect": "Selecteer een jaar",
-    "yearDisplay": "Jaar {year}",
-    "yearViewing": "Configuratie bekijken voor Jaar {year}",
+    "yearDisplay": "Jaar {{year}}",
+    "yearViewing": "Configuratie bekijken voor Jaar {{year}}",
     "activeStatus": "Actieve status",
     "activeStatusHint": "Deze configuratie in- of uitschakelen",
     "noConfigs": "Nog geen configuraties. Klik op \"Nieuw jaar\" om er een aan te maken.",
@@ -1189,6 +1236,19 @@
   "questionBank": {
     "createQuestionBank": "Vragenbank aanmaken",
     "editQuestionBank": "Vragenbank bewerken",
+    "question": "Vraag",
+    "questionList": {
+      "addQuestion": "Vraag toevoegen",
+      "bulkUpload": "Bulk upload",
+      "uid": "UID",
+      "question": "Vraag",
+      "difficulty": "Moeilijkheidsgraad",
+      "marks": "Punten",
+      "action": "Actie",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "noQuestions": "Geen vragen gevonden"
+    },
     "form": {
       "name": "Naam",
       "namePlaceholder": "Voer naam in",
@@ -1264,6 +1324,6 @@
     "ongoingCourses": "Lopende Cursussen",
     "finishedCourses": "Afgeronde Cursussen",
     "courseEnrollmentTrend": "Trend Cursusinschrijvingen",
-    "comparedToLastMonth": "{percent} vergeleken met vorige maand"
+    "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
   }
 }

@@ -71,7 +71,7 @@
   "common": {
     "welcome": {
       "back": "Willkommen zurück!",
-      "backWithName": "Willkommen zurück, {name}!",
+      "backWithName": "Willkommen zurück, {{name}}!",
       "subtitle": "Alle Ihre Kurse, Fortschritte und Updates an einem Ort."
     },
     "deleteConfirm": {
@@ -92,10 +92,56 @@
     "none": "Keine",
     "active": "Aktiv",
     "inactive": "Inaktiv",
+    "deleted": "Gelöscht",
+    "archived": "Archiviert",
     "unknown": "Unbekannt",
     "notAvailable": "N/V",
     "dash": "-",
-    "document": "Dokument"
+    "document": "Dokument",
+    "today": "Heute",
+    "more": "mehr",
+    "tba": "TBA",
+    "view": "Ansehen",
+    "download": "Herunterladen",
+    "loading": "Laden...",
+    "teacher": "Dozent",
+    "student": "Student",
+    "selectCountryFirst": "Bitte wählen Sie zuerst ein Land aus",
+    "searchCountries": "Länder suchen...",
+    "searchCities": "Städte suchen...",
+    "searchLanguages": "Sprachen suchen...",
+    "searchTitles": "Akademische Grade suchen...",
+    "searchRoles": "Dozentenrollen suchen..."
+  },
+  "userCard": {
+    "intake": "Aufnahme",
+    "unknownUser": "Unbekannter {{type}}"
+  },
+  "calendar": {
+    "viewType": {
+      "month": "Monat",
+      "week": "Woche"
+    },
+    "days": {
+      "sun": "So",
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "session": "Sitzung",
+    "loading": "Laden...",
+    "more": "mehr"
+  },
+  "sessionCard": {
+    "noSessions": "Keine Sitzungen geplant",
+    "sessionName": "Sitzungsname",
+    "date": "Datum",
+    "time": "Zeit",
+    "teachers": "Dozenten",
+    "sessionPrefix": "Sitzung"
   },
   "countryManagement": {
     "title": "Länderverwaltung",
@@ -945,7 +991,7 @@
     "ongoingCourses": "Laufende Kurse",
     "finishedCourses": "Beendete Kurse",
     "courseEnrollmentTrend": "Kurseinschreibungstrend",
-    "comparedToLastMonth": "{percent} im Vergleich zum Vormonat"
+    "comparedToLastMonth": "{{percent}} im Vergleich zum Vormonat"
   },
   "exam": {
     "title": "Prüfungen",
@@ -1080,10 +1126,11 @@
       "allUsers": "Alle Benutzer",
       "teachers": "Dozenten",
       "students": "Studenten",
-      "sendToAll": "An alle {role} senden",
-      "selectTeachers": "Dozenten auswählen",
-      "selectStudents": "Studenten auswählen",
-      "searchPlaceholder": "{role} suchen...",
+      "sendToAll": "An alle {{role}} senden",
+      "noContactsSelected": "Bitte wählen Sie mindestens einen Kontakt aus",
+      "sendSuccess": "Emails erfolgreich versendet!",
+      "sendError": "Emails konnten nicht versendet werden",
+      "searchPlaceholder": "{{role}} suchen...",
       "errors": {
         "subjectRequired": "Betreff ist erforderlich",
         "messageRequired": "Nachricht ist erforderlich",
@@ -1157,8 +1204,8 @@
     "yearHint": "Konfiguration für ein neues Programmjahr erstellen",
     "programYear": "Programmjahr",
     "yearPlaceholderSelect": "Wählen Sie ein Jahr",
-    "yearDisplay": "Jahr {year}",
-    "yearViewing": "Konfiguration für Jahr {year} wird angezeigt",
+    "yearDisplay": "Jahr {{year}}",
+    "yearViewing": "Konfiguration für Jahr {{year}} wird angezeigt",
     "activeStatus": "Aktiver Status",
     "activeStatusHint": "Diese Konfiguration aktivieren oder deaktivieren",
     "noConfigs": "Noch keine Konfigurationen vorhanden. Klicken Sie auf \"Neues Jahr\", um eine zu erstellen.",
@@ -1196,6 +1243,19 @@
   "questionBank": {
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
+    "question": "Frage",
+    "questionList": {
+      "addQuestion": "Frage hinzufügen",
+      "bulkUpload": "Massenupload",
+      "uid": "UID",
+      "question": "Frage",
+      "difficulty": "Schwierigkeit",
+      "marks": "Punkte",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "noQuestions": "Keine Fragen gefunden"
+    },
     "form": {
       "name": "Name",
       "namePlaceholder": "Name eingeben",

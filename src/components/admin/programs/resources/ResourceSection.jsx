@@ -4,7 +4,6 @@ import { Plus, Trash, FileText, Link as LinkIcon, ExternalLink, Cloud } from "lu
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 
 const ResourceSection = ({ control, register, setValue, append, remove, fields, errors }) => {
   const { t } = useTranslation();

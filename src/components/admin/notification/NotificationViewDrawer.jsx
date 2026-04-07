@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Bell, Users, Calendar, Tag } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const InfoRow = ({ icon: Icon, label, value }) => (
   <div className="flex items-start gap-3 py-3 border-b border-sidebar-border last:border-0">

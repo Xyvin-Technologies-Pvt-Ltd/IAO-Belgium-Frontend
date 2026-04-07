@@ -71,7 +71,7 @@
   "common": {
     "welcome": {
       "back": "Bon retour !",
-      "backWithName": "Bon retour, {name} !",
+      "backWithName": "Bon retour, {{name}} !",
       "subtitle": "Tous vos cours, progrès et mises à jour en un seul endroit."
     },
     "deleteConfirm": {
@@ -92,10 +92,56 @@
     "none": "Aucun",
     "active": "Actif",
     "inactive": "Inactif",
+    "deleted": "Supprimé",
+    "archived": "Archivé",
     "unknown": "Inconnu",
     "notAvailable": "N/A",
     "dash": "-",
-    "document": "document"
+    "document": "document",
+    "today": "Aujourd'hui",
+    "more": "plus",
+    "tba": "TBA",
+    "view": "Voir",
+    "download": "Télécharger",
+    "loading": "Chargement...",
+    "teacher": "Enseignant",
+    "student": "Étudiant",
+    "selectCountryFirst": "Veuillez d'abord sélectionner un pays",
+    "searchCountries": "Rechercher des pays...",
+    "searchCities": "Rechercher des villes...",
+    "searchLanguages": "Rechercher des langues...",
+    "searchTitles": "Rechercher des grades académiques...",
+    "searchRoles": "Rechercher des rôles d'enseignant..."
+  },
+  "userCard": {
+    "intake": "Admission",
+    "unknownUser": "Inconnu {{type}}"
+  },
+  "calendar": {
+    "viewType": {
+      "month": "Mois",
+      "week": "Semaine"
+    },
+    "days": {
+      "sun": "Dim",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam"
+    },
+    "session": "Session",
+    "loading": "Chargement...",
+    "more": "plus"
+  },
+  "sessionCard": {
+    "noSessions": "Aucune session prévue",
+    "sessionName": "Nom de la session",
+    "date": "Date",
+    "time": "Heure",
+    "teachers": "Enseignants",
+    "sessionPrefix": "Session"
   },
   "countryManagement": {
     "title": "Gestion des pays",
@@ -1073,10 +1119,13 @@
       "allUsers": "Tous les utilisateurs",
       "teachers": "Enseignants",
       "students": "Étudiants",
-      "sendToAll": "Envoyer à tous les {role}",
+      "sendToAll": "Envoyer à tous les {{role}}",
+      "noContactsSelected": "Veuillez sélectionner au moins un contact",
+      "sendSuccess": "Emails envoyés avec succès !",
+      "sendError": "Échec de l'envoi des emails",
       "selectTeachers": "Sélectionner des enseignants",
       "selectStudents": "Sélectionner des étudiants",
-      "searchPlaceholder": "Rechercher des {role}...",
+      "searchPlaceholder": "Rechercher des {{role}}...",
       "errors": {
         "subjectRequired": "Le sujet est requis",
         "messageRequired": "Le message est requis",
@@ -1150,8 +1199,8 @@
     "yearHint": "Création de la configuration pour une nouvelle année de programme",
     "programYear": "Année de programme",
     "yearPlaceholderSelect": "Sélectionner une année",
-    "yearDisplay": "Année {year}",
-    "yearViewing": "Affichage de la configuration pour l'année {year}",
+    "yearDisplay": "Année {{year}}",
+    "yearViewing": "Affichage de la configuration pour l'année {{year}}",
     "activeStatus": "Statut actif",
     "activeStatusHint": "Activer ou désactiver cette configuration",
     "noConfigs": "Pas encore de configurations. Cliquez sur \"Nouvelle année\" pour en créer une.",
@@ -1189,6 +1238,19 @@
   "questionBank": {
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
+    "question": "Question",
+    "questionList": {
+      "addQuestion": "Ajouter une question",
+      "bulkUpload": "Téléchargement groupé",
+      "uid": "UID",
+      "question": "Question",
+      "difficulty": "Difficulté",
+      "marks": "Points",
+      "action": "Action",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "noQuestions": "Aucune question trouvée"
+    },
     "form": {
       "name": "Nom",
       "namePlaceholder": "Entrez le nom",
@@ -1264,6 +1326,6 @@
     "ongoingCourses": "Cours en cours",
     "finishedCourses": "Cours terminés",
     "courseEnrollmentTrend": "Tendance des inscriptions aux cours",
-    "comparedToLastMonth": "{percent} par rapport au mois dernier"
+    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
   }
 }

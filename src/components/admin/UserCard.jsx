@@ -22,24 +22,30 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
               {user?.first_name && user?.last_name
                 ? `${user.first_name} ${user.last_name}`
                 : user?.email ||
-                  `Unknown ${isTeacher ? "Teacher" : "Student"}`}
+                  t("userCard.unknownUser", {
+                    type: isTeacher ? t("common.teacher") : t("common.student"),
+                  })}
             </h2>
             <span
               className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
-                user?.status === 'active' ? 'bg-green-500' :
-                user?.status === 'inactive' ? 'bg-gray-500' :
-                user?.status === 'deleted' ? 'bg-red-500' :
-                'bg-gray-500'
+                user?.status === "active"
+                  ? "bg-green-500"
+                  : user?.status === "inactive"
+                    ? "bg-gray-500"
+                    : user?.status === "deleted"
+                      ? "bg-red-500"
+                      : "bg-gray-500"
               }`}
             >
-              {user?.status?.charAt(0).toUpperCase() +
-                user?.status?.slice(1) || "Active"}
+              {user?.status
+                ? t(`common.${user.status.toLowerCase()}`)
+                : t("common.active")}
             </span>
           </div>
           <p className="text-sm font-medium text-sidebar-foreground/70">
             {isTeacher
-              ? user?.teacher_role?.name || "N/A"
-              : user?.program_name || "N/A"}
+              ? user?.teacher_role?.name || t("common.notAvailable")
+              : user?.program_name || t("common.notAvailable")}
           </p>
         </div>
       </div>
@@ -47,25 +53,25 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
         <h3 className="text-base font-semibold mb-4 text-sidebar-foreground">
           {t("studentManagement.modal.basicInfo")}
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <InfoItem
-            label={t("studentManagement.modal.phoneNumber")}
-            value={user?.phone || "N/A"}
-          />
-          <InfoItem
-            label={t("studentManagement.modal.emailAddress")}
-            value={user?.email || "N/A"}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <InfoItem
+              label={t("studentManagement.modal.phoneNumber")}
+              value={user?.phone || t("common.notAvailable")}
+            />
+            <InfoItem
+              label={t("studentManagement.modal.emailAddress")}
+              value={user?.email || t("common.notAvailable")}
+            />
 
           {isTeacher ? (
             <>
               <InfoItem
                 label={t("studentManagement.modal.academicDegree")}
-                value={user?.academic_degree?.name || "N/A"}
+                value={user?.academic_degree?.name || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.teacherRole")}
-                value={user?.teacher_role?.name || "N/A"}
+                value={user?.teacher_role?.name || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.employmentStartDate")}
@@ -74,7 +80,7 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
                     ? moment(user.iao_employment_start_date).format(
                         "DD MMM YYYY",
                       )
-                    : "N/A"
+                    : t("common.notAvailable")
                 }
               />
               <InfoItem
@@ -82,7 +88,7 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
                 value={
                   user?.language?.length > 0
                     ? user.language.map((lang) => lang.name).join(", ")
-                    : "N/A"
+                    : t("common.notAvailable")
                 }
               />
               <InfoItem
@@ -92,7 +98,7 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
                     ? user.location
                         .map((loc) => `${loc.name}, ${loc.country.name}`)
                         .join("; ")
-                    : "N/A"
+                    : t("common.notAvailable")
                 }
               />
             </>
@@ -100,40 +106,43 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
             <>
               <InfoItem
                 label={t("studentManagement.modal.batch")}
-                value={user?.batch_name || "N/A"}
+                value={user?.batch_name || t("common.notAvailable")}
               />
-              <InfoItem label={"Intake"} value={user?.intake_name || "N/A"} />
+              <InfoItem
+                label={t("userCard.intake")}
+                value={user?.intake_name || t("common.notAvailable")}
+              />
               <InfoItem
                 label={t("studentManagement.modal.address")}
-                value={user?.address || "N/A"}
+                value={user?.address || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.country")}
-                value={user?.country || "N/A"}
+                value={user?.country || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.city")}
-                value={user?.city || "N/A"}
+                value={user?.city || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.postalCode")}
-                value={user?.postal_code || "N/A"}
+                value={user?.postal_code || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.studentId")}
-                value={user?.uid || "N/A"}
+                value={user?.uid || t("common.notAvailable")}
               />
               <InfoItem
                 label={t("studentManagement.modal.enrolledDate")}
                 value={
                   user?.enrolled_date
                     ? moment(user.enrolled_date).format("YYYY-MM-DD")
-                    : "N/A"
+                    : t("common.notAvailable")
                 }
               />
               <InfoItem
                 label={t("studentManagement.modal.previousEducation")}
-                value={user?.previous_education || "N/A"}
+                value={user?.previous_education || t("common.notAvailable")}
               />
             </>
           )}
