@@ -242,7 +242,7 @@
       "noAnalyticsFound": "Keine Analysedaten gefunden",
       "noPaymentAnalyticsFound": "Keine Zahlungsanalysen gefunden",
       "loadingAnalytics": "Analysedaten werden geladen...",
-      "loadFailed": "Fehler beim Laden der Einschreibungsdetails"
+      "loadAnalyticsFailed": "Fehler beim Laden der Analysedaten"
     }
   },
   "ltiManagement": {
@@ -423,7 +423,7 @@
     "table": {
       "name": "Name",
       "status": "Status",
-      "action": "Action",
+      "action": "Aktion",
       "edit": "Bearbeiten",
       "noLanguages": "Keine Sprachen gefunden"
     },

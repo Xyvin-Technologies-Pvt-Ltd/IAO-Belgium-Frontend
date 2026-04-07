@@ -1474,5 +1474,28 @@
     "finishedCourses": "Afgeronde Cursussen",
     "courseEnrollmentTrend": "Trend Cursusinschrijvingen",
     "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
+  },
+  "ltiManagement": {
+    "title": "LTI-tool beheer",
+    "subtitle": "Beheer LTI 1.3 externe tools geïntegreerd in de HUB",
+    "registerTool": "Tool registreren",
+    "table": {
+      "name": "Naam",
+      "clientId": "Client ID",
+      "deploymentId": "Deployment ID",
+      "oidcLoginUrl": "OIDC Login URL",
+      "active": "Actief",
+      "actions": "Acties"
+    },
+    "actions": {
+      "edit": "Bewerken",
+      "platformConfig": "Platformconfiguratie",
+      "deactivate": "Deactiveren"
+    },
+    "messages": {
+      "noTools": "Geen LTI-tools geregistreerd",
+      "clickToRegister": "Klik op \"Tool registreren\" om Enatom of een andere LTI 1.3 tool toe te voegen.",
+      "loadFailed": "Laden van LTI-tools mislukt"
+    }
   }
 }
