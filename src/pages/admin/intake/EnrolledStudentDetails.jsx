@@ -22,27 +22,27 @@ const EnrolledStudentDetails = () => {
     if (student?.data) {
       updateBreadcrumbs([
         {
-          label: "Admission administration",
+          label: t("common.admissionAdministration"),
           path: "/admin/admission-administration",
           navigable: false,
         },
         {
-          label: "Academics",
+          label: t("common.academics"),
           path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Intakes",
+          label: t("common.intakes"),
           path: `/admin/admission-administration/academics/${student?.data?.academic}`,
           navigable: true,
         },
         {
-          label: "Intakes Details",
+          label: t("common.intakeDetails"),
           path: `/admin/admission-administration/academics/intakes/${student?.data?.intake_id}`,
           navigable: true,
         },
         {
-          label: "Student Details",
+          label: t("common.studentDetails"),
           path: `/admin/admission-administration/academics/intakes/batch/student/${id}`,
           navigable: false,
         },

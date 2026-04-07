@@ -20,9 +20,10 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetStudentsContracts } from "@/store/useContractStore";
-import { set } from "zod";
+import { useTranslation } from "react-i18next";
 
 const StudentContracts = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -49,7 +50,7 @@ const StudentContracts = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-2">
         <Input
-          placeholder="Search by student name or email..."
+          placeholder={t("common.searchStudentNameEmail")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -61,13 +62,13 @@ const StudentContracts = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-36">
-            <SelectValue placeholder="All statuses" />
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder={t("common.chooseStatus") || t("common.allStatuses")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="signed">Signed</SelectItem>
+            <SelectItem value="all">{t("common.allStatuses")}</SelectItem>
+            <SelectItem value="pending">{t("common.pending")}</SelectItem>
+            <SelectItem value="signed">{t("common.signed")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -75,12 +76,12 @@ const StudentContracts = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Student</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Contract</TableHead>
-            <TableHead>Version</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Signed At</TableHead>
+            <TableHead>{t("common.student")}</TableHead>
+            <TableHead>{t("common.email")}</TableHead>
+            <TableHead>{t("common.contract")}</TableHead>
+            <TableHead>{t("common.version")}</TableHead>
+            <TableHead>{t("common.status")}</TableHead>
+            <TableHead>{t("common.signedAt")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody
@@ -92,7 +93,7 @@ const StudentContracts = () => {
             <TableRow>
               <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load student contracts"}
+                  message={error?.message || t("common.failedToLoadStudentContracts")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -118,7 +119,7 @@ const StudentContracts = () => {
                         : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
-                    {item.status === "signed" ? "Signed" : "Pending"}
+                    {item.status === "signed" ? t("common.signed") : t("common.pending")}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -133,7 +134,7 @@ const StudentContracts = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center">
-                No student contracts found
+                {t("common.noStudentContracts")}
               </TableCell>
             </TableRow>
           )}

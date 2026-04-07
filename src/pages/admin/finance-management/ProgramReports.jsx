@@ -3,6 +3,7 @@ import { useGetAnalyticsByProgram } from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
+import { useTranslation } from "react-i18next";
 
 const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
 
@@ -16,6 +17,7 @@ const buildQueryFilters = (filters) => {
 };
 
 const ProgramReports = () => {
+  const { t } = useTranslation();
   const { updateBreadcrumbs } = useBreadcrumb();
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
@@ -24,18 +26,18 @@ const ProgramReports = () => {
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", navigable: false },
-      { label: "Finance Reports", path: "/admin/finance-reports", navigable: true },
-      { label: "Program Reports" },
+      { label: t("common.dashboard"), path: "/admin/dashboard", navigable: false },
+      { label: t("common.financeReports"), path: "/admin/finance-reports", navigable: true },
+      { label: t("common.programReports") },
     ]);
     return () => updateBreadcrumbs([]);
-  }, []);
+  }, [t]);
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Program Reports
+          {t("common.programReports")}
         </h2>
         <CityReportsFilterDrawer
           draftFilters={draftFilters}
@@ -51,12 +53,12 @@ const ProgramReports = () => {
         error={error}
         labelKey="program_name"
         labelFn={(item) => {
-          const parts = [item.program_name || "Unknown"];
+          const parts = [item.program_name || t("common.unknown")];
           const details = [item.city_name, item.language_name].filter(Boolean);
           if (details.length > 0) parts.push(`(${details.join(" - ")})`);
           return parts.join(" ");
         }}
-        title="Program"
+        title={t("common.program")}
       />
     </div>
   );

@@ -40,12 +40,12 @@ const Academics = () => {
   useEffect(() => {
     updateBreadcrumbs([
       {
-        label: "Admission administration",
+        label: t("common.admissionAdministration"),
         path: "/admin/admission-administration",
         navigable: false,
       },
       {
-        label: "Academic Years",
+        label: t("common.academicYears"),
         path: "/admin/admission-administration/academics",
         navigable: false,
       },
@@ -54,7 +54,7 @@ const Academics = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, []);
+  }, [t]);
 
   const handleOpenCreate = () => {
     setEditingAcademic(null);
@@ -119,7 +119,7 @@ const Academics = () => {
         <div className="flex flex-col items-center justify-center h-[80vh] text-center bg-sidebar rounded-xl p-5 border border-sidebar-border">
           <img
             src={image}
-            alt="No academics"
+            alt={t("common.noAcademics")}
             className="w-64 mb-4 opacity-80"
           />
           <h3 className="text-lg font-semibold text-sidebar-foreground">

@@ -17,8 +17,10 @@ import { Switch } from "@/components/ui/switch";
 import RegisterLtiTool from "@/components/admin/lti/RegisterLtiTool";
 import PlatformConfigModal from "@/components/admin/lti/PlatformConfigModal";
 import { useGetLtiTools, useDeactivateLtiTool, useUpdateLtiTool } from "@/store/useLtiStore";
+import { useTranslation } from "react-i18next";
 
 const LtiManagement = () => {
+  const { t } = useTranslation();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPlatformConfigOpen, setIsPlatformConfigOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState(null);
@@ -70,16 +72,16 @@ const LtiManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-            LTI Tool Management
+            {t("ltiManagement.title")}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage LTI 1.3 external tools integrated with the HUB
+            {t("ltiManagement.subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={handleOpenCreate}>
             <Plus className="h-4 w-4 mr-2" />
-            Register Tool
+            {t("ltiManagement.registerTool")}
           </Button>
         </div>
       </div>
@@ -87,12 +89,12 @@ const LtiManagement = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Client ID</TableHead>
-            <TableHead>Deployment ID</TableHead>
-            <TableHead>OIDC Login URL</TableHead>
-            <TableHead>Active</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{t("ltiManagement.table.name")}</TableHead>
+            <TableHead>{t("ltiManagement.table.clientId")}</TableHead>
+            <TableHead>{t("ltiManagement.table.deploymentId")}</TableHead>
+            <TableHead>{t("ltiManagement.table.oidcLoginUrl")}</TableHead>
+            <TableHead>{t("ltiManagement.table.active")}</TableHead>
+            <TableHead>{t("ltiManagement.table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -102,7 +104,7 @@ const LtiManagement = () => {
             <TableRow>
               <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load LTI tools"}
+                  message={error?.message || t("ltiManagement.messages.loadFailed")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -129,17 +131,17 @@ const LtiManagement = () => {
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("ltiManagement.actions.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(tool),
                       },
                       {
-                        label: "Platform Config",
+                        label: t("ltiManagement.actions.platformConfig"),
                         icon: Settings,
                         onClick: () => handleOpenPlatformConfig(tool._id),
                       },
                       {
-                        label: "Deactivate",
+                        label: t("ltiManagement.actions.deactivate"),
                         icon: Trash2,
                         onClick: () => handleDeleteClick(tool._id),
                       },
@@ -152,9 +154,9 @@ const LtiManagement = () => {
             <TableRow>
               <TableCell colSpan={6} className="text-center py-12">
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <p className="font-medium">No LTI tools registered</p>
+                  <p className="font-medium">{t("ltiManagement.messages.noTools")}</p>
                   <p className="text-sm">
-                    Click "Register Tool" to add Enatom or another LTI 1.3 tool.
+                    {t("ltiManagement.messages.clickToRegister")}
                   </p>
                 </div>
               </TableCell>

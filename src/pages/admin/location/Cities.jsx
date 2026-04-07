@@ -131,14 +131,14 @@ const Cities = () => {
                       </span>
                     ))
                   ) : (
-                    <span className="text-gray-500 text-sm">No times</span>
+                    <span className="text-gray-500 text-sm">{t("common.noTimes")}</span>
                   )}
                 </TableCell>
                 <TableCell>
                   {i?.venue?.length > 0 ? (
                     i.venue.join(", ")
                   ) : (
-                    <span className="text-gray-500 text-sm">No venues</span>
+                    <span className="text-gray-500 text-sm">{t("common.noVenues")}</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -197,7 +197,7 @@ const Cities = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="City"
+        data={t("common.city")}
       />
     </div>
   );

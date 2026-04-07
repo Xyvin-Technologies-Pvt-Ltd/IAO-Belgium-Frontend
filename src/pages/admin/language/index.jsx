@@ -181,7 +181,7 @@ const Language = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="Language"
+        data={t("common.language")}
       />
     </div>
   );

@@ -74,13 +74,21 @@
       "backWithName": "Welcome back, {{name}}!",
       "subtitle": "All your courses, progress, and updates in one place."
     },
+    "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Delete Confirmation",
-      "message": "Are you sure you want to delete",
+      "message": "Are you sure you want to delete {{count}} {{data}}? {{cannotUndo}}",
       "cannotUndo": "This action cannot be undone.",
       "cancel": "Cancel",
       "delete": "Delete",
       "deleting": "Deleting..."
+    },
+    "sendConfirm": {
+      "title": "Send Notification",
+      "message": "This will send the notification to all recipients immediately. This action cannot be undone.",
+      "send": "Send",
+      "sending": "Sending...",
+      "cancel": "Cancel"
     },
     "create": "Create",
     "update": "Update",
@@ -106,12 +114,136 @@
     "loading": "Loading...",
     "teacher": "Teacher",
     "student": "Student",
+    "name": "Name",
+    "email": "Email",
+    "status": "Status",
+    "file": "File",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
     "selectCountryFirst": "Please select a country first",
+    "admissionAdministration": "Admission administration",
+    "academicYears": "Academic Years",
+    "academics": "Academics",
+    "intakes": "Intakes",
+    "intakeDetails": "Intake Details",
+    "batchDetails": "Batch Details",
+    "mins": "mins",
+    "min": "min",
+    "description": "Description:",
+    "instructions": "Instructions:",
+    "source": "Source",
+    "numberOfQuestions": "Number of Questions",
+    "viewFile": "View File",
+    "unknownType": "Unknown {{type}}",
+    "noContracts": "No contracts found",
+    "noStudentContracts": "No student contracts found",
+    "searchContracts": "Search contracts...",
+    "searchStudentNameEmail": "Search by student name or email...",
+    "allStatuses": "All statuses",
+    "chooseStatus": "Choose status",
+    "signed": "Signed",
+    "pending": "Pending",
+    "contract": "Contract",
+    "version": "Version",
+    "signedAt": "Signed At",
+    "createContract": "Create Contract",
+    "editContract": "Edit Contract",
+    "failedToLoadContracts": "Failed to load contracts",
+    "failedToLoadStudentContracts": "Failed to load student contracts",
+    "yearLog": "Year Log",
+    "batch": "batch",
+    "exam": "exam",
     "searchCountries": "Search countries...",
     "searchCities": "Search cities...",
     "searchLanguages": "Search languages...",
     "searchTitles": "Search academic degrees...",
-    "searchRoles": "Search teacher roles..."
+    "searchRoles": "Search teacher roles...",
+    "paymentId": "Payment ID",
+    "studentName": "Student Name",
+    "intake": "Intake",
+    "program": "Program",
+    "city": "City",
+    "component": "Component",
+    "purpose": "Purpose",
+    "amount": "Amount",
+    "date": "Date",
+    "trxCount": "Trx Count",
+    "convenienceFee": "Convenience Fee",
+    "paid": "Paid",
+    "failed": "Failed",
+    "canceled": "Canceled",
+    "allReports": "All Reports",
+    "cityReports": "City Reports",
+    "programReports": "Program Reports",
+    "batchReports": "Batch Reports",
+    "studentReports": "Student Reports",
+    "financeReports": "Finance Reports",
+    "others": "Others",
+    "total": "Total",
+    "noTimes": "No times",
+    "noVenues": "No venues"
+  },
+  "finance": {
+    "title": "Finance Management",
+    "reports": {
+      "all": {
+        "title": "All Reports",
+        "description": "View all payment transactions"
+      },
+      "city": {
+        "title": "City Reports",
+        "description": "Payment analytics by city"
+      },
+      "program": {
+        "title": "Program Reports",
+        "description": "Payment analytics by program"
+      },
+      "batch": {
+        "title": "Batch Reports",
+        "description": "Payment analytics by batch"
+      },
+      "student": {
+        "title": "Student Reports",
+        "description": "Payment analytics by student"
+      }
+    },
+    "fields": {
+      "totalRevenue": "Total Revenue",
+      "totalTransactions": "Total Transactions",
+      "paidTransactions": "Paid Transactions",
+      "revenueBreakdown": "Revenue Breakdown",
+      "revenueDistribution": "Revenue Distribution",
+      "paymentStatus": "Payment Status",
+      "detailedData": "Detailed Data",
+      "totalAmount": "Total Amount"
+    },
+    "filters": {
+      "title": "Filters",
+      "filterReports": "Filter Reports",
+      "filterCityReports": "Filter City Reports",
+      "narrowDownPayments": "Narrow down the payments list",
+      "narrowDownCityAnalytics": "Narrow down the city analytics",
+      "allStatuses": "All Statuses",
+      "allPurposes": "All Purposes",
+      "dateRange": "Date Range",
+      "from": "From",
+      "to": "To",
+      "clearAll": "Clear All",
+      "applyFilters": "Apply Filters"
+    },
+    "purposes": {
+      "admissionFee": "Admission Fee",
+      "modulePurchase": "Module Purchase"
+    },
+    "messages": {
+      "noPaymentsFound": "No payments found",
+      "noAnalyticsData": "No analytics data available",
+      "noAnalyticsFound": "No analytics data found",
+      "noPaymentAnalyticsFound": "No payment analytics found",
+      "loadingAnalytics": "Loading analytics data...",
+      "loadAnalyticsFailed": "Failed to load analytics data"
+    }
   },
   "userCard": {
     "intake": "Intake",
@@ -393,7 +525,24 @@
         "registrationDeadline": "Registration Deadline"
       },
       "loading": "Loading intake details...",
-      "loadFailed": "Failed to load intake details"
+      "loadFailed": "Failed to load enrollment details"
+    },
+    "filters": {
+      "title": "Filters",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "language": "Language",
+      "allLanguages": "All Languages",
+      "location": "Location",
+      "countryHelper": "Country (Helper)",
+      "selectCountryFirst": "Select Country to filter Cities",
+      "searchCountries": "Search countries...",
+      "city": "City",
+      "allCities": "All Cities",
+      "searchCities": "Search cities...",
+      "clearAll": "Clear All",
+      "applyFilters": "Apply Filters",
+      "narrowDownIntakes": "Narrow down the intakes list"
     }
   },
   "adminManagement": {

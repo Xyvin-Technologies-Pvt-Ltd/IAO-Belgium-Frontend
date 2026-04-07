@@ -95,17 +95,17 @@ const Intakes = () => {
     if (intakes) {
       updateBreadcrumbs([
         {
-          label: "Admission administration",
+          label: t("common.admissionAdministration"),
           path: "/admin/admission-administration",
           navigable: false,
         },
         {
-          label: "Academics",
+          label: t("common.academics"),
           path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Intakes",
+          label: t("common.intakes"),
           path: `/admin/admission-administration/intakes/batch/${intakes._id}`,
           navigable: false,
         },
@@ -254,7 +254,7 @@ const Intakes = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="Intake"
+        data={t("common.intake")}
       />
     </div>
   );

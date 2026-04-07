@@ -49,7 +49,7 @@ const AdminDashboard = () => {
         <h1 className="text-4xl font-semibold">
           {isLoading 
             ? t("common.welcome.back") 
-            : t("common.welcome.backWithName").replace("{name}", displayName)
+            : t("common.welcome.backWithName", { name: displayName })
           }
         </h1>
         <p className="text-muted-foreground text-lg">

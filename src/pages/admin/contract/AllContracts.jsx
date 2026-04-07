@@ -17,8 +17,10 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetContracts } from "@/store/useContractStore";
 import CreateContract from "@/components/admin/contract/CreateContract";
+import { useTranslation } from "react-i18next";
 
 const AllContracts = () => {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -54,22 +56,22 @@ const AllContracts = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder="Search contracts..."
+          placeholder={t("common.searchContracts")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>Create Contract</Button>
+        <Button onClick={handleOpenCreate}>{t("common.createContract")}</Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Version</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>File</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{t("common.name")}</TableHead>
+            <TableHead>{t("common.version")}</TableHead>
+            <TableHead>{t("common.status")}</TableHead>
+            <TableHead>{t("common.file") || "File"}</TableHead>
+            <TableHead>{t("common.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -79,7 +81,7 @@ const AllContracts = () => {
             <TableRow>
               <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load contracts"}
+                  message={error?.message || t("common.failedToLoadContracts")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -98,7 +100,7 @@ const AllContracts = () => {
                         : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {contract.is_active ? "Active" : "Inactive"}
+                    {contract.is_active ? t("common.active") : t("common.inactive")}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -109,7 +111,7 @@ const AllContracts = () => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-primary hover:underline text-sm"
                     >
-                      View <ExternalLink className="h-3 w-3" />
+                      {t("common.view")} <ExternalLink className="h-3 w-3" />
                     </a>
                   ) : (
                     <span className="text-gray-400 text-sm">—</span>
@@ -119,7 +121,7 @@ const AllContracts = () => {
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("common.edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(contract),
                       },
@@ -131,7 +133,7 @@ const AllContracts = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center">
-                No contracts found
+                {t("common.noContracts")}
               </TableCell>
             </TableRow>
           )}

@@ -78,18 +78,25 @@ const AllReports = () => {
   };
 
   const formatPurpose = (purpose) => {
-    if (!purpose) return "N/A";
-    return purpose
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    if (!purpose) return t("common.notAvailable");
+    switch (purpose) {
+      case "admission-fee":
+        return t("finance.purposes.admissionFee");
+      case "module-purchase":
+        return t("finance.purposes.modulePurchase");
+      default:
+        return purpose
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+    }
   };
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          All Reports
+          {t("finance.reports.all.title")}
         </h2>
       </div>
 
@@ -116,16 +123,16 @@ const AllReports = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Payment ID</TableHead>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Intake</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead>Component</TableHead>
-              <TableHead>Purpose</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Convenience Fee</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t("common.paymentId")}</TableHead>
+              <TableHead>{t("common.studentName")}</TableHead>
+              <TableHead>{t("common.intake")}</TableHead>
+              <TableHead>{t("common.program")}</TableHead>
+              <TableHead>{t("common.component")}</TableHead>
+              <TableHead>{t("common.purpose")}</TableHead>
+              <TableHead>{t("common.amount")}</TableHead>
+              <TableHead>{t("common.convenienceFee")}</TableHead>
+              <TableHead>{t("common.date")}</TableHead>
+              <TableHead>{t("common.status")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -149,16 +156,16 @@ const AllReports = () => {
             ) : payments?.length > 0 ? (
               payments?.map((payment) => (
                 <TableRow key={payment._id}>
-                  <TableCell>{payment?.uid || "N/A"}</TableCell>
+                  <TableCell>{payment?.uid || t("common.notAvailable")}</TableCell>
                   <TableCell>
                     {payment?.user
                       ? `${payment.user.first_name || ""} ${payment.user.last_name || ""}`.trim() ||
-                        "N/A"
-                      : "N/A"}
+                      t("common.notAvailable")
+                      : t("common.notAvailable")}
                   </TableCell>
-                  <TableCell>{payment?.intake_name || "N/A"}</TableCell>
-                  <TableCell>{payment?.program_name || "N/A"}</TableCell>
-                  <TableCell>{payment?.component?.name || "N/A"}</TableCell>
+                  <TableCell>{payment?.intake_name || t("common.notAvailable")}</TableCell>
+                  <TableCell>{payment?.program_name || t("common.notAvailable")}</TableCell>
+                  <TableCell>{payment?.component?.name || t("common.notAvailable")}</TableCell>
                   <TableCell>
                     <span
                       className={`font-medium ${getPurposeColor(payment?.purpose)}`}
@@ -179,7 +186,7 @@ const AllReports = () => {
                   <TableCell>
                     {payment?.createdAt
                       ? moment(payment.createdAt).format("DD MMM YYYY")
-                      : "N/A"}
+                      : t("common.notAvailable")}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={payment?.status} />
@@ -189,7 +196,7 @@ const AllReports = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={10} className="text-center">
-                  No payments found
+                  {t("finance.messages.noPaymentsFound")}
                 </TableCell>
               </TableRow>
             )}

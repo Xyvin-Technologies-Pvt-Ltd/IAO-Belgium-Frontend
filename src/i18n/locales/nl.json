@@ -74,13 +74,21 @@
       "backWithName": "Welkom terug, {{name}}!",
       "subtitle": "Al je cursussen, voortgang en updates op één plek."
     },
+    "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Bevestig verwijderen",
-      "message": "Weet je zeker dat je wilt verwijderen",
+      "message": "Weet je zeker dat je {{count}} {{data}} wilt verwijderen? {{cannotUndo}}",
       "cannotUndo": "Deze actie kan niet ongedaan worden gemaakt.",
       "cancel": "Annuleren",
       "delete": "Verwijderen",
       "deleting": "Verwijderen..."
+    },
+    "sendConfirm": {
+      "title": "Melding verzenden",
+      "message": "Dit verzendt de melding onmiddellijk naar alle ontvangers. Deze actie kan niet ongedaan worden gemaakt.",
+      "send": "Verzenden",
+      "sending": "Verzenden...",
+      "cancel": "Annuleren"
     },
     "create": "Aanmaken",
     "update": "Bijwerken",
@@ -106,12 +114,136 @@
     "loading": "Laden...",
     "teacher": "Docent",
     "student": "Student",
+    "name": "Naam",
+    "email": "E-mail",
+    "status": "Status",
+    "file": "Bestand",
+    "actions": "Acties",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
     "selectCountryFirst": "Selecteer eerst een land",
     "searchCountries": "Landen zoeken...",
+    "admissionAdministration": "Toelatingsadministratie",
+    "academicYears": "Academische jaren",
+    "academics": "Academici",
+    "intakes": "Instroom",
+    "intakeDetails": "Instroomdetails",
+    "batchDetails": "Batchdetails",
+    "mins": "minuten",
+    "min": "min",
+    "description": "Beschrijving:",
+    "instructions": "Instructies:",
+    "source": "Bron",
+    "numberOfQuestions": "Aantal vragen",
+    "viewFile": "Bestand bekijken",
+    "unknownType": "Onbekende {{type}}",
+    "noContracts": "Geen contracten gevonden",
+    "noStudentContracts": "Geen studentcontracten gevonden",
+    "searchContracts": "Contracten zoeken...",
+    "searchStudentNameEmail": "Zoeken op studentnaam of e-mail...",
+    "allStatuses": "Alle statussen",
+    "chooseStatus": "Kies status",
+    "signed": "Ondertekend",
+    "pending": "In afwachting",
+    "contract": "Contract",
+    "version": "Versie",
+    "signedAt": "Ondertekend op",
+    "createContract": "Contract aanmaken",
+    "editContract": "Contract bewerken",
+    "failedToLoadContracts": "Laden van contracten mislukt",
+    "failedToLoadStudentContracts": "Laden van studentcontracten mislukt",
+    "yearLog": "Jaarlogboek",
+    "batch": "batch",
+    "exam": "Examen",
     "searchCities": "Steden zoeken...",
     "searchLanguages": "Talen zoeken...",
     "searchTitles": "Academische graden zoeken...",
-    "searchRoles": "Docentrollen zoeken..."
+    "searchRoles": "Docentrollen zoeken...",
+    "paymentId": "Betalings-ID",
+    "studentName": "Studentnaam",
+    "intake": "Intake",
+    "program": "Programma",
+    "city": "Stad",
+    "component": "Component",
+    "purpose": "Doeleinde",
+    "amount": "Bedrag",
+    "date": "Datum",
+    "trxCount": "Aantal transacties",
+    "convenienceFee": "Servicekosten",
+    "paid": "Betaald",
+    "failed": "Mislukt",
+    "canceled": "Geannuleerd",
+    "allReports": "Alle rapporten",
+    "cityReports": "Stadsrapporten",
+    "programReports": "Programmarapporten",
+    "batchReports": "Batchrapporten",
+    "studentReports": "Studentrapporten",
+    "financeReports": "Financiële rapporten",
+    "others": "Anderen",
+    "total": "Totaal",
+    "noTimes": "Geen tijden",
+    "noVenues": "Geen locaties"
+  },
+  "finance": {
+    "title": "Financieel beheer",
+    "reports": {
+      "all": {
+        "title": "Alle rapporten",
+        "description": "Bekijk alle betalingstransacties"
+      },
+      "city": {
+        "title": "Stadsrapporten",
+        "description": "Betalingsanalyse per stad"
+      },
+      "program": {
+        "title": "Programmarapporten",
+        "description": "Betalingsanalyse per programma"
+      },
+      "batch": {
+        "title": "Batchrapporten",
+        "description": "Betalingsanalyse per batch"
+      },
+      "student": {
+        "title": "Studentrapporten",
+        "description": "Betalingsanalyse per student"
+      }
+    },
+    "fields": {
+      "totalRevenue": "Totale omzet",
+      "totalTransactions": "Totaal aantal transacties",
+      "paidTransactions": "Betaalde transacties",
+      "revenueBreakdown": "Omzetoverzicht",
+      "revenueDistribution": "Omzetverdeling",
+      "paymentStatus": "Betalingsstatus",
+      "detailedData": "Gedetailleerde gegevens",
+      "totalAmount": "Totaalbedrag"
+    },
+    "filters": {
+      "title": "Filters",
+      "filterReports": "Rapporten filteren",
+      "filterCityReports": "Stadsrapporten filteren",
+      "narrowDownPayments": "Betalingslijst verfijnen",
+      "narrowDownCityAnalytics": "Stadsanalyse verfijnen",
+      "allStatuses": "Alle statussen",
+      "allPurposes": "Alle doeleinden",
+      "dateRange": "Datumbereik",
+      "from": "Van",
+      "to": "Tot",
+      "clearAll": "Alles wissen",
+      "applyFilters": "Filters toepassen"
+    },
+    "purposes": {
+      "admissionFee": "Inschrijfgeld",
+      "modulePurchase": "Module-aankoop"
+    },
+    "messages": {
+      "noPaymentsFound": "Geen betalingen gevonden",
+      "noAnalyticsData": "Geen analysegegevens beschikbaar",
+      "noAnalyticsFound": "Geen analysegegevens gevonden",
+      "noPaymentAnalyticsFound": "Geen betalingsanalyse gevonden",
+      "loadingAnalytics": "Analysegegevens laden...",
+      "loadAnalyticsFailed": "Laden van analysegegevens mislukt"
+    }
   },
   "userCard": {
     "intake": "Intake",
@@ -391,8 +523,25 @@
         "registrationFee": "Inschrijfgeld",
         "registrationDeadline": "Inschrijfdeadline"
       },
-      "loading": "Intakegegevens laden...",
-      "loadFailed": "Laden van intakegegevens mislukt"
+      "loading": "Intake details laden...",
+      "loadFailed": "Laden van intake details mislukt"
+    },
+    "filters": {
+      "title": "Filters",
+      "status": "Status",
+      "allStatuses": "Alle statussen",
+      "language": "Taal",
+      "allLanguages": "Alle talen",
+      "location": "Locatie",
+      "countryHelper": "Land (Hulp)",
+      "selectCountryFirst": "Selecteer eerst een land om steden te filteren",
+      "searchCountries": "Landen zoeken...",
+      "city": "Stad",
+      "allCities": "Alle steden",
+      "searchCities": "Steden zoeken...",
+      "clearAll": "Alles wissen",
+      "applyFilters": "Filters toepassen",
+      "narrowDownIntakes": "Verfijn de lijst met intakes"
     }
   },
   "adminManagement": {

@@ -6,12 +6,13 @@ import {
   UserCircle,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 const REPORT_CARDS = [
   {
     key: "all",
-    title: "All Reports",
-    description: "View all payment transactions",
+    titleKey: "finance.reports.all.title",
+    descriptionKey: "finance.reports.all.description",
     icon: LayoutDashboard,
     iconColor: "#3b82f6",
     bgColor: "rgba(59,130,246,0.08)",
@@ -20,8 +21,8 @@ const REPORT_CARDS = [
   },
   {
     key: "city",
-    title: "City Reports",
-    description: "Payment analytics by city",
+    titleKey: "finance.reports.city.title",
+    descriptionKey: "finance.reports.city.description",
     icon: Building2,
     iconColor: "#22c55e",
     bgColor: "rgba(34,197,94,0.08)",
@@ -30,8 +31,8 @@ const REPORT_CARDS = [
   },
   {
     key: "program",
-    title: "Program Reports",
-    description: "Payment analytics by program",
+    titleKey: "finance.reports.program.title",
+    descriptionKey: "finance.reports.program.description",
     icon: GraduationCap,
     iconColor: "#ff8904",
     bgColor: "rgba(255,137,4,0.08)",
@@ -40,8 +41,8 @@ const REPORT_CARDS = [
   },
   {
     key: "batch",
-    title: "Batch Reports",
-    description: "Payment analytics by batch",
+    titleKey: "finance.reports.batch.title",
+    descriptionKey: "finance.reports.batch.description",
     icon: Users,
     iconColor: "#8b5cf6",
     bgColor: "rgba(139,92,246,0.08)",
@@ -50,8 +51,8 @@ const REPORT_CARDS = [
   },
   {
     key: "student",
-    title: "Student Reports",
-    description: "Payment analytics by student",
+    titleKey: "finance.reports.student.title",
+    descriptionKey: "finance.reports.student.description",
     icon: UserCircle,
     iconColor: "#ef4444",
     bgColor: "rgba(239,68,68,0.08)",
@@ -62,12 +63,13 @@ const REPORT_CARDS = [
 
 const FinanceManagement = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Finance Management
+          {t("finance.title")}
         </h2>
       </div>
 
@@ -107,14 +109,14 @@ const FinanceManagement = () => {
                   color: "var(--sidebar-foreground, #1e293b)",
                   marginBottom: 4,
                 }}>
-                  {card.title}
+                  {t(card.titleKey)}
                 </h3>
                 <p style={{
                   fontSize: 13,
                   color: "#94a3b8",
                   lineHeight: 1.4,
                 }}>
-                  {card.description}
+                  {t(card.descriptionKey)}
                 </p>
               </div>
             </div>

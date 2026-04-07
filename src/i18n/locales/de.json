@@ -74,13 +74,21 @@
       "backWithName": "Willkommen zurück, {{name}}!",
       "subtitle": "Alle Ihre Kurse, Fortschritte und Updates an einem Ort."
     },
+    "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Löschen bestätigen",
-      "message": "Sind Sie sicher, dass Sie löschen möchten",
+      "message": "Sind Sie sicher, dass Sie {{count}} {{data}} löschen möchten? {{cannotUndo}}",
       "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "delete": "Löschen",
       "deleting": "Löschen..."
+    },
+    "sendConfirm": {
+      "title": "Benachrichtigung senden",
+      "message": "Dies wird die Benachrichtigung sofort an alle Empfänger senden. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "send": "Senden",
+      "sending": "Senden...",
+      "cancel": "Abbrechen"
     },
     "create": "Erstellen",
     "update": "Aktualisieren",
@@ -106,12 +114,159 @@
     "loading": "Laden...",
     "teacher": "Dozent",
     "student": "Student",
+    "name": "Name",
+    "email": "E-Mail",
+    "status": "Status",
+    "file": "Datei",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
     "selectCountryFirst": "Bitte wählen Sie zuerst ein Land aus",
     "searchCountries": "Länder suchen...",
+    "admissionAdministration": "Zulassungsverwaltung",
+    "academicYears": "Akademische Jahre",
+    "academics": "Akademik",
+    "intakes": "Aufnahmen",
+    "intakeDetails": "Aufnahme-Details",
+    "batchDetails": "Chargen-Details",
+    "mins": "Minuten",
+    "min": "Min",
+    "description": "Beschreibung:",
+    "instructions": "Anweisungen:",
+    "source": "Quelle",
+    "numberOfQuestions": "Anzahl der Fragen",
+    "viewFile": "Datei ansehen",
+    "unknownType": "Unbekannter {{type}}",
+    "noContracts": "Keine Verträge gefunden",
+    "noStudentContracts": "Keine Studentenverträge gefunden",
+    "searchContracts": "Verträge suchen...",
+    "searchStudentNameEmail": "Nach Studentennamen oder E-Mail suchen...",
+    "allStatuses": "Alle Status",
+    "chooseStatus": "Status wählen",
+    "signed": "Unterzeichnet",
+    "pending": "Ausstehend",
+    "contract": "Vertrag",
+    "version": "Version",
+    "signedAt": "Unterzeichnet am",
+    "createContract": "Vertrag erstellen",
+    "editContract": "Vertrag bearbeiten",
+    "failedToLoadContracts": "Fehler beim Laden der Verträge",
+    "failedToLoadStudentContracts": "Fehler beim Laden der Studentenverträge",
+    "yearLog": "Jahresprotokoll",
+    "batch": "Charge",
+    "exam": "Prüfung",
     "searchCities": "Städte suchen...",
     "searchLanguages": "Sprachen suchen...",
     "searchTitles": "Akademische Grade suchen...",
-    "searchRoles": "Dozentenrollen suchen..."
+    "searchRoles": "Dozentenrollen suchen...",
+    "paymentId": "Zahlungs-ID",
+    "studentName": "Studentenname",
+    "intake": "Aufnahme",
+    "program": "Programm",
+    "city": "Stadt",
+    "component": "Komponente",
+    "purpose": "Zweck",
+    "amount": "Betrag",
+    "date": "Datum",
+    "trxCount": "Anzahl der Transaktionen",
+    "convenienceFee": "Servicegebühr",
+    "paid": "Bezahlt",
+    "failed": "Fehlgeschlagen",
+    "canceled": "Abgebrochen",
+    "allReports": "Alle Berichte",
+    "cityReports": "Berichte nach Stadt",
+    "programReports": "Berichte nach Programm",
+    "batchReports": "Berichte nach Charge",
+    "studentReports": "Berichte nach Student",
+    "financeReports": "Finanzberichte",
+    "others": "Andere",
+    "total": "Gesamt",
+    "noTimes": "Keine Zeiten",
+    "noVenues": "Keine Veranstaltungsorte"
+  },
+  "finance": {
+    "title": "Finanzverwaltung",
+    "reports": {
+      "all": {
+        "title": "Alle Berichte",
+        "description": "Alle Zahlungstransaktionen anzeigen"
+      },
+      "city": {
+        "title": "Berichte nach Stadt",
+        "description": "Zahlungsanalysen nach Stadt"
+      },
+      "program": {
+        "title": "Berichte nach Programm",
+        "description": "Zahlungsanalysen nach Programm"
+      },
+      "batch": {
+        "title": "Berichte nach Charge",
+        "description": "Zahlungsanalysen nach Charge"
+      },
+      "student": {
+        "title": "Berichte nach Student",
+        "description": "Zahlungsanalysen nach Student"
+      }
+    },
+    "fields": {
+      "totalRevenue": "Gesamteinnahmen",
+      "totalTransactions": "Gesamttransaktionen",
+      "paidTransactions": "Bezahlte Transaktionen",
+      "revenueBreakdown": "Einnahmenaufschlüsselung",
+      "revenueDistribution": "Einnahmenverteilung",
+      "paymentStatus": "Zahlungsstatus",
+      "detailedData": "Detaillierte Daten",
+      "totalAmount": "Gesamtbetrag"
+    },
+    "filters": {
+      "title": "Filter",
+      "filterReports": "Berichte filtern",
+      "filterCityReports": "Berichte nach Stadt filtern",
+      "narrowDownPayments": "Zahlungsliste eingrenzen",
+      "narrowDownCityAnalytics": "Stadtanalysen eingrenzen",
+      "allStatuses": "Alle Status",
+      "allPurposes": "Alle Zwecke",
+      "dateRange": "Datumsbereich",
+      "from": "Von",
+      "to": "Bis",
+      "clearAll": "Alles löschen",
+      "applyFilters": "Filter anwenden"
+    },
+    "purposes": {
+      "admissionFee": "Zulassungsgebühr",
+      "modulePurchase": "Modulkauf"
+    },
+    "messages": {
+      "noPaymentsFound": "Keine Zahlungen gefunden",
+      "noAnalyticsData": "Keine Analysedaten verfügbar",
+      "noAnalyticsFound": "Keine Analysedaten gefunden",
+      "noPaymentAnalyticsFound": "Keine Zahlungsanalysen gefunden",
+      "loadingAnalytics": "Analysedaten werden geladen...",
+      "loadFailed": "Fehler beim Laden der Einschreibungsdetails"
+    }
+  },
+  "ltiManagement": {
+    "title": "LTI-Tool-Verwaltung",
+    "subtitle": "Verwalten Sie in den HUB integrierte LTI 1.3 externe Tools",
+    "registerTool": "Tool registrieren",
+    "table": {
+      "name": "Name",
+      "clientId": "Client-ID",
+      "deploymentId": "Deployment-ID",
+      "oidcLoginUrl": "OIDC-Login-URL",
+      "active": "Aktiv",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "edit": "Bearbeiten",
+      "platformConfig": "Plattform-Konfiguration",
+      "deactivate": "Deaktivieren"
+    },
+    "messages": {
+      "noTools": "Keine LTI-Tools registriert",
+      "clickToRegister": "Klicken Sie auf \"Tool registrieren\", um Enatom oder ein anderes LTI 1.3 Tool hinzuzufügen.",
+      "loadFailed": "Fehler beim Laden der LTI-Tools"
+    }
   },
   "userCard": {
     "intake": "Aufnahme",
@@ -391,8 +546,25 @@
         "registrationFee": "Anmeldegebühr",
         "registrationDeadline": "Anmeldefrist"
       },
-      "loading": "Aufnahmedetails werden geladen...",
-      "loadFailed": "Laden der Aufnahmedetails fehlgeschlagen"
+      "loading": "Lade Aufnahmedetails...",
+      "loadFailed": "Aufnahmedetails konnten nicht geladen werden"
+    },
+    "filters": {
+      "title": "Filter",
+      "status": "Status",
+      "allStatuses": "Alle Stati",
+      "language": "Sprache",
+      "allLanguages": "Alle Sprachen",
+      "location": "Standort",
+      "countryHelper": "Land (Hilfe)",
+      "selectCountryFirst": "Wählen Sie zuerst ein Land aus, um Städte zu filtern",
+      "searchCountries": "Länder suchen...",
+      "city": "Stadt",
+      "allCities": "Alle Städte",
+      "searchCities": "Städte suchen...",
+      "clearAll": "Alle löschen",
+      "applyFilters": "Filter anwenden",
+      "narrowDownIntakes": "Eingrenzen der Aufnahmeliste"
     }
   },
   "adminManagement": {

@@ -155,7 +155,7 @@ const Exams = () => {
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
-                <TableCell>{i?.duration ?? 0} min</TableCell>
+                <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
                 <TableCell>{i?.passing_marks ?? 0}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
