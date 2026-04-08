@@ -4,7 +4,7 @@
     "locationValue": "Nederland",
     "nav": {
       "dashboard": "Dashboard",
-      "myCourses": "Mijn Cursussen",
+      "myCourses": "Mijn Opleidingen",
       "myApp": "Mijn APP",
       "invoices": "Facturen",
       "assessment": "Beoordeling"
@@ -72,7 +72,7 @@
     "welcome": {
       "back": "Welkom terug!",
       "backWithName": "Welkom terug, {{name}}!",
-      "subtitle": "Al je cursussen, voortgang en updates op één plek."
+      "subtitle": "Al je opleidingen, voortgang en updates op één plek."
     },
     "dashboard": "Dashboard",
     "deleteConfirm": {
@@ -175,7 +175,7 @@
     "canceled": "Geannuleerd",
     "allReports": "Alle rapporten",
     "cityReports": "Stadsrapporten",
-    "programReports": "Programmarapporten",
+    "programReports": "Opleidingsrapporten",
     "batchReports": "Batchrapporten",
     "studentReports": "Studentrapporten",
     "financeReports": "Financiële rapporten",
@@ -196,8 +196,8 @@
         "description": "Betalingsanalyse per stad"
       },
       "program": {
-        "title": "Programmarapporten",
-        "description": "Betalingsanalyse per programma"
+        "title": "Opleidingsrapporten",
+        "description": "Betalingsanalyse per opleiding"
       },
       "batch": {
         "title": "Batchrapporten",
@@ -417,11 +417,11 @@
     }
   },
   "programManagement": {
-    "title": "Programma's",
+    "title": "Opleidingen",
     "search": "Zoeken...",
     "delete": "Verwijderen",
     "duplicate": "Dupliceren",
-    "createProgram": "Programma aanmaken",
+    "createProgram": "Opleiding aanmaken",
     "table": {
       "uid": "UID",
       "name": "Naam",
@@ -432,21 +432,21 @@
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
-      "noPrograms": "Geen programma's gevonden"
+      "noPrograms": "Geen opleidingen gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van programma's mislukt"
+      "loadFailed": "Laden van opleidingen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuw programma aanmaken",
-      "editTitle": "Programma bewerken",
-      "createSubtitle": "Laten we een nieuw programma aanmaken",
-      "editSubtitle": "Programmagegevens bijwerken",
-      "nameLabel": "Programmanaam",
-      "namePlaceholder": "Voer programmanaam in",
-      "programTypeLabel": "Programmatype",
-      "programTypePlaceholder": "Selecteer programmatype",
-      "durationLabel": "Duur van het programma",
+      "createTitle": "Een nieuwe opleiding aanmaken",
+      "editTitle": "Opleiding bewerken",
+      "createSubtitle": "Laten we een nieuwe opleiding aanmaken",
+      "editSubtitle": "Opleidingsgegevens bijwerken",
+      "nameLabel": "Opleidingsnaam",
+      "namePlaceholder": "Voer opleidingsnaam in",
+      "programTypeLabel": "Opleidingstype",
+      "programTypePlaceholder": "Selecteer opleidingstype",
+      "durationLabel": "Duur van de opleiding",
       "durationPlaceholder": "Voer duur in jaren in (bijv. 1, 2, 3)",
       "languageLabel": "Taal",
       "languagePlaceholder": "Selecteer taal",
@@ -505,7 +505,7 @@
       "studentsPerBatchPlaceholder": "Voer studenten per groep in",
       "maxStudentEnrollmentLabel": "Max studenten inschrijving",
       "maxStudentEnrollmentPlaceholder": "Voer max inschrijving in",
-      "searchPrograms": "Programma's zoeken..."
+      "searchPrograms": "Opleidingen zoeken..."
     },
     "details": {
       "tabs": {
@@ -839,11 +839,11 @@
     },
     "emptyState": {
       "title": "Nog geen academische jaren aangemaakt",
-      "subtitle": "Begin met het maken van een academisch jaar om programma's, batches en toelatingen efficiënt te beheren."
+      "subtitle": "Begin met het maken van een academisch jaar om opleidingen, batches en toelatingen efficiënt te beheren."
     },
     "card": {
       "academicYear": "Academisch jaar",
-      "programs": "Programma's",
+      "programs": "Opleidingen",
       "batches": "Batches",
       "edit": "Bewerken",
       "duplicate": "Dupliceren"
@@ -1037,9 +1037,9 @@
     }
   },
   "programDetail": {
-    "title": "Programmadetails",
+    "title": "Opleidingsdetails",
     "cards": {
-      "programName": "Programmanaam",
+      "programName": "Opleidingsnaam",
       "duration": "Duur",
       "noOfModules": "Aantal modules",
       "registrationFee": "Inschrijfgeld",
@@ -1053,12 +1053,12 @@
       "examComponents": "Examen"
     },
     "emptyState": {
-      "title": "Nog geen programmamodules toegevoegd",
-      "subtitle": "Begin met het toevoegen van modules, apps, bronnen of examens om dit programma effectief op te bouwen en te beheren.",
-      "createButton": "Programmamodule aanmaken"
+      "title": "Nog geen opleidingsmodules toegevoegd",
+      "subtitle": "Begin met het toevoegen van modules, apps, bronnen of examens om deze opleiding effectief op te bouwen en te beheren.",
+      "createButton": "Opleidingsmodule aanmaken"
     },
-    "loading": "Programmadetails laden...",
-    "loadFailed": "Laden van programmadetails mislukt"
+    "loading": "Opleidingsdetails laden...",
+    "loadFailed": "Laden van opleidingsdetails mislukt"
   },
   "learningModule": {
     "search": "Modules zoeken...",
@@ -1297,8 +1297,8 @@
     }
   },
   "componentManagement": {
-    "createTitle": "Programma module aanmaken",
-    "editTitle": "Programma module bewerken",
+    "createTitle": "Opleidingsmodule aanmaken",
+    "editTitle": "Opleidingsmodule bewerken",
     "typeLabel": "Type",
     "typePlaceholder": "Selecteer type",
     "types": {
@@ -1337,14 +1337,14 @@
     "uploadingFiles": "Bestanden uploaden..."
   },
   "programConfig": {
-    "title": "Programma configuratie",
+    "title": "Opleidingsconfiguratie",
     "subtitle": "Academische vereisten en drempels configureren",
     "selectYear": "Selecteer jaar",
     "newYear": "Nieuw jaar",
     "yearLabel": "Jaar (1e, 2e, 3e, etc.)",
     "yearPlaceholder": "bijv. 1 voor het eerste jaar",
-    "yearHint": "Configuratie aanmaken voor een nieuw programma-jaar",
-    "programYear": "Programma jaar",
+    "yearHint": "Configuratie aanmaken voor een nieuw opleidingsjaar",
+    "programYear": "Opleidingsjaar",
     "yearPlaceholderSelect": "Selecteer een jaar",
     "yearDisplay": "Jaar {{year}}",
     "yearViewing": "Configuratie bekijken voor Jaar {{year}}",
@@ -1470,9 +1470,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "ongoingCourses": "Lopende Cursussen",
-    "finishedCourses": "Afgeronde Cursussen",
-    "courseEnrollmentTrend": "Trend Cursusinschrijvingen",
+    "ongoingCourses": "Lopende Opleidingen",
+    "finishedCourses": "Afgeronde Opleidingen",
+    "courseEnrollmentTrend": "Trend Opleidingsinschrijvingen",
     "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
   },
   "ltiManagement": {

@@ -4,7 +4,7 @@
     "locationValue": "Niederlande",
     "nav": {
       "dashboard": "Dashboard",
-      "myCourses": "Meine Kurse",
+      "myCourses": "Meine Ausbildungen",
       "myApp": "Meine APP",
       "invoices": "Rechnungen",
       "assessment": "Bewertung"
@@ -72,7 +72,7 @@
     "welcome": {
       "back": "Willkommen zurück!",
       "backWithName": "Willkommen zurück, {{name}}!",
-      "subtitle": "Alle Ihre Kurse, Fortschritte und Updates an einem Ort."
+      "subtitle": "Alle Ihre Ausbildungen, Fortschritte und Updates an einem Ort."
     },
     "dashboard": "Dashboard",
     "deleteConfirm": {
@@ -173,7 +173,7 @@
     "canceled": "Abgebrochen",
     "allReports": "Alle Berichte",
     "cityReports": "Berichte nach Stadt",
-    "programReports": "Berichte nach Programm",
+    "programReports": "Berichte nach Ausbildung / Studiengang",
     "batchReports": "Berichte nach Charge",
     "studentReports": "Berichte nach Student",
     "financeReports": "Finanzberichte",
@@ -194,8 +194,8 @@
         "description": "Zahlungsanalysen nach Stadt"
       },
       "program": {
-        "title": "Berichte nach Programm",
-        "description": "Zahlungsanalysen nach Programm"
+        "title": "Berichte nach Ausbildung / Studiengang",
+        "description": "Zahlungsanalysen nach Ausbildung / Studiengang"
       },
       "batch": {
         "title": "Berichte nach Charge",
@@ -438,11 +438,11 @@
     }
   },
   "programManagement": {
-    "title": "Programme",
+    "title": "Ausbildungen / Studiengänge",
     "search": "Suchen...",
     "delete": "Löschen",
     "duplicate": "Duplizieren",
-    "createProgram": "Programm erstellen",
+    "createProgram": "Ausbildung / Studiengang erstellen",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -453,21 +453,21 @@
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
-      "noPrograms": "Keine Programme gefunden"
+      "noPrograms": "Keine Ausbildungen / Studiengänge gefunden"
     },
     "messages": {
-      "loadFailed": "Laden der Programme fehlgeschlagen"
+      "loadFailed": "Laden der Ausbildungen / Studiengänge fehlgeschlagen"
     },
     "modal": {
-      "createTitle": "Ein neues Programm erstellen",
-      "editTitle": "Programm bearbeiten",
-      "createSubtitle": "Lassen Sie uns ein neues Programm erstellen",
-      "editSubtitle": "Programmdetails aktualisieren",
-      "nameLabel": "Programmname",
-      "namePlaceholder": "Programmnamen eingeben",
-      "programTypeLabel": "Programmtyp",
-      "programTypePlaceholder": "Programmtyp auswählen",
-      "durationLabel": "Dauer des Programms",
+      "createTitle": "Eine neue Ausbildung / Studiengang erstellen",
+      "editTitle": "Ausbildung / Studiengang bearbeiten",
+      "createSubtitle": "Lassen Sie uns eine neue Ausbildung / Studiengang erstellen",
+      "editSubtitle": "Details der Ausbildung / Studiengang aktualisieren",
+      "nameLabel": "Name der Ausbildung / Studiengang",
+      "namePlaceholder": "Name der Ausbildung / Studiengang eingeben",
+      "programTypeLabel": "Typ der Ausbildung / Studiengang",
+      "programTypePlaceholder": "Typ auswählen",
+      "durationLabel": "Dauer der Ausbildung / Studiengang",
       "durationPlaceholder": "Dauer in Jahren eingeben (z. B. 1, 2, 3)",
       "languageLabel": "Sprache",
       "languagePlaceholder": "Sprache auswählen",
@@ -526,7 +526,7 @@
       "studentsPerBatchPlaceholder": "Studenten pro Gruppe eingeben",
       "maxStudentEnrollmentLabel": "Max. Studentenzahl",
       "maxStudentEnrollmentPlaceholder": "Maximale Einschreibung eingeben",
-      "searchPrograms": "Programme suchen..."
+      "searchPrograms": "Ausbildungen / Studiengänge suchen..."
     },
     "details": {
       "tabs": {
@@ -774,11 +774,11 @@
     },
     "emptyState": {
       "title": "Noch keine akademischen Jahre erstellt",
-      "subtitle": "Beginnen Sie mit der Erstellung eines akademischen Jahres, um Programme, Gruppen und Zulassungen effizient zu verwalten."
+      "subtitle": "Beginnen Sie mit der Erstellung eines akademischen Jahres, um Ausbildungen / Studiengänge, Gruppen und Zulassungen effizient zu verwalten."
     },
     "card": {
       "academicYear": "Akademisches Jahr",
-      "programs": "Programme",
+      "programs": "Ausbildungen / Studiengänge",
       "batches": "Gruppen",
       "edit": "Bearbeiten",
       "duplicate": "Duplizieren"
@@ -972,9 +972,9 @@
     }
   },
   "programDetail": {
-    "title": "Programmdetails",
+    "title": "Details der Ausbildung / Studiengang",
     "cards": {
-      "programName": "Programmname",
+      "programName": "Name der Ausbildung / Studiengang",
       "duration": "Dauer",
       "noOfModules": "Anzahl der Module",
       "registrationFee": "Anmeldegebühr",
@@ -988,12 +988,12 @@
       "examComponents": "Prüfung"
     },
     "emptyState": {
-      "title": "Noch keine Programm-Module hinzugefügt",
-      "subtitle": "Beginnen Sie mit dem Hinzufügen von Modulen, Apps, Ressourcen oder Prüfungen, um dieses Programm effizient aufzubauen und zu verwalten.",
-      "createButton": "Programm-Modul erstellen"
+      "title": "Noch keine Module der Ausbildung / Studiengang hinzugefügt",
+      "subtitle": "Beginnen Sie mit dem Hinzufügen von Modulen, Apps, Ressourcen oder Prüfungen, um diese Ausbildung / Studiengang effizient aufzubauen und zu verwalten.",
+      "createButton": "Modul der Ausbildung / Studiengang erstellen"
     },
-    "loading": "Programmdetails werden geladen...",
-    "loadFailed": "Laden der Programmdetails fehlgeschlagen"
+    "loading": "Details der Ausbildung / Studiengang werden geladen...",
+    "loadFailed": "Laden der Details der Ausbildung / Studiengang fehlgeschlagen"
   },
   "learningModule": {
     "search": "Module suchen...",
@@ -1103,7 +1103,7 @@
       "createSubtitle": "Lassen Sie uns eine neue Planung erstellen",
       "editSubtitle": "Planungsdetails aktualisieren",
       "programLabel": "Ausbildung / Studiengang",
-      "searchPrograms": "Programme suchen...",
+      "searchPrograms": "Ausbildungen / Studiengänge suchen...",
       "batchLabel": "Gruppe",
       "batchPlaceholder": "Gruppe auswählen",
       "searchBatches": "Gruppen suchen...",
@@ -1158,9 +1158,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "ongoingCourses": "Laufende Kurse",
-    "finishedCourses": "Beendete Kurse",
-    "courseEnrollmentTrend": "Kurseinschreibungstrend",
+    "ongoingCourses": "Laufende Ausbildungen",
+    "finishedCourses": "Abgeschlossene Ausbildungen",
+    "courseEnrollmentTrend": "Einschreibungstrend Ausbildung / Studiengang",
     "comparedToLastMonth": "{{percent}} im Vergleich zum Vormonat"
   },
   "exam": {
@@ -1325,8 +1325,8 @@
     }
   },
   "componentManagement": {
-    "createTitle": "Programm-Modul erstellen",
-    "editTitle": "Programm-Modul bearbeiten",
+    "createTitle": "Modul der Ausbildung / Studiengang erstellen",
+    "editTitle": "Modul der Ausbildung / Studiengang bearbeiten",
     "typeLabel": "Typ",
     "typePlaceholder": "Typ auswählen",
     "types": {
@@ -1365,14 +1365,14 @@
     "uploadingFiles": "Dateien werden hochgeladen..."
   },
   "programConfig": {
-    "title": "Programm-Konfiguration",
+    "title": "Konfiguration der Ausbildung / Studiengang",
     "subtitle": "Akademische Anforderungen und Schwellenwerte konfigurieren",
     "selectYear": "Jahr auswählen",
     "newYear": "Neues Jahr",
     "yearLabel": "Jahr (1., 2., 3. etc.)",
     "yearPlaceholder": "z.B. 1 für das erste Jahr",
-    "yearHint": "Konfiguration für ein neues Programmjahr erstellen",
-    "programYear": "Programmjahr",
+    "yearHint": "Konfiguration für ein neues Jahr der Ausbildung / Studiengang erstellen",
+    "programYear": "Jahr der Ausbildung / Studiengang",
     "yearPlaceholderSelect": "Wählen Sie ein Jahr",
     "yearDisplay": "Jahr {{year}}",
     "yearViewing": "Konfiguration für Jahr {{year}} wird angezeigt",

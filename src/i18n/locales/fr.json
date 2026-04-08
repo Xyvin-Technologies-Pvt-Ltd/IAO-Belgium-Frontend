@@ -4,7 +4,7 @@
     "locationValue": "Pays-Bas",
     "nav": {
       "dashboard": "Tableau de bord",
-      "myCourses": "Mes cours",
+      "myCourses": "Mes formations",
       "myApp": "Mon APP",
       "invoices": "Factures",
       "assessment": "Évaluation"
@@ -72,7 +72,7 @@
     "welcome": {
       "back": "Bon retour !",
       "backWithName": "Bon retour, {{name}} !",
-      "subtitle": "Tous vos cours, progrès et mises à jour en un seul endroit."
+      "subtitle": "Tous vos formations, progrès et mises à jour en un seul endroit."
     },
     "dashboard": "Tableau de bord",
     "deleteConfirm": {
@@ -417,11 +417,11 @@
     }
   },
   "programManagement": {
-    "title": "Programmes",
+    "title": "Formations / Programmes",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
-    "createProgram": "Créer un programme",
+    "createProgram": "Créer une formation / programme",
     "table": {
       "uid": "UID",
       "name": "Nom",
@@ -432,21 +432,21 @@
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
-      "noPrograms": "Aucun programme trouvé"
+      "noPrograms": "Aucune formation / programme trouvé"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des programmes"
+      "loadFailed": "Échec du chargement des formations / programmes"
     },
     "modal": {
-      "createTitle": "Créer un nouveau programme",
-      "editTitle": "Modifier le programme",
-      "createSubtitle": "Créons un nouveau programme",
-      "editSubtitle": "Mettre à jour les détails du programme",
-      "nameLabel": "Nom du programme",
-      "namePlaceholder": "Entrez le nom du programme",
-      "programTypeLabel": "Type de programme",
-      "programTypePlaceholder": "Sélectionnez le type de programme",
-      "durationLabel": "Durée du programme",
+      "createTitle": "Créer une nouvelle formation / programme",
+      "editTitle": "Modifier la formation / programme",
+      "createSubtitle": "Créons une nouvelle formation / programme",
+      "editSubtitle": "Mettre à jour les détails de la formation / programme",
+      "nameLabel": "Nom de la formation / programme",
+      "namePlaceholder": "Entrez le nom de la formation / programme",
+      "programTypeLabel": "Type de formation / programme",
+      "programTypePlaceholder": "Sélectionnez le type de formation / programme",
+      "durationLabel": "Durée de la formation / programme",
       "durationPlaceholder": "Entrez la durée en années (ex : 1, 2, 3)",
       "languageLabel": "Langue",
       "languagePlaceholder": "Sélectionnez la langue",
@@ -782,9 +782,9 @@
       "assistantsLabel": "Assistants pédagogiques",
       "assistantsPlaceholder": "Sélectionnez des assistants pédagogiques",
       "searchAssistants": "Rechercher des assistants pédagogiques...",
-      "traineesLabel": "Stagiaires",
-      "traineesPlaceholder": "Sélectionnez des stagiaires",
-      "searchTrainees": "Rechercher des stagiaires...",
+      "traineesLabel": "Stagiaires / Trainees",
+      "traineesPlaceholder": "Sélectionnez des stagiaires / trainees",
+      "searchTrainees": "Rechercher des stagiaires / trainees...",
       "addSession": "Ajouter une autre session"
     },
     "view": {
@@ -839,11 +839,11 @@
     },
     "emptyState": {
       "title": "Aucune année académique créée pour l'instant",
-      "subtitle": "Commencez par créer une année académique pour gérer efficacement les programmes, les lots et les admissions."
+      "subtitle": "Commencez par créer une année académique pour gérer efficacement les formations / programmes, les lots et les admissions."
     },
     "card": {
       "academicYear": "Année académique",
-      "programs": "Programmes",
+      "programs": "Formations / Programmes",
       "batches": "Lots",
       "edit": "Modifier",
       "duplicate": "Dupliquer"
@@ -1037,9 +1037,9 @@
     }
   },
   "programDetail": {
-    "title": "Détails du programme",
+    "title": "Détails de la formation / programme",
     "cards": {
-      "programName": "Nom du programme",
+      "programName": "Nom de la formation / programme",
       "duration": "Durée",
       "noOfModules": "Nb de modules",
       "registrationFee": "Frais d'inscription",
@@ -1053,12 +1053,12 @@
       "examComponents": "Examen"
     },
     "emptyState": {
-      "title": "Aucun module de programme ajouté pour l'instant",
-      "subtitle": "Commencez par ajouter des modules, des apps, des ressources ou des examens pour construire et gérer ce programme efficacement.",
-      "createButton": "Créer un module de programme"
+      "title": "Aucun module de formation / programme ajouté pour l'instant",
+      "subtitle": "Commencez par ajouter des modules, des apps, des ressources ou des examens pour construire et gérer cette formation / programme efficacement.",
+      "createButton": "Créer un module de formation / programme"
     },
-    "loading": "Chargement des détails du programme...",
-    "loadFailed": "Échec du chargement des détails du programme"
+    "loading": "Chargement des détails de la formation / programme...",
+    "loadFailed": "Échec du chargement des détails de la formation / programme"
   },
   "learningModule": {
     "search": "Rechercher des modules...",
@@ -1299,8 +1299,8 @@
     }
   },
   "componentManagement": {
-    "createTitle": "Créer un module de programme",
-    "editTitle": "Modifier le module de programme",
+    "createTitle": "Créer un module de formation / programme",
+    "editTitle": "Modifier le module de formation / programme",
     "typeLabel": "Type",
     "typePlaceholder": "Sélectionner le type",
     "types": {
@@ -1339,14 +1339,14 @@
     "uploadingFiles": "Téléchargement des fichiers..."
   },
   "programConfig": {
-    "title": "Configuration du programme",
+    "title": "Configuration de la formation / programme",
     "subtitle": "Configurer les exigences académiques et les seuils",
     "selectYear": "Sélectionner l'année",
     "newYear": "Nouvelle année",
     "yearLabel": "Année (1ère, 2ème, 3ème, etc.)",
     "yearPlaceholder": "ex: 1 pour la première année",
-    "yearHint": "Création de la configuration pour une nouvelle année de programme",
-    "programYear": "Année de programme",
+    "yearHint": "Création de la configuration pour une nouvelle année de formation / programme",
+    "programYear": "Année de formation / programme",
     "yearPlaceholderSelect": "Sélectionner une année",
     "yearDisplay": "Année {{year}}",
     "yearViewing": "Affichage de la configuration pour l'année {{year}}",
@@ -1472,9 +1472,9 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "ongoingCourses": "Cours en cours",
-    "finishedCourses": "Cours terminés",
-    "courseEnrollmentTrend": "Tendance des inscriptions aux cours",
+    "ongoingCourses": "Formations en cours",
+    "finishedCourses": "Formations terminées",
+    "courseEnrollmentTrend": "Tendance des inscriptions aux formations",
     "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
   },
   "ltiManagement": {

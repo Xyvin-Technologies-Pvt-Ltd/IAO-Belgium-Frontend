@@ -4,7 +4,7 @@
     "locationValue": "Netherlands",
     "nav": {
       "dashboard": "Dashboard",
-      "myCourses": "My Courses",
+      "myCourses": "My Programmes",
       "myApp": "My APP",
       "invoices": "Invoices",
       "assessment": "Assessment"
@@ -72,7 +72,7 @@
     "welcome": {
       "back": "Welcome back!",
       "backWithName": "Welcome back, {{name}}!",
-      "subtitle": "All your courses, progress, and updates in one place."
+      "subtitle": "All your programmes, progress, and updates in one place."
     },
     "dashboard": "Dashboard",
     "deleteConfirm": {
@@ -973,7 +973,7 @@
       "createButton": "Create Programme Module"
     },
     "loading": "Loading programme details...",
-    "loadFailed": "Failed to load program details"
+    "loadFailed": "Failed to load programme details"
   },
   "learningModule": {
     "search": "Search modules...",
@@ -1138,9 +1138,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "ongoingCourses": "Ongoing Courses",
-    "finishedCourses": "Finished Courses",
-    "courseEnrollmentTrend": "Course Enrollment Trend",
+    "ongoingCourses": "Ongoing Programmes",
+    "finishedCourses": "Finished Programmes",
+    "courseEnrollmentTrend": "Programme Enrollment Trend",
     "comparedToLastMonth": "{{percent}} compared to last month"
   },
   "exam": {
@@ -1328,8 +1328,8 @@
     }
   },
   "componentManagement": {
-    "createTitle": "Create Program Module",
-    "editTitle": "Edit Program Module",
+    "createTitle": "Create Programme Module",
+    "editTitle": "Edit Programme Module",
     "typeLabel": "Type",
     "typePlaceholder": "Select type",
     "types": {
@@ -1368,14 +1368,14 @@
     "uploadingFiles": "Uploading files..."
   },
   "programConfig": {
-    "title": "Program Configuration",
+    "title": "Programme Configuration",
     "subtitle": "Configure academic requirements and thresholds",
     "selectYear": "Select Year",
     "newYear": "New Year",
     "yearLabel": "Year (1st, 2nd, 3rd, etc.)",
     "yearPlaceholder": "e.g., 1 for first year",
-    "yearHint": "Creating configuration for a new program year",
-    "programYear": "Program Year",
+    "yearHint": "Creating configuration for a new programme year",
+    "programYear": "Programme Year",
     "yearPlaceholderSelect": "Select a year",
     "yearDisplay": "Year {{year}}",
     "yearViewing": "Viewing configuration for Year {{year}}",
