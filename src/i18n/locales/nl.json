@@ -24,7 +24,7 @@
       "dashboard": "Dashboard",
       "schedules": "Roosters",
       "planning": "Planning",
-      "evaluations": "Evaluaties",
+      "evaluations": "Feedback",
       "exams": "Examens"
     },
     "admin": {
@@ -162,7 +162,7 @@
     "paymentId": "Betalings-ID",
     "studentName": "Studentnaam",
     "intake": "Intake",
-    "program": "Programma",
+    "program": "Opleiding",
     "city": "Stad",
     "component": "Component",
     "purpose": "Doeleinde",
@@ -474,7 +474,7 @@
     "createIntake": "Intake aanmaken",
     "table": {
       "name": "Naam",
-      "program": "Programma",
+      "program": "Opleiding",
       "city": "Stad",
       "language": "Taal",
       "registrationFee": "Inschrijfgeld",
@@ -494,8 +494,8 @@
       "editTitle": "Intake bewerken",
       "nameLabel": "Intakenaam",
       "namePlaceholder": "Voer intakenaam in",
-      "programLabel": "Programma",
-      "programPlaceholder": "Selecteer programma",
+      "programLabel": "Opleiding",
+      "programPlaceholder": "Selecteer opleiding",
       "registrationFeeLabel": "Inschrijfgeld",
       "registrationFeePlaceholder": "Voer inschrijfgeld in",
       "startDateLabel": "Startdatum",
@@ -620,12 +620,12 @@
       },
       "badges": {
         "batchId": "Batch ID",
-        "program": "Programma"
+        "program": "Opleiding"
       },
       "info": {
         "title": "Batch Informatie",
         "intakeName": "Intakenaam",
-        "program": "Programma",
+        "program": "Opleiding",
         "capacity": "Capaciteit",
         "intakeStartDate": "Intake startdatum",
         "intakeEndDate": "Intake einddatum",
@@ -686,7 +686,7 @@
       "country": "Land",
       "city": "Stad",
       "previousEducation": "Vooropleiding",
-      "program": "Programma",
+      "program": "Opleiding",
       "batch": "Batch",
       "enrolledDate": "Ingeschreven op",
       "status": "Status",
@@ -729,7 +729,7 @@
     "delete": "Verwijderen",
     "createPlanning": "Planning Aanmaken",
     "table": {
-      "program": "Programma",
+      "program": "Opleiding",
       "batch": "Batch",
       "module": "Module",
       "teachers": "Docenten",
@@ -755,8 +755,8 @@
       "editTitle": "Planning bewerken",
       "createSubtitle": "Laten we een nieuwe planning aanmaken",
       "editSubtitle": "Planning gegevens bijwerken",
-      "programLabel": "Programma",
-      "searchPrograms": "Programma's zoeken...",
+      "programLabel": "Opleiding",
+      "searchPrograms": "Opleidingen zoeken...",
       "batchLabel": "Batch",
       "batchPlaceholder": "Selecteer batch",
       "searchBatches": "Batches zoeken...",
@@ -782,14 +782,14 @@
       "assistantsLabel": "Assistenten",
       "assistantsPlaceholder": "Selecteer assistenten",
       "searchAssistants": "Assistenten zoeken...",
-      "traineesLabel": "Stagiairs",
-      "traineesPlaceholder": "Selecteer stagiairs",
-      "searchTrainees": "Stagiairs zoeken...",
+      "traineesLabel": "Trainees",
+      "traineesPlaceholder": "Selecteer trainees",
+      "searchTrainees": "Trainees zoeken...",
       "addSession": "Nog een sessie toevoegen"
     },
     "view": {
       "moduleLabel": "Module",
-      "programLabel": "Programma",
+      "programLabel": "Opleiding",
       "batchLabel": "Batch",
       "descriptionLabel": "Beschrijving",
       "sessionLabel": "Sessie",
@@ -877,7 +877,7 @@
       "phoneNumber": "Telefoonnummer",
       "emailAddress": "E-mailadres",
       "previousEducation": "Vooropleiding",
-      "program": "Programma",
+      "program": "Opleiding",
       "address": "Adres",
       "applicationId": "Candidatuur ID",
       "noDocuments": "Geen documenten bijgevoegd",
@@ -1332,7 +1332,7 @@
     "submissionTypesLabel": "Inlevertypes",
     "caseStudies": "Casuïstiek",
     "essays": "Essays",
-    "internships": "Stages",
+    "internships": "Praktijk / Stage",
     "activeStatus": "Actieve status",
     "uploadingFiles": "Bestanden uploaden..."
   },
@@ -1366,13 +1366,13 @@
         "title": "Inleververeisten",
         "caseStudies": "Casuïstiek",
         "essays": "Essays",
-        "internships": "Stages",
+        "internships": "Praktijk / Stage",
         "mandatoryHint": "Verplicht voor voltooiing van het jaar",
         "minPass": "Min. slagingspercentage (%)",
         "passMark": "Slaaggrens (%)"
       },
       "internship": {
-        "title": "Stagevereisten",
+        "title": "Praktijk-/Stagevereisten",
         "minCases": "Minimum aantal casussen"
       }
     },

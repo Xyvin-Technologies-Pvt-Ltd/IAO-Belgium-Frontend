@@ -18,13 +18,13 @@
   },
   "sidebar": {
     "teacher": {
-      "title": "Tutor Dashboard",
+      "title": "Lecturer Dashboard",
       "main": "Main",
       "operations": "Operations",
       "dashboard": "Dashboard",
       "schedules": "Schedules",
       "planning": "Planning",
-      "evaluations": "Evaluations",
+      "evaluations": "Feedback / Evaluation",
       "exams": "Exams"
     },
     "admin": {
@@ -39,13 +39,13 @@
       "programAdministration": "Program Administration",
       "locations": "Locations",
       "languages": "Languages",
-      "teacherQualifications": "Tutor Qualifications",
-       "teacherData": "Tutor Data",
+      "teacherQualifications": "Lecturer Qualifications",
+       "teacherData": "Lecturer Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
       "academics": "Academic Years",
       "planning": "Planning",
-      "teacherManagement": "Tutor Management",
+      "teacherManagement": "Lecturer Management",
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
       "adminManagement": "Admin Management",
@@ -112,7 +112,7 @@
     "view": "View",
     "download": "Download",
     "loading": "Loading...",
-    "teacher": "Teacher",
+    "teacher": "Lecturer",
     "student": "Student",
     "name": "Name",
     "email": "Email",
@@ -158,11 +158,11 @@
     "searchCities": "Search cities...",
     "searchLanguages": "Search languages...",
     "searchTitles": "Search academic degrees...",
-    "searchRoles": "Search teacher roles...",
+    "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
     "studentName": "Student Name",
     "intake": "Intake",
-    "program": "Program",
+    "program": "Programme",
     "city": "City",
     "component": "Component",
     "purpose": "Purpose",
@@ -175,7 +175,7 @@
     "canceled": "Canceled",
     "allReports": "All Reports",
     "cityReports": "City Reports",
-    "programReports": "Program Reports",
+    "programReports": "Programme Reports",
     "batchReports": "Batch Reports",
     "studentReports": "Student Reports",
     "financeReports": "Finance Reports",
@@ -196,8 +196,8 @@
         "description": "Payment analytics by city"
       },
       "program": {
-        "title": "Program Reports",
-        "description": "Payment analytics by program"
+        "title": "Programme Reports",
+        "description": "Payment analytics by programme"
       },
       "batch": {
         "title": "Batch Reports",
@@ -272,7 +272,7 @@
     "sessionName": "Session Name",
     "date": "Date",
     "time": "Time",
-    "teachers": "Tutors",
+    "teachers": "Lecturers",
     "sessionPrefix": "Session"
   },
   "countryManagement": {
@@ -417,11 +417,11 @@
     }
   },
   "programManagement": {
-    "title": "Programs",
+    "title": "Programmes",
     "search": "Search...",
     "delete": "Delete",
     "duplicate": "Duplicate",
-    "createProgram": "Create Program",
+    "createProgram": "Create Programme",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -433,20 +433,20 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noPrograms": "No Programs found"
+      "noPrograms": "No Programmes found"
     },
     "messages": {
-      "loadFailed": "Failed to load programs"
+      "loadFailed": "Failed to load programmes"
     },
     "modal": {
-      "createTitle": "Create a new Program",
-      "editTitle": "Edit Program",
-      "createSubtitle": "Let's create a new program",
-      "editSubtitle": "Update the program details",
-      "nameLabel": "Program Name",
-      "namePlaceholder": "Enter program name",
-      "programTypeLabel": "Program Type",
-      "programTypePlaceholder": "Select program type",
+      "createTitle": "Create a new Programme",
+      "editTitle": "Edit Programme",
+      "createSubtitle": "Let's create a new programme",
+      "editSubtitle": "Update the programme details",
+      "nameLabel": "Programme Name",
+      "namePlaceholder": "Enter programme name",
+      "programTypeLabel": "Programme Type",
+      "programTypePlaceholder": "Select programme type",
       "durationLabel": "Duration of the Programme",
       "durationPlaceholder": "Enter duration in years (e.g., 1, 2, 3)",
       "languageLabel": "Language",
@@ -475,7 +475,7 @@
     "createIntake": "Create Intake",
     "table": {
       "name": "Name",
-      "program": "Program",
+      "program": "Programme",
       "city": "City",
       "language": "Language",
       "registrationFee": "Registration Fee",
@@ -495,8 +495,8 @@
       "editTitle": "Edit Intake",
       "nameLabel": "Intake Name",
       "namePlaceholder": "Enter intake name",
-      "programLabel": "Program",
-      "programPlaceholder": "Select program",
+      "programLabel": "Programme",
+      "programPlaceholder": "Select programme",
       "registrationFeeLabel": "Registration Fee",
       "registrationFeePlaceholder": "Enter registration fee",
       "startDateLabel": "Start Date",
@@ -506,7 +506,7 @@
       "studentsPerBatchPlaceholder": "Enter students per group",
       "maxStudentEnrollmentLabel": "Max Student Enrollment",
       "maxStudentEnrollmentPlaceholder": "Enter max enrollment",
-      "searchPrograms": "Search programs..."
+      "searchPrograms": "Search programmes..."
     },
     "details": {
       "tabs": {
@@ -621,12 +621,12 @@
       },
       "badges": {
         "batchId": "Batch ID",
-        "program": "Program"
+        "program": "Programme"
       },
       "info": {
         "title": "Batch Information",
         "intakeName": "Intake Name",
-        "program": "Program",
+        "program": "Programme",
         "capacity": "Capacity",
         "intakeStartDate": "Intake Start Date",
         "intakeEndDate": "Intake End Date",
@@ -687,7 +687,7 @@
       "country": "Country",
       "city": "City",
       "previousEducation": "Previous Education",
-      "program": "Program",
+      "program": "Programme",
       "batch": "Batch",
       "enrolledDate": "Enrolled Date",
       "status": "Status",
@@ -711,7 +711,7 @@
       "documents": "Documents",
       "noDocuments": "No documents available",
       "academicDegree": "Academic Degree",
-      "teacherRole": "Teacher Role",
+      "teacherRole": "Lecturer Role",
       "employmentStartDate": "Employment Start Date",
       "languages": "Languages",
       "locations": "Locations"
@@ -754,11 +754,11 @@
     },
     "emptyState": {
       "title": "No Academic Years Created Yet",
-      "subtitle": "Start by creating an academic year to manage programs, batches, and admissions efficiently."
+      "subtitle": "Start by creating an academic year to manage programmes, batches, and admissions efficiently."
     },
     "card": {
       "academicYear": "Academic Year",
-      "programs": "Programs",
+      "programs": "Programmes",
       "batches": "Batches",
       "edit": "Edit",
       "duplicate": "Duplicate"
@@ -792,7 +792,7 @@
       "phoneNumber": "Phone number",
       "emailAddress": "Email Address",
       "previousEducation": "Previous education",
-      "program": "Program",
+      "program": "Programme",
       "address": "Address",
       "applicationId": "Application ID",
       "noDocuments": "No documents attached",
@@ -845,69 +845,69 @@
     }
   },
   "teacherTitleManagement": {
-    "title": "Tutor Titles",
+    "title": "Lecturer Titles",
     "search": "Search...",
     "delete": "Delete",
-    "createTitle": "Create Tutor Title",
+    "createTitle": "Create Lecturer Title",
     "table": {
       "name": "Name",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noTitles": "No Tutor Titles found"
+      "noTitles": "No Lecturer Titles found"
     },
     "messages": {
-      "loadFailed": "Failed to load tutor titles"
+      "loadFailed": "Failed to load lecturer titles"
     },
     "modal": {
-      "createTitle": "Create a new Tutor Title",
-      "editTitle": "Edit Tutor Title",
-      "createSubtitle": "Let's create a new tutor title",
-      "editSubtitle": "Update the tutor title details",
+      "createTitle": "Create a new Lecturer Title",
+      "editTitle": "Edit Lecturer Title",
+      "createSubtitle": "Let's create a new lecturer title",
+      "editSubtitle": "Update the lecturer title details",
       "nameLabel": "Title Name",
       "namePlaceholder": "Enter title name (e.g., Dr., Prof., Mr., Ms.)",
       "nameRequired": "Title name is required"
     }
   },
   "teacherQualification": {
-    "title": "Tutor Qualifications",
+    "title": "Lecturer Qualifications",
     "tabs": {
       "titles": "Titles",
       "roles": "Roles"
     }
   },
   "teacherRoleManagement": {
-    "title": "Tutor Roles",
+    "title": "Lecturer Roles",
     "search": "Search...",
     "delete": "Delete",
-    "createRole": "Create Tutor Role",
+    "createRole": "Create Lecturer Role",
     "table": {
       "name": "Name",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noRoles": "No Tutor Roles found"
+      "noRoles": "No Lecturer Roles found"
     },
     "messages": {
-      "loadFailed": "Failed to load tutor roles"
+      "loadFailed": "Failed to load lecturer roles"
     },
     "modal": {
-      "createTitle": "Create a new Tutor Role",
-      "editTitle": "Edit Tutor Role",
-      "createSubtitle": "Let's create a new tutor role",
-      "editSubtitle": "Update the tutor role details",
+      "createTitle": "Create a new Lecturer Role",
+      "editTitle": "Edit Lecturer Role",
+      "createSubtitle": "Let's create a new lecturer role",
+      "editSubtitle": "Update the lecturer role details",
       "nameLabel": "Role Name",
-      "namePlaceholder": "Enter role name (e.g., Assistant Professor, Tutor, Senior Tutor)",
+      "namePlaceholder": "Enter role name (e.g., Assistant Professor, Lecturer, Senior Lecturer)",
       "nameRequired": "Role name is required"
     }
   },
   "teacherManagement": {
-    "title": "Tutor Management",
-    "search": "Search tutors...",
+    "title": "Lecturer Management",
+    "search": "Search lecturers...",
     "delete": "Delete",
-    "createTeacher": "Create Tutor",
+    "createTeacher": "Create Lecturer",
     "table": {
-      "teacherId": "Tutor ID",
+      "teacherId": "Lecturer ID",
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
@@ -919,16 +919,16 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noTeachers": "No Tutors found"
+      "noTeachers": "No Lecturers found"
     },
     "messages": {
-      "loadFailed": "Failed to load tutors"
+      "loadFailed": "Failed to load lecturers"
     },
     "modal": {
-      "createTitle": "Create a new Tutor",
-      "editTitle": "Edit Tutor",
-      "createSubtitle": "Let's create a new tutor",
-      "editSubtitle": "Update the tutor details",
+      "createTitle": "Create a new Lecturer",
+      "editTitle": "Edit Lecturer",
+      "createSubtitle": "Let's create a new lecturer",
+      "editSubtitle": "Update the lecturer details",
       "firstNameLabel": "First Name",
       "firstNamePlaceholder": "Enter first name",
       "lastNameLabel": "Last Name",
@@ -945,16 +945,16 @@
       "languagePlaceholder": "Select language",
       "academicDegreeLabel": "Academic Degree",
       "academicDegreePlaceholder": "Select degree",
-      "teacherRoleLabel": "Tutor Role",
+      "teacherRoleLabel": "Lecturer Role",
       "teacherRolePlaceholder": "Select role",
       "employmentStartDateLabel": "Employment Start Date",
       "employmentStartDatePlaceholder": "Select start date"
     }
   },
   "programDetail": {
-    "title": "Program Details",
+    "title": "Programme Details",
     "cards": {
-      "programName": "Program Name",
+      "programName": "Programme Name",
       "duration": "Duration",
       "noOfModules": "No of Modules",
       "registrationFee": "Registration Fee",
@@ -968,11 +968,11 @@
       "examComponents": "Exam"
     },
     "emptyState": {
-      "title": "No Program Modules Added Yet",
-      "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this program effectively.",
-      "createButton": "Create Program Module"
+      "title": "No Programme Modules Added Yet",
+      "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this programme effectively.",
+      "createButton": "Create Programme Module"
     },
-    "loading": "Loading program details...",
+    "loading": "Loading programme details...",
     "loadFailed": "Failed to load program details"
   },
   "learningModule": {
@@ -1056,10 +1056,10 @@
     "delete": "Delete",
     "createPlanning": "Create Planning",
     "table": {
-      "program": "Program",
+      "program": "Programme",
       "batch": "Batch",
       "module": "Module",
-      "teachers": "Tutors",
+      "teachers": "Lecturers",
       "venue": "Venue",
       "sessions": "Sessions",
       "status": "Status",
@@ -1082,8 +1082,8 @@
       "editTitle": "Edit Planning",
       "createSubtitle": "Let's create a new planning",
       "editSubtitle": "Update the planning details",
-      "programLabel": "Program",
-      "searchPrograms": "Search programs...",
+      "programLabel": "Programme",
+      "searchPrograms": "Search programmes...",
       "batchLabel": "Batch",
       "batchPlaceholder": "Select batch",
       "searchBatches": "Search batches...",
@@ -1103,12 +1103,12 @@
       "timeFromLabel": "Time From",
       "timeTillLabel": "Time Till",
       "preferredTimes": "Preferred Times",
-      "teachersLabel": "Tutors",
-      "teachersPlaceholder": "Select tutors",
-      "searchTeachers": "Search tutors...",
-      "assistantsLabel": "Assistants",
-      "assistantsPlaceholder": "Select assistants",
-      "searchAssistants": "Search assistants...",
+      "teachersLabel": "Lecturers",
+      "teachersPlaceholder": "Select lecturers",
+      "searchTeachers": "Search lecturers...",
+      "assistantsLabel": "Teaching Assistants",
+      "assistantsPlaceholder": "Select teaching assistants",
+      "searchAssistants": "Search teaching assistants...",
       "traineesLabel": "Trainees",
       "traineesPlaceholder": "Select trainees",
       "searchTrainees": "Search trainees...",
@@ -1116,7 +1116,7 @@
     },
     "view": {
       "moduleLabel": "Module",
-      "programLabel": "Program",
+      "programLabel": "Programme",
       "batchLabel": "Batch",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
@@ -1124,7 +1124,7 @@
       "dateLabel": "Date",
       "timeFromLabel": "Time From",
       "timeTillLabel": "Time Till",
-      "teachersLabel": "Tutors",
+      "teachersLabel": "Lecturers",
       "venueLabel": "Venue"
     },
     "calendar": {
@@ -1297,7 +1297,7 @@
       "sendToLabel": "Send To",
       "sendToPlaceholder": "Select recipients...",
       "allUsers": "All Users",
-      "teachers": "Tutors",
+      "teachers": "Lecturers",
       "students": "Students",
       "sendToAll": "Send to all {{role}}",
       "noContactsSelected": "Please select at least one contact",
@@ -1319,9 +1319,9 @@
       "created": "Created",
       "sentAt": "Sent At",
       "allUsers": "All Users",
-      "allTeachers": "All Tutors",
+      "allTeachers": "All Lecturers",
       "allStudents": "All Students",
-      "selectedTeachers": "Selected Tutors",
+      "selectedTeachers": "Selected Lecturers",
       "selectedStudents": "Selected Students",
       "selectedUsers": "Selected Users",
       "system": "System"
@@ -1363,7 +1363,7 @@
     "submissionTypesLabel": "Submission Types",
     "caseStudies": "Case Studies",
     "essays": "Essays",
-    "internships": "Internships",
+    "internships": "Clinical Practice",
     "activeStatus": "Active Status",
     "uploadingFiles": "Uploading files..."
   },
@@ -1397,13 +1397,13 @@
         "title": "Submission Requirements",
         "caseStudies": "Case Studies",
         "essays": "Essays",
-        "internships": "Internships",
+        "internships": "Clinical Practice",
         "mandatoryHint": "Mandatory for Year Completion",
         "minPass": "Min. Passing Percentage (%)",
         "passMark": "Pass Mark (%)"
       },
       "internship": {
-        "title": "Internship Requirements",
+        "title": "Clinical Practice Requirements",
         "minCases": "Minimum Cases"
       }
     },

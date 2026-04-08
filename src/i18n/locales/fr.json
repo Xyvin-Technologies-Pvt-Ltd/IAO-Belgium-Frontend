@@ -24,7 +24,7 @@
       "dashboard": "Tableau de bord",
       "schedules": "Horaires",
       "planning": "Planification",
-      "evaluations": "Évaluations",
+      "evaluations": "Feedback / Évaluation",
       "exams": "Examens"
     },
     "admin": {
@@ -162,7 +162,7 @@
     "paymentId": "ID de paiement",
     "studentName": "Nom de l'étudiant",
     "intake": "Session",
-    "program": "Programme",
+    "program": "Formation / Programme",
     "city": "Ville",
     "component": "Composant",
     "purpose": "Objet",
@@ -474,7 +474,7 @@
     "createIntake": "Créer une admission",
     "table": {
       "name": "Nom",
-      "program": "Programme",
+      "program": "Formation / Programme",
       "city": "Ville",
       "language": "Langue",
       "registrationFee": "Frais d'inscription",
@@ -494,8 +494,8 @@
       "editTitle": "Modifier l'admission",
       "nameLabel": "Nom de l'admission",
       "namePlaceholder": "Entrez le nom de l'admission",
-      "programLabel": "Programme",
-      "programPlaceholder": "Sélectionnez le programme",
+      "programLabel": "Formation / Programme",
+      "programPlaceholder": "Sélectionnez la formation",
       "registrationFeeLabel": "Frais d'inscription",
       "registrationFeePlaceholder": "Entrez les frais d'inscription",
       "startDateLabel": "Date de début",
@@ -620,12 +620,12 @@
       },
       "badges": {
         "batchId": "ID du lot",
-        "program": "Programme"
+        "program": "Formation / Programme"
       },
       "info": {
         "title": "Informations sur le lot",
         "intakeName": "Nom de l'admission",
-        "program": "Programme",
+        "program": "Formation / Programme",
         "capacity": "Capacité",
         "intakeStartDate": "Date de début de l'admission",
         "intakeEndDate": "Date de fin de l'admission",
@@ -686,7 +686,7 @@
       "country": "Pays",
       "city": "Ville",
       "previousEducation": "Éducation précédente",
-      "program": "Programme",
+      "program": "Formation / Programme",
       "batch": "Lot",
       "enrolledDate": "Date d'inscription",
       "status": "Statut",
@@ -729,7 +729,7 @@
     "delete": "Supprimer",
     "createPlanning": "Créer une planification",
     "table": {
-      "program": "Programme",
+      "program": "Formation / Programme",
       "batch": "Lot",
       "module": "Module",
       "teachers": "Enseignants",
@@ -755,8 +755,8 @@
       "editTitle": "Modifier la planification",
       "createSubtitle": "Créons une nouvelle planification",
       "editSubtitle": "Mettre à jour les détails de la planification",
-      "programLabel": "Programme",
-      "searchPrograms": "Rechercher des programmes...",
+      "programLabel": "Formation / Programme",
+      "searchPrograms": "Rechercher des formations...",
       "batchLabel": "Lot",
       "batchPlaceholder": "Sélectionnez un lot",
       "searchBatches": "Rechercher des lots...",
@@ -779,9 +779,9 @@
       "teachersLabel": "Enseignants",
       "teachersPlaceholder": "Sélectionnez des enseignants",
       "searchTeachers": "Rechercher des enseignants...",
-      "assistantsLabel": "Assistants",
-      "assistantsPlaceholder": "Sélectionnez des assistants",
-      "searchAssistants": "Rechercher des assistants...",
+      "assistantsLabel": "Assistants pédagogiques",
+      "assistantsPlaceholder": "Sélectionnez des assistants pédagogiques",
+      "searchAssistants": "Rechercher des assistants pédagogiques...",
       "traineesLabel": "Stagiaires",
       "traineesPlaceholder": "Sélectionnez des stagiaires",
       "searchTrainees": "Rechercher des stagiaires...",
@@ -789,7 +789,7 @@
     },
     "view": {
       "moduleLabel": "Module",
-      "programLabel": "Programme",
+      "programLabel": "Formation / Programme",
       "batchLabel": "Lot",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
@@ -877,7 +877,7 @@
       "phoneNumber": "Numéro de téléphone",
       "emailAddress": "Adresse email",
       "previousEducation": "Éducation précédente",
-      "program": "Programme",
+      "program": "Formation / Programme",
       "address": "Adresse",
       "applicationId": "ID de candidature",
       "noDocuments": "Aucun document joint",
@@ -1334,7 +1334,7 @@
     "submissionTypesLabel": "Types de soumission",
     "caseStudies": "Études de cas",
     "essays": "Essais",
-    "internships": "Stages",
+    "internships": "Stage clinique",
     "activeStatus": "Statut actif",
     "uploadingFiles": "Téléchargement des fichiers..."
   },
@@ -1368,13 +1368,13 @@
         "title": "Exigences de soumission",
         "caseStudies": "Études de cas",
         "essays": "Essais",
-        "internships": "Stages",
+        "internships": "Stage clinique",
         "mandatoryHint": "Obligatoire pour l'achèvement de l'année",
         "minPass": "Pourcentage minimum de réussite (%)",
         "passMark": "Note de passage (%)"
       },
       "internship": {
-        "title": "Exigences de stage",
+        "title": "Exigences de stage clinique",
         "minCases": "Nombre minimum de cas"
       }
     },

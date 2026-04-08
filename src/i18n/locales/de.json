@@ -24,7 +24,7 @@
       "dashboard": "Dashboard",
       "schedules": "Zeitpläne",
       "planning": "Planung",
-      "evaluations": "Bewertungen",
+      "evaluations": "Feedback / Bewertung",
       "exams": "Prüfungen"
     },
     "admin": {
@@ -162,9 +162,7 @@
     "paymentId": "Zahlungs-ID",
     "studentName": "Studentenname",
     "intake": "Aufnahme",
-    "program": "Programm",
-    "city": "Stadt",
-    "component": "Komponente",
+    "program": "Ausbildung / Studiengang",
     "purpose": "Zweck",
     "amount": "Betrag",
     "date": "Datum",
@@ -497,7 +495,7 @@
     "createIntake": "Aufnahme erstellen",
     "table": {
       "name": "Name",
-      "program": "Programm",
+      "program": "Ausbildung / Studiengang",
       "city": "Stadt",
       "language": "Sprache",
       "registrationFee": "Anmeldegebühr",
@@ -517,8 +515,8 @@
       "editTitle": "Aufnahme bearbeiten",
       "nameLabel": "Aufnahmename",
       "namePlaceholder": "Aufnahmenamen eingeben",
-      "programLabel": "Programm",
-      "programPlaceholder": "Programm auswählen",
+      "programLabel": "Ausbildung / Studiengang",
+      "programPlaceholder": "Ausbildung / Studiengang auswählen",
       "registrationFeeLabel": "Anmeldegebühr",
       "registrationFeePlaceholder": "Anmeldegebühr eingeben",
       "startDateLabel": "Startdatum",
@@ -643,12 +641,12 @@
       },
       "badges": {
         "batchId": "Gruppen-ID",
-        "program": "Programm"
+        "program": "Ausbildung / Studiengang"
       },
       "info": {
         "title": "Gruppeninformationen",
         "intakeName": "Aufnahmename",
-        "program": "Programm",
+        "program": "Ausbildung / Studiengang",
         "capacity": "Kapazität",
         "intakeStartDate": "Aufnahmestartdatum",
         "intakeEndDate": "Aufnahmeenddatum",
@@ -709,7 +707,7 @@
       "country": "Land",
       "city": "Stadt",
       "previousEducation": "Vorbildung",
-      "program": "Programm",
+      "program": "Ausbildung / Studiengang",
       "batch": "Gruppe",
       "enrolledDate": "Eingeschrieben am",
       "status": "Status",
@@ -814,7 +812,7 @@
       "phoneNumber": "Telefonnummer",
       "emailAddress": "E-Mail-Adresse",
       "previousEducation": "Vorbildung",
-      "program": "Programm",
+      "program": "Ausbildung / Studiengang",
       "address": "Adresse",
       "applicationId": "Bewerbungs-ID",
       "noDocuments": "Keine Dokumente beigefügt",
@@ -1078,7 +1076,7 @@
     "delete": "Löschen",
     "createPlanning": "Planung erstellen",
     "table": {
-      "program": "Programm",
+      "program": "Ausbildung / Studiengang",
       "batch": "Gruppe",
       "module": "Modul",
       "teachers": "Dozenten",
@@ -1104,7 +1102,7 @@
       "editTitle": "Planung bearbeiten",
       "createSubtitle": "Lassen Sie uns eine neue Planung erstellen",
       "editSubtitle": "Planungsdetails aktualisieren",
-      "programLabel": "Programm",
+      "programLabel": "Ausbildung / Studiengang",
       "searchPrograms": "Programme suchen...",
       "batchLabel": "Gruppe",
       "batchPlaceholder": "Gruppe auswählen",
@@ -1131,14 +1129,14 @@
       "assistantsLabel": "Assistenten",
       "assistantsPlaceholder": "Assistenten auswählen",
       "searchAssistants": "Assistenten suchen...",
-      "traineesLabel": "Auszubildende",
-      "traineesPlaceholder": "Auszubildende auswählen",
-      "searchTrainees": "Auszubildende suchen...",
+      "traineesLabel": "Trainees",
+      "traineesPlaceholder": "Trainees auswählen",
+      "searchTrainees": "Trainees suchen...",
       "addSession": "Weitere Sitzung hinzufügen"
     },
     "view": {
       "moduleLabel": "Modul",
-      "programLabel": "Programm",
+      "programLabel": "Ausbildung / Studiengang",
       "batchLabel": "Gruppe",
       "descriptionLabel": "Beschreibung",
       "sessionLabel": "Sitzung",
@@ -1362,7 +1360,7 @@
     "submissionTypesLabel": "Abgabetypen",
     "caseStudies": "Fallstudien",
     "essays": "Essays",
-    "internships": "Praktika",
+    "internships": "Praktikum",
     "activeStatus": "Aktiver Status",
     "uploadingFiles": "Dateien werden hochgeladen..."
   },
@@ -1396,14 +1394,13 @@
         "title": "Abgabeanforderungen",
         "caseStudies": "Fallstudien",
         "essays": "Essays",
-        "internships": "Praktika",
+        "internships": "Praktikum",
         "mandatoryHint": "Verpflichtend für den Jahresabschluss",
         "minPass": "Mindestbestehenssatz (%)",
         "passMark": "Bestehungsgrenze (%)"
       },
       "internship": {
-        "title": "Praktikumsanforderungen",
-        "minCases": "Mindestanzahl an Fällen"
+        "title": "Praktikumsanforderungen",        "minCases": "Mindestanzahl an Fällen"
       }
     },
     "actions": {
