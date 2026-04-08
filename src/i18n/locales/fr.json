@@ -127,7 +127,7 @@
     "academics": "Académiques",
     "intakes": "Sessions",
     "intakeDetails": "Détails de la session",
-    "batchDetails": "Détails du lot",
+    "batchDetails": "Détails du groupe",
     "mins": "mins",
     "min": "min",
     "description": "Description:",
@@ -152,7 +152,7 @@
     "failedToLoadContracts": "Échec du chargement des contrats",
     "failedToLoadStudentContracts": "Échec du chargement des contrats d'étudiants",
     "yearLog": "Journal de l'année",
-    "batch": "lot",
+    "batch": "groupe",
     "exam": "Examen",
     "searchCountries": "Rechercher des pays...",
     "searchCities": "Rechercher des villes...",
@@ -176,7 +176,7 @@
     "allReports": "Tous les rapports",
     "cityReports": "Rapports par ville",
     "programReports": "Rapports par programme",
-    "batchReports": "Rapports par lot",
+    "batchReports": "Rapports par groupe",
     "studentReports": "Rapports par étudiant",
     "financeReports": "Rapports financiers",
     "others": "Autres",
@@ -200,8 +200,8 @@
         "description": "Analyses de paiement par programme"
       },
       "batch": {
-        "title": "Rapports par lot",
-        "description": "Analyses de paiement par lot"
+        "title": "Rapports par groupe",
+        "description": "Analyses de paiement par groupe"
       },
       "student": {
         "title": "Rapports par étudiant",
@@ -578,14 +578,14 @@
     }
   },
   "batchManagement": {
-    "title": "Gestion des lots",
-    "search": "Rechercher des lots...",
-    "createBatch": "Créer un lot",
-    "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau lot pour cette admission ?",
+    "title": "Gestion des groupes",
+    "search": "Rechercher des groupes...",
+    "createBatch": "Créer un groupe",
+    "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau groupe pour cette admission ?",
     "searchStudent": "Rechercher des étudiants...",
     "table": {
-      "batchId": "ID du lot",
-      "batchName": "Nom du lot",
+      "batchId": "ID du groupe",
+      "batchName": "Nom du groupe",
       "capacity": "Capacité",
       "enrolled": "Inscrit",
       "available": "Disponible",
@@ -596,13 +596,13 @@
       "percentage": "Pourcentage",
       "result": "Résultat",
       "submittedAt": "Soumis le",
-      "noBatches": "Aucun lot trouvé",
+      "noBatches": "Aucun groupe trouvé",
       "noStudents": "Aucun étudiant trouvé",
-      "noResults": "Aucun résultat d'examen trouvé pour ce lot.",
+      "noResults": "Aucun résultat d'examen trouvé pour ce groupe.",
       "unnamedExam": "Examen sans nom"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des lots",
+      "loadFailed": "Échec du chargement des groupes",
       "loadResultsFailed": "Échec du chargement des résultats"
     },
     "details": {
@@ -619,11 +619,11 @@
         "avgAttendance": "Présence moy."
       },
       "badges": {
-        "batchId": "ID du lot",
+        "batchId": "ID du groupe",
         "program": "Formation / Programme"
       },
       "info": {
-        "title": "Informations sur le lot",
+        "title": "Informations sur le groupe",
         "intakeName": "Nom de l'admission",
         "program": "Formation / Programme",
         "capacity": "Capacité",
@@ -631,27 +631,27 @@
         "intakeEndDate": "Date de fin de l'admission",
         "students": "Étudiants"
       },
-      "loading": "Chargement des détails du lot...",
-      "loadFailed": "Échec du chargement des détails du lot"
+      "loading": "Chargement des détails du groupe...",
+      "loadFailed": "Échec du chargement des détails du groupe"
     },
     "modal": {
-      "batchLabel": "Lot",
-      "batchPlaceholder": "Sélectionnez un lot",
+      "batchLabel": "Groupe",
+      "batchPlaceholder": "Sélectionnez un groupe",
       "moveStudent": {
-        "title": "Déplacer l'étudiant vers un autre lot",
-        "description": "Examinez les détails de l'étudiant et choisissez un nouveau lot pour continuer.",
+        "title": "Déplacer l'étudiant vers un autre groupe",
+        "description": "Examinez les détails de l'étudiant et choisissez un nouveau groupe pour continuer.",
         "studentId": "ID de l'étudiant",
         "studentName": "Nom de l'étudiant",
-        "currentBatch": "Lot actuel",
-        "assignToBatch": "Assigner au lot",
-        "selectBatch": "Sélectionnez un lot",
-        "noAvailableBatches": "Aucun lot disponible",
+        "currentBatch": "Groupe actuel",
+        "assignToBatch": "Assigner au groupe",
+        "selectBatch": "Sélectionnez un groupe",
+        "noAvailableBatches": "Aucun groupe disponible",
         "studentsCount": "étudiants",
-        "warningMessage": "L'étudiant sera retiré du lot actuel.",
+        "warningMessage": "L'étudiant sera retiré du groupe actuel.",
         "cancel": "Annuler",
         "move": "Déplacer l'étudiant",
         "moving": "Déplacement...",
-        "loadBatchesFailed": "Échec du chargement des lots"
+        "loadBatchesFailed": "Échec du chargement des groupes"
       }
     },
     "actions": {
@@ -660,8 +660,8 @@
       "delete": "Supprimer",
       "cancel": "Annuler",
       "creating": "Création...",
-      "createBatch": "Créer un lot",
-      "moveToAnotherBatch": "Déplacer vers un autre lot"
+      "createBatch": "Créer un groupe",
+      "moveToAnotherBatch": "Déplacer vers un autre groupe"
     },
     "yearLog": {
       "year": "Année",
@@ -671,7 +671,7 @@
       "date": "Date",
       "actions": "Actions",
       "recalculate": "Recalculer la fin d'année",
-      "noLogs": "Aucun log de fin d'année trouvé pour ce lot."
+      "noLogs": "Aucun log de fin d'année trouvé pour ce groupe."
     }
   },
   "studentManagement": {
@@ -687,7 +687,7 @@
       "city": "Ville",
       "previousEducation": "Éducation précédente",
       "program": "Formation / Programme",
-      "batch": "Lot",
+      "batch": "Groupe",
       "enrolledDate": "Date d'inscription",
       "status": "Statut",
       "noStudents": "Aucun étudiant trouvé"
@@ -699,7 +699,7 @@
       "basicInfo": "Informations de base",
       "phoneNumber": "Numéro de téléphone",
       "emailAddress": "Adresse email",
-      "batch": "Lot",
+      "batch": "Groupe",
       "address": "Adresse",
       "country": "Pays",
       "city": "Ville",
@@ -730,7 +730,7 @@
     "createPlanning": "Créer une planification",
     "table": {
       "program": "Formation / Programme",
-      "batch": "Lot",
+      "batch": "Groupe",
       "module": "Module",
       "teachers": "Enseignants",
       "venue": "Lieu",
@@ -757,9 +757,9 @@
       "editSubtitle": "Mettre à jour les détails de la planification",
       "programLabel": "Formation / Programme",
       "searchPrograms": "Rechercher des formations...",
-      "batchLabel": "Lot",
-      "batchPlaceholder": "Sélectionnez un lot",
-      "searchBatches": "Rechercher des lots...",
+      "batchLabel": "Groupe",
+      "batchPlaceholder": "Sélectionnez un groupe",
+      "searchBatches": "Rechercher des groupes...",
       "moduleLabel": "Module",
       "modulePlaceholder": "Sélectionnez un module",
       "searchComponents": "Rechercher des composants...",
@@ -790,7 +790,7 @@
     "view": {
       "moduleLabel": "Module",
       "programLabel": "Formation / Programme",
-      "batchLabel": "Lot",
+      "batchLabel": "Groupe",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
       "sessionNameLabel": "Nom de la session",

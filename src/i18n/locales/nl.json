@@ -128,7 +128,7 @@
     "academics": "Academici",
     "intakes": "Instroom",
     "intakeDetails": "Instroomdetails",
-    "batchDetails": "Batchdetails",
+    "batchDetails": "Groepsdetails",
     "mins": "minuten",
     "min": "min",
     "description": "Beschrijving:",
@@ -153,7 +153,7 @@
     "failedToLoadContracts": "Laden van contracten mislukt",
     "failedToLoadStudentContracts": "Laden van studentcontracten mislukt",
     "yearLog": "Jaarlogboek",
-    "batch": "batch",
+    "batch": "groep",
     "exam": "Examen",
     "searchCities": "Steden zoeken...",
     "searchLanguages": "Talen zoeken...",
@@ -176,7 +176,7 @@
     "allReports": "Alle rapporten",
     "cityReports": "Stadsrapporten",
     "programReports": "Opleidingsrapporten",
-    "batchReports": "Batchrapporten",
+    "batchReports": "Groepsrapporten",
     "studentReports": "Studentrapporten",
     "financeReports": "Financiële rapporten",
     "others": "Anderen",
@@ -200,8 +200,8 @@
         "description": "Betalingsanalyse per opleiding"
       },
       "batch": {
-        "title": "Batchrapporten",
-        "description": "Betalingsanalyse per batch"
+        "title": "Groepsrapporten",
+        "description": "Betalingsanalyse per groep"
       },
       "student": {
         "title": "Studentrapporten",
@@ -509,12 +509,12 @@
     },
     "details": {
       "tabs": {
-        "batches": "Batches",
+        "batches": "Groepen",
         "enrollments": "Inschrijvingen"
       },
       "cards": {
         "totalEnrollments": "Totaal inschrijvingen",
-        "totalBatches": "Totaal batches",
+        "totalBatches": "Totaal groepen",
         "startDate": "Startdatum",
         "endDate": "Einddatum"
       },
@@ -578,14 +578,14 @@
     }
   },
   "batchManagement": {
-    "title": "Batch Beheer",
-    "search": "Batches zoeken...",
-    "createBatch": "Batch aanmaken",
-    "createBatchConfirmation": "Weet je zeker dat je een nieuwe batch wilt aanmaken voor deze intake?",
+    "title": "Groepsbeheer",
+    "search": "Groepen zoeken...",
+    "createBatch": "Groep aanmaken",
+    "createBatchConfirmation": "Weet je zeker dat je een nieuwe groep wilt aanmaken voor deze intake?",
     "searchStudent": "Studenten zoeken...",
     "table": {
-      "batchId": "Batch ID",
-      "batchName": "Batchnaam",
+      "batchId": "Groep ID",
+      "batchName": "Groepsnaam",
       "capacity": "Capaciteit",
       "enrolled": "Ingeschreven",
       "available": "Beschikbaar",
@@ -596,13 +596,13 @@
       "percentage": "Percentage",
       "result": "Resultaat",
       "submittedAt": "Ingediend op",
-      "noBatches": "Geen batches gevonden",
+      "noBatches": "Geen groepen gevonden",
       "noStudents": "Geen studenten gevonden",
-      "noResults": "Geen examenresultaten gevonden voor deze batch.",
+      "noResults": "Geen examenresultaten gevonden voor deze groep.",
       "unnamedExam": "Naamloos examen"
     },
     "messages": {
-      "loadFailed": "Laden van batches mislukt",
+      "loadFailed": "Laden van groepen mislukt",
       "loadResultsFailed": "Laden van resultaten mislukt"
     },
     "details": {
@@ -619,11 +619,11 @@
         "avgAttendance": "Gem. aanwezigheid"
       },
       "badges": {
-        "batchId": "Batch ID",
+        "batchId": "Groep ID",
         "program": "Opleiding"
       },
       "info": {
-        "title": "Batch Informatie",
+        "title": "Groepsinformatie",
         "intakeName": "Intakenaam",
         "program": "Opleiding",
         "capacity": "Capaciteit",
@@ -631,27 +631,27 @@
         "intakeEndDate": "Intake einddatum",
         "students": "Studenten"
       },
-      "loading": "Batchgegevens laden...",
-      "loadFailed": "Laden van batchgegevens mislukt"
+      "loading": "Groepsgegevens laden...",
+      "loadFailed": "Laden van groepsgegevens mislukt"
     },
     "modal": {
-      "batchLabel": "Batch",
-      "batchPlaceholder": "Selecteer batch",
+      "batchLabel": "Groep",
+      "batchPlaceholder": "Selecteer groep",
       "moveStudent": {
-        "title": "Student verplaatsen naar andere batch",
-        "description": "Bekijk de studentgegevens en kies een nieuwe batch om door te gaan.",
+        "title": "Student verplaatsen naar andere groep",
+        "description": "Bekijk de studentgegevens en kies een nieuwe groep om door te gaan.",
         "studentId": "Student ID",
         "studentName": "Studentnaam",
-        "currentBatch": "Huidige batch",
-        "assignToBatch": "Toewijzen aan batch",
-        "selectBatch": "Selecteer een batch",
-        "noAvailableBatches": "Geen beschikbare batches",
+        "currentBatch": "Huidige groep",
+        "assignToBatch": "Toewijzen aan groep",
+        "selectBatch": "Selecteer een groep",
+        "noAvailableBatches": "Geen beschikbare groepen",
         "studentsCount": "studenten",
-        "warningMessage": "De student wordt verwijderd uit de huidige batch.",
+        "warningMessage": "De student wordt verwijderd uit de huidige groep.",
         "cancel": "Annuleren",
         "move": "Student verplaatsen",
         "moving": "Verplaatsen...",
-        "loadBatchesFailed": "Laden van batches mislukt"
+        "loadBatchesFailed": "Laden van groepen mislukt"
       }
     },
     "actions": {
@@ -660,8 +660,8 @@
       "delete": "Verwijderen",
       "cancel": "Annuleren",
       "creating": "Aanmaken...",
-      "createBatch": "Batch aanmaken",
-      "moveToAnotherBatch": "Verplaatsen naar een andere batch"
+      "createBatch": "Groep aanmaken",
+      "moveToAnotherBatch": "Verplaatsen naar een andere groep"
     },
     "yearLog": {
       "year": "Jaar",
@@ -671,7 +671,7 @@
       "date": "Datum",
       "actions": "Acties",
       "recalculate": "Herbereken jaarvoltooiing",
-      "noLogs": "Geen jaarvoltooiingslogs gevonden voor deze batch."
+      "noLogs": "Geen jaarvoltooiingslogs gevonden voor deze groep."
     }
   },
   "studentManagement": {
@@ -687,7 +687,7 @@
       "city": "Stad",
       "previousEducation": "Vooropleiding",
       "program": "Opleiding",
-      "batch": "Batch",
+      "batch": "Groep",
       "enrolledDate": "Ingeschreven op",
       "status": "Status",
       "noStudents": "Geen studenten gevonden"
@@ -699,7 +699,7 @@
       "basicInfo": "Basisgegevens",
       "phoneNumber": "Telefoonnummer",
       "emailAddress": "E-mailadres",
-      "batch": "Batch",
+      "batch": "Groep",
       "address": "Adres",
       "country": "Land",
       "city": "Stad",
@@ -730,7 +730,7 @@
     "createPlanning": "Planning Aanmaken",
     "table": {
       "program": "Opleiding",
-      "batch": "Batch",
+      "batch": "Groep",
       "module": "Module",
       "teachers": "Docenten",
       "venue": "Locatie",
@@ -757,9 +757,9 @@
       "editSubtitle": "Planning gegevens bijwerken",
       "programLabel": "Opleiding",
       "searchPrograms": "Opleidingen zoeken...",
-      "batchLabel": "Batch",
-      "batchPlaceholder": "Selecteer batch",
-      "searchBatches": "Batches zoeken...",
+      "batchLabel": "Groep",
+      "batchPlaceholder": "Selecteer groep",
+      "searchBatches": "Groepen zoeken...",
       "moduleLabel": "Module",
       "modulePlaceholder": "Selecteer module",
       "searchComponents": "Componenten zoeken...",
@@ -790,7 +790,7 @@
     "view": {
       "moduleLabel": "Module",
       "programLabel": "Opleiding",
-      "batchLabel": "Batch",
+      "batchLabel": "Groep",
       "descriptionLabel": "Beschrijving",
       "sessionLabel": "Sessie",
       "sessionNameLabel": "Sessienaam",
@@ -839,12 +839,12 @@
     },
     "emptyState": {
       "title": "Nog geen academische jaren aangemaakt",
-      "subtitle": "Begin met het maken van een academisch jaar om opleidingen, batches en toelatingen efficiënt te beheren."
+      "subtitle": "Begin met het maken van een academisch jaar om opleidingen, groepen en toelatingen efficiënt te beheren."
     },
     "card": {
       "academicYear": "Academisch jaar",
       "programs": "Opleidingen",
-      "batches": "Batches",
+      "batches": "Groepen",
       "edit": "Bewerken",
       "duplicate": "Dupliceren"
     }

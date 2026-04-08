@@ -127,7 +127,7 @@
     "academics": "Academics",
     "intakes": "Intakes",
     "intakeDetails": "Intake Details",
-    "batchDetails": "Batch Details",
+    "batchDetails": "Group Details",
     "mins": "mins",
     "min": "min",
     "description": "Description:",
@@ -152,7 +152,7 @@
     "failedToLoadContracts": "Failed to load contracts",
     "failedToLoadStudentContracts": "Failed to load student contracts",
     "yearLog": "Year Log",
-    "batch": "batch",
+    "batch": "group",
     "exam": "exam",
     "searchCountries": "Search countries...",
     "searchCities": "Search cities...",
@@ -176,7 +176,7 @@
     "allReports": "All Reports",
     "cityReports": "City Reports",
     "programReports": "Programme Reports",
-    "batchReports": "Batch Reports",
+    "batchReports": "Group Reports",
     "studentReports": "Student Reports",
     "financeReports": "Finance Reports",
     "others": "Others",
@@ -200,8 +200,8 @@
         "description": "Payment analytics by programme"
       },
       "batch": {
-        "title": "Batch Reports",
-        "description": "Payment analytics by batch"
+        "title": "Group Reports",
+        "description": "Payment analytics by group"
       },
       "student": {
         "title": "Student Reports",
@@ -510,12 +510,12 @@
     },
     "details": {
       "tabs": {
-        "batches": "Batches",
+        "batches": "Groups",
         "enrollments": "Enrollments"
       },
       "cards": {
         "totalEnrollments": "Total Enrollments",
-        "totalBatches": "Total Batches",
+        "totalBatches": "Total Groups",
         "startDate": "Start Date",
         "endDate": "End Date"
       },
@@ -579,14 +579,14 @@
     }
   },
   "batchManagement": {
-    "title": "Batch Management",
-    "search": "Search batches...",
-    "createBatch": "Create Batch",
-    "createBatchConfirmation": "Are you sure you want to create a new batch for this intake?",
+    "title": "Group Management",
+    "search": "Search groups...",
+    "createBatch": "Create Group",
+    "createBatchConfirmation": "Are you sure you want to create a new group for this intake?",
     "searchStudent": "Search students...",
     "table": {
-      "batchId": "Batch ID",
-      "batchName": "Batch Name",
+      "batchId": "Group ID",
+      "batchName": "Group Name",
       "capacity": "Capacity",
       "enrolled": "Enrolled",
       "available": "Available",
@@ -597,13 +597,13 @@
       "percentage": "Percentage",
       "result": "Result",
       "submittedAt": "Submitted At",
-      "noBatches": "No Batches found",
+      "noBatches": "No Groups found",
       "noStudents": "No students found",
-      "noResults": "No exam results found for this batch.",
+      "noResults": "No exam results found for this group.",
       "unnamedExam": "Unnamed Exam"
     },
     "messages": {
-      "loadFailed": "Failed to load batches",
+      "loadFailed": "Failed to load groups",
       "loadResultsFailed": "Failed to load results"
     },
     "details": {
@@ -620,11 +620,11 @@
         "avgAttendance": "Avg. Attendance"
       },
       "badges": {
-        "batchId": "Batch ID",
+        "batchId": "Group ID",
         "program": "Programme"
       },
       "info": {
-        "title": "Batch Information",
+        "title": "Group Information",
         "intakeName": "Intake Name",
         "program": "Programme",
         "capacity": "Capacity",
@@ -632,27 +632,27 @@
         "intakeEndDate": "Intake End Date",
         "students": "Students"
       },
-      "loading": "Loading batch details...",
-      "loadFailed": "Failed to load batch details"
+      "loading": "Loading group details...",
+      "loadFailed": "Failed to load group details"
     },
     "modal": {
-      "batchLabel": "Batch",
-      "batchPlaceholder": "Select batch",
+      "batchLabel": "Group",
+      "batchPlaceholder": "Select group",
       "moveStudent": {
-        "title": "Move Student to Another Batch",
-        "description": "Review the student details and choose a new batch to continue.",
+        "title": "Move Student to Another Group",
+        "description": "Review the student details and choose a new group to continue.",
         "studentId": "Student ID",
         "studentName": "Student Name",
-        "currentBatch": "Current Batch",
-        "assignToBatch": "Assign to Batch",
-        "selectBatch": "Select a batch",
-        "noAvailableBatches": "No available batches",
+        "currentBatch": "Current Group",
+        "assignToBatch": "Assign to Group",
+        "selectBatch": "Select a group",
+        "noAvailableBatches": "No available groups",
         "studentsCount": "students",
-        "warningMessage": "The student will be removed from the current batch.",
+        "warningMessage": "The student will be removed from the current group.",
         "cancel": "Cancel",
         "move": "Move Student",
         "moving": "Moving...",
-        "loadBatchesFailed": "Failed to load batches"
+        "loadBatchesFailed": "Failed to load groups"
       }
     },
     "actions": {
@@ -661,8 +661,8 @@
       "delete": "Delete",
       "cancel": "Cancel",
       "creating": "Creating...",
-      "createBatch": "Create Batch",
-      "moveToAnotherBatch": "Move to another batch"
+      "createBatch": "Create Group",
+      "moveToAnotherBatch": "Move to another group"
     },
     "yearLog": {
       "year": "Year",
@@ -672,7 +672,7 @@
       "date": "Date",
       "actions": "Actions",
       "recalculate": "Recalculate year completion",
-      "noLogs": "No year completion logs found for this batch."
+      "noLogs": "No year completion logs found for this group."
     }
   },
   "studentManagement": {
@@ -688,7 +688,7 @@
       "city": "City",
       "previousEducation": "Previous Education",
       "program": "Programme",
-      "batch": "Batch",
+      "batch": "Group",
       "enrolledDate": "Enrolled Date",
       "status": "Status",
       "noStudents": "No Students found"
@@ -700,7 +700,7 @@
       "basicInfo": "Basic Information",
       "phoneNumber": "Phone Number",
       "emailAddress": "Email Address",
-      "batch": "Batch",
+      "batch": "Group",
       "address": "Address",
       "country": "Country",
       "city": "City",
@@ -754,12 +754,12 @@
     },
     "emptyState": {
       "title": "No Academic Years Created Yet",
-      "subtitle": "Start by creating an academic year to manage programmes, batches, and admissions efficiently."
+      "subtitle": "Start by creating an academic year to manage programmes, groups, and admissions efficiently."
     },
     "card": {
       "academicYear": "Academic Year",
       "programs": "Programmes",
-      "batches": "Batches",
+      "batches": "Groups",
       "edit": "Edit",
       "duplicate": "Duplicate"
     }
@@ -1057,7 +1057,7 @@
     "createPlanning": "Create Planning",
     "table": {
       "program": "Programme",
-      "batch": "Batch",
+      "batch": "Group",
       "module": "Module",
       "teachers": "Lecturers",
       "venue": "Venue",
@@ -1084,9 +1084,9 @@
       "editSubtitle": "Update the planning details",
       "programLabel": "Programme",
       "searchPrograms": "Search programmes...",
-      "batchLabel": "Batch",
-      "batchPlaceholder": "Select batch",
-      "searchBatches": "Search batches...",
+      "batchLabel": "Group",
+      "batchPlaceholder": "Select group",
+      "searchBatches": "Search groups...",
       "moduleLabel": "Module",
       "modulePlaceholder": "Select module",
       "searchComponents": "Search components...",
@@ -1117,7 +1117,7 @@
     "view": {
       "moduleLabel": "Module",
       "programLabel": "Programme",
-      "batchLabel": "Batch",
+      "batchLabel": "Group",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
       "sessionNameLabel": "Session Name",
