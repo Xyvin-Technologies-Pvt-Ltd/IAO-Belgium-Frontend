@@ -982,7 +982,7 @@
       "createSubtitle": "Créons un nouveau rôle d'enseignant",
       "editSubtitle": "Mettre à jour les détails du rôle d'enseignant",
       "nameLabel": "Nom du rôle",
-      "namePlaceholder": "Entrez le rôle (ex : Professeur assistant, Conférencier)",
+      "namePlaceholder": "Entrez le rôle (ex : Professeur assistant, Enseignant)",
       "nameRequired": "Le nom du rôle est requis"
     }
   },

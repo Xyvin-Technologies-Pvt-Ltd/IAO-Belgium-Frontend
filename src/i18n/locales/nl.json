@@ -982,7 +982,7 @@
       "createSubtitle": "Laten we een nieuwe docentrol aanmaken",
       "editSubtitle": "Docentrolgegevens bijwerken",
       "nameLabel": "Rolnaam",
-      "namePlaceholder": "Voer rol in (bijv. Assistent-professor, Lector)",
+      "namePlaceholder": "Voer rol in (bijv. Assistent-professor, Docent)",
       "nameRequired": "Rolnaam is verplicht"
     }
   },
