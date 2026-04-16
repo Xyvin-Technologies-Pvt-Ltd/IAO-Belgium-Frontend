@@ -63,23 +63,12 @@ const AllReports = () => {
   const handleDownloadReceipt = async (payment) => {
     try {
       const html = await getInvoiceHtml(payment._id);
-      const html2pdf = (await import("html2pdf.js")).default;
-      const container = document.createElement("div");
-      container.innerHTML = html;
-      document.body.appendChild(container);
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename: `invoice-${payment.uid || payment._id}.pdf`,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        })
-        .from(container)
-        .save();
-      document.body.removeChild(container);
+      const win = window.open("", "_blank");
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
     } catch (err) {
-      console.error("Failed to download invoice:", err);
+      console.error("Failed to open invoice:", err);
     }
   };
 
