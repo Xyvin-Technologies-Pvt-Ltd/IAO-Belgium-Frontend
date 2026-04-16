@@ -64,6 +64,7 @@ const AllReports = () => {
     try {
       const html = await getInvoiceHtml(payment._id);
       const win = window.open("", "_blank");
+      win.document.open();
       win.document.write(html);
       win.document.close();
     } catch (err) {
