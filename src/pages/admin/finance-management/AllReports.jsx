@@ -63,12 +63,15 @@ const AllReports = () => {
   const handleDownloadReceipt = async (payment) => {
     try {
       const html = await getInvoiceHtml(payment._id);
-      const win = window.open("", "_blank");
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${payment.uid || payment._id}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Failed to open invoice:", err);
+      console.error("Failed to download invoice:", err);
     }
   };
 
