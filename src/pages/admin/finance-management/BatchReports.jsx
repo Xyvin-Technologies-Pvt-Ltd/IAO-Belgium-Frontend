@@ -6,6 +6,7 @@ import {
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
+import { useTranslation } from "react-i18next";
 
 const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
 
@@ -19,6 +20,7 @@ const buildQueryFilters = (filters) => {
 };
 
 const BatchReports = () => {
+  const { t } = useTranslation();
   const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -27,12 +29,12 @@ const BatchReports = () => {
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", navigable: false },
-      { label: "Finance Reports", path: "/admin/finance-reports", navigable: true },
-      { label: "Batch Reports" },
+      { label: t("common.dashboard"), path: "/admin/dashboard", navigable: false },
+      { label: t("common.financeReports"), path: "/admin/finance-reports", navigable: true },
+      { label: t("common.batchReports") },
     ]);
     return () => updateBreadcrumbs([]);
-  }, []);
+  }, [t]);
 
   const queryFilters = buildQueryFilters(appliedFilters);
 
@@ -46,7 +48,7 @@ const BatchReports = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Batch Reports
+          {t("common.batchReports")}
         </h2>
         <CityReportsFilterDrawer
           draftFilters={draftFilters}
@@ -69,7 +71,7 @@ const BatchReports = () => {
         isLoading={isLoadingChart || isLoadingTable}
         error={errorChart || errorTable}
         labelKey="batch_name"
-        title="Batch"
+        title={t("common.batch")}
       />
     </div>
   );

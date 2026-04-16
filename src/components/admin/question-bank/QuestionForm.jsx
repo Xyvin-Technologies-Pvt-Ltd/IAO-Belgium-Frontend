@@ -311,7 +311,7 @@ const QuestionForm = ({
                   {t("questionBank.questionForm.difficulty")}
                 </Label>
                 <Select
-                  key={`difficulty-${questionData?._id || 'new'}-${watch("difficulty")}`}
+                  key={`difficulty-${questionData?._id || "new"}-${watch("difficulty")}`}
                   value={watch("difficulty") || "medium"}
                   onValueChange={(v) => {
                     if (v && (v === "easy" || v === "medium" || v === "hard")) {
@@ -320,7 +320,9 @@ const QuestionForm = ({
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue
+                      placeholder={t("questionBank.questionForm.selectDifficultyPlaceholder")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="easy">

@@ -6,11 +6,13 @@ import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import { Label } from "@/components/ui/label";
 import { contractSchema } from "@/validations/admin/contract.validation";
+import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
 
 const CreateContract = ({ open, onClose, contractData }) => {
+  const { t } = useTranslation();
   const isEdit = !!contractData;
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -115,7 +117,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
         createContract.mutate(payload, { onSuccess: handleClose });
       }
     } catch {
-      toast.error("Failed to upload file");
+      toast.error(t("contractManagement.messages.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -131,10 +133,10 @@ const CreateContract = ({ open, onClose, contractData }) => {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {isEdit ? "Edit Contract" : "Create Contract"}
+              {isEdit ? t("contractManagement.editContract") : t("contractManagement.createContract")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-white/70">
-              {isEdit ? "Update contract details" : "Upload a new contract version"}
+              {isEdit ? t("contractManagement.editSubtitle") : t("contractManagement.createSubtitle")}
             </p>
           </div>
           <button
@@ -147,8 +149,8 @@ const CreateContract = ({ open, onClose, contractData }) => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <FormField
-            label="Contract Name"
-            placeholder="Enter contract name"
+            label={t("contractManagement.modal.nameLabel")}
+            placeholder={t("contractManagement.modal.namePlaceholder")}
             error={errors.name?.message}
             required
             {...register("name")}
@@ -156,7 +158,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-900 dark:text-white">
-              Contract File <span className="text-red-500">*</span>
+              {t("contractManagement.modal.fileLabel")} <span className="text-red-500">*</span>
             </Label>
             <div
               className="border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-primary transition-colors"
@@ -174,7 +176,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
                   <>
                     <FileText className="h-8 w-8 text-primary" />
                     <p className="text-sm text-gray-600 dark:text-white/70 truncate max-w-full">
-                      {fileName || "File selected"}
+                      {fileName || t("contractManagement.modal.fileSelected")}
                     </p>
                     {isEdit && contractData?.file && !pendingFile && (
                       <a
@@ -184,16 +186,16 @@ const CreateContract = ({ open, onClose, contractData }) => {
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-1 text-xs text-primary hover:underline"
                       >
-                        View current document <ExternalLink className="h-3 w-3" />
+                        {t("contractManagement.modal.viewCurrent")} <ExternalLink className="h-3 w-3" />
                       </a>
                     )}
-                    <p className="text-xs text-gray-400">Click to replace</p>
+                    <p className="text-xs text-gray-400">{t("contractManagement.modal.clickReplace")}</p>
                   </>
                 ) : (
                   <>
                     <Upload className="h-8 w-8 text-gray-400" />
                     <p className="text-sm text-gray-500">
-                      Click to upload PDF or Word document
+                      {t("contractManagement.modal.uploadHint")}
                     </p>
                   </>
                 )}

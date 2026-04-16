@@ -17,8 +17,11 @@ const DeleteConfirm = ({ open, onClose, onConfirm, count, data, isLoading = fals
         <DialogHeader>
           <DialogTitle>{t("common.deleteConfirm.title")}</DialogTitle>
           <DialogDescription>
-            {t("common.deleteConfirm.message")}{" "}
-            <span className="font-semibold">{count}</span> {data}? {t("common.deleteConfirm.cannotUndo")}
+            {t("common.deleteConfirm.message", {
+              count,
+              data,
+              cannotUndo: t("common.deleteConfirm.cannotUndo"),
+            })}
           </DialogDescription>
         </DialogHeader>
 

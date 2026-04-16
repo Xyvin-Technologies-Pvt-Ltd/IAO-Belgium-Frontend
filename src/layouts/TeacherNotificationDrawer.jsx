@@ -6,13 +6,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Bell, X } from "lucide-react";
+import { Bell } from "lucide-react";
 import {
   useGetUnreadTeacherNotificationsCount,
   useInfiniteTeacherNotifications,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
-  useClearNotification,
 } from "@/store/useNotificationStore";
 import moment from "moment";
 import { useState } from "react";
@@ -39,7 +38,6 @@ const TeacherNotificationDrawer = () => {
 
   const { mutate: markAsRead } = useMarkNotificationAsRead();
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllNotificationsAsRead();
-  const { mutate: clearOne } = useClearNotification();
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -56,11 +54,6 @@ const TeacherNotificationDrawer = () => {
       setIsOpen(false);
       navigate({ to: `/teacher/evaluations/${notification.meta.submission_id}` });
     }
-  };
-
-  const handleClear = (e, id) => {
-    e.stopPropagation();
-    clearOne(id);
   };
 
   return (
@@ -175,22 +168,13 @@ const TeacherNotificationDrawer = () => {
                         !notification.read
                           ? "font-medium text-sidebar-foreground"
                           : "text-dashboard-text-secondary"
-                      } ${notification.subject ? "text-xs opacity-80 mt-0.5" : ""}`}
-                    >
-                      {notification.message}
-                    </p>
+                      } ${notification.subject ? "text-xs opacity-80 mt-0.5" : ""} prose prose-xs max-w-none`}
+                      dangerouslySetInnerHTML={{ __html: notification.message }}
+                    />
                     <p className="text-xs text-dashboard-text-secondary mt-1 opacity-70">
                       {moment(notification.createdAt).fromNow()}
                     </p>
                   </div>
-
-                  <button
-                    onClick={(e) => handleClear(e, notification._id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5 p-0.5 rounded hover:bg-sidebar-border text-sidebar-foreground/40 hover:text-sidebar-foreground"
-                    title="Clear notification"
-                  >
-                    <X size={14} />
-                  </button>
                 </div>
               ))}
 
@@ -203,6 +187,7 @@ const TeacherNotificationDrawer = () => {
           )}
         </div>
       </SheetContent>
+
     </Sheet>
   );
 };

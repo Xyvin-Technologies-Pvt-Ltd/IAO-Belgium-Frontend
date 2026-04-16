@@ -65,3 +65,12 @@ export const getAnalyticsByStudent = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const getInvoiceHtml = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/payment/invoice/${id}`, { responseType: "text" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

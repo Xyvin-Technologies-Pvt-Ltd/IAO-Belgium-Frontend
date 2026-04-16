@@ -118,8 +118,8 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
               </h2>
               <p className="text-sm text-gray-500 dark:text-white/70">
                 {isEdit
-                  ? t("exam.editSubtitle", "Update the exam details")
-                  : t("exam.createSubtitle", "Fill in the exam details")}
+                  ? t("exam.editSubtitle")
+                  : t("exam.createSubtitle")}
               </p>
             </div>
             <button
@@ -192,7 +192,6 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 {...register("duration", { valueAsNumber: true })}
                 type="number"
                 min={1}
-                placeholder="60"
               />
               {errors.duration && (
                 <p className="text-sm text-red-500">

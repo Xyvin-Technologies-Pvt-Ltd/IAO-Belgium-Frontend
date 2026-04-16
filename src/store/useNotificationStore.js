@@ -2,13 +2,15 @@ import {
   getTeacherNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
-  clearNotification,
   getUnreadTeacherNotificationsCount,
   getAdminNotifications,
   createAdminNotification,
   updateAdminNotification,
   deleteAdminNotification,
   sendAdminNotification,
+  previewNotificationCount,
+  getNotificationRecipients,
+  getNotificationById,
 } from "@/api/notificationApi";
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -79,22 +81,6 @@ export const useMarkAllNotificationsAsRead = () => {
   });
 };
 
-export const useClearNotification = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id) => clearNotification(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-infinite"] });
-      queryClient.invalidateQueries({ queryKey: ["teacher-notifications-unread"] });
-    },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to clear notification");
-    },
-  });
-};
-
 // ─── Admin hooks ─────────────────────────────────────────────────────────────
 
 export const useGetAdminNotifications = (params, options = {}) => {
@@ -160,5 +146,32 @@ export const useSendAdminNotification = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to send notification");
     },
+  });
+};
+
+export const usePreviewNotificationCount = () => {
+  return useMutation({
+    mutationFn: previewNotificationCount,
+  });
+};
+
+export const useGetNotificationRecipients = (id, params, options = {}) => {
+  return useQuery({
+    queryKey: ["notification-recipients", id, params],
+    queryFn: () => getNotificationRecipients(id, params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const useGetNotificationById = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["notification", id],
+    queryFn: () => getNotificationById(id),
+    staleTime: 30000,
+    enabled: !!id,
+    ...options,
   });
 };

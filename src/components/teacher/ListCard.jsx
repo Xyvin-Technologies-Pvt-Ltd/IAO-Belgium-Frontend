@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 const ListCard = ({ columns = [], data = [], isLoading = false }) => {
+  const { t } = useTranslation();
   const handleView = (item) => {
     if (item.url) window.open(item.url, "_blank");
   };
@@ -15,11 +17,16 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
     return (
       <div className="border rounded-lg bg-card text-card-foreground shadow-sm p-4 md:p-6">
         <div className="hidden md:grid md:grid-cols-3 pb-4 gap-4">
-          {columns.map((_, i) => <Skeleton key={i} className="h-6 w-24" />)}
+          {columns.map((_, i) => (
+            <Skeleton key={i} className="h-6 w-24" />
+          ))}
         </div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:items-center md:gap-4">
+            <div
+              key={i}
+              className="space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:items-center md:gap-4"
+            >
               <div className="flex items-center gap-2">
                 <Skeleton className="w-4 h-4" />
                 <Skeleton className="h-5 w-48" />
@@ -39,7 +46,9 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
   return (
     <div className="border rounded-lg bg-card text-card-foreground shadow-sm p-4 md:p-6">
       <div className="hidden md:grid md:grid-cols-3 text-base font-semibold pb-4 border-b border-border">
-        {columns.map((col, i) => <span key={i}>{col}</span>)}
+        {columns.map((col, i) => (
+          <span key={i}>{col}</span>
+        ))}
       </div>
 
       <div className="space-y-4 md:space-y-3 mt-4 md:mt-0">
@@ -66,7 +75,7 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
                 onClick={() => handleView(item)}
               >
                 <Eye className="w-4 h-4" />
-                View
+                {t("common.view")}
               </Button>
               <Button
                 variant="outline"
@@ -74,7 +83,7 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
                 onClick={() => handleDownload(item)}
               >
                 <Download className="w-4 h-4" />
-                Download
+                {t("common.download")}
               </Button>
             </div>
           </div>

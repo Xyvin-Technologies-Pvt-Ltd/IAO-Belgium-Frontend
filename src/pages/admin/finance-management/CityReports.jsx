@@ -3,6 +3,7 @@ import { useGetAnalyticsByCity } from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
+import { useTranslation } from "react-i18next";
 
 const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
 
@@ -16,6 +17,7 @@ const buildQueryFilters = (filters) => {
 };
 
 const CityReports = () => {
+  const { t } = useTranslation();
   const { updateBreadcrumbs } = useBreadcrumb();
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
@@ -24,18 +26,18 @@ const CityReports = () => {
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", navigable: false },
-      { label: "Finance Reports", path: "/admin/finance-reports", navigable: true },
-      { label: "City Reports" },
+      { label: t("common.dashboard"), path: "/admin/dashboard", navigable: false },
+      { label: t("common.financeReports"), path: "/admin/finance-reports", navigable: true },
+      { label: t("common.cityReports") },
     ]);
     return () => updateBreadcrumbs([]);
-  }, []);
+  }, [t]);
 
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          City Reports
+          {t("common.cityReports")}
         </h2>
         <CityReportsFilterDrawer
           draftFilters={draftFilters}
@@ -50,7 +52,7 @@ const CityReports = () => {
         isLoading={isLoading}
         error={error}
         labelKey="city_name"
-        title="City"
+        title={t("common.city")}
       />
     </div>
   );

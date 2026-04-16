@@ -243,7 +243,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
             <SearchableSelect
               label={t("teacherManagement.modal.countryLabel")}
               placeholder={t("teacherManagement.modal.countryPlaceholder")}
-              searchPlaceholder="Search countries..."
+              searchPlaceholder={t("common.searchCountries")}
               items={countriesData?.data || []}
               value={watch("country") || ""}
               onChange={(v) => setValue("country", v, { shouldValidate: true })}
@@ -258,9 +258,9 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
               placeholder={
                 selectedCountry
                   ? t("teacherManagement.modal.citiesPlaceholder")
-                  : "Please select a country first"
+                  : t("common.selectCountryFirst")
               }
-              searchPlaceholder="Search cities..."
+              searchPlaceholder={t("common.searchCities")}
               items={citiesData?.data || []}
               selected={selectedLocations}
               onChange={(val) =>
@@ -275,7 +275,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
             <SearchableMultiSelect
               label={t("teacherManagement.modal.languageLabel")}
               placeholder={t("teacherManagement.modal.languagePlaceholder")}
-              searchPlaceholder="Search languages..."
+              searchPlaceholder={t("common.searchLanguages")}
               items={languagesData?.data || []}
               selected={selectedLanguages}
               onChange={(val) =>
@@ -291,7 +291,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
               placeholder={t(
                 "teacherManagement.modal.academicDegreePlaceholder",
               )}
-              searchPlaceholder="Search academic degrees..."
+              searchPlaceholder={t("common.searchTitles")}
               items={titlesData?.data || []}
               value={watch("academic_degree") || ""}
               onChange={(v) =>
@@ -306,7 +306,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
             <SearchableSelect
               label={t("teacherManagement.modal.teacherRoleLabel")}
               placeholder={t("teacherManagement.modal.teacherRolePlaceholder")}
-              searchPlaceholder="Search teacher roles..."
+              searchPlaceholder={t("common.searchRoles")}
               items={rolesData?.data || []}
               value={watch("teacher_role") || ""}
               onChange={(v) =>

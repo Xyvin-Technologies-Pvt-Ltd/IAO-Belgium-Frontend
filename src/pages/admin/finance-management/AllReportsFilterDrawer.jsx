@@ -17,6 +17,7 @@ import {
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "react-i18next";
 
 const FilterSection = ({ label, children }) => (
   <div className="space-y-2">
@@ -34,6 +35,7 @@ const AllReportsFilterDrawer = ({
   setAppliedFilters,
   setPage,
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(
@@ -58,7 +60,7 @@ const AllReportsFilterDrawer = ({
       <SheetTrigger asChild>
         <Button variant={activeFiltersCount > 0 ? "default" : "outline"} className="relative gap-2">
           <SlidersHorizontal className="h-4 w-4" />
-          Filters
+          {t("finance.filters.title")}
           {activeFiltersCount > 0 && (
             <span style={{
               position: "absolute", top: -8, right: -8,
@@ -88,10 +90,10 @@ const AllReportsFilterDrawer = ({
             </div>
             <div>
               <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                Filter Reports
+                {t("finance.filters.filterReports")}
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Narrow down the payments list
+                {t("finance.filters.narrowDownPayments")}
               </p>
             </div>
           </div>
@@ -99,36 +101,36 @@ const AllReportsFilterDrawer = ({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label="Status">
+            <FilterSection label={t("common.status")}>
               <Select
                 value={draftFilters.status}
                 onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, status: val }))}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All Statuses" />
+                  <SelectValue placeholder={t("finance.filters.allStatuses")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                  <SelectItem value="canceled">Canceled</SelectItem>
+                  <SelectItem value="all">{t("finance.filters.allStatuses")}</SelectItem>
+                  <SelectItem value="pending">{t("common.pending")}</SelectItem>
+                  <SelectItem value="paid">{t("common.paid")}</SelectItem>
+                  <SelectItem value="failed">{t("common.failed")}</SelectItem>
+                  <SelectItem value="canceled">{t("common.canceled")}</SelectItem>
                 </SelectContent>
               </Select>
             </FilterSection>
 
-            <FilterSection label="Purpose">
+            <FilterSection label={t("common.purpose")}>
               <Select
                 value={draftFilters.purpose}
                 onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, purpose: val }))}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All Purposes" />
+                  <SelectValue placeholder={t("finance.filters.allPurposes")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Purposes</SelectItem>
-                  <SelectItem value="admission-fee">Admission Fee</SelectItem>
-                  <SelectItem value="module-purchase">Module Purchase</SelectItem>
+                  <SelectItem value="all">{t("finance.filters.allPurposes")}</SelectItem>
+                  <SelectItem value="admission-fee">{t("finance.purposes.admissionFee")}</SelectItem>
+                  <SelectItem value="module-purchase">{t("finance.purposes.modulePurchase")}</SelectItem>
                 </SelectContent>
               </Select>
             </FilterSection>
@@ -136,9 +138,9 @@ const AllReportsFilterDrawer = ({
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
             <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-              Date Range
+              {t("finance.filters.dateRange")}
             </p>
-            <FilterSection label="From">
+            <FilterSection label={t("finance.filters.from")}>
               <Input
                 type="date"
                 className="bg-sidebar border-sidebar-border"
@@ -146,7 +148,7 @@ const AllReportsFilterDrawer = ({
                 onChange={(e) => setDraftFilters((prev) => ({ ...prev, from: e.target.value }))}
               />
             </FilterSection>
-            <FilterSection label="To">
+            <FilterSection label={t("finance.filters.to")}>
               <Input
                 type="date"
                 className="bg-sidebar border-sidebar-border"
@@ -168,10 +170,10 @@ const AllReportsFilterDrawer = ({
           }}
         >
           <Button variant="outline" className="w-full border-sidebar-border" onClick={handleClearAll}>
-            Clear All
+            {t("finance.filters.clearAll")}
           </Button>
           <Button className="w-full" onClick={handleApply}>
-            Apply Filters
+            {t("finance.filters.applyFilters")}
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -181,7 +181,7 @@ const Countries = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="Country"
+        data={t("common.country")}
       />
     </div>
   );

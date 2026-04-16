@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMoment } from "@/utils/dateUtils";
+import { useTranslation } from "react-i18next";
+import moment from "moment";
 
 const CalendarView = ({
   plannings = [],
@@ -12,6 +14,13 @@ const CalendarView = ({
   currentWeekStart,
   onWeekChange,
 }) => {
+  const { t, i18n } = useTranslation();
+
+  // Sync moment locale with app language
+  useMemo(() => {
+    moment.locale(i18n.language);
+  }, [i18n.language]);
+
   const [currentDate, setCurrentDate] = useState(getMoment());
 
   const daysInMonth = currentDate.daysInMonth();
@@ -168,7 +177,7 @@ const CalendarView = ({
           </div>
         )}
         <p className={`text-sm font-semibold leading-tight ${colors.text}`}>
-          {session.module_name || "Session"}
+          {session.module_name || t("planningManagement.calendar.session")}
         </p>
         {teacher && (
           <p className={`text-xs mt-0.5 ${colors.text} opacity-75`}>{teacher}</p>
@@ -220,7 +229,7 @@ const CalendarView = ({
             ))}
             {sessionsForDay.length > 3 && (
               <p className="text-xs pl-1 text-gray-400 dark:text-sidebar-foreground/40">
-                + {sessionsForDay.length - 3} more
+                + {sessionsForDay.length - 3} {t("planningManagement.calendar.more")}
               </p>
             )}
           </div>
@@ -292,7 +301,7 @@ const CalendarView = ({
           onClick={handleToday}
           className="px-3.5 py-1 rounded-md border border-gray-300 dark:border-sidebar-border text-sm font-medium text-gray-700 dark:text-sidebar-foreground/70 bg-white dark:bg-sidebar hover:bg-gray-50 dark:hover:bg-sidebar-border/20 transition-colors"
         >
-          Today
+          {t("planningManagement.calendar.today")}
         </button>
 
         <button
@@ -326,7 +335,7 @@ const CalendarView = ({
                     : "bg-white dark:bg-sidebar text-gray-600 dark:text-sidebar-foreground/60 hover:bg-gray-50 dark:hover:bg-sidebar-border/20"
                 }`}
               >
-                {type}
+                {t(`planningManagement.calendar.${type}`)}
               </button>
             ))}
           </div>
@@ -339,7 +348,7 @@ const CalendarView = ({
         ) : (
           <>
             <div className="grid grid-cols-7 bg-gray-50 dark:bg-sidebar/60 border-b border-gray-100 dark:border-sidebar-border">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              {moment.weekdaysShort(true).map((day) => (
                 <div
                   key={day}
                   className="py-2.5 text-center text-xs font-medium tracking-wide uppercase text-gray-400 dark:text-sidebar-foreground/40"
@@ -355,7 +364,7 @@ const CalendarView = ({
 
       {isLoading && (
         <p className="text-center text-sm text-gray-400 dark:text-sidebar-foreground/40 py-2">
-          Loading…
+          {t("planningManagement.calendar.loading")}
         </p>
       )}
     </div>

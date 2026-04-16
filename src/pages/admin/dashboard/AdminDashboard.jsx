@@ -15,15 +15,15 @@ const AdminDashboard = () => {
 
   const stats = [
     {
-      title: "Ongoing Courses",
+      title: t("dashboard.ongoingCourses"),
       value: "12",
-      changeText: "+15% compared to last month",
+      changeText: t("dashboard.comparedToLastMonth", { percent: "+15%" }),
       icon: Activity,
     },
     {
-      title: "Finished Courses",
+      title: t("dashboard.finishedCourses"),
       value: "+1500",
-      changeText: "+90% compared to last month",
+      changeText: t("dashboard.comparedToLastMonth", { percent: "+90%" }),
       icon: Users,
     }
   ];
@@ -49,7 +49,7 @@ const AdminDashboard = () => {
         <h1 className="text-4xl font-semibold">
           {isLoading 
             ? t("common.welcome.back") 
-            : t("common.welcome.backWithName").replace("{name}", displayName)
+            : t("common.welcome.backWithName", { name: displayName })
           }
         </h1>
         <p className="text-muted-foreground text-lg">
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
         ))}
       </div>
       <div>
-        <DashboardGraph title="Course Enrollment Trend" data={data} />
+        <DashboardGraph title={t("dashboard.courseEnrollmentTrend")} data={data} />
       </div>
     </div>
   );

@@ -103,3 +103,14 @@ export const getUsers= async (filter) => {
     throw error.response.data;
   }
 }
+
+export const getTeacherModules = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/planning/teacher/modules/dropdown`, {
+      params: filter
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

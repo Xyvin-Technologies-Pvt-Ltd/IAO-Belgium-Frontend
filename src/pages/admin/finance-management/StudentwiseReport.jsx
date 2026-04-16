@@ -30,7 +30,7 @@ const buildQueryFilters = (filters) => {
 
 const StudentwiseReport = () => {
   const { t } = useTranslation();
-   const { updateBreadcrumbs } = useBreadcrumb();
+  const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -44,19 +44,20 @@ const StudentwiseReport = () => {
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", navigable: false },
+      { label: t("common.dashboard"), path: "/admin/dashboard", navigable: false },
       {
-        label: "Finance Reports",
+        label: t("common.financeReports"),
         path: "/admin/finance-reports",
         navigable: true,
       },
-      { label: "Student Reports" },
+      { label: t("common.studentReports") },
     ]);
 
     return () => {
       updateBreadcrumbs([]);
     };
-  }, []);
+  }, [t]);
+
   const { data, isLoading, error, refetch, isFetching } =
     useGetAnalyticsByStudent({
       page,
@@ -72,7 +73,7 @@ const StudentwiseReport = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Student Reports
+          {t("common.studentReports")}
         </h2>
       </div>
 
@@ -95,15 +96,15 @@ const StudentwiseReport = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Total Revenue</TableHead>
-              <TableHead>Trx Count</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Pending</TableHead>
-              <TableHead>Failed</TableHead>
-              <TableHead>Admission Fee</TableHead>
-              <TableHead>Module Purchase</TableHead>
+              <TableHead>{t("common.studentName")}</TableHead>
+              <TableHead>{t("common.email")}</TableHead>
+              <TableHead>{t("finance.fields.totalRevenue")}</TableHead>
+              <TableHead>{t("common.trxCount")}</TableHead>
+              <TableHead>{t("common.paid")}</TableHead>
+              <TableHead>{t("common.pending")}</TableHead>
+              <TableHead>{t("common.failed")}</TableHead>
+              <TableHead>{t("finance.purposes.admissionFee")}</TableHead>
+              <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -155,7 +156,7 @@ const StudentwiseReport = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={9} className="text-center">
-                  No payment analytics found
+                  {t("finance.messages.noPaymentAnalyticsFound")}
                 </TableCell>
               </TableRow>
             )}

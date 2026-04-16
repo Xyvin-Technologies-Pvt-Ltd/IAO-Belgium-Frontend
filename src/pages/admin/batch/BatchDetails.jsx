@@ -21,7 +21,7 @@ const BatchDetails = () => {
   const { data: batch, isLoading, error, refetch } = useGetBatchesById(id);
   const getInitialTab = () => {
     const savedTab = localStorage.getItem(`batchDetailsTab_${id}`);
-    return savedTab || "Overview";
+    return savedTab || t("batchManagement.details.tabs.overview");
   };
 
   const [activeTab, setActiveTab] = useState(getInitialTab);
@@ -34,27 +34,27 @@ const BatchDetails = () => {
     if (batch?.data) {
       updateBreadcrumbs([
         {
-          label: "Admission administration",
+          label: t("common.admissionAdministration"),
           path: "/admin/admission-administration",
           navigable: false,
         },
         {
-          label: "Academics",
+          label: t("common.academics"),
           path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Intakes",
+          label: t("common.intakes"),
           path: `/admin/admission-administration/academics/${batch.data.academic}`,
           navigable: true,
         },
         {
-          label: "Intakes Details",
+          label: t("common.intakeDetails"),
           path: `/admin/admission-administration/academics/intakes/${batch.data.intake_id}`,
           navigable: true,
         },
         {
-          label: "Batch Details",
+          label: t("common.batchDetails"),
           path: `/admin/admission-administration/academics/intakes/batch/${batch.data._id}`,
           navigable: false,
         },
@@ -63,7 +63,7 @@ const BatchDetails = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [batch?.data?._id]);
+  }, [batch?.data?._id, t]);
 
   if (isLoading) {
     return (
@@ -158,7 +158,7 @@ const BatchDetails = () => {
           },
           {
             key: "Year",
-            label: "Year Log",
+            label: t("common.yearLog"),
           }
         ].map((tab) => (
           <button

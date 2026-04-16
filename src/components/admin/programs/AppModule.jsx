@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -23,7 +23,12 @@ import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 
 const AppModule = ({ programId, onComponentCreated,languageId }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Sync moment locale with app language
+  useMemo(() => {
+    moment.locale(i18n.language);
+  }, [i18n.language]);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");

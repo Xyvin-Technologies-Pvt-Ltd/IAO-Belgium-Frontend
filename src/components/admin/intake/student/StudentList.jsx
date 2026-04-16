@@ -111,7 +111,7 @@ const StudentList = () => {
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.batch_name}</TableCell>
                 <TableCell>
-                  {formatTZ(i?.enrolled_date, "DD-MM-YYYY") || "N/A"}
+                  {formatTZ(i?.enrolled_date, "DD-MM-YYYY") || t("common.notAvailable")}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />

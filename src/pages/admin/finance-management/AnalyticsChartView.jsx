@@ -29,6 +29,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { TrendingUp, CreditCard, CheckCircle } from "lucide-react";
 import { ErrorMessage, LoadingState } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -115,12 +116,12 @@ const CustomTick = ({ x, y, payload }) => {
   );
 };
 
-const DonutCenter = ({ viewBox, total }) => {
+const DonutCenter = ({ viewBox, total, t }) => {
   const { cx, cy } = viewBox;
   const fmt = total >= 1000 ? `EUR ${(total / 1000).toFixed(1)}k` : `EUR ${total.toFixed(0)}`;
   return (
     <g>
-      <text x={cx} y={cy - 10} textAnchor="middle" fontSize={11} fill="#94a3b8" fontWeight={500}>Total</text>
+      <text x={cx} y={cy - 10} textAnchor="middle" fontSize={11} fill="#94a3b8" fontWeight={500}>{t("common.total")}</text>
       <text x={cx} y={cy + 14} textAnchor="middle" fontSize={17} fill="var(--sidebar-foreground, #1e293b)" fontWeight={800}>{fmt}</text>
     </g>
   );
@@ -153,16 +154,18 @@ const AnalyticsChartView = ({
   labelFn,
   title,
 }) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
-      <LoadingState text="Loading analytics data..." size="lg" />
+      <LoadingState text={t("finance.messages.loadingAnalytics")} size="lg" />
     );
   }
 
   if (error) {
     return (
       <ErrorMessage 
-        message={error?.message || "Failed to load analytics data"} 
+        message={error?.message || t("finance.messages.loadAnalyticsFailed")} 
         variant="card" 
         showRetry={false} 
       />
@@ -172,12 +175,12 @@ const AnalyticsChartView = ({
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-muted-foreground">
-        No analytics data available
+        {t("finance.messages.noAnalyticsData")}
       </div>
     );
   }
 
-  const getLabel = (item) => labelFn ? labelFn(item) : item[labelKey] || "Unknown";
+  const getLabel = (item) => labelFn ? labelFn(item) : item[labelKey] || t("common.unknown");
 
   const totalRevenue = totalCount?.amount || 0;
   const totalTransactions = totalCount?.transactions || 0;
@@ -201,7 +204,7 @@ const AnalyticsChartView = ({
   const othersAmt = sortedNonZero.slice(5).reduce((s, i) => s + i.total_amount, 0);
   const pieData = [
     ...top5.map((item) => ({ name: getLabel(item), value: item.total_amount })),
-    ...(othersAmt > 0 ? [{ name: "Others", value: othersAmt }] : []),
+    ...(othersAmt > 0 ? [{ name: t("common.others"), value: othersAmt }] : []),
   ];
   const pieColors = [...COLORS, PIE_OTHERS_COLOR];
 
@@ -223,10 +226,10 @@ const AnalyticsChartView = ({
         }}>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.75)", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>
-              Total Revenue
+              {t("finance.fields.totalRevenue")}
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.1 }}>
-              EUR {totalRevenue.toLocaleString({maximumFractionDigits: 2})}
+              EUR {totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
             </h2>
           </div>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.20)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -246,7 +249,7 @@ const AnalyticsChartView = ({
         }}>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "#94a3b8", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>
-              Total Transactions
+              {t("finance.fields.totalTransactions")}
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "var(--sidebar-foreground, #1e293b)", letterSpacing: "-0.025em", lineHeight: 1.1 }}>
               {totalTransactions.toLocaleString()}
@@ -268,7 +271,7 @@ const AnalyticsChartView = ({
         }}>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "#94a3b8", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: 8 }}>
-              Paid Transactions
+              {t("finance.fields.paidTransactions")}
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "var(--sidebar-foreground, #1e293b)", letterSpacing: "-0.025em", lineHeight: 1.1 }}>
               {totalPaid.toLocaleString()}
@@ -283,7 +286,7 @@ const AnalyticsChartView = ({
       <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
         <CardHeader className="p-0 mb-4">
           <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
-            {title} — Revenue Breakdown
+            {title} — {t("finance.fields.revenueBreakdown")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -293,11 +296,11 @@ const AnalyticsChartView = ({
               <XAxis dataKey="name" tick={<CustomTick />} height={52} interval={0} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `EUR ${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
               <Tooltip content={<CustomTooltipRevenue />} cursor={{ fill: "rgba(241,245,249,0.55)", radius: 8 }} />
-              <Bar dataKey="admission_fee" name="Admission Fee" fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={40} />
-              <Bar dataKey="module_purchase" name="Module Purchase" fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={40} />
+              <Bar dataKey="admission_fee" name={t("finance.purposes.admissionFee")} fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={40} />
+              <Bar dataKey="module_purchase" name={t("finance.purposes.modulePurchase")} fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
-          <InlineLegend items={[{ color: "#3b82f6", label: "Admission Fee" }, { color: "#ff8904", label: "Module Purchase" }]} />
+          <InlineLegend items={[{ color: "#3b82f6", label: t("finance.purposes.admissionFee") }, { color: "#ff8904", label: t("finance.purposes.modulePurchase") }]} />
         </CardContent>
       </Card>
 
@@ -306,7 +309,7 @@ const AnalyticsChartView = ({
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
-              Revenue Distribution
+              {t("finance.fields.revenueDistribution")}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -326,7 +329,7 @@ const AnalyticsChartView = ({
                   {pieData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="none" />
                   ))}
-                  <Label content={<DonutCenter total={totalRevenue} />} position="center" />
+                  <Label content={<DonutCenter total={totalRevenue} t={t} />} position="center" />
                 </Pie>
                 <Tooltip content={<CustomTooltipPie />} />
               </PieChart>
@@ -337,7 +340,7 @@ const AnalyticsChartView = ({
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none flex flex-col">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
-              Payment Status
+              {t("finance.fields.paymentStatus")}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 flex-1 flex flex-col">
@@ -347,29 +350,29 @@ const AnalyticsChartView = ({
                 <XAxis dataKey="name" tick={<CustomTick />} height={52} interval={0} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltipStatus />} cursor={{ fill: "rgba(241,245,249,0.55)", radius: 8 }} />
-                <Bar dataKey="paid" name="Paid" fill="#22c55e" radius={[6, 6, 0, 0]} maxBarSize={36} />
-                <Bar dataKey="pending" name="Pending" fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={36} />
-                <Bar dataKey="failed" name="Failed" fill="#ef4444" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="paid" name={t("common.paid")} fill="#22c55e" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="pending" name={t("common.pending")} fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Bar dataKey="failed" name={t("common.failed")} fill="#ef4444" radius={[6, 6, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ResponsiveContainer>
-            <InlineLegend items={[{ color: "#22c55e", label: "Paid" }, { color: "#ff8904", label: "Pending" }, { color: "#ef4444", label: "Failed" }]} />
+            <InlineLegend items={[{ color: "#22c55e", label: t("common.paid") }, { color: "#ff8904", label: t("common.pending") }, { color: "#ef4444", label: t("common.failed") }]} />
           </CardContent>
         </Card>
       </div>
 
       <div className="mt-8">
-        <h3 className="text-lg font-medium mb-4">Detailed Data</h3>
+        <h3 className="text-lg font-medium mb-4">{t("finance.fields.detailedData")}</h3>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>{title.split(" ")[0]}</TableHead>
-              <TableHead>Total Amount</TableHead>
-              <TableHead>Admission Fee</TableHead>
-              <TableHead>Module Purchase</TableHead>
-              <TableHead>Transactions</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Pending</TableHead>
-              <TableHead>Failed</TableHead>
+              <TableHead>{t("finance.fields.totalAmount")}</TableHead>
+              <TableHead>{t("finance.purposes.admissionFee")}</TableHead>
+              <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
+              <TableHead>{t("common.trxCount")}</TableHead>
+              <TableHead>{t("common.paid")}</TableHead>
+              <TableHead>{t("common.pending")}</TableHead>
+              <TableHead>{t("common.failed")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isLoading ? "opacity-50 pointer-events-none" : ""}>
@@ -378,7 +381,7 @@ const AnalyticsChartView = ({
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center p-8">
-                  <ErrorMessage message={error?.message || "Failed to load analytic data"} variant="inline" />
+                  <ErrorMessage message={error?.message || t("finance.messages.loadAnalyticsFailed")} variant="inline" />
                 </TableCell>
               </TableRow>
             ) : displayTableData?.length > 0 ? (
@@ -396,7 +399,7 @@ const AnalyticsChartView = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center">No analytics data found</TableCell>
+                <TableCell colSpan={8} className="text-center">{t("finance.messages.noAnalyticsFound")}</TableCell>
               </TableRow>
             )}
           </TableBody>

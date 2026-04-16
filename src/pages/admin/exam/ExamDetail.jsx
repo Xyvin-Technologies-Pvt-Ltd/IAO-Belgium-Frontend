@@ -155,21 +155,21 @@ const ExamDetail = () => {
         />
         <DashboardCard
           title={t("exam.detail.duration")}
-          value={`${exam.duration || 0} mins`}
+          value={`${exam.duration || 0} ${t("common.mins")}`}
           icon={Timer}
         />
       </div>
 
       {exam.description && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Description:</p>
+          <p className="text-sm font-bold mb-2">{t("common.description")}</p>
           <p className="text-sm text-card-foreground/80">{exam.description}</p>
         </div>
       )}
 
       {exam.instructions && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Instructions:</p>
+          <p className="text-sm font-bold mb-2">{t("common.instructions")}</p>
           <div className="text-sm text-card-foreground/80 whitespace-pre-wrap">
             {exam.instructions}
           </div>
@@ -185,8 +185,8 @@ const ExamDetail = () => {
             <table className="w-full text-sm text-left">
               <thead className="bg-[#f4f4f5] dark:bg-muted text-muted-foreground text-xs font-semibold">
                 <tr>
-                  <th className="px-6 py-4 border-b">Source</th>
-                  <th className="px-6 py-4 border-b">Number of Questions</th>
+                  <th className="px-6 py-4 border-b">{t("common.source")}</th>
+                  <th className="px-6 py-4 border-b">{t("common.numberOfQuestions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

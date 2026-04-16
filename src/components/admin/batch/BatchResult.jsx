@@ -32,7 +32,7 @@ const BatchResult = () => {
   if (isLoading) return <LoadingState />;
   if (isError)
     return (
-      <ErrorMessage message={error?.message || "Failed to load results"} />
+      <ErrorMessage message={error?.message || t("batchManagement.messages.loadResultsFailed")} />
     );
 
   if (!results?.data || results.data.length === 0) {
@@ -76,7 +76,7 @@ const BatchResult = () => {
                 <TableCell className="px-6 py-4">
                   {result.student?.first_name} {result.student?.last_name}
                 </TableCell>
-                <TableCell>{result.exam?.name || "Unnamed Exam"}</TableCell>
+                <TableCell>{result.exam?.name || t("batchManagement.table.unnamedExam")}</TableCell>
                 <TableCell className="text-center font-medium">
                   {result.score}
                 </TableCell>

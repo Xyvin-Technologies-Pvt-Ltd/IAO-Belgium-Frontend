@@ -194,7 +194,7 @@ const QuestionList = ({ questionBankId }) => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={isDeleting}
-        data="Question"
+        data={t("questionBank.question")}
       />
     </div>
   );

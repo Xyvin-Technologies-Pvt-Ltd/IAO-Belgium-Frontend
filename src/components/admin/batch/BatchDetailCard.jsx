@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 const InfoItem = ({ label, value }) => (
   <div className="space-y-1">
     <p className="text-sm text-sidebar-foreground/70">{label}</p>
-    <p className="text-sm font-medium text-sidebar-foreground">{value || "-"}</p>
+    <p className="text-sm font-medium text-sidebar-foreground">{value || t("common.dash")}</p>
   </div>
 );
 

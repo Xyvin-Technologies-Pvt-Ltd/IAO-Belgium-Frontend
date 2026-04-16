@@ -223,7 +223,7 @@ const BatchList = () => {
         }}
         onConfirm={handleDeleteBatch}
         count={1}
-        data={selectedBatch?.name || "batch"}
+        data={selectedBatch?.name || t("common.batch")}
         isLoading={deleteBatchMutation.isPending}
       />
     </div>

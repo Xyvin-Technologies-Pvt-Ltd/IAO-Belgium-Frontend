@@ -209,15 +209,19 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Master of Science">
-                    Master of Science
+                    {t("programManagement.modal.programTypes.masterOfScience")}
                   </SelectItem>
                   <SelectItem value="Lateral Entry Master of Science">
-                    Lateral Entry Master of Science
+                    {t("programManagement.modal.programTypes.lateralEntry")}
                   </SelectItem>
-                  <SelectItem value="Diploma">Diploma</SelectItem>
-                  <SelectItem value="Manual Therapie">Manual Therapie</SelectItem>
+                  <SelectItem value="Diploma">
+                    {t("programManagement.modal.programTypes.diploma")}
+                  </SelectItem>
+                  <SelectItem value="Manual Therapie">
+                    {t("programManagement.modal.programTypes.manualTherapie")}
+                  </SelectItem>
                   <SelectItem value="Post Academic Module">
-                    Post Academic Module
+                    {t("programManagement.modal.programTypes.postAcademic")}
                   </SelectItem>
                 </SelectContent>
               </Select>

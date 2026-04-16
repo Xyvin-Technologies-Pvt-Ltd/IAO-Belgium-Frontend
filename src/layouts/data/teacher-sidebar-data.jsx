@@ -5,6 +5,7 @@ import {
   FileMinus,
   BookOpenCheck,
   ClipboardCheck,
+  Bell,
 } from "lucide-react";
 
 export const getTeacherSidebarData = (t) => ({
@@ -41,6 +42,11 @@ export const getTeacherSidebarData = (t) => ({
           title: t("sidebar.teacher.exams"),
           url: "/teacher/exams",
           icon: ClipboardCheck,
+        },
+        {
+          title: "Notification Management",
+          url: "/teacher/notifications",
+          icon: Bell,
         },
       ],
     },

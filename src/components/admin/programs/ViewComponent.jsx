@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { X, FileText, CheckCircle, XCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,14 +8,22 @@ import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 
 const ViewComponent = ({ open, onClose, componentData }) => {
+  const { t, i18n } = useTranslation();
+
+  useMemo(() => {
+    if (i18n.language) {
+      moment.locale(i18n.language);
+    }
+  }, [i18n.language]);
+
   if (!open || !componentData) return null;
 
   const getTypeLabel = (type) => {
     const typeLabels = {
-      module: "Module",
-      app: "Application",
-      resource: "Resource",
-      exam: "Exam",
+      module: t("componentManagement.types.module"),
+      app: t("componentManagement.types.app"),
+      resource: t("componentManagement.types.resource"),
+      exam: t("componentManagement.types.exam"),
     };
     return typeLabels[type] || type;
   };
@@ -80,7 +90,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground">
-                  Year
+                  {t("componentManagement.year")}
                 </h3>
                 <p className="text-lg">{componentData.year}</p>
               </div>
@@ -88,7 +98,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
               {componentData.submission_deadline && (
                 <div>
                   <h3 className="font-medium text-sm text-muted-foreground">
-                    Submission Deadline
+                    {t("componentManagement.submissionDeadlineLabel")}
                   </h3>
                   <p className="text-lg">
                     {formatTZ(componentData.submission_deadline, "DD-MM-YYYY")}
@@ -100,7 +110,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
                 componentData.type === "module" && (
                   <div>
                     <h3 className="font-medium text-sm text-muted-foreground">
-                      Amount
+                      {t("componentManagement.amountLabel")}
                     </h3>
                     <p className="text-lg">
                       {componentData.currency
@@ -115,23 +125,23 @@ const ViewComponent = ({ open, onClose, componentData }) => {
               <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-dashed border-muted-foreground/30">
                 <div>
                   <h3 className="font-medium text-sm text-muted-foreground">
-                    Linked Module
+                    {t("componentManagement.linkedModuleLabel")}
                   </h3>
                   <p className="text-base font-semibold">
-                    {componentData.linked_module?.name || "N/A"}
+                    {componentData.linked_module?.name || t("common.notAvailable")}
                     {componentData.linked_module?.module_number &&
-                      ` (Module ${componentData.linked_module.module_number})`}
+                      ` (${t("componentManagement.year")} ${componentData.linked_module.module_number})`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 italic">
-                    Exam scheduled before this module
+                    {t("componentManagement.linkedModuleHint")}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-medium text-sm text-muted-foreground">
-                    Linked Exam
+                    {t("componentManagement.linkedExamLabel")}
                   </h3>
                   <p className="text-base font-semibold">
-                    {componentData.linked_exam?.name || "N/A"}
+                    {componentData.linked_exam?.name || t("common.notAvailable")}
                     {componentData.linked_exam?.uid &&
                       ` (${componentData.linked_exam.uid})`}
                   </p>
@@ -142,7 +152,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             {componentData.instruction && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-2">
-                  Instructions
+                  {t("componentManagement.instructionsLabel")}
                 </h3>
                 <div className="bg-muted rounded-lg p-4">
                   <div
@@ -157,7 +167,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             {componentData.files && componentData.files.length > 0 && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-3">
-                  Resources
+                  {t("resourceModule.resources.title")}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {componentData.files.map((file, index) => (
@@ -188,7 +198,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             {componentData.submissions && componentData.type === "app" && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-3">
-                  Submissions
+                  {t("componentManagement.submissionTypesLabel")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
@@ -197,7 +207,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="text-sm">Case studies</span>
+                    <span className="text-sm">{t("componentManagement.caseStudies")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {componentData.submissions.essays ? (
@@ -205,7 +215,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="text-sm">Essays</span>
+                    <span className="text-sm">{t("componentManagement.essays")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {componentData.submissions.internships ? (
@@ -213,7 +223,7 @@ const ViewComponent = ({ open, onClose, componentData }) => {
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="text-sm">Internships</span>
+                    <span className="text-sm">{t("componentManagement.internships")}</span>
                   </div>
                 </div>
               </div>
@@ -223,21 +233,21 @@ const ViewComponent = ({ open, onClose, componentData }) => {
 
             <div className="flex items-center justify-between">
               <span className="font-medium text-sm text-muted-foreground">
-                Status
+                {t("componentManagement.activeStatus")}
               </span>
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${componentData.status ? "bg-green-500" : "bg-red-500"}`}
                 />
                 <span className="text-sm font-medium">
-                  {componentData.status ? "Active" : "Inactive"}
+                  {componentData.status ? t("common.active") : t("common.inactive")}
                 </span>
               </div>
             </div>
           </div>
           <div className="flex justify-end p-6 border-t">
             <Button variant="outline" onClick={onClose}>
-              Close
+              {t("common.cancel")}
             </Button>
           </div>
         </div>

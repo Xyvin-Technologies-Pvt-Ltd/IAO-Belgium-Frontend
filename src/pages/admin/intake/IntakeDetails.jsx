@@ -32,22 +32,22 @@ const IntakeDetails = () => {
     if (intake?.data) {
       updateBreadcrumbs([
         {
-          label: "Admission administration",
+          label: t("common.admissionAdministration"),
           path: "/admin/admission-administration",
           navigable: false,
         },
         {
-          label: "Academics",
+          label: t("common.academics"),
           path: "/admin/admission-administration/academics",
           navigable: true,
         },
         {
-          label: "Intakes",
+          label: t("common.intakes"),
           path: `/admin/admission-administration/academics/${intake?.data?.academic}`,
           navigable: true,
         },
         {
-          label: "Intakes Details",
+          label: t("common.intakeDetails"),
           path: `/admin/admission-administration/academics/intakes/${id}`,
           navigable: false,
         },

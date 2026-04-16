@@ -22,6 +22,7 @@ import {
   useGetAllCountries,
 } from "@/store/useDropdownStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import { useTranslation } from "react-i18next";
 
 const FilterSection = ({ label, children }) => (
   <div className="space-y-2">
@@ -39,6 +40,7 @@ const IntakesFilterDrawer = ({
   setAppliedFilters,
   setPage,
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [countrySearchTerm, setCountrySearchTerm] = useState("");
   const [citySearchTerm, setCitySearchTerm] = useState("");
@@ -86,7 +88,7 @@ const IntakesFilterDrawer = ({
       <SheetTrigger asChild>
         <Button variant={activeFiltersCount > 0 ? "default" : "outline"} className="relative gap-2">
           <SlidersHorizontal className="h-4 w-4" />
-          Filters
+          {t("intakeManagement.filters.title")}
           {activeFiltersCount > 0 && (
             <span style={{
               position: "absolute", top: -8, right: -8,
@@ -113,10 +115,10 @@ const IntakesFilterDrawer = ({
             </div>
             <div>
               <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                Filter Intakes
+                {t("intakeManagement.filters.narrowDownIntakes")}
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Narrow down the intakes list
+                {t("intakeManagement.filters.narrowDownIntakes")}
               </p>
             </div>
           </div>
@@ -124,26 +126,26 @@ const IntakesFilterDrawer = ({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label="Status">
+            <FilterSection label={t("intakeManagement.filters.status")}>
               <Select
                 value={draftFilters.status}
                 onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, status: val }))}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All Statuses" />
+                  <SelectValue placeholder={t("intakeManagement.filters.allStatuses")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
+                  <SelectItem value="all">{t("intakeManagement.filters.allStatuses")}</SelectItem>
+                  <SelectItem value="open">{t("common.open")}</SelectItem>
+                  <SelectItem value="closed">{t("common.closed")}</SelectItem>
                 </SelectContent>
               </Select>
             </FilterSection>
 
-            <FilterSection label="Language">
+            <FilterSection label={t("intakeManagement.filters.language")}>
               <SearchableSelect
-                placeholder="All Languages"
-                searchPlaceholder="Search languages..."
+                placeholder={t("intakeManagement.filters.allLanguages")}
+                searchPlaceholder={t("intakeManagement.filters.searchLanguages")}
                 items={languagesData?.data || []}
                 value={draftFilters.language === "all" ? "" : draftFilters.language}
                 onChange={(val) => setDraftFilters((prev) => ({ ...prev, language: val || "all" }))}
@@ -155,12 +157,12 @@ const IntakesFilterDrawer = ({
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
             <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-              Location
+              {t("intakeManagement.filters.location")}
             </p>
-            <FilterSection label="Country (Helper)">
+            <FilterSection label={t("intakeManagement.filters.countryHelper")}>
               <SearchableSelect
-                placeholder="Select Country to filter Cities"
-                searchPlaceholder="Search countries..."
+                placeholder={t("intakeManagement.filters.selectCountryFirst")}
+                searchPlaceholder={t("intakeManagement.filters.searchCountries")}
                 items={countriesData?.data || []}
                 value={draftFilters.country === "all" ? "" : draftFilters.country}
                 onChange={(val) =>
@@ -171,10 +173,10 @@ const IntakesFilterDrawer = ({
               />
             </FilterSection>
 
-            <FilterSection label="City">
+            <FilterSection label={t("intakeManagement.filters.city")}>
               <SearchableSelect
-                placeholder="All Cities"
-                searchPlaceholder="Search cities..."
+                placeholder={t("intakeManagement.filters.allCities")}
+                searchPlaceholder={t("intakeManagement.filters.searchCities")}
                 items={citiesData?.data || []}
                 value={draftFilters.city === "all" ? "" : draftFilters.city}
                 onChange={(val) => setDraftFilters((prev) => ({ ...prev, city: val || "all" }))}
@@ -193,10 +195,10 @@ const IntakesFilterDrawer = ({
           display: "flex", flexDirection: "column", gap: 12,
         }}>
           <Button variant="outline" className="w-full border-sidebar-border" onClick={handleClearAll}>
-            Clear All
+            {t("intakeManagement.filters.clearAll")}
           </Button>
           <Button className="w-full" onClick={handleApply}>
-            Apply Filters
+            {t("intakeManagement.filters.applyFilters")}
           </Button>
         </SheetFooter>
       </SheetContent>

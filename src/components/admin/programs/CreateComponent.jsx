@@ -166,10 +166,10 @@ const CreateComponent = ({
   })();
 
   const componentTypes = [
-    { value: "module", label: "Learning Module" },
-    { value: "app", label: "Applied Professional Practice(APP)" },
-    { value: "resource", label: "Research" },
-    { value: "exam", label: "Exam Component" },
+    { value: "module", label: t("componentManagement.types.module") },
+    { value: "app", label: t("componentManagement.types.app") },
+    { value: "resource", label: t("componentManagement.types.resource") },
+    { value: "exam", label: t("componentManagement.types.exam") },
   ];
 
   const handleClose = () => {
@@ -409,7 +409,7 @@ const CreateComponent = ({
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isEdit ? "Edit Module" : "Create Module"}
+                {isEdit ? t("componentManagement.editTitle") : t("componentManagement.createTitle")}
               </h2>
             </div>
             <button
@@ -424,14 +424,14 @@ const CreateComponent = ({
         <div className="overflow-y-auto flex-1 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label>Module Type *</Label>
+              <Label>{t("componentManagement.typeLabel")} *</Label>
               <Select
                 value={watchedType || ""}
                 onValueChange={(v) => setValue("type", v)}
                 disabled={isEdit}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select module type" />
+                  <SelectValue placeholder={t("componentManagement.typePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {componentTypes.map((type) => (
@@ -451,10 +451,10 @@ const CreateComponent = ({
               <>
                 <div className="space-y-2 relative">
                   <Label>
-                    Module Name <span className="text-red-500">*</span>
+                    {t("componentManagement.nameLabel")} <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    placeholder="Enter module name"
+                    placeholder={t("componentManagement.namePlaceholder")}
                     {...register("name")}
                     onChange={(e) => {
                       register("name").onChange(e);
@@ -508,7 +508,7 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    In which year the module belongs{" "}
+                    {t("componentManagement.yearLabel")}{" "}
                     <span className="text-red-500">*</span>
                   </Label>
                   <Select
@@ -519,12 +519,12 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select year" />
+                      <SelectValue placeholder={t("componentManagement.yearPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {[1, 2, 3, 4, 5].map((year) => (
                         <SelectItem key={year} value={year.toString()}>
-                          Year {year}
+                          {t("componentManagement.year")} {year}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -541,17 +541,17 @@ const CreateComponent = ({
             {selectedType === "module" && (
               <>
                 <FormField
-                  label="Module Number"
+                  label={t("componentManagement.moduleNumberLabel")}
                   type="number"
-                  placeholder="Enter module number"
+                  placeholder={t("componentManagement.moduleNumberPlaceholder")}
                   error={errors.module_number?.message}
                   required
                   {...register("module_number")}
                 />
                 <FormField
-                  label="Amount"
+                  label={t("componentManagement.amountLabel")}
                   type="number"
-                  placeholder="Enter amount"
+                  placeholder={t("componentManagement.amountPlaceholder")}
                   error={errors.amount?.message}
                   required
                   {...register("amount")}
@@ -562,9 +562,9 @@ const CreateComponent = ({
               <>
                 <div className="space-y-2">
                   <Label>
-                    Module{" "}
+                    {t("componentManagement.linkedModuleLabel")}{" "}
                     <span className="text-xs text-muted-foreground">
-                      (Exam scheduled before this module)
+                      {t("componentManagement.linkedModuleHint")}
                     </span>{" "}
                     <span className="text-red-500">*</span>
                   </Label>
@@ -576,7 +576,7 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select module" />
+                      <SelectValue placeholder={t("componentManagement.linkedModulePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {programModules.map((mod) => (
@@ -586,7 +586,7 @@ const CreateComponent = ({
                       ))}
                       {programModules.length === 0 && (
                         <div className="p-2 text-sm text-muted-foreground">
-                          No modules found for this program
+                          {t("componentManagement.noModulesFound")}
                         </div>
                       )}
                     </SelectContent>
@@ -600,7 +600,7 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    Exam <span className="text-red-500">*</span>
+                    {t("componentManagement.linkedExamLabel")} <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     key={`linked_exam-${watch("linked_exam")}`}
@@ -610,7 +610,7 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select exam" />
+                      <SelectValue placeholder={t("componentManagement.linkedExamPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {publishedExams.map((exam) => (
@@ -620,7 +620,7 @@ const CreateComponent = ({
                       ))}
                       {publishedExams.length === 0 && (
                         <div className="p-2 text-sm text-muted-foreground">
-                          No published exams available
+                          {t("componentManagement.noPublishedExams")}
                         </div>
                       )}
                     </SelectContent>
@@ -636,9 +636,9 @@ const CreateComponent = ({
             {selectedType === "app" && (
               <>
                 <FormField
-                  label="Submission Deadline"
+                  label={t("componentManagement.submissionDeadlineLabel")}
                   type="date"
-                  placeholder="Select deadline"
+                  placeholder={t("componentManagement.submissionDeadlinePlaceholder")}
                   error={errors.submission_deadline?.message}
                   required
                   {...register("submission_deadline")}
@@ -646,12 +646,12 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    Instructions <span className="text-red-500">*</span>
+                    {t("componentManagement.instructionsLabel")} <span className="text-red-500">*</span>
                   </Label>
                   <RichTextEditor
                     value={instructionContent}
                     onChange={setInstructionContent}
-                    placeholder="Enter instructions"
+                    placeholder={t("componentManagement.instructionsPlaceholder")}
                     className={cn(errors.instruction && "border-destructive")}
                   />
                   {errors.instruction && (
@@ -662,9 +662,9 @@ const CreateComponent = ({
                 </div>
 
                 <FormField
-                  label="Instruction Video URL"
+                  label={t("componentManagement.instructionVideoLabel")}
                   type="url"
-                  placeholder="Enter instruction video URL"
+                  placeholder={t("componentManagement.instructionVideoPlaceholder")}
                   error={errors.instruction_video?.message}
                   required
                   {...register("instruction_video")}
@@ -672,7 +672,7 @@ const CreateComponent = ({
 
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">
-                    Submission Types
+                    {t("componentManagement.submissionTypesLabel")}
                   </Label>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
@@ -683,7 +683,7 @@ const CreateComponent = ({
                         {...register("submissions.case_studies")}
                       />
                       <Label htmlFor="case_studies" className="text-sm">
-                        Case Studies
+                        {t("componentManagement.caseStudies")}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -694,7 +694,7 @@ const CreateComponent = ({
                         {...register("submissions.essays")}
                       />
                       <Label htmlFor="essays" className="text-sm">
-                        Essays
+                        {t("componentManagement.essays")}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -705,7 +705,7 @@ const CreateComponent = ({
                         {...register("submissions.internships")}
                       />
                       <Label htmlFor="internships" className="text-sm">
-                        Internships
+                        {t("componentManagement.internships")}
                       </Label>
                     </div>
                   </div>
@@ -726,7 +726,7 @@ const CreateComponent = ({
             )}
 
             <div className="flex items-center justify-between">
-              <Label>Active Status</Label>
+              <Label>{t("componentManagement.activeStatus")}</Label>
               <Switch
                 checked={watchedStatus}
                 onCheckedChange={(v) => setValue("status", v)}
@@ -737,7 +737,7 @@ const CreateComponent = ({
               onCancel={handleClose}
               isLoading={isSubmitting}
               isEdit={isEdit}
-              submitText={isUploading ? "Uploading files..." : undefined}
+              submitText={isUploading ? t("componentManagement.uploadingFiles") : undefined}
             />
           </form>
         </div>

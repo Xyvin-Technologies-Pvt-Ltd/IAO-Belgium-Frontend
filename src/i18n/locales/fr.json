@@ -4,7 +4,7 @@
     "locationValue": "Pays-Bas",
     "nav": {
       "dashboard": "Tableau de bord",
-      "myCourses": "Mes cours",
+      "myCourses": "Mes formations",
       "myApp": "Mon APP",
       "invoices": "Factures",
       "assessment": "Évaluation"
@@ -18,17 +18,17 @@
   },
   "sidebar": {
     "teacher": {
-      "title": "Tableau de bord enseignant",
+      "title": "Tableau de bord de l'enseignant",
       "main": "Principal",
       "operations": "Opérations",
       "dashboard": "Tableau de bord",
       "schedules": "Horaires",
       "planning": "Planification",
-      "evaluations": "Évaluations",
+      "evaluations": "Feedback / Évaluation",
       "exams": "Examens"
     },
     "admin": {
-      "title": "Tableau de bord administrateur",
+      "title": "Tableau de bord de l'administrateur",
       "main": "Principal",
       "operations": "Opérations",
       "academicManagement": "Gestion académique",
@@ -36,10 +36,11 @@
       "masterData": "Données de base",
       "settings": "Paramètres",
       "dashboard": "Tableau de bord",
-      "programAdministration": "Administration des programmes",
+      "programAdministration": "Administration du programme",
       "locations": "Emplacements",
       "languages": "Langues",
       "teacherQualifications": "Qualifications des enseignants",
+      "teacherData": "Données des enseignants",
       "admissionAdministration": "Administration des admissions",
       "applicationReview": "Examen des candidatures",
       "academics": "Années académiques",
@@ -49,7 +50,7 @@
       "financeReports": "Rapports financiers",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
-      "adminLogs": "Journaux d'administration",
+      "adminLogs": "Logs administrateur",
       "examination": "Examen",
       "questionBanks": "Banques de questions",
       "exams": "Examens"
@@ -62,33 +63,217 @@
     "logo": "Bureau IAO"
   },
   "languages": {
-    "en": "English",
+    "en": "Anglais",
     "fr": "Français",
-    "nl": "Dutch",
-    "de": "German"
+    "nl": "Néerlandais",
+    "de": "Allemand"
   },
   "common": {
     "welcome": {
       "back": "Bon retour !",
-      "backWithName": "Bon retour, {name} !",
-      "subtitle": "Tous vos cours, progrès et mises à jour en un seul endroit."
+      "backWithName": "Bon retour, {{name}} !",
+      "subtitle": "Tous vos formations, progrès et mises à jour en un seul endroit."
     },
+    "dashboard": "Tableau de bord",
     "deleteConfirm": {
       "title": "Confirmation de suppression",
-      "message": "Êtes-vous sûr de vouloir supprimer",
+      "message": "Êtes-vous sûr de vouloir supprimer {{count}} {{data}} ? {{cannotUndo}}",
       "cannotUndo": "Cette action ne peut pas être annulée.",
       "cancel": "Annuler",
       "delete": "Supprimer",
       "deleting": "Suppression..."
     },
+    "sendConfirm": {
+      "title": "Envoyer la notification",
+      "message": "Cela enverra la notification à tous les destinataires immédiatement. Cette action ne peut pas être annulée.",
+      "send": "Envoyer",
+      "sending": "Envoi...",
+      "cancel": "Annuler"
+    },
     "create": "Créer",
-    "update": "Modifier",
+    "update": "Mettre à jour",
     "cancel": "Annuler",
     "add": "Ajouter",
     "uploading": "Téléchargement...",
     "yes": "Oui",
     "no": "Non",
-    "none": "Aucun"
+    "none": "Aucun",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "deleted": "Supprimé",
+    "archived": "Archivé",
+    "unknown": "Inconnu",
+    "notAvailable": "N/A",
+    "dash": "-",
+    "document": "document",
+    "today": "Aujourd'hui",
+    "more": "plus",
+    "tba": "TBA",
+    "view": "Voir",
+    "download": "Télécharger",
+    "loading": "Chargement...",
+    "teacher": "Enseignant",
+    "student": "Étudiant",
+    "name": "Nom",
+    "email": "Email",
+    "status": "Statut",
+    "file": "Fichier",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "selectCountryFirst": "Veuillez d'abord sélectionner un pays",
+    "admissionAdministration": "Administration des admissions",
+    "academicYears": "Années académiques",
+    "academics": "Académiques",
+    "intakes": "Sessions",
+    "intakeDetails": "Détails de la session",
+    "batchDetails": "Détails du groupe",
+    "mins": "mins",
+    "min": "min",
+    "description": "Description:",
+    "instructions": "Instructions:",
+    "source": "Source",
+    "numberOfQuestions": "Nombre de questions",
+    "viewFile": "Voir le fichier",
+    "unknownType": "Inconnu {{type}}",
+    "noContracts": "Aucun contrat trouvé",
+    "noStudentContracts": "Aucun contrat d'étudiant trouvé",
+    "searchContracts": "Rechercher des contrats...",
+    "searchStudentNameEmail": "Rechercher par nom d'étudiant ou email...",
+    "allStatuses": "Tous les statuts",
+    "chooseStatus": "Choisir le statut",
+    "signed": "Signé",
+    "pending": "En attente",
+    "contract": "Contrat",
+    "version": "Version",
+    "signedAt": "Signé le",
+    "createContract": "Créer un contrat",
+    "editContract": "Modifier le contrat",
+    "failedToLoadContracts": "Échec du chargement des contrats",
+    "failedToLoadStudentContracts": "Échec du chargement des contrats d'étudiants",
+    "yearLog": "Journal de l'année",
+    "batch": "groupe",
+    "exam": "Examen",
+    "searchCountries": "Rechercher des pays...",
+    "searchCities": "Rechercher des villes...",
+    "searchLanguages": "Rechercher des langues...",
+    "searchTitles": "Rechercher des grades académiques...",
+    "searchRoles": "Rechercher des rôles d'enseignant...",
+    "paymentId": "ID de paiement",
+    "studentName": "Nom de l'étudiant",
+    "intake": "Session",
+    "program": "Formation / Programme",
+    "city": "Ville",
+    "component": "Composant",
+    "purpose": "Objet",
+    "amount": "Montant",
+    "date": "Date",
+    "trxCount": "Nombre de transactions",
+    "convenienceFee": "Frais de commodité",
+    "paid": "Payé",
+    "failed": "Échoué",
+    "canceled": "Annulé",
+    "allReports": "Tous les rapports",
+    "cityReports": "Rapports par ville",
+    "programReports": "Rapports par programme",
+    "batchReports": "Rapports par groupe",
+    "studentReports": "Rapports par étudiant",
+    "financeReports": "Rapports financiers",
+    "others": "Autres",
+    "total": "Total",
+    "noTimes": "Aucun horaire",
+    "noVenues": "Aucun lieu"
+  },
+  "finance": {
+    "title": "Gestion financière",
+    "reports": {
+      "all": {
+        "title": "Tous les rapports",
+        "description": "Voir toutes les transactions de paiement"
+      },
+      "city": {
+        "title": "Rapports par ville",
+        "description": "Analyses de paiement par ville"
+      },
+      "program": {
+        "title": "Rapports par programme",
+        "description": "Analyses de paiement par programme"
+      },
+      "batch": {
+        "title": "Rapports par groupe",
+        "description": "Analyses de paiement par groupe"
+      },
+      "student": {
+        "title": "Rapports par étudiant",
+        "description": "Analyses de paiement par étudiant"
+      }
+    },
+    "fields": {
+      "totalRevenue": "Revenu total",
+      "totalTransactions": "Total des transactions",
+      "paidTransactions": "Transactions payées",
+      "revenueBreakdown": "Répartition des revenus",
+      "revenueDistribution": "Distribution des revenus",
+      "paymentStatus": "Statut du paiement",
+      "detailedData": "Données détaillées",
+      "totalAmount": "Montant total"
+    },
+    "filters": {
+      "title": "Filtres",
+      "filterReports": "Filtrer les rapports",
+      "filterCityReports": "Filtrer les rapports par ville",
+      "narrowDownPayments": "Affiner la liste des paiements",
+      "narrowDownCityAnalytics": "Affiner les analyses par ville",
+      "allStatuses": "Tous les statuts",
+      "allPurposes": "Tous les objectifs",
+      "dateRange": "Plage de dates",
+      "from": "Du",
+      "to": "Au",
+      "clearAll": "Tout effacer",
+      "applyFilters": "Appliquer les filtres"
+    },
+    "purposes": {
+      "admissionFee": "Frais d'admission",
+      "modulePurchase": "Achat de module"
+    },
+    "messages": {
+      "noPaymentsFound": "Aucun paiement trouvé",
+      "noAnalyticsData": "Aucune donnée analytique disponible",
+      "noAnalyticsFound": "Aucune donnée analytique trouvée",
+      "noPaymentAnalyticsFound": "Aucune analyse de paiement trouvée",
+      "loadingAnalytics": "Chargement des données analytiques...",
+      "loadAnalyticsFailed": "Échec du chargement des données analytiques"
+    }
+  },
+  "userCard": {
+    "intake": "Admission",
+    "unknownUser": "Inconnu {{type}}"
+  },
+  "calendar": {
+    "viewType": {
+      "month": "Mois",
+      "week": "Semaine"
+    },
+    "days": {
+      "sun": "Dim",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam"
+    },
+    "session": "Session",
+    "loading": "Chargement...",
+    "more": "plus"
+  },
+  "sessionCard": {
+    "noSessions": "Aucune session prévue",
+    "sessionName": "Nom de la session",
+    "date": "Date",
+    "time": "Heure",
+    "teachers": "Enseignants",
+    "sessionPrefix": "Session"
   },
   "countryManagement": {
     "title": "Gestion des pays",
@@ -117,9 +302,9 @@
       "nameLabel": "Nom",
       "namePlaceholder": "Entrez le nom du pays",
       "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Entrez la description",
+      "descriptionPlaceholder": "Entrez une description",
       "codeLabel": "Code du pays",
-      "codePlaceholder": "Entrez le code du pays (ex: US, CA, UK)",
+      "codePlaceholder": "Entrez le code du pays (ex : FR, CA, BE)",
       "currencyLabel": "Devise",
       "currencyPlaceholder": "Sélectionnez une devise",
       "statusLabel": "Actif",
@@ -157,7 +342,8 @@
       "startTimeLabel": "Heure de début",
       "endTimeLabel": "Heure de fin",
       "venuesLabel": "Lieux",
-      "venueLabel": "Lieu"
+      "venueLabel": "Lieu",
+      "searchCountries": "Rechercher des pays..."
     }
   },
   "roleManagement": {
@@ -186,7 +372,7 @@
       "nameLabel": "Nom",
       "namePlaceholder": "Entrez le nom du rôle",
       "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Entrez la description",
+      "descriptionPlaceholder": "Entrez une description",
       "permissionsLabel": "Permissions",
       "viewLabel": "Voir",
       "modifyLabel": "Modifier",
@@ -194,7 +380,7 @@
     },
     "view": {
       "title": "Vue du rôle",
-      "subtitle": "Détails et permissions du rôle"
+      "subtitle": "Détails du rôle et permissions"
     },
     "permissions": {
       "rolesManagement": "Gestion des rôles",
@@ -203,7 +389,7 @@
       "academicManagement": "Gestion académique",
       "financeManagement": "Gestion financière",
       "masterDataManagement": "Gestion des données de base",
-      "logsManagement": "Gestion des journaux"
+      "logsManagement": "Gestion des logs"
     }
   },
   "languageManagement": {
@@ -231,15 +417,14 @@
     }
   },
   "programManagement": {
-    "title": "Programmes",
+    "title": "Formations / Programmes",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
-    "createProgram": "Créer un programme",
+    "createProgram": "Créer une formation / programme",
     "table": {
       "uid": "UID",
       "name": "Nom",
-
       "type": "Type",
       "year": "Année",
       "city": "Ville",
@@ -247,39 +432,49 @@
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
-      "noPrograms": "Aucun programme trouvé"
+      "noPrograms": "Aucune formation / programme trouvé"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des programmes"
+      "loadFailed": "Échec du chargement des formations / programmes"
     },
     "modal": {
-      "createTitle": "Créer un nouveau programme",
-      "editTitle": "Modifier le programme",
-      "createSubtitle": "Créons un nouveau programme",
-      "editSubtitle": "Mettre à jour les détails du programme",
-      "nameLabel": "Nom du programme",
-      "namePlaceholder": "Entrez le nom du programme",
-      "programTypeLabel": "Type de programme",
-      "programTypePlaceholder": "Sélectionnez le type de programme",
-      "durationLabel": "Durée du programme",
-      "durationPlaceholder": "Entrez la durée en années (ex: 1, 2, 3)",
+      "createTitle": "Créer une nouvelle formation / programme",
+      "editTitle": "Modifier la formation / programme",
+      "createSubtitle": "Créons une nouvelle formation / programme",
+      "editSubtitle": "Mettre à jour les détails de la formation / programme",
+      "nameLabel": "Nom de la formation / programme",
+      "namePlaceholder": "Entrez le nom de la formation / programme",
+      "programTypeLabel": "Type de formation / programme",
+      "programTypePlaceholder": "Sélectionnez le type de formation / programme",
+      "durationLabel": "Durée de la formation / programme",
+      "durationPlaceholder": "Entrez la durée en années (ex : 1, 2, 3)",
       "languageLabel": "Langue",
-      "languagePlaceholder": "Sélectionnez une langue",
+      "languagePlaceholder": "Sélectionnez la langue",
       "countryLabel": "Pays",
-      "countryPlaceholder": "Sélectionnez un pays",
+      "countryPlaceholder": "Sélectionnez le pays",
       "cityLabel": "Ville",
-      "cityPlaceholder": "Sélectionnez une ville",
-      "cityPlaceholderDisabled": "Sélectionnez d'abord un pays"
+      "cityPlaceholder": "Sélectionnez la ville",
+      "cityPlaceholderDisabled": "Sélectionnez d'abord le pays",
+      "programTypes": {
+        "masterOfScience": "Master of Science",
+        "lateralEntry": "Master of Science (Entrée latérale)",
+        "diploma": "Diplôme",
+        "manualTherapie": "Thérapie manuelle",
+        "postAcademic": "Module post-académique"
+      },
+      "searchLanguages": "Rechercher des langues...",
+      "searchCountries": "Rechercher des pays...",
+      "searchCities": "Rechercher des villes..."
     }
   },
   "intakeManagement": {
-    "title": "Inscriptions",
+    "title": "Admissions",
     "search": "Rechercher...",
     "delete": "Supprimer",
-    "createIntake": "Créer une inscription",
+    "createIntake": "Créer une admission",
     "table": {
       "name": "Nom",
-      "program": "Programme",
+      "program": "Formation / Programme",
       "city": "Ville",
       "language": "Langue",
       "registrationFee": "Frais d'inscription",
@@ -289,18 +484,18 @@
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
-      "noIntakes": "Aucune inscription trouvée"
+      "noIntakes": "Aucune admission trouvée"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des inscriptions"
+      "loadFailed": "Échec du chargement des admissions"
     },
     "modal": {
-      "createTitle": "Créer une nouvelle inscription",
-      "editTitle": "Modifier l'inscription",
-      "nameLabel": "Nom de l'inscription",
-      "namePlaceholder": "Entrez le nom de l'inscription",
-      "programLabel": "Programme",
-      "programPlaceholder": "Sélectionnez un programme",
+      "createTitle": "Créer une nouvelle admission",
+      "editTitle": "Modifier l'admission",
+      "nameLabel": "Nom de l'admission",
+      "namePlaceholder": "Entrez le nom de l'admission",
+      "programLabel": "Formation / Programme",
+      "programPlaceholder": "Sélectionnez la formation",
       "registrationFeeLabel": "Frais d'inscription",
       "registrationFeePlaceholder": "Entrez les frais d'inscription",
       "startDateLabel": "Date de début",
@@ -308,8 +503,9 @@
       "registrationDeadlineLabel": "Date limite d'inscription",
       "studentsPerBatchLabel": "Étudiants par groupe",
       "studentsPerBatchPlaceholder": "Entrez le nombre d'étudiants par groupe",
-      "maxStudentEnrollmentLabel": "Inscription maximale d'étudiants",
-      "maxStudentEnrollmentPlaceholder": "Entrez l'inscription maximale"
+      "maxStudentEnrollmentLabel": "Inscription max d'étudiants",
+      "maxStudentEnrollmentPlaceholder": "Entrez l'inscription max",
+      "searchPrograms": "Rechercher des programmes..."
     },
     "details": {
       "tabs": {
@@ -323,12 +519,29 @@
         "endDate": "Date de fin"
       },
       "badges": {
-        "intakeId": "ID d'inscription",
+        "intakeId": "ID de l'admission",
         "registrationFee": "Frais d'inscription",
         "registrationDeadline": "Date limite d'inscription"
       },
-      "loading": "Chargement des détails de l'inscription...",
-      "loadFailed": "Échec du chargement des détails de l'inscription"
+      "loading": "Chargement des détails de la session...",
+      "loadFailed": "Échec du chargement des détails de la session"
+    },
+    "filters": {
+      "title": "Filtres",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "language": "Langue",
+      "allLanguages": "Toutes les langues",
+      "location": "Emplacement",
+      "countryHelper": "Pays (Aide)",
+      "selectCountryFirst": "Sélectionnez d'abord un pays pour filtrer les villes",
+      "searchCountries": "Rechercher des pays...",
+      "city": "Ville",
+      "allCities": "Toutes les villes",
+      "searchCities": "Rechercher des villes...",
+      "clearAll": "Tout effacer",
+      "applyFilters": "Appliquer les filtres",
+      "narrowDownIntakes": "Affiner la liste des sessions"
     }
   },
   "adminManagement": {
@@ -351,8 +564,8 @@
       "createSubtitle": "Créons un nouvel administrateur",
       "firstNameLabel": "Prénom",
       "firstNamePlaceholder": "Entrez le prénom",
-      "lastNameLabel": "Nom de famille",
-      "lastNamePlaceholder": "Entrez le nom de famille",
+      "lastNameLabel": "Nom",
+      "lastNamePlaceholder": "Entrez le nom",
       "emailLabel": "Email",
       "emailPlaceholder": "Entrez l'email",
       "phoneLabel": "Téléphone",
@@ -360,20 +573,21 @@
       "roleLabel": "Rôle",
       "rolePlaceholder": "Sélectionnez un rôle",
       "loadingRoles": "Chargement des rôles...",
-      "noActiveRoles": "Aucun rôle actif trouvé"
+      "noActiveRoles": "Aucun rôle actif trouvé",
+      "searchRoles": "Rechercher des rôles..."
     }
   },
   "batchManagement": {
-    "title": "Gestion des lots",
-    "search": "Rechercher des lots...",
-    "createBatch": "Créer un lot",
-    "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau lot pour cette inscription ?",
+    "title": "Gestion des groupes",
+    "search": "Rechercher des groupes...",
+    "createBatch": "Créer un groupe",
+    "createBatchConfirmation": "Êtes-vous sûr de vouloir créer un nouveau groupe pour cette admission ?",
     "searchStudent": "Rechercher des étudiants...",
     "table": {
-      "batchId": "ID du lot",
-      "batchName": "Nom du lot",
+      "batchId": "ID du groupe",
+      "batchName": "Nom du groupe",
       "capacity": "Capacité",
-      "enrolled": "Inscrits",
+      "enrolled": "Inscrit",
       "available": "Disponible",
       "status": "Statut",
       "student": "Étudiant",
@@ -382,12 +596,14 @@
       "percentage": "Pourcentage",
       "result": "Résultat",
       "submittedAt": "Soumis le",
-      "noBatches": "Aucun lot trouvé",
+      "noBatches": "Aucun groupe trouvé",
       "noStudents": "Aucun étudiant trouvé",
-      "noResults": "Aucun résultat d'examen trouvé pour ce lot."
+      "noResults": "Aucun résultat d'examen trouvé pour ce groupe.",
+      "unnamedExam": "Examen sans nom"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des lots"
+      "loadFailed": "Échec du chargement des groupes",
+      "loadResultsFailed": "Échec du chargement des résultats"
     },
     "details": {
       "tabs": {
@@ -403,39 +619,39 @@
         "avgAttendance": "Présence moy."
       },
       "badges": {
-        "batchId": "ID du lot",
-        "program": "Programme"
+        "batchId": "ID du groupe",
+        "program": "Formation / Programme"
       },
       "info": {
-        "title": "Informations sur le lot",
-        "intakeName": "Nom de l'inscription",
-        "program": "Programme",
+        "title": "Informations sur le groupe",
+        "intakeName": "Nom de l'admission",
+        "program": "Formation / Programme",
         "capacity": "Capacité",
-        "intakeStartDate": "Date de début d'inscription",
-        "intakeEndDate": "Date de fin d'inscription",
+        "intakeStartDate": "Date de début de l'admission",
+        "intakeEndDate": "Date de fin de l'admission",
         "students": "Étudiants"
       },
-      "loading": "Chargement des détails du lot...",
-      "loadFailed": "Échec du chargement des détails du lot"
+      "loading": "Chargement des détails du groupe...",
+      "loadFailed": "Échec du chargement des détails du groupe"
     },
     "modal": {
-      "batchLabel": "Lot",
-      "batchPlaceholder": "Sélectionnez un lot",
+      "batchLabel": "Groupe",
+      "batchPlaceholder": "Sélectionnez un groupe",
       "moveStudent": {
-        "title": "Déplacer l'étudiant vers un autre lot",
-        "description": "Examinez les détails de l'étudiant et choisissez un nouveau lot pour continuer.",
-        "studentId": "ID étudiant",
+        "title": "Déplacer l'étudiant vers un autre groupe",
+        "description": "Examinez les détails de l'étudiant et choisissez un nouveau groupe pour continuer.",
+        "studentId": "ID de l'étudiant",
         "studentName": "Nom de l'étudiant",
-        "currentBatch": "Lot actuel",
-        "assignToBatch": "Assigner au lot",
-        "selectBatch": "Sélectionner un lot",
-        "noAvailableBatches": "Aucun lot disponible",
+        "currentBatch": "Groupe actuel",
+        "assignToBatch": "Assigner au groupe",
+        "selectBatch": "Sélectionnez un groupe",
+        "noAvailableBatches": "Aucun groupe disponible",
         "studentsCount": "étudiants",
-        "warningMessage": "L'étudiant sera retiré du lot actuel.",
+        "warningMessage": "L'étudiant sera retiré du groupe actuel.",
         "cancel": "Annuler",
         "move": "Déplacer l'étudiant",
         "moving": "Déplacement...",
-        "loadBatchesFailed": "Échec du chargement des lots"
+        "loadBatchesFailed": "Échec du chargement des groupes"
       }
     },
     "actions": {
@@ -444,24 +660,34 @@
       "delete": "Supprimer",
       "cancel": "Annuler",
       "creating": "Création...",
-      "createBatch": "Créer un lot",
-      "moveToAnotherBatch": "Déplacer vers un autre lot"
+      "createBatch": "Créer un groupe",
+      "moveToAnotherBatch": "Déplacer vers un autre groupe"
+    },
+    "yearLog": {
+      "year": "Année",
+      "action": "Action",
+      "source": "Source",
+      "details": "Détails",
+      "date": "Date",
+      "actions": "Actions",
+      "recalculate": "Recalculer la fin d'année",
+      "noLogs": "Aucun log de fin d'année trouvé pour ce groupe."
     }
   },
   "studentManagement": {
     "title": "Gestion des étudiants",
     "search": "Rechercher des étudiants...",
     "table": {
-      "studentId": "ID étudiant",
+      "studentId": "ID de candidature",
       "studentName": "Nom de l'étudiant",
       "name": "Nom",
       "email": "Email",
       "phone": "Téléphone",
       "country": "Pays",
       "city": "Ville",
-      "previousEducation": "Formation antérieure",
-      "program": "Programme",
-      "batch": "Lot",
+      "previousEducation": "Éducation précédente",
+      "program": "Formation / Programme",
+      "batch": "Groupe",
       "enrolledDate": "Date d'inscription",
       "status": "Statut",
       "noStudents": "Aucun étudiant trouvé"
@@ -473,18 +699,18 @@
       "basicInfo": "Informations de base",
       "phoneNumber": "Numéro de téléphone",
       "emailAddress": "Adresse email",
-      "batch": "Lot",
+      "batch": "Groupe",
       "address": "Adresse",
       "country": "Pays",
       "city": "Ville",
       "postalCode": "Code postal",
-      "studentId": "ID étudiant",
+      "studentId": "ID de l'étudiant",
       "enrolledDate": "Date d'inscription",
-      "previousEducation": "Formation antérieure",
+      "previousEducation": "Éducation précédente",
       "documents": "Documents",
       "noDocuments": "Aucun document disponible",
-      "academicDegree": "Diplôme académique",
-      "teacherRole": "Rôle d'enseignant",
+      "academicDegree": "Degré académique",
+      "teacherRole": "Rôle de l'enseignant",
       "employmentStartDate": "Date de début d'emploi",
       "languages": "Langues",
       "locations": "Emplacements"
@@ -497,9 +723,95 @@
       "cities": "Villes"
     }
   },
+  "planningManagement": {
+    "title": "Gestion de la planification",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createPlanning": "Créer une planification",
+    "table": {
+      "program": "Formation / Programme",
+      "batch": "Groupe",
+      "module": "Module",
+      "teachers": "Enseignants",
+      "venue": "Lieu",
+      "sessions": "Sessions",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noPlannings": "Aucune planification trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des planifications"
+    },
+    "teacher": {
+      "language": "Langue",
+      "location": "Emplacement",
+      "actions": "Actions",
+      "accept": "Accepter",
+      "reject": "Rejeter"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle planification",
+      "editTitle": "Modifier la planification",
+      "createSubtitle": "Créons une nouvelle planification",
+      "editSubtitle": "Mettre à jour les détails de la planification",
+      "programLabel": "Formation / Programme",
+      "searchPrograms": "Rechercher des formations...",
+      "batchLabel": "Groupe",
+      "batchPlaceholder": "Sélectionnez un groupe",
+      "searchBatches": "Rechercher des groupes...",
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Sélectionnez un module",
+      "searchComponents": "Rechercher des composants...",
+      "venueLabel": "Lieu",
+      "venuePlaceholder": "Entrez le nom du lieu",
+      "preferredVenues": "Lieux préférés",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez une description",
+      "sessionsLabel": "Sessions",
+      "sessionLabel": "Session",
+      "sessionNameLabel": "Nom de la session",
+      "sessionNamePlaceholder": "Entrez le nom de la session",
+      "dateLabel": "Date de la session",
+      "timeFromLabel": "De",
+      "timeTillLabel": "À",
+      "preferredTimes": "Horaires préférés",
+      "teachersLabel": "Enseignants",
+      "teachersPlaceholder": "Sélectionnez des enseignants",
+      "searchTeachers": "Rechercher des enseignants...",
+      "assistantsLabel": "Assistants pédagogiques",
+      "assistantsPlaceholder": "Sélectionnez des assistants pédagogiques",
+      "searchAssistants": "Rechercher des assistants pédagogiques...",
+      "traineesLabel": "Stagiaires / Trainees",
+      "traineesPlaceholder": "Sélectionnez des stagiaires / trainees",
+      "searchTrainees": "Rechercher des stagiaires / trainees...",
+      "addSession": "Ajouter une autre session"
+    },
+    "view": {
+      "moduleLabel": "Module",
+      "programLabel": "Formation / Programme",
+      "batchLabel": "Groupe",
+      "descriptionLabel": "Description",
+      "sessionLabel": "Session",
+      "sessionNameLabel": "Nom de la session",
+      "dateLabel": "Date",
+      "timeFromLabel": "De",
+      "timeTillLabel": "À",
+      "teachersLabel": "Enseignants",
+      "venueLabel": "Lieu"
+    },
+    "calendar": {
+      "today": "Aujourd'hui",
+      "month": "Mois",
+      "week": "Semaine",
+      "loading": "Chargement...",
+      "more": "plus",
+      "session": "Session"
+    }
+  },
   "academicManagement": {
     "title": "Gestion académique",
-    "search": "Rechercher des années académiques...",
+    "search": "Rechercher les années académiques...",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
     "createAcademic": "Créer une année académique",
@@ -519,19 +831,19 @@
       "createTitle": "Créer une nouvelle année académique",
       "editTitle": "Modifier l'année académique",
       "nameLabel": "Nom de l'année académique",
-      "namePlaceholder": "Entrez le nom de l'année académique (ex: 2024-2025)",
+      "namePlaceholder": "Entrez le nom de l'année académique (ex : 2024-2025)",
       "startDateLabel": "Date de début",
       "endDateLabel": "Date de fin",
       "registrationStartDateLabel": "Date de début d'inscription",
       "registrationEndDateLabel": "Date de fin d'inscription"
     },
     "emptyState": {
-      "title": "Aucune année académique créée",
-      "subtitle": "Commencez par créer une année académique pour gérer efficacement les programmes, les lots et les admissions."
+      "title": "Aucune année académique créée pour l'instant",
+      "subtitle": "Commencez par créer une année académique pour gérer efficacement les formations / programmes, les lots et les admissions."
     },
     "card": {
       "academicYear": "Année académique",
-      "programs": "Programmes",
+      "programs": "Formations / Programmes",
       "batches": "Lots",
       "edit": "Modifier",
       "duplicate": "Dupliquer"
@@ -545,12 +857,12 @@
       "name": "Nom",
       "email": "Email",
       "phone": "Téléphone",
-      "previousEducation": "Formation antérieure",
+      "previousEducation": "Éducation précédente",
       "address": "Adresse",
       "postalCode": "Code postal",
       "city": "Ville",
       "country": "Pays",
-      "paymentStatus": "Statut de Paiement",
+      "paymentStatus": "Statut de paiement",
       "status": "Statut",
       "action": "Action",
       "noApplications": "Aucune candidature trouvée"
@@ -559,23 +871,32 @@
       "loadFailed": "Échec du chargement des candidatures"
     },
     "modal": {
-      "basicInfo": "Informations de base",
+      "basicInfo": "Infos de base",
       "attachedDocuments": "Documents joints",
       "actions": "Actions",
       "phoneNumber": "Numéro de téléphone",
       "emailAddress": "Adresse email",
-      "previousEducation": "Formation antérieure",
-      "program": "Programme",
+      "previousEducation": "Éducation précédente",
+      "program": "Formation / Programme",
       "address": "Adresse",
       "applicationId": "ID de candidature",
       "noDocuments": "Aucun document joint",
+      "unknownApplicant": "Candidat inconnu",
       "requestAdditionalInfo": "Demander des informations supplémentaires",
       "remarks": "Remarques",
-      "remarksPlaceholder": "Entrez des remarques à ajouter avant de transmettre",
+      "remarksPlaceholder": "Entrez vos remarques avant transfert",
       "processing": "Traitement...",
       "reject": "Rejeter",
       "waitlist": "En cours",
       "accept": "Accepter"
+    },
+    "status": {
+      "pending": "En attente",
+      "drafted": "Brouillon",
+      "waitlisted": "En cours",
+      "resubmitted": "Soumis à nouveau",
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
     },
     "documents": {
       "idCard": "Carte d'identité",
@@ -588,8 +909,28 @@
       "documentFlagged": "Document signalé"
     }
   },
+  "contractManagement": {
+    "title": "Gestion des contrats",
+    "search": "Rechercher des contrats...",
+    "createContract": "Créer un contrat",
+    "editContract": "Modifier le contrat",
+    "createSubtitle": "Télécharger une nouvelle version du contrat",
+    "editSubtitle": "Mettre à jour les détails du contrat",
+    "modal": {
+      "nameLabel": "Nom du contrat",
+      "namePlaceholder": "Entrez le nom du contrat",
+      "fileLabel": "Fichier du contrat",
+      "fileSelected": "Fichier sélectionné",
+      "viewCurrent": "Voir le document actuel",
+      "clickReplace": "Cliquer pour remplacer",
+      "uploadHint": "Cliquer pour télécharger un document PDF ou Word"
+    },
+    "messages": {
+      "uploadFailed": "Échec du téléchargement du fichier"
+    }
+  },
   "teacherTitleManagement": {
-    "title": "Titres d'enseignant",
+    "title": "Titres des enseignants",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "createTitle": "Créer un titre d'enseignant",
@@ -601,7 +942,7 @@
       "noTitles": "Aucun titre d'enseignant trouvé"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des titres d'enseignant"
+      "loadFailed": "Échec du chargement des titres d'enseignants"
     },
     "modal": {
       "createTitle": "Créer un nouveau titre d'enseignant",
@@ -609,7 +950,7 @@
       "createSubtitle": "Créons un nouveau titre d'enseignant",
       "editSubtitle": "Mettre à jour les détails du titre d'enseignant",
       "nameLabel": "Nom du titre",
-      "namePlaceholder": "Entrez le nom du titre (ex: Dr., Prof., M., Mme.)",
+      "namePlaceholder": "Entrez le titre (ex : Dr, Prof, M., Mme)",
       "nameRequired": "Le nom du titre est requis"
     }
   },
@@ -621,7 +962,7 @@
     }
   },
   "teacherRoleManagement": {
-    "title": "Rôles d'enseignant",
+    "title": "Rôles des enseignants",
     "search": "Rechercher...",
     "delete": "Supprimer",
     "createRole": "Créer un rôle d'enseignant",
@@ -633,7 +974,7 @@
       "noRoles": "Aucun rôle d'enseignant trouvé"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des rôles d'enseignant"
+      "loadFailed": "Échec du chargement des rôles d'enseignants"
     },
     "modal": {
       "createTitle": "Créer un nouveau rôle d'enseignant",
@@ -641,7 +982,7 @@
       "createSubtitle": "Créons un nouveau rôle d'enseignant",
       "editSubtitle": "Mettre à jour les détails du rôle d'enseignant",
       "nameLabel": "Nom du rôle",
-      "namePlaceholder": "Entrez le nom du rôle (ex: Professeur assistant, Chargé de cours, Enseignant senior)",
+      "namePlaceholder": "Entrez le rôle (ex : Professeur assistant, Enseignant)",
       "nameRequired": "Le nom du rôle est requis"
     }
   },
@@ -655,9 +996,9 @@
       "name": "Nom",
       "email": "Email",
       "phone": "Téléphone",
-      "academicDegree": "Diplôme académique",
+      "academicDegree": "Degré académique",
       "role": "Rôle",
-      "employmentStartDate": "Date de début d'emploi IAO",
+      "employmentStartDate": "Date de début à l'IAO",
       "location": "Emplacement",
       "language": "Langue",
       "status": "Statut",
@@ -675,8 +1016,8 @@
       "editSubtitle": "Mettre à jour les détails de l'enseignant",
       "firstNameLabel": "Prénom",
       "firstNamePlaceholder": "Entrez le prénom",
-      "lastNameLabel": "Nom de famille",
-      "lastNamePlaceholder": "Entrez le nom de famille",
+      "lastNameLabel": "Nom",
+      "lastNamePlaceholder": "Entrez le nom",
       "emailLabel": "Email",
       "emailPlaceholder": "Entrez l'adresse email",
       "phoneLabel": "Téléphone",
@@ -686,38 +1027,38 @@
       "citiesLabel": "Villes",
       "citiesPlaceholder": "Sélectionnez des villes",
       "languageLabel": "Langue",
-      "languagePlaceholder": "Sélectionnez la langue",
-      "academicDegreeLabel": "Diplôme académique",
-      "academicDegreePlaceholder": "Sélectionnez le diplôme",
-      "teacherRoleLabel": "Rôle d'enseignant",
-      "teacherRolePlaceholder": "Sélectionnez le rôle",
+      "languagePlaceholder": "Sélectionnez une langue",
+      "academicDegreeLabel": "Degré académique",
+      "academicDegreePlaceholder": "Sélectionnez un degré",
+      "teacherRoleLabel": "Rôle de l'enseignant",
+      "teacherRolePlaceholder": "Sélectionnez un rôle",
       "employmentStartDateLabel": "Date de début d'emploi",
-      "employmentStartDatePlaceholder": "Sélectionnez la date de début"
+      "employmentStartDatePlaceholder": "Sélectionnez une date"
     }
   },
   "programDetail": {
-    "title": "Détails du programme",
+    "title": "Détails de la formation / programme",
     "cards": {
-      "programName": "Nom du programme",
+      "programName": "Nom de la formation / programme",
       "duration": "Durée",
-      "noOfModules": "Nombre de modules",
+      "noOfModules": "Nb de modules",
       "registrationFee": "Frais d'inscription",
-      "years": "années",
+      "years": "ans",
       "free": "Gratuit"
     },
     "tabs": {
       "learningModules": "Module d'apprentissage",
-      "applications": "Pratique professionnelle appliquée(APP)",
+      "applications": "Pratique Professionnelle Appliquée (APP)",
       "resources": "Recherche",
       "examComponents": "Examen"
     },
     "emptyState": {
-      "title": "Aucun module de programme ajouté",
-      "subtitle": "Commencez par ajouter des modules, des applications, des ressources ou des examens pour construire et gérer ce programme efficacement.",
-      "createButton": "Créer un module de programme"
+      "title": "Aucun module de formation / programme ajouté pour l'instant",
+      "subtitle": "Commencez par ajouter des modules, des apps, des ressources ou des examens pour construire et gérer cette formation / programme efficacement.",
+      "createButton": "Créer un module de formation / programme"
     },
-    "loading": "Chargement des détails du programme...",
-    "loadFailed": "Échec du chargement des détails du programme"
+    "loading": "Chargement des détails de la formation / programme...",
+    "loadFailed": "Échec du chargement des détails de la formation / programme"
   },
   "learningModule": {
     "search": "Rechercher des modules...",
@@ -751,7 +1092,22 @@
       "noApps": "Aucun composant d'application trouvé"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des composants d'application"
+      "loadFailed": "Échec du chargement des composants de l'application"
+    }
+  },
+  "examModule": {
+    "search": "Rechercher des composants d'examen...",
+    "table": {
+      "examModuleId": "ID du module d'examen",
+      "linkedExam": "Examen lié",
+      "linkedModule": "Module lié",
+      "status": "Statut",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "noComponents": "Aucun composant d'examen trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des composants de l'examen"
     }
   },
   "resourceModule": {
@@ -768,104 +1124,24 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des composants de ressource"
+    },
+    "resources": {
+      "title": "Ressources",
+      "noResources": "Aucune ressource ajoutée pour l'instant",
+      "uploadFile": "Télécharger un fichier",
+      "addLink": "Ajouter un lien",
+      "enterUrl": "Entrer l'URL (Lien)",
+      "existingFile": "Fichier existant",
+      "resourceNameOptional": "Nom de la ressource (Optionnel)"
     }
   },
-  "planningManagement": {
-    "title": "Gestion de la planification",
-    "search": "Rechercher...",
-    "delete": "Supprimer",
-    "createPlanning": "Créer une planification",
-    "table": {
-      "program": "Programme",
-      "batch": "Lot",
-      "module": "Module",
-      "teachers": "Enseignants",
-      "venue": "Lieu",
-      "sessions": "Sessions",
-      "status": "Statut",
-      "action": "Action",
-      "edit": "Modifier",
-      "noPlannings": "Aucune planification trouvée"
-    },
-    "messages": {
-      "loadFailed": "Échec du chargement des planifications"
-    },
-    "teacher": {
-      "language": "Langue",
-      "location": "Emplacement",
-      "actions": "Actions",
-      "accept": "Accepter",
-      "reject": "Rejeter"
-    },
-    "modal": {
-      "createTitle": "Créer une nouvelle planification",
-      "editTitle": "Modifier la planification",
-      "createSubtitle": "Créons une nouvelle planification",
-      "editSubtitle": "Mettre à jour les détails de la planification",
-      "programLabel": "Programme",
-      "programPlaceholder": "Sélectionnez un programme",
-      "batchLabel": "Lot",
-      "batchPlaceholder": "Sélectionnez un lot",
-      "moduleLabel": "Module",
-      "modulePlaceholder": "Sélectionnez un module",
-      "venueLabel": "Lieu",
-      "venuePlaceholder": "Entrez le nom du lieu",
-      "venueRequired": "Le lieu est requis",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Entrez la description de la planification ou des notes supplémentaires...",
-      "sessionsLabel": "Sessions",
-      "addSession": "Ajouter une session",
-      "sessionLabel": "Session",
-      "sessionNameLabel": "Nom de la session",
-      "sessionNamePlaceholder": "Entrez le nom de la session",
-      "sessionNameRequired": "Le nom de la session est requis",
-      "dateLabel": "Date",
-      "timeFromLabel": "Heure de début",
-      "timeTillLabel": "Heure de fin",
-      "teachersLabel": "Enseignants",
-      "teachersPlaceholder": "Sélectionnez des enseignants...",
-      "assistantsLabel": "Assistants",
-      "assistantsPlaceholder": "Sélectionnez des assistants...",
-      "traineesLabel": "Stagiaires",
-      "traineesPlaceholder": "Sélectionnez des stagiaires...",
-      "searchAssistants": "Rechercher des assistants...",
-      "searchTrainees": "Rechercher des stagiaires...",
-      "dateRequired": "La date est requise",
-      "startTimeRequired": "L'heure de début est requise",
-      "endTimeRequired": "L'heure de fin est requise",
-      "searchPrograms": "Rechercher des programmes...",
-      "searchBatches": "Rechercher des lots...",
-      "searchComponents": "Rechercher des composants...",
-      "searchTeachers": "Rechercher des enseignants...",
-      "preferredVenues": "Lieux préférés :",
-      "preferredTimes": "Horaires préférés :"
-    },
-    "view": {
-      "moduleLabel": "Module",
-      "programLabel": "Programme",
-      "batchLabel": "Lot",
-      "descriptionLabel": "Description",
-      "sessionLabel": "Session",
-      "sessionNameLabel": "Nom de la session",
-      "dateLabel": "Date",
-      "timeFromLabel": "Heure de début",
-      "timeTillLabel": "Heure de fin",
-      "teachersLabel": "Enseignants",
-      "venueLabel": "Lieu"
-    }
-  },
-  "moduleManagement": {
-    "modal": {
-      "moduleLabel": "Module",
-      "modulePlaceholder": "Sélectionnez un module"
-    }
-  },
-
   "exam": {
     "title": "Examens",
     "search": "Rechercher des examens...",
     "createExam": "Créer un examen",
     "editExam": "Modifier l'examen",
+    "createSubtitle": "Remplissez les détails de l'examen",
+    "editSubtitle": "Mettre à jour les détails de l'examen",
     "loading": "Chargement de l'examen...",
     "questions": "questions",
     "minutes": "min",
@@ -906,7 +1182,7 @@
       "questionSources": "Sources de questions",
       "addQuestionSource": "Ajouter une source",
       "selectQuestionBank": "Sélectionner une banque de questions",
-      "questionsAvailable": "disponibles",
+      "questionsAvailable": "disponible",
       "questions": "questions",
       "totalQuestions": "Total des questions",
       "noQuestionBanks": "Aucune banque de questions disponible",
@@ -931,6 +1207,246 @@
       "available": "disponible"
     }
   },
+  "lti": {
+    "platformConfig": {
+      "title": "Configuration de la plateforme LTI",
+      "subtitle": "Partagez ces valeurs avec Enatom pour enregistrer le HUB en tant que plateforme de confiance.",
+      "exportJson": "Exporter le JSON",
+      "issuer": "Émetteur (iss)",
+      "clientId": "ID client",
+      "deploymentId": "ID de déploiement",
+      "jwksUrl": "URL JWKS",
+      "oidcAuthEndpoint": "Point de terminaison d'authentification OIDC",
+      "accessTokenUrl": "URL du jeton d'accès",
+      "oidcConfigUrl": "URL de configuration OpenID (enregistrement dynamique)",
+      "copyToClipboard": "Copier dans le presse-papiers"
+    },
+    "registerTool": {
+      "createTitle": "Enregistrer l'outil LTI",
+      "editTitle": "Modifier l'outil LTI",
+      "createSubtitle": "Ajouter un nouvel outil externe LTI 1.3 (ex : Enatom)",
+      "editSubtitle": "Mettre à jour les identifiants de l'outil LTI 1.3",
+      "nameLabel": "Nom de l'outil",
+      "namePlaceholder": "Entrez un nom d'affichage pour cet outil",
+      "clientIdLabel": "ID client",
+      "clientIdPlaceholder": "Identifiant unique fourni par l'outil externe",
+      "deploymentIdLabel": "ID de déploiement",
+      "deploymentIdPlaceholder": "Identifiant de déploiement du fournisseur de l'outil",
+      "generatedByPlatform": "Généré et géré par la plateforme",
+      "oidcLoginUrlLabel": "URL de connexion OIDC",
+      "oidcLoginUrlPlaceholder": "https://fournisseur-outil.com/lti/login",
+      "redirectUriLabel": "URI de redirection",
+      "redirectUriPlaceholder": "https://fournisseur-outil.com/lti/callback",
+      "jwksUrlLabel": "URL JWKS",
+      "jwksUrlPlaceholder": "https://fournisseur-outil.com/.well-known/jwks.json",
+      "launchUrlLabel": "URL de lancement",
+      "launchUrlPlaceholder": "https://fournisseur-outil.com/app (optionnel)",
+      "errors": {
+        "nameRequired": "Le nom est requis",
+        "oidcLoginUrlRequired": "L'URL de connexion OIDC est requise",
+        "redirectUriRequired": "L'URI de redirection est requise",
+        "jwksUrlRequired": "L'URL JWKS est requise",
+        "invalidHttps": "Doit être une URL HTTPS valide"
+      }
+    }
+  },
+  "notification": {
+    "modal": {
+      "createTitle": "Créer une notification",
+      "editTitle": "Modifier la notification",
+      "createSubtitle": "Rédiger une nouvelle notification",
+      "editSubtitle": "Mettre à jour les détails de la notification",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Sujet de la notification",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Message de la notification",
+      "typeLabel": "Type",
+      "typeInApp": "In-App",
+      "typeEmail": "Email",
+      "sendToLabel": "Envoyer à",
+      "sendToPlaceholder": "Sélectionnez les destinataires...",
+      "allUsers": "Tous les utilisateurs",
+      "teachers": "Enseignants",
+      "students": "Étudiants",
+      "sendToAll": "Envoyer à tous les {{role}}",
+      "noContactsSelected": "Veuillez sélectionner au moins un contact",
+      "sendSuccess": "Emails envoyés avec succès !",
+      "sendError": "Échec de l'envoi des emails",
+      "selectTeachers": "Sélectionner des enseignants",
+      "selectStudents": "Sélectionner des étudiants",
+      "searchPlaceholder": "Rechercher des {{role}}...",
+      "errors": {
+        "subjectRequired": "Le sujet est requis",
+        "messageRequired": "Le message est requis",
+        "typeRequired": "Sélectionnez au moins un type",
+        "recipientRequired": "Sélectionnez au moins un destinataire"
+      }
+    },
+    "view": {
+      "title": "Détails de la notification",
+      "message": "Message",
+      "recipients": "Destinataires",
+      "type": "Type",
+      "created": "Créé le",
+      "sentAt": "Envoyé le",
+      "allUsers": "Tous les utilisateurs",
+      "allTeachers": "Tous les enseignants",
+      "allStudents": "Tous les étudiants",
+      "selectedTeachers": "Enseignants sélectionnés",
+      "selectedStudents": "Étudiants sélectionnés",
+      "selectedUsers": "Utilisateurs sélectionnés",
+      "system": "Système"
+    }
+  },
+  "componentManagement": {
+    "createTitle": "Créer un module de formation / programme",
+    "editTitle": "Modifier le module de formation / programme",
+    "typeLabel": "Type",
+    "typePlaceholder": "Sélectionner le type",
+    "types": {
+      "module": "Module",
+      "app": "Application",
+      "resource": "Ressource",
+      "exam": "Examen"
+    },
+    "nameLabel": "Nom",
+    "namePlaceholder": "Entrez le nom",
+    "yearLabel": "Année",
+    "yearPlaceholder": "Sélectionner l'année",
+    "year": "Année",
+    "moduleNumberLabel": "Numéro de module",
+    "moduleNumberPlaceholder": "Entrez le numéro du module",
+    "amountLabel": "Montant",
+    "amountPlaceholder": "Entrez le montant",
+    "linkedModuleLabel": "Module lié",
+    "linkedModuleHint": "Examen prévu avant ce module",
+    "linkedModulePlaceholder": "Sélectionner le module",
+    "noModulesFound": "Aucun module trouvé",
+    "linkedExamLabel": "Examen lié",
+    "linkedExamPlaceholder": "Sélectionner l'examen",
+    "noPublishedExams": "Aucun examen publié trouvé",
+    "submissionDeadlineLabel": "Date limite de soumission",
+    "submissionDeadlinePlaceholder": "Sélectionner la date limite",
+    "instructionsLabel": "Instructions",
+    "instructionsPlaceholder": "Entrez les instructions",
+    "instructionVideoLabel": "Vidéo d'instruction (URL)",
+    "instructionVideoPlaceholder": "Entrez l'URL de la vidéo",
+    "submissionTypesLabel": "Types de soumission",
+    "caseStudies": "Études de cas",
+    "essays": "Essais",
+    "internships": "Stage clinique",
+    "activeStatus": "Statut actif",
+    "uploadingFiles": "Téléchargement des fichiers..."
+  },
+  "programConfig": {
+    "title": "Configuration de la formation / programme",
+    "subtitle": "Configurer les exigences académiques et les seuils",
+    "selectYear": "Sélectionner l'année",
+    "newYear": "Nouvelle année",
+    "yearLabel": "Année (1ère, 2ème, 3ème, etc.)",
+    "yearPlaceholder": "ex: 1 pour la première année",
+    "yearHint": "Création de la configuration pour une nouvelle année de formation / programme",
+    "programYear": "Année de formation / programme",
+    "yearPlaceholderSelect": "Sélectionner une année",
+    "yearDisplay": "Année {{year}}",
+    "yearViewing": "Affichage de la configuration pour l'année {{year}}",
+    "activeStatus": "Statut actif",
+    "activeStatusHint": "Activer ou désactiver cette configuration",
+    "noConfigs": "Pas encore de configurations. Cliquez sur \"Nouvelle année\" pour en créer une.",
+    "requirements": {
+      "exam": {
+        "title": "Exigences d'examen",
+        "required": "Examens requis",
+        "hint": "Les étudiants doivent réussir tous les examens de module pour progresser"
+      },
+      "attendance": {
+        "title": "Exigences d'assiduité",
+        "overallMin": "Pourcentage minimum global (%)",
+        "perModuleMin": "Pourcentage minimum par module (%)"
+      },
+      "submission": {
+        "title": "Exigences de soumission",
+        "caseStudies": "Études de cas",
+        "essays": "Essais",
+        "internships": "Stage clinique",
+        "mandatoryHint": "Obligatoire pour l'achèvement de l'année",
+        "minPass": "Pourcentage minimum de réussite (%)",
+        "passMark": "Note de passage (%)"
+      },
+      "internship": {
+        "title": "Exigences de stage clinique",
+        "minCases": "Nombre minimum de cas"
+      }
+    },
+    "actions": {
+      "saving": "Enregistrement...",
+      "update": "Mettre à jour la configuration",
+      "create": "Créer la configuration"
+    }
+  },
+  "questionBank": {
+    "createQuestionBank": "Créer une banque de questions",
+    "editQuestionBank": "Modifier la banque de questions",
+    "question": "Question",
+    "questionList": {
+      "addQuestion": "Ajouter une question",
+      "bulkUpload": "Téléchargement groupé",
+      "uid": "UID",
+      "question": "Question",
+      "difficulty": "Difficulté",
+      "marks": "Points",
+      "action": "Action",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "noQuestions": "Aucune question trouvée"
+    },
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Entrez le nom",
+      "description": "Description",
+      "descriptionPlaceholder": "Entrez la description"
+    },
+    "bulkUpload": {
+      "title": "Téléchargement groupé de questions",
+      "description": "Téléchargez un fichier CSV contenant des questions. Téléchargez le modèle ci-dessous pour voir le format requis.",
+      "downloadTemplate": "Télécharger le modèle",
+      "selectFile": "Sélectionner un fichier",
+      "upload": "Télécharger les questions"
+    },
+    "questionForm": {
+      "addQuestion": "Ajouter une question",
+      "editQuestion": "Modifier la question",
+      "createSubtitle": "Remplissez les détails de la question",
+      "editSubtitle": "Mettre à jour les détails de la question",
+      "questionText": "Texte de la question",
+      "questionTextPlaceholder": "Entrez le texte de la question",
+      "options": "Options",
+      "addOption": "Ajouter une option",
+      "option": "Option",
+      "correct": "Correct",
+      "enterOption": "Entrez le texte de l'option",
+      "explanation": "Explication",
+      "explanationPlaceholder": "Entrez l'explication de la bonne réponse",
+      "difficulty": "Difficulté",
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile",
+      "marks": "Points"
+    }
+  },
+  "currencies": {
+    "USD": "Dollar américain",
+    "EUR": "Euro",
+    "GBP": "Livre sterling",
+    "CAD": "Dollar canadien",
+    "AUD": "Dollar australien",
+    "JPY": "Yen japonais",
+    "CNY": "Yuan chinois",
+    "INR": "Roupie indienne",
+    "CHF": "Franc suisse",
+    "SEK": "Couronne suédoise",
+    "DKK": "Couronne danoise"
+  },
   "login": {
     "title": "Bureau IAO",
     "subtitle": "Connectez-vous à notre système de back-office sécurisé pour gérer les opérations quotidiennes de l'IAO",
@@ -952,6 +1468,36 @@
       "otpRequired": "Veuillez entrer l'OTP",
       "loginSuccess": "Connexion réussie !",
       "otpInvalid": "OTP invalide. Veuillez réessayer."
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "ongoingCourses": "Formations en cours",
+    "finishedCourses": "Formations terminées",
+    "courseEnrollmentTrend": "Tendance des inscriptions aux formations",
+    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
+  },
+  "ltiManagement": {
+    "title": "Gestion des outils LTI",
+    "subtitle": "Gérez les outils externes LTI 1.3 intégrés au HUB",
+    "registerTool": "Enregistrer un outil",
+    "table": {
+      "name": "Nom",
+      "clientId": "ID client",
+      "deploymentId": "ID de déploiement",
+      "oidcLoginUrl": "URL de connexion OIDC",
+      "active": "Actif",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "platformConfig": "Configuration de la plateforme",
+      "deactivate": "Désactiver"
+    },
+    "messages": {
+      "noTools": "Aucun outil LTI enregistré",
+      "clickToRegister": "Cliquez sur \"Enregistrer un outil\" pour ajouter Enatom ou un autre outil LTI 1.3.",
+      "loadFailed": "Échec du chargement des outils LTI"
     }
   }
 }
