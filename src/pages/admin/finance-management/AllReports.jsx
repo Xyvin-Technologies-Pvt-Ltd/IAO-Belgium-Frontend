@@ -16,6 +16,8 @@ import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetPayments } from "@/store/usePaymentStore";
 import moment from "moment";
+import { Download } from "lucide-react";
+import { getInvoiceHtml } from "@/api/paymentApi";
 import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
 
 const AllReports = () => {
@@ -58,6 +60,16 @@ const AllReports = () => {
 
   const payments = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const handleDownloadReceipt = async (payment) => {
+    try {
+      const html = await getInvoiceHtml(payment._id);
+      const win = window.open("", "_blank");
+      win.document.write(html);
+      win.document.close();
+    } catch (err) {
+      console.error("Failed to open invoice:", err);
+    }
+  };
 
   const getActualAmount = (payment) => {
     if (payment.purpose === "module-purchase" && payment.convenience_fee) {
@@ -133,6 +145,7 @@ const AllReports = () => {
               <TableHead>{t("common.convenienceFee")}</TableHead>
               <TableHead>{t("common.date")}</TableHead>
               <TableHead>{t("common.status")}</TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -190,6 +203,17 @@ const AllReports = () => {
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={payment?.status} />
+                  </TableCell>
+                  <TableCell>
+                    {payment?.status === "paid" && (
+                      <button
+                        onClick={() => handleDownloadReceipt(payment)}
+                        title="Download receipt"
+                        className="p-1.5 rounded-md text-sidebar-foreground/60 hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                      >
+                        <Download size={15} />
+                      </button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

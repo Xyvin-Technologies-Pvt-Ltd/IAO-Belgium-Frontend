@@ -36,6 +36,7 @@ import AttendenceView from "@/pages/admin/student/AttendenceView";
 import AllContracts from "@/pages/admin/contract/AllContracts";
 import StudentContracts from "@/pages/admin/contract/StudentContracts";
 import Notifications from "@/pages/admin/notification";
+import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
 
 const withPermissionProtection = (Component, path) => {
@@ -266,6 +267,10 @@ export const adminRoutes = [
   {
     path: "/admin/notification-management",
     component: withPermissionProtection(Notifications, "/admin/notification-management"),
+  },
+  {
+    path: "/admin/notification-management/$id",
+    component: withPermissionProtection(NotificationDetail, "/admin/notification-management"),
   },
   {
     path: "/admin/lti-management",

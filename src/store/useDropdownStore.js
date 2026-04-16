@@ -9,6 +9,7 @@ import {
   getBatches,
   getComponents,
   getUsers,
+  getTeacherModules,
 } from "@/api/dropDownApi";
 import { useQuery } from "@tanstack/react-query";
 
@@ -104,6 +105,16 @@ export const useGetUsers = (filter, options = {}) => {
   return useQuery({
     queryKey: ["all-users", filter],
     queryFn: () => getUsers(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetTeacherModules = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-modules", filter],
+    queryFn: () => getTeacherModules(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,

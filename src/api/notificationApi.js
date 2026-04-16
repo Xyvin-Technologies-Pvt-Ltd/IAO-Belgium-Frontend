@@ -29,15 +29,6 @@ export const markAllNotificationsAsRead = async () => {
   }
 };
 
-export const clearNotification = async (id) => {
-  try {
-    const response = await axiosInstance.patch(`/notification/${id}/clear`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
 export const getUnreadTeacherNotificationsCount = async () => {
   try {
     const response = await axiosInstance.get(`/notification/me/unread-count`);
@@ -88,6 +79,33 @@ export const deleteAdminNotification = async (id) => {
 export const sendAdminNotification = async (id) => {
   try {
     const response = await axiosInstance.post(`/notification/${id}/send`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const previewNotificationCount = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/notification/preview-count`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getNotificationById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/notification/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getNotificationRecipients = async (id, params) => {
+  try {
+    const response = await axiosInstance.get(`/notification/${id}/recipients`, { params });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

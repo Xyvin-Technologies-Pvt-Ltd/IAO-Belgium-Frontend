@@ -9,6 +9,7 @@ import Evaluations from "@/pages/teacher/evaluvations";
 import ViewSubmission from "@/pages/teacher/evaluvations/ViewSubmission";
 import ExamList from "@/pages/teacher/exam";
 import ExamDetail from "@/pages/teacher/exam/ExamDetail";
+import TeacherNotifications from "@/pages/teacher/notification";
 
 export const teacherRoutes = [
   {
@@ -25,4 +26,5 @@ export const teacherRoutes = [
   { path: "/teacher/evaluations/$id", component: ViewSubmission },
   { path: "/teacher/exams", component: ExamList },
   { path: "/teacher/exams/$exam_id/$planning_id", component: ExamDetail },
+  { path: "/teacher/notifications", component: TeacherNotifications },
 ];

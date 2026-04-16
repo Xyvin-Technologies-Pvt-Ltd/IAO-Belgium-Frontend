@@ -21,31 +21,32 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useNavigate } from "@tanstack/react-router";
 import {
   useGetAdminNotifications,
   useDeleteAdminNotification,
   useSendAdminNotification,
 } from "@/store/useNotificationStore";
-import NotificationModal from "@/components/admin/notification/NotificationModal";
+import TeacherNotificationModal from "@/components/teacher/notification/TeacherNotificationModal";
+import NotificationViewDrawer from "@/components/admin/notification/NotificationViewDrawer";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import SendConfirm from "@/components/SendConfirm";
 import { Pencil, Trash2, Send, Eye } from "lucide-react";
 import moment from "moment";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const getRecipientsLabel = (n) => {
   if (n.meta?.module_id) return `Module: ${n.meta.module_name || n.meta.module_id}`;
-  if (n.type === "student_corner") return "Selected Students";
-  return "All Students (Filtered)";
+  return "Students (Filtered)";
 };
 
-const Notifications = () => {
-  const navigate = useNavigate();
+const TeacherNotifications = () => {
+  const { user } = useAuthStore();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [sendTarget, setSendTarget] = useState(null);
@@ -56,7 +57,7 @@ const Notifications = () => {
     useGetAdminNotifications({
       page,
       limit: rowsPerPage,
-      category: "general",
+      created_by: user?._id,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       ...(statusFilter !== "all" ? { status: statusFilter } : {}),
     });
@@ -67,7 +68,7 @@ const Notifications = () => {
   const notifications = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleView = (n) => navigate({ to: `/admin/notification-management/${n._id}` });
+  const handleView = (n) => { setSelected(n); setViewOpen(true); };
   const handleEdit = (n) => { setSelected(n); setModalOpen(true); };
   const handleCreate = () => { setSelected(null); setModalOpen(true); };
 
@@ -82,13 +83,13 @@ const Notifications = () => {
   return (
     <div className="space-y-6 mt-4">
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        Notification Management
+        My Sent Alerts
       </h2>
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <Input
-            placeholder="Search notifications..."
+            placeholder="Search my alerts..."
             className="w-56"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
@@ -106,15 +107,14 @@ const Notifications = () => {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleCreate}>Create Notification</Button>
+        <Button onClick={handleCreate}>Send New Alert</Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Subject</TableHead>
-            <TableHead>Recipients</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Target Module</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Send Date</TableHead>
             <TableHead>Actions</TableHead>
@@ -122,10 +122,10 @@ const Notifications = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage message={error?.message || "Failed to load notifications"} onRetry={refetch} variant="inline" />
               </TableCell>
             </TableRow>
@@ -136,11 +136,6 @@ const Notifications = () => {
                   {n.subject || <span className="text-sidebar-foreground/40 italic">No subject</span>}
                 </TableCell>
                 <TableCell>{getRecipientsLabel(n)}</TableCell>
-                <TableCell>
-                  {n.type
-                    ? n.type === "student_corner" ? "Student Corner" : "Notification"
-                    : <span className="text-sidebar-foreground/40 italic">System</span>}
-                </TableCell>
                 <TableCell><StatusBadge status={n.status} /></TableCell>
                 <TableCell>
                   {n.status === "sent" && n.send_date
@@ -189,8 +184,8 @@ const Notifications = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-sidebar-foreground/60">
-                No notifications found
+              <TableCell colSpan={5} className="text-center py-8 text-sidebar-foreground/60">
+                No alerts found
               </TableCell>
             </TableRow>
           )}
@@ -199,7 +194,8 @@ const Notifications = () => {
 
       <Pagination page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} totalRows={totalRows} />
 
-      <NotificationModal key={selected?._id || "new"} open={modalOpen} onClose={() => setModalOpen(false)} notification={selected} />
+      <TeacherNotificationModal key={selected?._id || "new"} open={modalOpen} onClose={() => setModalOpen(false)} notification={selected} />
+      <NotificationViewDrawer open={viewOpen} onClose={() => setViewOpen(false)} notification={selected} />
 
       <DeleteConfirm
         open={!!deleteTarget}
@@ -218,4 +214,4 @@ const Notifications = () => {
   );
 };
 
-export default Notifications;
+export default TeacherNotifications;
