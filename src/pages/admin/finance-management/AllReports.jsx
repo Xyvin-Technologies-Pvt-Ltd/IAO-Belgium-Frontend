@@ -63,12 +63,22 @@ const AllReports = () => {
   const handleDownloadReceipt = async (payment) => {
     try {
       const html = await getInvoiceHtml(payment._id);
-      const win = window.open("", "_blank");
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
+      iframe.contentWindow.focus();
+      iframe.contentWindow.onafterprint = () => document.body.removeChild(iframe);
+      setTimeout(() => iframe.contentWindow.print(), 500);
     } catch (err) {
-      console.error("Failed to open invoice:", err);
+      console.error("Failed to download invoice:", err);
     }
   };
 
