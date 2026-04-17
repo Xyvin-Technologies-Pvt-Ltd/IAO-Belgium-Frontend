@@ -62,6 +62,22 @@ export const useGetAllCities = (filter, options = {}) => {
   });
 };
 
+// Programs filtered by selected city and/or language (cascaded)
+export const useGetProgramsByCitiesAndLanguages = (cityId = "", languageId = "", options = {}) => {
+  return useQuery({
+    queryKey: ["programs-by-city-language", cityId, languageId],
+    queryFn: () => {
+      const params = { status: "active" };
+      if (cityId) params.city = cityId;
+      if (languageId) params.language = languageId;
+      return getAllPrograms(params);
+    },
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
 export const useGetAllLanguages = (filter, options = {}) => {
   return useQuery({
     queryKey: ["all-languages", filter],

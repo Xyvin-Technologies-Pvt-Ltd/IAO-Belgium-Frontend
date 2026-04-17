@@ -11,7 +11,7 @@ import {
   useGetAllCities,
   useGetAllCountries,
   useGetAllLanguages,
-  useGetAllPrograms,
+  useGetProgramsByCitiesAndLanguages,
 } from "@/store/useDropdownStore";
 import {
   useCreateAdminNotification,
@@ -48,13 +48,56 @@ const PillGroup = ({ label, options, selected, onChange, valueKey = "_id", label
   </div>
 );
 
-const AudienceFilters = ({ years, setYears, languages, setLanguages, cities, setCities, countries, setCountries, programs, setPrograms, languagesData, citiesData, countriesData, programsData }) => (
+const SinglePillGroup = ({ label, options, selected, onChange, valueKey = "_id", labelKey = "name" }) => (
+  <div className="space-y-2">
+    <Label className="text-sm font-medium">{label}</Label>
+    <div className="flex flex-wrap gap-1.5">
+      {options?.map((opt, i) => {
+        const isObj = typeof opt === "object" && opt !== null;
+        const val = isObj ? opt[valueKey] : opt;
+        const displayLabel = isObj ? opt[labelKey] : opt;
+        if (val === undefined || val === null) return null;
+        const isSelected = selected === val;
+        return (
+          <button
+            key={val || i}
+            type="button"
+            onClick={() => onChange(isSelected ? "" : val)}
+            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+              isSelected
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-muted"
+            }`}
+          >
+            {displayLabel}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+const AudienceFilters = ({
+  years, setYears,
+  language, onLanguageChange,
+  city, onCityChange,
+  country, onCountryChange,
+  program, onProgramChange,
+  languagesData,
+  citiesData,
+  countriesData,
+  programsData,
+}) => (
   <div className="space-y-4">
     <PillGroup label="Year" options={[1,2,3,4,5].map(y => ({ id: y, label: String(y) }))} valueKey="id" labelKey="label" selected={years} onChange={setYears} />
-    <PillGroup label="Language Group" options={languagesData?.data || []} selected={languages} onChange={setLanguages} />
-    <PillGroup label="City" options={citiesData?.data || []} selected={cities} onChange={setCities} />
-    <PillGroup label="Country" options={countriesData?.data || []} selected={countries} onChange={setCountries} />
-    <PillGroup label="Course" options={programsData?.data || []} selected={programs} onChange={setPrograms} />
+    <SinglePillGroup label="Country" options={countriesData?.data || []} selected={country} onChange={onCountryChange} />
+    {country && (
+      <SinglePillGroup label="City" options={citiesData?.data || []} selected={city} onChange={onCityChange} />
+    )}
+    <SinglePillGroup label="Language Group" options={languagesData?.data || []} selected={language} onChange={onLanguageChange} />
+    {(city || language) && (
+      <SinglePillGroup label="Course" options={programsData?.data || []} selected={program} onChange={onProgramChange} />
+    )}
   </div>
 );
 
@@ -68,23 +111,32 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const [messageContent, setMessageContent] = useState("");
 
   const [selectedYears, setSelectedYears] = useState([]);
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const [selectedCities, setSelectedCities] = useState([]);
-  const [selectedCountries, setSelectedCountries] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedProgram, setSelectedProgram] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   const [scYears, setScYears] = useState([]);
-  const [scLanguages, setScLanguages] = useState([]);
-  const [scPrograms, setScPrograms] = useState([]);
-  const [scCities, setScCities] = useState([]);
-  const [scCountries, setScCountries] = useState([]);
+  const [scLanguage, setScLanguage] = useState("");
+  const [scProgram, setScProgram] = useState("");
+  const [scCity, setScCity] = useState("");
+  const [scCountry, setScCountry] = useState("");
 
   const [previewCount, setPreviewCount] = useState(null);
 
   const { data: countriesData } = useGetAllCountries({ status: "active" });
   const { data: languagesData } = useGetAllLanguages({ status: "active" });
-  const { data: citiesData } = useGetAllCities({ status: "active" });
-  const { data: programsData } = useGetAllPrograms({ status: "active" });
+
+  // Cascaded: cities filtered by selected country, programs by selected city or language
+  const activeCountry = category === "notification" ? selectedCountry : scCountry;
+  const activeLanguage = category === "notification" ? selectedLanguage : scLanguage;
+  const activeCity = category === "notification" ? selectedCity : scCity;
+
+  const { data: citiesData } = useGetAllCities({
+    status: "active",
+    ...(activeCountry ? { country: activeCountry } : {}),
+  });
+  const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage);
 
   const { register, trigger, getValues, reset, setValue, formState: { errors } } = useForm({
     defaultValues: { subject: "", expiry_date: "" },
@@ -97,8 +149,35 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const resetAll = () => {
     setStep(1); setPreviewCount(null); setIsGlobal(false);
-    setSelectedYears([]); setSelectedLanguages([]); setSelectedPrograms([]); setSelectedCities([]); setSelectedCountries([]);
-    setScYears([]); setScLanguages([]); setScPrograms([]); setScCities([]); setScCountries([]);
+    setSelectedYears([]); setSelectedLanguage(""); setSelectedProgram(""); setSelectedCity(""); setSelectedCountry("");
+    setScYears([]); setScLanguage(""); setScProgram(""); setScCity(""); setScCountry("");
+  };
+
+  // When country changes, clear city and program
+  const handleCountryChange = (val) => {
+    if (category === "notification") {
+      setSelectedCountry(val); setSelectedCity(""); setSelectedProgram("");
+    } else {
+      setScCountry(val); setScCity(""); setScProgram("");
+    }
+  };
+
+  // When city changes, clear program
+  const handleCityChange = (val) => {
+    if (category === "notification") {
+      setSelectedCity(val); setSelectedProgram("");
+    } else {
+      setScCity(val); setScProgram("");
+    }
+  };
+
+  // When language changes, clear program
+  const handleLanguageChange = (val) => {
+    if (category === "notification") {
+      setSelectedLanguage(val); setSelectedProgram("");
+    } else {
+      setScLanguage(val); setScProgram("");
+    }
   };
 
   useEffect(() => {
@@ -120,16 +199,13 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     if (category !== "notification") return;
     const filters = {};
     if (selectedYears.length) filters.year = selectedYears;
-    if (selectedPrograms.length) filters.course = selectedPrograms;
-    if (selectedCities.length) filters.city = selectedCities;
-    if (selectedCountries.length) filters.country = selectedCountries;
-    if (selectedLanguages.length) filters.language = selectedLanguages;
+    if (selectedProgram) filters.course = selectedProgram;
     if (Object.keys(filters).length > 0) {
       previewMutation.mutate({ filters }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
     } else {
       setPreviewCount(null);
     }
-  }, [selectedYears, selectedLanguages, selectedPrograms, selectedCities, selectedCountries, category]);
+  }, [selectedYears, selectedProgram, selectedCity, selectedCountry, selectedLanguage, category]);
 
   // Preview count — student_corner type
   useEffect(() => {
@@ -140,21 +216,18 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     }
     const filters = {};
     if (scYears.length) filters.year = scYears;
-    if (scPrograms.length) filters.course = scPrograms;
-    if (scCities.length) filters.city = scCities;
-    if (scCountries.length) filters.country = scCountries;
-    if (scLanguages.length) filters.language = scLanguages;
+    if (scProgram) filters.course = scProgram;
     if (Object.keys(filters).length > 0) {
       previewMutation.mutate({ filters }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
     } else {
       setPreviewCount(null);
     }
-  }, [scYears, scLanguages, scPrograms, scCities, scCountries, isGlobal, category]);
+  }, [scYears, scProgram, scCity, scCountry, scLanguage, isGlobal, category]);
 
   const handleNext = async () => {
     if (step === 1) { setStep(2); return; }
     if (step === 2) {
-      const scHasAudience = isGlobal || scYears.length || scLanguages.length || scPrograms.length || scCities.length || scCountries.length;
+      const scHasAudience = isGlobal || scYears.length || scLanguage || scProgram || scCity || scCountry;
       if (category === "student_corner" && !scHasAudience) return;
       setStep(3); return;
     }
@@ -170,18 +243,12 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     if (category === "notification") {
       const filters = {};
       if (selectedYears.length) filters.year = selectedYears;
-      if (selectedPrograms.length) filters.course = selectedPrograms;
-      if (selectedCities.length) filters.city = selectedCities;
-      if (selectedCountries.length) filters.country = selectedCountries;
-      if (selectedLanguages.length) filters.language = selectedLanguages;
+      if (selectedProgram) filters.course = selectedProgram;
       payload = { subject: data.subject, message: messageContent, type: "notification", status: "drafted", filters };
     } else {
       const scFilters = {};
       if (scYears.length) scFilters.year = scYears;
-      if (scPrograms.length) scFilters.course = scPrograms;
-      if (scCities.length) scFilters.city = scCities;
-      if (scCountries.length) scFilters.country = scCountries;
-      if (scLanguages.length) scFilters.language = scLanguages;
+      if (scProgram) scFilters.course = scProgram;
       payload = { subject: data.subject, message: messageContent, type: "student_corner", status: "drafted", filters: isGlobal ? {} : scFilters, ...(data.expiry_date ? { expiry_date: data.expiry_date } : {}) };
     }
     if (isEdit) {
@@ -296,14 +363,14 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                 <AudienceFilters
                   years={category === "notification" ? selectedYears : scYears}
                   setYears={category === "notification" ? setSelectedYears : setScYears}
-                  languages={category === "notification" ? selectedLanguages : scLanguages}
-                  setLanguages={category === "notification" ? setSelectedLanguages : setScLanguages}
-                  cities={category === "notification" ? selectedCities : scCities}
-                  setCities={category === "notification" ? setSelectedCities : setScCities}
-                  countries={category === "notification" ? selectedCountries : scCountries}
-                  setCountries={category === "notification" ? setSelectedCountries : setScCountries}
-                  programs={category === "notification" ? selectedPrograms : scPrograms}
-                  setPrograms={category === "notification" ? setSelectedPrograms : setScPrograms}
+                  language={category === "notification" ? selectedLanguage : scLanguage}
+                  onLanguageChange={handleLanguageChange}
+                  city={category === "notification" ? selectedCity : scCity}
+                  onCityChange={handleCityChange}
+                  country={category === "notification" ? selectedCountry : scCountry}
+                  onCountryChange={handleCountryChange}
+                  program={category === "notification" ? selectedProgram : scProgram}
+                  onProgramChange={category === "notification" ? setSelectedProgram : setScProgram}
                   languagesData={languagesData}
                   citiesData={citiesData}
                   countriesData={countriesData}
