@@ -292,7 +292,7 @@ const CreateComponent = ({
       };
 
       if (data.type !== "exam") {
-        payload.name = data.name;
+        payload.name = data.type === "app" ? "APP" : data.name;
         payload.year = data.year;
 
         // Process resources: upload files in parallel using Promise.all
@@ -440,62 +440,64 @@ const CreateComponent = ({
             </div>
             {selectedType !== "exam" && (
               <>
-                <div className="space-y-2 relative">
-                  <Label>
-                    {t("componentManagement.nameLabel")} <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    placeholder={t("componentManagement.namePlaceholder")}
-                    {...register("name")}
-                    onChange={(e) => {
-                      register("name").onChange(e);
-                      if (selectedType === "module" && !isEdit) {
-                        setModuleNameSearch(e.target.value);
-                        setShowModuleSuggestions(true);
-                        // Clear selected system_id when user types manually
-                        setSelectedSystemId(null);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (
-                        selectedType === "module" &&
-                        !isEdit &&
-                        moduleNameSearch
-                      ) {
-                        setShowModuleSuggestions(true);
-                      }
-                    }}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-destructive">
-                      {errors.name.message}
-                    </p>
-                  )}
-
-                  {/* Module suggestions dropdown */}
-                  {selectedType === "module" &&
-                    !isEdit &&
-                    showModuleSuggestions &&
-                    moduleNameSearch.length > 2 &&
-                    existingModules.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-y-auto">
-                        {existingModules.map((module) => (
-                          <div
-                            key={module._id}
-                            className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
-                            onClick={() => {
-                              setValue("name", module.name);
-                              setModuleNameSearch(module.name);
-                              setSelectedSystemId(module.system_id || null);
-                              setShowModuleSuggestions(false);
-                            }}
-                          >
-                            <p className="font-medium text-sm">{module.name}</p>
-                          </div>
-                        ))}
-                      </div>
+                {selectedType !== "app" && (
+                  <div className="space-y-2 relative">
+                    <Label>
+                      {t("componentManagement.nameLabel")} <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      placeholder={t("componentManagement.namePlaceholder")}
+                      {...register("name")}
+                      onChange={(e) => {
+                        register("name").onChange(e);
+                        if (selectedType === "module" && !isEdit) {
+                          setModuleNameSearch(e.target.value);
+                          setShowModuleSuggestions(true);
+                          // Clear selected system_id when user types manually
+                          setSelectedSystemId(null);
+                        }
+                      }}
+                      onFocus={() => {
+                        if (
+                          selectedType === "module" &&
+                          !isEdit &&
+                          moduleNameSearch
+                        ) {
+                          setShowModuleSuggestions(true);
+                        }
+                      }}
+                    />
+                    {errors.name && (
+                      <p className="text-sm text-destructive">
+                        {errors.name.message}
+                      </p>
                     )}
-                </div>
+
+                    {/* Module suggestions dropdown */}
+                    {selectedType === "module" &&
+                      !isEdit &&
+                      showModuleSuggestions &&
+                      moduleNameSearch.length > 2 &&
+                      existingModules.length > 0 && (
+                        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-md max-h-60 overflow-y-auto">
+                          {existingModules.map((module) => (
+                            <div
+                              key={module._id}
+                              className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer border-b last:border-b-0"
+                              onClick={() => {
+                                setValue("name", module.name);
+                                setModuleNameSearch(module.name);
+                                setSelectedSystemId(module.system_id || null);
+                                setShowModuleSuggestions(false);
+                              }}
+                            >
+                              <p className="font-medium text-sm">{module.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label>

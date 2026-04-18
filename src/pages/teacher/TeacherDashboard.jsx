@@ -10,7 +10,7 @@ const TeacherDashboard= () => {
     
     const firstName = profile?.first_name || "";
     const lastName = profile?.last_name || "";
-    const fullName = `${firstName} ${lastName}`.trim();
+    const fullName = `${lastName} ${firstName}`.trim();
     const displayName = fullName || "Teacher";
   const stats = [
     {

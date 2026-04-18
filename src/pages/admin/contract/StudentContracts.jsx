@@ -102,9 +102,9 @@ const StudentContracts = () => {
           ) : contracts.length > 0 ? (
             contracts.map((item) => (
               <TableRow key={item._id}>
-                <TableCell>
-                  {item.application?.user?.first_name}{" "}
-                  {item.application?.user?.last_name}
+                <TableCell className={"capitalize"}>
+                  {item.application?.user?.last_name}{" "}
+                  {item.application?.user?.first_name}
                 </TableCell>
                 <TableCell>{item.application?.user?.email}</TableCell>
                 <TableCell>{item.contract?.name ?? "—"}</TableCell>

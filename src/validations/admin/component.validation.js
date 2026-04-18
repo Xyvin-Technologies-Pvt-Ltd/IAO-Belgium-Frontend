@@ -50,6 +50,7 @@ const moduleComponentSchema = baseComponentSchema.extend({
 });
 
 const appComponentSchema = baseComponentSchema.extend({
+  name: z.string().optional().or(z.literal("")),
   submission_deadline: z.string().min(1, "Submission deadline is required"),
   instruction: z.string().min(1, "Instruction is required"),
   instruction_video: z.string().optional().or(z.literal("")),

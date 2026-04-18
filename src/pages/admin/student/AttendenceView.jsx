@@ -47,7 +47,7 @@ const AttendenceView = () => {
           navigable: true,
         },
         {
-          label: `${studentInfo.first_name} ${studentInfo.last_name}`,
+          label: `${studentInfo.last_name} ${studentInfo.first_name}`,
           path: `/admin/student-management/${id}`,
           navigable: true,
         },
@@ -99,8 +99,8 @@ const AttendenceView = () => {
             {/* Info */}
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base font-bold text-foreground">
-                  {studentInfo.first_name} {studentInfo.last_name}
+                <span className="text-base font-bold text-foreground capitalize">
+                  {studentInfo.last_name} {studentInfo.first_name}
                 </span>
                 {studentInfo.uid && (
                   <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-muted text-muted-foreground">

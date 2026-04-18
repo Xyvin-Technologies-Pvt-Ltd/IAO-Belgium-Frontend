@@ -128,8 +128,8 @@ const StudentwiseReport = () => {
             ) : students?.length > 0 ? (
               students?.map((student) => (
                 <TableRow key={student._id}>
-                  <TableCell className="font-medium">
-                    {student.first_name || ""} {student.last_name || ""}
+                  <TableCell className="capitalize">
+                    {student.last_name || ""} {student.first_name || ""}
                   </TableCell>
                   <TableCell>{student.email || "-"}</TableCell>
                   <TableCell>

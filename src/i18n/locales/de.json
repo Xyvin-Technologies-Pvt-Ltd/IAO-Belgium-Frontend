@@ -1330,9 +1330,9 @@
     "typeLabel": "Typ",
     "typePlaceholder": "Typ auswählen",
     "types": {
-      "module": "Modul",
-      "app": "Anwendung",
-      "resource": "Ressource",
+      "module": "Lernmodul",
+      "app": "Angewandte Berufspraxis (APP)",
+      "resource": "Forschung",
       "exam": "Prüfung"
     },
     "nameLabel": "Name",

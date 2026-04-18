@@ -181,9 +181,9 @@ const AllReports = () => {
               payments?.map((payment) => (
                 <TableRow key={payment._id}>
                   <TableCell>{payment?.uid || t("common.notAvailable")}</TableCell>
-                  <TableCell>
+                  <TableCell className={"capitalize"}>
                     {payment?.user
-                      ? `${payment.user.first_name || ""} ${payment.user.last_name || ""}`.trim() ||
+                      ? `${payment.user.last_name || ""} ${payment.user.first_name || ""}`.trim() ||
                       t("common.notAvailable")
                       : t("common.notAvailable")}
                   </TableCell>

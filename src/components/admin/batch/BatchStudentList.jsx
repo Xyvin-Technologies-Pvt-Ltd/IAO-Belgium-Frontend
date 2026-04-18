@@ -95,8 +95,8 @@ const BatchStudentList = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>
-                  {i?.first_name} {i?.last_name}
+                <TableCell className={"capitalize"}>
+                  {i?.last_name} {i?.first_name}
                 </TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>

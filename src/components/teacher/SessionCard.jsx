@@ -55,15 +55,15 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
           const teachers = [
             ...(session.teachers?.map(
               (t) =>
-                `${t.teacher?.first_name || ""} ${t.teacher?.last_name || ""}`.trim(),
+                `${t.teacher?.last_name || ""} ${t.teacher?.first_name || ""}`.trim(),
             ) || []),
             ...(session.assistants?.map(
               (a) =>
-                `${a.assistant?.first_name || ""} ${a.assistant?.last_name || ""}`.trim(),
+                `${a.assistant?.last_name || ""} ${a.assistant?.first_name || ""}`.trim(),
             ) || []),
             ...(session.trainees?.map(
               (t) =>
-                `${t.trainee?.first_name || ""} ${t.trainee?.last_name || ""}`.trim(),
+                `${t.trainee?.last_name || ""} ${t.trainee?.first_name || ""}`.trim(),
             ) || []),
           ].filter(Boolean);
 
@@ -77,7 +77,7 @@ const SessionCard = ({ sessions = [], isLoading = false }) => {
               </span>
               <span>{formatDate(session.session_date)}</span>
               <span>{formatTime(session.start_time, session.end_time)}</span>
-              <span className="text-muted-foreground line-clamp-2">
+              <span className="text-muted-foreground line-clamp-2 capitalize">
                 {teachers.length > 0 ? teachers.join(", ") : t("common.tba")}
               </span>
             </div>

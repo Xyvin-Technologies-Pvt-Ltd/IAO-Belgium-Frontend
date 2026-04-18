@@ -107,7 +107,7 @@ const ApplicationReview = () => {
                 <TableCell>
                   {i?.uid}
                 </TableCell>
-                <TableCell>{i?.user?.first_name}{" "}{i?.user?.last_name}</TableCell>
+                <TableCell className={"capitalize"}>{i?.user?.last_name}{" "}{i?.user?.first_name}</TableCell>
                 <TableCell>{i?.user?.email}</TableCell>
                 <TableCell>{i?.user?.phone}</TableCell>
                 <TableCell>{i?.user?.previous_education}</TableCell>

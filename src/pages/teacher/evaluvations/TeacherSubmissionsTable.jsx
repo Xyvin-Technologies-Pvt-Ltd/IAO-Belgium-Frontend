@@ -95,11 +95,11 @@ const TeacherSubmissionsTable = ({ submissionType }) => {
                   className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                   onClick={() => handleRowClick(item)}
                 >
-                  <TableCell>
+                  <TableCell className={"capitalize"}>
                     {item?.student
-                      ? `${item.student.first_name || ""} ${item.student.last_name || ""}`
+                      ? `${item.student.last_name || ""} ${item.student.first_name || ""}`
                       : item?.application?.user
-                        ? `${item.application.user.first_name || ""} ${item.application.user.last_name || ""}`
+                        ? `${item.application.user.last_name || ""} ${item.application.user.first_name || ""}`
                         : "-"}
                   </TableCell>
                   <TableCell

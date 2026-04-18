@@ -18,9 +18,9 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
 
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-sidebar-foreground">
+            <h2 className="text-lg font-bold text-sidebar-foreground capitalize">
               {user?.first_name && user?.last_name
-                ? `${user.first_name} ${user.last_name}`
+                ? `${user.last_name} ${user.first_name}`
                 : user?.email ||
                   t("userCard.unknownUser", {
                     type: isTeacher ? t("common.teacher") : t("common.student"),

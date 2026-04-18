@@ -77,8 +77,8 @@ const BatchYearLog = () => {
             ) : logs?.length > 0 ? (
               logs.map((log) => (
                 <TableRow key={log._id} className="hover:bg-muted/30">
-                  <TableCell>
-                       {log.application?.user?.first_name} {log.application?.user?.last_name}
+                  <TableCell className={"capitalize"}>
+                       {log.application?.user?.last_name} {log.application?.user?.first_name}
                    
                   </TableCell>
                   <TableCell className="text-center font-semibold ">

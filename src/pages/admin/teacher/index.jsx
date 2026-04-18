@@ -159,7 +159,7 @@ const Teachers = () => {
               <TableRow key={i._id}  className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}>
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.first_name + " " + i?.last_name}</TableCell>
+                <TableCell className={"capitalize"}>{i?.last_name + " " + i?.first_name}</TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.phone}</TableCell>
                 <TableCell>{i?.academic_degree?.name}</TableCell>

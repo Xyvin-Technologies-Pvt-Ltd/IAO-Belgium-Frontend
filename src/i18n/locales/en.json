@@ -1333,9 +1333,9 @@
     "typeLabel": "Type",
     "typePlaceholder": "Select type",
     "types": {
-      "module": "Module",
-      "app": "Application",
-      "resource": "Resource",
+      "module": "Learning Module",
+      "app": "Applied Professional Practice (APP)",
+      "resource": "Research",
       "exam": "Exam"
     },
     "nameLabel": "Name",
