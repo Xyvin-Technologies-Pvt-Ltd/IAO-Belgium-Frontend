@@ -73,8 +73,8 @@ const BatchResult = () => {
                 key={result._id}
                 className="transition-colors hover:bg-muted/50"
               >
-                <TableCell className="px-6 py-4">
-                  {result.student?.first_name} {result.student?.last_name}
+                <TableCell className="px-6 py-4 capitalize">
+                  {result.student?.last_name} {result.student?.first_name}
                 </TableCell>
                 <TableCell>{result.exam?.name || t("batchManagement.table.unnamedExam")}</TableCell>
                 <TableCell className="text-center font-medium">

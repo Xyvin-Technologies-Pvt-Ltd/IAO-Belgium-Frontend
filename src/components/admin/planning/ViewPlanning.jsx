@@ -99,7 +99,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                             const teacher = teacherObj.teacher || teacherObj;
                             const teacherName =
                               teacher.first_name && teacher.last_name
-                                ? `${teacher.first_name} ${teacher.last_name}`.trim()
+                                ? `${teacher.last_name} ${teacher.first_name}`.trim()
                                 : teacher.name || "Unknown Teacher";
                             const status = teacherObj.status || "pending";
 
@@ -107,7 +107,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                               <Badge
                                 key={teacher._id || teacherIndex}
                                 variant="outline"
-                                className={`text-xs ${getBadgeStyles(status)}`}
+                                className={`text-xs  capitalize ${getBadgeStyles(status)}`}
                               >
                                 {teacherName}
                               </Badge>
@@ -129,7 +129,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                                 assistantObj.assistant || assistantObj;
                               const assistantName =
                                 assistant.first_name && assistant.last_name
-                                  ? `${assistant.first_name} ${assistant.last_name}`.trim()
+                                  ? `${assistant.last_name} ${assistant.first_name}`.trim()
                                   : assistant.name || "Unknown Assistant";
                               const status = assistantObj.status || "pending";
 
@@ -137,7 +137,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                                 <Badge
                                   key={assistant._id || assistantIndex}
                                   variant="outline"
-                                  className={`text-xs ${getBadgeStyles(status)}`}
+                                  className={`text-xs capitalize ${getBadgeStyles(status)}`}
                                 >
                                   {assistantName}
                                 </Badge>
@@ -158,7 +158,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                             const trainee = traineeObj.trainee || traineeObj;
                             const traineeName =
                               trainee.first_name && trainee.last_name
-                                ? `${trainee.first_name} ${trainee.last_name}`.trim()
+                                ? `${trainee.last_name} ${trainee.first_name}`.trim()
                                 : trainee.name || "Unknown Trainee";
                             const status = traineeObj.status || "pending";
 
@@ -166,7 +166,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                               <Badge
                                 key={trainee._id || traineeIndex}
                                 variant="outline"
-                                className={`text-xs ${getBadgeStyles(status)}`}
+                                className={`text-xs capitalize ${getBadgeStyles(status)}`}
                               >
                                 {traineeName}
                               </Badge>

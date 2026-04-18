@@ -150,8 +150,8 @@ const SessionAttendence = () => {
               const currentStatus = student.attendance_status;
               return (
                 <TableRow key={student.application_id}>
-                  <TableCell>
-                    {`${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+                  <TableCell className={"capitalize"}>
+                    {`${student.last_name || ""} ${student.first_name || ""}`.trim() ||
                       "N/A"}
                   </TableCell>
                   <TableCell>

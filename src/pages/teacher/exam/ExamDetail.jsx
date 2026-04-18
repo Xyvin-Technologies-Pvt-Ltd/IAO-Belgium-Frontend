@@ -344,9 +344,9 @@ const ExamDetail = () => {
                   >
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-medium">
-                          {result.student?.first_name}{" "}
-                          {result.student?.last_name}
+                        <span className="font-medium capitalize">
+                          {result.student?.last_name}{" "}
+                          {result.student?.first_name}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {result.student?.uid}

@@ -80,8 +80,8 @@ const MoveStudentDialog = ({
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground dark:text-white/70">{t("batchManagement.modal.moveStudent.studentName")}</label>
-              <p className="text-sm font-semibold text-dashboard-text dark:text-white">
-                {student?.first_name} {student?.last_name}
+              <p className="text-sm font-semibold text-dashboard-text dark:text-white capitalize">
+                {student?.last_name} {student?.first_name}
               </p>
             </div>
           </div>

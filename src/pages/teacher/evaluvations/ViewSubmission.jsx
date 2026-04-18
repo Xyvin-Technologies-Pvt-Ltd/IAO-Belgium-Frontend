@@ -205,9 +205,9 @@ const ViewSubmission = () => {
   }
 
   const studentName = submissionData?.student
-    ? `${submissionData.student.first_name || ""} ${submissionData.student.last_name || ""}`
+    ? `${submissionData.student.last_name || ""} ${submissionData.student.first_name || ""}`
     : submissionData?.application?.user
-      ? `${submissionData.application.user.first_name || ""} ${submissionData.application.user.last_name || ""}`
+      ? `${submissionData.application.user.last_name || ""} ${submissionData.application.user.first_name || ""}`
       : "N/A";
 
   const isEvolvable = submissionData?.status === "submitted";
@@ -257,7 +257,7 @@ const ViewSubmission = () => {
           {/* Student Info */}
           <div className="bg-[#F9F9F9] dark:bg-gray-800/50 p-5 mb-8">
             <div className="flex justify-between items-start mb-4">
-              <h1 className="text-2xl font-bold text-[#374151] dark:text-white">
+              <h1 className="text-2xl font-bold text-[#374151] dark:text-white capitalize">
                 {studentName}
               </h1>
               <StatusBadge status={submissionData?.status || "pending"} />

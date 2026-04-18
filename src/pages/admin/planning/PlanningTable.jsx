@@ -99,7 +99,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
         if (person && person._id && !seen.has(person._id)) {
           seen.set(person._id, {
             _id: person._id,
-            name: `${person.first_name || ""} ${person.last_name || ""}`.trim(),
+            name: `${person.last_name || ""} ${person.first_name || ""}`.trim(),
             status: item.status || "pending",
           });
         }

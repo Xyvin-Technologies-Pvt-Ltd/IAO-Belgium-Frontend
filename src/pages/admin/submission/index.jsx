@@ -64,7 +64,8 @@ const Submissions = () => {
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(activeStatus !== "all" ? { status: activeStatus } : {}),
+    ...(activeStatus !== "all" && activeStatus !== "assigned" ? { status: activeStatus } : {}),
+    ...(activeStatus === "assigned" ? { has_assigned_teacher: "true" } : {}),
     ...(appliedFilters.submission_type !== "all"
       ? { submission_type: appliedFilters.submission_type }
       : {}),
@@ -155,7 +156,7 @@ const Submissions = () => {
       {/* Status Tabs */}
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {["all", "submitted", "passed", "failed"].map((status) => (
+          {["all", "submitted", "assigned", "passed", "failed"].map((status) => (
             <button
               key={status}
               onClick={() => { setActiveStatus(status); setPage(1); }}
@@ -286,8 +287,8 @@ const Submissions = () => {
                       aria-label={`Select row ${item._id}`}
                     />
                   </TableCell>
-                  <TableCell>
-                    {item?.student?.first_name} {item?.student?.last_name}
+                  <TableCell className={"capitalize"}>
+                    {item?.student?.last_name} {item?.student?.first_name}
                   </TableCell>
                   <TableCell
                     className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
@@ -331,9 +332,9 @@ const Submissions = () => {
                   <TableCell>
                     <StatusBadge status={item?.resubmission_enabled ? true : false} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={"capitalize"}>
                     {item?.assigned_teacher && Object.keys(item.assigned_teacher).length > 0
-                      ? `${item.assigned_teacher.first_name} ${item.assigned_teacher.last_name}`
+                      ? `${item.assigned_teacher.last_name} ${item.assigned_teacher.first_name}`
                       : <span className="text-red-500">not assigned</span>}
                   </TableCell>
                   <TableCell>

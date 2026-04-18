@@ -103,9 +103,9 @@ const ViewApplication = ({ open, onClose, application }) => {
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-dashboard-text dark:text-white">
+                <h2 className="text-lg font-bold text-dashboard-text dark:text-white capitalize">
                   {application?.user?.first_name && application?.user?.last_name 
-                    ? `${application.user.first_name} ${application.user.last_name}`
+                    ? `${application.user.last_name} ${application.user.first_name}`
                     : application?.user?.email || t("applicationReview.modal.unknownApplicant")}
                 </h2>
                 <span className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${

@@ -34,7 +34,7 @@ export function NavUser() {
 
   const firstName = profile?.first_name || "";
   const lastName = profile?.last_name || "";
-  const fullName = `${firstName} ${lastName}`.trim() || "User";
+  const fullName = `${lastName} ${firstName}`.trim() || "User";
   const role = profile?.role_access?.name || profile?.role || "";
   const avatar = profile?.avatar || profile?.profilePicture || "";
 

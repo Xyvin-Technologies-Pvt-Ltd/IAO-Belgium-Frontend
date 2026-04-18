@@ -1302,9 +1302,9 @@
     "typeLabel": "Type",
     "typePlaceholder": "Selecteer type",
     "types": {
-      "module": "Module",
-      "app": "Applicatie",
-      "resource": "Bron",
+      "module": "Leermodule",
+      "app": "Toegepaste Professionele Praktijk (APP)",
+      "resource": "Onderzoek",
       "exam": "Examen"
     },
     "nameLabel": "Naam",
