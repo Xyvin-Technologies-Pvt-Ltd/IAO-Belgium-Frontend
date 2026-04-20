@@ -34,7 +34,8 @@ import { Pencil, Trash2, Send, Eye } from "lucide-react";
 import moment from "moment";
 
 const getRecipientsLabel = (n) => {
-  if (n.meta?.module_id) return `Module: ${n.meta.module_name || n.meta.module_id}`;
+  if (n.meta?.module_id)
+    return `Module: ${n.meta.module_name || n.meta.module_id}`;
   if (n.type === "student_corner") return "Selected Students";
   return "All Students (Filtered)";
 };
@@ -67,12 +68,21 @@ const Notifications = () => {
   const notifications = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleView = (n) => navigate({ to: `/admin/notification-management/${n._id}` });
-  const handleEdit = (n) => { setSelected(n); setModalOpen(true); };
-  const handleCreate = () => { setSelected(null); setModalOpen(true); };
+  const handleView = (n) =>
+    navigate({ to: `/admin/notification-management/${n._id}` });
+  const handleEdit = (n) => {
+    setSelected(n);
+    setModalOpen(true);
+  };
+  const handleCreate = () => {
+    setSelected(null);
+    setModalOpen(true);
+  };
 
   const handleDeleteConfirm = () => {
-    deleteMutation.mutate(deleteTarget, { onSuccess: () => setDeleteTarget(null) });
+    deleteMutation.mutate(deleteTarget, {
+      onSuccess: () => setDeleteTarget(null),
+    });
   };
 
   const handleSendConfirm = () => {
@@ -91,9 +101,18 @@ const Notifications = () => {
             placeholder="Search notifications..."
             className="w-56"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
-          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => {
+              setStatusFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="w-36">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
@@ -113,39 +132,69 @@ const Notifications = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Subject</TableHead>
-            <TableHead>Recipients</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Send Date</TableHead>
+            <TableHead>Read</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
           {isLoading ? (
             <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center p-8">
-                <ErrorMessage message={error?.message || "Failed to load notifications"} onRetry={refetch} variant="inline" />
+                <ErrorMessage
+                  message={error?.message || "Failed to load notifications"}
+                  onRetry={refetch}
+                  variant="inline"
+                />
               </TableCell>
             </TableRow>
           ) : notifications.length > 0 ? (
             notifications.map((n) => (
               <TableRow key={n._id}>
                 <TableCell className="font-medium">
-                  {n.subject || <span className="text-sidebar-foreground/40 italic">No subject</span>}
+                  {n.subject || (
+                    <span className="text-sidebar-foreground/40 italic">
+                      No subject
+                    </span>
+                  )}
                 </TableCell>
-                <TableCell>{getRecipientsLabel(n)}</TableCell>
                 <TableCell>
-                  {n.type
-                    ? n.type === "student_corner" ? "Student Corner" : "Notification"
-                    : <span className="text-sidebar-foreground/40 italic">System</span>}
+                  {n.type ? (
+                    n.type === "student_corner" ? (
+                      "Student Corner"
+                    ) : (
+                      "Notification"
+                    )
+                  ) : (
+                    <span className="text-sidebar-foreground/40 italic">
+                      System
+                    </span>
+                  )}
                 </TableCell>
-                <TableCell><StatusBadge status={n.status} /></TableCell>
                 <TableCell>
-                  {n.status === "sent" && n.send_date
-                    ? moment(n.send_date).format("MMM DD, YYYY")
-                    : <span className="text-sidebar-foreground/40">—</span>}
+                  <StatusBadge status={n.status} />
+                </TableCell>
+                <TableCell>
+                  {n.status === "sent" && n.send_date ? (
+                    moment(n.send_date).format("MMM DD, YYYY")
+                  ) : (
+                    <span className="text-sidebar-foreground/40">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {n.status === "sent" && n.recipient_count > 0 ? (
+                    <span className="text-sm">
+                      {n.read_count}/{n.recipient_count}
+                    </span>
+                  ) : (
+                    <span className="text-sidebar-foreground/40">—</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
@@ -189,7 +238,10 @@ const Notifications = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-sidebar-foreground/60">
+              <TableCell
+                colSpan={6}
+                className="text-center py-8 text-sidebar-foreground/60"
+              >
                 No notifications found
               </TableCell>
             </TableRow>
@@ -197,9 +249,20 @@ const Notifications = () => {
         </TableBody>
       </Table>
 
-      <Pagination page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} totalRows={totalRows} />
+      <Pagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={totalRows}
+      />
 
-      <NotificationModal key={selected?._id || "new"} open={modalOpen} onClose={() => setModalOpen(false)} notification={selected} />
+      <NotificationModal
+        key={selected?._id || "new"}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        notification={selected}
+      />
 
       <DeleteConfirm
         open={!!deleteTarget}

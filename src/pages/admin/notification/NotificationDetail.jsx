@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bell, Calendar, Tag, Check, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams } from "@tanstack/react-router";
+import { Bell, Calendar, Tag, Check, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import StatusBadge from "@/components/StatusBadge";
@@ -9,6 +9,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import {
   useGetNotificationById,
   useGetNotificationRecipients,
@@ -24,7 +25,6 @@ import {
 
 const NotificationDetail = () => {
   const { id } = useParams({ strict: false });
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const [page, setPage] = useState(1);
@@ -32,8 +32,28 @@ const NotificationDetail = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);
 
+  const { updateBreadcrumbs } = useBreadcrumb();
+
   const { data: notifData, isLoading: notifLoading } = useGetNotificationById(id);
   const notification = notifData?.data;
+
+  useEffect(() => {
+    if (notification) {
+      updateBreadcrumbs([
+        {
+          label: "Notification Management",
+          path: "/admin/notification-management",
+          navigable: true,
+        },
+        {
+          label: notification.subject || "Notification Detail",
+          path: `/admin/notification-management/${id}`,
+          navigable: false,
+        },
+      ]);
+    }
+    return () => updateBreadcrumbs([]);
+  }, [notification?.subject, id]);
 
   const {
     data: recipientsData,
@@ -52,19 +72,6 @@ const NotificationDetail = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate({ to: "/admin/notification-management" })}
-          className="p-1.5 rounded-md hover:bg-sidebar-accent transition-colors text-sidebar-foreground/60 hover:text-sidebar-foreground"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Notification Detail
-        </h2>
-      </div>
-
       {notifLoading ? (
         <div className="h-40 rounded-xl bg-sidebar-accent/20 animate-pulse" />
       ) : notification ? (
@@ -91,7 +98,7 @@ const NotificationDetail = () => {
               <p className="text-xs text-sidebar-foreground/50 mb-2 font-medium uppercase tracking-wide">
                 {t("notification.view.message")}
               </p>
-              <p className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none"
+              <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5"
               dangerouslySetInnerHTML={{ __html: notification.message }}
             />
             </div>

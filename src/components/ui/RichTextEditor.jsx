@@ -81,8 +81,18 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
 
     // Add https:// if no protocol is specified
     const url = linkUrl.match(/^https?:\/\//) ? linkUrl : `https://${linkUrl}`;
-    
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+
+    const { from, to } = editor.state.selection;
+    const hasSelection = from !== to;
+
+    if (hasSelection) {
+      // Apply link to selected text
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    } else {
+      // No selection — insert the URL as linked text
+      editor.chain().focus().insertContent(`<a href="${url}">${url}</a>`).run();
+    }
+
     setShowLinkInput(false);
     setLinkUrl('');
   }, [editor, linkUrl]);
