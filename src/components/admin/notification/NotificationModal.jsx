@@ -235,7 +235,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
       if (selectedCity) filters.city = selectedCity;
       if (selectedCountry) filters.country = selectedCountry;
       if (selectedLanguage) filters.language = selectedLanguage;
-      payload = { subject: data.subject, message: messageContent, type: "notification", status: "drafted", filters };
+      payload = { subject: data.subject, message: messageContent, type: "notification", status: "drafted", ...(Object.keys(filters).length ? { filters } : {}) };
     } else {
       const scFilters = {};
       if (scYear) scFilters.year = scYear;
@@ -243,7 +243,15 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
       if (scCity) scFilters.city = scCity;
       if (scCountry) scFilters.country = scCountry;
       if (scLanguage) scFilters.language = scLanguage;
-      payload = { subject: data.subject, message: messageContent, type: "student_corner", status: "drafted", filters: isGlobal ? {} : scFilters, ...(data.expiry_date ? { expiry_date: data.expiry_date } : {}) };
+      const has_sc_filters = Object.keys(scFilters).length > 0;
+      payload = {
+        subject: data.subject,
+        message: messageContent,
+        type: "student_corner",
+        status: "drafted",
+        ...(!isGlobal && has_sc_filters ? { filters: scFilters } : {}),
+        ...(data.expiry_date ? { expiry_date: data.expiry_date } : {}),
+      };
     }
     if (isEdit) {
       updateMutation.mutate({ id: notification._id, data: payload }, { onSuccess: onClose });
