@@ -19,34 +19,7 @@ import {
   usePreviewNotificationCount,
 } from "@/store/useNotificationStore";
 
-const PillGroup = ({ label, options, selected, onChange, valueKey = "_id", labelKey = "name" }) => (
-  <div className="space-y-2">
-    <Label className="text-sm font-medium">{label}</Label>
-    <div className="flex flex-wrap gap-1.5">
-      {options?.map((opt, i) => {
-        const isObj = typeof opt === "object" && opt !== null;
-        const val = isObj ? opt[valueKey] : opt;
-        const displayLabel = isObj ? opt[labelKey] : opt;
-        if (val === undefined || val === null) return null;
-        const isSelected = selected.includes(val);
-        return (
-          <button
-            key={val || i}
-            type="button"
-            onClick={() => isSelected ? onChange(selected.filter((x) => x !== val)) : onChange([...selected, val])}
-            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-              isSelected
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background text-foreground border-border hover:bg-muted"
-            }`}
-          >
-            {displayLabel}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
+
 
 const SinglePillGroup = ({ label, options, selected, onChange, valueKey = "_id", labelKey = "name" }) => (
   <div className="space-y-2">
@@ -78,7 +51,7 @@ const SinglePillGroup = ({ label, options, selected, onChange, valueKey = "_id",
 );
 
 const AudienceFilters = ({
-  years, setYears,
+  year, onYearChange,
   language, onLanguageChange,
   city, onCityChange,
   country, onCountryChange,
@@ -89,12 +62,12 @@ const AudienceFilters = ({
   programsData,
 }) => (
   <div className="space-y-4">
-    <PillGroup label="Year" options={[1,2,3,4,5].map(y => ({ id: y, label: String(y) }))} valueKey="id" labelKey="label" selected={years} onChange={setYears} />
+    <SinglePillGroup label="Language Group" options={languagesData?.data || []} selected={language} onChange={onLanguageChange} />
+    <SinglePillGroup label="Year" options={[1,2,3,4,5].map(y => ({ id: String(y), label: String(y) }))} valueKey="id" labelKey="label" selected={year} onChange={onYearChange} />
     <SinglePillGroup label="Country" options={countriesData?.data || []} selected={country} onChange={onCountryChange} />
     {country && (
       <SinglePillGroup label="City" options={citiesData?.data || []} selected={city} onChange={onCityChange} />
     )}
-    <SinglePillGroup label="Language Group" options={languagesData?.data || []} selected={language} onChange={onLanguageChange} />
     {(city || language) && (
       <SinglePillGroup label="Course" options={programsData?.data || []} selected={program} onChange={onProgramChange} />
     )}
@@ -110,13 +83,13 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const [isGlobal, setIsGlobal] = useState(false);
   const [messageContent, setMessageContent] = useState("");
 
-  const [selectedYears, setSelectedYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
 
-  const [scYears, setScYears] = useState([]);
+  const [scYear, setScYear] = useState("");
   const [scLanguage, setScLanguage] = useState("");
   const [scProgram, setScProgram] = useState("");
   const [scCity, setScCity] = useState("");
@@ -149,8 +122,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const resetAll = () => {
     setStep(1); setPreviewCount(null); setIsGlobal(false);
-    setSelectedYears([]); setSelectedLanguage(""); setSelectedProgram(""); setSelectedCity(""); setSelectedCountry("");
-    setScYears([]); setScLanguage(""); setScProgram(""); setScCity(""); setScCountry("");
+    setSelectedYear(""); setSelectedLanguage(""); setSelectedProgram(""); setSelectedCity(""); setSelectedCountry("");
+    setScYear(""); setScLanguage(""); setScProgram(""); setScCity(""); setScCountry("");
   };
 
   // When country changes, clear city and program
@@ -180,6 +153,15 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     }
   };
 
+  // When year changes
+  const handleYearChange = (val) => {
+    if (category === "notification") {
+      setSelectedYear(val);
+    } else {
+      setScYear(val);
+    }
+  };
+
   useEffect(() => {
     if (open) {
       reset({ subject: notification?.subject || "", expiry_date: notification?.expiry_date ? notification.expiry_date.slice(0, 10) : "" });
@@ -198,14 +180,17 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   useEffect(() => {
     if (category !== "notification") return;
     const filters = {};
-    if (selectedYears.length) filters.year = selectedYears;
+    if (selectedYear) filters.year = selectedYear;
     if (selectedProgram) filters.course = selectedProgram;
+    if (selectedCity) filters.city = selectedCity;
+    if (selectedCountry) filters.country = selectedCountry;
+    if (selectedLanguage) filters.language = selectedLanguage;
     if (Object.keys(filters).length > 0) {
       previewMutation.mutate({ filters }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
     } else {
       setPreviewCount(null);
     }
-  }, [selectedYears, selectedProgram, selectedCity, selectedCountry, selectedLanguage, category]);
+  }, [selectedYear, selectedProgram, selectedCity, selectedCountry, selectedLanguage, category]);
 
   // Preview count — student_corner type
   useEffect(() => {
@@ -215,19 +200,22 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
       return;
     }
     const filters = {};
-    if (scYears.length) filters.year = scYears;
+    if (scYear) filters.year = scYear;
     if (scProgram) filters.course = scProgram;
+    if (scCity) filters.city = scCity;
+    if (scCountry) filters.country = scCountry;
+    if (scLanguage) filters.language = scLanguage;
     if (Object.keys(filters).length > 0) {
       previewMutation.mutate({ filters }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
     } else {
       setPreviewCount(null);
     }
-  }, [scYears, scProgram, scCity, scCountry, scLanguage, isGlobal, category]);
+  }, [scYear, scProgram, scCity, scCountry, scLanguage, isGlobal, category]);
 
   const handleNext = async () => {
     if (step === 1) { setStep(2); return; }
     if (step === 2) {
-      const scHasAudience = isGlobal || scYears.length || scLanguage || scProgram || scCity || scCountry;
+      const scHasAudience = isGlobal || scYear || scLanguage || scProgram || scCity || scCountry;
       if (category === "student_corner" && !scHasAudience) return;
       setStep(3); return;
     }
@@ -242,13 +230,19 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     let payload;
     if (category === "notification") {
       const filters = {};
-      if (selectedYears.length) filters.year = selectedYears;
+      if (selectedYear) filters.year = selectedYear;
       if (selectedProgram) filters.course = selectedProgram;
+      if (selectedCity) filters.city = selectedCity;
+      if (selectedCountry) filters.country = selectedCountry;
+      if (selectedLanguage) filters.language = selectedLanguage;
       payload = { subject: data.subject, message: messageContent, type: "notification", status: "drafted", filters };
     } else {
       const scFilters = {};
-      if (scYears.length) scFilters.year = scYears;
+      if (scYear) scFilters.year = scYear;
       if (scProgram) scFilters.course = scProgram;
+      if (scCity) scFilters.city = scCity;
+      if (scCountry) scFilters.country = scCountry;
+      if (scLanguage) scFilters.language = scLanguage;
       payload = { subject: data.subject, message: messageContent, type: "student_corner", status: "drafted", filters: isGlobal ? {} : scFilters, ...(data.expiry_date ? { expiry_date: data.expiry_date } : {}) };
     }
     if (isEdit) {
@@ -361,8 +355,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
               {(!isGlobal || category === "notification") && (
                 <AudienceFilters
-                  years={category === "notification" ? selectedYears : scYears}
-                  setYears={category === "notification" ? setSelectedYears : setScYears}
+                  year={category === "notification" ? selectedYear : scYear}
+                  onYearChange={handleYearChange}
                   language={category === "notification" ? selectedLanguage : scLanguage}
                   onLanguageChange={handleLanguageChange}
                   city={category === "notification" ? selectedCity : scCity}
