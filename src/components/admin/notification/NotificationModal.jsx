@@ -449,7 +449,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="border-t pt-3">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Message</p>
-                  <div className="text-sm text-foreground/80 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: messageContent }} />
+                  <div className="text-sm text-foreground/80 prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5" dangerouslySetInnerHTML={{ __html: messageContent }} />
                 </div>
               </div>
             </div>
