@@ -1,11 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, List } from 'lucide-react';
+import Link from '@tiptap/extension-link';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon } from 'lucide-react';
 import { Button } from './button';
 import { cn } from "@/lib/utils";
 
 const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -16,6 +20,12 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
         orderedList: {
           keepMarks: true,
           keepAttributes: false,
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-primary underline cursor-pointer',
         },
       }),
     ],
@@ -50,8 +60,37 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
     editor.chain().focus().toggleBold().run();
   };
 
+  const toggleItalic = () => {
+    editor.chain().focus().toggleItalic().run();
+  };
+
   const toggleBulletList = () => {
     editor.chain().focus().toggleBulletList().run();
+  };
+
+  const toggleOrderedList = () => {
+    editor.chain().focus().toggleOrderedList().run();
+  };
+
+  const setLink = useCallback(() => {
+    if (linkUrl === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      setShowLinkInput(false);
+      return;
+    }
+
+    // Add https:// if no protocol is specified
+    const url = linkUrl.match(/^https?:\/\//) ? linkUrl : `https://${linkUrl}`;
+    
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    setShowLinkInput(false);
+    setLinkUrl('');
+  }, [editor, linkUrl]);
+
+  const openLinkInput = () => {
+    const previousUrl = editor.getAttributes('link').href;
+    setLinkUrl(previousUrl || '');
+    setShowLinkInput(true);
   };
 
   return (
@@ -76,12 +115,82 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
           type="button"
           variant="ghost"
           size="sm"
+          onClick={toggleItalic}
+          className={`h-7 w-7 p-0 ${editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
+        >
+          <Italic size={14} />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
           onClick={toggleBulletList}
           className={`h-7 w-7 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
         >
           <List size={14} />
         </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={toggleOrderedList}
+          className={`h-7 w-7 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
+        >
+          <ListOrdered size={14} />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={openLinkInput}
+          className={`h-7 w-7 p-0 ${editor.isActive('link') ? 'bg-gray-200 dark:bg-gray-600' : ''}`}
+        >
+          <LinkIcon size={14} />
+        </Button>
       </div>
+
+      {/* Link Input */}
+      {showLinkInput && (
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-input bg-gray-50/50 dark:bg-gray-800/50">
+          <input
+            type="text"
+            placeholder="Enter URL"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                setLink();
+              } else if (e.key === 'Escape') {
+                setShowLinkInput(false);
+                setLinkUrl('');
+              }
+            }}
+            className="flex-1 px-2 py-1 text-sm border border-input rounded bg-white dark:bg-gray-900 outline-none focus:ring-1 focus:ring-primary"
+            autoFocus
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={setLink}
+            className="h-7 px-3 text-xs"
+          >
+            Set
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setShowLinkInput(false);
+              setLinkUrl('');
+            }}
+            className="h-7 px-3 text-xs"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
 
       {/* Editor */}
       <div className="px-3 py-2 relative">
@@ -126,6 +235,17 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
         }
         .tiptap-editor .ProseMirror strong {
           font-weight: bold;
+        }
+        .tiptap-editor .ProseMirror em {
+          font-style: italic;
+        }
+        .tiptap-editor .ProseMirror a {
+          color: hsl(var(--primary));
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        .tiptap-editor .ProseMirror a:hover {
+          text-decoration: none;
         }
         .tiptap-editor .ProseMirror ul ul,
         .tiptap-editor .ProseMirror ol ol,
