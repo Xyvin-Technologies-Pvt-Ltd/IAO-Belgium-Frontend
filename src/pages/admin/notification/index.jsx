@@ -34,8 +34,8 @@ import { Pencil, Trash2, Send, Eye } from "lucide-react";
 import moment from "moment";
 
 const getRecipientsLabel = (n) => {
-  if (n.meta?.module_id)
-    return `Module: ${n.meta.module_name || n.meta.module_id}`;
+  if (n.meta?.batch_id)
+    return `Batch: ${n.meta.batch_name || n.meta.batch_id}`;
   if (n.type === "student_corner") return "Selected Students";
   return "All Students (Filtered)";
 };

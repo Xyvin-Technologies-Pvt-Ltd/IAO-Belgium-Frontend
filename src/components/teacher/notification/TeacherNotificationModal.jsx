@@ -58,9 +58,9 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
       });
       setMessageContent(initialMessage);
       setStep(1);
-      if (notification?.meta?.module_id) {
-        setSelectedModuleId(notification.meta.module_id);
-        setSelectedModule({ _id: notification.meta.module_id, name: notification.meta.module_name || "Assigned Module" });
+      if (notification?.meta?.batch_id) {
+        setSelectedModuleId(notification.meta.batch_id);
+        setSelectedModule({ _id: notification.meta.batch_id, name: notification.meta.batch_name || "Assigned Batch" });
       } else {
         setSelectedModuleId("");
         setSelectedModule(null);
@@ -73,10 +73,11 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   // Sync selectedModule object when ID changes if we have data
   useEffect(() => {
     if (selectedModuleId && modulesData?.data) {
-      const found = modulesData.data.find(m => m._id === selectedModuleId);
+      const found = modulesData.data.find(m => m.batch_id === selectedModuleId);
       if (found) {
         setSelectedModule({ 
           ...found, 
+          _id: found.batch_id,
           name: `${found.component_name} (${found.batch_name})` 
         });
       }
@@ -86,7 +87,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   useEffect(() => {
     if (selectedModuleId) {
       previewMutation.mutate(
-        { meta: { module_id: selectedModuleId } },
+        { meta: { batch_id: selectedModuleId } },
         { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) }
       );
     } else {
@@ -120,8 +121,8 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
       category: "module_message",
       status: "drafted",
       meta: { 
-        module_id: selectedModuleId, 
-        module_name: selectedModule?.name 
+        batch_id: selectedModuleId, 
+        batch_name: selectedModule?.name 
       },
     };
 
@@ -199,17 +200,18 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                    <Users size={18} /> Select Target Group
                  </h3>
                  <SearchableSelect
-                    label="Assigned Module"
-                    placeholder="Search your modules..."
+                    label="Assigned Batch"
+                    placeholder="Search your batches..."
                     items={modulesData?.data?.map(m => ({ 
                       ...m, 
+                      _id: m.batch_id,
                       name: `${m.component_name} (${m.batch_name})` 
                     })) || []}
                     value={selectedModuleId}
                     onChange={setSelectedModuleId} 
                     onSearch={setModuleSearch}
                     isLoading={modulesLoading}
-                    error={!selectedModuleId ? "Please select a module" : null}
+                    error={!selectedModuleId ? "Please select a batch" : null}
                   />
                   {selectedModuleId && (
                     <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-background border border-border">
@@ -225,7 +227,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                   )}
                </div>
                <p className="text-xs text-muted-foreground ml-1 italic">
-                 Note: Only students approved and enrolled in this module will receive the alert.
+                 Note: Only students approved and enrolled in this batch (including location overrides) will receive the alert.
                </p>
             </div>
           )}
@@ -269,7 +271,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/30 rounded-xl space-y-1 border">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Target Module</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Target Batch</p>
                   <p className="font-medium">{selectedModule?.name}</p>
                 </div>
                 
