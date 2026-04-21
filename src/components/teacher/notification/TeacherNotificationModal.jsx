@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useGetComponents, useGetTeacherModules } from "@/store/useDropdownStore";
 import {
@@ -25,6 +25,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [moduleSearch, setModuleSearch] = useState("");
   const [previewCount, setPreviewCount] = useState(null);
+  const [messageContent, setMessageContent] = useState("");
 
   const debouncedModuleSearch = useDebounce(moduleSearch, 400);
 
@@ -38,6 +39,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     register,
     trigger,
     getValues,
+    setValue,
     reset,
     formState: { errors },
   } = useForm({ defaultValues: { subject: "", message: "" } });
@@ -49,10 +51,12 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
 
   useEffect(() => {
     if (open) {
+      const initialMessage = notification?.message || "";
       reset({
         subject: notification?.subject || "",
-        message: notification?.message || "",
+        message: initialMessage,
       });
+      setMessageContent(initialMessage);
       setStep(1);
       if (notification?.meta?.module_id) {
         setSelectedModuleId(notification.meta.module_id);
@@ -94,8 +98,16 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     if (step === 1) {
       if (selectedModuleId) setStep(2);
     } else if (step === 2) {
-      const isValid = await trigger(["subject", "message"]);
-      if (isValid) setStep(3);
+      // Update form value with rich text content
+      setValue("message", messageContent);
+      const isValid = await trigger(["subject"]);
+      // Validate message manually since it's not a registered field
+      if (isValid && messageContent.trim() && messageContent !== "<p></p>") {
+        setStep(3);
+      } else if (!messageContent.trim() || messageContent === "<p></p>") {
+        // Show error for empty message
+        alert(t("notification.modal.errors.messageRequired"));
+      }
     }
   };
 
@@ -103,7 +115,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     const data = getValues();
     const payload = {
       subject: data.subject,
-      message: data.message,
+      message: messageContent,
       type: "notification",
       category: "module_message",
       status: "drafted",
@@ -239,12 +251,12 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                 <Label>
                   {t("notification.modal.messageLabel")} <span className="text-red-500">*</span>
                 </Label>
-                <Textarea
+                <RichTextEditor
+                  value={messageContent}
+                  onChange={setMessageContent}
                   placeholder={t("notification.modal.messagePlaceholder")}
-                  rows={6}
-                  {...register("message", { required: t("notification.modal.errors.messageRequired") })}
+                  className="min-h-[200px]"
                 />
-                {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
               </div>
             </div>
           )}
@@ -274,7 +286,10 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="pt-3 border-t">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Message Body</p>
-                  <p className="text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">{getValues("message")}</p>
+                  <div 
+                    className="text-sm text-foreground/90 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: messageContent }}
+                  />
                 </div>
               </div>
             </div>
