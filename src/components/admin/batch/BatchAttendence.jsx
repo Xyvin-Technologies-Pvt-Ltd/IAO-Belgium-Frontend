@@ -15,7 +15,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetBatchAttendance } from "@/store/useBatchStore";
-import { Check, X } from "lucide-react";
+import { Check, X, MapPin } from "lucide-react";
 import { formatTZ } from "@/utils/dateUtils";
 
 const BatchAttendence = () => {
@@ -58,6 +58,14 @@ const BatchAttendence = () => {
         <div className="flex items-center justify-center">
           <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
             <X className="w-2 h-2 text-white stroke-3" />
+          </div>
+        </div>
+      );
+    } else if (status === "location_changed") {
+      return (
+        <div className="flex items-center justify-center" title="Location changed">
+          <div className="w-4 h-4 rounded-full bg-orange-400 flex items-center justify-center">
+            <MapPin className="w-2 h-2 text-white stroke-3" />
           </div>
         </div>
       );

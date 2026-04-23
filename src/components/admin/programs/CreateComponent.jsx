@@ -107,8 +107,6 @@ const CreateComponent = ({
 
   const createComponent = useCreateComponent();
   const updateComponent = useUpdateComponent();
-// console.log("programlanguageid",programLanguageId)
-  // Search for existing modules when typing module name
   const { data: existingModulesData } = useGetComponents(
     {
       type: "module",
@@ -303,6 +301,11 @@ const CreateComponent = ({
             if (resource.type === "file" && resource.file) {
               // Upload new file
               try {
+                if (resource.file.size === 0) {
+                  console.error(
+                    "[CreateComponent] ❌ resource.file.size is 0 — empty file",
+                  );
+                }
                 const response = await uploadFile(resource.file);
                 const fileUrl = response?.data?.file_url;
 
@@ -400,7 +403,9 @@ const CreateComponent = ({
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isEdit ? t("componentManagement.editTitle") : t("componentManagement.createTitle")}
+                {isEdit
+                  ? t("componentManagement.editTitle")
+                  : t("componentManagement.createTitle")}
               </h2>
             </div>
             <button
@@ -422,7 +427,9 @@ const CreateComponent = ({
                 disabled={isEdit}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t("componentManagement.typePlaceholder")} />
+                  <SelectValue
+                    placeholder={t("componentManagement.typePlaceholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {componentTypes.map((type) => (
@@ -443,7 +450,8 @@ const CreateComponent = ({
                 {selectedType !== "app" && (
                   <div className="space-y-2 relative">
                     <Label>
-                      {t("componentManagement.nameLabel")} <span className="text-red-500">*</span>
+                      {t("componentManagement.nameLabel")}{" "}
+                      <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       placeholder={t("componentManagement.namePlaceholder")}
@@ -491,7 +499,9 @@ const CreateComponent = ({
                                 setShowModuleSuggestions(false);
                               }}
                             >
-                              <p className="font-medium text-sm">{module.name}</p>
+                              <p className="font-medium text-sm">
+                                {module.name}
+                              </p>
                             </div>
                           ))}
                         </div>
@@ -512,7 +522,9 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("componentManagement.yearPlaceholder")} />
+                      <SelectValue
+                        placeholder={t("componentManagement.yearPlaceholder")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {[1, 2, 3, 4, 5].map((year) => (
@@ -569,7 +581,11 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("componentManagement.linkedModulePlaceholder")} />
+                      <SelectValue
+                        placeholder={t(
+                          "componentManagement.linkedModulePlaceholder",
+                        )}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {programModules.map((mod) => (
@@ -593,7 +609,8 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    {t("componentManagement.linkedExamLabel")} <span className="text-red-500">*</span>
+                    {t("componentManagement.linkedExamLabel")}{" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     key={`linked_exam-${watch("linked_exam")}`}
@@ -603,7 +620,11 @@ const CreateComponent = ({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("componentManagement.linkedExamPlaceholder")} />
+                      <SelectValue
+                        placeholder={t(
+                          "componentManagement.linkedExamPlaceholder",
+                        )}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {publishedExams.map((exam) => (
@@ -631,7 +652,9 @@ const CreateComponent = ({
                 <FormField
                   label={t("componentManagement.submissionDeadlineLabel")}
                   type="date"
-                  placeholder={t("componentManagement.submissionDeadlinePlaceholder")}
+                  placeholder={t(
+                    "componentManagement.submissionDeadlinePlaceholder",
+                  )}
                   error={errors.submission_deadline?.message}
                   required
                   {...register("submission_deadline")}
@@ -639,12 +662,15 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    {t("componentManagement.instructionsLabel")} <span className="text-red-500">*</span>
+                    {t("componentManagement.instructionsLabel")}{" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <RichTextEditor
                     value={instructionContent}
                     onChange={setInstructionContent}
-                    placeholder={t("componentManagement.instructionsPlaceholder")}
+                    placeholder={t(
+                      "componentManagement.instructionsPlaceholder",
+                    )}
                     className={cn(errors.instruction && "border-destructive")}
                   />
                   {errors.instruction && (
@@ -657,7 +683,9 @@ const CreateComponent = ({
                 <FormField
                   label={t("componentManagement.instructionVideoLabel")}
                   type="url"
-                  placeholder={t("componentManagement.instructionVideoPlaceholder")}
+                  placeholder={t(
+                    "componentManagement.instructionVideoPlaceholder",
+                  )}
                   error={errors.instruction_video?.message}
                   required
                   {...register("instruction_video")}
@@ -730,7 +758,11 @@ const CreateComponent = ({
               onCancel={handleClose}
               isLoading={isSubmitting}
               isEdit={isEdit}
-              submitText={isUploading ? t("componentManagement.uploadingFiles") : undefined}
+              submitText={
+                isUploading
+                  ? t("componentManagement.uploadingFiles")
+                  : undefined
+              }
             />
           </form>
         </div>

@@ -64,10 +64,8 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Just store the file locally, don't upload yet
     setPendingFile(file);
     setFileName(file.name);
-    // Set a placeholder so validation knows a file is selected
     setValue("file", "__pending__", { shouldValidate: true });
   };
 
@@ -75,9 +73,10 @@ const CreateContract = ({ open, onClose, contractData }) => {
     setIsUploading(true);
     try {
       let fileUrl = formData.file;
-
-      // Upload only now, on submit
       if (pendingFile) {
+        if (pendingFile.size === 0) {
+          console.error("[CreateContract] ❌ pendingFile.size is 0 — empty file, upload will fail");
+        }
         const response = await uploadFile(pendingFile);
         fileUrl = response?.data?.file_url;
         if (!fileUrl) throw new Error("Upload failed");

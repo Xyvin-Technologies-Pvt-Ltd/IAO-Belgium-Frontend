@@ -27,26 +27,26 @@ import {
   useSendAdminNotification,
 } from "@/store/useNotificationStore";
 import TeacherNotificationModal from "@/components/teacher/notification/TeacherNotificationModal";
-import NotificationViewDrawer from "@/components/admin/notification/NotificationViewDrawer";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import SendConfirm from "@/components/SendConfirm";
 import { Pencil, Trash2, Send, Eye } from "lucide-react";
 import moment from "moment";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useNavigate } from "@tanstack/react-router";
 
 const getRecipientsLabel = (n) => {
-  if (n.meta?.module_id) return `Module: ${n.meta.module_name || n.meta.module_id}`;
+  if (n.meta?.batch_id) return `Batch: ${n.meta.batch_name || n.meta.batch_id}`;
   return "Students (Filtered)";
 };
 
 const TeacherNotifications = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
-  const [viewOpen, setViewOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [sendTarget, setSendTarget] = useState(null);
@@ -68,7 +68,9 @@ const TeacherNotifications = () => {
   const notifications = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleView = (n) => { setSelected(n); setViewOpen(true); };
+  const handleView = (n) => {
+    navigate({ to: `/teacher/notifications/${n._id}` });
+  };
   const handleEdit = (n) => { setSelected(n); setModalOpen(true); };
   const handleCreate = () => { setSelected(null); setModalOpen(true); };
 
@@ -114,7 +116,7 @@ const TeacherNotifications = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Subject</TableHead>
-            <TableHead>Target Module</TableHead>
+            <TableHead>Target Batch</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Send Date</TableHead>
             <TableHead>Actions</TableHead>
@@ -195,7 +197,6 @@ const TeacherNotifications = () => {
       <Pagination page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} totalRows={totalRows} />
 
       <TeacherNotificationModal key={selected?._id || "new"} open={modalOpen} onClose={() => setModalOpen(false)} notification={selected} />
-      <NotificationViewDrawer open={viewOpen} onClose={() => setViewOpen(false)} notification={selected} />
 
       <DeleteConfirm
         open={!!deleteTarget}

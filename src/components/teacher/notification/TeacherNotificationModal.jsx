@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useGetComponents, useGetTeacherModules } from "@/store/useDropdownStore";
 import {
@@ -25,6 +25,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [moduleSearch, setModuleSearch] = useState("");
   const [previewCount, setPreviewCount] = useState(null);
+  const [messageContent, setMessageContent] = useState("");
 
   const debouncedModuleSearch = useDebounce(moduleSearch, 400);
 
@@ -38,6 +39,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     register,
     trigger,
     getValues,
+    setValue,
     reset,
     formState: { errors },
   } = useForm({ defaultValues: { subject: "", message: "" } });
@@ -49,14 +51,16 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
 
   useEffect(() => {
     if (open) {
+      const initialMessage = notification?.message || "";
       reset({
         subject: notification?.subject || "",
-        message: notification?.message || "",
+        message: initialMessage,
       });
+      setMessageContent(initialMessage);
       setStep(1);
-      if (notification?.meta?.module_id) {
-        setSelectedModuleId(notification.meta.module_id);
-        setSelectedModule({ _id: notification.meta.module_id, name: notification.meta.module_name || "Assigned Module" });
+      if (notification?.meta?.batch_id) {
+        setSelectedModuleId(notification.meta.batch_id);
+        setSelectedModule({ _id: notification.meta.batch_id, name: notification.meta.batch_name || "Assigned Batch" });
       } else {
         setSelectedModuleId("");
         setSelectedModule(null);
@@ -69,10 +73,11 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   // Sync selectedModule object when ID changes if we have data
   useEffect(() => {
     if (selectedModuleId && modulesData?.data) {
-      const found = modulesData.data.find(m => m._id === selectedModuleId);
+      const found = modulesData.data.find(m => m.batch_id === selectedModuleId);
       if (found) {
         setSelectedModule({ 
           ...found, 
+          _id: found.batch_id,
           name: `${found.component_name} (${found.batch_name})` 
         });
       }
@@ -82,7 +87,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   useEffect(() => {
     if (selectedModuleId) {
       previewMutation.mutate(
-        { meta: { module_id: selectedModuleId } },
+        { meta: { batch_id: selectedModuleId } },
         { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) }
       );
     } else {
@@ -94,8 +99,16 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     if (step === 1) {
       if (selectedModuleId) setStep(2);
     } else if (step === 2) {
-      const isValid = await trigger(["subject", "message"]);
-      if (isValid) setStep(3);
+      // Update form value with rich text content
+      setValue("message", messageContent);
+      const isValid = await trigger(["subject"]);
+      // Validate message manually since it's not a registered field
+      if (isValid && messageContent.trim() && messageContent !== "<p></p>") {
+        setStep(3);
+      } else if (!messageContent.trim() || messageContent === "<p></p>") {
+        // Show error for empty message
+        alert(t("notification.modal.errors.messageRequired"));
+      }
     }
   };
 
@@ -103,13 +116,13 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
     const data = getValues();
     const payload = {
       subject: data.subject,
-      message: data.message,
+      message: messageContent,
       type: "notification",
       category: "module_message",
       status: "drafted",
       meta: { 
-        module_id: selectedModuleId, 
-        module_name: selectedModule?.name 
+        batch_id: selectedModuleId, 
+        batch_name: selectedModule?.name 
       },
     };
 
@@ -187,17 +200,18 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                    <Users size={18} /> Select Target Group
                  </h3>
                  <SearchableSelect
-                    label="Assigned Module"
-                    placeholder="Search your modules..."
+                    label="Assigned Batch"
+                    placeholder="Search your batches..."
                     items={modulesData?.data?.map(m => ({ 
                       ...m, 
+                      _id: m.batch_id,
                       name: `${m.component_name} (${m.batch_name})` 
                     })) || []}
                     value={selectedModuleId}
                     onChange={setSelectedModuleId} 
                     onSearch={setModuleSearch}
                     isLoading={modulesLoading}
-                    error={!selectedModuleId ? "Please select a module" : null}
+                    error={!selectedModuleId ? "Please select a batch" : null}
                   />
                   {selectedModuleId && (
                     <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-background border border-border">
@@ -213,7 +227,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                   )}
                </div>
                <p className="text-xs text-muted-foreground ml-1 italic">
-                 Note: Only students approved and enrolled in this module will receive the alert.
+                 Note: Only students approved and enrolled in this batch (including location overrides) will receive the alert.
                </p>
             </div>
           )}
@@ -239,12 +253,12 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                 <Label>
                   {t("notification.modal.messageLabel")} <span className="text-red-500">*</span>
                 </Label>
-                <Textarea
+                <RichTextEditor
+                  value={messageContent}
+                  onChange={setMessageContent}
                   placeholder={t("notification.modal.messagePlaceholder")}
-                  rows={6}
-                  {...register("message", { required: t("notification.modal.errors.messageRequired") })}
+                  className="min-h-[200px]"
                 />
-                {errors.message && <p className="text-xs text-red-500">{errors.message.message}</p>}
               </div>
             </div>
           )}
@@ -257,7 +271,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/30 rounded-xl space-y-1 border">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Target Module</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Target Batch</p>
                   <p className="font-medium">{selectedModule?.name}</p>
                 </div>
                 
@@ -274,7 +288,10 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="pt-3 border-t">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Message Body</p>
-                  <p className="text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed">{getValues("message")}</p>
+                  <div 
+                    className="text-sm text-foreground/90 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: messageContent }}
+                  />
                 </div>
               </div>
             </div>
