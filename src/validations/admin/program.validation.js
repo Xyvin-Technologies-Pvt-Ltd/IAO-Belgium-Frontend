@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const programSchema = z.object({
   name: z.string().min(1, "Program name is required"),
+  program_code: z.string().min(1, "Program code is required").max(10, "Program code must be at most 10 characters"),
   program_type: z.enum([
     "Master of Science",
     "Lateral Entry Master of Science", 

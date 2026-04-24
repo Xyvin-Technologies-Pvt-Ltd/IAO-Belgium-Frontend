@@ -446,6 +446,7 @@
     "table": {
       "uid": "UID",
       "name": "Name",
+      "code": "Code",
       "type": "Typ",
       "year": "Jahr",
       "city": "Stadt",
@@ -465,6 +466,8 @@
       "editSubtitle": "Details der Ausbildung / Studiengang aktualisieren",
       "nameLabel": "Name der Ausbildung / Studiengang",
       "namePlaceholder": "Name der Ausbildung / Studiengang eingeben",
+      "codeLabel": "Ausbildungs- / Studiengang-Code",
+      "codePlaceholder": "Code eingeben",
       "programTypeLabel": "Typ der Ausbildung / Studiengang",
       "programTypePlaceholder": "Typ auswählen",
       "durationLabel": "Dauer der Ausbildung / Studiengang",
@@ -699,6 +702,7 @@
     "title": "Studentenverwaltung",
     "search": "Studenten suchen...",
     "table": {
+      "uid": "UID",
       "studentId": "Bewerbungs-ID",
       "studentName": "Studentenname",
       "name": "Name",
@@ -1410,9 +1414,18 @@
     }
   },
   "questionBank": {
+    "title": "Fragenbanken",
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
     "question": "Frage",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "questionCount": "Anzahl Fragen",
+      "status": "Status",
+      "action": "Aktion"
+    },
     "questionList": {
       "addQuestion": "Frage hinzufügen",
       "bulkUpload": "Massenupload",

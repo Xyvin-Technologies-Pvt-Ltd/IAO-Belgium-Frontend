@@ -67,6 +67,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
     resolver: zodResolver(programSchema),
     defaultValues: {
       name: "",
+      program_code: "",
       program_type: "",
       year: "",
       language: "",
@@ -95,6 +96,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const handleClose = () => {
     reset({
       name: "",
+      program_code: "",
       program_type: "",
       year: "",
       language: "",
@@ -113,6 +115,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
     reset({
       name: programData.name || "",
+      program_code: programData.program_code || "",
       program_type: programData.program_type || "",
       year: programData.year || "",
       language: programData.language?._id || "",
@@ -128,6 +131,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const onSubmit = (formData) => {
     const payload = {
       name: formData.name,
+      program_code: formData.program_code,
       program_type: formData.program_type,
       year: formData.year,
       language: formData.language,
@@ -167,7 +171,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   : t("programManagement.modal.createSubtitle")}
               </p>
             </div>
-            <button 
+            <button
               onClick={handleClose}
               className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white cursor-pointer"
             >
@@ -185,8 +189,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("name")}
             />
-
-
 
             <div className="space-y-2">
               <Label>
@@ -240,7 +242,13 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("year")}
             />
-
+            <FormField
+              label={t("programManagement.modal.codeLabel")}
+              placeholder={t("programManagement.modal.codePlaceholder")}
+              error={errors.program_code?.message}
+              required
+              {...register("program_code")}
+            />
             <SearchableSelect
               label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}

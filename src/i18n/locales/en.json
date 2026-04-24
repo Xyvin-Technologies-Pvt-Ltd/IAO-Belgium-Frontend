@@ -425,7 +425,7 @@
     "table": {
       "uid": "UID",
       "name": "Name",
-
+      "code": "Code",
       "type": "Type",
       "year": "Year",
       "city": "City",
@@ -445,6 +445,8 @@
       "editSubtitle": "Update the programme details",
       "nameLabel": "Programme Name",
       "namePlaceholder": "Enter programme name",
+      "codeLabel": "Programme Code",
+      "codePlaceholder": "Enter programme code",
       "programTypeLabel": "Programme Type",
       "programTypePlaceholder": "Select programme type",
       "durationLabel": "Duration of the Programme",
@@ -679,6 +681,7 @@
     "title": "Student Management",
     "search": "Search students...",
     "table": {
+      "uid": "UID",
       "studentId": "Application ID",
       "studentName": "Student Name",
       "name": "Name",
@@ -1414,9 +1417,18 @@
     }
   },
   "questionBank": {
+    "title": "Question Banks",
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
+    "table": {
+      "uid": "UID",
+      "name": "Name",
+      "description": "Description",
+      "questionCount": "Question Count",
+      "status": "Status",
+      "action": "Action"
+    },
     "questionList": {
       "addQuestion": "Add Question",
       "bulkUpload": "Bulk Upload",

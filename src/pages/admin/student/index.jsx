@@ -87,6 +87,7 @@ const AllStudents = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>{t("studentManagement.table.uid")}</TableHead>
             <TableHead>{t("studentManagement.table.name")}</TableHead>
             <TableHead>{t("studentManagement.table.email")}</TableHead>
             <TableHead>{t("studentManagement.table.phone")}</TableHead>
@@ -122,6 +123,9 @@ const AllStudents = () => {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}
               >
+                 <TableCell className={"capitalize"}>
+                  {i?.uid}
+                </TableCell>
                 <TableCell className={"capitalize"}>
                   {i?.last_name} {i?.first_name}
                 </TableCell>

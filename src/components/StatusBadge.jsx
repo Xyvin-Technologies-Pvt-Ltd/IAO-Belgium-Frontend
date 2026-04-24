@@ -22,6 +22,7 @@ const statusVariants = {
   scheduled: "text-blue-600",
   sent: "text-green-600",
   closed: "text-red-500",
+  open: "text-green-600",
 
   // Submission statuses
   submitted: "text-blue-600",
@@ -84,6 +85,8 @@ const StatusBadge = ({ status }) => {
     displayText = status ? "Active" : "Inactive";
   } else if (status === "not_started") {
     displayText = "Not Started";
+  } else if (status === "archived") {
+    displayText = "Archived";
   } else {
     displayText = status;
   }
