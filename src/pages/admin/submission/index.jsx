@@ -16,7 +16,6 @@ import { useGetSubmissions, useBulkAssignTeacher, useBulkEnableResubmission } fr
 import { useGetUsers } from "@/store/useDropdownStore";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
 import SubmissionsFilterDrawer from "./SubmissionsFilterDrawer";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -160,7 +159,7 @@ const Submissions = () => {
             <button
               key={status}
               onClick={() => { setActiveStatus(status); setPage(1); }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap capitalize ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap capitalize cursor-pointer ${
                 activeStatus === status
                   ? "border-[#ff8904] text-[#ff8904]"
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"

@@ -96,10 +96,10 @@ const Notifications = () => {
       </h2>
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-1 gap-2">
           <Input
             placeholder="Search notifications..."
-            className="w-56"
+            className="max-w-xs"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);

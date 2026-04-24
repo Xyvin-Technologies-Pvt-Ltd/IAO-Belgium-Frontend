@@ -425,6 +425,7 @@
     "table": {
       "uid": "UID",
       "name": "Naam",
+      "code": "Code",
       "type": "Type",
       "year": "Jaar",
       "city": "Stad",
@@ -444,6 +445,8 @@
       "editSubtitle": "Opleidingsgegevens bijwerken",
       "nameLabel": "Opleidingsnaam",
       "namePlaceholder": "Voer opleidingsnaam in",
+      "codeLabel": "Opleidingscode",
+      "codePlaceholder": "Voer code in",
       "programTypeLabel": "Opleidingstype",
       "programTypePlaceholder": "Selecteer opleidingstype",
       "durationLabel": "Duur van de opleiding",
@@ -678,6 +681,7 @@
     "title": "Studentbeheer",
     "search": "Studenten zoeken...",
     "table": {
+      "uid": "UID",
       "studentId": "Aanmeldings ID",
       "studentName": "Studentnaam",
       "name": "Naam",
@@ -1383,9 +1387,18 @@
     }
   },
   "questionBank": {
+    "title": "Vragenbanken",
     "createQuestionBank": "Vragenbank aanmaken",
     "editQuestionBank": "Vragenbank bewerken",
     "question": "Vraag",
+    "table": {
+      "uid": "UID",
+      "name": "Naam",
+      "description": "Beschrijving",
+      "questionCount": "Aantal vragen",
+      "status": "Status",
+      "action": "Actie"
+    },
     "questionList": {
       "addQuestion": "Vraag toevoegen",
       "bulkUpload": "Bulk upload",

@@ -3,17 +3,19 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "@/api/axiosintercepter";
 
-const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
+const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
   const { t } = useTranslation();
   const user = isTeacher ? teacher : student;
 
   return (
-    <div className={`${hide ? '' : 'rounded-xl p-5 border border-sidebar-border'} bg-sidebar   space-y-6`}>
+    <div
+      className={`${hide ? "" : "rounded-xl p-5 border border-sidebar-border"} bg-sidebar   space-y-6`}
+    >
       <div className="flex items-start gap-4 pb-4 border-b border-sidebar-border">
         <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl">
-          {user?.first_name 
+          {user?.first_name
             ? user.first_name.charAt(0).toUpperCase()
-            : user?.email?.charAt(0).toUpperCase() || '?'}
+            : user?.email?.charAt(0).toUpperCase() || "?"}
         </div>
 
         <div className="space-y-1 flex-1">
@@ -26,21 +28,13 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
                     type: isTeacher ? t("common.teacher") : t("common.student"),
                   })}
             </h2>
-            <span
-              className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-white ${
-                user?.status === "active"
-                  ? "bg-green-500"
-                  : user?.status === "inactive"
-                    ? "bg-gray-500"
-                    : user?.status === "deleted"
-                      ? "bg-red-500"
-                      : "bg-gray-500"
-              }`}
-            >
-              {user?.status
-                ? t(`common.${user.status.toLowerCase()}`)
-                : t("common.active")}
-            </span>
+            {user?.uid && (
+              <span
+                className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-sidebar-foreground bg-[#0A0A0A]/20`}
+              >
+                {user?.uid}
+              </span>
+            )}
           </div>
           <p className="text-sm font-medium text-sidebar-foreground/70">
             {isTeacher
@@ -53,15 +47,15 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
         <h3 className="text-base font-semibold mb-4 text-sidebar-foreground">
           {t("studentManagement.modal.basicInfo")}
         </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <InfoItem
-              label={t("studentManagement.modal.phoneNumber")}
-              value={user?.phone || t("common.notAvailable")}
-            />
-            <InfoItem
-              label={t("studentManagement.modal.emailAddress")}
-              value={user?.email || t("common.notAvailable")}
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <InfoItem
+            label={t("studentManagement.modal.phoneNumber")}
+            value={user?.phone || t("common.notAvailable")}
+          />
+          <InfoItem
+            label={t("studentManagement.modal.emailAddress")}
+            value={user?.email || t("common.notAvailable")}
+          />
 
           {isTeacher ? (
             <>
@@ -96,8 +90,8 @@ const UserCard= ({ student, teacher, isTeacher = false ,hide}) => {
                 value={
                   user?.location?.length > 0
                     ? user.location
-                        .map((loc) => `${loc.name}, ${loc.country.name}`)
-                        .join("; ")
+                        .map((loc) => loc.name)
+                        .join(", ")
                     : t("common.notAvailable")
                 }
               />

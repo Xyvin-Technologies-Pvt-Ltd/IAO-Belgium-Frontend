@@ -8,6 +8,13 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
@@ -106,16 +113,16 @@ const Exams = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="">{t("exam.allStatuses")}</option>
-            <option value="draft">{t("exam.status.draft")}</option>
-            <option value="published">{t("exam.status.published")}</option>
-            <option value="archived">{t("exam.status.archived")}</option>
-          </select>
+          <Select value={statusFilter || undefined} onValueChange={(value) => setStatusFilter(value || "")}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("exam.allStatuses")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">{t("exam.status.draft")}</SelectItem>
+              <SelectItem value="published">{t("exam.status.published")}</SelectItem>
+              <SelectItem value="archived">{t("exam.status.archived")}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={handleOpenCreate}>{t("exam.createExam")}</Button>
       </div>

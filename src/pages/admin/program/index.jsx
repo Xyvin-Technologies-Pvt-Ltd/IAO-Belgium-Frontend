@@ -151,8 +151,8 @@ const Programs = () => {
           <TableRow>
             <TableHead>{t("programManagement.table.uid")}</TableHead>
             <TableHead>{t("programManagement.table.name")}</TableHead>
-
             <TableHead>{t("programManagement.table.type")}</TableHead>
+            <TableHead>{t("programManagement.table.code")}</TableHead>
             <TableHead>{t("programManagement.table.year")}</TableHead>
             <TableHead>{t("programManagement.table.city")}</TableHead>
             <TableHead>{t("programManagement.table.language")}</TableHead>
@@ -162,10 +162,10 @@ const Programs = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("programManagement.messages.loadFailed")
@@ -186,6 +186,8 @@ const Programs = () => {
                 <TableCell>{i?.name}</TableCell>
 
                 <TableCell>{i?.program_type}</TableCell>
+                <TableCell>{i?.program_code}</TableCell>
+
                 <TableCell>{i?.year}</TableCell>
                 <TableCell>{i?.city?.name}</TableCell>
                 <TableCell>{i?.language?.name}</TableCell>
@@ -223,7 +225,7 @@ const Programs = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("programManagement.table.noPrograms")}
               </TableCell>
             </TableRow>

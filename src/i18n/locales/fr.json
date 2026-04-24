@@ -425,6 +425,7 @@
     "table": {
       "uid": "UID",
       "name": "Nom",
+      "code": "Code",
       "type": "Type",
       "year": "Année",
       "city": "Ville",
@@ -444,6 +445,8 @@
       "editSubtitle": "Mettre à jour les détails de la formation / programme",
       "nameLabel": "Nom de la formation / programme",
       "namePlaceholder": "Entrez le nom de la formation / programme",
+      "codeLabel": "Code de la formation / programme",
+      "codePlaceholder": "Entrez le code",
       "programTypeLabel": "Type de formation / programme",
       "programTypePlaceholder": "Sélectionnez le type de formation / programme",
       "durationLabel": "Durée de la formation / programme",
@@ -1385,9 +1388,18 @@
     }
   },
   "questionBank": {
+    "title": "Banques de questions",
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",
+    "table": {
+      "uid": "UID",
+      "name": "Nom",
+      "description": "Description",
+      "questionCount": "Nombre de questions",
+      "status": "Statut",
+      "action": "Action"
+    },
     "questionList": {
       "addQuestion": "Ajouter une question",
       "bulkUpload": "Téléchargement groupé",
