@@ -94,7 +94,7 @@ const BatchYearLog = () => {
                     {log.details || t("common.dash")}
                   </TableCell>
                   <TableCell className="text-center text-muted-foreground whitespace-nowrap">
-                    {getMoment(log.createdAt).format("MMM D, YYYY HH:mm")}
+                    {getMoment(log.createdAt).format("DD-MM-YYYY, HH:mm")}
                   </TableCell>
                   <TableCell className="text-center">
                     {log.application?.user?.current_year === log.year ? (

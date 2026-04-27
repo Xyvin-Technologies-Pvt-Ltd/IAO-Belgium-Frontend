@@ -215,7 +215,7 @@ const AttendenceView = () => {
                           {session.name}
                         </TableCell>
                         <TableCell className="py-4 px-4 text-sm text-foreground/70 align-middle">
-                          {session.date ? moment(session.date).format("DD MMMM, YYYY") : "-"}
+                          {session.date ? moment(session.date).format("DD-MM-YYYY") : "-"}
                         </TableCell>
                         <TableCell className="py-4 px-4 text-center align-middle">
                           {getAttendanceIcon(session.attendance)}

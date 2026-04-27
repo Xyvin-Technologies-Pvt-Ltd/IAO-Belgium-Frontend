@@ -68,7 +68,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
 
     if (dates.length === 0) return "N/A";
 
-    return dates[0].format("MMM D, YYYY");
+    return dates[0].format("DD-MM-YYYY");
   };
 
   const getSessionEndDate = (sessions) => {
@@ -82,7 +82,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
 
     if (dates.length === 0) return "N/A";
 
-    return dates[dates.length - 1].format("MMM D, YYYY");
+    return dates[dates.length - 1].format("DD-MM-YYYY");
   };
 
   // Helper function to get unique personnel across all sessions
