@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, Shield, Users } from "lucide-react";
+import { GraduationCap, Shield, Users, Copy, Check } from "lucide-react";
 import { useGetProgramsList } from "@/store/useProgramStore";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -18,6 +18,7 @@ import logo from "../assets/images/logo.png";
 
 const LoginSelection = () => {
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   const { data: programsData, isLoading, error, refetch } = useGetProgramsList();
@@ -32,8 +33,28 @@ const LoginSelection = () => {
       return;
     }
     
-    const studentLoginUrl = `https://dev-student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
     window.open(studentLoginUrl, '_blank');
+  };
+
+  const handleCopyUrl = async () => {
+    if (!selectedProgram) return;
+    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    try {
+      await navigator.clipboard.writeText(studentLoginUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for browsers that don't support clipboard API
+      const textarea = document.createElement("textarea");
+      textarea.value = studentLoginUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -121,6 +142,24 @@ const LoginSelection = () => {
                 <GraduationCap className="w-4 h-4 mr-2" />
                 Continue as Student
               </Button>
+
+              <button
+                onClick={handleCopyUrl}
+                disabled={!selectedProgram || isLoading}
+                className="w-full flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-green-600" />
+                    <span className="text-green-600">URL Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy login URL</span>
+                  </>
+                )}
+              </button>
             </div>
           </Card>
         </div>
