@@ -97,7 +97,7 @@ const ProgramDetail = () => {
         {
           label: t("sidebar.admin.programAdministration"),
           path: "/admin/program",
-          navigable: false,
+          navigable: true,
         },
         {
           label: t("programDetail.title"),
