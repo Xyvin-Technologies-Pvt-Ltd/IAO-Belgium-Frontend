@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Languages } from "lucide-react";
 import { getMoment } from "@/utils/dateUtils";
-import moment from "moment";
 import TeacherNotificationDrawer from "./TeacherNotificationDrawer";
 
 export default function AdminTeacherLayoutComponent() {
