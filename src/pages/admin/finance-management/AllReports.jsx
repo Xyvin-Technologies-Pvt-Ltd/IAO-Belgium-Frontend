@@ -209,7 +209,7 @@ const AllReports = () => {
                   </TableCell>
                   <TableCell>
                     {payment?.createdAt
-                      ? moment(payment.createdAt).format("DD MMM YYYY")
+                      ? moment(payment.createdAt).format("DD-MM-YYYY")
                       : t("common.notAvailable")}
                   </TableCell>
                   <TableCell>

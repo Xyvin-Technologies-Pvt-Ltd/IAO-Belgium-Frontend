@@ -191,17 +191,17 @@ const Intakes = () => {
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
-                    ? moment.utc(i.start_date).format("MMM DD, YYYY")
+                    ? moment.utc(i.start_date).format("DD-MM-YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.end_date
-                    ? moment.utc(i.end_date).format("MMM DD, YYYY")
+                    ? moment.utc(i.end_date).format("DD-MM-YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   {i?.registration_deadline
-                    ? moment.utc(i.registration_deadline).format("MMM DD, YYYY")
+                    ? moment.utc(i.registration_deadline).format("DD-MM-YYYY")
                     : "N/A"}
                 </TableCell>
                 <TableCell>

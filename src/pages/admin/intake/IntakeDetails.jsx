@@ -111,7 +111,7 @@ const IntakeDetails = () => {
               {intakeData.registration_deadline && (
                 <span className="px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-xs">
                   {t("intakeManagement.details.badges.registrationDeadline")}:{" "}
-                  {formatTZ(intakeData.registration_deadline, "DD/MM/YYYY")}
+                  {formatTZ(intakeData.registration_deadline, "DD-MM-YYYY")}
                 </span>
               )}
             </div>
@@ -133,13 +133,13 @@ const IntakeDetails = () => {
 
           <DashboardCard
             title={t("intakeManagement.details.cards.startDate")}
-            value={formatTZ(intakeData?.start_date, "DD/MM/YYYY")}
+            value={formatTZ(intakeData?.start_date, "DD-MM-YYYY")}
             icon={Calendar}
           />
 
           <DashboardCard
             title={t("intakeManagement.details.cards.endDate")}
-            value={formatTZ(intakeData?.end_date, "DD/MM/YYYY")}
+            value={formatTZ(intakeData?.end_date, "DD-MM-YYYY")}
             icon={CalendarCheck}
           />
         </div>

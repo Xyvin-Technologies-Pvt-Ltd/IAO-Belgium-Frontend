@@ -130,7 +130,7 @@ const TeacherNotificationDetail = () => {
                 <Calendar size={13} className="text-sidebar-foreground/50 shrink-0" />
                 <span className="text-sidebar-foreground/50 text-xs">Created:</span>
                 <span className="font-medium text-sidebar-foreground">
-                  {moment(notification.createdAt).format("MMM DD, YYYY · HH:mm")}
+                  {moment(notification.createdAt).format("DD-MM-YYYY, HH:mm")}
                 </span>
               </div>
               {notification.status === "sent" && notification.send_date && (
@@ -138,7 +138,7 @@ const TeacherNotificationDetail = () => {
                   <Calendar size={13} className="text-sidebar-foreground/50 shrink-0" />
                   <span className="text-sidebar-foreground/50 text-xs">Sent:</span>
                   <span className="font-medium text-sidebar-foreground">
-                    {moment(notification.send_date).format("MMM DD, YYYY · HH:mm")}
+                    {moment(notification.send_date).format("DD-MM-YYYY, HH:mm")}
                   </span>
                 </div>
               )}
@@ -147,7 +147,7 @@ const TeacherNotificationDetail = () => {
                   <Calendar size={13} className="text-sidebar-foreground/50 shrink-0" />
                   <span className="text-sidebar-foreground/50 text-xs">Expires:</span>
                   <span className="font-medium text-sidebar-foreground">
-                    {moment(notification.expiry_date).format("MMM DD, YYYY")}
+                    {moment(notification.expiry_date).format("DD-MM-YYYY, HH:mm")}
                   </span>
                 </div>
               )}

@@ -120,7 +120,7 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
                 <TableCell>{i?.year}</TableCell>
                 <TableCell>{i?.files?.length}</TableCell>
                 <TableCell>
-                  {moment(i?.submission_deadline || "").format("LL")}
+                  {moment(i?.submission_deadline || "").format("DD-MM-YYYY")}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />

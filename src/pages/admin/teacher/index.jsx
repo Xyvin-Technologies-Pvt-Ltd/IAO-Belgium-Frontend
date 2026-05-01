@@ -165,7 +165,7 @@ const Teachers = () => {
                 <TableCell>{i?.academic_degree?.name}</TableCell>
                 <TableCell>{i?.teacher_role?.name}</TableCell>
                 <TableCell>
-                  {moment(i?.iao_employment_start_date).format("YYYY-MM-DD")}
+                  {moment(i?.iao_employment_start_date).format("DD-MM-YYYY")}
                 </TableCell>
                 <TableCell>
                   {i?.location?.length

@@ -87,7 +87,7 @@ const BatchResult = () => {
                   <StatusBadge status={result.result} />
                 </TableCell>
                 <TableCell className="text-center text-muted-foreground px-6 py-4">
-                  {getMoment(result.submitted_at).format("MMM D, HH:mm")}
+                  {getMoment(result.submitted_at).format("DD-MM-YYYY, HH:mm")}
                 </TableCell>
               </TableRow>
             ))

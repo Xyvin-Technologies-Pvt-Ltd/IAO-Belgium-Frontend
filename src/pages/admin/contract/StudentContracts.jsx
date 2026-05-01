@@ -21,6 +21,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetStudentsContracts } from "@/store/useContractStore";
 import { useTranslation } from "react-i18next";
+import moment from "moment";
 
 const StudentContracts = () => {
   const { t } = useTranslation();
@@ -63,7 +64,9 @@ const StudentContracts = () => {
           }}
         >
           <SelectTrigger className="w-48">
-            <SelectValue placeholder={t("common.chooseStatus") || t("common.allStatuses")} />
+            <SelectValue
+              placeholder={t("common.chooseStatus") || t("common.allStatuses")}
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("common.allStatuses")}</SelectItem>
@@ -93,7 +96,9 @@ const StudentContracts = () => {
             <TableRow>
               <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || t("common.failedToLoadStudentContracts")}
+                  message={
+                    error?.message || t("common.failedToLoadStudentContracts")
+                  }
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -119,12 +124,14 @@ const StudentContracts = () => {
                         : "bg-yellow-100 text-yellow-700"
                     }`}
                   >
-                    {item.status === "signed" ? t("common.signed") : t("common.pending")}
+                    {item.status === "signed"
+                      ? t("common.signed")
+                      : t("common.pending")}
                   </span>
                 </TableCell>
                 <TableCell>
                   {item.signed_at ? (
-                    new Date(item.signed_at).toLocaleDateString()
+                    moment(item.signed_at).format("DD-MM-YYYY")
                   ) : (
                     <span className="text-gray-400">—</span>
                   )}

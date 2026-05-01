@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 const SessionCard = ({ sessions = [], isLoading = false }) => {
   const { t } = useTranslation();
-  const formatDate = (dateString) => formatTZ(dateString, "MMMM DD, YYYY");
+  const formatDate = (dateString) => formatTZ(dateString, "DD-MM-YYYY");
 
   const formatTime = (startTime, endTime) => {
     const start = getMoment(startTime);

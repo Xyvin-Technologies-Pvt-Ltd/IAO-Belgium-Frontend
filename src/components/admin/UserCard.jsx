@@ -72,7 +72,7 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
                 value={
                   user?.iao_employment_start_date
                     ? moment(user.iao_employment_start_date).format(
-                        "DD MMM YYYY",
+                        "DD-MM-YYYY",
                       )
                     : t("common.notAvailable")
                 }
@@ -130,7 +130,7 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
                 label={t("studentManagement.modal.enrolledDate")}
                 value={
                   user?.enrolled_date
-                    ? moment(user.enrolled_date).format("YYYY-MM-DD")
+                    ? moment(user.enrolled_date).format("DD-MM-YYYY")
                     : t("common.notAvailable")
                 }
               />

@@ -352,9 +352,7 @@ const ViewSubmission = () => {
               {submissionData?.reviewed_at && (
                 <div className="text-xs text-gray-400 mt-4">
                   Evaluated on{" "}
-                  {moment(submissionData.reviewed_at).format(
-                    "MMM Do YYYY, h:mm a",
-                  )}
+                  {moment(submissionData.reviewed_at).format("DD-MM-YYYY, HH:mm")}
                 </div>
               )}
             </div>

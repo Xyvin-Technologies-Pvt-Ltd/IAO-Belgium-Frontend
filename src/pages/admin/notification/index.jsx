@@ -182,7 +182,7 @@ const Notifications = () => {
                 </TableCell>
                 <TableCell>
                   {n.status === "sent" && n.send_date ? (
-                    moment(n.send_date).format("MMM DD, YYYY")
+                    moment(n.send_date).format("DD-MM-YYYY")
                   ) : (
                     <span className="text-sidebar-foreground/40">—</span>
                   )}

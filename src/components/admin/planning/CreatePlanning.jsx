@@ -83,6 +83,16 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     { enabled: open },
   );
 
+  const programsRaw = programsData?.data || [];
+  const programs = programsRaw.map((program) => ({
+    _id: program._id,
+    name: `${program.name} - ${program.city?.name || "N/A"} - ${program.language?.name || "N/A"}`,
+    city: program.city,
+    language: program.language,
+  }));
+  const selectedProgramData = programsRaw.find((p) => p._id === selectedProgram);
+  const selectedLanguageId = selectedProgramData?.language?._id || "";
+
   const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
     selectedProgram,
     {
@@ -106,6 +116,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
       role: "teacher",
       teacher_role: "Teacher",
+      ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open },
   );
@@ -115,6 +126,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(assistantSearchTerm && { search: assistantSearchTerm }),
       role: "teacher",
       teacher_role: "Assistant",
+      ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open },
   );
@@ -124,16 +136,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(traineeSearchTerm && { search: traineeSearchTerm }),
       role: "teacher",
       teacher_role: "Trainee",
+      ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open },
   );
 
-  const programsRaw = programsData?.data || [];
-  const programs = programsRaw.map((program) => ({
-    _id: program._id,
-    name: `${program.name} - ${program.city?.name || "N/A"} - ${program.language?.name || "N/A"}`,
-    city: program.city,
-  }));
+
   const batches = batchesData?.data || [];
   const components = componentsData?.data || [];
   const teachers = teachersData?.data || [];

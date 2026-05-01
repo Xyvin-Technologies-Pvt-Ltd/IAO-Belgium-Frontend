@@ -37,12 +37,12 @@ const BatchDetailCard = ({ batch }) => {
 
         <InfoItem
           label={t("batchManagement.details.info.intakeStartDate")}
-          value={moment(batch.start_date).format("DD MMM YYYY")}
+          value={moment(batch.start_date).format("DD-MM-YYYY")}
         />
 
         <InfoItem
           label={t("batchManagement.details.info.intakeEndDate")}
-          value={moment(batch.end_date).format("DD MMM YYYY")}
+          value={moment(batch.end_date).format("DD-MM-YYYY")}
         />
       </div>
     </div>

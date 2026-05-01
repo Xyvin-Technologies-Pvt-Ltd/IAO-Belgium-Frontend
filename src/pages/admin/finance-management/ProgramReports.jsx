@@ -26,7 +26,6 @@ const ProgramReports = () => {
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: t("common.dashboard"), path: "/admin/dashboard", navigable: false },
       { label: t("common.financeReports"), path: "/admin/finance-reports", navigable: true },
       { label: t("common.programReports") },
     ]);
