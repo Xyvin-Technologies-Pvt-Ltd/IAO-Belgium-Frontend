@@ -834,7 +834,7 @@
       "createTitle": "Créer une nouvelle année académique",
       "editTitle": "Modifier l'année académique",
       "nameLabel": "Nom de l'année académique",
-      "namePlaceholder": "Entrez le nom de l'année académique (ex : 2024-2025)",
+      "namePlaceholder": "Rempli automatiquement à partir des dates",
       "startDateLabel": "Date de début",
       "endDateLabel": "Date de fin",
       "registrationStartDateLabel": "Date de début d'inscription",
@@ -1389,6 +1389,7 @@
   },
   "questionBank": {
     "title": "Banques de questions",
+    "search": "Rechercher des banques de questions...",
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",
@@ -1410,6 +1411,7 @@
       "action": "Action",
       "edit": "Modifier",
       "delete": "Supprimer",
+      "noQuestionBanks": "Aucune banque de questions trouvée",
       "noQuestions": "Aucune question trouvée"
     },
     "form": {

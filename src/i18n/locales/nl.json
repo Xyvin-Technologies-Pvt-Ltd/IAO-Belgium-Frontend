@@ -835,7 +835,7 @@
       "createTitle": "Een nieuw academisch jaar aanmaken",
       "editTitle": "Academisch jaar bewerken",
       "nameLabel": "Naam academisch jaar",
-      "namePlaceholder": "Voer naam in (bijv. 2024-2025)",
+      "namePlaceholder": "Automatisch ingevuld op basis van de datums",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Einddatum",
       "registrationStartDateLabel": "Startdatum inschrijving",
@@ -1388,6 +1388,7 @@
   },
   "questionBank": {
     "title": "Vragenbanken",
+    "search": "Vragenbanken zoeken...",
     "createQuestionBank": "Vragenbank aanmaken",
     "editQuestionBank": "Vragenbank bewerken",
     "question": "Vraag",
@@ -1409,6 +1410,7 @@
       "action": "Actie",
       "edit": "Bewerken",
       "delete": "Verwijderen",
+      "noQuestionBanks": "Geen vragenbanken gevonden",
       "noQuestions": "Geen vragen gevonden"
     },
     "form": {

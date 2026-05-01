@@ -770,7 +770,7 @@
       "createTitle": "Ein neues akademisches Jahr erstellen",
       "editTitle": "Akademisches Jahr bearbeiten",
       "nameLabel": "Name des akademischen Jahres",
-      "namePlaceholder": "Namen eingeben (z. B. 2024-2025)",
+      "namePlaceholder": "Wird automatisch aus den Daten befüllt",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Enddatum",
       "registrationStartDateLabel": "Beginn der Anmeldung",
@@ -1415,6 +1415,7 @@
   },
   "questionBank": {
     "title": "Fragenbanken",
+    "search": "Fragenbanken suchen...",
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
     "question": "Frage",
@@ -1436,6 +1437,7 @@
       "action": "Aktion",
       "edit": "Bearbeiten",
       "delete": "Löschen",
+      "noQuestionBanks": "Keine Fragenbanken gefunden",
       "noQuestions": "Keine Fragen gefunden"
     },
     "form": {

@@ -749,7 +749,7 @@
       "createTitle": "Create a new Academic Year",
       "editTitle": "Edit Academic Year",
       "nameLabel": "Academic Year Name",
-      "namePlaceholder": "Enter academic year name (e.g., 2024-2025)",
+      "namePlaceholder": "Auto-filled from start and end dates",
       "startDateLabel": "Start Date",
       "endDateLabel": "End Date",
       "registrationStartDateLabel": "Registration Start Date",
@@ -1418,6 +1418,7 @@
   },
   "questionBank": {
     "title": "Question Banks",
+    "search": "Search question banks...",
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
@@ -1439,6 +1440,7 @@
       "action": "Action",
       "edit": "Edit",
       "delete": "Delete",
+      "noQuestionBanks": "No Question Banks found",
       "noQuestions": "No Questions Found"
     },
     "form": {
