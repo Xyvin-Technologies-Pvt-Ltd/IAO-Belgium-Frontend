@@ -32,7 +32,7 @@ const LoginSelection = () => {
       return;
     }
     
-    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    const studentLoginUrl = `https://dev-student-iao.xyvin.com/login?programId=${selectedProgram}`;
     window.open(studentLoginUrl, '_blank');
   };
 
