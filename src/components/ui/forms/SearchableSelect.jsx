@@ -56,7 +56,6 @@ const SearchableSelect = ({
       )}
 
       <Select
-        key={`${value || "empty"}-${items.length}`}
         value={value || ""}
         onValueChange={onChange}
         onOpenChange={handleOpenChange}
@@ -70,7 +69,7 @@ const SearchableSelect = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
-        <SelectContent className="max-h-80">
+        <SelectContent className="max-h-80" position="popper" sideOffset={4}>
           {/* Search Input */}
           <div className="p-2 border-b border-border sticky top-0 bg-popover z-10">
             <div className="relative">

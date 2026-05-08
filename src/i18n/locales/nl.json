@@ -63,10 +63,10 @@
     "logo": "IAO Back office"
   },
   "languages": {
-    "en": "Engels",
-    "fr": "Frans",
+    "en": "English",
+    "fr": "Français",
     "nl": "Nederlands",
-    "de": "Duits"
+    "de": "Deutsch"
   },
   "common": {
     "welcome": {

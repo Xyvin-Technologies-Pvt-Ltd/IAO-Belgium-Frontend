@@ -74,3 +74,12 @@ export const getInvoiceHtml = async (id) => {
     throw error.response?.data || error;
   }
 };
+
+export const createPayment = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/payment`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

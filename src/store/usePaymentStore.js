@@ -5,8 +5,10 @@ import {
   getAnalyticsByBatch,
   getAnalyticsByBatchList,
   getAnalyticsByStudent,
+  createPayment,
 } from "@/api/paymentApi";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useGetPayments = (filter, options = {}) => {
   return useQuery({
@@ -62,5 +64,20 @@ export const useGetAnalyticsByStudent = (filter, options = {}) => {
     staleTime: 60000,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useCreatePayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createPayment,
+    onSuccess: () => {
+      toast.success("Manual payment recorded & Invoice created!");
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to create invoice");
+    },
   });
 };

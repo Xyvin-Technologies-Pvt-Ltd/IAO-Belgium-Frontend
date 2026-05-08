@@ -108,6 +108,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/finance-reports",
             icon: FileText,
           },
+          {
+            title: t("sidebar.admin.customInvoices", { defaultValue: "Custom Invoices" }),
+            url: "/admin/custom-invoices",
+            icon: NotebookText,
+          },
         ],
       },
       {

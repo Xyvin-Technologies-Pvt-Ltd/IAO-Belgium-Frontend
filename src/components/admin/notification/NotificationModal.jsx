@@ -97,8 +97,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const [previewCount, setPreviewCount] = useState(null);
 
-  const { data: countriesData } = useGetAllCountries({ status: "active" });
-  const { data: languagesData } = useGetAllLanguages({ status: "active" });
+  const { data: countriesData } = useGetAllCountries({ status: "active" }, { enabled: open });
+  const { data: languagesData } = useGetAllLanguages({ status: "active" }, { enabled: open });
 
   // Cascaded: cities filtered by selected country, programs by selected city or language
   const activeCountry = category === "notification" ? selectedCountry : scCountry;
@@ -108,8 +108,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const { data: citiesData } = useGetAllCities({
     status: "active",
     ...(activeCountry ? { country: activeCountry } : {}),
-  });
-  const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage);
+  }, { enabled: open });
+  const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage, { enabled: open });
 
   const { register, trigger, getValues, reset, setValue, formState: { errors } } = useForm({
     defaultValues: { subject: "", expiry_date: "" },

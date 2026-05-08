@@ -113,6 +113,13 @@ const NotificationDetail = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-sidebar-border bg-sidebar-accent/20 text-sm">
+                <Tag size={13} className="text-sidebar-foreground/50 shrink-0" />
+                <span className="text-sidebar-foreground/50 text-xs">Created By:</span>
+                <span className="font-medium text-sidebar-foreground">
+                  {notification.sender_name || "System"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-sidebar-border bg-sidebar-accent/20 text-sm">
                 <Calendar size={13} className="text-sidebar-foreground/50 shrink-0" />
                 <span className="text-sidebar-foreground/50 text-xs">{t("notification.view.created")}:</span>
                 <span className="font-medium text-sidebar-foreground">

@@ -27,6 +27,7 @@ import {
   useDeleteAdminNotification,
   useSendAdminNotification,
 } from "@/store/useNotificationStore";
+import { useGetAdminDropdown } from "@/store/useDropdownStore";
 import NotificationModal from "@/components/admin/notification/NotificationModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import SendConfirm from "@/components/SendConfirm";
@@ -48,6 +49,7 @@ const Notifications = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [createdByFilter, setCreatedByFilter] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [sendTarget, setSendTarget] = useState(null);
 
@@ -60,7 +62,10 @@ const Notifications = () => {
       category: "general",
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+      ...(createdByFilter !== "all" ? { created_by: createdByFilter } : {}),
     });
+
+  const { data: adminData } = useGetAdminDropdown();
 
   const deleteMutation = useDeleteAdminNotification();
   const sendMutation = useSendAdminNotification();
@@ -124,6 +129,25 @@ const Notifications = () => {
               <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>
           </Select>
+          <Select
+            value={createdByFilter}
+            onValueChange={(v) => {
+              setCreatedByFilter(v);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Created By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Admins</SelectItem>
+              {adminData?.data?.map((admin) => (
+                <SelectItem key={admin._id} value={admin._id}>
+                  {admin.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={handleCreate}>Create Notification</Button>
       </div>
@@ -134,6 +158,7 @@ const Notifications = () => {
             <TableHead>Subject</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Created By</TableHead>
             <TableHead>Send Date</TableHead>
             <TableHead>Read</TableHead>
             <TableHead>Actions</TableHead>
@@ -179,6 +204,9 @@ const Notifications = () => {
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={n.status} />
+                </TableCell>
+                <TableCell className="text-sm">
+                  {n.sender_name || "System"}
                 </TableCell>
                 <TableCell>
                   {n.status === "sent" && n.send_date ? (

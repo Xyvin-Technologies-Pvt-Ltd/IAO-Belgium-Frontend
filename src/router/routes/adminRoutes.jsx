@@ -38,6 +38,7 @@ import StudentContracts from "@/pages/admin/contract/StudentContracts";
 import Notifications from "@/pages/admin/notification";
 import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
+import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -131,6 +132,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       AllReports,
       "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/custom-invoices",
+    component: withPermissionProtection(
+      CustomInvoices,
+      "/admin/custom-invoices",
     ),
   },
   {
