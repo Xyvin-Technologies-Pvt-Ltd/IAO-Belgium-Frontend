@@ -21,6 +21,7 @@ import {
   useGetQuestions,
   useDeleteQuestion,
 } from "@/store/useQuestionBankStore";
+import moment from "moment";
 
 const DIFFICULTY_LABELS = {
   easy: "Easy",
@@ -38,6 +39,8 @@ const QuestionList = ({ questionBankId }) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [deleteIds, setDeleteIds] = useState({ bankId: null, questionId: null });
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const { data, isLoading, error, refetch, isFetching } = useGetQuestions(
     questionBankId,
@@ -45,6 +48,8 @@ const QuestionList = ({ questionBankId }) => {
       page,
       limit: rowsPerPage,
       ...(difficulty ? { difficulty } : {}),
+      sort_by: sortBy,
+      sort_order: sortOrder,
     },
   );
   const { mutateAsync: deleteQuestion, isPending: isDeleting } =
@@ -111,15 +116,33 @@ const QuestionList = ({ questionBankId }) => {
             <TableHead>{t("questionBank.questionList.question")}</TableHead>
             <TableHead>{t("questionBank.questionList.difficulty")}</TableHead>
             <TableHead>{t("questionBank.questionList.marks")}</TableHead>
+            <TableHead
+              className="cursor-pointer hover:text-primary transition-colors select-none"
+              onClick={() => {
+                if (sortBy === "createdAt") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("createdAt");
+                  setSortOrder("desc");
+                }
+              }}
+            >
+              <div className="flex items-center gap-1">
+                Created At
+                {sortBy === "createdAt" && (
+                  <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </TableHead>
             <TableHead>{t("questionBank.questionList.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={5} />
+            <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center p-8">
+              <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("questionBank.messages.loadFailed")}
                   onRetry={refetch}
@@ -138,6 +161,9 @@ const QuestionList = ({ questionBankId }) => {
                   {t(`questionBank.questionForm.${i?.difficulty || "medium"}`)}
                 </TableCell>
                 <TableCell>{i?.marks ?? 1}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {i?.createdAt ? moment(i.createdAt).format("DD-MM-YYYY") : "-"}
+                </TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
@@ -158,7 +184,7 @@ const QuestionList = ({ questionBankId }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">
+              <TableCell colSpan={6} className="text-center">
                 {t("questionBank.questionList.noQuestions")}
               </TableCell>
             </TableRow>

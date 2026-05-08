@@ -6,13 +6,13 @@ export const adminSchema = z.object({
     .min(1, "First name is required")
     .min(2, "First name must be at least 2 characters")
     .max(50, "First name must be at most 50 characters")
-    .regex(/^[a-zA-Z\s\-'\.]+$/, "First name can only contain letters, spaces, hyphens, apostrophes, and periods"),
+    .regex(/^[\p{L}\p{M}\s\-'\.]+$/u, "First name can only contain letters, spaces, hyphens, apostrophes, and periods"),
   last_name: z
     .string()
     .min(1, "Last name is required")
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be at most 50 characters")
-    .regex(/^[a-zA-Z\s\-'\.]+$/, "Last name can only contain letters, spaces, hyphens, apostrophes, and periods"),
+    .regex(/^[\p{L}\p{M}\s\-'\.]+$/u, "Last name can only contain letters, spaces, hyphens, apostrophes, and periods"),
   email: z
     .string()
     .min(1, "Email is required")

@@ -48,6 +48,10 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               label={t("planningManagement.view.batchLabel")}
               value={planningData?.batch?.name || "N/A"}
             />
+            <InfoItem
+              label="Students"
+              value={planningData?.student_count || 0}
+            />
             {planningData?.description && (
               <InfoItem
                 label={t("planningManagement.view.descriptionLabel")}

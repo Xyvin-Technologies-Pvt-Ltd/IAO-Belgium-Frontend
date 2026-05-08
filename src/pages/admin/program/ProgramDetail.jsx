@@ -34,12 +34,19 @@ const ProgramDetail = () => {
   };
 
   const handleComponentCreated = (componentType) => {
+    // Refresh program data to update counts and types
+    refetch();
+
     // Switch to the tab corresponding to the created component type
-    if (componentType && tabs.some((tab) => tab.id === componentType)) {
-      setActiveTab(componentType);
-      const storageKey = `programActiveTab_${id}`;
-      localStorage.setItem(storageKey, componentType);
-    }
+    // We use a small timeout to ensure the tabs have been re-calculated after refetch
+    setTimeout(() => {
+      if (componentType) {
+        setActiveTab(componentType);
+        const storageKey = `programActiveTab_${id}`;
+        localStorage.setItem(storageKey, componentType);
+      }
+    }, 100);
+
     setIsModalOpen(false);
   };
   // Component mapping for different types

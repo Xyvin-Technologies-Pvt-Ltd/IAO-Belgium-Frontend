@@ -25,6 +25,7 @@ import {
 } from "@/store/useQuestionBankStore";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
+import moment from "moment";
 
 const QuestionBanks = () => {
   const navigate = useNavigate();
@@ -36,6 +37,8 @@ const QuestionBanks = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBank, setSelectedBank] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -43,6 +46,8 @@ const QuestionBanks = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    sort_by: sortBy,
+    sort_order: sortOrder,
   });
   const { mutateAsync: deleteBank, isPending: isDeleting } =
     useDeleteQuestionBank();
@@ -106,16 +111,34 @@ const QuestionBanks = () => {
             <TableHead>{t("questionBank.table.name")}</TableHead>
             <TableHead>{t("questionBank.table.description")}</TableHead>
             <TableHead>{t("questionBank.table.questionCount")}</TableHead>
+            <TableHead
+              className="cursor-pointer hover:text-primary transition-colors select-none"
+              onClick={() => {
+                if (sortBy === "createdAt") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("createdAt");
+                  setSortOrder("desc");
+                }
+              }}
+            >
+              <div className="flex items-center gap-1">
+                Created At
+                {sortBy === "createdAt" && (
+                  <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
+            </TableHead>
             <TableHead>{t("questionBank.table.status")}</TableHead>
             <TableHead>{t("questionBank.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("questionBank.messages.loadFailed")}
                   onRetry={refetch}
@@ -136,6 +159,9 @@ const QuestionBanks = () => {
                   {i?.description || "-"}
                 </TableCell>
                 <TableCell>{i?.question_count ?? 0}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {i?.createdAt ? moment(i.createdAt).format("DD-MM-YYYY") : "-"}
+                </TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -159,7 +185,7 @@ const QuestionBanks = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={7} className="text-center">
                 {t("questionBank.table.noQuestionBanks")}
               </TableCell>
             </TableRow>
