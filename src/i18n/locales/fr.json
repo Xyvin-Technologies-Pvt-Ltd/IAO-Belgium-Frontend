@@ -63,10 +63,10 @@
     "logo": "Bureau IAO"
   },
   "languages": {
-    "en": "Anglais",
+    "en": "English",
     "fr": "Français",
-    "nl": "Néerlandais",
-    "de": "Allemand"
+    "nl": "Nederlands",
+    "de": "Deutsch"
   },
   "common": {
     "welcome": {

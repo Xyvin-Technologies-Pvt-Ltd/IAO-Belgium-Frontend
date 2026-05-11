@@ -6,7 +6,7 @@ export const teacherSchema = z.object({
     .min(1, "First name is required")
     .min(2, "First name must be at least 2 characters")
     .max(20, "First name must not exceed 20 characters")
-    .regex(/^[a-zA-Z\s'-]+$/, "First name can only contain letters, spaces, hyphens, and apostrophes")
+    .regex(/^[\p{L}\p{M}\s'-]+$/u, "First name can only contain letters, spaces, hyphens, and apostrophes")
     .refine((name) => name.trim().length > 0, "First name cannot be just whitespace")
     .transform((name) => name.trim()),
   last_name: z
@@ -14,7 +14,7 @@ export const teacherSchema = z.object({
     .min(1, "Last name is required")
     .min(2, "Last name must be at least 2 characters")
     .max(20, "Last name must not exceed 20 characters")
-    .regex(/^[a-zA-Z\s'-]+$/, "Last name can only contain letters, spaces, hyphens, and apostrophes")
+    .regex(/^[\p{L}\p{M}\s'-]+$/u, "Last name can only contain letters, spaces, hyphens, and apostrophes")
     .refine((name) => name.trim().length > 0, "Last name cannot be just whitespace")
     .transform((name) => name.trim()),
   email: z

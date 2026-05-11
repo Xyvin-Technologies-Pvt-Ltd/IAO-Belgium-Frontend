@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useBulkUploadQuestions } from "@/store/useQuestionBankStore";
 
-const CSV_TEMPLATE = `question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,difficulty
-"What is 2+2?","3","4","5","6","B","Basic arithmetic","easy"
-"What is the capital of France?","London","Paris","Berlin","Madrid","B","Paris is the capital","medium"`;
+const CSV_TEMPLATE = `question_text;option_a;option_b;option_c;option_d;correct_answer;explanation;difficulty
+"What is 2+2?";"3";"4";"5";"6";"B";"Basic arithmetic";"easy"
+"What is the capital of France?";"London";"Paris";"Berlin";"Madrid";"B";"Paris is the capital";"medium"`;
 
 const BulkUploadDialog = ({ open, onClose, questionBankId, onSuccess }) => {
   const { t } = useTranslation();
@@ -23,7 +24,10 @@ const BulkUploadDialog = ({ open, onClose, questionBankId, onSuccess }) => {
   const handleFileChange = (e) => {
     const f = e.target.files?.[0];
     if (f) {
-      if (!f.name.endsWith(".csv")) {
+      const isCsv = f.name.endsWith(".csv") || f.type === "text/csv" || f.type === "application/vnd.ms-excel";
+      if (!isCsv) {
+        toast.error(t("questionBank.messages.invalidFile"));
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
       setFile(f);

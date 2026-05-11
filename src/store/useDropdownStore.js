@@ -127,6 +127,16 @@ export const useGetUsers = (filter, options = {}) => {
   });
 };
 
+export const useGetAdminDropdown = (options = {}) => {
+  return useQuery({
+    queryKey: ["admin-dropdown"],
+    queryFn: () => getUsers({ role: "admin" }),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
 export const useGetTeacherModules = (filter, options = {}) => {
   return useQuery({
     queryKey: ["teacher-modules", filter],

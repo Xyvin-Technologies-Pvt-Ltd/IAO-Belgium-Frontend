@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -215,6 +215,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
             <TableHead>{t("planningManagement.table.module")}</TableHead>
             <TableHead>Year</TableHead>
+            <TableHead className="text-center">Students</TableHead>
             <TableHead>Session Start Date</TableHead>
             <TableHead>Session End Date</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
@@ -229,10 +230,10 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={12} />
+            <TableSkeleton rows={rowsPerPage} columns={13} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={12} className="text-center p-8">
+              <TableCell colSpan={13} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -264,6 +265,14 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
                   {i?.component?.name}
                 </TableCell>
                 <TableCell>{i?.cohort_year || "N/A"}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1.5 justify-center">
+                    <Users size={14} className="text-sidebar-foreground/40" />
+                    <span className="font-semibold text-sidebar-foreground/80">
+                      {i?.student_count || 0}
+                    </span>
+                  </div>
+                </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {getSessionStartDate(i?.sessions)}
                 </TableCell>
@@ -303,7 +312,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={12} className="text-center">
+              <TableCell colSpan={13} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>

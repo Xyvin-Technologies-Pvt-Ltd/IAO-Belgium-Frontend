@@ -21,8 +21,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { useCreateProgram, useUpdateProgram } from "@/store/useProgramStore";
 import { programSchema } from "@/validations/admin";
+import { useNavigate } from "@tanstack/react-router";
 
 const CreateProgram = ({ open, onClose, programData }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const isEdit = !!programData;
 
@@ -144,8 +146,14 @@ const CreateProgram = ({ open, onClose, programData }) => {
       : payload;
 
     mutation.mutate(mutationData, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         handleClose();
+        if (!isEdit && response?.data?._id) {
+          navigate({
+            to: "/admin/program/$id",
+            params: { id: response.data._id },
+          });
+        }
       },
     });
   };

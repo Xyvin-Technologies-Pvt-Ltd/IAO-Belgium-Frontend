@@ -181,59 +181,65 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
   useEffect(() => {
     if (planningData && isEdit && open) {
-      const programId = planningData.component?.program?._id || "";
-
-      setValue("program", programId);
-      setValue("batch", planningData.batch?._id || "");
-      setValue("component", planningData.component?._id || "");
-      setValue("venue", planningData.venue || "");
-      setValue("description", planningData.description || "");
-
-      if (planningData.sessions && planningData.sessions.length > 0) {
-        const formattedSessions = planningData.sessions.map((session) => {
+      const programId = planningData.component?.program?._id || planningData.component?.program || "";
+      const batchId = planningData.batch?._id || planningData.batch || "";
+      const componentId = planningData.component?._id || planningData.component || "";
+      
+      const formattedSessions = planningData.sessions?.map((session) => ({
+        _id: session._id,
+        name: session.name || "",
+        session_date: formatTZ(session.session_date, "YYYY-MM-DD"),
+        start_time: formatTZ(session.start_time, "HH:mm"),
+        end_time: formatTZ(session.end_time, "HH:mm"),
+        teachers: session.teachers?.map((t) => {
+          const teacher = t.teacher || t;
           return {
-            _id: session._id,
-            name: session.name || "",
-            session_date: formatTZ(session.session_date, "YYYY-MM-DD"),
-            start_time: formatTZ(session.start_time, "HH:mm"),
-            end_time: formatTZ(session.end_time, "HH:mm"),
-            teachers: session.teachers
-              ? session.teachers.map((t) => {
-                  const teacher = t.teacher || t;
-                  const teacherData = {
-                    _id: teacher._id,
-                    name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-                    status: t.status || "pending",
-                  };
-                  return teacherData;
-                })
-              : [],
-            assistants: session.assistants
-              ? session.assistants.map((a) => {
-                  const assistant = a.assistant || a;
-                  return {
-                    _id: assistant._id,
-                    name: `${assistant.first_name} ${assistant.last_name}`.trim(),
-                    status: a.status || "pending",
-                  };
-                })
-              : [],
-            trainees: session.trainees
-              ? session.trainees.map((t) => {
-                  const trainee = t.trainee || t;
-                  return {
-                    _id: trainee._id,
-                    name: `${trainee.first_name} ${trainee.last_name}`.trim(),
-                    status: t.status || "pending",
-                  };
-                })
-              : [],
+            _id: teacher._id,
+            name: `${teacher.first_name} ${teacher.last_name}`.trim(),
+            status: t.status || "pending",
           };
-        });
-        setValue("sessions", formattedSessions);
+        }) || [],
+        assistants: session.assistants?.map((a) => {
+          const assistant = a.assistant || a;
+          return {
+            _id: assistant._id,
+            name: `${assistant.first_name} ${assistant.last_name}`.trim(),
+            status: a.status || "pending",
+          };
+        }) || [],
+        trainees: session.trainees?.map((t) => {
+          const trainee = t.trainee || t;
+          return {
+            _id: trainee._id,
+            name: `${trainee.first_name} ${trainee.last_name}`.trim(),
+            status: t.status || "pending",
+          };
+        }) || [],
+      })) || [];
+
+      reset({
+        program: programId,
+        batch: batchId,
+        component: componentId,
+        venue: planningData.venue || "",
+        description: planningData.description || "",
+        sessions: formattedSessions,
+      });
+
+      // Pre-set search terms so the SearchableSelect can show the labels even if items list is loading
+      if (planningData.component?.program?.name) {
+        setProgramSearchTerm(planningData.component.program.name);
+      }
+      if (planningData.batch?.name) {
+        setBatchSearchTerm(planningData.batch.name);
+      }
+      if (planningData.component?.name) {
+        setComponentSearchTerm(planningData.component.name);
       }
     }
-  }, [planningData, isEdit, setValue, open]);
+  }, [planningData, isEdit, reset, open]);
+
+
 
   useEffect(() => {
     if (selectedProgram && !isEdit) {
@@ -356,9 +362,11 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     }
   };
 
-  if (!open) return null;
+  const isSubmitting = updatePlanning.isPending || createPlanning.isPending;
 
-  const isSubmitting = createPlanning.isPending || updatePlanning.isPending;
+
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
@@ -394,7 +402,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               searchPlaceholder={t("planningManagement.modal.searchPrograms")}
               items={programs}
               value={watch("program")}
-              onChange={(value) => setValue("program", value)}
+              onChange={(value) => {
+                if (value) setValue("program", value);
+              }}
               onSearch={setProgramSearchTerm}
               isLoading={programsLoading}
               error={errors.program?.message}
@@ -407,7 +417,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               searchPlaceholder={t("planningManagement.modal.searchBatches")}
               items={batches}
               value={watch("batch")}
-              onChange={(value) => setValue("batch", value)}
+              onChange={(value) => {
+                if (value) setValue("batch", value);
+              }}
               onSearch={setBatchSearchTerm}
               isLoading={batchesLoading}
               error={errors.batch?.message}
@@ -421,7 +433,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               searchPlaceholder={t("planningManagement.modal.searchComponents")}
               items={components}
               value={watch("component")}
-              onChange={(value) => setValue("component", value)}
+              onChange={(value) => {
+                if (value) setValue("component", value);
+              }}
               onSearch={setComponentSearchTerm}
               isLoading={componentsLoading}
               error={errors.component?.message}
