@@ -42,7 +42,7 @@ const TeacherNotificationDetail = () => {
       updateBreadcrumbs([
         {
           label: "My Sent Alerts",
-          path: "/teacher/notification",
+          path: "/teacher/notifications",
           navigable: true,
         },
         {
@@ -179,15 +179,16 @@ const TeacherNotificationDetail = () => {
                   <TableHead>#</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead className="text-center">Read</TableHead>
+                  <TableHead className="text-center">Read Status</TableHead>
+                  <TableHead className="text-center">Read At</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
                 {recipientsLoading ? (
-                  <TableSkeleton rows={rowsPerPage} columns={4} />
+                  <TableSkeleton rows={rowsPerPage} columns={5} />
                 ) : recipientsError ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center p-8">
+                    <TableCell colSpan={5} className="text-center p-8">
                       <ErrorMessage
                         message={recipientsError?.message || "Failed to load recipients"}
                         onRetry={refetch}
@@ -205,16 +206,25 @@ const TeacherNotificationDetail = () => {
                       <TableCell className="text-sidebar-foreground/70">{r.user?.email || "—"}</TableCell>
                       <TableCell className="text-center">
                         {r.read ? (
-                          <Check size={16} className="text-green-500 mx-auto" />
+                          <div className="flex items-center justify-center gap-1.5 text-green-500 font-medium text-xs">
+                            <Check size={14} />
+                            <span>Read</span>
+                          </div>
                         ) : (
-                          <X size={16} className="text-gray-400 mx-auto" />
+                          <div className="flex items-center justify-center gap-1.5 text-gray-400 text-xs">
+                            <X size={14} />
+                            <span>Unread</span>
+                          </div>
                         )}
+                      </TableCell>
+                      <TableCell className="text-center text-sidebar-foreground/70 text-xs">
+                        {r.read_at ? moment(r.read_at).format("DD-MM-YYYY, HH:mm") : "—"}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-sidebar-foreground/60">
+                    <TableCell colSpan={5} className="text-center py-8 text-sidebar-foreground/60">
                       No recipients found
                     </TableCell>
                   </TableRow>

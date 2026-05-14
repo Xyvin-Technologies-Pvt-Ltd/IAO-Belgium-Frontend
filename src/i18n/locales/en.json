@@ -53,7 +53,8 @@
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
-      "exams": "Exams"
+      "exams": "Exams",
+      "createInvoice": "Create Invoice"
     },
     "user": {
       "loading": "Loading...",
@@ -182,7 +183,10 @@
     "others": "Others",
     "total": "Total",
     "noTimes": "No times",
-    "noVenues": "No venues"
+    "noVenues": "No venues",
+    "search": "Search...",
+    "currency": "Currency",
+    "processing": "Processing..."
   },
   "finance": {
     "title": "Finance Management",
@@ -206,6 +210,17 @@
       "student": {
         "title": "Student Reports",
         "description": "Payment analytics by student"
+      },
+      "createInvoice": {
+        "title": "Create Invoice (Custom Payment)",
+        "student": "Select Student",
+        "searchStudent": "Search for a student...",
+        "invoiceTitle": "Invoice Title / Description",
+        "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
+        "submit": "Create Invoice"
+      },
+      "customInvoices": {
+        "title": "Custom Invoices"
       }
     },
     "fields": {
@@ -242,7 +257,8 @@
       "noAnalyticsFound": "No analytics data found",
       "noPaymentAnalyticsFound": "No payment analytics found",
       "loadingAnalytics": "Loading analytics data...",
-      "loadAnalyticsFailed": "Failed to load analytics data"
+      "loadAnalyticsFailed": "Failed to load analytics data",
+      "noCustomInvoicesFound": "No custom invoices found."
     }
   },
   "userCard": {

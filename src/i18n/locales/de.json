@@ -53,7 +53,8 @@
       "adminLogs": "Admin-Protokolle",
       "examination": "Prüfung",
       "questionBanks": "Fragenkataloge",
-      "exams": "Prüfungen"
+      "exams": "Prüfungen",
+      "createInvoice": "Rechnung erstellen"
     },
     "user": {
       "loading": "Laden...",
@@ -180,7 +181,10 @@
     "others": "Andere",
     "total": "Gesamt",
     "noTimes": "Keine Zeiten",
-    "noVenues": "Keine Veranstaltungsorte"
+    "noVenues": "Keine Veranstaltungsorte",
+    "search": "Suchen...",
+    "currency": "Währung",
+    "processing": "Verarbeitung..."
   },
   "finance": {
     "title": "Finanzverwaltung",
@@ -204,6 +208,17 @@
       "student": {
         "title": "Berichte nach Student",
         "description": "Zahlungsanalysen nach Student"
+      },
+      "createInvoice": {
+        "title": "Rechnung erstellen (Benutzerdefinierte Zahlung)",
+        "student": "Student auswählen",
+        "searchStudent": "Nach einem Studenten suchen...",
+        "invoiceTitle": "Rechnungstitel / Beschreibung",
+        "titlePlaceholder": "z.B. Semestergebühr, Stipendienanpassung",
+        "submit": "Rechnung erstellen"
+      },
+      "customInvoices": {
+        "title": "Benutzerdefinierte Rechnungen"
       }
     },
     "fields": {
@@ -240,7 +255,8 @@
       "noAnalyticsFound": "Keine Analysedaten gefunden",
       "noPaymentAnalyticsFound": "Keine Zahlungsanalysen gefunden",
       "loadingAnalytics": "Analysedaten werden geladen...",
-      "loadAnalyticsFailed": "Fehler beim Laden der Analysedaten"
+      "loadAnalyticsFailed": "Fehler beim Laden der Analysedaten",
+      "noCustomInvoicesFound": "Keine benutzerdefinierten Rechnungen gefunden."
     }
   },
   "ltiManagement": {
