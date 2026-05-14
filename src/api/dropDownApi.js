@@ -114,3 +114,14 @@ export const getTeacherModules = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const getAllAcademicYears = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/academic/dropdown`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

@@ -10,6 +10,7 @@ import {
   getComponents,
   getUsers,
   getTeacherModules,
+  getAllAcademicYears,
 } from "@/api/dropDownApi";
 import { useQuery } from "@tanstack/react-query";
 
@@ -141,6 +142,16 @@ export const useGetTeacherModules = (filter, options = {}) => {
   return useQuery({
     queryKey: ["teacher-modules", filter],
     queryFn: () => getTeacherModules(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetAllAcademicYears = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-academic-years", filter],
+    queryFn: () => getAllAcademicYears(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,

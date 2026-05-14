@@ -122,6 +122,7 @@ export const useAddQuestion = () => {
       queryClient.invalidateQueries({
         queryKey: ["question-bank", variables.questionBankId],
       });
+      queryClient.invalidateQueries({ queryKey: ["question-banks"] });
       toast.success(response?.message || "Question added successfully!");
     },
     onError: (error) => {
@@ -162,6 +163,7 @@ export const useDeleteQuestion = () => {
       queryClient.invalidateQueries({
         queryKey: ["question-bank", variables.questionBankId],
       });
+      queryClient.invalidateQueries({ queryKey: ["question-banks"] });
       toast.success(response?.message || "Question deleted successfully!");
     },
     onError: (error) => {
@@ -182,6 +184,7 @@ export const useBulkUploadQuestions = () => {
       queryClient.invalidateQueries({
         queryKey: ["question-bank", variables.questionBankId],
       });
+      queryClient.invalidateQueries({ queryKey: ["question-banks"] });
       toast.success(
         response?.message || `Imported ${response?.data?.imported || 0} questions`,
       );

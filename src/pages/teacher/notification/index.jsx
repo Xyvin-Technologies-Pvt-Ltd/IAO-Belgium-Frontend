@@ -103,7 +103,6 @@ const TeacherNotifications = () => {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="drafted">Drafted</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="sent">Sent</SelectItem>
               <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>

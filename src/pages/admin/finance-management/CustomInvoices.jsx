@@ -70,11 +70,11 @@ const CustomInvoices = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          {t("finance.reports.customInvoices.title", { defaultValue: "Custom Invoices" })}
+          {t("finance.reports.customInvoices.title")}
         </h2>
         <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
           <Plus size={16} />
-          {t("sidebar.admin.createInvoice", { defaultValue: "Create Invoice" })}
+          {t("sidebar.admin.createInvoice")}
         </Button>
       </div>
 
@@ -156,7 +156,7 @@ const CustomInvoices = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center">
-                  {t("finance.messages.noPaymentsFound", { defaultValue: "No custom invoices found." })}
+                  {t("finance.messages.noCustomInvoicesFound")}
                 </TableCell>
               </TableRow>
             )}

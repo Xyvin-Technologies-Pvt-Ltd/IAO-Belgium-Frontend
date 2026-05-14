@@ -53,7 +53,8 @@
       "adminLogs": "Admin Logs",
       "examination": "Examen",
       "questionBanks": "Vragenbanken",
-      "exams": "Examens"
+      "exams": "Examens",
+      "createInvoice": "Factuur aanmaken"
     },
     "user": {
       "loading": "Laden...",
@@ -182,7 +183,10 @@
     "others": "Anderen",
     "total": "Totaal",
     "noTimes": "Geen tijden",
-    "noVenues": "Geen locaties"
+    "noVenues": "Geen locaties",
+    "search": "Zoeken...",
+    "currency": "Valuta",
+    "processing": "Verwerken..."
   },
   "finance": {
     "title": "Financieel beheer",
@@ -206,6 +210,17 @@
       "student": {
         "title": "Studentrapporten",
         "description": "Betalingsanalyse per student"
+      },
+      "createInvoice": {
+        "title": "Factuur aanmaken (Aangepaste betaling)",
+        "student": "Selecteer student",
+        "searchStudent": "Zoek naar een student...",
+        "invoiceTitle": "Factuurtitel / Beschrijving",
+        "titlePlaceholder": "bijv. Semesterkosten, Aanpassing studiebeurs",
+        "submit": "Factuur aanmaken"
+      },
+      "customInvoices": {
+        "title": "Aangepaste facturen"
       }
     },
     "fields": {
@@ -242,7 +257,8 @@
       "noAnalyticsFound": "Geen analysegegevens gevonden",
       "noPaymentAnalyticsFound": "Geen betalingsanalyse gevonden",
       "loadingAnalytics": "Analysegegevens laden...",
-      "loadAnalyticsFailed": "Laden van analysegegevens mislukt"
+      "loadAnalyticsFailed": "Laden van analysegegevens mislukt",
+      "noCustomInvoicesFound": "Geen aangepaste facturen gevonden."
     }
   },
   "userCard": {

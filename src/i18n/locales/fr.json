@@ -53,7 +53,8 @@
       "adminLogs": "Logs administrateur",
       "examination": "Examen",
       "questionBanks": "Banques de questions",
-      "exams": "Examens"
+      "exams": "Examens",
+      "createInvoice": "Créer une facture"
     },
     "user": {
       "loading": "Chargement...",
@@ -182,7 +183,10 @@
     "others": "Autres",
     "total": "Total",
     "noTimes": "Aucun horaire",
-    "noVenues": "Aucun lieu"
+    "noVenues": "Aucun lieu",
+    "search": "Rechercher...",
+    "currency": "Devise",
+    "processing": "Traitement..."
   },
   "finance": {
     "title": "Gestion financière",
@@ -206,6 +210,17 @@
       "student": {
         "title": "Rapports par étudiant",
         "description": "Analyses de paiement par étudiant"
+      },
+      "createInvoice": {
+        "title": "Créer une facture (Paiement personnalisé)",
+        "student": "Sélectionner un étudiant",
+        "searchStudent": "Rechercher un étudiant...",
+        "invoiceTitle": "Titre / Description de la facture",
+        "titlePlaceholder": "ex : Frais de semestre, Ajustement de bourse",
+        "submit": "Créer une facture"
+      },
+      "customInvoices": {
+        "title": "Factures personnalisées"
       }
     },
     "fields": {
@@ -242,7 +257,8 @@
       "noAnalyticsFound": "Aucune donnée analytique trouvée",
       "noPaymentAnalyticsFound": "Aucune analyse de paiement trouvée",
       "loadingAnalytics": "Chargement des données analytiques...",
-      "loadAnalyticsFailed": "Échec du chargement des données analytiques"
+      "loadAnalyticsFailed": "Échec du chargement des données analytiques",
+      "noCustomInvoicesFound": "Aucune facture personnalisée trouvée."
     }
   },
   "userCard": {
