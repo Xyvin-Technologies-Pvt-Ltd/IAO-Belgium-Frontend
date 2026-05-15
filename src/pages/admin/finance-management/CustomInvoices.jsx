@@ -37,7 +37,7 @@ const CustomInvoices = () => {
   const { data, isLoading, error, refetch, isFetching } = useGetPayments({
     page,
     limit: rowsPerPage,
-    purpose: "other",
+    purpose: "custom-invoice",
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
 
