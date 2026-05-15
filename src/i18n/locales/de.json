@@ -247,7 +247,8 @@
     },
     "purposes": {
       "admissionFee": "Zulassungsgebühr",
-      "modulePurchase": "Modulkauf"
+      "modulePurchase": "Modulkauf",
+      "customInvoice": "Benutzerdefinierte Rechnung"
     },
     "messages": {
       "noPaymentsFound": "Keine Zahlungen gefunden",

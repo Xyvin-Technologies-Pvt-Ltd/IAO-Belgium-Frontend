@@ -249,7 +249,8 @@
     },
     "purposes": {
       "admissionFee": "Admission Fee",
-      "modulePurchase": "Module Purchase"
+      "modulePurchase": "Module Purchase",
+      "customInvoice": "Custom Invoice"
     },
     "messages": {
       "noPaymentsFound": "No payments found",

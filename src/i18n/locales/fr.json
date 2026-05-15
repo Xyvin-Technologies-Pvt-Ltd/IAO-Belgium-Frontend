@@ -249,7 +249,8 @@
     },
     "purposes": {
       "admissionFee": "Frais d'admission",
-      "modulePurchase": "Achat de module"
+      "modulePurchase": "Achat de module",
+      "customInvoice": "Facture personnalisée"
     },
     "messages": {
       "noPaymentsFound": "Aucun paiement trouvé",

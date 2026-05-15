@@ -249,7 +249,8 @@
     },
     "purposes": {
       "admissionFee": "Inschrijfgeld",
-      "modulePurchase": "Module-aankoop"
+      "modulePurchase": "Module-aankoop",
+      "customInvoice": "Aangepaste factuur"
     },
     "messages": {
       "noPaymentsFound": "Geen betalingen gevonden",
