@@ -54,7 +54,7 @@
       "examination": "Examen",
       "questionBanks": "Banques de questions",
       "exams": "Examens",
-      "createInvoice": "Créer une facture"
+      "createInvoice": "Créer une facture personnalisée"
     },
     "user": {
       "loading": "Chargement...",
@@ -212,12 +212,12 @@
         "description": "Analyses de paiement par étudiant"
       },
       "createInvoice": {
-        "title": "Créer une facture (Paiement personnalisé)",
+        "title": "Créer une facture personnalisée",
         "student": "Sélectionner un étudiant",
         "searchStudent": "Rechercher un étudiant...",
         "invoiceTitle": "Titre / Description de la facture",
         "titlePlaceholder": "ex : Frais de semestre, Ajustement de bourse",
-        "submit": "Créer une facture"
+        "submit": "Créer une facture personnalisée"
       },
       "customInvoices": {
         "title": "Factures personnalisées"

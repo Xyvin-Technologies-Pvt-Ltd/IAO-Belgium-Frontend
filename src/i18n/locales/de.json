@@ -54,7 +54,7 @@
       "examination": "Prüfung",
       "questionBanks": "Fragenkataloge",
       "exams": "Prüfungen",
-      "createInvoice": "Rechnung erstellen"
+      "createInvoice": "Benutzerdefinierte Rechnung erstellen"
     },
     "user": {
       "loading": "Laden...",
@@ -210,12 +210,12 @@
         "description": "Zahlungsanalysen nach Student"
       },
       "createInvoice": {
-        "title": "Rechnung erstellen (Benutzerdefinierte Zahlung)",
+        "title": "Benutzerdefinierte Rechnung erstellen",
         "student": "Student auswählen",
         "searchStudent": "Nach einem Studenten suchen...",
         "invoiceTitle": "Rechnungstitel / Beschreibung",
         "titlePlaceholder": "z.B. Semestergebühr, Stipendienanpassung",
-        "submit": "Rechnung erstellen"
+        "submit": "Benutzerdefinierte Rechnung erstellen"
       },
       "customInvoices": {
         "title": "Benutzerdefinierte Rechnungen"

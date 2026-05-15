@@ -143,7 +143,7 @@ const CreateInvoice = ({ open, onClose }) => {
               <Button type="submit" disabled={createPaymentMutation.isPending || !watch("user") || !watch("amount")}>
                 {createPaymentMutation.isPending 
                   ? t("common.processing") 
-                  : t("finance.reports.createInvoice.sendInvoice")}
+                  : t("finance.reports.createInvoice.submit")}
               </Button>
             </div>
           </form>
