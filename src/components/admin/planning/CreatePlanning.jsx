@@ -185,37 +185,52 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       const batchId = planningData.batch?._id || planningData.batch || "";
       const componentId = planningData.component?._id || planningData.component || "";
       
-      const formattedSessions = planningData.sessions?.map((session) => ({
-        _id: session._id,
-        name: session.name || "",
-        session_date: formatTZ(session.session_date, "YYYY-MM-DD"),
-        start_time: formatTZ(session.start_time, "HH:mm"),
-        end_time: formatTZ(session.end_time, "HH:mm"),
-        teachers: session.teachers?.map((t) => {
-          const teacher = t.teacher || t;
-          return {
-            _id: teacher._id,
-            name: `${teacher.first_name} ${teacher.last_name}`.trim(),
-            status: t.status || "pending",
-          };
-        }) || [],
-        assistants: session.assistants?.map((a) => {
-          const assistant = a.assistant || a;
-          return {
-            _id: assistant._id,
-            name: `${assistant.first_name} ${assistant.last_name}`.trim(),
-            status: a.status || "pending",
-          };
-        }) || [],
-        trainees: session.trainees?.map((t) => {
-          const trainee = t.trainee || t;
-          return {
-            _id: trainee._id,
-            name: `${trainee.first_name} ${trainee.last_name}`.trim(),
-            status: t.status || "pending",
-          };
-        }) || [],
-      })) || [];
+      console.log("DEBUG: editing planningData", planningData);
+      
+      const formattedSessions = planningData.sessions?.map((session) => {
+        console.log(`DEBUG: session ${session.name} staff:`, {
+          teachers: session.teachers,
+          assistants: session.assistants,
+          trainees: session.trainees
+        });
+
+        return {
+          _id: session._id,
+          name: session.name || "",
+          session_date: formatTZ(session.session_date, "YYYY-MM-DD"),
+          start_time: formatTZ(session.start_time, "HH:mm"),
+          end_time: formatTZ(session.end_time, "HH:mm"),
+          teachers: session.teachers?.map((t) => {
+            const teacher = t.teacher || t;
+            console.log("DEBUG: mapping teacher", t, teacher);
+            return {
+              _id: teacher._id,
+              name: `${teacher.first_name} ${teacher.last_name}`.trim(),
+              status: t.status || "pending",
+            };
+          }) || [],
+          assistants: session.assistants?.map((a) => {
+            const assistant = a.assistant || a;
+            console.log("DEBUG: mapping assistant", a, assistant);
+            return {
+              _id: assistant._id,
+              name: `${assistant.first_name} ${assistant.last_name}`.trim(),
+              status: a.status || "pending",
+            };
+          }) || [],
+          trainees: session.trainees?.map((t) => {
+            const trainee = t.trainee || t;
+            console.log("DEBUG: mapping trainee", t, trainee);
+            return {
+              _id: trainee._id,
+              name: `${trainee.first_name} ${trainee.last_name}`.trim(),
+              status: t.status || "pending",
+            };
+          }) || [],
+        };
+      }) || [];
+
+      console.log("DEBUG: formattedSessions result", formattedSessions);
 
       reset({
         program: programId,
@@ -665,108 +680,129 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                     {/* Individual Teachers Selection - Only for Edit Mode */}
                     {isEdit && (
                       <>
-                        <SearchableMultiSelect
-                          label={t("planningManagement.modal.teachersLabel")}
-                          placeholder={t(
-                            "planningManagement.modal.teachersPlaceholder",
-                          )}
-                          searchPlaceholder={t(
-                            "planningManagement.modal.searchTeachers",
-                          )}
-                          items={teachers}
-                          selected={watch(`sessions.${index}.teachers`) || []}
-                          onChange={(selectedTeachers) => {
-                            const currentTeachers =
-                              watch(`sessions.${index}.teachers`) || [];
-                            const teachersWithStatus = selectedTeachers.map(
-                              (teacher) => {
-                                const existing = currentTeachers.find(
-                                  (t) => t._id === teacher._id,
+                        {(() => {
+                          const selectedTeachers = watch(`sessions.${index}.teachers`) || [];
+                          console.log(`DEBUG: Session ${index} selected teachers:`, selectedTeachers);
+                          console.log(`DEBUG: Available teachers list:`, teachers);
+                          return (
+                            <SearchableMultiSelect
+                              label={t("planningManagement.modal.teachersLabel")}
+                              placeholder={t(
+                                "planningManagement.modal.teachersPlaceholder",
+                              )}
+                              searchPlaceholder={t(
+                                "planningManagement.modal.searchTeachers",
+                              )}
+                              items={teachers}
+                              selected={selectedTeachers}
+                              onChange={(selectedTeachers) => {
+                                const currentTeachers =
+                                  watch(`sessions.${index}.teachers`) || [];
+                                const teachersWithStatus = selectedTeachers.map(
+                                  (teacher) => {
+                                    const existing = currentTeachers.find(
+                                      (t) => t._id === teacher._id,
+                                    );
+                                    return {
+                                      ...teacher,
+                                      status: existing?.status || "pending",
+                                    };
+                                  },
                                 );
-                                return {
-                                  ...teacher,
-                                  status: existing?.status || "pending",
-                                };
-                              },
-                            );
-                            setValue(
-                              `sessions.${index}.teachers`,
-                              teachersWithStatus,
-                              { shouldValidate: true, shouldDirty: true },
-                            );
-                          }}
-                          onSearch={setTeacherSearchTerm}
-                          isLoading={teachersLoading}
-                          error={errors.sessions?.[index]?.teachers?.message}
-                        />
-                        <SearchableMultiSelect
-                          label={t("planningManagement.modal.assistantsLabel")}
-                          placeholder={t(
-                            "planningManagement.modal.assistantsPlaceholder",
-                          )}
-                          searchPlaceholder={t(
-                            "planningManagement.modal.searchAssistants",
-                          )}
-                          items={assistants}
-                          selected={watch(`sessions.${index}.assistants`) || []}
-                          onChange={(selectedAssistants) => {
-                            const currentAssistants =
-                              watch(`sessions.${index}.assistants`) || [];
-                            const assistantsWithStatus = selectedAssistants.map(
-                              (assistant) => {
-                                const existing = currentAssistants.find(
-                                  (a) => a._id === assistant._id,
+                                setValue(
+                                  `sessions.${index}.teachers`,
+                                  teachersWithStatus,
+                                  { shouldValidate: true, shouldDirty: true },
                                 );
-                                return {
-                                  ...assistant,
-                                  status: existing?.status || "pending",
-                                };
-                              },
-                            );
-                            setValue(
-                              `sessions.${index}.assistants`,
-                              assistantsWithStatus,
-                              { shouldValidate: true, shouldDirty: true },
-                            );
-                          }}
-                          onSearch={setAssistantSearchTerm}
-                          isLoading={assistantsLoading}
-                          error={errors.sessions?.[index]?.assistants?.message}
-                        />
-                        <SearchableMultiSelect
-                          label={t("planningManagement.modal.traineesLabel")}
-                          placeholder={t(
-                            "planningManagement.modal.traineesPlaceholder",
-                          )}
-                          searchPlaceholder={t(
-                            "planningManagement.modal.searchTrainees",
-                          )}
-                          items={trainees}
-                          selected={watch(`sessions.${index}.trainees`) || []}
-                          onChange={(selectedTrainees) => {
-                            const currentTrainees =
-                              watch(`sessions.${index}.trainees`) || [];
-                            const traineesWithStatus = selectedTrainees.map(
-                              (trainee) => {
-                                const existing = currentTrainees.find(
-                                  (t) => t._id === trainee._id,
+                              }}
+                              onSearch={setTeacherSearchTerm}
+                              isLoading={teachersLoading}
+                              error={errors.sessions?.[index]?.teachers?.message}
+                            />
+                          );
+                        })()}
+
+                        {(() => {
+                          const selectedAssistants = watch(`sessions.${index}.assistants`) || [];
+                          console.log(`DEBUG: Session ${index} selected assistants:`, selectedAssistants);
+                          return (
+                            <SearchableMultiSelect
+                              label={t("planningManagement.modal.assistantsLabel")}
+                              placeholder={t(
+                                "planningManagement.modal.assistantsPlaceholder",
+                              )}
+                              searchPlaceholder={t(
+                                "planningManagement.modal.searchAssistants",
+                              )}
+                              items={assistants}
+                              selected={selectedAssistants}
+                              onChange={(selectedAssistants) => {
+                                const currentAssistants =
+                                  watch(`sessions.${index}.assistants`) || [];
+                                const assistantsWithStatus = selectedAssistants.map(
+                                  (assistant) => {
+                                    const existing = currentAssistants.find(
+                                      (a) => a._id === assistant._id,
+                                    );
+                                    return {
+                                      ...assistant,
+                                      status: existing?.status || "pending",
+                                    };
+                                  },
                                 );
-                                return {
-                                  ...trainee,
-                                  status: existing?.status || "pending",
-                                };
-                              },
-                            );
-                            setValue(
-                              `sessions.${index}.trainees`,
-                              traineesWithStatus,
-                              { shouldValidate: true, shouldDirty: true },
-                            );
-                          }}
-                          onSearch={setTraineeSearchTerm}
-                          isLoading={traineesLoading}
-                          error={errors.sessions?.[index]?.trainees?.message}
-                        />
+                                setValue(
+                                  `sessions.${index}.assistants`,
+                                  assistantsWithStatus,
+                                  { shouldValidate: true, shouldDirty: true },
+                                );
+                              }}
+                              onSearch={setAssistantSearchTerm}
+                              isLoading={assistantsLoading}
+                              error={errors.sessions?.[index]?.assistants?.message}
+                            />
+                          );
+                        })()}
+
+                        {(() => {
+                          const selectedTrainees = watch(`sessions.${index}.trainees`) || [];
+                          console.log(`DEBUG: Session ${index} selected trainees:`, selectedTrainees);
+                          return (
+                            <SearchableMultiSelect
+                              label={t("planningManagement.modal.traineesLabel")}
+                              placeholder={t(
+                                "planningManagement.modal.traineesPlaceholder",
+                              )}
+                              searchPlaceholder={t(
+                                "planningManagement.modal.searchTrainees",
+                              )}
+                              items={trainees}
+                              selected={selectedTrainees}
+                              onChange={(selectedTrainees) => {
+                                const currentTrainees =
+                                  watch(`sessions.${index}.trainees`) || [];
+                                const traineesWithStatus = selectedTrainees.map(
+                                  (trainee) => {
+                                    const existing = currentTrainees.find(
+                                      (t) => t._id === trainee._id,
+                                    );
+                                    return {
+                                      ...trainee,
+                                      status: existing?.status || "pending",
+                                    };
+                                  },
+                                );
+                                setValue(
+                                  `sessions.${index}.trainees`,
+                                  traineesWithStatus,
+                                  { shouldValidate: true, shouldDirty: true },
+                                );
+                              }}
+                              onSearch={setTraineeSearchTerm}
+                              isLoading={traineesLoading}
+                              error={errors.sessions?.[index]?.trainees?.message}
+                            />
+                          );
+                        })()}
                       </>
                     )}
                   </div>

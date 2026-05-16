@@ -57,6 +57,27 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
             value={user?.email || t("common.notAvailable")}
           />
 
+          {isTeacher && (
+            <>
+              <InfoItem
+                label={t("studentManagement.modal.address")}
+                value={user?.address || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("studentManagement.modal.country")}
+                value={user?.country || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("studentManagement.modal.city")}
+                value={user?.city || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("studentManagement.modal.postalCode")}
+                value={user?.postal_code || t("common.notAvailable")}
+              />
+            </>
+          )}
+
           {isTeacher ? (
             <>
               <InfoItem

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,15 @@ import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
+import { Label } from "@/components/ui/label";
+import { GetCountries } from "react-country-state-city";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useCreateTeacher, useUpdateTeacher } from "@/store/useTeacherStore";
 import {
@@ -23,29 +32,17 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   const { t } = useTranslation();
   const isEdit = !!teacherData;
 
-  const [citySearchTerm, setCitySearchTerm] = useState("");
-  const [countrySearchTerm, setCountrySearchTerm] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [preferredCitySearchTerm, setPreferredCitySearchTerm] = useState("");
   const [languageSearchTerm, setLanguageSearchTerm] = useState("");
   const [titleSearchTerm, setTitleSearchTerm] = useState("");
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
 
-  const [selectedCountry, setSelectedCountry] = useState("");
-
-  const { data: countriesData, isLoading: countriesLoading } =
-    useGetAllCountries(
-      { 
-        ...(countrySearchTerm && { search: countrySearchTerm })
-      },
-      { enabled: open }
-    );
-
-  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
-    {
-      ...(citySearchTerm && { search: citySearchTerm }),
-      ...(selectedCountry && { country: selectedCountry }),
-    },
-    { enabled: open && !!selectedCountry },
-  );
+  useEffect(() => {
+    GetCountries().then((result) => {
+      setCountries(result);
+    });
+  }, []);
 
   const { data: languagesData, isLoading: languagesLoading } =
     useGetAllLanguages(
@@ -71,6 +68,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   const updateTeacher = useUpdateTeacher();
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -85,7 +83,10 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       last_name: "",
       email: "",
       phone: "",
+      address: "",
+      postal_code: "",
       country: "",
+      city: "",
       location: [],
       language: [],
       academic_degree: "",
@@ -94,18 +95,18 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
     },
   });
 
-  const selectedLocations = watch("location");
   const selectedLanguages = watch("language");
-  const watchedCountry = watch("country");
+  const selectedLocations = watch("location");
 
-  useEffect(() => {
-    if (watchedCountry !== selectedCountry) {
-      setSelectedCountry(watchedCountry);
-      if (watchedCountry !== selectedCountry && selectedLocations.length > 0) {
-        setValue("location", [], { shouldValidate: true });
-      }
-    }
-  }, [watchedCountry, selectedCountry, selectedLocations.length, setValue]);
+  // Filter Teaching Cities based on Selected Languages
+  const selectedLanguageIds = selectedLanguages?.map(l => l._id).join(",");
+  const { data: preferredCitiesData, isLoading: preferredCitiesLoading } = useGetAllCities(
+    {
+      ...(preferredCitySearchTerm && { search: preferredCitySearchTerm }),
+      ...(selectedLanguageIds && { language: selectedLanguageIds }),
+    },
+    { enabled: open && !!selectedLanguageIds },
+  );
 
   const handleClose = () => {
     reset({
@@ -113,48 +114,45 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       last_name: "",
       email: "",
       phone: "",
+      address: "",
+      postal_code: "",
       country: "",
+      city: "",
       location: [],
       language: [],
       academic_degree: "",
       teacher_role: "",
       iao_employment_start_date: "",
     });
-    setCitySearchTerm("");
-    setCountrySearchTerm("");
+    setPreferredCitySearchTerm("");
     setLanguageSearchTerm("");
     setTitleSearchTerm("");
     setRoleSearchTerm("");
-    setSelectedCountry("");
     onClose();
   };
 
   useEffect(() => {
     if (!open || !teacherData) return;
 
-    // Extract country from the first location if available
-    const countryId = teacherData.country?._id || 
-                      (Array.isArray(teacherData.location) && teacherData.location.length > 0 
-                        ? teacherData.location[0].country 
-                        : "");
+    const academicDegreeId = teacherData.academic_degree?._id || teacherData.academic_degree || "";
+    const teacherRoleId = teacherData.teacher_role?._id || teacherData.teacher_role || "";
 
     reset({
       first_name: teacherData.first_name || "",
       last_name: teacherData.last_name || "",
       email: teacherData.email || "",
       phone: teacherData.phone || "",
-      country: countryId,
-      academic_degree: teacherData.academic_degree?._id || "",
-      teacher_role: teacherData.teacher_role?._id || "",
+      address: teacherData.address || "",
+      postal_code: teacherData.postal_code || "",
+      country: teacherData.country || "",
+      city: teacherData.city || "",
+      academic_degree: academicDegreeId,
+      teacher_role: teacherRoleId,
       iao_employment_start_date:
         teacherData.iao_employment_start_date?.split("T")[0] || "",
       location: Array.isArray(teacherData.location) ? teacherData.location : [],
       language: Array.isArray(teacherData.language) ? teacherData.language : [],
     });
-
-    if (countryId) {
-      setSelectedCountry(countryId);
-    }
   }, [open, teacherData, reset]);
 
   const onSubmit = (data) => {
@@ -163,8 +161,6 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       location: data.location.map((l) => l._id),
       language: data.language.map((l) => l._id),
     };
-
-    delete payload.country;
 
     if (isEdit && teacherData) {
       if (data.email === teacherData.email) {
@@ -208,123 +204,197 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
 
         <div className="flex-1 overflow-y-auto p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            {/* Personal Details Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                {t("teacherManagement.modal.personalDetails") || "Personal Details"}
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label={t("teacherManagement.modal.firstNameLabel")}
+                  placeholder={t("teacherManagement.modal.firstNamePlaceholder")}
+                  {...register("first_name")}
+                  error={errors.first_name?.message}
+                  required
+                />
+                <FormField
+                  label={t("teacherManagement.modal.lastNameLabel")}
+                  placeholder={t("teacherManagement.modal.lastNamePlaceholder")}
+                  {...register("last_name")}
+                  error={errors.last_name?.message}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label={t("teacherManagement.modal.emailLabel")}
+                  placeholder={t("teacherManagement.modal.emailPlaceholder")}
+                  {...register("email")}
+                  error={errors.email?.message}
+                  required
+                />
+                <FormField
+                  label={t("teacherManagement.modal.phoneLabel")}
+                  placeholder={t("teacherManagement.modal.phonePlaceholder")}
+                  {...register("phone")}
+                  error={errors.phone?.message}
+                  required
+                />
+              </div>
+
               <FormField
-                label={t("teacherManagement.modal.firstNameLabel")}
-                placeholder={t("teacherManagement.modal.firstNamePlaceholder")}
-                {...register("first_name")}
-                error={errors.first_name?.message}
+                label={t("teacherManagement.modal.addressLabel") || "Address"}
+                placeholder={t("teacherManagement.modal.addressPlaceholder")}
+                {...register("address")}
+                error={errors.address?.message}
                 required
               />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label={t("teacherManagement.modal.postalCodeLabel") || "Postal Code"}
+                  placeholder={t("teacherManagement.modal.postalCodePlaceholder")}
+                  {...register("postal_code")}
+                  error={errors.postal_code?.message}
+                  required
+                />
+                <FormField
+                  label={t("teacherManagement.modal.countryLabel")}
+                  required
+                  error={errors.country?.message}
+                >
+                  <Select 
+                    onValueChange={(value) => setValue("country", value, { shouldValidate: true })}
+                    value={watch("country") || ""}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t("teacherManagement.modal.countryPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country.id} value={country.name}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </div>
               <FormField
-                label={t("teacherManagement.modal.lastNameLabel")}
-                placeholder={t("teacherManagement.modal.lastNamePlaceholder")}
-                {...register("last_name")}
-                error={errors.last_name?.message}
+                label={t("teacherManagement.modal.cityLabel") || "City"}
+                placeholder={t("teacherManagement.modal.cityPlaceholder")}
+                {...register("city")}
+                error={errors.city?.message}
                 required
               />
             </div>
 
-            <FormField
-              label={t("teacherManagement.modal.emailLabel")}
-              placeholder={t("teacherManagement.modal.emailPlaceholder")}
-              {...register("email")}
-              error={errors.email?.message}
-              required
-            />
-            <FormField
-              label={t("teacherManagement.modal.phoneLabel")}
-              placeholder={t("teacherManagement.modal.phonePlaceholder")}
-              {...register("phone")}
-              error={errors.phone?.message}
-              required
-            />
+            {/* IAO Teaching Details Section */}
+            <div className="space-y-4 pt-4">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+                {t("teacherManagement.modal.teachingDetails") || "IAO Teaching Details"}
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableMultiSelect
+                      label={t("teacherManagement.modal.languageLabel")}
+                      placeholder={t("teacherManagement.modal.languagePlaceholder")}
+                      searchPlaceholder={t("common.searchLanguages")}
+                      items={languagesData?.data || []}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      onSearch={setLanguageSearchTerm}
+                      isLoading={languagesLoading}
+                      error={errors.language?.message}
+                      required
+                    />
+                  )}
+                />
 
-            <SearchableSelect
-              label={t("teacherManagement.modal.countryLabel")}
-              placeholder={t("teacherManagement.modal.countryPlaceholder")}
-              searchPlaceholder={t("common.searchCountries")}
-              items={countriesData?.data || []}
-              value={watch("country") || ""}
-              onChange={(v) => setValue("country", v, { shouldValidate: true })}
-              onSearch={setCountrySearchTerm}
-              isLoading={countriesLoading}
-              error={errors.country?.message}
-              required
-            />
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableMultiSelect
+                      label={t("teacherManagement.modal.citiesLabel")}
+                      placeholder={
+                        selectedLanguageIds
+                          ? t("teacherManagement.modal.citiesPlaceholder")
+                          : "Select preferred language(s) first"
+                      }
+                      searchPlaceholder={t("common.searchCities")}
+                      items={preferredCitiesData?.data || []}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      onSearch={setPreferredCitySearchTerm}
+                      isLoading={preferredCitiesLoading}
+                      error={errors.location?.message}
+                      disabled={!selectedLanguageIds}
+                      required
+                    />
+                  )}
+                />
+                {!preferredCitiesLoading && selectedLanguageIds && preferredCitiesData?.data?.length === 0 && (
+                  <p className="text-xs text-amber-600 italic">
+                    No cities found where the selected language(s) are taught.
+                  </p>
+                )}
+              </div>
 
-            <SearchableMultiSelect
-              label={t("teacherManagement.modal.citiesLabel")}
-              placeholder={
-                selectedCountry
-                  ? t("teacherManagement.modal.citiesPlaceholder")
-                  : t("common.selectCountryFirst")
-              }
-              searchPlaceholder={t("common.searchCities")}
-              items={citiesData?.data || []}
-              selected={selectedLocations}
-              onChange={(val) =>
-                setValue("location", val, { shouldValidate: true })
-              }
-              onSearch={setCitySearchTerm}
-              isLoading={citiesLoading}
-              error={errors.location?.message}
-              disabled={!selectedCountry}
-            />
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <Controller
+                  name="academic_degree"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      label={t("teacherManagement.modal.academicDegreeLabel")}
+                      placeholder={t(
+                        "teacherManagement.modal.academicDegreePlaceholder",
+                      )}
+                      searchPlaceholder={t("common.searchTitles")}
+                      items={titlesData?.data || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onSearch={setTitleSearchTerm}
+                      isLoading={titlesLoading}
+                      error={errors.academic_degree?.message}
+                      required
+                    />
+                  )}
+                />
 
-            <SearchableMultiSelect
-              label={t("teacherManagement.modal.languageLabel")}
-              placeholder={t("teacherManagement.modal.languagePlaceholder")}
-              searchPlaceholder={t("common.searchLanguages")}
-              items={languagesData?.data || []}
-              selected={selectedLanguages}
-              onChange={(val) =>
-                setValue("language", val, { shouldValidate: true })
-              }
-              onSearch={setLanguageSearchTerm}
-              isLoading={languagesLoading}
-              error={errors.language?.message}
-            />
+                <Controller
+                  name="teacher_role"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      label={t("teacherManagement.modal.teacherRoleLabel")}
+                      placeholder={t("teacherManagement.modal.teacherRolePlaceholder")}
+                      searchPlaceholder={t("common.searchRoles")}
+                      items={rolesData?.data || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onSearch={setRoleSearchTerm}
+                      isLoading={rolesLoading}
+                      error={errors.teacher_role?.message}
+                      required
+                    />
+                  )}
+                />
+              </div>
 
-            <SearchableSelect
-              label={t("teacherManagement.modal.academicDegreeLabel")}
-              placeholder={t(
-                "teacherManagement.modal.academicDegreePlaceholder",
-              )}
-              searchPlaceholder={t("common.searchTitles")}
-              items={titlesData?.data || []}
-              value={watch("academic_degree") || ""}
-              onChange={(v) =>
-                setValue("academic_degree", v, { shouldValidate: true })
-              }
-              onSearch={setTitleSearchTerm}
-              isLoading={titlesLoading}
-              error={errors.academic_degree?.message}
-              required
-            />
-
-            <SearchableSelect
-              label={t("teacherManagement.modal.teacherRoleLabel")}
-              placeholder={t("teacherManagement.modal.teacherRolePlaceholder")}
-              searchPlaceholder={t("common.searchRoles")}
-              items={rolesData?.data || []}
-              value={watch("teacher_role") || ""}
-              onChange={(v) =>
-                setValue("teacher_role", v, { shouldValidate: true })
-              }
-              onSearch={setRoleSearchTerm}
-              isLoading={rolesLoading}
-              error={errors.teacher_role?.message}
-              required
-            />
-
-            <FormField
-              label={t("teacherManagement.modal.employmentStartDateLabel")}
-              type="date"
-              {...register("iao_employment_start_date")}
-              error={errors.iao_employment_start_date?.message}
-              required
-            />
+              <FormField
+                label={t("teacherManagement.modal.employmentStartDateLabel")}
+                type="date"
+                {...register("iao_employment_start_date")}
+                error={errors.iao_employment_start_date?.message}
+                required
+              />
+            </div>
 
             <FormActions
               onCancel={handleClose}

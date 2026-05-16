@@ -731,7 +731,7 @@
       "noDocuments": "Aucun document disponible",
       "academicDegree": "Degré académique",
       "teacherRole": "Rôle de l'enseignant",
-      "employmentStartDate": "Date de début d'emploi",
+      "employmentStartDate": "Date de début",
       "languages": "Langues",
       "locations": "Emplacements"
     }
@@ -813,6 +813,7 @@
       "batchLabel": "Groupe",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
+      "sessionsLabel": "Sessions",
       "sessionNameLabel": "Nom de la session",
       "dateLabel": "Date",
       "timeFromLabel": "De",
@@ -1018,7 +1019,7 @@
       "phone": "Téléphone",
       "academicDegree": "Degré académique",
       "role": "Rôle",
-      "employmentStartDate": "Date de début à l'IAO",
+      "employmentStartDate": "Date de début",
       "location": "Emplacement",
       "language": "Langue",
       "status": "Statut",
@@ -1052,7 +1053,7 @@
       "academicDegreePlaceholder": "Sélectionnez un degré",
       "teacherRoleLabel": "Rôle de l'enseignant",
       "teacherRolePlaceholder": "Sélectionnez un rôle",
-      "employmentStartDateLabel": "Date de début d'emploi",
+      "employmentStartDateLabel": "Date de début",
       "employmentStartDatePlaceholder": "Sélectionnez une date"
     }
   },
