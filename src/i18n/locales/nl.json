@@ -54,7 +54,7 @@
       "examination": "Examen",
       "questionBanks": "Vragenbanken",
       "exams": "Examens",
-      "createInvoice": "Factuur aanmaken"
+      "createInvoice": "Aangepaste factuur maken"
     },
     "user": {
       "loading": "Laden...",
@@ -212,12 +212,12 @@
         "description": "Betalingsanalyse per student"
       },
       "createInvoice": {
-        "title": "Factuur aanmaken (Aangepaste betaling)",
+        "title": "Aangepaste factuur maken",
         "student": "Selecteer student",
         "searchStudent": "Zoek naar een student...",
         "invoiceTitle": "Factuurtitel / Beschrijving",
         "titlePlaceholder": "bijv. Semesterkosten, Aanpassing studiebeurs",
-        "submit": "Factuur aanmaken"
+        "submit": "Aangepaste factuur maken"
       },
       "customInvoices": {
         "title": "Aangepaste facturen"
@@ -249,7 +249,8 @@
     },
     "purposes": {
       "admissionFee": "Inschrijfgeld",
-      "modulePurchase": "Module-aankoop"
+      "modulePurchase": "Module-aankoop",
+      "customInvoice": "Aangepaste factuur"
     },
     "messages": {
       "noPaymentsFound": "Geen betalingen gevonden",

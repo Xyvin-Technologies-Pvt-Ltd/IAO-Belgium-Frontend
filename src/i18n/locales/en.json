@@ -54,7 +54,7 @@
       "examination": "Examination",
       "questionBanks": "Question Banks",
       "exams": "Exams",
-      "createInvoice": "Create Invoice"
+      "createInvoice": "Create Custom Invoice"
     },
     "user": {
       "loading": "Loading...",
@@ -212,12 +212,12 @@
         "description": "Payment analytics by student"
       },
       "createInvoice": {
-        "title": "Create Invoice (Custom Payment)",
+        "title": "Create Custom Invoice",
         "student": "Select Student",
         "searchStudent": "Search for a student...",
         "invoiceTitle": "Invoice Title / Description",
         "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
-        "submit": "Create Invoice"
+        "submit": "Create Custom Invoice"
       },
       "customInvoices": {
         "title": "Custom Invoices"
@@ -249,7 +249,8 @@
     },
     "purposes": {
       "admissionFee": "Admission Fee",
-      "modulePurchase": "Module Purchase"
+      "modulePurchase": "Module Purchase",
+      "customInvoice": "Custom Invoice"
     },
     "messages": {
       "noPaymentsFound": "No payments found",

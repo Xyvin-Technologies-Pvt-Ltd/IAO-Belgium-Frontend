@@ -18,7 +18,7 @@ const CreateInvoice = ({ open, onClose }) => {
       user: "",
       amount: "",
       currency: "EUR",
-      purpose: "other",
+      purpose: "custom-invoice",
     },
   });
 

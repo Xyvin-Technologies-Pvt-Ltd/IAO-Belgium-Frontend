@@ -95,7 +95,7 @@ const AllReports = () => {
         return "text-blue-600 dark:text-blue-400";
       case "module-purchase":
         return "text-green-600 dark:text-green-400";
-      case "other":
+      case "custom-invoice":
         return "text-purple-600 dark:text-purple-400";
       default:
         return "text-gray-600 dark:text-gray-400";
@@ -109,8 +109,8 @@ const AllReports = () => {
         return t("finance.purposes.admissionFee");
       case "module-purchase":
         return t("finance.purposes.modulePurchase");
-      case "other":
-        return t("finance.purposes.other", "Other");
+      case "custom-invoice":
+        return t("finance.purposes.customInvoice");
       default:
         return purpose
           .split("-")
@@ -220,7 +220,7 @@ const AllReports = () => {
                     <StatusBadge status={payment?.status} />
                   </TableCell>
                   <TableCell>
-                    {(payment?.status === "paid" || payment?.purpose === "other") && (
+                    {(payment?.status === "paid" || payment?.purpose === "custom-invoice") && (
                       <button
                         onClick={() => handleDownloadReceipt(payment)}
                         title="Download receipt"
