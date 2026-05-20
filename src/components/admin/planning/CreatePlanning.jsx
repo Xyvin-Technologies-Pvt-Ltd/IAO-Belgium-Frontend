@@ -46,6 +46,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       batch: "",
       component: "",
       venue: "",
+      venue_address: "",
       description: "",
       teachers: [],
       assistants: [],
@@ -154,6 +155,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       batch: "",
       component: "",
       venue: "",
+      venue_address: "",
       description: "",
       teachers: [],
       assistants: [],
@@ -237,6 +239,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         batch: batchId,
         component: componentId,
         venue: planningData.venue || "",
+        venue_address: planningData.venue_address || "",
         description: planningData.description || "",
         sessions: formattedSessions,
       });
@@ -319,6 +322,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       batch: formData.batch,
       component: formData.component,
       venue: formData.venue,
+      ...(formData.venue_address && { venue_address: formData.venue_address }),
       ...(formData.description && { description: formData.description }),
       sessions: formattedSessions,
     };
@@ -458,39 +462,56 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               required
             />
 
-            <div className="space-y-2">
-              <FormField
-                label={t("planningManagement.modal.venueLabel")}
-                placeholder={t("planningManagement.modal.venuePlaceholder")}
-                error={errors.venue?.message}
-                required
-                {...register("venue")}
-              />
-              {/* Preferred Venues */}
-              {selectedProgram &&
-                programs.find((p) => p._id === selectedProgram)?.city?.venue
-                  ?.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs text-gray-600 dark:text-gray-400">
-                      {t("planningManagement.modal.preferredVenues")}
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {programs
-                        .find((p) => p._id === selectedProgram)
-                        ?.city?.venue?.map((venue, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => setValue("venue", venue)}
-                            className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
-                          >
-                            {venue}
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <FormField
+                  label={t("planningManagement.modal.venueLabel")}
+                  placeholder={t("planningManagement.modal.venuePlaceholder")}
+                  error={errors.venue?.message}
+                  required
+                  {...register("venue")}
+                />
+              </div>
+              <div className="space-y-2">
+                <FormField
+                  label={t("planningManagement.modal.venueAddress", "Venue Address")}
+                  placeholder={t("planningManagement.modal.venueAddressPlaceholder", "Enter full address")}
+                  error={errors.venue_address?.message}
+                  {...register("venue_address")}
+                />
+              </div>
             </div>
+
+            {/* Preferred Venues */}
+            {selectedProgram &&
+              programs.find((p) => p._id === selectedProgram)?.city?.venue
+                ?.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-600 dark:text-gray-400">
+                    {t("planningManagement.modal.preferredVenues")}
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {programs
+                      .find((p) => p._id === selectedProgram)
+                      ?.city?.venue?.map((venueObj, index) => {
+                        const venueName = typeof venueObj === 'string' ? venueObj : venueObj.name;
+                        const venueAddress = typeof venueObj === 'string' ? '' : (venueObj.address || '');
+                        return (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            setValue("venue", venueName);
+                            setValue("venue_address", venueAddress);
+                          }}
+                          className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
+                        >
+                          {venueName}
+                        </button>
+                      )})}
+                  </div>
+                </div>
+              )}
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">

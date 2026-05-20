@@ -137,10 +137,10 @@ const Plannings = () => {
                         {hasMultipleSessions ? (
                           <button
                             onClick={() => toggleModule(planning._id)}
-                            className="p-1 hover:bg-gray-100 rounded transition-transform"
+                            className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 rounded text-muted-foreground hover:text-primary dark:text-zinc-400 dark:hover:text-primary transition-all duration-200 cursor-pointer"
                           >
                             <ChevronRight
-                              className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                              className={`h-4 w-4 transition-transform ${isExpanded ? "rotate-90 text-primary" : ""}`}
                             />
                           </button>
                         ) : (
@@ -150,7 +150,7 @@ const Plannings = () => {
                       </div>
                     </TableCell>
                     <TableCell
-                      className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap"
+                      className="max-w-37.5 overflow-hidden text-ellipsis whitespace-nowrap font-bold text-gray-900 dark:text-gray-100"
                       title={planning.component_name}
                     >
                       {planning.component_name}
@@ -225,7 +225,7 @@ const Plannings = () => {
                     planning.sessions?.map((session) => (
                       <TableRow
                         key={session.session_id}
-                        className="bg-muted/30 border-l-4 border-l-primary/20"
+                        className="bg-muted/65 dark:bg-muted/50 border-l-4 border-l-primary hover:bg-muted/85 dark:hover:bg-muted/70 transition-colors"
                       >
                         <TableCell className="pl-12" colSpan={2}></TableCell>
                         <TableCell

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FormField from "@/components/ui/forms/FormField";
+import { PhoneInput } from "@/components/ui/phone-input";
 import FormActions from "@/components/ui/forms/FormActions";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
@@ -206,7 +207,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Details Section */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground border-l-2 border-gray-300 dark:border-zinc-700 pl-2.5">
                 {t("teacherManagement.modal.personalDetails") || "Personal Details"}
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -236,11 +237,23 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                 />
                 <FormField
                   label={t("teacherManagement.modal.phoneLabel")}
-                  placeholder={t("teacherManagement.modal.phonePlaceholder")}
-                  {...register("phone")}
                   error={errors.phone?.message}
                   required
-                />
+                >
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <PhoneInput
+                        value={value || ""}
+                        onChange={onChange}
+                        defaultCountry="US"
+                        placeholder={t("teacherManagement.modal.phonePlaceholder")}
+                        error={errors.phone}
+                      />
+                    )}
+                  />
+                </FormField>
               </div>
 
               <FormField
@@ -264,21 +277,32 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                   required
                   error={errors.country?.message}
                 >
-                  <Select 
-                    onValueChange={(value) => setValue("country", value, { shouldValidate: true })}
-                    value={watch("country") || ""}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t("teacherManagement.modal.countryPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country.id} value={country.name}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field }) => (
+                      <Select 
+                        key={countries.length}
+                        onValueChange={(val) => {
+                          if (val) {
+                            field.onChange(val);
+                          }
+                        }}
+                        value={field.value || ""}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t("teacherManagement.modal.countryPlaceholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem key={country.id} value={country.name}>
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </FormField>
               </div>
               <FormField
@@ -290,9 +314,13 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
               />
             </div>
 
+            <div className="py-6">
+              <hr className="border-t border-gray-200 dark:border-white/10" />
+            </div>
+
             {/* IAO Teaching Details Section */}
-            <div className="space-y-4 pt-4">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 border-b pb-2">
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground border-l-2 border-gray-300 dark:border-zinc-700 pl-2.5">
                 {t("teacherManagement.modal.teachingDetails") || "IAO Teaching Details"}
               </h3>
               <div className="grid grid-cols-1 gap-4">

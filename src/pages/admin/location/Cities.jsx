@@ -136,7 +136,7 @@ const Cities = () => {
                 </TableCell>
                 <TableCell>
                   {i?.venue?.length > 0 ? (
-                    i.venue.join(", ")
+                    i.venue.map(v => typeof v === 'string' ? v : v.name).join(", ")
                   ) : (
                     <span className="text-gray-500 text-sm">{t("common.noVenues")}</span>
                   )}

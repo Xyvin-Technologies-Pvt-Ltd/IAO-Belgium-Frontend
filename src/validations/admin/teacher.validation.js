@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const teacherSchema = z.object({
   first_name: z
@@ -25,14 +26,16 @@ export const teacherSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number must not exceed 15 digits"),
+    .refine((phone) => {
+      if (!phone) return false;
+      return isValidPhoneNumber(phone);
+    }, "Please enter a valid phone number"),
   
   // Address Section
   address: z
     .string()
     .min(1, "Address is required")
-    .max(200, "Address must not exceed 200 characters")
+    .max(100, "Address must not exceed 100 characters")
     .regex(/^[a-zA-Z0-9\s\-\'\.\,\u00C0-\u017F]+$/, "Address contains invalid characters"),
   postal_code: z
     .string()
