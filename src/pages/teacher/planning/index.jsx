@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, Fragment } from "react";
+import { useState, useMemo, Fragment } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -45,8 +45,42 @@ const Plannings = () => {
 
   const updateStatusMutation = useUpdateTeacherStatus();
 
-  const plannings = data?.data || [];
+  const rawSessions = data?.data || [];
   const totalRows = data?.total_count || 0;
+
+  // Group flat session array by planning_id into the structure the table expects
+  const plannings = useMemo(() => {
+    if (!rawSessions?.length) return [];
+
+    // If data is already grouped (has sessions sub-array), return as-is
+    if (rawSessions[0]?.sessions) return rawSessions;
+
+    const grouped = new Map();
+    for (const session of rawSessions) {
+      const key = session.planning_id || session._id;
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          _id: key,
+          program_name: session.program_name || "N/A",
+          component_name: session.module_name || "N/A",
+          venue: session.venue || "N/A",
+          language: session.language || "N/A",
+          location: session.location || "N/A",
+          batch_name: session.batch_name || "N/A",
+          sessions: [],
+        });
+      }
+      grouped.get(key).sessions.push({
+        session_id: session._id,
+        name: session.name,
+        session_date: session.session_date,
+        start_time: session.start_time,
+        end_time: session.end_time,
+        status: session.teacher_status || "pending",
+      });
+    }
+    return Array.from(grouped.values());
+  }, [rawSessions]);
 
   const handleStatusUpdate = async (sessionId, status) => {
     try {
@@ -167,13 +201,13 @@ const Plannings = () => {
                     ) : (
                       <>
                         <TableCell>
-                          {formatTZ(planning.sessions[0]?.session_date, "MMM DD, YYYY") || "N/A"}
+                          {formatTZ(planning.sessions?.[0]?.session_date, "MMM DD, YYYY") || "N/A"}
                         </TableCell>
                         <TableCell>
-                          {formatTZ(planning.sessions[0]?.start_time, "HH:mm") || "N/A"}
+                          {formatTZ(planning.sessions?.[0]?.start_time, "HH:mm") || "N/A"}
                         </TableCell>
                         <TableCell>
-                          {formatTZ(planning.sessions[0]?.end_time, "HH:mm") || "N/A"}
+                          {formatTZ(planning.sessions?.[0]?.end_time, "HH:mm") || "N/A"}
                         </TableCell>
                       </>
                     )}
@@ -192,7 +226,7 @@ const Plannings = () => {
                             className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
                             onClick={() =>
                               handleStatusUpdate(
-                                planning.sessions[0].session_id,
+                                planning.sessions?.[0]?.session_id,
                                 "accepted"
                               )
                             }
@@ -207,7 +241,7 @@ const Plannings = () => {
                             className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
                             onClick={() =>
                               handleStatusUpdate(
-                                planning.sessions[0].session_id,
+                                planning.sessions?.[0]?.session_id,
                                 "rejected"
                               )
                             }
