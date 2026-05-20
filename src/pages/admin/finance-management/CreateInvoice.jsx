@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CreateInvoice = ({ open, onClose }) => {
   const { t } = useTranslation();
@@ -121,14 +128,19 @@ const CreateInvoice = ({ open, onClose }) => {
               <Label className="text-sm font-medium">
                 {t("common.currency")} <span className="text-red-500">*</span>
               </Label>
-              <select
-                {...register("currency", { required: true })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+              <Select
+                value={watch("currency")}
+                onValueChange={(value) => setValue("currency", value)}
               >
-                <option value="EUR">EUR (€)</option>
-                <option value="USD">USD ($)</option>
-                <option value="GBP">GBP (£)</option>
-              </select>
+                <SelectTrigger className="mt-1 w-full">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EUR">EUR (€)</SelectItem>
+                  <SelectItem value="USD">USD ($)</SelectItem>
+                  <SelectItem value="GBP">GBP (£)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="pt-4 flex justify-end gap-3">

@@ -40,7 +40,12 @@ export const citySchema = z
       .array(timeSchema)
       .min(1, "At least one time slot is required"),
     venue: z
-      .array(z.string().min(1, "Venue name cannot be empty"))
+      .array(
+        z.object({
+          name: z.string().min(1, "Venue name cannot be empty"),
+          address: z.string().optional(),
+        })
+      )
       .min(1, "At least one venue is required"),
   })
   .refine(
@@ -56,7 +61,7 @@ export const citySchema = z
   )
   .refine(
     (data) => {
-      const venues = data.venue.filter((v) => v.trim() !== "");
+      const venues = data.venue.map((v) => v.name?.trim()).filter(Boolean);
       const uniqueVenues = new Set(venues);
       return uniqueVenues.size === venues.length;
     },

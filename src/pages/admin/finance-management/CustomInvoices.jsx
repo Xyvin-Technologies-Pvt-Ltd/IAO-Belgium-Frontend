@@ -143,13 +143,15 @@ const CustomInvoices = () => {
                     <StatusBadge status={payment?.status} />
                   </TableCell>
                   <TableCell>
-                    <button
-                      onClick={() => handleDownloadReceipt(payment)}
-                      title="Download receipt"
-                      className="p-1.5 rounded-md text-sidebar-foreground/60 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
-                    >
-                      <Download size={15} />
-                    </button>
+                    {payment?.status !== "pending" && (
+                      <button
+                        onClick={() => handleDownloadReceipt(payment)}
+                        title="Download receipt"
+                        className="p-1.5 rounded-md text-sidebar-foreground/60 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
+                      >
+                        <Download size={15} />
+                      </button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

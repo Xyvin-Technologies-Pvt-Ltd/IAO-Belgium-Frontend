@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const teacherSchema = z.object({
   first_name: z
@@ -25,17 +26,35 @@ export const teacherSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number must not exceed 15 digits"),
+    .refine((phone) => {
+      if (!phone) return false;
+      return isValidPhoneNumber(phone);
+    }, "Please enter a valid phone number"),
+  
+  // Address Section
+  address: z
+    .string()
+    .min(1, "Address is required")
+    .max(100, "Address must not exceed 100 characters")
+    .regex(/^[a-zA-Z0-9\s\-\'\.\,\u00C0-\u017F]+$/, "Address contains invalid characters"),
+  postal_code: z
+    .string()
+    .min(1, "Postal Code is required")
+    .max(20, "Postal Code must not exceed 20 characters")
+    .regex(/^[a-zA-Z0-9\-]+$/, "Postal Code can only contain alphanumeric characters and hyphens"),
   country: z.string().min(1, "Country is required"),
+  city: z.string().min(1, "City is required"),
+
+  // Teaching Preferences
   location: z.array(z.object({
     _id: z.string(),
     name: z.string()
-  })).min(1, "At least one location is required"),
+  })).min(1, "At least one preferred city is required"),
   language: z.array(z.object({
     _id: z.string(),
     name: z.string()
-  })).min(1, "At least one language is required"),
+  })).min(1, "At least one preferred language is required"),
+
   academic_degree: z.string().min(1, "Academic degree is required"),
   teacher_role: z.string().min(1, "Teacher role is required"),
   iao_employment_start_date: z.string().min(1, "Employment start date is required"),

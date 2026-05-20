@@ -220,7 +220,7 @@ const AllReports = () => {
                     <StatusBadge status={payment?.status} />
                   </TableCell>
                   <TableCell>
-                    {(payment?.status === "paid" || payment?.purpose === "custom-invoice") && (
+                    {payment?.status !== "pending" && (payment?.status === "paid" || payment?.purpose === "custom-invoice") && (
                       <button
                         onClick={() => handleDownloadReceipt(payment)}
                         title="Download receipt"

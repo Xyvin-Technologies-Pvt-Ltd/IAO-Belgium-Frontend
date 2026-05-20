@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { SearchIcon, X, Check } from "lucide-react";
+import { SearchIcon, X, Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Badge } from "@/components/ui/badge";
@@ -93,14 +93,14 @@ const SearchableMultiSelect = ({
         <div
           onClick={handleToggle}
           className={cn(
-            "min-h-9 w-full px-3 py-2 bg-white dark:bg-input/30 border border-input rounded-[6px] transition-colors cursor-pointer",
+            "min-h-9 w-full px-3 py-2 bg-white dark:bg-input/30 border border-input rounded-[6px] transition-colors cursor-pointer flex items-center justify-between gap-2",
             "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             error && "border-destructive ring-destructive/20",
             disabled && "cursor-not-allowed opacity-50"
           )}
         >
-          <div className="flex flex-wrap gap-1 min-h-5">
+          <div className="flex flex-wrap gap-1 min-h-5 flex-1">
             {selected.length === 0 ? (
               <span className="text-muted-foreground text-sm">{placeholder}</span>
             ) : (
@@ -125,6 +125,7 @@ const SearchableMultiSelect = ({
               ))
             )}
           </div>
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
         </div>
 
         {isOpen && (

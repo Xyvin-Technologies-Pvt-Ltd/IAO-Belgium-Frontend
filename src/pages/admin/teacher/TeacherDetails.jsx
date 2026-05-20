@@ -22,12 +22,12 @@ const TeacherDetails = () => {
     if (teacher?.data) {
       updateBreadcrumbs([
         {
-          label: "Teacher Management",
+          label: "Lecturer Management",
           path: "/admin/teacher-management",
           navigable: true,
         },
         {
-          label: "Teacher Details",
+          label: "Lecturer Details",
           path: "/admin/teacher-management",
           navigable: false,
         },

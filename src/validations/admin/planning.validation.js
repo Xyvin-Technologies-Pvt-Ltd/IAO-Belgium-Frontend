@@ -22,6 +22,7 @@ export const planningSchema = z.object({
   batch: z.string().min(1, "Batch is required"),
   component: z.string().min(1, "Component is required"),
   venue: z.string().min(1, "Venue is required"),
+  venue_address: z.string().optional(),
   description: z.string().optional(),
   teachers: z.array(teacherSchema).optional(),
   assistants: z.array(teacherSchema).optional(),

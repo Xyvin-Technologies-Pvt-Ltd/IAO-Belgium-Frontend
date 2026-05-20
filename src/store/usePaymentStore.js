@@ -73,7 +73,7 @@ export const useCreatePayment = () => {
   return useMutation({
     mutationFn: createPayment,
     onSuccess: () => {
-      toast.success("Manual payment recorded & Invoice created!");
+      toast.success("Manual Invoice created!");
       queryClient.invalidateQueries({ queryKey: ["payments"] });
     },
     onError: (error) => {

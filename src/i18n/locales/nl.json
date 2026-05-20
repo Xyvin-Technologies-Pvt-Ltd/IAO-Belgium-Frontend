@@ -732,7 +732,7 @@
       "noDocuments": "Geen documenten beschikbaar",
       "academicDegree": "Academische graad",
       "teacherRole": "Docentrol",
-      "employmentStartDate": "Ingangsdatum dienstverband",
+      "employmentStartDate": "Startdatum",
       "languages": "Talen",
       "locations": "Locaties"
     }
@@ -814,6 +814,7 @@
       "batchLabel": "Groep",
       "descriptionLabel": "Beschrijving",
       "sessionLabel": "Sessie",
+      "sessionsLabel": "Sessies",
       "sessionNameLabel": "Sessienaam",
       "dateLabel": "Datum",
       "timeFromLabel": "Tijd van",
@@ -1019,7 +1020,7 @@
       "phone": "Telefoon",
       "academicDegree": "Academische graad",
       "role": "Rol",
-      "employmentStartDate": "IAO Startdatum dienstverband",
+      "employmentStartDate": "Startdatum",
       "location": "Locatie",
       "language": "Taal",
       "status": "Status",
@@ -1053,7 +1054,7 @@
       "academicDegreePlaceholder": "Selecteer graad",
       "teacherRoleLabel": "Docentrol",
       "teacherRolePlaceholder": "Selecteer rol",
-      "employmentStartDateLabel": "Startdatum dienstverband",
+      "employmentStartDateLabel": "Startdatum",
       "employmentStartDatePlaceholder": "Selecteer startdatum"
     }
   },
