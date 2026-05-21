@@ -126,6 +126,7 @@ const Notifications = () => {
               <SelectItem value="drafted">Drafted</SelectItem>
               <SelectItem value="sent">Sent</SelectItem>
               <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="deleted">Deleted</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -232,7 +233,7 @@ const Notifications = () => {
                     >
                       <Eye size={15} />
                     </button>
-                    {n.status !== "sent" && (
+                    {n.status !== "sent" && n.status !== "deleted" && (
                       <>
                         <button
                           onClick={() => handleEdit(n)}
@@ -249,6 +250,9 @@ const Notifications = () => {
                         >
                           <Send size={15} />
                         </button>
+                      </>
+                    )}
+                    {n.status !== "deleted" && (n.status !== "sent" || n.type === "student_corner") && (
                         <button
                           onClick={() => setDeleteTarget(n._id)}
                           disabled={deleteMutation.isPending}
@@ -257,7 +261,6 @@ const Notifications = () => {
                         >
                           <Trash2 size={15} />
                         </button>
-                      </>
                     )}
                   </div>
                 </TableCell>
