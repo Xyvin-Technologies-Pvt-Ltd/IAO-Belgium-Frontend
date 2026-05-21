@@ -6,8 +6,9 @@ import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import TeacherSessions from "./TeacherSessions";
+import TeacherAttachments from "./TeacherAttachments";
 
-const TABS = ["sessions"];
+const TABS = ["sessions", "attachments"];
 
 const TeacherDetails = () => {
   const { t } = useTranslation();
@@ -76,13 +77,14 @@ const TeacherDetails = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              {t("planningManagement.sessions", "Sessions")}
+              {t(`planningManagement.${tab}`, tab)}
             </button>
           ))}
         </nav>
       </div>
 
       {activeTab === "sessions" && <TeacherSessions teacherId={id} />}
+      {activeTab === "attachments" && <TeacherAttachments teacherId={id} attachments={teacherData.attachments || []} />}
     </div>
   );
 };

@@ -93,6 +93,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       academic_degree: "",
       teacher_role: "",
       iao_employment_start_date: "",
+      iao_id: "",
     },
   });
 
@@ -124,6 +125,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       academic_degree: "",
       teacher_role: "",
       iao_employment_start_date: "",
+      iao_id: "",
     });
     setPreferredCitySearchTerm("");
     setLanguageSearchTerm("");
@@ -151,6 +153,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       teacher_role: teacherRoleId,
       iao_employment_start_date:
         teacherData.iao_employment_start_date?.split("T")[0] || "",
+      iao_id: teacherData.iao_id || "",
       location: Array.isArray(teacherData.location) ? teacherData.location : [],
       language: Array.isArray(teacherData.language) ? teacherData.language : [],
     });
@@ -415,13 +418,21 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                 />
               </div>
 
-              <FormField
-                label={t("teacherManagement.modal.employmentStartDateLabel")}
-                type="date"
-                {...register("iao_employment_start_date")}
-                error={errors.iao_employment_start_date?.message}
-                required
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  label={t("teacherManagement.modal.employmentStartDateLabel")}
+                  type="date"
+                  {...register("iao_employment_start_date")}
+                  error={errors.iao_employment_start_date?.message}
+                  required
+                />
+                <FormField
+                  label="IAO ID"
+                  placeholder="Enter IAO ID"
+                  {...register("iao_id")}
+                  error={errors.iao_id?.message}
+                />
+              </div>
             </div>
 
             <FormActions

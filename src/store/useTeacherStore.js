@@ -5,6 +5,8 @@ import {
   getTeacherById,
   updateTeacher,
   getSessionsByTeacherId,
+  addTeacherAttachment,
+  deleteTeacherAttachment
 } from "@/api/teacherApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -82,5 +84,35 @@ export const useGetSessionsByTeacherId = (teacherId, params, options = {}) => {
     enabled: !!teacherId,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useAddTeacherAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ teacherId, data }) => addTeacherAttachment(teacherId, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher", variables.teacherId] });
+      toast.success(response?.message || "Attachment added successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add attachment");
+    },
+  });
+};
+
+export const useDeleteTeacherAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ teacherId, attachmentId }) => deleteTeacherAttachment(teacherId, attachmentId),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["teacher", variables.teacherId] });
+      toast.success(response?.message || "Attachment deleted successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete attachment");
+    },
   });
 };

@@ -147,6 +147,31 @@ const NotificationDetail = () => {
             </div>
           </div>
 
+          {/* Audit Trail */}
+          {notification.audit_trail && notification.audit_trail.length > 0 && (
+            <div className="space-y-4 rounded-xl border border-sidebar-border bg-sidebar p-5">
+              <h3 className="font-semibold text-sidebar-foreground">
+                Audit Trail
+              </h3>
+              <div className="space-y-3">
+                {notification.audit_trail.map((entry, idx) => (
+                  <div key={idx} className="flex items-center gap-3 text-sm border-b border-sidebar-border/50 pb-2 last:border-0 last:pb-0">
+                    <div className="w-2 h-2 rounded-full bg-sidebar-primary shrink-0"></div>
+                    <div className="flex-1 text-sidebar-foreground/80">
+                      <span className="capitalize font-medium text-sidebar-foreground">{entry.action}</span> by{" "}
+                      <span className="font-semibold text-sidebar-foreground">
+                        {entry.user ? `${entry.user.first_name || ""} ${entry.user.last_name || ""}`.trim() : "System"}
+                      </span>
+                    </div>
+                    <div className="text-xs text-sidebar-foreground/50">
+                      {moment(entry.timestamp).format("DD-MM-YYYY, HH:mm:ss")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Recipients table */}
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3 flex-wrap">

@@ -52,3 +52,21 @@ export const getSessionsByTeacherId = async (teacherId, params) => {
     throw error.response.data;
   }
 };
+
+export const addTeacherAttachment = async (teacherId, data) => {
+  try {
+    const response = await axiosInstance.post(`/user/teacher/${teacherId}/attachments`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteTeacherAttachment = async (teacherId, attachmentId) => {
+  try {
+    const response = await axiosInstance.delete(`/user/teacher/${teacherId}/attachments/${attachmentId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

@@ -59,4 +59,5 @@ export const teacherSchema = z.object({
   teacher_role: z.string().min(1, "Teacher role is required"),
   iao_employment_start_date: z.string().min(1, "Employment start date is required"),
   status: z.boolean().optional(),
+  iao_id: z.string().optional(),
 });

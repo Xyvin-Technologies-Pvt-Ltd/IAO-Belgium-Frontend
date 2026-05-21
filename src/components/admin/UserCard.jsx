@@ -99,6 +99,10 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
                 }
               />
               <InfoItem
+                label="IAO ID"
+                value={user?.iao_id || t("common.notAvailable")}
+              />
+              <InfoItem
                 label={t("studentManagement.modal.languages")}
                 value={
                   user?.language?.length > 0
