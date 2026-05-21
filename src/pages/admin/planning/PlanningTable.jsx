@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
+import PlanningFilterDrawer from "./PlanningFilterDrawer";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -29,6 +30,18 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [draftFilters, setDraftFilters] = useState({
+    module_number: "all",
+    status: "active",
+    program: "all",
+    batch: "all",
+  });
+  const [appliedFilters, setAppliedFilters] = useState({
+    module_number: "all",
+    status: "active",
+    program: "all",
+    batch: "all",
+  });
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -38,17 +51,19 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
 
   const debouncedSearch = useDebounce(search, 500);
 
-  // Reset page when city or search changes
   useEffect(() => {
     setPage(1);
-  }, [activeCity, debouncedSearch]);
+  }, [activeCity, debouncedSearch, appliedFilters]);
 
   const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(activeCity !== "all" ? { city: activeCity } : {}),
-    status: "active",
+    ...(appliedFilters.module_number !== "all" ? { module_number: appliedFilters.module_number } : {}),
+    ...(appliedFilters.program !== "all" ? { program: appliedFilters.program } : {}),
+    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
+    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
   });
   const { mutateAsync: deletePlanning, isPending: isDeleting } =
     useDeletePlanning();
@@ -197,12 +212,21 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("planningManagement.search")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder={t("planningManagement.search")}
+            className="max-w-xs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <PlanningFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
+        </div>
         <Button onClick={handleOpenCreate}>
           {t("planningManagement.createPlanning")}
         </Button>
@@ -214,6 +238,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             <TableHead>{t("planningManagement.table.program")}</TableHead>
             <TableHead>{t("planningManagement.table.batch")}</TableHead>
             <TableHead>{t("planningManagement.table.module")}</TableHead>
+            <TableHead>Sequence</TableHead>
             <TableHead>Year</TableHead>
             <TableHead className="text-center">Students</TableHead>
             <TableHead>Session Start Date</TableHead>
@@ -230,10 +255,10 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={13} />
+            <TableSkeleton rows={rowsPerPage} columns={14} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={13} className="text-center p-8">
+              <TableCell colSpan={14} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -263,6 +288,9 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
                   title={i?.component?.name}
                 >
                   {i?.component?.name}
+                </TableCell>
+                <TableCell>
+                  {i?.component?.module_number ? i.component.module_number : "N/A"}
                 </TableCell>
                 <TableCell>{i?.cohort_year || "N/A"}</TableCell>
                 <TableCell>
@@ -312,7 +340,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={13} className="text-center">
+              <TableCell colSpan={14} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>
