@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "@tanstack/react-router";
-import { Bell, Calendar, Tag, Check, X } from "lucide-react";
+import { Bell, Calendar, Tag, Check, X, Paperclip, File } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import StatusBadge from "@/components/StatusBadge";
@@ -70,6 +70,19 @@ const NotificationDetail = () => {
   const recipients = recipientsData?.data || [];
   const totalRows = recipientsData?.total_count || 0;
 
+  useEffect(() => {
+    if (notification?.message) {
+      console.log("Debug - Raw Notification Message:", notification.message);
+      // Attempt to encode spaces in image URLs to see if it fixes the broken image
+      const processedMsg = notification.message.replace(/src="([^"]+)"/g, (match, p1) => {
+        console.log("Debug - Found image src:", p1);
+        console.log("Debug - Encoded image src:", encodeURI(p1));
+        return `src="${encodeURI(p1)}"`;
+      });
+      console.log("Debug - Processed Notification Message:", processedMsg);
+    }
+  }, [notification?.message]);
+
   return (
     <div className="space-y-6 mt-4">
       {notifLoading ? (
@@ -99,7 +112,7 @@ const NotificationDetail = () => {
                 {t("notification.view.message")}
               </p>
               <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5"
-              dangerouslySetInnerHTML={{ __html: notification.message }}
+              dangerouslySetInnerHTML={{ __html: notification.message?.replace(/src="([^"]+)"/g, (match, p1) => `src="${encodeURI(p1)}"`) }}
             />
             </div>
 
@@ -146,6 +159,39 @@ const NotificationDetail = () => {
               )}
             </div>
           </div>
+
+          {/* Attachments */}
+          {notification.attachments && notification.attachments.length > 0 && (
+            <div className="rounded-xl border border-sidebar-border bg-sidebar p-5 space-y-3">
+              <h3 className="font-semibold text-sidebar-foreground flex items-center gap-2">
+                <Paperclip size={16} />
+                Attachments ({notification.attachments.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {notification.attachments.map((file, idx) => (
+                  <a
+                    key={idx}
+                    href={file.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-sidebar-border rounded-lg bg-sidebar-accent/10 hover:bg-sidebar-accent/30 transition-colors group"
+                  >
+                    <div className="p-2 bg-sidebar-primary/10 rounded-md text-sidebar-primary shrink-0 group-hover:scale-105 transition-transform">
+                      <File size={16} />
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-sm font-medium truncate text-sidebar-foreground" title={file.file_name}>
+                        {file.file_name}
+                      </p>
+                      <p className="text-xs text-sidebar-foreground/50 mt-0.5">
+                        {((file.size || 0) / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Audit Trail */}
           {notification.audit_trail && notification.audit_trail.length > 0 && (

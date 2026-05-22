@@ -111,3 +111,30 @@ export const getNotificationRecipients = async (id, params) => {
     throw error.response?.data || error;
   }
 };
+
+export const createSavedAudience = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/notification/saved-audience`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getSavedAudiences = async () => {
+  try {
+    const response = await axiosInstance.get(`/notification/saved-audience`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteSavedAudience = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/notification/saved-audience/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

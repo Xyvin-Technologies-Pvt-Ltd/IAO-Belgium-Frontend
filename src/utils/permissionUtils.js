@@ -9,20 +9,23 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/planning": ["operations_management_view", "operations_management_modify"],
   "/admin/teacher-management": ["academic_management_view", "academic_management_modify"],
   "/admin/student-management": ["academic_management_view", "academic_management_modify"],
+  "/admin/notification-management": ["academic_management_view", "academic_management_modify"],
   "/admin/finance-reports": ["finance_management_view", "finance_management_modify"],
+  "/admin/custom-invoices": ["finance_management_view", "finance_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
-  "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"],
-  "/admin/teacher-data": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/teacher-qualifications": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"], // Fallback just in case
   "/admin/admin-management": ["admin_management_view", "admin_management_modify"],
   "/admin/role-management": ["roles_management_view", "roles_management_modify"],
+  "/admin/lti-management": ["admin_management_view", "admin_management_modify"],
   "/admin/admin-logs": ["logs_management_view"],
   "/admin/examination/question-banks": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/exams": ["operations_management_view", "operations_management_modify"],
   "/admin/submissions": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/assignments": ["operations_management_view", "operations_management_modify"],
-  "/admin/contracts": ["operations_management_view", "operations_management_modify"],
-  "/admin/student-contracts": ["operations_management_view", "operations_management_modify"],
+  "/admin/contracts": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/student-contracts": ["master_data_management_view", "master_data_management_modify"],
 };
 
 /**
