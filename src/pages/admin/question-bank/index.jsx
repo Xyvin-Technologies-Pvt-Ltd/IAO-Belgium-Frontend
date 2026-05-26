@@ -110,6 +110,7 @@ const QuestionBanks = () => {
             <TableHead>{t("questionBank.table.uid")}</TableHead>
             <TableHead>{t("questionBank.table.name")}</TableHead>
             <TableHead>{t("questionBank.table.description")}</TableHead>
+            <TableHead>{t("questionBank.table.language")}</TableHead>
             <TableHead>{t("questionBank.table.questionCount")}</TableHead>
             <TableHead
               className="cursor-pointer hover:text-primary transition-colors select-none"
@@ -135,10 +136,10 @@ const QuestionBanks = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("questionBank.messages.loadFailed")}
                   onRetry={refetch}
@@ -158,6 +159,7 @@ const QuestionBanks = () => {
                 <TableCell className="max-w-[200px] truncate">
                   {i?.description || "-"}
                 </TableCell>
+                <TableCell>{i?.language?.name || "-"}</TableCell>
                 <TableCell>{i?.question_count ?? 0}</TableCell>
                 <TableCell className="whitespace-nowrap">
                   {i?.createdAt ? moment(i.createdAt).format("DD-MM-YYYY") : "-"}
@@ -185,7 +187,7 @@ const QuestionBanks = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("questionBank.table.noQuestionBanks")}
               </TableCell>
             </TableRow>

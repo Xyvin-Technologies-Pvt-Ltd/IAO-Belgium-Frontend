@@ -1172,6 +1172,7 @@
     "publish": "Publiceren",
     "archive": "Archiveren",
     "allStatuses": "Alle statussen",
+    "allLanguages": "Alle talen",
     "status": {
       "draft": "Concept",
       "published": "Gepubliceerd",
@@ -1184,6 +1185,7 @@
       "duration": "Duur",
       "passingMarks": "Behaald",
       "module": "Module",
+      "language": "Taal",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
@@ -1204,6 +1206,7 @@
       "questionSources": "Vraagbronnen",
       "addQuestionSource": "Bron Toevoegen",
       "selectQuestionBank": "Selecteer Vragenbank",
+      "language": "Taal",
       "questionsAvailable": "beschikbaar",
       "questions": "vragen",
       "totalQuestions": "Totaal aantal vragen",
@@ -1415,8 +1418,12 @@
       "name": "Naam",
       "description": "Beschrijving",
       "questionCount": "Aantal vragen",
+      "language": "Taal",
       "status": "Status",
-      "action": "Actie"
+      "action": "Actie",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "noQuestionBanks": "Geen vragenbanken gevonden"
     },
     "questionList": {
       "addQuestion": "Vraag toevoegen",
@@ -1434,6 +1441,7 @@
     "form": {
       "name": "Naam",
       "namePlaceholder": "Voer naam in",
+      "language": "Taal",
       "description": "Omschrijving",
       "descriptionPlaceholder": "Voer omschrijving in"
     },

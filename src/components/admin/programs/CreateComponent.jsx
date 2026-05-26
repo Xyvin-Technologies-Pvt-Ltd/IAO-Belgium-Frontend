@@ -133,7 +133,10 @@ const CreateComponent = ({
 
   // Fetch published exams (for exam type)
   const { data: publishedExamsData } = useGetExamsDropdown(
-    { status: "published" },
+    {
+      status: "published",
+      ...(programLanguageId && { language: programLanguageId }),
+    },
     {
       enabled: selectedType === "exam",
     },

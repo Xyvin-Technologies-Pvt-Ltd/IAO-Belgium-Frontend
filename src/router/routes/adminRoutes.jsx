@@ -39,6 +39,7 @@ import Notifications from "@/pages/admin/notification";
 import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
+import StudentCornerCMS from "@/pages/admin/student-corner";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -283,5 +284,9 @@ export const adminRoutes = [
   {
     path: "/admin/lti-management",
     component: withPermissionProtection(LtiManagement, "/admin/lti-management"),
+  },
+  {
+    path: "/admin/student-corner",
+    component: withPermissionProtection(StudentCornerCMS, "/admin/student-corner"),
   },
 ];

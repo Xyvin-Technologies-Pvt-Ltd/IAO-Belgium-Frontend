@@ -1187,6 +1187,7 @@
     "publish": "Publish",
     "archive": "Archive",
     "allStatuses": "All Statuses",
+    "allLanguages": "All Languages",
     "status": {
       "draft": "Draft",
       "published": "Published",
@@ -1199,6 +1200,7 @@
       "duration": "Duration",
       "passingMarks": "Passing",
       "module": "Module",
+      "language": "Language",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
@@ -1219,6 +1221,7 @@
       "questionSources": "Question Sources",
       "addQuestionSource": "Add Source",
       "selectQuestionBank": "Select Question Bank",
+      "language": "Language",
       "questionsAvailable": "available",
       "questions": "questions",
       "totalQuestions": "Total Questions",
@@ -1453,8 +1456,12 @@
       "name": "Name",
       "description": "Description",
       "questionCount": "Question Count",
+      "language": "Language",
       "status": "Status",
-      "action": "Action"
+      "action": "Action",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noQuestionBanks": "No Question Banks found"
     },
     "questionList": {
       "addQuestion": "Add Question",
@@ -1472,6 +1479,7 @@
     "form": {
       "name": "Name",
       "namePlaceholder": "Enter name",
+      "language": "Language",
       "description": "Description",
       "descriptionPlaceholder": "Enter description"
     },
