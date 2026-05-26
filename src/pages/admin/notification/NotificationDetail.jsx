@@ -111,7 +111,7 @@ const NotificationDetail = () => {
               <p className="text-xs text-sidebar-foreground/50 mb-2 font-medium uppercase tracking-wide">
                 {t("notification.view.message")}
               </p>
-              <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5"
+              <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5 [&_img]:max-w-[300px] [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2"
               dangerouslySetInnerHTML={{ __html: notification.message?.replace(/src="([^"]+)"/g, (match, p1) => `src="${encodeURI(p1)}"`) }}
             />
             </div>
