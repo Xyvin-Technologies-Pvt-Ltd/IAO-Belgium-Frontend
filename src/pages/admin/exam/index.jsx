@@ -30,6 +30,7 @@ import {
   usePublishExam,
   useArchiveExam,
 } from "@/store/useExamStore";
+import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -40,20 +41,25 @@ const Exams = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [languageFilter, setLanguageFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const { data: languagesData } = useGetAllLanguages({ status: true });
+  const languages = languagesData?.data || [];
+
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, languageFilter]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetExams({
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(statusFilter ? { status: statusFilter } : {}),
+    ...(languageFilter ? { language: languageFilter } : {}),
   });
   const publishExam = usePublishExam();
   const archiveExam = useArchiveExam();
@@ -123,6 +129,18 @@ const Exams = () => {
               <SelectItem value="archived">{t("exam.status.archived")}</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={languageFilter || undefined} onValueChange={(value) => setLanguageFilter(value || "")}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("exam.allLanguages")} />
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map((lang) => (
+                <SelectItem key={lang._id} value={lang._id}>
+                  {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button onClick={handleOpenCreate}>{t("exam.createExam")}</Button>
       </div>
@@ -135,16 +153,17 @@ const Exams = () => {
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
+            <TableHead>{t("exam.table.language")}</TableHead>
             <TableHead>{t("exam.table.status")}</TableHead>
             <TableHead>{t("exam.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -164,6 +183,7 @@ const Exams = () => {
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
                 <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
                 <TableCell>{i?.passing_marks ?? 0}</TableCell>
+                <TableCell>{i?.language?.name || "-"}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -201,7 +221,7 @@ const Exams = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>

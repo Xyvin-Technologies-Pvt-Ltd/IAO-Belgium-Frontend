@@ -167,6 +167,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/lti-management",
             icon: Link2,
           },
+          {
+            title: "Student Corner",
+            url: "/admin/student-corner",
+            icon: LayoutDashboard,
+          },
         ],
       },
     ],

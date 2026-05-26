@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Valid permission IDs
 const VALID_PERMISSIONS = [
   "roles_management_view",
   "roles_management_modify",
@@ -14,7 +13,7 @@ const VALID_PERMISSIONS = [
   "finance_management_modify",
   "master_data_management_view",
   "master_data_management_modify",
-  "logs_management_view",
+  "logs_management_view"
 ];
 
 export const roleSchema = z.object({

@@ -13,9 +13,17 @@ import {
 } from "@/components/ui/select";
 import { useGetQuestionBanksDropdown } from "@/store/useQuestionBankStore";
 
-const QuestionSourceSelector = ({ value = [], onChange, error }) => {
+const QuestionSourceSelector = ({ value = [], onChange, error, selectedLanguage }) => {
   const { t } = useTranslation();
-  const { data: banksData } = useGetQuestionBanksDropdown({ status: true });
+  const { data: banksData } = useGetQuestionBanksDropdown(
+    {
+      status: true,
+      ...(selectedLanguage ? { language: selectedLanguage } : {}),
+    },
+    {
+      enabled: !!selectedLanguage,
+    }
+  );
   const banks = banksData?.data || [];
 
   const addSource = () => {
@@ -38,11 +46,22 @@ const QuestionSourceSelector = ({ value = [], onChange, error }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label>{t("exam.form.questionSources")} *</Label>
-        <Button type="button" variant="outline" size="sm" onClick={addSource}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addSource}
+          disabled={!selectedLanguage}
+        >
           <Plus className="h-4 w-4 mr-1" />
           {t("exam.form.addQuestionSource")}
         </Button>
       </div>
+      {!selectedLanguage && (
+        <p className="text-sm text-amber-600 dark:text-amber-400">
+          Please select a language first to load question banks.
+        </p>
+      )}
       {value.map((src, idx) => (
         <div key={idx} className="flex gap-2 items-center p-3 border rounded-lg">
           <Select

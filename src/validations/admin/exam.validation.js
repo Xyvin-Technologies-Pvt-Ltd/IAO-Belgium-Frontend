@@ -9,6 +9,7 @@ export const examSchema = z.object({
   name: z.string().min(1, "Exam name is required"),
   description: z.string().optional(),
   instructions: z.string().optional(),
+  language: z.string().min(1, "Language is required"),
   question_sources: z
     .array(questionSourceSchema)
     .min(1, "At least one question source is required"),

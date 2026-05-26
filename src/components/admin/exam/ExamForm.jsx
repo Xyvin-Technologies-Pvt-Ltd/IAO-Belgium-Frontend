@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import QuestionSourceSelector from "./QuestionSourceSelector";
 import { useCreateExam, useUpdateExam } from "@/store/useExamStore";
+import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { examSchema } from "@/validations/admin/exam.validation";
 
 const ExamForm = ({ open, onClose, examData, onSuccess }) => {
@@ -35,12 +36,16 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       name: "",
       description: "",
       instructions: "",
+      language: "",
       question_sources: [],
       passing_marks: 0,
       passing_type: "percentage",
       duration: 60,
     },
   });
+
+  const { data: languagesData } = useGetAllLanguages({ status: true });
+  const languages = languagesData?.data || [];
 
   const questionSources = watch("question_sources") || [];
   const createExam = useCreateExam();
@@ -51,6 +56,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       name: "",
       description: "",
       instructions: "",
+      language: "",
       question_sources: [],
       passing_marks: 0,
       passing_type: "percentage",
@@ -65,6 +71,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         name: examData.name || "",
         description: examData.description || "",
         instructions: examData.instructions || "",
+        language: examData.language?._id || examData.language || "",
         question_sources:
           examData.question_sources?.map((s) => ({
             question_bank:
@@ -82,6 +89,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         name: "",
         description: "",
         instructions: "",
+        language: "",
         question_sources: [],
         passing_marks: 0,
         passing_type: "percentage",
@@ -178,10 +186,40 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("exam.form.language") || "Language"} <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                key={`language-${watch("language")}`}
+                value={watch("language") || ""}
+                onValueChange={(v) => {
+                  setValue("language", v, { shouldValidate: true });
+                  // Reset question sources when language changes to prevent invalid mixing
+                  setValue("question_sources", []);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang._id} value={lang._id}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.language && (
+                <p className="text-sm text-red-500">{errors.language.message}</p>
+              )}
+            </div>
+
             <QuestionSourceSelector
               value={questionSources}
               onChange={(v) => setValue("question_sources", v)}
               error={errors.question_sources?.message}
+              selectedLanguage={watch("language")}
             />
 
             <div className="space-y-2">

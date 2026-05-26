@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosintercepter";
 
-export const uploadFile = async (file) => {
+export const uploadFile = async (file, onUploadProgress) => {
 
   if (!file || file.size === 0) {
     console.error("[uploadApi] ❌ File is null or empty — aborting upload");
@@ -10,7 +10,12 @@ export const uploadFile = async (file) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await axiosInstance.post("/upload", formData);
+    const response = await axiosInstance.post("/upload", formData, {
+      onUploadProgress,
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
     return response.data;
   } catch (error) {
     console.error("[uploadApi] ❌ Upload failed:", error);

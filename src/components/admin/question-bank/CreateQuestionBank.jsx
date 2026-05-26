@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCreateQuestionBank, useUpdateQuestionBank } from "@/store/useQuestionBankStore";
+import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { questionBankSchema } from "@/validations/admin/questionBank.validation";
 
 const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
@@ -21,14 +29,20 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(questionBankSchema),
     defaultValues: {
       name: "",
       description: "",
+      language: "",
     },
   });
+
+  const { data: languagesData } = useGetAllLanguages({ status: true });
+  const languages = languagesData?.data || [];
 
   const createBank = useCreateQuestionBank();
   const updateBank = useUpdateQuestionBank();
@@ -38,11 +52,13 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
       reset({
         name: bankData.name || "",
         description: bankData.description || "",
+        language: bankData.language?._id || bankData.language || "",
       });
     } else {
       reset({
         name: "",
         description: "",
+        language: "",
       });
     }
   }, [bankData, reset, open]);
@@ -61,6 +77,15 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
     } catch (err) {
       // Error handled by store
     }
+  };
+
+  const handleClose = () => {
+    reset({
+      name: "",
+      description: "",
+      language: "",
+    });
+    onClose();
   };
 
   return (
@@ -95,8 +120,30 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
               placeholder={t("questionBank.form.descriptionPlaceholder")}
             />
           </FormField>
+          <FormField
+            label={t("questionBank.form.language") || "Language"}
+            error={errors.language?.message}
+            required
+          >
+            <Select
+              key={`language-${watch("language")}`}
+              value={watch("language") || ""}
+              onValueChange={(v) => setValue("language", v, { shouldValidate: true })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang._id} value={lang._id}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
           <FormActions
-            onCancel={onClose}
+            onCancel={handleClose}
             submitLabel={isEdit ? t("common.update") : t("common.create")}
             isLoading={createBank.isPending || updateBank.isPending}
           />

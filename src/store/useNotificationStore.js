@@ -11,6 +11,9 @@ import {
   previewNotificationCount,
   getNotificationRecipients,
   getNotificationById,
+  createSavedAudience,
+  getSavedAudiences,
+  deleteSavedAudience,
 } from "@/api/notificationApi";
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -173,5 +176,43 @@ export const useGetNotificationById = (id, options = {}) => {
     staleTime: 30000,
     enabled: !!id,
     ...options,
+  });
+};
+
+export const useGetSavedAudiences = (options = {}) => {
+  return useQuery({
+    queryKey: ["saved-audiences"],
+    queryFn: getSavedAudiences,
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useCreateSavedAudience = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createSavedAudience,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["saved-audiences"] });
+      toast.success(response?.message || "Audience saved successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save audience");
+    },
+  });
+};
+
+export const useDeleteSavedAudience = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteSavedAudience,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["saved-audiences"] });
+      toast.success(response?.message || "Audience deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete audience");
+    },
   });
 };

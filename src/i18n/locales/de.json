@@ -1200,6 +1200,7 @@
     "publish": "Veröffentlichen",
     "archive": "Archivieren",
     "allStatuses": "Alle Status",
+    "allLanguages": "Alle Sprachen",
     "status": {
       "draft": "Entwurf",
       "published": "Veröffentlicht",
@@ -1212,6 +1213,7 @@
       "duration": "Dauer",
       "passingMarks": "Bestehen",
       "module": "Modul",
+      "language": "Sprache",
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
@@ -1232,6 +1234,7 @@
       "questionSources": "Fragenquellen",
       "addQuestionSource": "Quelle hinzufügen",
       "selectQuestionBank": "Fragenkatalog auswählen",
+      "language": "Sprache",
       "questionsAvailable": "verfügbar",
       "questions": "Fragen",
       "totalQuestions": "Gesamtanzahl der Fragen",
@@ -1442,8 +1445,12 @@
       "name": "Name",
       "description": "Beschreibung",
       "questionCount": "Anzahl Fragen",
+      "language": "Sprache",
       "status": "Status",
-      "action": "Aktion"
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "noQuestionBanks": "Keine Fragenbanken gefunden"
     },
     "questionList": {
       "addQuestion": "Frage hinzufügen",
@@ -1461,6 +1468,7 @@
     "form": {
       "name": "Name",
       "namePlaceholder": "Name eingeben",
+      "language": "Sprache",
       "description": "Beschreibung",
       "descriptionPlaceholder": "Beschreibung eingeben"
     },

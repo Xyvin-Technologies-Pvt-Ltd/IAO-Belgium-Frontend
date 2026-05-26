@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { Bold, Italic, List, ListOrdered, Link as LinkIcon } from 'lucide-react';
+import Image from '@tiptap/extension-image';
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 import { Button } from './button';
 import { cn } from "@/lib/utils";
 
-const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
+const RichTextEditor = ({ value, onChange, placeholder, className = "", onImageAdded }) => {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
 
@@ -26,6 +27,13 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
         openOnClick: false,
         HTMLAttributes: {
           class: 'text-primary underline cursor-pointer',
+        },
+      }),
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+        HTMLAttributes: {
+          class: 'max-w-full rounded-md border inline-block my-2',
         },
       }),
     ],
@@ -103,6 +111,22 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
     setShowLinkInput(true);
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Url = e.target.result;
+      editor.chain().focus().setImage({ src: base64Url }).run();
+      if (onImageAdded) {
+        onImageAdded(file, base64Url);
+      }
+    };
+    reader.readAsDataURL(file);
+    event.target.value = ""; // reset input
+  };
+
   return (
     <div className={cn(
       "placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input min-h-16 w-full min-w-0 rounded-[6px] border-[0.5px] transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
@@ -157,6 +181,15 @@ const RichTextEditor = ({ value, onChange, placeholder, className = "" }) => {
         >
           <LinkIcon size={14} />
         </Button>
+        <label className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          <input 
+            type="file" 
+            accept="image/*" 
+            className="hidden" 
+            onChange={handleImageUpload} 
+          />
+          <ImageIcon size={14} className="text-foreground" />
+        </label>
       </div>
 
       {/* Link Input */}
