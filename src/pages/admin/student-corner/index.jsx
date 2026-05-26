@@ -272,7 +272,7 @@ const StudentCornerCMS = () => {
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Videos</h3>
-            <button type="button" onClick={() => appendVideo({ title: "", videoUrl: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
+            <button type="button" onClick={() => appendVideo({ title: "", video_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
               <Plus className="h-4 w-4" /> Add Video
             </button>
           </div>
