@@ -177,7 +177,7 @@ const StudentCornerCMS = () => {
       <div className="space-y-8">
         {/* PAMs Banner Section */}
         <section className="bg-card border rounded-lg p-6">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">PAMs Banner</h3>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Banner</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Title</Label>
