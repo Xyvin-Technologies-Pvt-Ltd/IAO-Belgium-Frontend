@@ -105,7 +105,7 @@ const TeacherNotificationDetail = () => {
               <p className="text-xs text-sidebar-foreground/50 mb-2 font-medium uppercase tracking-wide">
                 Message
               </p>
-              <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5"
+              <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5 [&_img]:max-w-[300px] [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2"
                 dangerouslySetInnerHTML={{ __html: notification.message }}
               />
             </div>
@@ -117,13 +117,6 @@ const TeacherNotificationDetail = () => {
                 <span className="text-sidebar-foreground/50 text-xs">Target:</span>
                 <span className="font-medium text-sidebar-foreground">
                   {getRecipientsLabel()}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-sidebar-border bg-sidebar-accent/20 text-sm">
-                <Tag size={13} className="text-sidebar-foreground/50 shrink-0" />
-                <span className="text-sidebar-foreground/50 text-xs">Type:</span>
-                <span className="font-medium text-sidebar-foreground">
-                  {notification.type === "student_corner" ? "Student Corner" : "Alert"}
                 </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-sidebar-border bg-sidebar-accent/20 text-sm">

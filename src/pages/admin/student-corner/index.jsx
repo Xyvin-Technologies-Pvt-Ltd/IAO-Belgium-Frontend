@@ -221,7 +221,6 @@ const StudentCornerCMS = () => {
           </div>
         </section>
 
-        {/* Documents Section */}
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Documents</h3>
