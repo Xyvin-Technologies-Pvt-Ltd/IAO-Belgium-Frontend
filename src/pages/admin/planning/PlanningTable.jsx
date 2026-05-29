@@ -180,6 +180,30 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
     );
   };
 
+  const renderExamChips = (exams) => {
+    if (!exams || exams.length === 0) {
+      return (
+        <span className="text-gray-500 text-sm">
+          No exams
+        </span>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {exams.map((ex) => (
+          <Badge
+            key={ex._id}
+            variant="secondary"
+            className="text-xs whitespace-nowrap bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
+          >
+            {ex.exam?.name || ex.exam_component?.name || "Unnamed Exam"}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
+
   const handleOpenCreate = () => {
     setSelectedPlanning(null);
     setIsModalOpen(true);
@@ -244,6 +268,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             <TableHead>Session Start Date</TableHead>
             <TableHead>Session End Date</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
+            <TableHead>{t("planningManagement.table.exams", "Exams")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.assistants", "Assistants")}</TableHead>
             <TableHead>{t("planningManagement.table.trainees", "Trainees")}</TableHead>
@@ -255,10 +280,10 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={14} />
+            <TableSkeleton rows={rowsPerPage} columns={15} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={14} className="text-center p-8">
+              <TableCell colSpan={15} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -313,6 +338,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
                 >
                   {i?.venue || "N/A"}
                 </TableCell>
+                <TableCell>{renderExamChips(i?.exams)}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'teachers')}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'assistants')}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'trainees')}</TableCell>
@@ -340,7 +366,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={14} className="text-center">
+              <TableCell colSpan={15} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>
