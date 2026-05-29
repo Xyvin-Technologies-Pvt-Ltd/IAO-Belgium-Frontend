@@ -7,6 +7,7 @@ import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
 import RoleManagement from "@/pages/admin/role-management";
 import Language from "@/pages/admin/language";
+import SpecialExceptions from "@/pages/admin/special-exception";
 import Intakes from "@/pages/admin/intake";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { getRequiredPermissions } from "@/utils/permissionUtils";
@@ -78,6 +79,13 @@ export const adminRoutes = [
   {
     path: "/admin/languages",
     component: withPermissionProtection(Language, "/admin/languages"),
+  },
+  {
+    path: "/admin/special-exceptions",
+    component: withPermissionProtection(
+      SpecialExceptions,
+      "/admin/special-exceptions",
+    ),
   },
   {
     path: "/admin/teacher-qualifications",

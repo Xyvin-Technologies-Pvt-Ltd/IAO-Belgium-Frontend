@@ -1,7 +1,7 @@
 import UserCard from "@/components/admin/UserCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentById } from "@/store/useStudentStore";
+import { useGetStudentById, useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -31,6 +31,14 @@ const StudentView = () => {
   const navigate = useNavigate();
   const { updateBreadcrumbs } = useBreadcrumb();
   const [filter, setFilter] = useState({ year: 1 });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedExceptions, setSelectedExceptions] = useState([]);
+
+  const { data: allExceptionsData, isLoading: isExceptionsLoading } = useGetSpecialExceptions({
+    enabled: isEditModalOpen,
+  });
+  const allExceptions = allExceptionsData?.data || [];
+  const updateExceptionsMutation = useUpdateStudentSpecialExceptions();
 
   const {
     data: student,
@@ -250,8 +258,130 @@ const StudentView = () => {
               {attendance}%
             </div>
           </div>
+
+          {/* Medical / Special Exceptions Section */}
+          <div className="mt-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900 dark:text-white">Special Exceptions</h3>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
+              >
+                Configure
+              </button>
+            </div>
+            <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
+              {studentData.special_exceptions && studentData.special_exceptions.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {studentData.special_exceptions.map((ex) => (
+                    <span
+                      key={ex._id}
+                      className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300 border border-orange-200 dark:border-orange-900/50"
+                    >
+                      {ex.name} (+{ex.extra_time_percentage}%)
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-2">
+                  No exceptions configured. Default exam settings apply.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Edit Special Exceptions Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+          <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md flex flex-col p-6 space-y-4">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              Configure Special Exceptions
+            </h3>
+            
+            <p className="text-xs text-gray-500 dark:text-white/60">
+              Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the longest extra duration multiplier to their exams.
+            </p>
+
+            {isExceptionsLoading ? (
+              <p className="text-sm">Loading conditions...</p>
+            ) : (
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                {allExceptions.map((ex) => {
+                  const isChecked = selectedExceptions.includes(ex._id);
+                  return (
+                    <label
+                      key={ex._id}
+                      className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          if (isChecked) {
+                            setSelectedExceptions(selectedExceptions.filter(id => id !== ex._id));
+                          } else {
+                            setSelectedExceptions([...selectedExceptions, ex._id]);
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {ex.name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-white/60">
+                          +{ex.extra_time_percentage}% extra time
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
+                {allExceptions.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No exceptions configured in system yet.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  updateExceptionsMutation.mutate(
+                    { id, specialExceptions: selectedExceptions },
+                    {
+                      onSuccess: () => {
+                        setIsEditModalOpen(false);
+                      },
+                    }
+                  );
+                }}
+                disabled={updateExceptionsMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-[#ff8904] rounded-lg hover:bg-[#e07b03] disabled:opacity-50 cursor-pointer"
+              >
+                {updateExceptionsMutation.isPending ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Initialize state when modal is opened */}
+      {(() => {
+        if (isEditModalOpen && selectedExceptions.length === 0 && studentData.special_exceptions?.length > 0) {
+          setSelectedExceptions(studentData.special_exceptions.map(ex => ex._id || ex));
+        }
+      })()}
     </div>
   );
 };

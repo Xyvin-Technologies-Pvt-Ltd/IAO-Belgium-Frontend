@@ -24,6 +24,7 @@ const SearchableSelect = ({
   className,
   disabled = false,
   isLoading = false,
+  renderItem = null, // optional: (item) => ReactNode
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -106,7 +107,7 @@ const SearchableSelect = ({
             <div className="max-h-60 overflow-y-auto">
               {items.map((item) => (
                 <SelectItem key={item._id} value={item._id}>
-                  {item.name}
+                  {renderItem ? renderItem(item) : item.name}
                 </SelectItem>
               ))}
             </div>
