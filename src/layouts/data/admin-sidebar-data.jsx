@@ -15,6 +15,7 @@ import {
   ScrollText,
   Bell,
   Link2,
+  Activity,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -76,6 +77,10 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
                 title: t("sidebar.admin.exams"),
                 url: "/admin/examination/exams",
               },
+              {
+                title: t("sidebar.admin.results"),
+                url: "/admin/results",
+              },
             ],
           },
         ],
@@ -127,6 +132,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.languages"),
             url: "/admin/languages",
             icon: Languages,
+          },
+          {
+            title: t("sidebar.admin.specialExceptions", "Special Exceptions"),
+            url: "/admin/special-exceptions",
+            icon: Activity,
           },
            {
             title: t("sidebar.admin.teacherQualifications"),

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
@@ -9,6 +9,9 @@ import { useTranslation } from "react-i18next";
 import { useCreateIntake, useUpdateIntake } from "@/store/useIntakeStore";
 import { useGetAllPrograms } from "@/store/useDropdownStore";
 import { intakeSchema } from "@/validations/admin";
+import moment from "moment";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
   const { t } = useTranslation();
@@ -28,6 +31,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     handleSubmit,
     reset,
     setValue,
+    control,
     watch,
     formState: { errors, isValid },
   } = useForm({
@@ -37,6 +41,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
       ...(isEdit && { name: "" }),
       program: [],
       admission_fee: "",
+      is_free: false,
       start_date: "",
       end_date: "",
       registration_deadline: "",
@@ -49,6 +54,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
   const updateIntake = useUpdateIntake();
 
   const selectedPrograms = watch("program");
+  const isFree = watch("is_free");
 
   const formatProgramData = (program) => {
     if (!program) return null;
@@ -65,6 +71,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
       ...(isEdit && { name: "" }),
       program: [],
       admission_fee: "",
+      is_free: false,
       start_date: "",
       end_date: "",
       registration_deadline: "",
@@ -86,7 +93,8 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
         : intakeData.program?._id
           ? [formatProgramData(intakeData.program)]
           : [],
-      admission_fee: intakeData.admission_fee || "",
+      admission_fee: intakeData.admission_fee ?? "",
+      is_free: intakeData.admission_fee === 0,
       start_date: intakeData.start_date
         ? intakeData.start_date.split("T")[0]
         : "",
@@ -99,17 +107,27 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     });
   }, [open, intakeData, reset]);
 
+  useEffect(() => {
+    if (isFree) {
+      setValue("admission_fee", 0, { shouldValidate: true });
+    }
+  }, [isFree, setValue]);
+
   const onSubmit = (formData) => {
+    const isDeadlinePassed = moment(formData.registration_deadline).endOf("day").isBefore(moment());
+    const status = isDeadlinePassed ? "closed" : "open";
+
     const payload = {
       ...(isEdit && { name: formData.name }),
       program: formData.program.map((p) => p._id),
-      admission_fee: Number(formData.admission_fee),
+      admission_fee: formData.is_free ? 0 : Number(formData.admission_fee),
       start_date: formData.start_date,
       end_date: formData.end_date,
       registration_deadline: formData.registration_deadline,
       student_per_batch: Number(formData.student_per_batch),
       max_student_enrollment: Number(formData.max_student_enrollment),
       academic: academicId,
+      status,
     };
 
     const mutation = isEdit ? updateIntake : createIntake;
@@ -172,14 +190,38 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
             required
           />
 
-          <FormField
-            label={t("intakeManagement.modal.registrationFeeLabel")}
-            placeholder={t("intakeManagement.modal.registrationFeePlaceholder")}
-            type="number"
-            error={errors.admission_fee?.message}
-            required
-            {...register("admission_fee")}
-          />
+          <div className="flex items-center space-x-3 bg-gray-50 dark:bg-zinc-900/50 p-3 rounded-lg border dark:border-white/10">
+            <Controller
+              name="is_free"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="is_free"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+            <div className="flex flex-col">
+              <Label htmlFor="is_free" className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer">
+                {t("intakeManagement.modal.freeIntakeLabel", "Free Intake")}
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                {t("intakeManagement.modal.freeIntakeDescription", "Enable if this intake does not require any registration fee")}
+              </span>
+            </div>
+          </div>
+
+          {!isFree && (
+            <FormField
+              label={t("intakeManagement.modal.registrationFeeLabel")}
+              placeholder={t("intakeManagement.modal.registrationFeePlaceholder")}
+              type="number"
+              error={errors.admission_fee?.message}
+              required
+              {...register("admission_fee")}
+            />
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <FormField

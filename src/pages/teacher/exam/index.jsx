@@ -101,7 +101,11 @@ const ExamList = () => {
                 <TableCell>{exam?.batch_name ?? "—"}</TableCell>
                 <TableCell>{exam?.total_questions ?? 0}</TableCell>
                 <TableCell>{exam?.duration ?? 0} min</TableCell>
-                <TableCell>{exam?.passing_marks ?? 0}</TableCell>
+                <TableCell>
+                  {exam?.passing_type === "percentage"
+                    ? `${exam?.passing_percentage ?? exam?.passing_marks ?? 0}%`
+                    : exam?.passing_marks ?? exam?.passing_percentage ?? 0}
+                </TableCell>
                 <TableCell>
                   <StatusBadge status={exam?.exam_session_status ?? "not_started"} />
                 </TableCell>

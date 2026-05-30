@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import {
@@ -81,6 +81,7 @@ const CreateComponent = ({
       name: "",
       year: 1,
       amount: 0,
+      is_free: false,
       module_number: 1,
       submission_deadline: "",
       instruction: "",
@@ -104,6 +105,7 @@ const CreateComponent = ({
 
   const watchedType = watch("type");
   const watchedStatus = watch("status");
+  const isFree = watch("is_free");
 
   const createComponent = useCreateComponent();
   const updateComponent = useUpdateComponent();
@@ -179,6 +181,7 @@ const CreateComponent = ({
       name: "",
       year: 1,
       amount: 0,
+      is_free: false,
       module_number: 1,
       submission_deadline: "",
       instruction: "",
@@ -231,6 +234,7 @@ const CreateComponent = ({
       name: componentData.name || "",
       year: Number(componentData.year) || 1,
       amount: componentData.amount || 0,
+      is_free: componentData.amount === 0,
       module_number: componentData.module_number || 1,
       submission_deadline: formattedDeadline,
       instruction: componentData.instruction || "",
@@ -281,6 +285,12 @@ const CreateComponent = ({
   useEffect(() => {
     setValue("instruction", instructionContent);
   }, [instructionContent, setValue]);
+
+  useEffect(() => {
+    if (isFree) {
+      setValue("amount", 0, { shouldValidate: true });
+    }
+  }, [isFree, setValue]);
 
   const onSubmit = async (data) => {
     setIsUploading(true);
@@ -343,7 +353,7 @@ const CreateComponent = ({
       }
 
       if (data.type === "module") {
-        payload.amount = data.amount;
+        payload.amount = data.is_free ? 0 : Number(data.amount);
         payload.module_number = data.module_number;
         // Include system_id if a module was selected from suggestions
         if (selectedSystemId) {
@@ -556,14 +566,38 @@ const CreateComponent = ({
                   required
                   {...register("module_number")}
                 />
-                <FormField
-                  label={t("componentManagement.amountLabel")}
-                  type="number"
-                  placeholder={t("componentManagement.amountPlaceholder")}
-                  error={errors.amount?.message}
-                  required
-                  {...register("amount")}
-                />
+                <div className="flex items-center space-x-3 bg-gray-50 dark:bg-zinc-900/50 p-3 rounded-lg border dark:border-white/10">
+                  <Controller
+                    name="is_free"
+                    control={control}
+                    render={({ field }) => (
+                      <Switch
+                        id="is_free"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <div className="flex flex-col">
+                    <Label htmlFor="is_free" className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer">
+                      {t("componentManagement.freeComponentLabel", "Free Module")}
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {t("componentManagement.freeComponentDescription", "Enable if this module does not require any additional payment")}
+                    </span>
+                  </div>
+                </div>
+
+                {!isFree && (
+                  <FormField
+                    label={t("componentManagement.amountLabel")}
+                    type="number"
+                    placeholder={t("componentManagement.amountPlaceholder")}
+                    error={errors.amount?.message}
+                    required
+                    {...register("amount")}
+                  />
+                )}
               </>
             )}
             {selectedType === "exam" && (

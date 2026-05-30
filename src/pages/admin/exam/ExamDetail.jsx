@@ -150,8 +150,8 @@ const ExamDetail = () => {
           icon={GraduationCap}
         />
         <DashboardCard
-          title={t("exam.detail.passingMarks")}
-          value={`${exam.passing_marks || 0} ${exam.passing_type === "percentage" ? "%" : ""}`}
+          title={exam.passing_type === "percentage" ? t("exam.detail.passingPercentage", "Passing Percentage") : t("exam.detail.passingMarks")}
+          value={`${exam.passing_type === "percentage" ? (exam.passing_percentage ?? exam.passing_marks ?? 0) : (exam.passing_marks ?? exam.passing_percentage ?? 0)} ${exam.passing_type === "percentage" ? "%" : ""}`}
         />
         <DashboardCard
           title={t("exam.detail.duration")}

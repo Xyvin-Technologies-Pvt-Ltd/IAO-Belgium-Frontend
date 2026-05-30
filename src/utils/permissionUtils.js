@@ -14,6 +14,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/custom-invoices": ["finance_management_view", "finance_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/special-exceptions": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-qualifications": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"], // Fallback just in case
   "/admin/admin-management": ["admin_management_view", "admin_management_modify"],
@@ -23,6 +24,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/examination/question-banks": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/exams": ["operations_management_view", "operations_management_modify"],
   "/admin/submissions": ["operations_management_view", "operations_management_modify"],
+  "/admin/results": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/assignments": ["operations_management_view", "operations_management_modify"],
   "/admin/contracts": ["master_data_management_view", "master_data_management_modify"],
   "/admin/student-contracts": ["master_data_management_view", "master_data_management_modify"],

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Plus, Trash } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useCreatePlanning, useUpdatePlanning } from "@/store/usePlanningStore";
+import { useCreatePlanning, useUpdatePlanning, useGetPlanning } from "@/store/usePlanningStore";
 import {
   useGetBatches,
   useGetComponents,
@@ -62,6 +62,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           trainees: [],
         },
       ],
+      exams: [],
     },
   });
 
@@ -112,6 +113,90 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       { enabled: open && !!selectedProgram },
     );
 
+  const selectedComponent = watch("component");
+  const selectedBatch = watch("batch");
+  const initialComponentId = planningData?.component?._id || planningData?.component || "";
+  const isComponentChanged = selectedComponent !== initialComponentId;
+
+  // Fetch all plannings for the selected batch to identify already-planned modules
+  const { data: batchPlanningsData } = useGetPlanning(
+    { batch: selectedBatch, is_all: "true" },
+    { enabled: open && !!selectedBatch },
+  );
+
+  // Set of component IDs that already have a planning for this batch
+  const plannedComponentIds = new Set(
+    (batchPlanningsData?.data || []).map(
+      (p) => p.component?._id || p.component
+    ).filter(Boolean)
+  );
+
+  const { data: examsData, isLoading: examsLoading } = useGetComponents(
+    {
+      program: selectedProgram,
+      type: "exam",
+      linked_module: selectedComponent,
+    },
+    { enabled: open && !!selectedProgram && !!selectedComponent },
+  );
+
+  const examsList = examsData?.data || [];
+
+  useEffect(() => {
+    // If exams are still loading from the API, do nothing
+    if (examsLoading) return;
+
+    if (open && examsList.length > 0) {
+      const currentExams = watch("exams") || [];
+
+      const newExams = examsList.map((examComp) => {
+        const existing = currentExams.find((e) => e.component === examComp._id);
+        if (existing) return existing;
+
+        // Fallback for edit mode: check if it's in planningData.exams
+        if (isEdit && !isComponentChanged) {
+          const original = planningData?.exams?.find(
+            (ex) => (ex.exam_component?._id || ex.exam_component) === examComp._id
+          );
+          if (original) {
+            return {
+              component: examComp._id,
+              exam: examComp.linked_exam || original.exam?._id || original.exam || "",
+              teacher: original.teacher?._id || original.teacher || "",
+              is_sit_at_home: original.is_sit_at_home || false,
+              max_attempts: original.max_attempts ?? 2,
+              cooldown_days: original.cooldown_days ?? 7,
+              deadline: original.deadline ? formatTZ(original.deadline, "YYYY-MM-DD") : "",
+            };
+          }
+        }
+
+        return {
+          component: examComp._id,
+          exam: examComp.linked_exam,
+          teacher: "",
+          is_sit_at_home: false,
+          max_attempts: 2,
+          cooldown_days: 7,
+          deadline: "",
+        };
+      });
+
+      const filteredNewExams = newExams.filter((ne) => examsList.some((el) => el._id === ne.component));
+      if (JSON.stringify(currentExams) !== JSON.stringify(filteredNewExams)) {
+        setValue("exams", filteredNewExams);
+      }
+    } else if (open) {
+      // Only clear if NOT in edit mode, OR if the component has actually changed
+      if (!isEdit || isComponentChanged) {
+        const currentExams = watch("exams") || [];
+        if (currentExams.length > 0) {
+          setValue("exams", []);
+        }
+      }
+    }
+  }, [examsList, examsLoading, open, setValue, isEdit, isComponentChanged, planningData]);
+
   const { data: teachersData, isLoading: teachersLoading } = useGetUsers(
     {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
@@ -144,10 +229,66 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
 
   const batches = batchesData?.data || [];
-  const components = componentsData?.data || [];
+  const componentsRaw = componentsData?.data || [];
+  const components = componentsRaw.map((comp) => {
+    const linkedExams = (comp.linked_exams || []).filter((e) => e.name);
+    if (linkedExams.length > 0) {
+      const examNames = linkedExams.map((e) => e.name).join(", ");
+      return {
+        ...comp,
+        name: `${comp.name} (Exam: ${examNames})`,
+      };
+    }
+    return comp;
+  });
   const teachers = teachersData?.data || [];
   const assistants = assistantsData?.data || [];
   const trainees = traineesData?.data || [];
+
+  // All teaching staff combined (for exam teacher dropdown)
+  const allStaff = [
+    ...teachers.map((u) => ({ ...u, _role: "Teacher" })),
+    ...assistants.map((u) => ({ ...u, _role: "Assistant" })),
+    ...trainees.map((u) => ({ ...u, _role: "Trainee" })),
+  ].filter(
+    (u, idx, arr) => arr.findIndex((x) => x._id === u._id) === idx
+  );
+
+  const getExamTeacherItems = (examComponentId, assignedTeacherValue) => {
+    const baseItems = allStaff.map((staff) => ({
+      _id: staff._id,
+      name: staff.name
+        ? `${staff.name} [${staff._role}]`
+        : `${staff.first_name ?? ""} ${staff.last_name ?? ""}`.trim() || "Unknown",
+    }));
+
+    if (assignedTeacherValue) {
+      const exists = baseItems.some((item) => item._id === assignedTeacherValue);
+      if (!exists) {
+        const examData = planningData?.exams?.find(
+          (ex) => (ex.exam_component?._id || ex.exam_component) === examComponentId
+        );
+        if (
+          examData &&
+          examData.teacher &&
+          typeof examData.teacher === "object" &&
+          examData.teacher._id === assignedTeacherValue
+        ) {
+          const teacherName = `${examData.teacher.first_name ?? ""} ${examData.teacher.last_name ?? ""}`.trim() || "Unknown";
+          baseItems.push({
+            _id: assignedTeacherValue,
+            name: `${teacherName} [Assigned]`,
+          });
+        } else {
+          baseItems.push({
+            _id: assignedTeacherValue,
+            name: "Loading/Assigned Teacher...",
+          });
+        }
+      }
+    }
+    return baseItems;
+  };
 
   const handleClose = () => {
     reset({
@@ -171,6 +312,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           trainees: [],
         },
       ],
+      exams: [],
     });
     setProgramSearchTerm("");
     setBatchSearchTerm("");
@@ -187,15 +329,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       const batchId = planningData.batch?._id || planningData.batch || "";
       const componentId = planningData.component?._id || planningData.component || "";
       
-      console.log("DEBUG: editing planningData", planningData);
-      
       const formattedSessions = planningData.sessions?.map((session) => {
-        console.log(`DEBUG: session ${session.name} staff:`, {
-          teachers: session.teachers,
-          assistants: session.assistants,
-          trainees: session.trainees
-        });
-
         return {
           _id: session._id,
           name: session.name || "",
@@ -204,7 +338,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           end_time: formatTZ(session.end_time, "HH:mm"),
           teachers: session.teachers?.map((t) => {
             const teacher = t.teacher || t;
-            console.log("DEBUG: mapping teacher", t, teacher);
             return {
               _id: teacher._id,
               name: `${teacher.first_name} ${teacher.last_name}`.trim(),
@@ -213,7 +346,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           }) || [],
           assistants: session.assistants?.map((a) => {
             const assistant = a.assistant || a;
-            console.log("DEBUG: mapping assistant", a, assistant);
             return {
               _id: assistant._id,
               name: `${assistant.first_name} ${assistant.last_name}`.trim(),
@@ -222,7 +354,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           }) || [],
           trainees: session.trainees?.map((t) => {
             const trainee = t.trainee || t;
-            console.log("DEBUG: mapping trainee", t, trainee);
             return {
               _id: trainee._id,
               name: `${trainee.first_name} ${trainee.last_name}`.trim(),
@@ -232,7 +363,15 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         };
       }) || [];
 
-      console.log("DEBUG: formattedSessions result", formattedSessions);
+      const formattedExams = planningData.exams?.map((ex) => ({
+        component: ex.exam_component?._id || ex.exam_component || "",
+        exam: ex.exam?._id || ex.exam || "",
+        teacher: ex.teacher?._id || ex.teacher || "",
+        is_sit_at_home: ex.is_sit_at_home || false,
+        max_attempts: ex.max_attempts ?? 2,
+        cooldown_days: ex.cooldown_days ?? 7,
+        deadline: ex.deadline ? formatTZ(ex.deadline, "YYYY-MM-DD") : "",
+      })) || [];
 
       reset({
         program: programId,
@@ -242,6 +381,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         venue_address: planningData.venue_address || "",
         description: planningData.description || "",
         sessions: formattedSessions,
+        exams: formattedExams,
       });
 
       // Pre-set search terms so the SearchableSelect can show the labels even if items list is loading
@@ -269,6 +409,8 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   }, [selectedProgram, setValue, isEdit]);
 
   const onSubmit = (formData) => {
+    console.log("[Planning onSubmit] formData:", formData);
+
     const formattedSessions = formData.sessions.map((session) => {
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
       const startTime = moment(session.start_time, "HH:mm").format("HH:mm");
@@ -279,13 +421,10 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       let sessionTrainees = [];
 
       if (isEdit) {
-        sessionTeachers = (session.teachers || []).map((teacher) => {
-          const formatted = {
-            teacher: teacher._id,
-            status: teacher.status || "pending",
-          };
-          return formatted;
-        });
+        sessionTeachers = (session.teachers || []).map((teacher) => ({
+          teacher: teacher._id,
+          status: teacher.status || "pending",
+        }));
         sessionAssistants = (session.assistants || []).map((assistant) => ({
           assistant: assistant._id,
           status: assistant.status || "pending",
@@ -325,7 +464,19 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(formData.venue_address && { venue_address: formData.venue_address }),
       ...(formData.description && { description: formData.description }),
       sessions: formattedSessions,
+      exams: (formData.exams || []).map((ex) => ({
+        component: ex.component,
+        exam: ex.exam,
+        teacher: ex.teacher || null,
+        // Ensure boolean — checkbox via register() may return string
+        is_sit_at_home: ex.is_sit_at_home === true || ex.is_sit_at_home === "true",
+        max_attempts: Number(ex.max_attempts) || 2,
+        cooldown_days: Number(ex.cooldown_days) ?? 7,
+        deadline: ex.deadline || null,
+      })),
     };
+
+    console.log("[Planning onSubmit] payload:", payload);
 
     const mutation = isEdit ? updatePlanning : createPlanning;
     const mutationData = isEdit
@@ -334,7 +485,11 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
+        console.log("[Planning onSubmit] SUCCESS");
         handleClose();
+      },
+      onError: (err) => {
+        console.error("[Planning onSubmit] ERROR:", err);
       },
     });
   };
@@ -414,7 +569,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         </div>
 
         <div className="overflow-y-auto flex-1 p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit, (validationErrors) => {
+              console.error("[Planning] Zod validation errors (form NOT submitted):", validationErrors);
+            })}
+            className="space-y-6"
+          >
             <SearchableSelect
               label={t("planningManagement.modal.programLabel")}
               placeholder={t("planningManagement.modal.searchPrograms")}
@@ -460,6 +620,34 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               error={errors.component?.message}
               disabled={!selectedProgram}
               required
+              renderItem={(item) => {
+                const isPlanned = plannedComponentIds.has(item._id);
+                return (
+                  <span className="flex items-center justify-between w-full gap-2">
+                    <span className="flex-1 truncate">{item.name}</span>
+                    {isPlanned && (
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "3px",
+                          fontSize: "10px",
+                          fontWeight: 600,
+                          padding: "1px 6px",
+                          borderRadius: "9999px",
+                          backgroundColor: "#dcfce7",
+                          color: "#166534",
+                          border: "1px solid #bbf7d0",
+                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                        }}
+                      >
+                        ✓ Planned
+                      </span>
+                    )}
+                  </span>
+                );
+              }}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -703,8 +891,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                       <>
                         {(() => {
                           const selectedTeachers = watch(`sessions.${index}.teachers`) || [];
-                          console.log(`DEBUG: Session ${index} selected teachers:`, selectedTeachers);
-                          console.log(`DEBUG: Available teachers list:`, teachers);
                           return (
                             <SearchableMultiSelect
                               label={t("planningManagement.modal.teachersLabel")}
@@ -745,7 +931,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
                         {(() => {
                           const selectedAssistants = watch(`sessions.${index}.assistants`) || [];
-                          console.log(`DEBUG: Session ${index} selected assistants:`, selectedAssistants);
                           return (
                             <SearchableMultiSelect
                               label={t("planningManagement.modal.assistantsLabel")}
@@ -786,7 +971,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
                         {(() => {
                           const selectedTrainees = watch(`sessions.${index}.trainees`) || [];
-                          console.log(`DEBUG: Session ${index} selected trainees:`, selectedTrainees);
                           return (
                             <SearchableMultiSelect
                               label={t("planningManagement.modal.traineesLabel")}
@@ -897,6 +1081,122 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 />
               </>
             )}
+            {/* Planned Exams Section */}
+            {watch("exams") && watch("exams").length > 0 && (
+              <div className="space-y-4 border-t dark:border-white/20 pt-4">
+                <Label className="text-base font-semibold">
+                  {t("planningManagement.modal.examsLabel", "Exams")}
+                </Label>
+                
+                {watch("exams").map((exam, index) => {
+                  const examComponent = examsList.find((e) => e._id === exam.component);
+                  const examName = examComponent?.name || t("planningManagement.modal.examLabel", "Exam");
+
+                  return (
+                    <div
+                      key={exam.component}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50"
+                    >
+                      <h4 className="font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2">
+                        {examName}
+                      </h4>
+
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`exam-${index}-sit-at-home`}
+                          {...register(`exams.${index}.is_sit_at_home`)}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <Label
+                          htmlFor={`exam-${index}-sit-at-home`}
+                          className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                        >
+                          {t("planningManagement.modal.sitAtHomeLabel", "Sit at Home Exam")}
+                        </Label>
+                      </div>
+
+                      {watch(`exams.${index}.is_sit_at_home`) ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              {t("planningManagement.modal.maxAttempts", "Max Attempts")}
+                            </Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              {...register(`exams.${index}.max_attempts`, { valueAsNumber: true })}
+                              className="mt-1"
+                            />
+                            {errors.exams?.[index]?.max_attempts && (
+                              <p className="text-sm text-red-500 mt-1">
+                                {errors.exams[index].max_attempts.message}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <Label className="text-sm font-medium">
+                              {t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}
+                            </Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              {...register(`exams.${index}.cooldown_days`, { valueAsNumber: true })}
+                              className="mt-1"
+                            />
+                            {errors.exams?.[index]?.cooldown_days && (
+                              <p className="text-sm text-red-500 mt-1">
+                                {errors.exams[index].cooldown_days.message}
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <Label className="text-sm font-medium">
+                              {t("planningManagement.modal.deadline", "Deadline")}
+                            </Label>
+                            <Input
+                              type="date"
+                              {...register(`exams.${index}.deadline`)}
+                              className="mt-1"
+                            />
+                            {errors.exams?.[index]?.deadline && (
+                              <p className="text-sm text-red-500 mt-1">
+                                {errors.exams[index].deadline.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          {(() => {
+                            const teacherVal = watch(`exams.${index}.teacher`);
+                            const teacherItems = getExamTeacherItems(exam.component, teacherVal);
+                            return (
+                              <SearchableSelect
+                                label={t("planningManagement.modal.examTeacherLabel", "Exam Teacher")}
+                                placeholder={t("planningManagement.modal.selectExamTeacher", "Select exam teacher")}
+                                searchPlaceholder={t("planningManagement.modal.searchTeachers")}
+                                items={teacherItems}
+                                value={teacherVal}
+                                onChange={(value) => {
+                                  setValue(`exams.${index}.teacher`, value);
+                                }}
+                                onSearch={setTeacherSearchTerm}
+                                isLoading={teachersLoading || assistantsLoading || traineesLoading}
+                                error={errors.exams?.[index]?.teacher?.message}
+                              />
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <FormActions
               onCancel={handleClose}
               isLoading={isSubmitting}

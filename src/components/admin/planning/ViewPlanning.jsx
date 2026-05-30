@@ -184,6 +184,56 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               ))}
             </div>
           )}
+          {planningData?.exams && planningData.exams.length > 0 && (
+            <div className="space-y-6">
+              <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("planningManagement.view.examsLabel", "Linked Exams")}
+              </h3>
+              <div className="grid grid-cols-1 gap-6">
+                {planningData.exams.map((exam, index) => {
+                  const examName = exam.exam?.name || exam.exam_component?.name || "Unnamed Exam";
+                  const teacherName = exam.teacher
+                    ? `${exam.teacher.last_name || ""} ${exam.teacher.first_name || ""}`.trim()
+                    : "N/A";
+                  
+                  return (
+                    <div key={exam._id || index} className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4 space-y-4 border dark:border-zinc-800">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-gray-900 dark:text-white">{examName}</h4>
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800">
+                          {exam.is_sit_at_home ? "Sit at Home" : "Classroom / Sit-in"}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <InfoItem
+                          label={t("planningManagement.view.examTeacherLabel", "Supervisor / Teacher")}
+                          value={teacherName}
+                        />
+                        {exam.is_sit_at_home ? (
+                          <>
+                            <InfoItem
+                              label={t("planningManagement.view.maxAttemptsLabel", "Max Attempts")}
+                              value={exam.max_attempts ?? 2}
+                            />
+                            <InfoItem
+                              label={t("planningManagement.view.cooldownLabel", "Cooldown (Days)")}
+                              value={exam.cooldown_days ?? 7}
+                            />
+                            <InfoItem
+                              label={t("planningManagement.view.deadlineLabel", "Deadline")}
+                              value={exam.deadline ? formatTZ(exam.deadline, "YYYY-MM-DD") : "No deadline"}
+                            />
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {planningData?.venue && (
             <div>
               <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>

@@ -50,10 +50,25 @@ const CalendarView = ({
         if (!map[key]) map[key] = [];
         map[key].push({
           ...session,
+          type: "session",
           planning,
           module_name: planning.component?.name,
           batch_name: planning.batch?.name,
         });
+      });
+
+      (planning.exams || []).forEach((exam) => {
+        if (exam.deadline) {
+          const key = getMoment(exam.deadline).format("YYYY-MM-DD");
+          if (!map[key]) map[key] = [];
+          map[key].push({
+            ...exam,
+            type: "exam",
+            planning,
+            module_name: exam.exam?.name || exam.exam_component?.name || "Exam",
+            batch_name: planning.batch?.name,
+          });
+        }
       });
     });
     return map;
@@ -93,6 +108,13 @@ const CalendarView = ({
   };
 
   const getStatusColor = (session) => {
+    if (session.type === "exam") {
+      return {
+        bg: "bg-purple-100 dark:bg-purple-900/30",
+        text: "text-purple-600 dark:text-purple-400",
+        dot: "bg-purple-500 dark:bg-purple-400",
+      };
+    }
     const hasTeachers = session.teachers && session.teachers.length > 0;
     if (!hasTeachers)
       return {
@@ -114,6 +136,7 @@ const CalendarView = ({
           text: "text-red-600 dark:text-red-400",
           dot: null,
         };
+      case "pending":
       default:
         return {
           bg: "bg-yellow-100 dark:bg-yellow-900/30",
@@ -124,40 +147,45 @@ const CalendarView = ({
   };
 
   const SessionCard = ({ session, idx }) => {
-    const startTime = getMoment(session.start_time).format("h:mma");
+    const isExam = session.type === "exam";
+    const startTime = isExam
+      ? (session.deadline ? getMoment(session.deadline).format("h:mma") : "")
+      : getMoment(session.start_time).format("h:mma");
     const colors = getStatusColor(session);
     return (
       <div
         key={idx}
         onClick={() => onSessionClick && onSessionClick(session)}
         className={`flex items-center gap-1 rounded cursor-pointer hover:opacity-80 transition-opacity px-1.5 py-0.5 ${colors.bg}`}
-        title={`${session.module_name} - ${session.batch_name}`}
+        title={isExam 
+          ? `Exam: ${session.module_name} (Deadline: ${session.deadline ? getMoment(session.deadline).format("YYYY-MM-DD HH:mm") : "N/A"})`
+          : `${session.module_name} - ${session.batch_name}`}
       >
         {colors.dot && (
           <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${colors.dot}`} />
         )}
         <span className={`text-xs truncate font-medium ${colors.text}`}>
-          <span className="opacity-75 font-normal">{startTime} </span>
-          {session.module_name}
+          {startTime && <span className="opacity-75 font-normal">{startTime} </span>}
+          {isExam ? `📝 ${session.module_name}` : session.module_name}
         </span>
       </div>
     );
   };
 
   const AgendaSessionRow = ({ session }) => {
+    const isExam = session.type === "exam";
     const colors = getStatusColor(session);
-    const hasTime =
-      session.start_time &&
-      !getMoment(session.start_time).isSame(
-        getMoment(session.start_time).startOf("day")
-      );
-    const startTime = hasTime ? getMoment(session.start_time).format("h:mmA") : null;
-    const endTime = hasTime && session.end_time ? getMoment(session.end_time).format("h:mmA") : null;
-    const teacher =
-      session.teachers && session.teachers.length > 0
-        ? session.teachers[0]?.name || session.teachers[0]?.full_name
-        : null;
-    const room = session.room || session.location || null;
+    const hasTime = isExam 
+      ? !!session.deadline 
+      : (session.start_time && !getMoment(session.start_time).isSame(getMoment(session.start_time).startOf("day")));
+    const startTime = isExam 
+      ? (session.deadline ? getMoment(session.deadline).format("h:mmA") : null)
+      : (hasTime ? getMoment(session.start_time).format("h:mmA") : null);
+    const endTime = isExam ? null : (hasTime && session.end_time ? getMoment(session.end_time).format("h:mmA") : null);
+    const teacher = isExam 
+      ? (session.teacher ? `${session.teacher.last_name || ""} ${session.teacher.first_name || ""}`.trim() : null)
+      : (session.teachers && session.teachers.length > 0 ? session.teachers[0]?.name || session.teachers[0]?.full_name : null);
+    const room = isExam ? null : (session.room || session.location || null);
 
     return (
       <div
@@ -168,7 +196,7 @@ const CalendarView = ({
           <div className="flex items-center gap-3 mb-1">
             {startTime && (
               <span className={`text-xs font-medium ${colors.text}`}>
-                {startTime}{endTime ? ` – ${endTime}` : ""}
+                {isExam ? `Deadline: ` : ""}{startTime}{endTime ? ` – ${endTime}` : ""}
               </span>
             )}
             {room && (
@@ -177,10 +205,12 @@ const CalendarView = ({
           </div>
         )}
         <p className={`text-sm font-semibold leading-tight ${colors.text}`}>
-          {session.module_name || t("planningManagement.calendar.session")}
+          {isExam ? `📝 Exam: ${session.module_name}` : (session.module_name || t("planningManagement.calendar.session"))}
         </p>
         {teacher && (
-          <p className={`text-xs mt-0.5 ${colors.text} opacity-75`}>{teacher}</p>
+          <p className={`text-xs mt-0.5 ${colors.text} opacity-75`}>
+            {isExam ? `Supervisor: ` : ""}{teacher}
+          </p>
         )}
         {session.batch_name && (
           <p className={`text-xs mt-0.5 ${colors.text} opacity-60`}>{session.batch_name}</p>

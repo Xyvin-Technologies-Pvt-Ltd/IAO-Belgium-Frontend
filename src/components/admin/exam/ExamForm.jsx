@@ -39,6 +39,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       language: "",
       question_sources: [],
       passing_marks: 0,
+      passing_percentage: 0,
       passing_type: "percentage",
       duration: 60,
     },
@@ -59,6 +60,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       language: "",
       question_sources: [],
       passing_marks: 0,
+      passing_percentage: 0,
       passing_type: "percentage",
       duration: 60,
     });
@@ -81,6 +83,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
             count: s.count || 1,
           })) || [],
         passing_marks: examData.passing_marks ?? 0,
+        passing_percentage: examData.passing_percentage ?? 0,
         passing_type: examData.passing_type || "percentage",
         duration: examData.duration ?? 60,
       });
@@ -92,6 +95,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         language: "",
         question_sources: [],
         passing_marks: 0,
+        passing_percentage: 0,
         passing_type: "percentage",
         duration: 60,
       });
@@ -99,10 +103,17 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   }, [examData, reset, open]);
 
   const onSubmit = (values) => {
+    const finalValues = { ...values };
+    if (values.passing_type === "percentage") {
+      finalValues.passing_marks = null;
+    } else {
+      finalValues.passing_percentage = null;
+    }
+
     const mutation = isEdit ? updateExam : createExam;
     const mutationData = isEdit
-      ? { id: examData._id, data: values }
-      : values;
+      ? { id: examData._id, data: finalValues }
+      : finalValues;
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
@@ -239,21 +250,40 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                  {t("exam.form.passingMarks")} <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  {...register("passing_marks", { valueAsNumber: true })}
-                  type="number"
-                  min={0}
-                />
-                {errors.passing_marks && (
-                  <p className="text-sm text-red-500">
-                    {errors.passing_marks.message}
-                  </p>
-                )}
-              </div>
+              {watch("passing_type") === "marks" ? (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                    {t("exam.form.passingMarks")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    {...register("passing_marks", { valueAsNumber: true })}
+                    type="number"
+                    min={0}
+                  />
+                  {errors.passing_marks && (
+                    <p className="text-sm text-red-500">
+                      {errors.passing_marks.message}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                    {t("exam.form.passingPercentage", "Passing Percentage")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    {...register("passing_percentage", { valueAsNumber: true })}
+                    type="number"
+                    min={0}
+                    max={100}
+                  />
+                  {errors.passing_percentage && (
+                    <p className="text-sm text-red-500">
+                      {errors.passing_percentage.message}
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-900 dark:text-white">
                   {t("exam.form.passingType")}

@@ -39,6 +39,7 @@
       "programAdministration": "Program Administration",
       "locations": "Locations",
       "languages": "Languages",
+      "specialExceptions": "Special Exceptions",
       "teacherQualifications": "Lecturer Qualifications",
        "teacherData": "Lecturer Data",
       "admissionAdministration": "Admission Administration",
@@ -54,6 +55,7 @@
       "examination": "Examination",
       "questionBanks": "Question Banks",
       "exams": "Exams",
+      "results": "Results",
       "createInvoice": "Create Custom Invoice"
     },
     "user": {
@@ -75,6 +77,7 @@
       "backWithName": "Welcome back, {{name}}!",
       "subtitle": "All your programmes, progress, and updates in one place."
     },
+    "filters": "Filters",
     "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Delete Confirmation",
@@ -518,6 +521,8 @@
       "programPlaceholder": "Select programme",
       "registrationFeeLabel": "Registration Fee",
       "registrationFeePlaceholder": "Enter registration fee",
+      "freeIntakeLabel": "Free Intake",
+      "freeIntakeDescription": "Enable if this intake does not require any registration fee",
       "startDateLabel": "Start Date",
       "endDateLabel": "End Date",
       "registrationDeadlineLabel": "Registration Deadline",
@@ -1379,6 +1384,8 @@
     "moduleNumberPlaceholder": "Enter module number",
     "amountLabel": "Amount",
     "amountPlaceholder": "Enter amount",
+    "freeComponentLabel": "Free Module",
+    "freeComponentDescription": "Enable if this module does not require any additional payment",
     "linkedModuleLabel": "Linked Module",
     "linkedModuleHint": "Exam scheduled before this module",
     "linkedModulePlaceholder": "Select module",
@@ -1545,6 +1552,45 @@
       "otpRequired": "Please enter OTP",
       "loginSuccess": "Successfully logged in!",
       "otpInvalid": "Invalid OTP. Please try again."
+    }
+  },
+  "resultsManagement": {
+    "title": "Exam Results",
+    "subtitle": "Track, monitor, and export student performance results",
+    "exportBtn": "Export Results",
+    "searchPlaceholder": "Search student...",
+    "filterTitle": "Filter Results",
+    "filterSubtitle": "Narrow down student exam results",
+    "failedOnly": "Failed Only",
+    "filter": {
+      "program": "Program",
+      "programPlaceholder": "All Programs",
+      "programSearchPlaceholder": "Search programs...",
+      "batch": "Batch",
+      "batchPlaceholder": "All Batches",
+      "batchPlaceholderDisabled": "Select a Program First",
+      "batchSearchPlaceholder": "Search batches...",
+      "academic": "Academic Year",
+      "academicPlaceholder": "All Academic Years",
+      "exam": "Exam",
+      "examPlaceholder": "All Exams",
+      "clearBtn": "Clear All",
+      "applyBtn": "Apply Filters"
+    },
+    "table": {
+      "student": "Student",
+      "uid": "UID",
+      "program": "Program",
+      "batch": "Batch",
+      "academic": "Academic Year",
+      "exam": "Exam",
+      "score": "Score",
+      "status": "Status",
+      "date": "Submitted Date",
+      "noResults": "No results found matching search/filter criteria."
+    },
+    "messages": {
+      "loadFailed": "Failed to load results data"
     }
   }
 }

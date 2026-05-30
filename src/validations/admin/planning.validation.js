@@ -17,6 +17,36 @@ const sessionSchema = z.object({
   trainees: z.array(teacherSchema).optional(),
 });
 
+const plannedExamSchema = z.object({
+  component: z.string().min(1, "Exam component is required"),
+  // linked_exam may be an ObjectId string or empty — allow either
+  exam: z.string().optional().nullable().default(""),
+  teacher: z.string().nullable().optional(),
+  // Checkbox via register() returns a boolean; coerce just in case
+  is_sit_at_home: z
+    .union([z.boolean(), z.literal("true"), z.literal("false")])
+    .transform((v) => v === true || v === "true")
+    .default(false),
+  // Input[type=number] with valueAsNumber can still return NaN — coerce safely
+  max_attempts: z
+    .union([z.number(), z.string()])
+    .transform((v) => {
+      const n = Number(v);
+      return isNaN(n) ? 2 : n;
+    })
+    .pipe(z.number().min(1))
+    .default(2),
+  cooldown_days: z
+    .union([z.number(), z.string()])
+    .transform((v) => {
+      const n = Number(v);
+      return isNaN(n) ? 7 : n;
+    })
+    .pipe(z.number().min(0))
+    .default(7),
+  deadline: z.string().nullable().optional(),
+});
+
 export const planningSchema = z.object({
   program: z.string().min(1, "Program is required"),
   batch: z.string().min(1, "Batch is required"),
@@ -28,4 +58,5 @@ export const planningSchema = z.object({
   assistants: z.array(teacherSchema).optional(),
   trainees: z.array(teacherSchema).optional(),
   sessions: z.array(sessionSchema).min(1, "At least one session is required"),
+  exams: z.array(plannedExamSchema).optional(),
 });

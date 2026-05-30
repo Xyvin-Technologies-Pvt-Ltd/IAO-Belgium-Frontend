@@ -43,7 +43,7 @@ const baseComponentSchema = z.object({
 const moduleComponentSchema = baseComponentSchema.extend({
   amount: z.coerce
     .number({ invalid_type_error: "Amount must be a number" })
-    .min(1, "Amount must be greater than 0"),
+    .min(0, "Amount must be at least 0"),
   module_number: z.coerce
     .number({ invalid_type_error: "Module number must be a number" })
     .min(1, "Module number must be at least 1"),

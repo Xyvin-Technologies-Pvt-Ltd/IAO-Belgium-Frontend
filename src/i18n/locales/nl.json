@@ -39,6 +39,7 @@
       "programAdministration": "Programma Administratie",
       "locations": "Locaties",
       "languages": "Talen",
+      "specialExceptions": "Speciale Uitzonderingen",
       "teacherQualifications": "Docentkwalificaties",
       "teacherData": "Docentgegevens",
       "admissionAdministration": "Toelatingsadministratie",
@@ -54,6 +55,7 @@
       "examination": "Examen",
       "questionBanks": "Vragenbanken",
       "exams": "Examens",
+      "results": "Resultaten",
       "createInvoice": "Aangepaste factuur maken"
     },
     "user": {
@@ -75,6 +77,7 @@
       "backWithName": "Welkom terug, {{name}}!",
       "subtitle": "Al je opleidingen, voortgang en updates op één plek."
     },
+    "filters": "Filters",
     "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Bevestig verwijderen",
@@ -518,6 +521,8 @@
       "programPlaceholder": "Selecteer opleiding",
       "registrationFeeLabel": "Inschrijfgeld",
       "registrationFeePlaceholder": "Voer inschrijfgeld in",
+      "freeIntakeLabel": "Gratis Intake",
+      "freeIntakeDescription": "Inschakelen als er geen inschrijfgeld vereist is voor deze intake",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Einddatum",
       "registrationDeadlineLabel": "Inschrijfdeadline",
@@ -1341,6 +1346,8 @@
     "moduleNumberPlaceholder": "Voer modulenummer in",
     "amountLabel": "Bedrag",
     "amountPlaceholder": "Voer bedrag in",
+    "freeComponentLabel": "Gratis module",
+    "freeComponentDescription": "Inschakelen als er geen extra betaling vereist is voor deze module",
     "linkedModuleLabel": "Gekoppelde module",
     "linkedModuleHint": "Examen gepland voor deze module",
     "linkedModulePlaceholder": "Selecteer module",
@@ -1537,6 +1544,45 @@
       "noTools": "Geen LTI-tools geregistreerd",
       "clickToRegister": "Klik op \"Tool registreren\" om Enatom of een andere LTI 1.3 tool toe te voegen.",
       "loadFailed": "Laden van LTI-tools mislukt"
+    }
+  },
+  "resultsManagement": {
+    "title": "Examenresultaten",
+    "subtitle": "Volg, controleer en exporteer prestatieresultaten van studenten",
+    "exportBtn": "Resultaten exporteren",
+    "searchPlaceholder": "Zoek student...",
+    "filterTitle": "Resultaten filteren",
+    "filterSubtitle": "Verfijn examenresultaten van studenten",
+    "failedOnly": "Alleen mislukt",
+    "filter": {
+      "program": "Opleiding",
+      "programPlaceholder": "Alle opleidingen",
+      "programSearchPlaceholder": "Opleidingen zoeken...",
+      "batch": "Groep",
+      "batchPlaceholder": "Alle groepen",
+      "batchPlaceholderDisabled": "Selecteer eerst een opleiding",
+      "batchSearchPlaceholder": "Groepen zoeken...",
+      "academic": "Academisch jaar",
+      "academicPlaceholder": "Alle academische jaren",
+      "exam": "Examen",
+      "examPlaceholder": "Alle examens",
+      "clearBtn": "Alles wissen",
+      "applyBtn": "Filters toepassen"
+    },
+    "table": {
+      "student": "Student",
+      "uid": "UID",
+      "program": "Opleiding",
+      "batch": "Groep",
+      "academic": "Academisch jaar",
+      "exam": "Examen",
+      "score": "Score",
+      "status": "Status",
+      "date": "Indieningsdatum",
+      "noResults": "Geen resultaten gevonden die voldoen aan de zoek-/filtercriteria."
+    },
+    "messages": {
+      "loadFailed": "Laden van resultaten mislukt"
     }
   }
 }

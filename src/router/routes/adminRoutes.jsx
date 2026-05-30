@@ -7,6 +7,7 @@ import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
 import RoleManagement from "@/pages/admin/role-management";
 import Language from "@/pages/admin/language";
+import SpecialExceptions from "@/pages/admin/special-exception";
 import Intakes from "@/pages/admin/intake";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { getRequiredPermissions } from "@/utils/permissionUtils";
@@ -40,6 +41,7 @@ import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
+import Results from "@/pages/admin/results";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -78,6 +80,13 @@ export const adminRoutes = [
   {
     path: "/admin/languages",
     component: withPermissionProtection(Language, "/admin/languages"),
+  },
+  {
+    path: "/admin/special-exceptions",
+    component: withPermissionProtection(
+      SpecialExceptions,
+      "/admin/special-exceptions",
+    ),
   },
   {
     path: "/admin/teacher-qualifications",
@@ -264,6 +273,10 @@ export const adminRoutes = [
       ExamDetail,
       "/admin/examination/exams",
     ),
+  },
+  {
+    path: "/admin/results",
+    component: withPermissionProtection(Results, "/admin/results"),
   },
   {
     path: "/admin/contracts",

@@ -61,3 +61,13 @@ export const getExamResults = async (exam_id, planning_id, params) => {
   );
   return response.data;
 };
+
+export const getAdminExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/results", { params });
+  return response.data;
+};
+
+export const exportAdminExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/results/export", { params });
+  return response.data;
+};

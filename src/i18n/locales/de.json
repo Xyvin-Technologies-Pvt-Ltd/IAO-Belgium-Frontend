@@ -39,6 +39,7 @@
       "programAdministration": "Programmverwaltung",
       "locations": "Standorte",
       "languages": "Sprachen",
+      "specialExceptions": "Besondere Ausnahmen",
       "teacherQualifications": "Dozentenqualifikationen",
       "teacherData": "Dozentendaten",
       "admissionAdministration": "Zulassungsverwaltung",
@@ -54,6 +55,7 @@
       "examination": "Prüfung",
       "questionBanks": "Fragenkataloge",
       "exams": "Prüfungen",
+      "results": "Ergebnisse",
       "createInvoice": "Benutzerdefinierte Rechnung erstellen"
     },
     "user": {
@@ -75,6 +77,7 @@
       "backWithName": "Willkommen zurück, {{name}}!",
       "subtitle": "Alle Ihre Ausbildungen, Fortschritte und Updates an einem Ort."
     },
+    "filters": "Filter",
     "dashboard": "Dashboard",
     "deleteConfirm": {
       "title": "Löschen bestätigen",
@@ -539,6 +542,8 @@
       "programPlaceholder": "Ausbildung / Studiengang auswählen",
       "registrationFeeLabel": "Anmeldegebühr",
       "registrationFeePlaceholder": "Anmeldegebühr eingeben",
+      "freeIntakeLabel": "Kostenfreie Aufnahme",
+      "freeIntakeDescription": "Aktivieren, wenn für diese Aufnahme keine Anmeldegebühr erforderlich ist",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Enddatum",
       "registrationDeadlineLabel": "Anmeldefrist",
@@ -1369,6 +1374,8 @@
     "moduleNumberPlaceholder": "Modulnummer eingeben",
     "amountLabel": "Betrag",
     "amountPlaceholder": "Betrag eingeben",
+    "freeComponentLabel": "Kostenfreies Modul",
+    "freeComponentDescription": "Aktivieren, wenn für dieses Modul keine zusätzliche Zahlung erforderlich ist",
     "linkedModuleLabel": "Verknüpftes Modul",
     "linkedModuleHint": "Prüfung vor diesem Modul geplant",
     "linkedModulePlaceholder": "Modul auswählen",
@@ -1534,6 +1541,45 @@
       "otpRequired": "Bitte OTP eingeben",
       "loginSuccess": "Erfolgreich angemeldet!",
       "otpInvalid": "Ungültiges OTP. Bitte versuchen Sie es erneut."
+    }
+  },
+  "resultsManagement": {
+    "title": "Prüfungsergebnisse",
+    "subtitle": "Leistungsergebnisse der Studenten verfolgen, überwachen und exportieren",
+    "exportBtn": "Ergebnisse exportieren",
+    "searchPlaceholder": "Studenten suchen...",
+    "filterTitle": "Ergebnisse filtern",
+    "filterSubtitle": "Prüfungsergebnisse der Studenten eingrenzen",
+    "failedOnly": "Nur nicht bestanden",
+    "filter": {
+      "program": "Ausbildung / Studiengang",
+      "programPlaceholder": "Alle Studiengänge",
+      "programSearchPlaceholder": "Studiengänge suchen...",
+      "batch": "Charge / Gruppe",
+      "batchPlaceholder": "Alle Chargen / Gruppen",
+      "batchPlaceholderDisabled": "Wählen Sie zuerst einen Studiengang aus",
+      "batchSearchPlaceholder": "Chargen / Gruppen suchen...",
+      "academic": "Akademisches Jahr",
+      "academicPlaceholder": "Alle akademischen Jahre",
+      "exam": "Prüfung",
+      "examPlaceholder": "Alle Prüfungen",
+      "clearBtn": "Alles löschen",
+      "applyBtn": "Filter anwenden"
+    },
+    "table": {
+      "student": "Student",
+      "uid": "UID",
+      "program": "Ausbildung / Studiengang",
+      "batch": "Charge / Gruppe",
+      "academic": "Akademisches Jahr",
+      "exam": "Prüfung",
+      "score": "Ergebnis / Punktzahl",
+      "status": "Status",
+      "date": "Abgabedatum",
+      "noResults": "Keine Ergebnisse gefunden, die den Such-/Filterkriterien entsprechen."
+    },
+    "messages": {
+      "loadFailed": "Fehler beim Laden der Ergebnisdaten"
     }
   }
 }
