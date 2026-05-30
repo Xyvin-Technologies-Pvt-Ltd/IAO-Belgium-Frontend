@@ -182,7 +182,11 @@ const Exams = () => {
                 <TableCell>{i?.name}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
                 <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
-                <TableCell>{i?.passing_marks ?? 0}</TableCell>
+                <TableCell>
+                  {i?.passing_type === "percentage"
+                    ? `${i?.passing_percentage ?? i?.passing_marks ?? 0}%`
+                    : i?.passing_marks ?? i?.passing_percentage ?? 0}
+                </TableCell>
                 <TableCell>{i?.language?.name || "-"}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />

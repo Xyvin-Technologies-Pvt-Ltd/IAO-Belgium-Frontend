@@ -11,6 +11,8 @@ import {
   startExamSession,
   endExamSession,
   getExamResults,
+  getAdminExamResults,
+  exportAdminExamResults,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -171,3 +173,15 @@ export const useGetExamResults = (
     ...options,
   });
 };
+
+export const useGetAdminExamResults = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-exam-results", params],
+    queryFn: () => getAdminExamResults(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export { getAdminExamResults, exportAdminExamResults };

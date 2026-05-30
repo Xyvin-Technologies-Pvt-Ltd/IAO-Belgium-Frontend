@@ -236,7 +236,7 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex-1 flex items-center gap-2">
           <Input
             placeholder={t("planningManagement.search")}
             className="max-w-xs"
