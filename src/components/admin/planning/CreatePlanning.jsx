@@ -161,7 +161,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           if (original) {
             return {
               component: examComp._id,
-              exam: original.exam?._id || original.exam || "",
+              exam: examComp.linked_exam || original.exam?._id || original.exam || "",
               teacher: original.teacher?._id || original.teacher || "",
               is_sit_at_home: original.is_sit_at_home || false,
               max_attempts: original.max_attempts ?? 2,
