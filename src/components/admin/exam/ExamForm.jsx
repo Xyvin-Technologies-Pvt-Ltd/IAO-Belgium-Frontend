@@ -105,9 +105,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   const onSubmit = (values) => {
     const finalValues = { ...values };
     if (values.passing_type === "percentage") {
-      finalValues.passing_marks = null;
+      delete finalValues.passing_marks;
     } else {
-      finalValues.passing_percentage = null;
+      delete finalValues.passing_percentage;
     }
 
     const mutation = isEdit ? updateExam : createExam;
