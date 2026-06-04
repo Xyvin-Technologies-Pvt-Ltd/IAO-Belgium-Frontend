@@ -118,17 +118,18 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const initialComponentId = planningData?.component?._id || planningData?.component || "";
   const isComponentChanged = selectedComponent !== initialComponentId;
 
-  // Fetch all plannings for the selected batch to identify already-planned modules
+  // Fetch all active plannings for the selected batch to identify already-planned modules
   const { data: batchPlanningsData } = useGetPlanning(
-    { batch: selectedBatch, is_all: "true" },
+    { batch: selectedBatch, is_all: "true", status: "active" },
     { enabled: open && !!selectedBatch },
   );
 
-  // Set of component IDs that already have a planning for this batch
+  // Set of component IDs that already have a planning for this batch (excluding the current planning itself if editing)
   const plannedComponentIds = new Set(
-    (batchPlanningsData?.data || []).map(
-      (p) => p.component?._id || p.component
-    ).filter(Boolean)
+    (batchPlanningsData?.data || [])
+      .filter((p) => !isEdit || p._id !== planningData?._id)
+      .map((p) => p.component?._id || p.component)
+      .filter(Boolean)
   );
 
   const { data: examsData, isLoading: examsLoading } = useGetComponents(
@@ -1101,96 +1102,27 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                         {examName}
                       </h4>
 
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id={`exam-${index}-sit-at-home`}
-                          {...register(`exams.${index}.is_sit_at_home`)}
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <Label
-                          htmlFor={`exam-${index}-sit-at-home`}
-                          className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
-                        >
-                          {t("planningManagement.modal.sitAtHomeLabel", "Sit at Home Exam")}
-                        </Label>
+                      <div>
+                        {(() => {
+                          const teacherVal = watch(`exams.${index}.teacher`);
+                          const teacherItems = getExamTeacherItems(exam.component, teacherVal);
+                          return (
+                            <SearchableSelect
+                              label={t("planningManagement.modal.examTeacherLabel", "Exam Teacher")}
+                              placeholder={t("planningManagement.modal.selectExamTeacher", "Select exam teacher")}
+                              searchPlaceholder={t("planningManagement.modal.searchTeachers")}
+                              items={teacherItems}
+                              value={teacherVal}
+                              onChange={(value) => {
+                                setValue(`exams.${index}.teacher`, value);
+                              }}
+                              onSearch={setTeacherSearchTerm}
+                              isLoading={teachersLoading || assistantsLoading || traineesLoading}
+                              error={errors.exams?.[index]?.teacher?.message}
+                            />
+                          );
+                        })()}
                       </div>
-
-                      {watch(`exams.${index}.is_sit_at_home`) ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <Label className="text-sm font-medium">
-                              {t("planningManagement.modal.maxAttempts", "Max Attempts")}
-                            </Label>
-                            <Input
-                              type="number"
-                              min="1"
-                              {...register(`exams.${index}.max_attempts`, { valueAsNumber: true })}
-                              className="mt-1"
-                            />
-                            {errors.exams?.[index]?.max_attempts && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.exams[index].max_attempts.message}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <Label className="text-sm font-medium">
-                              {t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}
-                            </Label>
-                            <Input
-                              type="number"
-                              min="0"
-                              {...register(`exams.${index}.cooldown_days`, { valueAsNumber: true })}
-                              className="mt-1"
-                            />
-                            {errors.exams?.[index]?.cooldown_days && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.exams[index].cooldown_days.message}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <Label className="text-sm font-medium">
-                              {t("planningManagement.modal.deadline", "Deadline")}
-                            </Label>
-                            <Input
-                              type="date"
-                              {...register(`exams.${index}.deadline`)}
-                              className="mt-1"
-                            />
-                            {errors.exams?.[index]?.deadline && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.exams[index].deadline.message}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          {(() => {
-                            const teacherVal = watch(`exams.${index}.teacher`);
-                            const teacherItems = getExamTeacherItems(exam.component, teacherVal);
-                            return (
-                              <SearchableSelect
-                                label={t("planningManagement.modal.examTeacherLabel", "Exam Teacher")}
-                                placeholder={t("planningManagement.modal.selectExamTeacher", "Select exam teacher")}
-                                searchPlaceholder={t("planningManagement.modal.searchTeachers")}
-                                items={teacherItems}
-                                value={teacherVal}
-                                onChange={(value) => {
-                                  setValue(`exams.${index}.teacher`, value);
-                                }}
-                                onSearch={setTeacherSearchTerm}
-                                isLoading={teachersLoading || assistantsLoading || traineesLoading}
-                                error={errors.exams?.[index]?.teacher?.message}
-                              />
-                            );
-                          })()}
-                        </div>
-                      )}
                     </div>
                   );
                 })}

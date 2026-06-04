@@ -105,10 +105,18 @@ const ExamDetail = () => {
               </h2>
               <ExamStatusBadge status={exam.status} />
             </div>
-            <div className="mt-2">
-              <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
+            <div className="mt-2 text-xs text-muted-foreground flex gap-2 flex-wrap items-center">
+              <span className="inline-block px-3 py-1 bg-muted rounded-full font-medium">
                 {exam.uid}
               </span>
+              <span className="inline-block px-3 py-1 bg-primary/10 text-primary border-transparent rounded-full font-medium">
+                {exam.type === "sit-at-home" ? t("exam.form.sitAtHome", "Sit-at-home") : t("exam.form.online", "Online")}
+              </span>
+              {exam.type === "sit-at-home" && exam.batch && (
+                <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">
+                  {t("planningManagement.modal.batchLabel")}: {exam.batch?.name || exam.batch}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -159,6 +167,36 @@ const ExamDetail = () => {
           icon={Timer}
         />
       </div>
+
+      {exam.type === "sit-at-home" && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm space-y-4">
+          <p className="text-sm font-bold border-b pb-2 mb-2">
+            {t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.batchLabel", "Group / Batch")}</p>
+              <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
+              <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
+              <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("exam.form.startDate", "Start Date")}</p>
+              <p className="font-semibold text-foreground">{exam.start_date ? new Date(exam.start_date).toLocaleDateString() : "No start date"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
+              <p className="font-semibold text-foreground">{exam.deadline ? new Date(exam.deadline).toLocaleDateString() : "No deadline"}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {exam.description && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
