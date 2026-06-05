@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import QuestionSourceSelector from "./QuestionSourceSelector";
 import { useCreateExam, useUpdateExam } from "@/store/useExamStore";
-import { useGetAllLanguages, useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import { useGetAllLanguages, useGetAllPrograms, useGetBatches, useGetComponents } from "@/store/useDropdownStore";
 import { examSchema } from "@/validations/admin/exam.validation";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 
@@ -49,9 +49,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       type: "online",
       program: "",
       batch: "",
+      module: "",
       max_attempts: 2,
       cooldown_days: 7,
-      start_date: "",
       deadline: "",
     },
   });
@@ -90,6 +90,19 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
     name: batch.name,
   }));
 
+  const { data: modulesData, isLoading: modulesLoading } = useGetComponents(
+    {
+      type: "module",
+      program: selectedProgram,
+    },
+    { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
+  );
+
+  const modules = (modulesData?.data || []).map((module) => ({
+    _id: module._id,
+    name: module.name,
+  }));
+
   const questionSources = watch("question_sources") || [];
   const createExam = useCreateExam();
   const updateExam = useUpdateExam();
@@ -108,9 +121,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       type: "online",
       program: "",
       batch: "",
+      module: "",
       max_attempts: 2,
       cooldown_days: 7,
-      start_date: "",
       deadline: "",
     });
     setProgramSearchTerm("");
@@ -120,7 +133,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
 
   useEffect(() => {
     if (examData && open) {
-      const prog = examData.batch?.intake?.program;
+      const prog = examData.batch?.intake?.program || examData.module?.program;
       if (prog?.name) {
         setProgramSearchTerm(prog.name);
       }
@@ -144,9 +157,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         type: examData.type || "online",
         program: prog?._id || "",
         batch: examData.batch?._id || examData.batch || "",
+        module: examData.module?._id || examData.module || "",
         max_attempts: examData.max_attempts ?? 2,
         cooldown_days: examData.cooldown_days ?? 7,
-        start_date: examData.start_date ? examData.start_date.split("T")[0] : "",
         deadline: examData.deadline ? examData.deadline.split("T")[0] : "",
       });
     } else if (!examData && open) {
@@ -163,9 +176,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         type: "online",
         program: "",
         batch: "",
+        module: "",
         max_attempts: 2,
         cooldown_days: 7,
-        start_date: "",
         deadline: "",
       });
       setProgramSearchTerm("");
@@ -185,14 +198,14 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       delete finalValues.program;
       finalValues.max_attempts = Number(values.max_attempts) || 2;
       finalValues.cooldown_days = Number(values.cooldown_days) ?? 7;
-      finalValues.start_date = values.start_date || null;
+      finalValues.module = values.module || null;
       finalValues.deadline = values.deadline || null;
     } else {
       delete finalValues.program;
       delete finalValues.batch;
+      delete finalValues.module;
       delete finalValues.max_attempts;
       delete finalValues.cooldown_days;
-      delete finalValues.start_date;
       delete finalValues.deadline;
     }
 
@@ -250,6 +263,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   if (v !== "sit-at-home") {
                     setValue("program", "");
                     setValue("batch", "");
+                    setValue("module", "");
                   }
                 }}
               >
@@ -282,6 +296,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                     if (value) {
                       setValue("program", value, { shouldValidate: true });
                       setValue("batch", "");
+                      setValue("module", "");
                     }
                   }}
                   onSearch={setProgramSearchTerm}
@@ -302,6 +317,21 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   onSearch={setBatchSearchTerm}
                   isLoading={batchesLoading}
                   error={errors.batch?.message}
+                  disabled={!selectedProgram}
+                  required
+                />
+
+                <SearchableSelect
+                  label={t("exam.form.moduleLabel", "Module")}
+                  placeholder={t("exam.form.modulePlaceholder", "Select Module")}
+                  searchPlaceholder={t("exam.form.searchModules", "Search Modules")}
+                  items={modules}
+                  value={watch("module")}
+                  onChange={(value) => {
+                    if (value) setValue("module", value, { shouldValidate: true });
+                  }}
+                  isLoading={modulesLoading}
+                  error={errors.module?.message}
                   disabled={!selectedProgram}
                   required
                 />
@@ -340,36 +370,19 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      {t("exam.form.startDate", "Start Date")}
-                    </Label>
-                    <Input
-                      type="date"
-                      {...register("start_date")}
-                    />
-                    {errors.start_date && (
-                      <p className="text-sm text-red-500">
-                        {errors.start_date.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      {t("planningManagement.modal.deadline", "Deadline")}
-                    </Label>
-                    <Input
-                      type="date"
-                      {...register("deadline")}
-                    />
-                    {errors.deadline && (
-                      <p className="text-sm text-red-500">
-                        {errors.deadline.message}
-                      </p>
-                    )}
-                  </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">
+                    {t("planningManagement.modal.deadline", "Deadline")}
+                  </Label>
+                  <Input
+                    type="date"
+                    {...register("deadline")}
+                  />
+                  {errors.deadline && (
+                    <p className="text-sm text-red-500">
+                      {errors.deadline.message}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

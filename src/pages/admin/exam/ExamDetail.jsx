@@ -186,10 +186,12 @@ const ExamDetail = () => {
               <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
               <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("exam.form.startDate", "Start Date")}</p>
-              <p className="font-semibold text-foreground">{exam.start_date ? new Date(exam.start_date).toLocaleDateString() : "No start date"}</p>
-            </div>
+            {exam.module && (
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
+                <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
+              </div>
+            )}
             <div>
               <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
               <p className="font-semibold text-foreground">{exam.deadline ? new Date(exam.deadline).toLocaleDateString() : "No deadline"}</p>

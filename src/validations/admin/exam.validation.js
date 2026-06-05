@@ -20,9 +20,9 @@ export const examSchema = z.object({
   type: z.enum(["online", "sit-at-home"]).default("online"),
   program: z.string().optional().nullable().default(""),
   batch: z.string().optional().nullable().default(""),
+  module: z.string().optional().nullable().default(""),
   max_attempts: z.coerce.number().min(1).default(2),
   cooldown_days: z.coerce.number().min(0).default(7),
-  start_date: z.string().optional().nullable().default(""),
   deadline: z.string().optional().nullable().default(""),
 }).refine((data) => {
   if (data.passing_type === "marks") {
@@ -56,4 +56,12 @@ export const examSchema = z.object({
 }, {
   message: "Batch is required for sit-at-home exam",
   path: ["batch"],
+}).refine((data) => {
+  if (data.type === "sit-at-home") {
+    return !!data.module && data.module.trim() !== "";
+  }
+  return true;
+}, {
+  message: "Module is required for sit-at-home exam",
+  path: ["module"],
 });
