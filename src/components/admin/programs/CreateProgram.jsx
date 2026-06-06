@@ -164,7 +164,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="p-6 border-b dark:border-white/20">
           <div className="flex items-start justify-between">
             <div>

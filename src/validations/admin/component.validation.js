@@ -41,6 +41,7 @@ const baseComponentSchema = z.object({
 });
 
 const moduleComponentSchema = baseComponentSchema.extend({
+  is_free: z.boolean().optional(),
   amount: z.coerce
     .number({ invalid_type_error: "Amount must be a number" })
     .min(0, "Amount must be at least 0"),
@@ -74,4 +75,12 @@ export const componentSchema = z.discriminatedUnion("type", [
   appComponentSchema.extend({ type: z.literal("app") }),
   resourceComponentSchema.extend({ type: z.literal("resource") }),
   examComponentSchema,
-]);
+]).superRefine((data, ctx) => {
+  if (data.type === "module" && data.is_free === false && (data.amount === undefined || data.amount <= 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Amount must be greater than 0",
+      path: ["amount"],
+    });
+  }
+});

@@ -205,7 +205,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       teacher_role: "Teacher",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
-    { enabled: open },
+    { enabled: open && !!selectedLanguageId },
   );
 
   const { data: assistantsData, isLoading: assistantsLoading } = useGetUsers(
@@ -215,7 +215,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       teacher_role: "Assistant",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
-    { enabled: open },
+    { enabled: open && !!selectedLanguageId },
   );
 
   const { data: traineesData, isLoading: traineesLoading } = useGetUsers(
@@ -225,7 +225,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       teacher_role: "Trainee",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
-    { enabled: open },
+    { enabled: open && !!selectedLanguageId },
   );
 
 
