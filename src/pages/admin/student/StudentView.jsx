@@ -278,7 +278,7 @@ const StudentView = () => {
                       key={ex._id}
                       className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300 border border-orange-200 dark:border-orange-900/50"
                     >
-                      {ex.name} (+{ex.extra_time_percentage}%)
+                      {ex.name} (+{ex.extra_time_min} min)
                     </span>
                   ))}
                 </div>
@@ -301,7 +301,7 @@ const StudentView = () => {
             </h3>
             
             <p className="text-xs text-gray-500 dark:text-white/60">
-              Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the longest extra duration multiplier to their exams.
+              Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams.
             </p>
 
             {isExceptionsLoading ? (
@@ -332,7 +332,7 @@ const StudentView = () => {
                           {ex.name}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-white/60">
-                          +{ex.extra_time_percentage}% extra time
+                          +{ex.extra_time_min} min extra time
                         </p>
                       </div>
                     </label>

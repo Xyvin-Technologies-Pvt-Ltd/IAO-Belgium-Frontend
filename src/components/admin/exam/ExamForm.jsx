@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -16,12 +16,16 @@ import {
 } from "@/components/ui/select";
 import QuestionSourceSelector from "./QuestionSourceSelector";
 import { useCreateExam, useUpdateExam } from "@/store/useExamStore";
-import { useGetAllLanguages } from "@/store/useDropdownStore";
+import { useGetAllLanguages, useGetAllPrograms, useGetBatches, useGetComponents } from "@/store/useDropdownStore";
 import { examSchema } from "@/validations/admin/exam.validation";
+import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 
 const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   const { t } = useTranslation();
   const isEdit = !!examData;
+
+  const [programSearchTerm, setProgramSearchTerm] = useState("");
+  const [batchSearchTerm, setBatchSearchTerm] = useState("");
 
   const {
     register,
@@ -42,11 +46,62 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       passing_percentage: 0,
       passing_type: "percentage",
       duration: 60,
+      type: "online",
+      program: "",
+      batch: "",
+      module: "",
+      max_attempts: 2,
+      cooldown_days: 7,
+      deadline: "",
     },
   });
 
+  const selectedProgram = watch("program");
+  const selectedType = watch("type");
+
   const { data: languagesData } = useGetAllLanguages({ status: true });
   const languages = languagesData?.data || [];
+
+  const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
+    {
+      ...(programSearchTerm && { search: programSearchTerm }),
+    },
+    { enabled: open && selectedType === "sit-at-home" },
+  );
+
+  const programsRaw = programsData?.data || [];
+  const programs = programsRaw.map((program) => ({
+    _id: program._id,
+    name: `${program.name} - ${program.city?.name || "N/A"} - ${program.language?.name || "N/A"}`,
+    city: program.city,
+    language: program.language,
+  }));
+
+  const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
+    selectedProgram,
+    {
+      ...(batchSearchTerm && { search: batchSearchTerm }),
+    },
+    { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
+  );
+
+  const batches = (batchesData?.data || []).map((batch) => ({
+    _id: batch._id,
+    name: batch.name,
+  }));
+
+  const { data: modulesData, isLoading: modulesLoading } = useGetComponents(
+    {
+      type: "module",
+      program: selectedProgram,
+    },
+    { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
+  );
+
+  const modules = (modulesData?.data || []).map((module) => ({
+    _id: module._id,
+    name: module.name,
+  }));
 
   const questionSources = watch("question_sources") || [];
   const createExam = useCreateExam();
@@ -63,12 +118,25 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       passing_percentage: 0,
       passing_type: "percentage",
       duration: 60,
+      type: "online",
+      program: "",
+      batch: "",
+      module: "",
+      max_attempts: 2,
+      cooldown_days: 7,
+      deadline: "",
     });
+    setProgramSearchTerm("");
+    setBatchSearchTerm("");
     onClose();
   };
 
   useEffect(() => {
     if (examData && open) {
+      const prog = examData.batch?.intake?.program || examData.module?.program;
+      if (prog?.name) {
+        setProgramSearchTerm(prog.name);
+      }
       reset({
         name: examData.name || "",
         description: examData.description || "",
@@ -86,6 +154,13 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         passing_percentage: examData.passing_percentage ?? 0,
         passing_type: examData.passing_type || "percentage",
         duration: examData.duration ?? 60,
+        type: examData.type || "online",
+        program: prog?._id || "",
+        batch: examData.batch?._id || examData.batch || "",
+        module: examData.module?._id || examData.module || "",
+        max_attempts: examData.max_attempts ?? 2,
+        cooldown_days: examData.cooldown_days ?? 7,
+        deadline: examData.deadline ? examData.deadline.split("T")[0] : "",
       });
     } else if (!examData && open) {
       reset({
@@ -98,7 +173,16 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         passing_percentage: 0,
         passing_type: "percentage",
         duration: 60,
+        type: "online",
+        program: "",
+        batch: "",
+        module: "",
+        max_attempts: 2,
+        cooldown_days: 7,
+        deadline: "",
       });
+      setProgramSearchTerm("");
+      setBatchSearchTerm("");
     }
   }, [examData, reset, open]);
 
@@ -108,6 +192,21 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       delete finalValues.passing_marks;
     } else {
       delete finalValues.passing_percentage;
+    }
+
+    if (values.type === "sit-at-home") {
+      delete finalValues.program;
+      finalValues.max_attempts = Number(values.max_attempts) || 2;
+      finalValues.cooldown_days = Number(values.cooldown_days) ?? 7;
+      finalValues.module = values.module || null;
+      finalValues.deadline = values.deadline || null;
+    } else {
+      delete finalValues.program;
+      delete finalValues.batch;
+      delete finalValues.module;
+      delete finalValues.max_attempts;
+      delete finalValues.cooldown_days;
+      delete finalValues.deadline;
     }
 
     const mutation = isEdit ? updateExam : createExam;
@@ -152,6 +251,142 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
 
         <div className="overflow-y-auto flex-1 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("exam.form.type", "Exam Type")}
+              </Label>
+              <Select
+                key={`type-${watch("type")}`}
+                value={watch("type") || "online"}
+                onValueChange={(v) => {
+                  setValue("type", v, { shouldValidate: true });
+                  if (v !== "sit-at-home") {
+                    setValue("program", "");
+                    setValue("batch", "");
+                    setValue("module", "");
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Exam Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="online">{t("exam.form.online", "Online")}</SelectItem>
+                  <SelectItem value="sit-at-home">{t("exam.form.sitAtHome", "Sit-at-home")}</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.type && (
+                <p className="text-sm text-red-500">{errors.type.message}</p>
+              )}
+            </div>
+
+            {watch("type") === "sit-at-home" && (
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50">
+                <h4 className="font-medium text-sm text-gray-900 dark:text-white pb-2 border-b dark:border-white/10">
+                  {t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
+                </h4>
+                
+                <SearchableSelect
+                  label={t("planningManagement.modal.programLabel")}
+                  placeholder={t("planningManagement.modal.searchPrograms")}
+                  searchPlaceholder={t("planningManagement.modal.searchPrograms")}
+                  items={programs}
+                  value={watch("program")}
+                  onChange={(value) => {
+                    if (value) {
+                      setValue("program", value, { shouldValidate: true });
+                      setValue("batch", "");
+                      setValue("module", "");
+                    }
+                  }}
+                  onSearch={setProgramSearchTerm}
+                  isLoading={programsLoading}
+                  error={errors.program?.message}
+                  required
+                />
+
+                <SearchableSelect
+                  label={t("planningManagement.modal.batchLabel")}
+                  placeholder={t("planningManagement.modal.batchPlaceholder")}
+                  searchPlaceholder={t("planningManagement.modal.searchBatches")}
+                  items={batches}
+                  value={watch("batch")}
+                  onChange={(value) => {
+                    if (value) setValue("batch", value, { shouldValidate: true });
+                  }}
+                  onSearch={setBatchSearchTerm}
+                  isLoading={batchesLoading}
+                  error={errors.batch?.message}
+                  disabled={!selectedProgram}
+                  required
+                />
+
+                <SearchableSelect
+                  label={t("exam.form.moduleLabel", "Module")}
+                  placeholder={t("exam.form.modulePlaceholder", "Select Module")}
+                  searchPlaceholder={t("exam.form.searchModules", "Search Modules")}
+                  items={modules}
+                  value={watch("module")}
+                  onChange={(value) => {
+                    if (value) setValue("module", value, { shouldValidate: true });
+                  }}
+                  isLoading={modulesLoading}
+                  error={errors.module?.message}
+                  disabled={!selectedProgram}
+                  required
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">
+                      {t("planningManagement.modal.maxAttempts", "Max Attempts")}
+                    </Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      {...register("max_attempts", { valueAsNumber: true })}
+                    />
+                    {errors.max_attempts && (
+                      <p className="text-sm text-red-500">
+                        {errors.max_attempts.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">
+                      {t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}
+                    </Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      {...register("cooldown_days", { valueAsNumber: true })}
+                    />
+                    {errors.cooldown_days && (
+                      <p className="text-sm text-red-500">
+                        {errors.cooldown_days.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">
+                    {t("planningManagement.modal.deadline", "Deadline")}
+                  </Label>
+                  <Input
+                    type="date"
+                    {...register("deadline")}
+                  />
+                  {errors.deadline && (
+                    <p className="text-sm text-red-500">
+                      {errors.deadline.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
                 {t("exam.form.name")} <span className="text-red-500">*</span>
@@ -289,6 +524,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   {t("exam.form.passingType")}
                 </Label>
                 <Select
+                  key={`passing_type-${watch("passing_type")}`}
                   value={watch("passing_type")}
                   onValueChange={(v) => setValue("passing_type", v)}
                 >

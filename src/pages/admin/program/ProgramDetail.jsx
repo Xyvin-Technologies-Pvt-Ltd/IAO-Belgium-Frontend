@@ -29,7 +29,8 @@ const ProgramDetail = () => {
   const { data: program, isLoading, error, refetch } = useGetProgramById(id);
 
   const handleOpenCreate = (componentType = null) => {
-    setPreselectedType(componentType);
+    const type = typeof componentType === "string" ? componentType : null;
+    setPreselectedType(type);
     setIsModalOpen(true);
   };
 
@@ -211,7 +212,7 @@ const ProgramDetail = () => {
           <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1">
             {t("programDetail.emptyState.subtitle")}
           </p>
-          <Button className="mt-4" onClick={handleOpenCreate}>
+          <Button className="mt-4" onClick={() => handleOpenCreate()}>
             {t("programDetail.emptyState.createButton")}
           </Button>
         </div>

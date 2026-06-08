@@ -35,7 +35,7 @@ const SpecialExceptions = () => {
   
   // Create/Edit Form State
   const [name, setName] = useState("");
-  const [extraTimePercentage, setExtraTimePercentage] = useState(25);
+  const [extraTimeMin, setExtraTimeMin] = useState(15);
   const [formError, setFormError] = useState("");
 
   const { data, isLoading, error, refetch, isFetching } = useGetSpecialExceptions();
@@ -53,7 +53,7 @@ const SpecialExceptions = () => {
   const handleOpenCreate = () => {
     setSelectedException(null);
     setName("");
-    setExtraTimePercentage(25);
+    setExtraTimeMin(15);
     setFormError("");
     setIsModalOpen(true);
   };
@@ -61,7 +61,7 @@ const SpecialExceptions = () => {
   const handleOpenEdit = (ex) => {
     setSelectedException(ex);
     setName(ex.name || "");
-    setExtraTimePercentage(ex.extra_time_percentage ?? 25);
+    setExtraTimeMin(ex.extra_time_min ?? 15);
     setFormError("");
     setIsModalOpen(true);
   };
@@ -86,14 +86,14 @@ const SpecialExceptions = () => {
       return;
     }
 
-    if (extraTimePercentage < 0) {
-      setFormError("Extra time percentage must be 0 or more");
+    if (extraTimeMin < 0) {
+      setFormError("Extra time must be 0 or more minutes");
       return;
     }
 
     const payload = {
       name: name.trim(),
-      extra_time_percentage: Number(extraTimePercentage),
+      extra_time_min: Number(extraTimeMin),
     };
 
     if (selectedException) {
@@ -153,7 +153,7 @@ const SpecialExceptions = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Condition Name</TableHead>
-            <TableHead>Extra Time Percentage</TableHead>
+            <TableHead>Extra Time (Minutes)</TableHead>
             <TableHead className="w-[100px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -177,7 +177,7 @@ const SpecialExceptions = () => {
                   {ex.name}
                 </TableCell>
                 <TableCell>
-                  +{ex.extra_time_percentage}%
+                  +{ex.extra_time_min} min
                 </TableCell>
                 <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
@@ -235,14 +235,14 @@ const SpecialExceptions = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="exception-time">Extra Time Percentage (%)</Label>
+                <Label htmlFor="exception-time">Extra Time (Minutes)</Label>
                 <Input
                   id="exception-time"
                   type="number"
                   min="0"
-                  placeholder="e.g. 25"
-                  value={extraTimePercentage}
-                  onChange={(e) => setExtraTimePercentage(e.target.value)}
+                  placeholder="e.g. 15"
+                  value={extraTimeMin}
+                  onChange={(e) => setExtraTimeMin(e.target.value)}
                 />
               </div>
 

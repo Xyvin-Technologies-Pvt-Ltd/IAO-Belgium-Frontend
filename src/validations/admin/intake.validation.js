@@ -7,6 +7,7 @@ export const intakeSchema = z
       _id: z.string(),
       name: z.string()
     })).min(1, "At least one program is required"),
+    is_free: z.boolean().optional(),
     admission_fee: z.coerce
       .number({ invalid_type_error: "Admission fee must be a number" })
       .min(0, "Must be a positive number"),
@@ -24,6 +25,18 @@ export const intakeSchema = z
       })
       .min(1, "Must be at least 1"),
   })
+  .refine(
+    (data) => {
+      if (data.is_free === false && (data.admission_fee === undefined || data.admission_fee <= 0)) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Registration fee must be greater than 0",
+      path: ["admission_fee"],
+    }
+  )
   .refine((data) => new Date(data.end_date) > new Date(data.start_date), {
     message: "End date must be after start date",
     path: ["end_date"],
