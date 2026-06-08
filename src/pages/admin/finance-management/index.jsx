@@ -4,6 +4,7 @@ import {
   GraduationCap,
   Users,
   UserCircle,
+  History,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -58,6 +59,16 @@ const REPORT_CARDS = [
     bgColor: "rgba(239,68,68,0.08)",
     accentColor: "#ef4444",
     path: "/admin/finance-reports/student",
+  },
+  {
+    key: "transactions",
+    titleKey: "finance.reports.transactions.title",
+    descriptionKey: "finance.reports.transactions.description",
+    icon: History,
+    iconColor: "#06b6d4",
+    bgColor: "rgba(6,182,212,0.08)",
+    accentColor: "#06b6d4",
+    path: "/admin/finance-reports/transactions",
   },
 ];
 

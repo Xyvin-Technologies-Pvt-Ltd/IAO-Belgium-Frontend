@@ -214,6 +214,10 @@
         "title": "Student Reports",
         "description": "Payment analytics by student"
       },
+      "transactions": {
+        "title": "Transaction Logs",
+        "description": "Raw Mollie checkout transaction history"
+      },
       "createInvoice": {
         "title": "Create Custom Invoice",
         "student": "Select Student",

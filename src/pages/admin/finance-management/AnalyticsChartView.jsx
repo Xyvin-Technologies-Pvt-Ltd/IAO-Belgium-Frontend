@@ -304,8 +304,7 @@ const AnalyticsChartView = ({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[4fr_8fr] gap-3">
-
+      <div className="w-full">
         <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
@@ -336,28 +335,6 @@ const AnalyticsChartView = ({
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
-        <Card className="bg-sidebar rounded-xl p-5 border border-sidebar-border shadow-none flex flex-col">
-          <CardHeader className="p-0 mb-4">
-            <CardTitle className="text-lg font-semibold text-sidebar-foreground tracking-tight">
-              {t("finance.fields.paymentStatus")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 flex-1 flex flex-col">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData} barCategoryGap="32%" barGap={3}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" tick={<CustomTick />} height={52} interval={0} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltipStatus />} cursor={{ fill: "rgba(241,245,249,0.55)", radius: 8 }} />
-                <Bar dataKey="paid" name={t("common.paid")} fill="#22c55e" radius={[6, 6, 0, 0]} maxBarSize={36} />
-                <Bar dataKey="pending" name={t("common.pending")} fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={36} />
-                <Bar dataKey="failed" name={t("common.failed")} fill="#ef4444" radius={[6, 6, 0, 0]} maxBarSize={36} />
-              </BarChart>
-            </ResponsiveContainer>
-            <InlineLegend items={[{ color: "#22c55e", label: t("common.paid") }, { color: "#ff8904", label: t("common.pending") }, { color: "#ef4444", label: t("common.failed") }]} />
-          </CardContent>
-        </Card>
       </div>
 
       <div className="mt-8">
@@ -371,16 +348,14 @@ const AnalyticsChartView = ({
               <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
               <TableHead>{t("common.trxCount")}</TableHead>
               <TableHead>{t("common.paid")}</TableHead>
-              <TableHead>{t("common.pending")}</TableHead>
-              <TableHead>{t("common.failed")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isLoading ? "opacity-50 pointer-events-none" : ""}>
             {isLoading && displayTableData.length === 0 ? (
-              <TableSkeleton rows={limit || 10} columns={8} />
+              <TableSkeleton rows={limit || 10} columns={6} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center p-8">
+                <TableCell colSpan={6} className="text-center p-8">
                   <ErrorMessage message={error?.message || t("finance.messages.loadAnalyticsFailed")} variant="inline" />
                 </TableCell>
               </TableRow>
@@ -393,13 +368,11 @@ const AnalyticsChartView = ({
                   <TableCell>EUR {(item.module_purchase_amount || 0).toFixed(2)}</TableCell>
                   <TableCell>{item.total_count}</TableCell>
                   <TableCell className="text-green-600">{item.paid_count}</TableCell>
-                  <TableCell style={{ color: "#ff8904" }}>{item.pending_count}</TableCell>
-                  <TableCell className="text-red-600">{item.failed_count}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center">{t("finance.messages.noAnalyticsFound")}</TableCell>
+                <TableCell colSpan={6} className="text-center">{t("finance.messages.noAnalyticsFound")}</TableCell>
               </TableRow>
             )}
           </TableBody>

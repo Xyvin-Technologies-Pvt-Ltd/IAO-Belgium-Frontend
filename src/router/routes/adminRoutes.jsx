@@ -29,6 +29,7 @@ import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
 import BatchReports from "@/pages/admin/finance-management/BatchReports";
 import FinanceManagement from "@/pages/admin/finance-management";
 import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseReport";
+import TransactionLogs from "@/pages/admin/finance-management/TransactionLogs";
 import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
@@ -176,6 +177,13 @@ export const adminRoutes = [
     path: "/admin/finance-reports/batch",
     component: withPermissionProtection(
       BatchReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/transactions",
+    component: withPermissionProtection(
+      TransactionLogs,
       "/admin/finance-reports",
     ),
   },

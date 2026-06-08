@@ -6,6 +6,7 @@ import {
   getAnalyticsByBatchList,
   getAnalyticsByStudent,
   createPayment,
+  getTransactionLogs,
 } from "@/api/paymentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -14,6 +15,16 @@ export const useGetPayments = (filter, options = {}) => {
   return useQuery({
     queryKey: ["payments", filter],
     queryFn: () => getPayments(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetTransactionLogs = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["transaction-logs", filter],
+    queryFn: () => getTransactionLogs(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,

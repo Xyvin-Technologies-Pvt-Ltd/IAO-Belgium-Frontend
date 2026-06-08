@@ -34,6 +34,7 @@ const AllReportsFilterDrawer = ({
   appliedFilters,
   setAppliedFilters,
   setPage,
+  isInvoiceReports = false,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -111,10 +112,19 @@ const AllReportsFilterDrawer = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t("finance.filters.allStatuses")}</SelectItem>
-                  <SelectItem value="pending">{t("common.pending")}</SelectItem>
-                  <SelectItem value="paid">{t("common.paid")}</SelectItem>
-                  <SelectItem value="failed">{t("common.failed")}</SelectItem>
-                  <SelectItem value="canceled">{t("common.canceled")}</SelectItem>
+                  {isInvoiceReports ? (
+                    <>
+                      <SelectItem value="pending">{t("common.pending")}</SelectItem>
+                      <SelectItem value="paid">{t("common.paid")}</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="pending">{t("common.pending")}</SelectItem>
+                      <SelectItem value="paid">{t("common.paid")}</SelectItem>
+                      <SelectItem value="failed">{t("common.failed")}</SelectItem>
+                      <SelectItem value="canceled">{t("common.canceled")}</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </FilterSection>

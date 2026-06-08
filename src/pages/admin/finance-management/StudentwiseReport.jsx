@@ -100,8 +100,6 @@ const StudentwiseReport = () => {
               <TableHead>{t("finance.fields.totalRevenue")}</TableHead>
               <TableHead>{t("common.trxCount")}</TableHead>
               <TableHead>{t("common.paid")}</TableHead>
-              <TableHead>{t("common.pending")}</TableHead>
-              <TableHead>{t("common.failed")}</TableHead>
               <TableHead>{t("finance.purposes.admissionFee")}</TableHead>
               <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
             </TableRow>
@@ -110,10 +108,10 @@ const StudentwiseReport = () => {
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={9} />
+              <TableSkeleton rows={rowsPerPage} columns={7} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center p-8">
+                <TableCell colSpan={7} className="text-center p-8">
                   <ErrorMessage
                     message={
                       error?.message ||
@@ -138,12 +136,6 @@ const StudentwiseReport = () => {
                   <TableCell className="text-green-600">
                     {student.paid_count || 0}
                   </TableCell>
-                  <TableCell style={{ color: "#ff8904" }}>
-                    {student.pending_count || 0}
-                  </TableCell>
-                  <TableCell className="text-red-600">
-                    {student.failed_count || 0}
-                  </TableCell>
                   <TableCell>
                     EUR {(student.admission_fee_amount || 0).toFixed(2)}
                   </TableCell>
@@ -154,7 +146,7 @@ const StudentwiseReport = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="text-center">
+                <TableCell colSpan={7} className="text-center">
                   {t("finance.messages.noPaymentAnalyticsFound")}
                 </TableCell>
               </TableRow>

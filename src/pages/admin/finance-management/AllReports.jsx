@@ -17,7 +17,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { useGetPayments } from "@/store/usePaymentStore";
 import moment from "moment";
 import { Download } from "lucide-react";
-import { getInvoiceHtml } from "@/api/paymentApi";
+import { getInvoicePrintHtml } from "@/api/paymentApi";
 import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
 
 const AllReports = () => {
@@ -62,7 +62,7 @@ const AllReports = () => {
   const totalRows = data?.total_count || 0;
   const handleDownloadReceipt = async (payment) => {
     try {
-      const html = await getInvoiceHtml(payment._id);
+      const html = await getInvoicePrintHtml(payment._id);
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
       iframe.style.right = "0";
@@ -144,6 +144,7 @@ const AllReports = () => {
             appliedFilters={appliedFilters}
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
+            isInvoiceReports={true}
           />
         </div>
 
