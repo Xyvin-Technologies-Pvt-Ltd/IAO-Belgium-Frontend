@@ -59,7 +59,7 @@ const Exams = () => {
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(statusFilter ? { status: statusFilter } : {}),
-    ...(languageFilter ? { language: languageFilter } : {}),
+    ...(languageFilter ? { exam_language: languageFilter } : {}),
   });
   const publishExam = usePublishExam();
   const archiveExam = useArchiveExam();
@@ -187,7 +187,7 @@ const Exams = () => {
                     ? `${i?.passing_percentage ?? i?.passing_marks ?? 0}%`
                     : i?.passing_marks ?? i?.passing_percentage ?? 0}
                 </TableCell>
-                <TableCell>{i?.language?.name || "-"}</TableCell>
+                <TableCell>{i?.exam_language?.name || "-"}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
