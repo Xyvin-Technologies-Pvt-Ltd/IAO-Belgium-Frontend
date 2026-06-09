@@ -37,7 +37,7 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
     defaultValues: {
       name: "",
       description: "",
-      language: "",
+      lang: "",
     },
   });
 
@@ -52,13 +52,13 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
       reset({
         name: bankData.name || "",
         description: bankData.description || "",
-        language: bankData.language?._id || bankData.language || "",
+        lang: bankData.lang?._id || bankData.lang || "",
       });
     } else {
       reset({
         name: "",
         description: "",
-        language: "",
+        lang: "",
       });
     }
   }, [bankData, reset, open]);
@@ -83,7 +83,7 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
     reset({
       name: "",
       description: "",
-      language: "",
+      lang: "",
     });
     onClose();
   };
@@ -122,13 +122,13 @@ const CreateQuestionBank = ({ open, onClose, bankData, onSuccess }) => {
           </FormField>
           <FormField
             label={t("questionBank.form.language") || "Language"}
-            error={errors.language?.message}
+            error={errors.lang?.message}
             required
           >
             <Select
-              key={`language-${watch("language")}`}
-              value={watch("language") || ""}
-              onValueChange={(v) => setValue("language", v, { shouldValidate: true })}
+              key={`lang-${watch("lang")}`}
+              value={watch("lang") || ""}
+              onValueChange={(v) => setValue("lang", v, { shouldValidate: true })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Language" />
