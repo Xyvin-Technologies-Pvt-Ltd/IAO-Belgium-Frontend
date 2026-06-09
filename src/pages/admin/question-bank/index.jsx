@@ -159,7 +159,7 @@ const QuestionBanks = () => {
                 <TableCell className="max-w-[200px] truncate">
                   {i?.description || "-"}
                 </TableCell>
-                <TableCell>{i?.language?.name || "-"}</TableCell>
+                <TableCell>{i?.lang?.name || "-"}</TableCell>
                 <TableCell>{i?.question_count ?? 0}</TableCell>
                 <TableCell className="whitespace-nowrap">
                   {i?.createdAt ? moment(i.createdAt).format("DD-MM-YYYY") : "-"}

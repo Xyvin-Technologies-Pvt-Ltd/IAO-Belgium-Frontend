@@ -18,7 +18,7 @@ const QuestionSourceSelector = ({ value = [], onChange, error, selectedLanguage 
   const { data: banksData } = useGetQuestionBanksDropdown(
     {
       status: true,
-      ...(selectedLanguage ? { language: selectedLanguage } : {}),
+      ...(selectedLanguage ? { lang: selectedLanguage } : {}),
     },
     {
       enabled: !!selectedLanguage,

@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -15,30 +14,48 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
-import { useGetPayments } from "@/store/usePaymentStore";
+import { useGetTransactionLogs } from "@/store/usePaymentStore";
 import moment from "moment";
-import { Download, Plus } from "lucide-react";
-import { getInvoicePrintHtml } from "@/api/paymentApi";
-import CreateInvoice from "./CreateInvoice";
+import { Download } from "lucide-react";
+import { getInvoiceHtml } from "@/api/paymentApi";
+import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
 
-const CustomInvoices = () => {
+const TransactionLogs = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({
+    status: "all",
+    purpose: "all",
+    from: "",
+    to: "",
+  });
+  const [draftFilters, setDraftFilters] = useState({
+    status: "all",
+    purpose: "all",
+    from: "",
+    to: "",
+  });
 
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, appliedFilters]);
 
-  const { data, isLoading, error, refetch, isFetching } = useGetPayments({
+  const { data, isLoading, error, refetch, isFetching } = useGetTransactionLogs({
     page,
     limit: rowsPerPage,
-    purpose: "custom-invoice",
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
+    ...(appliedFilters.purpose !== "all"
+      ? { purpose: appliedFilters.purpose }
+      : {}),
+    ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
+    ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
   });
 
   const payments = data?.data || [];
@@ -46,7 +63,7 @@ const CustomInvoices = () => {
 
   const handleDownloadReceipt = async (payment) => {
     try {
-      const html = await getInvoicePrintHtml(payment._id);
+      const html = await getInvoiceHtml(payment._id);
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
       iframe.style.right = "0";
@@ -66,20 +83,53 @@ const CustomInvoices = () => {
     }
   };
 
+  const getActualAmount = (payment) => {
+    if (payment.purpose === "module-purchase" && payment.convenience_fee) {
+      return payment.amount - payment.convenience_fee;
+    }
+    return payment.amount;
+  };
+
+  const getPurposeColor = (purpose) => {
+    switch (purpose) {
+      case "admission-fee":
+        return "text-blue-600 dark:text-blue-400";
+      case "module-purchase":
+        return "text-green-600 dark:text-green-400";
+      case "custom-invoice":
+        return "text-purple-600 dark:text-purple-400";
+      default:
+        return "text-gray-600 dark:text-gray-400";
+    }
+  };
+
+  const formatPurpose = (purpose) => {
+    if (!purpose) return t("common.notAvailable");
+    switch (purpose) {
+      case "admission-fee":
+        return t("finance.purposes.admissionFee");
+      case "module-purchase":
+        return t("finance.purposes.modulePurchase");
+      case "custom-invoice":
+        return t("finance.purposes.customInvoice");
+      default:
+        return purpose
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+    }
+  };
+
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          {t("finance.reports.customInvoices.title")}
+          {t("finance.reports.transactions.title")}
         </h2>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
-          <Plus size={16} />
-          {t("sidebar.admin.createInvoice")}
-        </Button>
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
           <Input
             placeholder={t("studentManagement.search")}
             className="max-w-xs"
@@ -89,6 +139,13 @@ const CustomInvoices = () => {
               setPage(1);
             }}
           />
+          <AllReportsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
 
         <Table>
@@ -96,27 +153,28 @@ const CustomInvoices = () => {
             <TableRow>
               <TableHead>{t("common.paymentId")}</TableHead>
               <TableHead>{t("common.studentName")}</TableHead>
+              <TableHead>{t("common.intake")}</TableHead>
+              <TableHead>{t("common.program")}</TableHead>
+              <TableHead>{t("common.component")}</TableHead>
+              <TableHead>{t("common.purpose")}</TableHead>
               <TableHead>{t("common.amount")}</TableHead>
+              <TableHead>{t("common.convenienceFee")}</TableHead>
+              <TableHead>{t("common.invoiceId", "Invoice ID")}</TableHead>
+              <TableHead>{t("common.receiptId", "Receipt ID")}</TableHead>
               <TableHead>{t("common.date")}</TableHead>
               <TableHead>{t("common.status")}</TableHead>
-              <TableHead></TableHead>
+              <TableHead>{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody
-            className={isFetching ? "opacity-50 pointer-events-none" : ""}
-          >
-            {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={6} />
+          <TableBody>
+            {isLoading || isFetching ? (
+              <TableSkeleton columns={13} rows={rowsPerPage} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center p-8">
+                <TableCell colSpan={13} className="h-24 text-center">
                   <ErrorMessage
-                    message={
-                      error?.message ||
-                      t("studentManagement.messages.loadFailed")
-                    }
-                    onRetry={refetch}
-                    variant="inline"
+                    message={error?.message || t("finance.messages.loadAnalyticsFailed")}
+                    refetch={refetch}
                   />
                 </TableCell>
               </TableRow>
@@ -130,10 +188,28 @@ const CustomInvoices = () => {
                       t("common.notAvailable")
                       : t("common.notAvailable")}
                   </TableCell>
+                  <TableCell>{payment?.intake_name || t("common.notAvailable")}</TableCell>
+                  <TableCell>{payment?.program_name || t("common.notAvailable")}</TableCell>
+                  <TableCell>{payment?.component?.name || t("common.notAvailable")}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`font-medium ${getPurposeColor(payment?.purpose)}`}
+                    >
+                      {formatPurpose(payment?.purpose)}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     {payment?.currency || "EUR"}{" "}
-                    {payment.amount.toFixed(2)}
+                    {getActualAmount(payment).toFixed(2)}
                   </TableCell>
+                  <TableCell>
+                    {payment.purpose === "module-purchase" &&
+                    payment.convenience_fee
+                      ? `${payment?.currency || "EUR"} ${payment.convenience_fee.toFixed(2)}`
+                      : "-"}
+                  </TableCell>
+                  <TableCell>{payment?.invoice_ref || "-"}</TableCell>
+                  <TableCell>{payment?.receipt_ref || "-"}</TableCell>
                   <TableCell>
                     {payment?.createdAt
                       ? moment(payment.createdAt).format("DD-MM-YYYY")
@@ -143,7 +219,7 @@ const CustomInvoices = () => {
                     <StatusBadge status={payment?.status} />
                   </TableCell>
                   <TableCell>
-                    {payment?.status !== "pending" && (
+                    {payment?.status !== "pending" && (payment?.status === "paid" || payment?.purpose === "custom-invoice") && (
                       <button
                         onClick={() => handleDownloadReceipt(payment)}
                         title="Download receipt"
@@ -157,8 +233,8 @@ const CustomInvoices = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  {t("finance.messages.noCustomInvoicesFound")}
+                <TableCell colSpan={13} className="text-center">
+                  {t("finance.messages.noPaymentsFound")}
                 </TableCell>
               </TableRow>
             )}
@@ -172,13 +248,8 @@ const CustomInvoices = () => {
           totalRows={totalRows}
         />
       </div>
-
-      <CreateInvoice 
-        open={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
-      />
     </div>
   );
 };
 
-export default CustomInvoices;
+export default TransactionLogs;

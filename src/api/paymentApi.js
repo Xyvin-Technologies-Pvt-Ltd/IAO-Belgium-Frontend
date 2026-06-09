@@ -2,6 +2,17 @@ import axiosInstance from "./axiosintercepter";
 
 export const getPayments = async (filter) => {
   try {
+    const response = await axiosInstance.get(`/invoice`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getTransactionLogs = async (filter) => {
+  try {
     const response = await axiosInstance.get(`/payment`, {
       params: filter,
     });
@@ -69,6 +80,15 @@ export const getAnalyticsByStudent = async (filter) => {
 export const getInvoiceHtml = async (id) => {
   try {
     const response = await axiosInstance.get(`/payment/invoice/${id}`, { responseType: "text" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getInvoicePrintHtml = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/invoice/${id}/html`, { responseType: "text" });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
