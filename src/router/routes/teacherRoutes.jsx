@@ -8,6 +8,8 @@ import ModuleView from "@/pages/teacher/schedule/ModuleView";
 import Evaluations from "@/pages/teacher/evaluvations";
 import ViewSubmission from "@/pages/teacher/evaluvations/ViewSubmission";
 import ExamList from "@/pages/teacher/exam";
+import OtherExamList from "@/pages/teacher/exam/OtherExamList";
+import OtherExamDetail from "@/pages/teacher/exam/OtherExamDetail";
 import ExamDetail from "@/pages/teacher/exam/ExamDetail";
 import TeacherNotifications from "@/pages/teacher/notification";
 import TeacherNotificationDetail from "@/pages/teacher/notification/NotificationDetail";
@@ -26,6 +28,8 @@ export const teacherRoutes = [
   { path: "/teacher/evaluations", component: Evaluations },
   { path: "/teacher/evaluations/$id", component: ViewSubmission },
   { path: "/teacher/exams", component: ExamList },
+  { path: "/teacher/other-exams", component: OtherExamList },
+  { path: "/teacher/other-exams/$exam_id", component: OtherExamDetail },
   { path: "/teacher/exams/$exam_id/$planning_id", component: ExamDetail },
   { path: "/teacher/notifications", component: TeacherNotifications },
   { path: "/teacher/notifications/$id", component: TeacherNotificationDetail },

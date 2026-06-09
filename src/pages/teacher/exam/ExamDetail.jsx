@@ -174,6 +174,7 @@ const ExamDetail = () => {
   }
 
   const exam = examData.data;
+  const isNonSessionExam = exam.type === "practical" || exam.type === "sit-at-home";
 
   return (
     <div className="space-y-6 mt-4">
@@ -195,7 +196,17 @@ const ExamDetail = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {!examStarted && !examEnded && (
+          {exam.type === "sit-at-home" && (
+            <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              {t("exam.type.sitAtHome", { defaultValue: "Sit-at-home" })}
+            </Badge>
+          )}
+          {exam.type === "practical" && (
+            <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+              {t("exam.type.practical", { defaultValue: "Practical/Clinical" })}
+            </Badge>
+          )}
+          {!isNonSessionExam && !examStarted && !examEnded && (
             <Button
               onClick={handleStartExam}
               disabled={!canStart || startSessionMutation.isPending}
@@ -206,7 +217,7 @@ const ExamDetail = () => {
                 : t("exam.startExam", { defaultValue: "Start Exam" })}
             </Button>
           )}
-          {examStarted && !examEnded && (
+          {!isNonSessionExam && examStarted && !examEnded && (
             <Button
               onClick={handleEndExam}
               disabled={endSessionMutation.isPending}
@@ -219,7 +230,7 @@ const ExamDetail = () => {
                 : t("exam.endExam", { defaultValue: "End Exam" })}
             </Button>
           )}
-          {examEnded && (
+          {!isNonSessionExam && examEnded && (
             <div className="text-sm font-medium text-green-600 dark:text-green-500 px-4 py-2 bg-green-50 dark:bg-green-900/20 rounded-md">
               {t("exam.examCompleted", { defaultValue: "Exam Completed" })}
             </div>
@@ -302,7 +313,8 @@ const ExamDetail = () => {
         </div>
       )}
 
-      {(exam.exam_session_status === "ended" ||
+      {(isNonSessionExam ||
+        exam.exam_session_status === "ended" ||
         resultsData?.data?.length > 0) && (
         <div className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
@@ -357,13 +369,13 @@ const ExamDetail = () => {
                       {result.score}
                     </TableCell>
                     <TableCell className="text-center">
-                      {result.percentage?.toFixed(2)}%
+                      {result.percentage !== null && result.percentage !== undefined ? `${result.percentage.toFixed(2)}%` : "—"}
                     </TableCell>
                     <TableCell className="text-center">
                       <StatusBadge status={result.result} />
                     </TableCell>
                     <TableCell className="text-center text-muted-foreground px-6 py-4">
-                      {getMoment(result.submitted_at).format("DD-MM-YYYY, HH:mm")}
+                      {result.submitted_at ? getMoment(result.submitted_at).format("DD-MM-YYYY, HH:mm") : "—"}
                     </TableCell>
                   </TableRow>
                 ))

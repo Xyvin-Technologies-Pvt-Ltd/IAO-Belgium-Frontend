@@ -26,7 +26,8 @@
       "schedules": "Schedules",
       "planning": "Planning",
       "evaluations": "Feedback / Evaluation",
-      "exams": "Exams"
+      "exams": "Exams",
+      "otherExams": "Other Exams"
     },
     "admin": {
       "title": "Admin Dashboard",
