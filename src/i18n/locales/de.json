@@ -17,6 +17,7 @@
     }
   },
   "sidebar": {
+    "logo": "IAO Backoffice",
     "teacher": {
       "title": "Dozenten-Dashboard",
       "main": "Hauptmenü",
@@ -62,8 +63,7 @@
       "loading": "Laden...",
       "noRole": "Keine Rolle",
       "signOut": "Abmelden"
-    },
-    "logo": "IAO Backoffice"
+    }
   },
   "languages": {
     "en": "English",
@@ -72,28 +72,8 @@
     "de": "Deutsch"
   },
   "common": {
-    "welcome": {
-      "back": "Willkommen zurück!",
-      "backWithName": "Willkommen zurück, {{name}}!",
-      "subtitle": "Alle Ihre Ausbildungen, Fortschritte und Updates an einem Ort."
-    },
     "filters": "Filter",
     "dashboard": "Dashboard",
-    "deleteConfirm": {
-      "title": "Löschen bestätigen",
-      "message": "Sind Sie sicher, dass Sie {{count}} {{data}} löschen möchten? {{cannotUndo}}",
-      "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
-      "cancel": "Abbrechen",
-      "delete": "Löschen",
-      "deleting": "Löschen..."
-    },
-    "sendConfirm": {
-      "title": "Benachrichtigung senden",
-      "message": "Dies wird die Benachrichtigung sofort an alle Empfänger senden. Diese Aktion kann nicht rückgängig gemacht werden.",
-      "send": "Senden",
-      "sending": "Senden...",
-      "cancel": "Abbrechen"
-    },
     "create": "Erstellen",
     "update": "Aktualisieren",
     "cancel": "Abbrechen",
@@ -164,6 +144,9 @@
     "searchTitles": "Akademische Grade suchen...",
     "searchRoles": "Dozentenrollen suchen...",
     "paymentId": "Zahlungs-ID",
+    "invoiceId": "Rechnungs-ID",
+    "receiptId": "Beleg-ID",
+    "downloadReceipt": "Beleg herunterladen",
     "studentName": "Studentenname",
     "intake": "Aufnahme",
     "program": "Ausbildung / Studiengang",
@@ -187,43 +170,30 @@
     "noVenues": "Keine Veranstaltungsorte",
     "search": "Suchen...",
     "currency": "Währung",
-    "processing": "Verarbeitung..."
+    "processing": "Verarbeitung...",
+    "welcome": {
+      "back": "Willkommen zurück!",
+      "backWithName": "Willkommen zurück, {{name}}!",
+      "subtitle": "Alle Ihre Ausbildungen, Fortschritte und Updates an einem Ort."
+    },
+    "deleteConfirm": {
+      "title": "Löschen bestätigen",
+      "message": "Sind Sie sicher, dass Sie {{count}} {{data}} löschen möchten? {{cannotUndo}}",
+      "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "delete": "Löschen",
+      "deleting": "Löschen..."
+    },
+    "sendConfirm": {
+      "title": "Benachrichtigung senden",
+      "message": "Dies wird die Benachrichtigung sofort an alle Empfänger senden. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "send": "Senden",
+      "sending": "Senden...",
+      "cancel": "Abbrechen"
+    }
   },
   "finance": {
     "title": "Finanzverwaltung",
-    "reports": {
-      "all": {
-        "title": "Alle Berichte",
-        "description": "Alle Zahlungstransaktionen anzeigen"
-      },
-      "city": {
-        "title": "Berichte nach Stadt",
-        "description": "Zahlungsanalysen nach Stadt"
-      },
-      "program": {
-        "title": "Berichte nach Ausbildung / Studiengang",
-        "description": "Zahlungsanalysen nach Ausbildung / Studiengang"
-      },
-      "batch": {
-        "title": "Berichte nach Charge",
-        "description": "Zahlungsanalysen nach Charge"
-      },
-      "student": {
-        "title": "Berichte nach Student",
-        "description": "Zahlungsanalysen nach Student"
-      },
-      "createInvoice": {
-        "title": "Benutzerdefinierte Rechnung erstellen",
-        "student": "Student auswählen",
-        "searchStudent": "Nach einem Studenten suchen...",
-        "invoiceTitle": "Rechnungstitel / Beschreibung",
-        "titlePlaceholder": "z.B. Semestergebühr, Stipendienanpassung",
-        "submit": "Benutzerdefinierte Rechnung erstellen"
-      },
-      "customInvoices": {
-        "title": "Benutzerdefinierte Rechnungen"
-      }
-    },
     "fields": {
       "totalRevenue": "Gesamteinnahmen",
       "totalTransactions": "Gesamttransaktionen",
@@ -261,6 +231,39 @@
       "loadingAnalytics": "Analysedaten werden geladen...",
       "loadAnalyticsFailed": "Fehler beim Laden der Analysedaten",
       "noCustomInvoicesFound": "Keine benutzerdefinierten Rechnungen gefunden."
+    },
+    "reports": {
+      "all": {
+        "title": "Alle Berichte",
+        "description": "Alle Zahlungstransaktionen anzeigen"
+      },
+      "city": {
+        "title": "Berichte nach Stadt",
+        "description": "Zahlungsanalysen nach Stadt"
+      },
+      "program": {
+        "title": "Berichte nach Ausbildung / Studiengang",
+        "description": "Zahlungsanalysen nach Ausbildung / Studiengang"
+      },
+      "batch": {
+        "title": "Berichte nach Charge",
+        "description": "Zahlungsanalysen nach Charge"
+      },
+      "student": {
+        "title": "Berichte nach Student",
+        "description": "Zahlungsanalysen nach Student"
+      },
+      "createInvoice": {
+        "title": "Benutzerdefinierte Rechnung erstellen",
+        "student": "Student auswählen",
+        "searchStudent": "Nach einem Studenten suchen...",
+        "invoiceTitle": "Rechnungstitel / Beschreibung",
+        "titlePlaceholder": "z.B. Semestergebühr, Stipendienanpassung",
+        "submit": "Benutzerdefinierte Rechnung erstellen"
+      },
+      "customInvoices": {
+        "title": "Benutzerdefinierte Rechnungen"
+      }
     }
   },
   "ltiManagement": {
@@ -291,6 +294,9 @@
     "unknownUser": "Unbekannter {{type}}"
   },
   "calendar": {
+    "session": "Sitzung",
+    "loading": "Laden...",
+    "more": "mehr",
     "viewType": {
       "month": "Monat",
       "week": "Woche"
@@ -303,10 +309,7 @@
       "thu": "Do",
       "fri": "Fr",
       "sat": "Sa"
-    },
-    "session": "Sitzung",
-    "loading": "Laden...",
-    "more": "mehr"
+    }
   },
   "sessionCard": {
     "noSessions": "Keine Sitzungen geplant",
@@ -499,16 +502,16 @@
       "cityLabel": "Stadt",
       "cityPlaceholder": "Stadt auswählen",
       "cityPlaceholderDisabled": "Wählen Sie zuerst das Land aus",
+      "searchLanguages": "Sprachen suchen...",
+      "searchCountries": "Länder suchen...",
+      "searchCities": "Städte suchen...",
       "programTypes": {
         "masterOfScience": "Master of Science",
         "lateralEntry": "Master of Science (Seiteneinstieg)",
         "diploma": "Diplom",
         "manualTherapie": "Manuelle Therapie",
         "postAcademic": "Postakademisches Modul"
-      },
-      "searchLanguages": "Sprachen suchen...",
-      "searchCountries": "Länder suchen...",
-      "searchCities": "Städte suchen..."
+      }
     }
   },
   "intakeManagement": {
@@ -554,6 +557,8 @@
       "searchPrograms": "Ausbildungen / Studiengänge suchen..."
     },
     "details": {
+      "loading": "Lade Aufnahmedetails...",
+      "loadFailed": "Aufnahmedetails konnten nicht geladen werden",
       "tabs": {
         "batches": "Gruppen",
         "enrollments": "Einschreibungen"
@@ -568,9 +573,7 @@
         "intakeId": "Aufnahme-ID",
         "registrationFee": "Anmeldegebühr",
         "registrationDeadline": "Anmeldefrist"
-      },
-      "loading": "Lade Aufnahmedetails...",
-      "loadFailed": "Aufnahmedetails konnten nicht geladen werden"
+      }
     },
     "filters": {
       "title": "Filter",
@@ -652,6 +655,8 @@
       "loadResultsFailed": "Laden der Ergebnisse fehlgeschlagen"
     },
     "details": {
+      "loading": "Gruppendetails werden geladen...",
+      "loadFailed": "Laden der Gruppendetails fehlgeschlagen",
       "tabs": {
         "overview": "Übersicht",
         "students": "Studenten",
@@ -676,9 +681,7 @@
         "intakeStartDate": "Aufnahmestartdatum",
         "intakeEndDate": "Aufnahmeenddatum",
         "students": "Studenten"
-      },
-      "loading": "Gruppendetails werden geladen...",
-      "loadFailed": "Laden der Gruppendetails fehlgeschlagen"
+      }
     },
     "modal": {
       "batchLabel": "Gruppe",
@@ -999,6 +1002,8 @@
   },
   "programDetail": {
     "title": "Details der Ausbildung / Studiengang",
+    "loading": "Details der Ausbildung / Studiengang werden geladen...",
+    "loadFailed": "Laden der Details der Ausbildung / Studiengang fehlgeschlagen",
     "cards": {
       "programName": "Name der Ausbildung / Studiengang",
       "duration": "Dauer",
@@ -1017,9 +1022,7 @@
       "title": "Noch keine Module der Ausbildung / Studiengang hinzugefügt",
       "subtitle": "Beginnen Sie mit dem Hinzufügen von Modulen, Apps, Ressourcen oder Prüfungen, um diese Ausbildung / Studiengang effizient aufzubauen und zu verwalten.",
       "createButton": "Modul der Ausbildung / Studiengang erstellen"
-    },
-    "loading": "Details der Ausbildung / Studiengang werden geladen...",
-    "loadFailed": "Laden der Details der Ausbildung / Studiengang fehlgeschlagen"
+    }
   },
   "learningModule": {
     "search": "Module suchen...",
@@ -1265,106 +1268,11 @@
       "available": "verfügbar"
     }
   },
-  "lti": {
-    "platformConfig": {
-      "title": "LTI-Plattformkonfiguration",
-      "subtitle": "Teilen Sie diese Werte mit Enatom, um den HUB als vertrauenswürdige Plattform zu registrieren.",
-      "exportJson": "JSON exportieren",
-      "issuer": "Emittent (iss)",
-      "clientId": "Client-ID",
-      "deploymentId": "Deployment-ID",
-      "jwksUrl": "JWKS-URL",
-      "oidcAuthEndpoint": "OIDC Authentifizierungsendpunkt",
-      "accessTokenUrl": "Zugriffstoken-URL",
-      "oidcConfigUrl": "OpenID Konfigurations-URL (dynamische Registrierung)",
-      "copyToClipboard": "In die Zwischenablage kopieren"
-    },
-    "registerTool": {
-      "createTitle": "LTI-Tool registrieren",
-      "editTitle": "LTI-Tool bearbeiten",
-      "createSubtitle": "Ein neues externes LTI 1.3-Tool hinzufügen (z. B. Enatom)",
-      "editSubtitle": "LTI 1.3-Tool-Anmeldeinformationen aktualisieren",
-      "nameLabel": "Tool-Name",
-      "namePlaceholder": "Anzeigenamen für dieses Tool eingeben",
-      "clientIdLabel": "Client-ID",
-      "clientIdPlaceholder": "Vom externen Tool bereitgestellte eindeutige Kennung",
-      "deploymentIdLabel": "Deployment-ID",
-      "deploymentIdPlaceholder": "Deployment-Kennung des Tool-Anbieters",
-      "generatedByPlatform": "Vom Platform generiert und verwaltet",
-      "oidcLoginUrlLabel": "OIDC-Login-URL",
-      "oidcLoginUrlPlaceholder": "https://tool-anbieter.com/lti/login",
-      "redirectUriLabel": "Redirect-URI",
-      "redirectUriPlaceholder": "https://tool-anbieter.com/lti/callback",
-      "jwksUrlLabel": "JWKS-URL",
-      "jwksUrlPlaceholder": "https://tool-anbieter.com/.well-known/jwks.json",
-      "launchUrlLabel": "Start-URL",
-      "launchUrlPlaceholder": "https://tool-anbieter.com/app (optional)",
-      "errors": {
-        "nameRequired": "Name ist erforderlich",
-        "oidcLoginUrlRequired": "OIDC-Login-URL ist erforderlich",
-        "redirectUriRequired": "Redirect-URI ist erforderlich",
-        "jwksUrlRequired": "JWKS-URL ist erforderlich",
-        "invalidHttps": "Muss eine gültige HTTPS-URL sein"
-      }
-    }
-  },
-  "notification": {
-    "modal": {
-      "createTitle": "Benachrichtigung erstellen",
-      "editTitle": "Benachrichtigung bearbeiten",
-      "createSubtitle": "Eine neue Benachrichtigung verfassen",
-      "editSubtitle": "Benachrichtigungsdetails aktualisieren",
-      "subjectLabel": "Betreff",
-      "subjectPlaceholder": "Betreff der Benachrichtigung",
-      "messageLabel": "Nachricht",
-      "messagePlaceholder": "Nachricht der Benachrichtigung",
-      "typeLabel": "Typ",
-      "typeInApp": "In-App",
-      "typeEmail": "E-Mail",
-      "sendToLabel": "Senden an",
-      "sendToPlaceholder": "Empfänger auswählen...",
-      "allUsers": "Alle Benutzer",
-      "teachers": "Dozenten",
-      "students": "Studenten",
-      "sendToAll": "An alle {{role}} senden",
-      "noContactsSelected": "Bitte wählen Sie mindestens einen Kontakt aus",
-      "sendSuccess": "Emails erfolgreich versendet!",
-      "sendError": "Emails konnten nicht versendet werden",
-      "searchPlaceholder": "{{role}} suchen...",
-      "errors": {
-        "subjectRequired": "Betreff ist erforderlich",
-        "messageRequired": "Nachricht ist erforderlich",
-        "typeRequired": "Mindestens einen Typ auswählen",
-        "recipientRequired": "Mindestens einen Empfänger auswählen"
-      }
-    },
-    "view": {
-      "title": "Benachrichtigungsdetails",
-      "message": "Nachricht",
-      "recipients": "Empfänger",
-      "type": "Typ",
-      "created": "Erstellt am",
-      "sentAt": "Gesendet am",
-      "allUsers": "Alle Benutzer",
-      "allTeachers": "Alle Dozenten",
-      "allStudents": "Alle Studenten",
-      "selectedTeachers": "Ausgewählte Dozenten",
-      "selectedStudents": "Ausgewählte Studenten",
-      "selectedUsers": "Ausgewählte Benutzer",
-      "system": "System"
-    }
-  },
   "componentManagement": {
     "createTitle": "Modul der Ausbildung / Studiengang erstellen",
     "editTitle": "Modul der Ausbildung / Studiengang bearbeiten",
     "typeLabel": "Typ",
     "typePlaceholder": "Typ auswählen",
-    "types": {
-      "module": "Lernmodul",
-      "app": "Angewandte Berufspraxis (APP)",
-      "resource": "Forschung",
-      "exam": "Prüfung"
-    },
     "nameLabel": "Name",
     "namePlaceholder": "Name eingeben",
     "yearLabel": "Jahr",
@@ -1394,7 +1302,13 @@
     "essays": "Essays",
     "internships": "Praktikum",
     "activeStatus": "Aktiver Status",
-    "uploadingFiles": "Dateien werden hochgeladen..."
+    "uploadingFiles": "Dateien werden hochgeladen...",
+    "types": {
+      "module": "Lernmodul",
+      "app": "Angewandte Berufspraxis (APP)",
+      "resource": "Forschung",
+      "exam": "Prüfung"
+    }
   },
   "programConfig": {
     "title": "Konfiguration der Ausbildung / Studiengang",
@@ -1411,6 +1325,11 @@
     "activeStatus": "Aktiver Status",
     "activeStatusHint": "Diese Konfiguration aktivieren oder deaktivieren",
     "noConfigs": "Noch keine Konfigurationen vorhanden. Klicken Sie auf \"Neues Jahr\", um eine zu erstellen.",
+    "actions": {
+      "saving": "Speichern...",
+      "update": "Konfiguration aktualisieren",
+      "create": "Konfiguration erstellen"
+    },
     "requirements": {
       "exam": {
         "title": "Prüfungsanforderungen",
@@ -1432,13 +1351,9 @@
         "passMark": "Bestehungsgrenze (%)"
       },
       "internship": {
-        "title": "Praktikumsanforderungen",        "minCases": "Mindestanzahl an Fällen"
+        "title": "Praktikumsanforderungen",
+        "minCases": "Mindestanzahl an Fällen"
       }
-    },
-    "actions": {
-      "saving": "Speichern...",
-      "update": "Konfiguration aktualisieren",
-      "create": "Konfiguration erstellen"
     }
   },
   "questionBank": {
@@ -1580,6 +1495,154 @@
     },
     "messages": {
       "loadFailed": "Fehler beim Laden der Ergebnisdaten"
+    }
+  },
+  "specialExceptions": {
+    "title": "Besondere Ausnahmen",
+    "searchPlaceholder": "Besondere Ausnahmen suchen...",
+    "addExceptionBtn": "Ausnahme hinzufügen",
+    "conditionName": "Bedingungsname",
+    "extraTimeMinutes": "Zusatzzeit (Minuten)",
+    "actions": "Aktionen",
+    "loadFailed": "Laden der besonderen Ausnahmen fehlgeschlagen",
+    "noExceptions": "Keine besonderen Ausnahmen gefunden.",
+    "addTitle": "Besondere Ausnahme hinzufügen",
+    "editTitle": "Besondere Ausnahme bearbeiten",
+    "nameLabel": "Name der Ausnahme",
+    "namePlaceholder": "z. B. Legasthenie, ADHS, Dyskalkulie",
+    "timeLabel": "Zusatzzeit (Minuten)",
+    "timePlaceholder": "z. B. 15",
+    "nameRequired": "Name ist erforderlich",
+    "timeInvalid": "Zusatzzeit muss 0 oder mehr Minuten betragen",
+    "saving": "Speichern...",
+    "saveChanges": "Änderungen speichern",
+    "createException": "Ausnahme erstellen",
+    "cancel": "Abbrechen",
+    "updateFailed": "Aktualisieren der besonderen Ausnahme fehlgeschlagen",
+    "createFailed": "Erstellen der besonderen Ausnahme fehlgeschlagen",
+    "deleteContext": "Besondere Ausnahme",
+    "extraTimeMinShort": "+{{minutes}} Min.",
+    "edit": "Bearbeiten",
+    "delete": "Löschen"
+  },
+  "studentCornerCMS": {
+    "title": "Student Corner",
+    "subtitle": "Inhalte für die Student Corner-Seite verwalten.",
+    "saveChanges": "Änderungen speichern",
+    "bannerSection": "Banner",
+    "teacherCtaSection": "Dozenten CTA",
+    "documentsSection": "Dokumente",
+    "quickLinksSection": "Schnelllinks",
+    "videosSection": "Videos",
+    "titleLabel": "Titel",
+    "subtitleLabel": "Untertitel",
+    "descriptionLabel": "Beschreibung",
+    "buttonTextLabel": "Button-Text",
+    "buttonLinkLabel": "Button-Link",
+    "applyLinkLabel": "Bewerbungslink",
+    "learnMoreLinkLabel": "Mehr erfahren Link",
+    "addDocument": "Dokument hinzufügen",
+    "addLink": "Link hinzufügen",
+    "addVideo": "Video hinzufügen",
+    "documentTitlePlaceholder": "Dokumenttitel",
+    "clickToReplace": "Zum Ersetzen klicken",
+    "clickToAttach": "Klicken, um Dokument anzuhängen (wird beim Speichern hochgeladen)",
+    "noDocuments": "Keine Dokumente hinzugefügt.",
+    "noQuickLinks": "Keine Schnelllinks hinzugefügt.",
+    "noVideos": "Keine Videos hinzugefügt.",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "uploadFailed": "Hochladen fehlgeschlagen für {{name}}",
+    "placeholderTitle": "Titel",
+    "placeholderUrl": "URL",
+    "placeholderVideoUrl": "Video-URL"
+  },
+  "lti": {
+    "platformConfig": {
+      "title": "LTI-Plattformkonfiguration",
+      "subtitle": "Teilen Sie diese Werte mit Enatom, um den HUB als vertrauenswürdige Plattform zu registrieren.",
+      "exportJson": "JSON exportieren",
+      "issuer": "Emittent (iss)",
+      "clientId": "Client-ID",
+      "deploymentId": "Deployment-ID",
+      "jwksUrl": "JWKS-URL",
+      "oidcAuthEndpoint": "OIDC Authentifizierungsendpunkt",
+      "accessTokenUrl": "Zugriffstoken-URL",
+      "oidcConfigUrl": "OpenID Konfigurations-URL (dynamische Registrierung)",
+      "copyToClipboard": "In die Zwischenablage kopieren"
+    },
+    "registerTool": {
+      "createTitle": "LTI-Tool registrieren",
+      "editTitle": "LTI-Tool bearbeiten",
+      "createSubtitle": "Ein neues externes LTI 1.3-Tool hinzufügen (z. B. Enatom)",
+      "editSubtitle": "LTI 1.3-Tool-Anmeldeinformationen aktualisieren",
+      "nameLabel": "Tool-Name",
+      "namePlaceholder": "Anzeigenamen für dieses Tool eingeben",
+      "clientIdLabel": "Client-ID",
+      "clientIdPlaceholder": "Vom externen Tool bereitgestellte eindeutige Kennung",
+      "deploymentIdLabel": "Deployment-ID",
+      "deploymentIdPlaceholder": "Deployment-Kennung des Tool-Anbieters",
+      "generatedByPlatform": "Vom Platform generiert und verwaltet",
+      "oidcLoginUrlLabel": "OIDC-Login-URL",
+      "oidcLoginUrlPlaceholder": "https://tool-anbieter.com/lti/login",
+      "redirectUriLabel": "Redirect-URI",
+      "redirectUriPlaceholder": "https://tool-anbieter.com/lti/callback",
+      "jwksUrlLabel": "JWKS-URL",
+      "jwksUrlPlaceholder": "https://tool-anbieter.com/.well-known/jwks.json",
+      "launchUrlLabel": "Start-URL",
+      "launchUrlPlaceholder": "https://tool-anbieter.com/app (optional)",
+      "errors": {
+        "nameRequired": "Name ist erforderlich",
+        "oidcLoginUrlRequired": "OIDC-Login-URL ist erforderlich",
+        "redirectUriRequired": "Redirect-URI ist erforderlich",
+        "jwksUrlRequired": "JWKS-URL ist erforderlich",
+        "invalidHttps": "Muss eine gültige HTTPS-URL sein"
+      }
+    }
+  },
+  "notification": {
+    "modal": {
+      "createTitle": "Benachrichtigung erstellen",
+      "editTitle": "Benachrichtigung bearbeiten",
+      "createSubtitle": "Eine neue Benachrichtigung verfassen",
+      "editSubtitle": "Benachrichtigungsdetails aktualisieren",
+      "subjectLabel": "Betreff",
+      "subjectPlaceholder": "Betreff der Benachrichtigung",
+      "messageLabel": "Nachricht",
+      "messagePlaceholder": "Nachricht der Benachrichtigung",
+      "typeLabel": "Typ",
+      "typeInApp": "In-App",
+      "typeEmail": "E-Mail",
+      "sendToLabel": "Senden an",
+      "sendToPlaceholder": "Empfänger auswählen...",
+      "allUsers": "Alle Benutzer",
+      "teachers": "Dozenten",
+      "students": "Studenten",
+      "sendToAll": "An alle {{role}} senden",
+      "noContactsSelected": "Bitte wählen Sie mindestens einen Kontakt aus",
+      "sendSuccess": "Emails erfolgreich versendet!",
+      "sendError": "Emails konnten nicht versendet werden",
+      "searchPlaceholder": "{{role}} suchen...",
+      "errors": {
+        "subjectRequired": "Betreff ist erforderlich",
+        "messageRequired": "Nachricht ist erforderlich",
+        "typeRequired": "Mindestens einen Typ auswählen",
+        "recipientRequired": "Mindestens einen Empfänger auswählen"
+      }
+    },
+    "view": {
+      "title": "Benachrichtigungsdetails",
+      "message": "Nachricht",
+      "recipients": "Empfänger",
+      "type": "Typ",
+      "created": "Erstellt am",
+      "sentAt": "Gesendet am",
+      "allUsers": "Alle Benutzer",
+      "allTeachers": "Alle Dozenten",
+      "allStudents": "Alle Studenten",
+      "selectedTeachers": "Ausgewählte Dozenten",
+      "selectedStudents": "Ausgewählte Studenten",
+      "selectedUsers": "Ausgewählte Benutzer",
+      "system": "System"
     }
   }
 }

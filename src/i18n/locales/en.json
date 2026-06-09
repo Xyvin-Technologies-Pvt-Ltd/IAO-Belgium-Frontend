@@ -17,6 +17,7 @@
     }
   },
   "sidebar": {
+    "logo": "IAO Back office",
     "teacher": {
       "title": "Lecturer Dashboard",
       "main": "Main",
@@ -41,7 +42,7 @@
       "languages": "Languages",
       "specialExceptions": "Special Exceptions",
       "teacherQualifications": "Lecturer Qualifications",
-       "teacherData": "Lecturer Data",
+      "teacherData": "Lecturer Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
       "academics": "Academic Years",
@@ -62,8 +63,7 @@
       "loading": "Loading...",
       "noRole": "No role",
       "signOut": "Sign out"
-    },
-    "logo": "IAO Back office"
+    }
   },
   "languages": {
     "en": "English",
@@ -72,28 +72,8 @@
     "de": "Deutsch"
   },
   "common": {
-    "welcome": {
-      "back": "Welcome back!",
-      "backWithName": "Welcome back, {{name}}!",
-      "subtitle": "All your programmes, progress, and updates in one place."
-    },
     "filters": "Filters",
     "dashboard": "Dashboard",
-    "deleteConfirm": {
-      "title": "Delete Confirmation",
-      "message": "Are you sure you want to delete {{count}} {{data}}? {{cannotUndo}}",
-      "cannotUndo": "This action cannot be undone.",
-      "cancel": "Cancel",
-      "delete": "Delete",
-      "deleting": "Deleting..."
-    },
-    "sendConfirm": {
-      "title": "Send Notification",
-      "message": "This will send the notification to all recipients immediately. This action cannot be undone.",
-      "send": "Send",
-      "sending": "Sending...",
-      "cancel": "Cancel"
-    },
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
@@ -126,6 +106,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "selectCountryFirst": "Please select a country first",
+    "searchCountries": "Search countries...",
     "admissionAdministration": "Admission administration",
     "academicYears": "Academic Years",
     "academics": "Academics",
@@ -158,17 +139,17 @@
     "yearLog": "Year Log",
     "batch": "group",
     "exam": "exam",
-    "searchCountries": "Search countries...",
     "searchCities": "Search cities...",
     "searchLanguages": "Search languages...",
     "searchTitles": "Search academic degrees...",
     "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
+    "invoiceId": "Invoice ID",
+    "receiptId": "Receipt ID",
+    "downloadReceipt": "Download receipt",
     "studentName": "Student Name",
     "intake": "Intake",
     "program": "Programme",
-    "city": "City",
-    "component": "Component",
     "purpose": "Purpose",
     "amount": "Amount",
     "date": "Date",
@@ -189,47 +170,32 @@
     "noVenues": "No venues",
     "search": "Search...",
     "currency": "Currency",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "city": "City",
+    "component": "Component",
+    "welcome": {
+      "back": "Welcome back!",
+      "backWithName": "Welcome back, {{name}}!",
+      "subtitle": "All your programmes, progress, and updates in one place."
+    },
+    "deleteConfirm": {
+      "title": "Delete Confirmation",
+      "message": "Are you sure you want to delete {{count}} {{data}}? {{cannotUndo}}",
+      "cannotUndo": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "sendConfirm": {
+      "title": "Send Notification",
+      "message": "This will send the notification to all recipients immediately. This action cannot be undone.",
+      "send": "Send",
+      "sending": "Sending...",
+      "cancel": "Cancel"
+    }
   },
   "finance": {
     "title": "Finance Management",
-    "reports": {
-      "all": {
-        "title": "All Reports",
-        "description": "View all payment transactions"
-      },
-      "city": {
-        "title": "City Reports",
-        "description": "Payment analytics by city"
-      },
-      "program": {
-        "title": "Programme Reports",
-        "description": "Payment analytics by programme"
-      },
-      "batch": {
-        "title": "Group Reports",
-        "description": "Payment analytics by group"
-      },
-      "student": {
-        "title": "Student Reports",
-        "description": "Payment analytics by student"
-      },
-      "transactions": {
-        "title": "Transaction Logs",
-        "description": "Raw Mollie checkout transaction history"
-      },
-      "createInvoice": {
-        "title": "Create Custom Invoice",
-        "student": "Select Student",
-        "searchStudent": "Search for a student...",
-        "invoiceTitle": "Invoice Title / Description",
-        "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
-        "submit": "Create Custom Invoice"
-      },
-      "customInvoices": {
-        "title": "Custom Invoices"
-      }
-    },
     "fields": {
       "totalRevenue": "Total Revenue",
       "totalTransactions": "Total Transactions",
@@ -267,6 +233,66 @@
       "loadingAnalytics": "Loading analytics data...",
       "loadAnalyticsFailed": "Failed to load analytics data",
       "noCustomInvoicesFound": "No custom invoices found."
+    },
+    "reports": {
+      "all": {
+        "title": "All Reports",
+        "description": "View all payment transactions"
+      },
+      "city": {
+        "title": "City Reports",
+        "description": "Payment analytics by city"
+      },
+      "program": {
+        "title": "Programme Reports",
+        "description": "Payment analytics by programme"
+      },
+      "batch": {
+        "title": "Group Reports",
+        "description": "Payment analytics by group"
+      },
+      "student": {
+        "title": "Student Reports",
+        "description": "Payment analytics by student"
+      },
+      "createInvoice": {
+        "title": "Create Custom Invoice",
+        "student": "Select Student",
+        "searchStudent": "Search for a student...",
+        "invoiceTitle": "Invoice Title / Description",
+        "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
+        "submit": "Create Custom Invoice"
+      },
+      "customInvoices": {
+        "title": "Custom Invoices"
+      },
+      "transactions": {
+        "title": "Transaction Logs",
+        "description": "Raw Mollie checkout transaction history"
+      }
+    }
+  },
+  "ltiManagement": {
+    "title": "LTI Management",
+    "subtitle": "Manage external LTI 1.3 tools integrated with the platform.",
+    "registerTool": "Register Tool",
+    "table": {
+      "name": "Name",
+      "clientId": "Client ID",
+      "deploymentId": "Deployment ID",
+      "oidcLoginUrl": "OIDC Login URL",
+      "active": "Active",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "platformConfig": "Platform Config",
+      "deactivate": "Deactivate"
+    },
+    "messages": {
+      "noTools": "No LTI tools registered yet",
+      "clickToRegister": "Click \"Register Tool\" to add your first external tool.",
+      "loadFailed": "Failed to load LTI tools"
     }
   },
   "userCard": {
@@ -274,6 +300,9 @@
     "unknownUser": "Unknown {{type}}"
   },
   "calendar": {
+    "session": "Session",
+    "loading": "Loading...",
+    "more": "more",
     "viewType": {
       "month": "Month",
       "week": "Week"
@@ -286,10 +315,7 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
-    },
-    "session": "Session",
-    "loading": "Loading...",
-    "more": "more"
+    }
   },
   "sessionCard": {
     "noSessions": "No sessions scheduled",
@@ -482,16 +508,16 @@
       "cityLabel": "City",
       "cityPlaceholder": "Select city",
       "cityPlaceholderDisabled": "Select country first",
+      "searchLanguages": "Search languages...",
+      "searchCountries": "Search countries...",
+      "searchCities": "Search cities...",
       "programTypes": {
         "masterOfScience": "Master of Science",
         "lateralEntry": "Lateral Entry Master of Science",
         "diploma": "Diploma",
         "manualTherapie": "Manual Therapie",
         "postAcademic": "Post Academic Module"
-      },
-      "searchLanguages": "Search languages...",
-      "searchCountries": "Search countries...",
-      "searchCities": "Search cities..."
+      }
     }
   },
   "intakeManagement": {
@@ -537,6 +563,8 @@
       "searchPrograms": "Search programmes..."
     },
     "details": {
+      "loading": "Loading intake details...",
+      "loadFailed": "Failed to load enrollment details",
       "tabs": {
         "batches": "Groups",
         "enrollments": "Enrollments"
@@ -551,9 +579,7 @@
         "intakeId": "Intake ID",
         "registrationFee": "Registration Fee",
         "registrationDeadline": "Registration Deadline"
-      },
-      "loading": "Loading intake details...",
-      "loadFailed": "Failed to load enrollment details"
+      }
     },
     "filters": {
       "title": "Filters",
@@ -635,6 +661,8 @@
       "loadResultsFailed": "Failed to load results"
     },
     "details": {
+      "loading": "Loading group details...",
+      "loadFailed": "Failed to load group details",
       "tabs": {
         "overview": "Overview",
         "students": "Students",
@@ -659,9 +687,7 @@
         "intakeStartDate": "Intake Start Date",
         "intakeEndDate": "Intake End Date",
         "students": "Students"
-      },
-      "loading": "Loading group details...",
-      "loadFailed": "Failed to load group details"
+      }
     },
     "modal": {
       "batchLabel": "Group",
@@ -966,16 +992,8 @@
       "emailPlaceholder": "Enter email address",
       "phoneLabel": "Phone",
       "phonePlaceholder": "Enter phone number",
-      "personalDetails": "Personal Details",
-      "teachingDetails": "IAO Teaching Details",
-      "addressLabel": "Address",
-      "addressPlaceholder": "Enter house number, street, apartment, etc.",
-      "postalCodeLabel": "Postal Code",
-      "postalCodePlaceholder": "Enter postal code (e.g., 123456 or AB-123)",
       "countryLabel": "Country",
       "countryPlaceholder": "Select country",
-      "cityLabel": "City",
-      "cityPlaceholder": "Select city",
       "citiesLabel": "Preferred Cities",
       "citiesPlaceholder": "Select cities where lecturer can teach",
       "languageLabel": "Preferred Languages",
@@ -985,11 +1003,21 @@
       "teacherRoleLabel": "Lecturer Role",
       "teacherRolePlaceholder": "Select role",
       "employmentStartDateLabel": "Start Date",
-      "employmentStartDatePlaceholder": "Select start date"
+      "employmentStartDatePlaceholder": "Select start date",
+      "personalDetails": "Personal Details",
+      "teachingDetails": "IAO Teaching Details",
+      "addressLabel": "Address",
+      "addressPlaceholder": "Enter house number, street, apartment, etc.",
+      "postalCodeLabel": "Postal Code",
+      "postalCodePlaceholder": "Enter postal code (e.g., 123456 or AB-123)",
+      "cityLabel": "City",
+      "cityPlaceholder": "Select city"
     }
   },
   "programDetail": {
     "title": "Programme Details",
+    "loading": "Loading programme details...",
+    "loadFailed": "Failed to load programme details",
     "cards": {
       "programName": "Programme Name",
       "duration": "Duration",
@@ -1008,9 +1036,7 @@
       "title": "No Programme Modules Added Yet",
       "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this programme effectively.",
       "createButton": "Create Programme Module"
-    },
-    "loading": "Loading programme details...",
-    "loadFailed": "Failed to load programme details"
+    }
   },
   "learningModule": {
     "search": "Search modules...",
@@ -1256,129 +1282,11 @@
       "available": "available"
     }
   },
-  "ltiManagement": {
-    "title": "LTI Management",
-    "subtitle": "Manage external LTI 1.3 tools integrated with the platform.",
-    "registerTool": "Register Tool",
-    "table": {
-      "name": "Name",
-      "clientId": "Client ID",
-      "deploymentId": "Deployment ID",
-      "oidcLoginUrl": "OIDC Login URL",
-      "active": "Active",
-      "actions": "Actions"
-    },
-    "actions": {
-      "edit": "Edit",
-      "platformConfig": "Platform Config",
-      "deactivate": "Deactivate"
-    },
-    "messages": {
-      "loadFailed": "Failed to load LTI tools",
-      "noTools": "No LTI tools registered yet",
-      "clickToRegister": "Click \"Register Tool\" to add your first external tool."
-    }
-  },
-  "lti": {
-    "platformConfig": {
-      "title": "LTI Platform Configuration",
-      "subtitle": "Share these values with Enatom to register the HUB as a trusted platform.",
-      "exportJson": "Export JSON",
-      "issuer": "Issuer (iss)",
-      "clientId": "Client ID",
-      "deploymentId": "Deployment ID",
-      "jwksUrl": "JWKS URL",
-      "oidcAuthEndpoint": "OIDC Authentication Endpoint",
-      "accessTokenUrl": "Access Token URL",
-      "oidcConfigUrl": "OpenID Configuration URL (Dynamic Registration)",
-      "copyToClipboard": "Copy to clipboard"
-    },
-    "registerTool": {
-      "createTitle": "Register LTI Tool",
-      "editTitle": "Edit LTI Tool",
-      "createSubtitle": "Add a new LTI 1.3 external tool (e.g. Enatom)",
-      "editSubtitle": "Update the LTI 1.3 tool credentials",
-      "nameLabel": "Tool Name",
-      "namePlaceholder": "Enter a display name for this tool",
-      "clientIdLabel": "Client ID",
-      "clientIdPlaceholder": "Unique identifier provided by the external tool",
-      "deploymentIdLabel": "Deployment ID",
-      "deploymentIdPlaceholder": "Deployment identifier from the tool provider",
-      "generatedByPlatform": "Generated and managed by the platform",
-      "oidcLoginUrlLabel": "OIDC Login URL",
-      "oidcLoginUrlPlaceholder": "https://tool-provider.com/lti/login",
-      "redirectUriLabel": "Redirect URI",
-      "redirectUriPlaceholder": "https://tool-provider.com/lti/callback",
-      "jwksUrlLabel": "JWKS URL",
-      "jwksUrlPlaceholder": "https://tool-provider.com/.well-known/jwks.json",
-      "launchUrlLabel": "Launch URL",
-      "launchUrlPlaceholder": "https://tool-provider.com/app (optional)",
-      "errors": {
-        "nameRequired": "Name is required",
-        "oidcLoginUrlRequired": "OIDC Login URL is required",
-        "redirectUriRequired": "Redirect URI is required",
-        "jwksUrlRequired": "JWKS URL is required",
-        "invalidHttps": "Must be a valid HTTPS URL"
-      }
-    }
-  },
-  "notification": {
-    "modal": {
-      "createTitle": "Create Notification",
-      "editTitle": "Edit Notification",
-      "createSubtitle": "Draft a new notification",
-      "editSubtitle": "Update the notification details",
-      "subjectLabel": "Subject",
-      "subjectPlaceholder": "Notification subject",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Notification message",
-      "typeLabel": "Type",
-      "typeInApp": "In-App",
-      "typeEmail": "Email",
-      "sendToLabel": "Send To",
-      "sendToPlaceholder": "Select recipients...",
-      "allUsers": "All Users",
-      "teachers": "Lecturers",
-      "students": "Students",
-      "sendToAll": "Send to all {{role}}",
-      "noContactsSelected": "Please select at least one contact",
-      "sendSuccess": "Emails sent successfully!",
-      "sendError": "Failed to send emails",
-      "searchPlaceholder": "Search {{role}}...",
-      "errors": {
-        "subjectRequired": "Subject is required",
-        "messageRequired": "Message is required",
-        "typeRequired": "Select at least one type",
-        "recipientRequired": "Select at least one recipient"
-      }
-    },
-    "view": {
-      "title": "Notification Details",
-      "message": "Message",
-      "recipients": "Recipients",
-      "type": "Type",
-      "created": "Created",
-      "sentAt": "Sent At",
-      "allUsers": "All Users",
-      "allTeachers": "All Lecturers",
-      "allStudents": "All Students",
-      "selectedTeachers": "Selected Lecturers",
-      "selectedStudents": "Selected Students",
-      "selectedUsers": "Selected Users",
-      "system": "System"
-    }
-  },
   "componentManagement": {
     "createTitle": "Create Programme Module",
     "editTitle": "Edit Programme Module",
     "typeLabel": "Type",
     "typePlaceholder": "Select type",
-    "types": {
-      "module": "Learning Module",
-      "app": "Applied Professional Practice (APP)",
-      "resource": "Research",
-      "exam": "Exam"
-    },
     "nameLabel": "Name",
     "namePlaceholder": "Enter name",
     "yearLabel": "Year",
@@ -1408,7 +1316,13 @@
     "essays": "Essays",
     "internships": "Clinical Practice",
     "activeStatus": "Active Status",
-    "uploadingFiles": "Uploading files..."
+    "uploadingFiles": "Uploading files...",
+    "types": {
+      "module": "Learning Module",
+      "app": "Applied Professional Practice (APP)",
+      "resource": "Research",
+      "exam": "Exam"
+    }
   },
   "programConfig": {
     "title": "Programme Configuration",
@@ -1425,6 +1339,11 @@
     "activeStatus": "Active Status",
     "activeStatusHint": "Enable or disable this configuration",
     "noConfigs": "No configurations yet. Click \"New Year\" to create one.",
+    "actions": {
+      "saving": "Saving...",
+      "update": "Update Configuration",
+      "create": "Create Configuration"
+    },
     "requirements": {
       "exam": {
         "title": "Exam Requirements",
@@ -1449,11 +1368,6 @@
         "title": "Clinical Practice Requirements",
         "minCases": "Minimum Cases"
       }
-    },
-    "actions": {
-      "saving": "Saving...",
-      "update": "Update Configuration",
-      "create": "Create Configuration"
     }
   },
   "questionBank": {
@@ -1595,6 +1509,154 @@
     },
     "messages": {
       "loadFailed": "Failed to load results data"
+    }
+  },
+  "specialExceptions": {
+    "title": "Special Exceptions",
+    "searchPlaceholder": "Search special exceptions...",
+    "addExceptionBtn": "Add Exception",
+    "conditionName": "Condition Name",
+    "extraTimeMinutes": "Extra Time (Minutes)",
+    "actions": "Actions",
+    "loadFailed": "Failed to load special exceptions",
+    "noExceptions": "No special exceptions found.",
+    "addTitle": "Add Special Exception",
+    "editTitle": "Edit Special Exception",
+    "nameLabel": "Exception Name",
+    "namePlaceholder": "e.g. Dyslexia, ADHD, Dyscalculia",
+    "timeLabel": "Extra Time (Minutes)",
+    "timePlaceholder": "e.g. 15",
+    "nameRequired": "Name is required",
+    "timeInvalid": "Extra time must be 0 or more minutes",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "createException": "Create Exception",
+    "cancel": "Cancel",
+    "updateFailed": "Failed to update special exception",
+    "createFailed": "Failed to create special exception",
+    "deleteContext": "Special Exception",
+    "extraTimeMinShort": "+{{minutes}} min",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "studentCornerCMS": {
+    "title": "Student Corner",
+    "subtitle": "Manage content for the Student Corner page.",
+    "saveChanges": "Save Changes",
+    "bannerSection": "Banner",
+    "teacherCtaSection": "Teacher CTA",
+    "documentsSection": "Documents",
+    "quickLinksSection": "Quick Links",
+    "videosSection": "Videos",
+    "titleLabel": "Title",
+    "subtitleLabel": "Subtitle",
+    "descriptionLabel": "Description",
+    "buttonTextLabel": "Button Text",
+    "buttonLinkLabel": "Button Link",
+    "applyLinkLabel": "Apply Link",
+    "learnMoreLinkLabel": "Learn More Link",
+    "addDocument": "Add Document",
+    "addLink": "Add Link",
+    "addVideo": "Add Video",
+    "documentTitlePlaceholder": "Document Title",
+    "clickToReplace": "Click to replace",
+    "clickToAttach": "Click to attach document (uploaded on Save)",
+    "noDocuments": "No documents added.",
+    "noQuickLinks": "No quick links added.",
+    "noVideos": "No videos added.",
+    "saveFailed": "Save failed",
+    "uploadFailed": "Upload failed for {{name}}",
+    "placeholderTitle": "Title",
+    "placeholderUrl": "URL",
+    "placeholderVideoUrl": "Video URL"
+  },
+  "lti": {
+    "platformConfig": {
+      "title": "LTI Platform Configuration",
+      "subtitle": "Share these values with Enatom to register the HUB as a trusted platform.",
+      "exportJson": "Export JSON",
+      "issuer": "Issuer (iss)",
+      "clientId": "Client ID",
+      "deploymentId": "Deployment ID",
+      "jwksUrl": "JWKS URL",
+      "oidcAuthEndpoint": "OIDC Authentication Endpoint",
+      "accessTokenUrl": "Access Token URL",
+      "oidcConfigUrl": "OpenID Configuration URL (Dynamic Registration)",
+      "copyToClipboard": "Copy to clipboard"
+    },
+    "registerTool": {
+      "createTitle": "Register LTI Tool",
+      "editTitle": "Edit LTI Tool",
+      "createSubtitle": "Add a new LTI 1.3 external tool (e.g. Enatom)",
+      "editSubtitle": "Update the LTI 1.3 tool credentials",
+      "nameLabel": "Tool Name",
+      "namePlaceholder": "Enter a display name for this tool",
+      "clientIdLabel": "Client ID",
+      "clientIdPlaceholder": "Unique identifier provided by the external tool",
+      "deploymentIdLabel": "Deployment ID",
+      "deploymentIdPlaceholder": "Deployment identifier from the tool provider",
+      "generatedByPlatform": "Generated and managed by the platform",
+      "oidcLoginUrlLabel": "OIDC Login URL",
+      "oidcLoginUrlPlaceholder": "https://tool-provider.com/lti/login",
+      "redirectUriLabel": "Redirect URI",
+      "redirectUriPlaceholder": "https://tool-provider.com/lti/callback",
+      "jwksUrlLabel": "JWKS URL",
+      "jwksUrlPlaceholder": "https://tool-provider.com/.well-known/jwks.json",
+      "launchUrlLabel": "Launch URL",
+      "launchUrlPlaceholder": "https://tool-provider.com/app (optional)",
+      "errors": {
+        "nameRequired": "Name is required",
+        "oidcLoginUrlRequired": "OIDC Login URL is required",
+        "redirectUriRequired": "Redirect URI is required",
+        "jwksUrlRequired": "JWKS URL is required",
+        "invalidHttps": "Must be a valid HTTPS URL"
+      }
+    }
+  },
+  "notification": {
+    "modal": {
+      "createTitle": "Create Notification",
+      "editTitle": "Edit Notification",
+      "createSubtitle": "Draft a new notification",
+      "editSubtitle": "Update the notification details",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Notification subject",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Notification message",
+      "typeLabel": "Type",
+      "typeInApp": "In-App",
+      "typeEmail": "Email",
+      "sendToLabel": "Send To",
+      "sendToPlaceholder": "Select recipients...",
+      "allUsers": "All Users",
+      "teachers": "Lecturers",
+      "students": "Students",
+      "sendToAll": "Send to all {{role}}",
+      "noContactsSelected": "Please select at least one contact",
+      "sendSuccess": "Emails sent successfully!",
+      "sendError": "Failed to send emails",
+      "searchPlaceholder": "Search {{role}}...",
+      "errors": {
+        "subjectRequired": "Subject is required",
+        "messageRequired": "Message is required",
+        "typeRequired": "Select at least one type",
+        "recipientRequired": "Select at least one recipient"
+      }
+    },
+    "view": {
+      "title": "Notification Details",
+      "message": "Message",
+      "recipients": "Recipients",
+      "type": "Type",
+      "created": "Created",
+      "sentAt": "Sent At",
+      "allUsers": "All Users",
+      "allTeachers": "All Lecturers",
+      "allStudents": "All Students",
+      "selectedTeachers": "Selected Lecturers",
+      "selectedStudents": "Selected Students",
+      "selectedUsers": "Selected Users",
+      "system": "System"
     }
   }
 }
