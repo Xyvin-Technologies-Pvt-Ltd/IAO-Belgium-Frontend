@@ -17,6 +17,7 @@
     }
   },
   "sidebar": {
+    "logo": "Bureau IAO",
     "teacher": {
       "title": "Tableau de bord de l'enseignant",
       "main": "Principal",
@@ -62,8 +63,7 @@
       "loading": "Chargement...",
       "noRole": "Aucun rôle",
       "signOut": "Se déconnecter"
-    },
-    "logo": "Bureau IAO"
+    }
   },
   "languages": {
     "en": "English",
@@ -72,28 +72,8 @@
     "de": "Deutsch"
   },
   "common": {
-    "welcome": {
-      "back": "Bon retour !",
-      "backWithName": "Bon retour, {{name}} !",
-      "subtitle": "Tous vos formations, progrès et mises à jour en un seul endroit."
-    },
     "filters": "Filtres",
     "dashboard": "Tableau de bord",
-    "deleteConfirm": {
-      "title": "Confirmation de suppression",
-      "message": "Êtes-vous sûr de vouloir supprimer {{count}} {{data}} ? {{cannotUndo}}",
-      "cannotUndo": "Cette action ne peut pas être annulée.",
-      "cancel": "Annuler",
-      "delete": "Supprimer",
-      "deleting": "Suppression..."
-    },
-    "sendConfirm": {
-      "title": "Envoyer la notification",
-      "message": "Cela enverra la notification à tous les destinataires immédiatement. Cette action ne peut pas être annulée.",
-      "send": "Envoyer",
-      "sending": "Envoi...",
-      "cancel": "Annuler"
-    },
     "create": "Créer",
     "update": "Mettre à jour",
     "cancel": "Annuler",
@@ -126,6 +106,7 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "selectCountryFirst": "Veuillez d'abord sélectionner un pays",
+    "searchCountries": "Rechercher des pays...",
     "admissionAdministration": "Administration des admissions",
     "academicYears": "Années académiques",
     "academics": "Académiques",
@@ -158,17 +139,17 @@
     "yearLog": "Journal de l'année",
     "batch": "groupe",
     "exam": "Examen",
-    "searchCountries": "Rechercher des pays...",
     "searchCities": "Rechercher des villes...",
     "searchLanguages": "Rechercher des langues...",
     "searchTitles": "Rechercher des grades académiques...",
     "searchRoles": "Rechercher des rôles d'enseignant...",
     "paymentId": "ID de paiement",
+    "invoiceId": "ID de facture",
+    "receiptId": "ID de reçu",
+    "downloadReceipt": "Télécharger le reçu",
     "studentName": "Nom de l'étudiant",
     "intake": "Session",
     "program": "Formation / Programme",
-    "city": "Ville",
-    "component": "Composant",
     "purpose": "Objet",
     "amount": "Montant",
     "date": "Date",
@@ -189,43 +170,32 @@
     "noVenues": "Aucun lieu",
     "search": "Rechercher...",
     "currency": "Devise",
-    "processing": "Traitement..."
+    "processing": "Traitement...",
+    "city": "Ville",
+    "component": "Composant",
+    "welcome": {
+      "back": "Bon retour !",
+      "backWithName": "Bon retour, {{name}} !",
+      "subtitle": "Tous vos formations, progrès et mises à jour en un seul endroit."
+    },
+    "deleteConfirm": {
+      "title": "Confirmation de suppression",
+      "message": "Êtes-vous sûr de vouloir supprimer {{count}} {{data}} ? {{cannotUndo}}",
+      "cannotUndo": "Cette action ne peut pas être annulée.",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "deleting": "Suppression..."
+    },
+    "sendConfirm": {
+      "title": "Envoyer la notification",
+      "message": "Cela enverra la notification à tous les destinataires immédiatement. Cette action ne peut pas être annulée.",
+      "send": "Envoyer",
+      "sending": "Envoi...",
+      "cancel": "Annuler"
+    }
   },
   "finance": {
     "title": "Gestion financière",
-    "reports": {
-      "all": {
-        "title": "Tous les rapports",
-        "description": "Voir toutes les transactions de paiement"
-      },
-      "city": {
-        "title": "Rapports par ville",
-        "description": "Analyses de paiement par ville"
-      },
-      "program": {
-        "title": "Rapports par programme",
-        "description": "Analyses de paiement par programme"
-      },
-      "batch": {
-        "title": "Rapports par groupe",
-        "description": "Analyses de paiement par groupe"
-      },
-      "student": {
-        "title": "Rapports par étudiant",
-        "description": "Analyses de paiement par étudiant"
-      },
-      "createInvoice": {
-        "title": "Créer une facture personnalisée",
-        "student": "Sélectionner un étudiant",
-        "searchStudent": "Rechercher un étudiant...",
-        "invoiceTitle": "Titre / Description de la facture",
-        "titlePlaceholder": "ex : Frais de semestre, Ajustement de bourse",
-        "submit": "Créer une facture personnalisée"
-      },
-      "customInvoices": {
-        "title": "Factures personnalisées"
-      }
-    },
     "fields": {
       "totalRevenue": "Revenu total",
       "totalTransactions": "Total des transactions",
@@ -263,6 +233,62 @@
       "loadingAnalytics": "Chargement des données analytiques...",
       "loadAnalyticsFailed": "Échec du chargement des données analytiques",
       "noCustomInvoicesFound": "Aucune facture personnalisée trouvée."
+    },
+    "reports": {
+      "all": {
+        "title": "Tous les rapports",
+        "description": "Voir toutes les transactions de paiement"
+      },
+      "city": {
+        "title": "Rapports par ville",
+        "description": "Analyses de paiement par ville"
+      },
+      "program": {
+        "title": "Rapports par programme",
+        "description": "Analyses de paiement par programme"
+      },
+      "batch": {
+        "title": "Rapports par groupe",
+        "description": "Analyses de paiement par groupe"
+      },
+      "student": {
+        "title": "Rapports par étudiant",
+        "description": "Analyses de paiement par étudiant"
+      },
+      "createInvoice": {
+        "title": "Créer une facture personnalisée",
+        "student": "Sélectionner un étudiant",
+        "searchStudent": "Rechercher un étudiant...",
+        "invoiceTitle": "Titre / Description de la facture",
+        "titlePlaceholder": "ex : Frais de semestre, Ajustement de bourse",
+        "submit": "Créer une facture personnalisée"
+      },
+      "customInvoices": {
+        "title": "Factures personnalisées"
+      }
+    }
+  },
+  "ltiManagement": {
+    "title": "Gestion des outils LTI",
+    "subtitle": "Gérez les outils externes LTI 1.3 intégrés au HUB",
+    "registerTool": "Enregistrer un outil",
+    "table": {
+      "name": "Nom",
+      "clientId": "ID client",
+      "deploymentId": "ID de déploiement",
+      "oidcLoginUrl": "URL de connexion OIDC",
+      "active": "Actif",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "platformConfig": "Configuration de la plateforme",
+      "deactivate": "Désactiver"
+    },
+    "messages": {
+      "noTools": "Aucun outil LTI enregistré",
+      "clickToRegister": "Cliquez sur \"Enregistrer un outil\" pour ajouter Enatom ou un autre outil LTI 1.3.",
+      "loadFailed": "Échec du chargement des outils LTI"
     }
   },
   "userCard": {
@@ -270,6 +296,9 @@
     "unknownUser": "Inconnu {{type}}"
   },
   "calendar": {
+    "session": "Session",
+    "loading": "Chargement...",
+    "more": "plus",
     "viewType": {
       "month": "Mois",
       "week": "Semaine"
@@ -282,10 +311,7 @@
       "thu": "Jeu",
       "fri": "Ven",
       "sat": "Sam"
-    },
-    "session": "Session",
-    "loading": "Chargement...",
-    "more": "plus"
+    }
   },
   "sessionCard": {
     "noSessions": "Aucune session prévue",
@@ -478,16 +504,16 @@
       "cityLabel": "Ville",
       "cityPlaceholder": "Sélectionnez la ville",
       "cityPlaceholderDisabled": "Sélectionnez d'abord le pays",
+      "searchLanguages": "Rechercher des langues...",
+      "searchCountries": "Rechercher des pays...",
+      "searchCities": "Rechercher des villes...",
       "programTypes": {
         "masterOfScience": "Master of Science",
         "lateralEntry": "Master of Science (Entrée latérale)",
         "diploma": "Diplôme",
         "manualTherapie": "Thérapie manuelle",
         "postAcademic": "Module post-académique"
-      },
-      "searchLanguages": "Rechercher des langues...",
-      "searchCountries": "Rechercher des pays...",
-      "searchCities": "Rechercher des villes..."
+      }
     }
   },
   "intakeManagement": {
@@ -533,6 +559,8 @@
       "searchPrograms": "Rechercher des programmes..."
     },
     "details": {
+      "loading": "Chargement des détails de la session...",
+      "loadFailed": "Échec du chargement des détails de la session",
       "tabs": {
         "batches": "Lots",
         "enrollments": "Inscriptions"
@@ -547,9 +575,7 @@
         "intakeId": "ID de l'admission",
         "registrationFee": "Frais d'inscription",
         "registrationDeadline": "Date limite d'inscription"
-      },
-      "loading": "Chargement des détails de la session...",
-      "loadFailed": "Échec du chargement des détails de la session"
+      }
     },
     "filters": {
       "title": "Filtres",
@@ -631,6 +657,8 @@
       "loadResultsFailed": "Échec du chargement des résultats"
     },
     "details": {
+      "loading": "Chargement des détails du groupe...",
+      "loadFailed": "Échec du chargement des détails du groupe",
       "tabs": {
         "overview": "Aperçu",
         "students": "Étudiants",
@@ -655,9 +683,7 @@
         "intakeStartDate": "Date de début de l'admission",
         "intakeEndDate": "Date de fin de l'admission",
         "students": "Étudiants"
-      },
-      "loading": "Chargement des détails du groupe...",
-      "loadFailed": "Échec du chargement des détails du groupe"
+      }
     },
     "modal": {
       "batchLabel": "Groupe",
@@ -746,93 +772,6 @@
     "tabs": {
       "countries": "Pays",
       "cities": "Villes"
-    }
-  },
-  "planningManagement": {
-    "title": "Gestion de la planification",
-    "search": "Rechercher...",
-    "delete": "Supprimer",
-    "createPlanning": "Créer une planification",
-    "table": {
-      "program": "Formation / Programme",
-      "batch": "Groupe",
-      "module": "Module",
-      "teachers": "Enseignants",
-      "venue": "Lieu",
-      "sessions": "Sessions",
-      "status": "Statut",
-      "action": "Action",
-      "edit": "Modifier",
-      "noPlannings": "Aucune planification trouvée"
-    },
-    "messages": {
-      "loadFailed": "Échec du chargement des planifications"
-    },
-    "teacher": {
-      "language": "Langue",
-      "location": "Emplacement",
-      "actions": "Actions",
-      "accept": "Accepter",
-      "reject": "Rejeter"
-    },
-    "modal": {
-      "createTitle": "Créer une nouvelle planification",
-      "editTitle": "Modifier la planification",
-      "createSubtitle": "Créons une nouvelle planification",
-      "editSubtitle": "Mettre à jour les détails de la planification",
-      "programLabel": "Formation / Programme",
-      "searchPrograms": "Rechercher des formations...",
-      "batchLabel": "Groupe",
-      "batchPlaceholder": "Sélectionnez un groupe",
-      "searchBatches": "Rechercher des groupes...",
-      "moduleLabel": "Module",
-      "modulePlaceholder": "Sélectionnez un module",
-      "searchComponents": "Rechercher des composants...",
-      "venueLabel": "Lieu",
-      "venuePlaceholder": "Entrez le nom du lieu",
-      "preferredVenues": "Lieux préférés",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Entrez une description",
-      "sessionsLabel": "Sessions",
-      "sessionLabel": "Session",
-      "sessionNameLabel": "Nom de la session",
-      "sessionNamePlaceholder": "Entrez le nom de la session",
-      "dateLabel": "Date de la session",
-      "timeFromLabel": "De",
-      "timeTillLabel": "À",
-      "preferredTimes": "Horaires préférés",
-      "teachersLabel": "Enseignants",
-      "teachersPlaceholder": "Sélectionnez des enseignants",
-      "searchTeachers": "Rechercher des enseignants...",
-      "assistantsLabel": "Assistants pédagogiques",
-      "assistantsPlaceholder": "Sélectionnez des assistants pédagogiques",
-      "searchAssistants": "Rechercher des assistants pédagogiques...",
-      "traineesLabel": "Stagiaires / Trainees",
-      "traineesPlaceholder": "Sélectionnez des stagiaires / trainees",
-      "searchTrainees": "Rechercher des stagiaires / trainees...",
-      "addSession": "Ajouter une autre session"
-    },
-    "view": {
-      "moduleLabel": "Module",
-      "programLabel": "Formation / Programme",
-      "batchLabel": "Groupe",
-      "descriptionLabel": "Description",
-      "sessionLabel": "Session",
-      "sessionsLabel": "Sessions",
-      "sessionNameLabel": "Nom de la session",
-      "dateLabel": "Date",
-      "timeFromLabel": "De",
-      "timeTillLabel": "À",
-      "teachersLabel": "Enseignants",
-      "venueLabel": "Lieu"
-    },
-    "calendar": {
-      "today": "Aujourd'hui",
-      "month": "Mois",
-      "week": "Semaine",
-      "loading": "Chargement...",
-      "more": "plus",
-      "session": "Session"
     }
   },
   "academicManagement": {
@@ -1064,6 +1003,8 @@
   },
   "programDetail": {
     "title": "Détails de la formation / programme",
+    "loading": "Chargement des détails de la formation / programme...",
+    "loadFailed": "Échec du chargement des détails de la formation / programme",
     "cards": {
       "programName": "Nom de la formation / programme",
       "duration": "Durée",
@@ -1082,9 +1023,7 @@
       "title": "Aucun module de formation / programme ajouté pour l'instant",
       "subtitle": "Commencez par ajouter des modules, des apps, des ressources ou des examens pour construire et gérer cette formation / programme efficacement.",
       "createButton": "Créer un module de formation / programme"
-    },
-    "loading": "Chargement des détails de la formation / programme...",
-    "loadFailed": "Échec du chargement des détails de la formation / programme"
+    }
   },
   "learningModule": {
     "search": "Rechercher des modules...",
@@ -1161,6 +1100,100 @@
       "resourceNameOptional": "Nom de la ressource (Optionnel)"
     }
   },
+  "planningManagement": {
+    "title": "Gestion de la planification",
+    "search": "Rechercher...",
+    "delete": "Supprimer",
+    "createPlanning": "Créer une planification",
+    "table": {
+      "program": "Formation / Programme",
+      "batch": "Groupe",
+      "module": "Module",
+      "teachers": "Enseignants",
+      "venue": "Lieu",
+      "sessions": "Sessions",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "noPlannings": "Aucune planification trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des planifications"
+    },
+    "teacher": {
+      "language": "Langue",
+      "location": "Emplacement",
+      "actions": "Actions",
+      "accept": "Accepter",
+      "reject": "Rejeter"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle planification",
+      "editTitle": "Modifier la planification",
+      "createSubtitle": "Créons une nouvelle planification",
+      "editSubtitle": "Mettre à jour les détails de la planification",
+      "programLabel": "Formation / Programme",
+      "searchPrograms": "Rechercher des formations...",
+      "batchLabel": "Groupe",
+      "batchPlaceholder": "Sélectionnez un groupe",
+      "searchBatches": "Rechercher des groupes...",
+      "moduleLabel": "Module",
+      "modulePlaceholder": "Sélectionnez un module",
+      "searchComponents": "Rechercher des composants...",
+      "venueLabel": "Lieu",
+      "venuePlaceholder": "Entrez le nom du lieu",
+      "preferredVenues": "Lieux préférés",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez une description",
+      "sessionsLabel": "Sessions",
+      "sessionLabel": "Session",
+      "sessionNameLabel": "Nom de la session",
+      "sessionNamePlaceholder": "Entrez le nom de la session",
+      "dateLabel": "Date de la session",
+      "timeFromLabel": "De",
+      "timeTillLabel": "À",
+      "preferredTimes": "Horaires préférés",
+      "teachersLabel": "Enseignants",
+      "teachersPlaceholder": "Sélectionnez des enseignants",
+      "searchTeachers": "Rechercher des enseignants...",
+      "assistantsLabel": "Assistants pédagogiques",
+      "assistantsPlaceholder": "Sélectionnez des assistants pédagogiques",
+      "searchAssistants": "Rechercher des assistants pédagogiques...",
+      "traineesLabel": "Stagiaires / Trainees",
+      "traineesPlaceholder": "Sélectionnez des stagiaires / trainees",
+      "searchTrainees": "Rechercher des stagiaires / trainees...",
+      "addSession": "Ajouter une autre session"
+    },
+    "view": {
+      "moduleLabel": "Module",
+      "programLabel": "Formation / Programme",
+      "batchLabel": "Groupe",
+      "descriptionLabel": "Description",
+      "sessionLabel": "Session",
+      "sessionsLabel": "Sessions",
+      "sessionNameLabel": "Nom de la session",
+      "dateLabel": "Date",
+      "timeFromLabel": "De",
+      "timeTillLabel": "À",
+      "teachersLabel": "Enseignants",
+      "venueLabel": "Lieu"
+    },
+    "calendar": {
+      "today": "Aujourd'hui",
+      "month": "Mois",
+      "week": "Semaine",
+      "loading": "Chargement...",
+      "more": "plus",
+      "session": "Session"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "ongoingCourses": "Formations en cours",
+    "finishedCourses": "Formations terminées",
+    "courseEnrollmentTrend": "Tendance des inscriptions aux formations",
+    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
+  },
   "exam": {
     "title": "Examens",
     "search": "Rechercher des examens...",
@@ -1236,108 +1269,11 @@
       "available": "disponible"
     }
   },
-  "lti": {
-    "platformConfig": {
-      "title": "Configuration de la plateforme LTI",
-      "subtitle": "Partagez ces valeurs avec Enatom pour enregistrer le HUB en tant que plateforme de confiance.",
-      "exportJson": "Exporter le JSON",
-      "issuer": "Émetteur (iss)",
-      "clientId": "ID client",
-      "deploymentId": "ID de déploiement",
-      "jwksUrl": "URL JWKS",
-      "oidcAuthEndpoint": "Point de terminaison d'authentification OIDC",
-      "accessTokenUrl": "URL du jeton d'accès",
-      "oidcConfigUrl": "URL de configuration OpenID (enregistrement dynamique)",
-      "copyToClipboard": "Copier dans le presse-papiers"
-    },
-    "registerTool": {
-      "createTitle": "Enregistrer l'outil LTI",
-      "editTitle": "Modifier l'outil LTI",
-      "createSubtitle": "Ajouter un nouvel outil externe LTI 1.3 (ex : Enatom)",
-      "editSubtitle": "Mettre à jour les identifiants de l'outil LTI 1.3",
-      "nameLabel": "Nom de l'outil",
-      "namePlaceholder": "Entrez un nom d'affichage pour cet outil",
-      "clientIdLabel": "ID client",
-      "clientIdPlaceholder": "Identifiant unique fourni par l'outil externe",
-      "deploymentIdLabel": "ID de déploiement",
-      "deploymentIdPlaceholder": "Identifiant de déploiement du fournisseur de l'outil",
-      "generatedByPlatform": "Généré et géré par la plateforme",
-      "oidcLoginUrlLabel": "URL de connexion OIDC",
-      "oidcLoginUrlPlaceholder": "https://fournisseur-outil.com/lti/login",
-      "redirectUriLabel": "URI de redirection",
-      "redirectUriPlaceholder": "https://fournisseur-outil.com/lti/callback",
-      "jwksUrlLabel": "URL JWKS",
-      "jwksUrlPlaceholder": "https://fournisseur-outil.com/.well-known/jwks.json",
-      "launchUrlLabel": "URL de lancement",
-      "launchUrlPlaceholder": "https://fournisseur-outil.com/app (optionnel)",
-      "errors": {
-        "nameRequired": "Le nom est requis",
-        "oidcLoginUrlRequired": "L'URL de connexion OIDC est requise",
-        "redirectUriRequired": "L'URI de redirection est requise",
-        "jwksUrlRequired": "L'URL JWKS est requise",
-        "invalidHttps": "Doit être une URL HTTPS valide"
-      }
-    }
-  },
-  "notification": {
-    "modal": {
-      "createTitle": "Créer une notification",
-      "editTitle": "Modifier la notification",
-      "createSubtitle": "Rédiger une nouvelle notification",
-      "editSubtitle": "Mettre à jour les détails de la notification",
-      "subjectLabel": "Sujet",
-      "subjectPlaceholder": "Sujet de la notification",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Message de la notification",
-      "typeLabel": "Type",
-      "typeInApp": "In-App",
-      "typeEmail": "Email",
-      "sendToLabel": "Envoyer à",
-      "sendToPlaceholder": "Sélectionnez les destinataires...",
-      "allUsers": "Tous les utilisateurs",
-      "teachers": "Enseignants",
-      "students": "Étudiants",
-      "sendToAll": "Envoyer à tous les {{role}}",
-      "noContactsSelected": "Veuillez sélectionner au moins un contact",
-      "sendSuccess": "Emails envoyés avec succès !",
-      "sendError": "Échec de l'envoi des emails",
-      "selectTeachers": "Sélectionner des enseignants",
-      "selectStudents": "Sélectionner des étudiants",
-      "searchPlaceholder": "Rechercher des {{role}}...",
-      "errors": {
-        "subjectRequired": "Le sujet est requis",
-        "messageRequired": "Le message est requis",
-        "typeRequired": "Sélectionnez au moins un type",
-        "recipientRequired": "Sélectionnez au moins un destinataire"
-      }
-    },
-    "view": {
-      "title": "Détails de la notification",
-      "message": "Message",
-      "recipients": "Destinataires",
-      "type": "Type",
-      "created": "Créé le",
-      "sentAt": "Envoyé le",
-      "allUsers": "Tous les utilisateurs",
-      "allTeachers": "Tous les enseignants",
-      "allStudents": "Tous les étudiants",
-      "selectedTeachers": "Enseignants sélectionnés",
-      "selectedStudents": "Étudiants sélectionnés",
-      "selectedUsers": "Utilisateurs sélectionnés",
-      "system": "Système"
-    }
-  },
   "componentManagement": {
     "createTitle": "Créer un module de formation / programme",
     "editTitle": "Modifier le module de formation / programme",
     "typeLabel": "Type",
     "typePlaceholder": "Sélectionner le type",
-    "types": {
-      "module": "Module d'apprentissage",
-      "app": "Pratique Professionnelle Appliquée (APP)",
-      "resource": "Recherche",
-      "exam": "Examen"
-    },
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez le nom",
     "yearLabel": "Année",
@@ -1367,7 +1303,13 @@
     "essays": "Essais",
     "internships": "Stage clinique",
     "activeStatus": "Statut actif",
-    "uploadingFiles": "Téléchargement des fichiers..."
+    "uploadingFiles": "Téléchargement des fichiers...",
+    "types": {
+      "module": "Module d'apprentissage",
+      "app": "Pratique Professionnelle Appliquée (APP)",
+      "resource": "Recherche",
+      "exam": "Examen"
+    }
   },
   "programConfig": {
     "title": "Configuration de la formation / programme",
@@ -1384,6 +1326,11 @@
     "activeStatus": "Statut actif",
     "activeStatusHint": "Activer ou désactiver cette configuration",
     "noConfigs": "Pas encore de configurations. Cliquez sur \"Nouvelle année\" pour en créer une.",
+    "actions": {
+      "saving": "Enregistrement...",
+      "update": "Mettre à jour la configuration",
+      "create": "Créer la configuration"
+    },
     "requirements": {
       "exam": {
         "title": "Exigences d'examen",
@@ -1408,11 +1355,6 @@
         "title": "Exigences de stage clinique",
         "minCases": "Nombre minimum de cas"
       }
-    },
-    "actions": {
-      "saving": "Enregistrement...",
-      "update": "Mettre à jour la configuration",
-      "create": "Créer la configuration"
     }
   },
   "questionBank": {
@@ -1517,36 +1459,6 @@
       "otpInvalid": "OTP invalide. Veuillez réessayer."
     }
   },
-  "dashboard": {
-    "title": "Tableau de bord",
-    "ongoingCourses": "Formations en cours",
-    "finishedCourses": "Formations terminées",
-    "courseEnrollmentTrend": "Tendance des inscriptions aux formations",
-    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
-  },
-  "ltiManagement": {
-    "title": "Gestion des outils LTI",
-    "subtitle": "Gérez les outils externes LTI 1.3 intégrés au HUB",
-    "registerTool": "Enregistrer un outil",
-    "table": {
-      "name": "Nom",
-      "clientId": "ID client",
-      "deploymentId": "ID de déploiement",
-      "oidcLoginUrl": "URL de connexion OIDC",
-      "active": "Actif",
-      "actions": "Actions"
-    },
-    "actions": {
-      "edit": "Modifier",
-      "platformConfig": "Configuration de la plateforme",
-      "deactivate": "Désactiver"
-    },
-    "messages": {
-      "noTools": "Aucun outil LTI enregistré",
-      "clickToRegister": "Cliquez sur \"Enregistrer un outil\" pour ajouter Enatom ou un autre outil LTI 1.3.",
-      "loadFailed": "Échec du chargement des outils LTI"
-    }
-  },
   "resultsManagement": {
     "title": "Résultats des examens",
     "subtitle": "Suivre, surveiller et exporter les résultats de performance des étudiants",
@@ -1584,6 +1496,156 @@
     },
     "messages": {
       "loadFailed": "Échec du chargement des données de résultats"
+    }
+  },
+  "specialExceptions": {
+    "title": "Exceptions Spéciales",
+    "searchPlaceholder": "Rechercher des exceptions spéciales...",
+    "addExceptionBtn": "Ajouter une exception",
+    "conditionName": "Nom de la condition",
+    "extraTimeMinutes": "Temps supplémentaire (Minutes)",
+    "actions": "Actions",
+    "loadFailed": "Échec du chargement des exceptions spéciales",
+    "noExceptions": "Aucune exception spéciale trouvée.",
+    "addTitle": "Ajouter une exception spéciale",
+    "editTitle": "Modifier l'exception spéciale",
+    "nameLabel": "Nom de l'exception",
+    "namePlaceholder": "ex: Dyslexie, TDAH, Dyscalculie",
+    "timeLabel": "Temps supplémentaire (Minutes)",
+    "timePlaceholder": "ex : 15",
+    "nameRequired": "Le nom est requis",
+    "timeInvalid": "Le temps supplémentaire doit être supérieur ou égal à 0 minute",
+    "saving": "Enregistrement...",
+    "saveChanges": "Enregistrer les modifications",
+    "createException": "Créer une exception",
+    "cancel": "Annuler",
+    "updateFailed": "Échec de la mise à jour de l'exception spéciale",
+    "createFailed": "Échec de la création de l'exception spéciale",
+    "deleteContext": "Exception spéciale",
+    "extraTimeMinShort": "+{{minutes}} min",
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "studentCornerCMS": {
+    "title": "Student Corner",
+    "subtitle": "Gérer le contenu de la page Student Corner.",
+    "saveChanges": "Enregistrer les modifications",
+    "bannerSection": "Bannière",
+    "teacherCtaSection": "Appel à l'action enseignant",
+    "documentsSection": "Documents",
+    "quickLinksSection": "Liens rapides",
+    "videosSection": "Vidéos",
+    "titleLabel": "Titre",
+    "subtitleLabel": "Sous-titre",
+    "descriptionLabel": "Description",
+    "buttonTextLabel": "Texte du bouton",
+    "buttonLinkLabel": "Lien du bouton",
+    "applyLinkLabel": "Lien de postulation",
+    "learnMoreLinkLabel": "Lien pour en savoir plus",
+    "addDocument": "Ajouter un document",
+    "addLink": "Ajouter un lien",
+    "addVideo": "Ajouter une vidéo",
+    "documentTitlePlaceholder": "Titre du document",
+    "clickToReplace": "Cliquez pour remplacer",
+    "clickToAttach": "Cliquez pour joindre le document (téléversé lors de la sauvegarde)",
+    "noDocuments": "Aucun document ajouté.",
+    "noQuickLinks": "Aucun lien rapide ajouté.",
+    "noVideos": "Aucune vidéo ajoutée.",
+    "saveFailed": "Échec de l'enregistrement",
+    "uploadFailed": "Échec du téléchargement pour {{name}}",
+    "placeholderTitle": "Titre",
+    "placeholderUrl": "URL",
+    "placeholderVideoUrl": "URL de la vidéo"
+  },
+  "lti": {
+    "platformConfig": {
+      "title": "Configuration de la plateforme LTI",
+      "subtitle": "Partagez ces valeurs avec Enatom pour enregistrer le HUB en tant que plateforme de confiance.",
+      "exportJson": "Exporter le JSON",
+      "issuer": "Émetteur (iss)",
+      "clientId": "ID client",
+      "deploymentId": "ID de déploiement",
+      "jwksUrl": "URL JWKS",
+      "oidcAuthEndpoint": "Point de terminaison d'authentification OIDC",
+      "accessTokenUrl": "URL du jeton d'accès",
+      "oidcConfigUrl": "URL de configuration OpenID (enregistrement dynamique)",
+      "copyToClipboard": "Copier dans le presse-papiers"
+    },
+    "registerTool": {
+      "createTitle": "Enregistrer l'outil LTI",
+      "editTitle": "Modifier l'outil LTI",
+      "createSubtitle": "Ajouter un nouvel outil externe LTI 1.3 (ex : Enatom)",
+      "editSubtitle": "Mettre à jour les identifiants de l'outil LTI 1.3",
+      "nameLabel": "Nom de l'outil",
+      "namePlaceholder": "Entrez un nom d'affichage pour cet outil",
+      "clientIdLabel": "ID client",
+      "clientIdPlaceholder": "Identifiant unique fourni par l'outil externe",
+      "deploymentIdLabel": "ID de déploiement",
+      "deploymentIdPlaceholder": "Identifiant de déploiement du fournisseur de l'outil",
+      "generatedByPlatform": "Généré et géré par la plateforme",
+      "oidcLoginUrlLabel": "URL de connexion OIDC",
+      "oidcLoginUrlPlaceholder": "https://fournisseur-outil.com/lti/login",
+      "redirectUriLabel": "URI de redirection",
+      "redirectUriPlaceholder": "https://fournisseur-outil.com/lti/callback",
+      "jwksUrlLabel": "URL JWKS",
+      "jwksUrlPlaceholder": "https://fournisseur-outil.com/.well-known/jwks.json",
+      "launchUrlLabel": "URL de lancement",
+      "launchUrlPlaceholder": "https://fournisseur-outil.com/app (optionnel)",
+      "errors": {
+        "nameRequired": "Le nom est requis",
+        "oidcLoginUrlRequired": "L'URL de connexion OIDC est requise",
+        "redirectUriRequired": "L'URI de redirection est requise",
+        "jwksUrlRequired": "L'URL JWKS est requise",
+        "invalidHttps": "Doit être une URL HTTPS valide"
+      }
+    }
+  },
+  "notification": {
+    "modal": {
+      "createTitle": "Créer une notification",
+      "editTitle": "Modifier la notification",
+      "createSubtitle": "Rédiger une nouvelle notification",
+      "editSubtitle": "Mettre à jour les détails de la notification",
+      "subjectLabel": "Sujet",
+      "subjectPlaceholder": "Sujet de la notification",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Message de la notification",
+      "typeLabel": "Type",
+      "typeInApp": "In-App",
+      "typeEmail": "Email",
+      "sendToLabel": "Envoyer à",
+      "sendToPlaceholder": "Sélectionnez les destinataires...",
+      "allUsers": "Tous les utilisateurs",
+      "teachers": "Enseignants",
+      "students": "Étudiants",
+      "sendToAll": "Envoyer à tous les {{role}}",
+      "noContactsSelected": "Veuillez sélectionner au moins un contact",
+      "sendSuccess": "Emails envoyés avec succès !",
+      "sendError": "Échec de l'envoi des emails",
+      "searchPlaceholder": "Rechercher des {{role}}...",
+      "selectTeachers": "Sélectionner des enseignants",
+      "selectStudents": "Sélectionner des étudiants",
+      "errors": {
+        "subjectRequired": "Le sujet est requis",
+        "messageRequired": "Le message est requis",
+        "typeRequired": "Sélectionnez au moins un type",
+        "recipientRequired": "Sélectionnez au moins un destinataire"
+      }
+    },
+    "view": {
+      "title": "Détails de la notification",
+      "message": "Message",
+      "recipients": "Destinataires",
+      "type": "Type",
+      "created": "Créé le",
+      "sentAt": "Envoyé le",
+      "allUsers": "Tous les utilisateurs",
+      "allTeachers": "Tous les enseignants",
+      "allStudents": "Tous les étudiants",
+      "selectedTeachers": "Enseignants sélectionnés",
+      "selectedStudents": "Étudiants sélectionnés",
+      "selectedUsers": "Utilisateurs sélectionnés",
+      "system": "Système"
     }
   }
 }

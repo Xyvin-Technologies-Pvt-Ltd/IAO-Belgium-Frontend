@@ -82,12 +82,12 @@ const SpecialExceptions = () => {
 
   const handleSave = () => {
     if (!name.trim()) {
-      setFormError("Name is required");
+      setFormError(t("specialExceptions.nameRequired", "Name is required"));
       return;
     }
 
     if (extraTimeMin < 0) {
-      setFormError("Extra time must be 0 or more minutes");
+      setFormError(t("specialExceptions.timeInvalid", "Extra time must be 0 or more minutes"));
       return;
     }
 
@@ -108,7 +108,7 @@ const SpecialExceptions = () => {
             setIsModalOpen(false);
           },
           onError: (err) => {
-            setFormError(err.message || "Failed to update special exception");
+            setFormError(err.message || t("specialExceptions.updateFailed", "Failed to update special exception"));
           },
         }
       );
@@ -121,7 +121,7 @@ const SpecialExceptions = () => {
             setIsModalOpen(false);
           },
           onError: (err) => {
-            setFormError(err.message || "Failed to create special exception");
+            setFormError(err.message || t("specialExceptions.createFailed", "Failed to create special exception"));
           },
         }
       );
@@ -132,29 +132,29 @@ const SpecialExceptions = () => {
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-          Special Exceptions
+          {t("specialExceptions.title", "Special Exceptions")}
         </h2>
       </div>
 
       <div className="flex items-center justify-between gap-2">
         <Input
-          placeholder="Search special exceptions..."
+          placeholder={t("specialExceptions.searchPlaceholder", "Search special exceptions...")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button onClick={handleOpenCreate} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          Add Exception
+          {t("specialExceptions.addExceptionBtn", "Add Exception")}
         </Button>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Condition Name</TableHead>
-            <TableHead>Extra Time (Minutes)</TableHead>
-            <TableHead className="w-[100px] text-right">Actions</TableHead>
+            <TableHead>{t("specialExceptions.conditionName", "Condition Name")}</TableHead>
+            <TableHead>{t("specialExceptions.extraTimeMinutes", "Extra Time (Minutes)")}</TableHead>
+            <TableHead className="w-[100px] text-right">{t("specialExceptions.actions", "Actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -164,7 +164,7 @@ const SpecialExceptions = () => {
             <TableRow>
               <TableCell colSpan={3} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load special exceptions"}
+                  message={error?.message || t("specialExceptions.loadFailed", "Failed to load special exceptions")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -177,18 +177,18 @@ const SpecialExceptions = () => {
                   {ex.name}
                 </TableCell>
                 <TableCell>
-                  +{ex.extra_time_min} min
+                  {t("specialExceptions.extraTimeMinShort", { minutes: ex.extra_time_min }, "+{{minutes}} min")}
                 </TableCell>
                 <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
                       {
-                        label: "Edit",
+                        label: t("specialExceptions.edit", "Edit"),
                         icon: Edit,
                         onClick: () => handleOpenEdit(ex),
                       },
                       {
-                        label: "Delete",
+                        label: t("specialExceptions.delete", "Delete"),
                         icon: Trash2,
                         onClick: () => handleOpenDelete(ex._id),
                       },
@@ -200,7 +200,7 @@ const SpecialExceptions = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                No special exceptions found.
+                {t("specialExceptions.noExceptions", "No special exceptions found.")}
               </TableCell>
             </TableRow>
           )}
@@ -213,7 +213,7 @@ const SpecialExceptions = () => {
           <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md flex flex-col p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                {selectedException ? "Edit Special Exception" : "Add Special Exception"}
+                {selectedException ? t("specialExceptions.editTitle", "Edit Special Exception") : t("specialExceptions.addTitle", "Add Special Exception")}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -225,22 +225,22 @@ const SpecialExceptions = () => {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="exception-name">Exception Name</Label>
+                <Label htmlFor="exception-name">{t("specialExceptions.nameLabel", "Exception Name")}</Label>
                 <Input
                   id="exception-name"
-                  placeholder="e.g. Dyslexia, ADHD, Dyscalculia"
+                  placeholder={t("specialExceptions.namePlaceholder", "e.g. Dyslexia, ADHD, Dyscalculia")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="exception-time">Extra Time (Minutes)</Label>
+                <Label htmlFor="exception-time">{t("specialExceptions.timeLabel", "Extra Time (Minutes)")}</Label>
                 <Input
                   id="exception-time"
                   type="number"
                   min="0"
-                  placeholder="e.g. 15"
+                  placeholder={t("specialExceptions.timePlaceholder", "e.g. 15")}
                   value={extraTimeMin}
                   onChange={(e) => setExtraTimeMin(e.target.value)}
                 />
@@ -259,7 +259,7 @@ const SpecialExceptions = () => {
                 onClick={() => setIsModalOpen(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
               >
-                Cancel
+                {t("specialExceptions.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -268,10 +268,10 @@ const SpecialExceptions = () => {
                 className="px-4 py-2 text-sm font-medium text-white bg-[#ff8904] rounded-lg hover:bg-[#e07b03] disabled:opacity-50 cursor-pointer"
               >
                 {createExceptionMutation.isPending || updateExceptionMutation.isPending
-                  ? "Saving..."
+                  ? t("specialExceptions.saving", "Saving...")
                   : selectedException
-                  ? "Save Changes"
-                  : "Create Exception"}
+                  ? t("specialExceptions.saveChanges", "Save Changes")
+                  : t("specialExceptions.createException", "Create Exception")}
               </button>
             </div>
           </div>
@@ -285,7 +285,7 @@ const SpecialExceptions = () => {
         onConfirm={handleConfirmDelete}
         count={1}
         isLoading={deleteExceptionMutation.isPending}
-        data="Special Exception"
+        data={t("specialExceptions.deleteContext", "Special Exception")}
       />
     </div>
   );

@@ -40,7 +40,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       name: "",
       description: "",
       instructions: "",
-      language: "",
+      exam_language: "",
       question_sources: [],
       passing_marks: 0,
       passing_percentage: 0,
@@ -112,7 +112,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       name: "",
       description: "",
       instructions: "",
-      language: "",
+      exam_language: "",
       question_sources: [],
       passing_marks: 0,
       passing_percentage: 0,
@@ -141,7 +141,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         name: examData.name || "",
         description: examData.description || "",
         instructions: examData.instructions || "",
-        language: examData.language?._id || examData.language || "",
+        exam_language: examData.exam_language?._id || examData.exam_language || "",
         question_sources:
           examData.question_sources?.map((s) => ({
             question_bank:
@@ -167,7 +167,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         name: "",
         description: "",
         instructions: "",
-        language: "",
+        exam_language: "",
         question_sources: [],
         passing_marks: 0,
         passing_percentage: 0,
@@ -437,10 +437,10 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 {t("exam.form.language") || "Language"} <span className="text-red-500">*</span>
               </Label>
               <Select
-                key={`language-${watch("language")}`}
-                value={watch("language") || ""}
+                key={`exam_language-${watch("exam_language")}`}
+                value={watch("exam_language") || ""}
                 onValueChange={(v) => {
-                  setValue("language", v, { shouldValidate: true });
+                  setValue("exam_language", v, { shouldValidate: true });
                   // Reset question sources when language changes to prevent invalid mixing
                   setValue("question_sources", []);
                 }}
@@ -456,8 +456,8 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.language && (
-                <p className="text-sm text-red-500">{errors.language.message}</p>
+              {errors.exam_language && (
+                <p className="text-sm text-red-500">{errors.exam_language.message}</p>
               )}
             </div>
 
@@ -465,7 +465,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
               value={questionSources}
               onChange={(v) => setValue("question_sources", v)}
               error={errors.question_sources?.message}
-              selectedLanguage={watch("language")}
+              selectedLanguage={watch("exam_language")}
             />
 
             <div className="space-y-2">

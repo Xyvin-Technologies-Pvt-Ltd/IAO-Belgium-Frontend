@@ -137,7 +137,7 @@ const CreateComponent = ({
   const { data: publishedExamsData } = useGetExamsDropdown(
     {
       status: "published",
-      ...(programLanguageId && { language: programLanguageId }),
+      ...(programLanguageId && { exam_language: programLanguageId }),
     },
     {
       enabled: selectedType === "exam",

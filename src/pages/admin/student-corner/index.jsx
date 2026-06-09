@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const fileUrl = watch(`documents.${index}.file_url`);
   const rawFile = watch(`documents.${index}.rawFile`);
@@ -25,7 +27,7 @@ const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
   return (
     <div className="flex gap-4 items-start p-4 border rounded-md bg-muted/50">
       <div className="flex-1 space-y-4">
-        <Input {...register(`documents.${index}.title`)} placeholder="Document Title" />
+        <Input {...register(`documents.${index}.title`)} placeholder={t("studentCornerCMS.documentTitlePlaceholder", "Document Title")} />
         
         <div className="space-y-2">
           <div
@@ -46,13 +48,13 @@ const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
                   <p className="text-sm text-gray-600 dark:text-white/70 truncate max-w-full">
                     {fileName}
                   </p>
-                  <p className="text-xs text-gray-400">Click to replace</p>
+                  <p className="text-xs text-gray-400">{t("studentCornerCMS.clickToReplace", "Click to replace")}</p>
                 </>
               ) : (
                 <>
                   <Upload className="h-8 w-8 text-gray-400" />
                   <p className="text-sm text-gray-500">
-                    Click to attach document (uploaded on Save)
+                    {t("studentCornerCMS.clickToAttach", "Click to attach document (uploaded on Save)")}
                   </p>
                 </>
               )}
@@ -68,6 +70,7 @@ const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
 };
 
 const StudentCornerCMS = () => {
+  const { t } = useTranslation();
   const { data: responseData, isLoading: loading } = useGetStudentCornerConfig();
   const updateConfigMutation = useUpdateStudentCornerConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,7 +113,7 @@ const StudentCornerCMS = () => {
         if (doc.rawFile) {
           const res = await uploadFile(doc.rawFile);
           finalUrl = res?.data?.file_url || res?.file_url;
-          if (!finalUrl) throw new Error(`Upload failed for ${doc.rawFile.name}`);
+          if (!finalUrl) throw new Error(t("studentCornerCMS.uploadFailed", { name: doc.rawFile.name }, "Upload failed for {{name}}"));
         }
         payloadDocuments.push({
           title: doc.title,
@@ -142,7 +145,7 @@ const StudentCornerCMS = () => {
         onSettled: () => setIsSubmitting(false)
       });
     } catch (error) {
-      toast.error(error.message || "Save failed");
+      toast.error(error.message || t("studentCornerCMS.saveFailed", "Save failed"));
       setIsSubmitting(false);
     }
   };
@@ -160,9 +163,9 @@ const StudentCornerCMS = () => {
       <div className="flex items-center justify-between gap-3 mb-6">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Student Corner
+            {t("studentCornerCMS.title", "Student Corner")}
           </h2>
-          <p className="text-sm text-gray-500 dark:text-white/70 mt-1">Manage content for the Student Corner page.</p>
+          <p className="text-sm text-gray-500 dark:text-white/70 mt-1">{t("studentCornerCMS.subtitle", "Manage content for the Student Corner page.")}</p>
         </div>
         <Button
           onClick={handleSubmit(onSubmit)}
@@ -170,29 +173,29 @@ const StudentCornerCMS = () => {
           className="flex items-center gap-2"
         >
           {(isSubmitting || updateConfigMutation.isPending) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save Changes
+          {t("studentCornerCMS.saveChanges", "Save Changes")}
         </Button>
       </div>
 
       <div className="space-y-8">
         {/* PAMs Banner Section */}
         <section className="bg-card border rounded-lg p-6">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Banner</h3>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">{t("studentCornerCMS.bannerSection", "Banner")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Title</Label>
+              <Label>{t("studentCornerCMS.titleLabel", "Title")}</Label>
               <Input {...register("pams_banner.title")} />
             </div>
             <div className="space-y-2">
-              <Label>Button Text</Label>
+              <Label>{t("studentCornerCMS.buttonTextLabel", "Button Text")}</Label>
               <Input {...register("pams_banner.button_text")} />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Subtitle</Label>
+              <Label>{t("studentCornerCMS.subtitleLabel", "Subtitle")}</Label>
               <Textarea {...register("pams_banner.subtitle")} rows={2} />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Button Link</Label>
+              <Label>{t("studentCornerCMS.buttonLinkLabel", "Button Link")}</Label>
               <Input {...register("pams_banner.button_link")} />
             </div>
           </div>
@@ -200,22 +203,22 @@ const StudentCornerCMS = () => {
 
         {/* Teacher CTA Section */}
         <section className="bg-card border rounded-lg p-6">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Teacher CTA</h3>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">{t("studentCornerCMS.teacherCtaSection", "Teacher CTA")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Title</Label>
+              <Label>{t("studentCornerCMS.titleLabel", "Title")}</Label>
               <Input {...register("teacher_cta.title")} />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Description</Label>
+              <Label>{t("studentCornerCMS.descriptionLabel", "Description")}</Label>
               <Textarea {...register("teacher_cta.description")} rows={2} />
             </div>
             <div className="space-y-2">
-              <Label>Apply Link</Label>
+              <Label>{t("studentCornerCMS.applyLinkLabel", "Apply Link")}</Label>
               <Input {...register("teacher_cta.apply_link")} />
             </div>
             <div className="space-y-2">
-              <Label>Learn More Link</Label>
+              <Label>{t("studentCornerCMS.learnMoreLinkLabel", "Learn More Link")}</Label>
               <Input {...register("teacher_cta.learn_more_link")} />
             </div>
           </div>
@@ -223,9 +226,9 @@ const StudentCornerCMS = () => {
 
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Documents</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.documentsSection", "Documents")}</h3>
             <button type="button" onClick={() => appendDoc({ title: "", file_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> Add Document
+              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addDocument", "Add Document")}
             </button>
           </div>
           <div className="space-y-4">
@@ -239,55 +242,55 @@ const StudentCornerCMS = () => {
                 removeDoc={removeDoc}
               />
             ))}
-            {docFields.length === 0 && <p className="text-muted-foreground text-sm">No documents added.</p>}
+            {docFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noDocuments", "No documents added.")}</p>}
           </div>
         </section>
 
         {/* Quick Links Section */}
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Quick Links</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.quickLinksSection", "Quick Links")}</h3>
             <button type="button" onClick={() => appendLink({ title: "", url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> Add Link
+              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addLink", "Add Link")}
             </button>
           </div>
           <div className="space-y-4">
             {linkFields.map((field, index) => (
               <div key={field.id} className="flex gap-4 items-start p-4 border rounded-md bg-muted/50">
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input {...register(`quick_links.${index}.title`)} placeholder="Title" />
-                  <Input {...register(`quick_links.${index}.url`)} placeholder="URL" />
+                  <Input {...register(`quick_links.${index}.title`)} placeholder={t("studentCornerCMS.placeholderTitle", "Title")} />
+                  <Input {...register(`quick_links.${index}.url`)} placeholder={t("studentCornerCMS.placeholderUrl", "URL")} />
                 </div>
                 <button type="button" onClick={() => removeLink(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
             ))}
-            {linkFields.length === 0 && <p className="text-muted-foreground text-sm">No quick links added.</p>}
+            {linkFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noQuickLinks", "No quick links added.")}</p>}
           </div>
         </section>
 
         {/* Videos Section */}
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Videos</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.videosSection", "Videos")}</h3>
             <button type="button" onClick={() => appendVideo({ title: "", video_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> Add Video
+              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addVideo", "Add Video")}
             </button>
           </div>
           <div className="space-y-4">
             {videoFields.map((field, index) => (
               <div key={field.id} className="flex gap-4 items-start p-4 border rounded-md bg-muted/50">
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input {...register(`videos.${index}.title`)} placeholder="Title" />
-                  <Input {...register(`videos.${index}.video_url`)} placeholder="Video URL" />
+                  <Input {...register(`videos.${index}.title`)} placeholder={t("studentCornerCMS.placeholderTitle", "Title")} />
+                  <Input {...register(`videos.${index}.video_url`)} placeholder={t("studentCornerCMS.placeholderVideoUrl", "Video URL")} />
                 </div>
                 <button type="button" onClick={() => removeVideo(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
             ))}
-            {videoFields.length === 0 && <p className="text-muted-foreground text-sm">No videos added.</p>}
+            {videoFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noVideos", "No videos added.")}</p>}
           </div>
         </section>
       </div>

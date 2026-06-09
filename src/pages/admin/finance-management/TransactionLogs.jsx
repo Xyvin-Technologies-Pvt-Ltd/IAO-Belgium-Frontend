@@ -222,7 +222,7 @@ const TransactionLogs = () => {
                     {payment?.status !== "pending" && (payment?.status === "paid" || payment?.purpose === "custom-invoice") && (
                       <button
                         onClick={() => handleDownloadReceipt(payment)}
-                        title="Download receipt"
+                        title={t("common.downloadReceipt", "Download receipt")}
                         className="p-1.5 rounded-md text-sidebar-foreground/60 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
                       >
                         <Download size={15} />
