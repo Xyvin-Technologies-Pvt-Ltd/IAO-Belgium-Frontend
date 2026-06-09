@@ -25,7 +25,7 @@ import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { getMoment } from "@/utils/dateUtils";
 
-const PlanningTable = ({ activeCity, setActiveCity }) => {
+const PlanningTable = ({ activeCity }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -383,7 +383,10 @@ const PlanningTable = ({ activeCity, setActiveCity }) => {
 
       <CreatePlanning
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedPlanning(null);
+        }}
         planningData={selectedPlanning}
         activeCity={activeCity}
       />
