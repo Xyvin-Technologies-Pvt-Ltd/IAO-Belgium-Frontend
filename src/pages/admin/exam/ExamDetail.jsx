@@ -197,25 +197,29 @@ const ExamDetail = () => {
                 <p className="font-semibold text-foreground">{exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}</p>
               </div>
             )}
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
-              <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
-              <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
-            </div>
-            {exam.module && (
-              <div>
-                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
-                <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
-              </div>
-            )}
-            {exam.deadline && (
-              <div>
-                <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
-                <p className="font-semibold text-foreground">{new Date(exam.deadline).toLocaleDateString()}</p>
-              </div>
+            {exam.type === "sit-at-home" && (
+              <>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
+                  <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
+                  <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
+                </div>
+                {exam.module && (
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
+                    <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
+                  </div>
+                )}
+                {exam.deadline && (
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
+                    <p className="font-semibold text-foreground">{new Date(exam.deadline).toLocaleDateString()}</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

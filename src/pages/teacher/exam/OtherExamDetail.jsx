@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,6 +19,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { getMoment } from "@/utils/dateUtils";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 const OtherExamDetail = () => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const OtherExamDetail = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const [expandedRows, setExpandedRows] = useState({});
 
   useEffect(() => {
     setPage(1);
@@ -70,6 +72,13 @@ const OtherExamDetail = () => {
     return () => updateBreadcrumbs([]);
   }, [examData?.data?.name, t]);
 
+  const toggleRow = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   if (isLoading) {
     return <LoadingState text={t("exam.loading")} fullHeight />;
   }
@@ -106,6 +115,8 @@ const OtherExamDetail = () => {
     return null;
   };
 
+  const totalColumns = 6;
+
   return (
     <div className="space-y-6 mt-4">
       {/* Header */}
@@ -141,71 +152,141 @@ const OtherExamDetail = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="px-6">
+              <TableHead className="w-10 px-3"></TableHead>
+              <TableHead className="px-4">
                 {t("exam.detail.student", { defaultValue: "Student" })}
               </TableHead>
               <TableHead className="text-center">
-                {t("exam.detail.score", { defaultValue: "Score" })}
+                {t("exam.detail.attempts", { defaultValue: "Attempts" })}
               </TableHead>
               <TableHead className="text-center">
-                {t("exam.detail.percentage", { defaultValue: "Percentage" })}
+                {t("exam.detail.bestScore", { defaultValue: "Best Score" })}
               </TableHead>
               <TableHead className="text-center">
                 {t("exam.detail.result", { defaultValue: "Result" })}
               </TableHead>
               <TableHead className="text-center px-6">
-                {t("exam.detail.submittedAt", { defaultValue: "Submitted At" })}
+                {t("exam.detail.lastSubmitted", { defaultValue: "Last Submitted" })}
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={studentsFetching ? "opacity-50 pointer-events-none" : ""}>
             {studentsLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={5} />
+              <TableSkeleton rows={rowsPerPage} columns={totalColumns} />
             ) : studentsData?.data?.length > 0 ? (
-              studentsData.data.map((item) => (
-                <TableRow
-                  key={item._id}
-                  className="transition-colors hover:bg-muted/50"
-                >
-                  <TableCell className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-medium capitalize">
-                        {item.student?.last_name}{" "}
-                        {item.student?.first_name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.student?.uid}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center font-medium">
-                    {item.score ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {item.percentage !== null && item.percentage !== undefined
-                      ? `${item.percentage.toFixed(2)}%`
-                      : "—"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {item.result ? (
-                      <StatusBadge status={item.result} />
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        {t("exam.detail.notTaken", { defaultValue: "Not taken" })}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center text-muted-foreground px-6 py-4">
-                    {item.submitted_at
-                      ? getMoment(item.submitted_at).format("DD-MM-YYYY, HH:mm")
-                      : "—"}
-                  </TableCell>
-                </TableRow>
-              ))
+              studentsData.data.map((item) => {
+                const hasAttempts = item.attempts && item.attempts.length > 0;
+                const isExpanded = expandedRows[item._id];
+
+                return (
+                  <Fragment key={item._id}>
+                    {/* Main student row */}
+                    <TableRow
+                      className={`transition-colors ${hasAttempts ? "cursor-pointer hover:bg-muted/50" : ""}`}
+                      onClick={() => hasAttempts && toggleRow(item._id)}
+                    >
+                      <TableCell className="px-3 py-4 w-10">
+                        {hasAttempts ? (
+                          <span className="inline-flex items-center justify-center w-5 h-5 text-muted-foreground">
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4" />
+                            )}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell className="px-4 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-medium capitalize">
+                            {item.student?.last_name}{" "}
+                            {item.student?.first_name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {item.student?.uid}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-medium">
+                          {item.attempts_count ?? 0}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
+                        {item.score !== null && item.score !== undefined
+                          ? item.score
+                          : "—"}
+                        {item.percentage !== null && item.percentage !== undefined && (
+                          <span className="text-xs text-muted-foreground ml-1">
+                            ({item.percentage.toFixed(1)}%)
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.result ? (
+                          <StatusBadge status={item.result} />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            {t("exam.detail.notTaken", { defaultValue: "Not taken" })}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center text-muted-foreground px-6 py-4">
+                        {item.submitted_at
+                          ? getMoment(item.submitted_at).format("DD-MM-YYYY, HH:mm")
+                          : "—"}
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Expanded attempts rows */}
+                    {isExpanded && hasAttempts && item.attempts.map((attempt) => (
+                      <TableRow
+                        key={attempt._id}
+                        className="bg-muted/30 dark:bg-muted/10"
+                      >
+                        <TableCell className="px-3 py-2"></TableCell>
+                        <TableCell className="px-4 py-2">
+                          <span className="text-sm text-muted-foreground pl-4">
+                            {t("exam.detail.attemptLabel", {
+                              defaultValue: "Attempt",
+                            })}{" "}
+                            #{attempt.attempt_number}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center py-2">
+                          <StatusBadge status={attempt.status} />
+                        </TableCell>
+                        <TableCell className="text-center font-medium py-2">
+                          {attempt.score !== null && attempt.score !== undefined
+                            ? attempt.score
+                            : "—"}
+                          {attempt.percentage !== null && attempt.percentage !== undefined && (
+                            <span className="text-xs text-muted-foreground ml-1">
+                              ({attempt.percentage.toFixed(1)}%)
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center py-2">
+                          {attempt.result ? (
+                            <StatusBadge status={attempt.result} />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center text-muted-foreground px-6 py-2">
+                          {attempt.submitted_at
+                            ? getMoment(attempt.submitted_at).format("DD-MM-YYYY, HH:mm")
+                            : "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </Fragment>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={totalColumns}
                   className="h-24 text-center text-muted-foreground"
                 >
                   {t("common.noResultsFound", {
@@ -231,3 +312,4 @@ const OtherExamDetail = () => {
 };
 
 export default OtherExamDetail;
+

@@ -166,10 +166,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               component: examComp._id,
               exam: examComp.linked_exam || original.exam?._id || original.exam || "",
               teacher: original.teacher?._id || original.teacher || "",
-              is_sit_at_home: original.is_sit_at_home || false,
-              max_attempts: original.max_attempts ?? 2,
-              cooldown_days: original.cooldown_days ?? 7,
-              deadline: original.deadline ? formatTZ(original.deadline, "YYYY-MM-DD") : "",
             };
           }
         }
@@ -178,10 +174,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           component: examComp._id,
           exam: examComp.linked_exam,
           teacher: "",
-          is_sit_at_home: false,
-          max_attempts: 2,
-          cooldown_days: 7,
-          deadline: "",
         };
       });
 
@@ -370,10 +362,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         component: ex.exam_component?._id || ex.exam_component || "",
         exam: ex.exam?._id || ex.exam || "",
         teacher: ex.teacher?._id || ex.teacher || "",
-        is_sit_at_home: ex.is_sit_at_home || false,
-        max_attempts: ex.max_attempts ?? 2,
-        cooldown_days: ex.cooldown_days ?? 7,
-        deadline: ex.deadline ? formatTZ(ex.deadline, "YYYY-MM-DD") : "",
       })) || [];
 
       reset({
@@ -471,11 +459,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         component: ex.component,
         exam: ex.exam,
         teacher: ex.teacher || null,
-        // Ensure boolean — checkbox via register() may return string
-        is_sit_at_home: ex.is_sit_at_home === true || ex.is_sit_at_home === "true",
-        max_attempts: Number(ex.max_attempts) || 2,
-        cooldown_days: Number(ex.cooldown_days ?? 7),
-        deadline: ex.deadline || null,
       })),
     };
 
