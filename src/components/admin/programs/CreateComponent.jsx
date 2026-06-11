@@ -137,6 +137,7 @@ const CreateComponent = ({
   const { data: publishedExamsData } = useGetExamsDropdown(
     {
       status: "published",
+      type: "online",
       ...(programLanguageId && { exam_language: programLanguageId }),
     },
     {

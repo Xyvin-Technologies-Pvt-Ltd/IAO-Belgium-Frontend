@@ -40,6 +40,24 @@ export const getTeacherExams = async (params) => {
   return response.data;
 };
 
+export const getTeacherOtherExams = async (params) => {
+  const response = await axiosInstance.get("/exam/teacher/other-exams", { params });
+  return response.data;
+};
+
+export const getOtherExamDetail = async (exam_id) => {
+  const response = await axiosInstance.get(`/exam/teacher/other-exams/${exam_id}`);
+  return response.data;
+};
+
+export const getOtherExamStudents = async (exam_id, params) => {
+  const response = await axiosInstance.get(
+    `/exam/teacher/other-exams/${exam_id}/students`,
+    { params },
+  );
+  return response.data;
+};
+
 export const getTeacherExamById = async (exam_id, planning_id) => {
   const response = await axiosInstance.get(`/exam/teacher/${exam_id}/${planning_id}`);
   return response.data;

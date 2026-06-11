@@ -26,7 +26,8 @@
       "schedules": "Roosters",
       "planning": "Planning",
       "evaluations": "Feedback",
-      "exams": "Examens"
+      "exams": "Examens",
+      "otherExams": "Overige examens"
     },
     "admin": {
       "title": "Admin Dashboard",

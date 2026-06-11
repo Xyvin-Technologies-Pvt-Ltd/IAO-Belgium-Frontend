@@ -26,7 +26,8 @@
       "schedules": "Horaires",
       "planning": "Planification",
       "evaluations": "Feedback / Évaluation",
-      "exams": "Examens"
+      "exams": "Examens",
+      "otherExams": "Autres examens"
     },
     "admin": {
       "title": "Tableau de bord de l'administrateur",

@@ -85,7 +85,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     { enabled: open },
   );
 
-  const programsRaw = programsData?.data || [];
+  const programsRaw = open ? (programsData?.data || []) : [];
   const programs = programsRaw.map((program) => ({
     _id: program._id,
     name: `${program.name} - ${program.city?.name || "N/A"} - ${program.language?.name || "N/A"}`,
@@ -126,7 +126,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
   // Set of component IDs that already have a planning for this batch (excluding the current planning itself if editing)
   const plannedComponentIds = new Set(
-    (batchPlanningsData?.data || [])
+    (open && selectedBatch && batchPlanningsData?.data
+      ? batchPlanningsData.data
+      : [])
       .filter((p) => !isEdit || p._id !== planningData?._id)
       .map((p) => p.component?._id || p.component)
       .filter(Boolean)
@@ -141,7 +143,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     { enabled: open && !!selectedProgram && !!selectedComponent },
   );
 
-  const examsList = examsData?.data || [];
+  const examsList = (open && selectedProgram && selectedComponent) ? (examsData?.data || []) : [];
 
   useEffect(() => {
     // If exams are still loading from the API, do nothing
@@ -164,10 +166,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               component: examComp._id,
               exam: examComp.linked_exam || original.exam?._id || original.exam || "",
               teacher: original.teacher?._id || original.teacher || "",
-              is_sit_at_home: original.is_sit_at_home || false,
-              max_attempts: original.max_attempts ?? 2,
-              cooldown_days: original.cooldown_days ?? 7,
-              deadline: original.deadline ? formatTZ(original.deadline, "YYYY-MM-DD") : "",
             };
           }
         }
@@ -176,10 +174,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
           component: examComp._id,
           exam: examComp.linked_exam,
           teacher: "",
-          is_sit_at_home: false,
-          max_attempts: 2,
-          cooldown_days: 7,
-          deadline: "",
         };
       });
 
@@ -229,8 +223,8 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   );
 
 
-  const batches = batchesData?.data || [];
-  const componentsRaw = componentsData?.data || [];
+  const batches = (open && selectedProgram) ? (batchesData?.data || []) : [];
+  const componentsRaw = (open && selectedProgram) ? (componentsData?.data || []) : [];
   const components = componentsRaw.map((comp) => {
     const linkedExams = (comp.linked_exams || []).filter((e) => e.name);
     if (linkedExams.length > 0) {
@@ -242,9 +236,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     }
     return comp;
   });
-  const teachers = teachersData?.data || [];
-  const assistants = assistantsData?.data || [];
-  const trainees = traineesData?.data || [];
+  const teachers = (open && selectedLanguageId) ? (teachersData?.data || []) : [];
+  const assistants = (open && selectedLanguageId) ? (assistantsData?.data || []) : [];
+  const trainees = (open && selectedLanguageId) ? (traineesData?.data || []) : [];
 
   // All teaching staff combined (for exam teacher dropdown)
   const allStaff = [
@@ -368,10 +362,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         component: ex.exam_component?._id || ex.exam_component || "",
         exam: ex.exam?._id || ex.exam || "",
         teacher: ex.teacher?._id || ex.teacher || "",
-        is_sit_at_home: ex.is_sit_at_home || false,
-        max_attempts: ex.max_attempts ?? 2,
-        cooldown_days: ex.cooldown_days ?? 7,
-        deadline: ex.deadline ? formatTZ(ex.deadline, "YYYY-MM-DD") : "",
       })) || [];
 
       reset({
@@ -469,11 +459,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         component: ex.component,
         exam: ex.exam,
         teacher: ex.teacher || null,
-        // Ensure boolean — checkbox via register() may return string
-        is_sit_at_home: ex.is_sit_at_home === true || ex.is_sit_at_home === "true",
-        max_attempts: Number(ex.max_attempts) || 2,
-        cooldown_days: Number(ex.cooldown_days) ?? 7,
-        deadline: ex.deadline || null,
       })),
     };
 

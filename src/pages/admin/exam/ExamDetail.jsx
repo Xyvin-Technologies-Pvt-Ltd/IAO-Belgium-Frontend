@@ -110,11 +110,20 @@ const ExamDetail = () => {
                 {exam.uid}
               </span>
               <span className="inline-block px-3 py-1 bg-primary/10 text-primary border-transparent rounded-full font-medium">
-                {exam.type === "sit-at-home" ? t("exam.form.sitAtHome", "Sit-at-home") : t("exam.form.online", "Online")}
+                {exam.type === "sit-at-home" 
+                  ? t("exam.form.sitAtHome", "Sit-at-home") 
+                  : exam.type === "practical" 
+                  ? t("exam.form.practical", "Practical") 
+                  : t("exam.form.online", "Online")}
               </span>
               {exam.type === "sit-at-home" && exam.batch && (
                 <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">
                   {t("planningManagement.modal.batchLabel")}: {exam.batch?.name || exam.batch}
+                </span>
+              )}
+              {exam.teachers && exam.teachers.length > 0 && (
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full font-medium">
+                  {t("exam.form.teachers", "Teachers")}: {exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}
                 </span>
               )}
             </div>
@@ -168,34 +177,50 @@ const ExamDetail = () => {
         />
       </div>
 
-      {exam.type === "sit-at-home" && (
+      {(exam.type === "sit-at-home" || exam.type === "practical") && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm space-y-4">
           <p className="text-sm font-bold border-b pb-2 mb-2">
-            {t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
+            {exam.type === "practical" 
+              ? t("exam.form.practicalSettings", "Practical Exam Settings") 
+              : t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.batchLabel", "Group / Batch")}</p>
-              <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
-              <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
-              <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
-            </div>
-            {exam.module && (
+            {exam.batch && (
               <div>
-                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
-                <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
+                <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.batchLabel", "Group / Batch")}</p>
+                <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
               </div>
             )}
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
-              <p className="font-semibold text-foreground">{exam.deadline ? new Date(exam.deadline).toLocaleDateString() : "No deadline"}</p>
-            </div>
+            {exam.teachers && exam.teachers.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.teachers", "Teachers")}</p>
+                <p className="font-semibold text-foreground">{exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}</p>
+              </div>
+            )}
+            {exam.type === "sit-at-home" && (
+              <>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
+                  <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
+                  <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
+                </div>
+                {exam.module && (
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
+                    <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
+                  </div>
+                )}
+                {exam.deadline && (
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
+                    <p className="font-semibold text-foreground">{new Date(exam.deadline).toLocaleDateString()}</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       )}

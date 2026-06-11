@@ -26,7 +26,8 @@
       "schedules": "Zeitpläne",
       "planning": "Planung",
       "evaluations": "Feedback / Bewertung",
-      "exams": "Prüfungen"
+      "exams": "Prüfungen",
+      "otherExams": "Andere Prüfungen"
     },
     "admin": {
       "title": "Admin-Dashboard",

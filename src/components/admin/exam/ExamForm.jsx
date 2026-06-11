@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -16,9 +16,16 @@ import {
 } from "@/components/ui/select";
 import QuestionSourceSelector from "./QuestionSourceSelector";
 import { useCreateExam, useUpdateExam } from "@/store/useExamStore";
-import { useGetAllLanguages, useGetAllPrograms, useGetBatches, useGetComponents } from "@/store/useDropdownStore";
+import {
+  useGetAllLanguages,
+  useGetAllPrograms,
+  useGetBatches,
+  useGetComponents,
+  useGetUsers,
+} from "@/store/useDropdownStore";
 import { examSchema } from "@/validations/admin/exam.validation";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 
 const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   const { t } = useTranslation();
@@ -26,6 +33,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
 
   const [programSearchTerm, setProgramSearchTerm] = useState("");
   const [batchSearchTerm, setBatchSearchTerm] = useState("");
+  const [teacherSearchTerm, setTeacherSearchTerm] = useState("");
 
   const {
     register,
@@ -53,6 +61,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       max_attempts: 2,
       cooldown_days: 7,
       deadline: "",
+      teachers: [],
     },
   });
 
@@ -66,7 +75,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
     {
       ...(programSearchTerm && { search: programSearchTerm }),
     },
-    { enabled: open && selectedType === "sit-at-home" },
+    { enabled: open && (selectedType === "sit-at-home" || selectedType === "practical") },
   );
 
   const programsRaw = programsData?.data || [];
@@ -82,7 +91,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
     {
       ...(batchSearchTerm && { search: batchSearchTerm }),
     },
-    { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
+    { enabled: open && (selectedType === "sit-at-home" || selectedType === "practical") && !!selectedProgram },
   );
 
   const batches = (batchesData?.data || []).map((batch) => ({
@@ -102,6 +111,51 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
     _id: module._id,
     name: module.name,
   }));
+
+  const { data: teachersRawData, isLoading: teachersLoading } = useGetUsers(
+    {
+      ...(teacherSearchTerm && { search: teacherSearchTerm }),
+      role: "teacher",
+    },
+    { enabled: open && (selectedType === "sit-at-home" || selectedType === "practical") }
+  );
+
+  const rawTeachers = teachersRawData?.data;
+
+  const teachersList = useMemo(() => {
+    const map = new Map();
+
+    // 1. Add teachers from examData (initially selected)
+    if (examData?.teachers && Array.isArray(examData.teachers)) {
+      examData.teachers.forEach((t) => {
+        const id = typeof t === "object" ? t?._id : t;
+        const name = typeof t === "object"
+          ? (t?.name || `${t?.first_name || ""} ${t?.last_name || ""} (${t?.email || ""})`.trim())
+          : t;
+        if (id) {
+          map.set(id.toString(), { _id: id.toString(), name });
+        }
+      });
+    }
+
+    // 2. Add searched teachers from API
+    if (rawTeachers && Array.isArray(rawTeachers)) {
+      rawTeachers.forEach((u) => {
+        if (u?._id) {
+          const name = u.name || `${u.first_name || ""} ${u.last_name || ""} (${u.email || ""})`.trim();
+          map.set(u._id.toString(), { _id: u._id.toString(), name });
+        }
+      });
+    }
+
+    return Array.from(map.values());
+  }, [examData?.teachers, rawTeachers]);
+
+  const selectedTeachersIds = watch("teachers") || [];
+  const selectedTeachersObjects = useMemo(() => {
+    const selectedSet = new Set(selectedTeachersIds.map(id => id ? id.toString() : ""));
+    return teachersList.filter(t => selectedSet.has(t._id));
+  }, [teachersList, selectedTeachersIds]);
 
   const questionSources = watch("question_sources") || [];
   const createExam = useCreateExam();
@@ -125,9 +179,11 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       max_attempts: 2,
       cooldown_days: 7,
       deadline: "",
+      teachers: [],
     });
     setProgramSearchTerm("");
     setBatchSearchTerm("");
+    setTeacherSearchTerm("");
     onClose();
   };
 
@@ -161,6 +217,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         max_attempts: examData.max_attempts ?? 2,
         cooldown_days: examData.cooldown_days ?? 7,
         deadline: examData.deadline ? examData.deadline.split("T")[0] : "",
+        teachers: examData.teachers?.map((t) => typeof t === "object" ? t._id : t) || [],
       });
     } else if (!examData && open) {
       reset({
@@ -180,9 +237,11 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         max_attempts: 2,
         cooldown_days: 7,
         deadline: "",
+        teachers: [],
       });
       setProgramSearchTerm("");
       setBatchSearchTerm("");
+      setTeacherSearchTerm("");
     }
   }, [examData, reset, open]);
 
@@ -194,12 +253,22 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       delete finalValues.passing_percentage;
     }
 
-    if (values.type === "sit-at-home") {
+    if (values.type === "sit-at-home" || values.type === "practical") {
       delete finalValues.program;
-      finalValues.max_attempts = Number(values.max_attempts) || 2;
-      finalValues.cooldown_days = Number(values.cooldown_days) ?? 7;
+      if (values.type === "sit-at-home") {
+        finalValues.max_attempts = Number(values.max_attempts) || 2;
+        finalValues.cooldown_days = Number(values.cooldown_days) ?? 7;
+        finalValues.deadline = values.deadline || null;
+      } else {
+        delete finalValues.max_attempts;
+        delete finalValues.cooldown_days;
+        delete finalValues.deadline;
+        finalValues.question_sources = [];
+        finalValues.exam_language = null;
+      }
+      finalValues.batch = values.batch || null;
       finalValues.module = values.module || null;
-      finalValues.deadline = values.deadline || null;
+      finalValues.teachers = values.teachers || [];
     } else {
       delete finalValues.program;
       delete finalValues.batch;
@@ -207,6 +276,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       delete finalValues.max_attempts;
       delete finalValues.cooldown_days;
       delete finalValues.deadline;
+      delete finalValues.teachers;
     }
 
     const mutation = isEdit ? updateExam : createExam;
@@ -260,9 +330,13 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 value={watch("type") || "online"}
                 onValueChange={(v) => {
                   setValue("type", v, { shouldValidate: true });
-                  if (v !== "sit-at-home") {
+                  if (v !== "sit-at-home" && v !== "practical") {
                     setValue("program", "");
                     setValue("batch", "");
+                    setValue("module", "");
+                    setValue("teachers", []);
+                  }
+                  if (v === "practical") {
                     setValue("module", "");
                   }
                 }}
@@ -273,6 +347,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 <SelectContent>
                   <SelectItem value="online">{t("exam.form.online", "Online")}</SelectItem>
                   <SelectItem value="sit-at-home">{t("exam.form.sitAtHome", "Sit-at-home")}</SelectItem>
+                  <SelectItem value="practical">{t("exam.form.practical", "Practical")}</SelectItem>
                 </SelectContent>
               </Select>
               {errors.type && (
@@ -280,10 +355,12 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
               )}
             </div>
 
-            {watch("type") === "sit-at-home" && (
+            {(watch("type") === "sit-at-home" || watch("type") === "practical") && (
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50">
                 <h4 className="font-medium text-sm text-gray-900 dark:text-white pb-2 border-b dark:border-white/10">
-                  {t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
+                  {watch("type") === "sit-at-home"
+                    ? t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")
+                    : t("exam.form.practicalSettings", "Practical Settings")}
                 </h4>
                 
                 <SearchableSelect
@@ -302,7 +379,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   onSearch={setProgramSearchTerm}
                   isLoading={programsLoading}
                   error={errors.program?.message}
-                  required
+                  required={watch("type") === "sit-at-home"}
                 />
 
                 <SearchableSelect
@@ -318,72 +395,93 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   isLoading={batchesLoading}
                   error={errors.batch?.message}
                   disabled={!selectedProgram}
-                  required
+                  required={watch("type") === "sit-at-home"}
                 />
 
-                <SearchableSelect
-                  label={t("exam.form.moduleLabel", "Module")}
-                  placeholder={t("exam.form.modulePlaceholder", "Select Module")}
-                  searchPlaceholder={t("exam.form.searchModules", "Search Modules")}
-                  items={modules}
-                  value={watch("module")}
-                  onChange={(value) => {
-                    if (value) setValue("module", value, { shouldValidate: true });
-                  }}
-                  isLoading={modulesLoading}
-                  error={errors.module?.message}
-                  disabled={!selectedProgram}
-                  required
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      {t("planningManagement.modal.maxAttempts", "Max Attempts")}
-                    </Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      {...register("max_attempts", { valueAsNumber: true })}
-                    />
-                    {errors.max_attempts && (
-                      <p className="text-sm text-red-500">
-                        {errors.max_attempts.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                      {t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}
-                    </Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      {...register("cooldown_days", { valueAsNumber: true })}
-                    />
-                    {errors.cooldown_days && (
-                      <p className="text-sm text-red-500">
-                        {errors.cooldown_days.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">
-                    {t("planningManagement.modal.deadline", "Deadline")}
-                  </Label>
-                  <Input
-                    type="date"
-                    {...register("deadline")}
+                {watch("type") === "sit-at-home" && (
+                  <SearchableSelect
+                    label={t("exam.form.moduleLabel", "Module")}
+                    placeholder={t("exam.form.modulePlaceholder", "Select Module")}
+                    searchPlaceholder={t("exam.form.searchModules", "Search Modules")}
+                    items={modules}
+                    value={watch("module")}
+                    onChange={(value) => {
+                      if (value) setValue("module", value, { shouldValidate: true });
+                    }}
+                    isLoading={modulesLoading}
+                    error={errors.module?.message}
+                    disabled={!selectedProgram}
+                    required
                   />
-                  {errors.deadline && (
-                    <p className="text-sm text-red-500">
-                      {errors.deadline.message}
-                    </p>
-                  )}
-                </div>
+                )}
+
+                <SearchableMultiSelect
+                  label={t("exam.form.teachersLabel", "Teachers")}
+                  placeholder={t("exam.form.teachersPlaceholder", "Select Teachers")}
+                  searchPlaceholder={t("exam.form.searchTeachers", "Search Teachers")}
+                  items={teachersList}
+                  selected={selectedTeachersObjects}
+                  onChange={(selectedItems) => {
+                    setValue("teachers", selectedItems.map(item => item._id), { shouldValidate: true });
+                  }}
+                  onSearch={setTeacherSearchTerm}
+                  isLoading={teachersLoading}
+                  error={errors.teachers?.message}
+                  required
+                />
+
+                {watch("type") === "sit-at-home" && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          {t("planningManagement.modal.maxAttempts", "Max Attempts")}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          {...register("max_attempts", { valueAsNumber: true })}
+                        />
+                        {errors.max_attempts && (
+                          <p className="text-sm text-red-500">
+                            {errors.max_attempts.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          {t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          {...register("cooldown_days", { valueAsNumber: true })}
+                        />
+                        {errors.cooldown_days && (
+                          <p className="text-sm text-red-500">
+                            {errors.cooldown_days.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        {t("planningManagement.modal.deadline", "Deadline")}
+                      </Label>
+                      <Input
+                        type="date"
+                        {...register("deadline")}
+                      />
+                      {errors.deadline && (
+                        <p className="text-sm text-red-500">
+                          {errors.deadline.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -432,41 +530,44 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                {t("exam.form.language") || "Language"} <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                key={`exam_language-${watch("exam_language")}`}
-                value={watch("exam_language") || ""}
-                onValueChange={(v) => {
-                  setValue("exam_language", v, { shouldValidate: true });
-                  // Reset question sources when language changes to prevent invalid mixing
-                  setValue("question_sources", []);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang._id} value={lang._id}>
-                      {lang.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.exam_language && (
-                <p className="text-sm text-red-500">{errors.exam_language.message}</p>
-              )}
-            </div>
+            {watch("type") !== "practical" && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                  {t("exam.form.language") || "Language"} <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  key={`exam_language-${watch("exam_language")}`}
+                  value={watch("exam_language") || ""}
+                  onValueChange={(v) => {
+                    setValue("exam_language", v, { shouldValidate: true });
+                    setValue("question_sources", []);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languages.map((lang) => (
+                      <SelectItem key={lang._id} value={lang._id}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.exam_language && (
+                  <p className="text-sm text-red-500">{errors.exam_language.message}</p>
+                )}
+              </div>
+            )}
 
-            <QuestionSourceSelector
-              value={questionSources}
-              onChange={(v) => setValue("question_sources", v)}
-              error={errors.question_sources?.message}
-              selectedLanguage={watch("exam_language")}
-            />
+            {watch("type") !== "practical" && (
+              <QuestionSourceSelector
+                value={questionSources}
+                onChange={(v) => setValue("question_sources", v)}
+                error={errors.question_sources?.message}
+                selectedLanguage={watch("exam_language")}
+              />
+            )}
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">

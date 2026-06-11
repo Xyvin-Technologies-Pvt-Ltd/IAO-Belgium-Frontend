@@ -7,6 +7,9 @@ import {
   publishExam,
   archiveExam,
   getTeacherExams,
+  getTeacherOtherExams,
+  getOtherExamDetail,
+  getOtherExamStudents,
   getTeacherExamById,
   startExamSession,
   endExamSession,
@@ -115,6 +118,36 @@ export const useGetTeacherExams = (params, options = {}) => {
     queryFn: () => getTeacherExams(params),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetTeacherOtherExams = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-other-exams", params],
+    queryFn: () => getTeacherOtherExams(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetOtherExamDetail = (exam_id, options = {}) => {
+  return useQuery({
+    queryKey: ["other-exam-detail", exam_id],
+    queryFn: () => getOtherExamDetail(exam_id),
+    enabled: !!exam_id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetOtherExamStudents = (exam_id, params, options = {}) => {
+  return useQuery({
+    queryKey: ["other-exam-students", exam_id, params],
+    queryFn: () => getOtherExamStudents(exam_id, params),
+    enabled: !!exam_id,
+    staleTime: 30000,
     ...options,
   });
 };
