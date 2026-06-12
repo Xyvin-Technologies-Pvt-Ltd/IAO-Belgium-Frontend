@@ -8,6 +8,9 @@ import {
   getStudentByApplication,
   updateintake,
   moveStudentToAnotherBatch,
+  markStudentAsFailed,
+  reEnrollStudent,
+  getBatchesByProgram,
 } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -122,5 +125,55 @@ export const useMoveStudentToAnotherBatch = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to move student");
     },
+  });
+};
+
+export const useMarkStudentAsFailed = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ applicationId, reason }) =>
+      markStudentAsFailed(applicationId, { reason }),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
+      toast.success(response?.message || "Student marked as failed successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark student as failed");
+    },
+  });
+};
+
+export const useReEnrollStudent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ applicationId, targetBatchId, failedYear, reason }) =>
+      reEnrollStudent(applicationId, {
+        target_batch_id: targetBatchId,
+        failed_year: failedYear,
+        reason,
+      }),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      toast.success(response?.message || "Student re-enrolled successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to re-enroll student");
+    },
+  });
+};
+
+export const useGetBatchesByProgram = (programId, options = {}) => {
+  return useQuery({
+    queryKey: ["batches", "program", programId],
+    queryFn: () => getBatchesByProgram(programId),
+    staleTime: 30000,
+    enabled: !!programId,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };

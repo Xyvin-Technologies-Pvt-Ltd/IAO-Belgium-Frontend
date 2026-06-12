@@ -69,6 +69,14 @@ const BatchAttendence = () => {
           </div>
         </div>
       );
+    } else if (status === "completed_elsewhere") {
+      return (
+        <div className="flex items-center justify-center" title="Completed in another batch">
+          <div className="w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center">
+            <Check className="w-2 h-2 text-white stroke-3" />
+          </div>
+        </div>
+      );
     }
     return (
       <div className="flex items-center justify-center">
@@ -185,9 +193,15 @@ const BatchAttendence = () => {
                     ) : (
                       <TableCell
                         key={`${module.module_id}-no-session`}
-                        className="text-center border-l py-2 text-muted-foreground italic"
+                        className="text-center border-l py-2"
                       >
-                        {t("common.dash")}
+                        {student.availability_statuses?.[module.module_id] === "completed" ? (
+                          <div className="flex items-center justify-center" title="Completed in another batch">
+                            <Check className="w-4 h-4 text-emerald-600 stroke-3" />
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground italic">{t("common.dash")}</span>
+                        )}
                       </TableCell>
                     ),
                   )}

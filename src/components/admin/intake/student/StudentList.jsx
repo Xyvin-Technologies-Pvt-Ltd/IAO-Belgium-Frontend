@@ -19,6 +19,7 @@ import { useGetEnrolledStudentsByIntake } from "@/store/useIntakeStore";
 import { formatTZ } from "@/utils/dateUtils";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import MoveStudentDialog from "./MoveStudentDialog";
+import ReEnrollStudentDialog from "./ReEnrollStudentDialog";
 
 const StudentList = () => {
   const params = useParams({ strict: false });
@@ -30,6 +31,7 @@ const StudentList = () => {
   const [search, setSearch] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+  const [reEnrollDialogOpen, setReEnrollDialogOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
@@ -56,6 +58,11 @@ const StudentList = () => {
   const handleMoveStudent = (student) => {
     setSelectedStudent(student);
     setMoveDialogOpen(true);
+  };
+
+  const handleReEnrollStudent = (student) => {
+    setSelectedStudent(student);
+    setReEnrollDialogOpen(true);
   };
   return (
     <div className="space-y-6 mt-4">
@@ -114,18 +121,33 @@ const StudentList = () => {
                   {formatTZ(i?.enrolled_date, "DD-MM-YYYY") || t("common.notAvailable")}
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={i?.status} />
+                  <StatusBadge status={i?.year_status} />
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
-                      {
-                        label: t("batchManagement.actions.moveToAnotherBatch"),
-                        onClick: (e) => {
-                          e.stopPropagation();
-                          handleMoveStudent(i);
-                        },
-                      },
+                      ...(i.year_status !== "failed"
+                        ? [
+                            {
+                              label: t("batchManagement.actions.moveToAnotherBatch"),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                handleMoveStudent(i);
+                              },
+                            },
+                          ]
+                        : []),
+                      ...(i.year_status === "failed"
+                        ? [
+                            {
+                              label: t("batchManagement.actions.reEnrollStudent", "Re-enroll for Failed Year"),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                handleReEnrollStudent(i);
+                              },
+                            },
+                          ]
+                        : []),
                     ]}
                   />
                 </TableCell>
@@ -153,6 +175,12 @@ const StudentList = () => {
         onOpenChange={setMoveDialogOpen}
         student={selectedStudent}
         intakeId={id}
+      />
+
+      <ReEnrollStudentDialog
+        open={reEnrollDialogOpen}
+        onOpenChange={setReEnrollDialogOpen}
+        student={selectedStudent}
       />
     </div>
   );

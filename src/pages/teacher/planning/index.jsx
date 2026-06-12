@@ -159,7 +159,10 @@ const Plannings = () => {
             </TableRow>
           ) : plannings?.length > 0 ? (
             plannings?.map((planning) => {
-              const mainStatus = planning.sessions?.[0]?.status || "pending";
+              const hasPending = planning.sessions?.some(
+                (s) => s.status === "pending" || !s.status
+              );
+              const mainStatus = hasPending ? "pending" : (planning.sessions?.[0]?.status || "pending");
               const isExpanded = expandedModules.has(planning._id);
               const hasMultipleSessions = planning.sessions?.length > 1;
 
@@ -283,7 +286,42 @@ const Plannings = () => {
                         <TableCell>
                           <StatusBadge status={session.status || "pending"} />
                         </TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>
+                          {(session.status === "pending" || !session.status) && (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    session.session_id,
+                                    "accepted"
+                                  )
+                                }
+                                disabled={updateStatusMutation.isPending}
+                              >
+                                <Check className="h-4 w-4 mr-1" />
+                                {t("planningManagement.teacher.accept")}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    session.session_id,
+                                    "rejected"
+                                  )
+                                }
+                                disabled={updateStatusMutation.isPending}
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                {t("planningManagement.teacher.reject")}
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                 </Fragment>

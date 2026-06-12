@@ -91,3 +91,36 @@ export const moveStudentToAnotherBatch = async (id, data) => {
     throw error.response.data;
   }
 };
+
+export const markStudentAsFailed = async (applicationId, data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/application/${applicationId}/mark-failed`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const reEnrollStudent = async (applicationId, data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/application/${applicationId}/re-enroll`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getBatchesByProgram = async (programId) => {
+  try {
+    const response = await axiosInstance.get(`/batch/by-program/${programId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

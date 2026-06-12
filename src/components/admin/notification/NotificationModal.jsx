@@ -16,6 +16,7 @@ import {
   useGetProgramsByCitiesAndLanguages,
   useGetComponents,
   useGetAllAcademicYears,
+  useGetBatches,
 } from "@/store/useDropdownStore";
 import {
   useCreateAdminNotification,
@@ -65,12 +66,14 @@ const AudienceFilters = ({
   city, onCityChange,
   country, onCountryChange,
   program, onProgramChange,
+  batch, onBatchChange,
   component, onComponentChange,
   academicYear, onAcademicYearChange,
   languagesData,
   citiesData,
   countriesData,
   programsData,
+  batchesData,
   componentsData,
   academicYearsData,
 }) => (
@@ -92,6 +95,14 @@ const AudienceFilters = ({
         selected={program}
         onChange={onProgramChange}
         labelKey="displayName"
+      />
+    )}
+    {program && batchesData?.data?.length > 0 && (
+      <SinglePillGroup
+        label="Batch"
+        options={batchesData.data}
+        selected={batch}
+        onChange={onBatchChange}
       />
     )}
     {program && (
@@ -121,6 +132,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
   const [selectedComponent, setSelectedComponent] = useState("");
   const [selectedAcademicYear, setSelectedAcademicYear] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
@@ -129,6 +141,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const [scYear, setScYear] = useState("");
   const [scLanguage, setScLanguage] = useState("");
   const [scProgram, setScProgram] = useState("");
+  const [scBatch, setScBatch] = useState("");
   const [scComponent, setScComponent] = useState("");
   const [scAcademicYear, setScAcademicYear] = useState("");
   const [scCity, setScCity] = useState("");
@@ -136,9 +149,9 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const [previewCount, setPreviewCount] = useState(null);
 
-  const { data: countriesData } = useGetAllCountries({ status: "active" }, { enabled: open });
-  const { data: languagesData } = useGetAllLanguages({ status: "active" }, { enabled: open });
-  const { data: academicYearsData } = useGetAllAcademicYears({ status: true }, { enabled: open });
+  const { data: countriesData } = useGetAllCountries({ status: "active" }, { enabled: open && step === 2 });
+  const { data: languagesData } = useGetAllLanguages({ status: "active" }, { enabled: open && step === 2 });
+  const { data: academicYearsData } = useGetAllAcademicYears({ status: true }, { enabled: open && step === 2 });
 
   // Cascaded: cities filtered by selected country, programs by selected city or language
   const activeCountry = category === "notification" ? selectedCountry : scCountry;
@@ -148,15 +161,17 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const { data: citiesData } = useGetAllCities({
     status: "active",
     ...(activeCountry ? { country: activeCountry } : {}),
-  }, { enabled: open });
-  const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage, { enabled: open });
+  }, { enabled: open && step === 2 && !!activeCountry });
+  const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage, { enabled: open && step === 2 && (!!activeCity || !!activeLanguage) });
 
   const activeProgram = category === "notification" ? selectedProgram : scProgram;
+  const { data: batchesData } = useGetBatches(activeProgram, {}, { enabled: open && step === 2 && !!activeProgram });
+
   const { data: componentsData } = useGetComponents({
     program: activeProgram,
     type: "module",
     status: "active"
-  }, { enabled: open && !!activeProgram });
+  }, { enabled: open && step === 2 && !!activeProgram });
 
   const { register, trigger, getValues, reset, setValue, formState: { errors } } = useForm({
     defaultValues: { subject: "", expiry_date: "" },
@@ -168,7 +183,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   const currentUser = useAuthStore(state => state.user);
-  const { data: savedAudiencesData } = useGetSavedAudiences({ enabled: open });
+  const { data: savedAudiencesData } = useGetSavedAudiences({ enabled: open && step === 2 });
   const savedAudiences = savedAudiencesData?.data || [];
   const createSavedAudienceMutation = useCreateSavedAudience();
   const deleteSavedAudienceMutation = useDeleteSavedAudience();
@@ -178,9 +193,9 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const hasCurrentFilters = () => {
     if (category === "notification") {
-      return selectedYear || selectedLanguage || selectedProgram || selectedComponent || selectedAcademicYear || selectedCity || selectedCountry;
+      return selectedBatch || selectedYear || selectedLanguage || selectedProgram || selectedComponent || selectedAcademicYear || selectedCity || selectedCountry;
     } else {
-      return !isGlobal && (scYear || scLanguage || scProgram || scComponent || scAcademicYear || scCity || scCountry);
+      return !isGlobal && (scBatch || scYear || scLanguage || scProgram || scComponent || scAcademicYear || scCity || scCountry);
     }
   };
 
@@ -244,17 +259,17 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   const resetAll = () => {
     setStep(1); setPreviewCount(null); setIsGlobal(false);
-    setSelectedYear(""); setSelectedLanguage(""); setSelectedProgram(""); setSelectedComponent(""); setSelectedAcademicYear(""); setSelectedCity(""); setSelectedCountry("");
-    setScYear(""); setScLanguage(""); setScProgram(""); setScComponent(""); setScAcademicYear(""); setScCity(""); setScCountry("");
+    setSelectedYear(""); setSelectedLanguage(""); setSelectedProgram(""); setSelectedBatch(""); setSelectedComponent(""); setSelectedAcademicYear(""); setSelectedCity(""); setSelectedCountry("");
+    setScYear(""); setScLanguage(""); setScProgram(""); setScBatch(""); setScComponent(""); setScAcademicYear(""); setScCity(""); setScCountry("");
     setAttachments([]); setUploadStatus(""); setInlineImages([]);
   };
 
   // When country changes, clear city and program
   const handleCountryChange = (val) => {
     if (category === "notification") {
-      setSelectedCountry(val); setSelectedCity(""); setSelectedProgram(""); setSelectedComponent(""); setSelectedAcademicYear("");
+      setSelectedCountry(val); setSelectedCity(""); setSelectedProgram(""); setSelectedBatch(""); setSelectedComponent(""); setSelectedAcademicYear("");
     } else {
-      setScCountry(val); setScCity(""); setScProgram(""); setScComponent(""); setScAcademicYear("");
+      setScCountry(val); setScCity(""); setScProgram(""); setScBatch(""); setScComponent(""); setScAcademicYear("");
     }
   };
 
@@ -270,17 +285,17 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   // When language changes, clear program and component
   const handleLanguageChange = (val) => {
     if (category === "notification") {
-      setSelectedLanguage(val); setSelectedProgram(""); setSelectedComponent("");
+      setSelectedLanguage(val); setSelectedProgram(""); setSelectedBatch(""); setSelectedComponent("");
     } else {
-      setScLanguage(val); setScProgram(""); setScComponent("");
+      setScLanguage(val); setScProgram(""); setScBatch(""); setScComponent("");
     }
   };
 
   const handleProgramChange = (val) => {
     if (category === "notification") {
-      setSelectedProgram(val); setSelectedComponent("");
+      setSelectedProgram(val); setSelectedBatch(""); setSelectedComponent("");
     } else {
-      setScProgram(val); setScComponent("");
+      setScProgram(val); setScBatch(""); setScComponent("");
     }
   }
 
@@ -301,6 +316,20 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
       setAttachments(notification?.attachments || []);
       setInlineImages([]);
       resetAll();
+
+      if (notification) {
+        if (notification.meta?.batch_id) {
+          if (notification.type === "student_corner") {
+            setScBatch(notification.meta.batch_id);
+            setIsGlobal(false);
+          } else {
+            setSelectedBatch(notification.meta.batch_id);
+          }
+        }
+        if (notification.filters) {
+          applySavedAudience(notification.filters);
+        }
+      }
     } else {
       reset({ subject: "", expiry_date: "" });
       setMessageContent("");
@@ -313,7 +342,12 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
 
   // Preview count — notification type
   useEffect(() => {
+    if (step !== 2) return;
     if (category !== "notification") return;
+    if (selectedBatch) {
+      previewMutation.mutate({ meta: { batch_id: selectedBatch } }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
+      return;
+    }
     const filters = {};
     if (selectedYear) filters.year = selectedYear;
     if (selectedProgram) filters.course = selectedProgram;
@@ -327,13 +361,18 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     } else {
       setPreviewCount(null);
     }
-  }, [selectedYear, selectedProgram, selectedComponent, selectedAcademicYear, selectedCity, selectedCountry, selectedLanguage, category]);
+  }, [selectedYear, selectedProgram, selectedBatch, selectedComponent, selectedAcademicYear, selectedCity, selectedCountry, selectedLanguage, category, step]);
 
   // Preview count — student_corner type
   useEffect(() => {
+    if (step !== 2) return;
     if (category !== "student_corner") return;
     if (isGlobal) {
       previewMutation.mutate({ filters: {} }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
+      return;
+    }
+    if (scBatch) {
+      previewMutation.mutate({ meta: { batch_id: scBatch } }, { onSuccess: (res) => setPreviewCount(res?.data?.count ?? null) });
       return;
     }
     const filters = {};
@@ -349,7 +388,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
     } else {
       setPreviewCount(null);
     }
-  }, [scYear, scProgram, scComponent, scAcademicYear, scCity, scCountry, scLanguage, isGlobal, category]);
+  }, [scYear, scProgram, scBatch, scComponent, scAcademicYear, scCity, scCountry, scLanguage, isGlobal, category, step]);
 
   const handleNext = async () => {
     if (step === 1) { setStep(2); return; }
@@ -456,7 +495,14 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
       if (selectedCity) filters.city = selectedCity;
       if (selectedCountry) filters.country = selectedCountry;
       if (selectedLanguage) filters.language = selectedLanguage;
-      payload = { subject: data.subject, message: finalMessageContent, attachments: finalAttachments, type: "notification", status: "drafted", ...(Object.keys(filters).length ? { filters } : {}) };
+      payload = { 
+        subject: data.subject, 
+        message: finalMessageContent, 
+        attachments: finalAttachments, 
+        type: "notification", 
+        status: "drafted", 
+        ...(selectedBatch ? { meta: { batch_id: selectedBatch } } : Object.keys(filters).length ? { filters } : {}) 
+      };
     } else {
       const scFilters = {};
       if (scYear) scFilters.year = scYear;
@@ -473,7 +519,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
         attachments: finalAttachments,
         type: "student_corner",
         status: "drafted",
-        ...(!isGlobal && has_sc_filters ? { filters: scFilters } : {}),
+        ...(scBatch ? { meta: { batch_id: scBatch } } : !isGlobal && has_sc_filters ? { filters: scFilters } : {}),
         ...(data.expiry_date ? { expiry_date: data.expiry_date } : {}),
       };
     }
@@ -655,6 +701,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                       onCountryChange={handleCountryChange}
                       program={category === "notification" ? selectedProgram : scProgram}
                       onProgramChange={handleProgramChange}
+                      batch={category === "notification" ? selectedBatch : scBatch}
+                      onBatchChange={category === "notification" ? setSelectedBatch : setScBatch}
                       component={category === "notification" ? selectedComponent : scComponent}
                       onComponentChange={category === "notification" ? setSelectedComponent : setScComponent}
                       academicYear={category === "notification" ? selectedAcademicYear : scAcademicYear}
@@ -663,6 +711,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                       citiesData={citiesData}
                       countriesData={countriesData}
                       programsData={programsData}
+                      batchesData={batchesData}
                       componentsData={componentsData}
                       academicYearsData={academicYearsData}
                     />
