@@ -1,4 +1,5 @@
 import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults, getBatchYearLog, recalculateYearCompletion } from "@/api/batchApi";
+import { markStudentAsFailed } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -100,6 +101,25 @@ export const useRecalculateYearCompletion = () => {
     onError: (error) => {
       queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
       toast.error(error?.message || "Failed to recalculate year completion");
+    },
+  });
+};
+
+export const useMarkStudentAsFailed = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ applicationId, reason }) =>
+      markStudentAsFailed(applicationId, { reason }),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      toast.success(response?.message || "Student marked as failed successfully!");
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
+      toast.error(error?.message || "Failed to mark student as failed");
     },
   });
 };

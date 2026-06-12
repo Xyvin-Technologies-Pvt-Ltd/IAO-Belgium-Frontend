@@ -23,6 +23,16 @@ const statusVariants = {
   sent: "text-green-600",
   closed: "text-red-500",
   open: "text-green-600",
+  re_enrolled: "text-blue-600",
+
+  // Year Completion logs
+  validation_check: "text-blue-600",
+  validation_failed: "text-red-600",
+  year_promoted: "text-green-600",
+  manual_override: "text-purple-600",
+  year_marked_failed: "text-red-600",
+  year_re_enrolled: "text-blue-600",
+  course_completed: "text-green-600",
 
   // Submission statuses
   submitted: "text-blue-600",
@@ -87,6 +97,22 @@ const StatusBadge = ({ status }) => {
     displayText = "Not Started";
   } else if (status === "archived") {
     displayText = "Archived";
+  } else if (status === "validation_check") {
+    displayText = "Validation Check";
+  } else if (status === "validation_failed") {
+    displayText = "Validation Failed";
+  } else if (status === "year_promoted") {
+    displayText = "Promoted";
+  } else if (status === "manual_override") {
+    displayText = "Manual Override";
+  } else if (status === "year_marked_failed") {
+    displayText = "Failed";
+  } else if (status === "year_re_enrolled") {
+    displayText = "Re-enrolled";
+  } else if (status === "course_completed") {
+    displayText = "Course Completed";
+  } else if (status === "re_enrolled") {
+    displayText = "Re-enrolled";
   } else {
     displayText = status;
   }

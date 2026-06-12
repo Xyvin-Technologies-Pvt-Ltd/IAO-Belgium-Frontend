@@ -12,11 +12,19 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetBatchYearLog, useRecalculateYearCompletion } from "@/store/useBatchStore";
+import { useGetBatchYearLog, useRecalculateYearCompletion, useMarkStudentAsFailed } from "@/store/useBatchStore";
 import { formatTZ, getMoment } from "@/utils/dateUtils";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const BatchYearLog = () => {
   const params = useParams({ strict: false });
@@ -34,12 +42,31 @@ const BatchYearLog = () => {
   );
 
   const recalculateMutation = useRecalculateYearCompletion();
+  const markFailedMutation = useMarkStudentAsFailed();
+
+  const [failedLog, setFailedLog] = useState(null);
+  const [reason, setReason] = useState("");
 
   const logs = data?.data || [];
   const totalRows = data?.total_count || 0;
 
   const handleRecalculate = (application_id) => {
     recalculateMutation.mutate(application_id);
+  };
+
+  const handleMarkFailed = async () => {
+    if (!failedLog) return;
+    try {
+      await markFailedMutation.mutateAsync({
+        applicationId: failedLog.application._id,
+        reason: reason,
+      });
+      setFailedLog(null);
+      setReason("");
+      refetch();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -50,6 +77,7 @@ const BatchYearLog = () => {
             <TableRow className="bg-muted/50">
               <TableHead>{t("batchManagement.table.student")}</TableHead>
               <TableHead className="text-center">{t("batchManagement.yearLog.year")}</TableHead>
+              <TableHead className="text-center">{t("batchManagement.yearLog.yearStatus", "Year Status")}</TableHead>
               <TableHead className="text-center">{t("batchManagement.yearLog.action")}</TableHead>
               <TableHead className="text-center">{t("batchManagement.yearLog.source")}</TableHead>
               <TableHead>{t("batchManagement.yearLog.details")}</TableHead>
@@ -61,10 +89,10 @@ const BatchYearLog = () => {
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={7} />
+              <TableSkeleton rows={rowsPerPage} columns={8} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center p-8">
+                <TableCell colSpan={8} className="text-center p-8">
                   <ErrorMessage
                     message={
                       error?.message || t("batchManagement.messages.loadFailed")
@@ -85,6 +113,9 @@ const BatchYearLog = () => {
                     {log.year}
                   </TableCell>
                   <TableCell className="text-center">
+                    <StatusBadge status={log.application?.year_status || "active"} />
+                  </TableCell>
+                  <TableCell className="text-center">
                     <StatusBadge status={log.action} />
                   </TableCell>
                   <TableCell className="text-center">
@@ -98,15 +129,31 @@ const BatchYearLog = () => {
                   </TableCell>
                   <TableCell className="text-center">
                     {log.application?.user?.current_year === log.year ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleRecalculate(log.application._id)}
-                        disabled={recalculateMutation.isPending}
-                        title={t("batchManagement.yearLog.recalculate")}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleRecalculate(log.application._id)}
+                          disabled={recalculateMutation.isPending}
+                          title={t("batchManagement.yearLog.recalculate")}
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                        {log.action === "validation_failed" && log.application?.year_status === "active" && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              setFailedLog(log);
+                              setReason("");
+                            }}
+                            disabled={markFailedMutation.isPending}
+                            title={t("batchManagement.yearLog.markFailed", "Mark as Failed")}
+                          >
+                            <span className="text-xs px-1 font-semibold">{t("batchManagement.yearLog.markFailed", "Mark Failed")}</span>
+                          </Button>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-muted-foreground">{t("common.dash")}</span>
                     )}
@@ -115,7 +162,7 @@ const BatchYearLog = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
                   {t("batchManagement.yearLog.noLogs")}
                 </TableCell>
               </TableRow>
@@ -133,6 +180,59 @@ const BatchYearLog = () => {
           totalRows={totalRows}
         />
       )}
+
+      <Dialog open={!!failedLog} onOpenChange={(open) => !open && setFailedLog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-semibold text-destructive">
+              {t("batchManagement.modal.markFailed.title", "Mark Student as Failed")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("batchManagement.yearLog.markFailedConfirm", "Are you sure? This will mark the student as failed for this academic year, allowing them to be re-enrolled into a different batch.")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="bg-muted p-3 rounded-md text-sm space-y-1">
+              <div>
+                <span className="font-medium text-muted-foreground">{t("batchManagement.modal.moveStudent.studentName", "Student")}: </span>
+                <span className="font-semibold capitalize">
+                  {failedLog?.application?.user?.last_name} {failedLog?.application?.user?.first_name}
+                </span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">{t("batchManagement.yearLog.year", "Year")}: </span>
+                <span className="font-semibold">{failedLog?.year}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("batchManagement.yearLog.markFailedReason", "Reason (optional)")}
+              </label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder={t("batchManagement.yearLog.markFailedReasonPlaceholder", "Enter reason for failing...")}
+                className="w-full min-h-[80px] px-3 py-2 border rounded-md text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFailedLog(null)} disabled={markFailedMutation.isPending}>
+              {t("batchManagement.modal.reEnrollStudent.cancel", "Cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleMarkFailed}
+              disabled={markFailedMutation.isPending}
+            >
+              {markFailedMutation.isPending ? t("common.processing", "Processing...") : t("batchManagement.yearLog.markFailed", "Mark as Failed")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

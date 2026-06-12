@@ -708,6 +708,22 @@
         "move": "Move Student",
         "moving": "Moving...",
         "loadBatchesFailed": "Failed to load groups"
+      },
+      "reEnrollStudent": {
+        "title": "Re-enroll Student",
+        "description": "Move student to a new intake and reset their failed year",
+        "failedYear": "Failed Year",
+        "selectIntake": "Select Target Intake",
+        "selectBatch": "Select Target Batch",
+        "reason": "Reason (optional)",
+        "reasonPlaceholder": "Enter reason for re-enrollment...",
+        "warningTitle": "Payment Reset Warning",
+        "warningMessage": "All module payments for the failed year will be canceled. The student must re-purchase all modules.",
+        "confirm": "Re-enroll Student",
+        "confirming": "Processing...",
+        "cancel": "Cancel",
+        "noIntakes": "No Intakes Available",
+        "noBatches": "No Batches in this Intake"
       }
     },
     "actions": {
@@ -717,7 +733,8 @@
       "cancel": "Cancel",
       "creating": "Creating...",
       "createBatch": "Create Group",
-      "moveToAnotherBatch": "Move to another group"
+      "moveToAnotherBatch": "Move to another group",
+      "reEnrollStudent": "Re-enroll for Failed Year"
     },
     "yearLog": {
       "year": "Year",
@@ -727,7 +744,12 @@
       "date": "Date",
       "actions": "Actions",
       "recalculate": "Recalculate year completion",
-      "noLogs": "No year completion logs found for this group."
+      "noLogs": "No year completion logs found for this group.",
+      "yearStatus": "Year Status",
+      "markFailed": "Mark Failed",
+      "markFailedConfirm": "Are you sure? This will mark the student as failed for this academic year, allowing them to be re-enrolled into a different batch.",
+      "markFailedReason": "Reason (optional)",
+      "markFailedReasonPlaceholder": "Enter reason for failing..."
     }
   },
   "studentManagement": {
