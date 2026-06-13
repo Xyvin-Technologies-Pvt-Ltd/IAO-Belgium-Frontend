@@ -180,7 +180,7 @@
       "subtitle": "All your programmes, progress, and updates in one place."
     },
     "deleteConfirm": {
-      "title": "Delete Confirmation",
+      "title": "Delete confirmation",
       "message": "Are you sure you want to delete {{count}} {{data}}? {{cannotUndo}}",
       "cannotUndo": "This action cannot be undone.",
       "cancel": "Cancel",
@@ -188,7 +188,7 @@
       "deleting": "Deleting..."
     },
     "sendConfirm": {
-      "title": "Send Notification",
+      "title": "Send notification",
       "message": "This will send the notification to all recipients immediately. This action cannot be undone.",
       "send": "Send",
       "sending": "Sending...",
@@ -209,17 +209,17 @@
     },
     "filters": {
       "title": "Filters",
-      "filterReports": "Filter Reports",
-      "filterCityReports": "Filter City Reports",
+      "filterReports": "Filter reports",
+      "filterCityReports": "Filter city reports",
       "narrowDownPayments": "Narrow down the payments list",
       "narrowDownCityAnalytics": "Narrow down the city analytics",
-      "allStatuses": "All Statuses",
-      "allPurposes": "All Purposes",
+      "allStatuses": "All statuses",
+      "allPurposes": "All purposes",
       "dateRange": "Date Range",
       "from": "From",
       "to": "To",
-      "clearAll": "Clear All",
-      "applyFilters": "Apply Filters"
+      "clearAll": "Clear all",
+      "applyFilters": "Apply filters"
     },
     "purposes": {
       "admissionFee": "Admission Fee",
@@ -262,7 +262,7 @@
         "searchStudent": "Search for a student...",
         "invoiceTitle": "Invoice Title / Description",
         "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
-        "submit": "Create Custom Invoice"
+        "submit": "Create custom invoice"
       },
       "customInvoices": {
         "title": "Custom Invoices"
@@ -340,18 +340,18 @@
       "action": "Action",
       "view": "View",
       "edit": "Edit",
-      "noCountries": "No Countries found"
+      "noCountries": "No countries found"
     },
     "messages": {
       "loadFailed": "Failed to load countries"
     },
     "modal": {
-      "createTitle": "Create a new Country",
+      "createTitle": "Create a new country",
       "editTitle": "Edit Country",
       "createSubtitle": "Let's create a new country",
       "editSubtitle": "Update the country details",
       "nameLabel": "Name",
-      "namePlaceholder": "Enter Country Name",
+      "namePlaceholder": "Enter country name",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter Description",
       "codeLabel": "Country Code",
@@ -375,20 +375,20 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noCities": "No Cities found"
+      "noCities": "No cities found"
     },
     "messages": {
       "loadFailed": "Failed to load cities"
     },
     "modal": {
-      "createTitle": "Create a new City",
+      "createTitle": "Create a new city",
       "editTitle": "Edit City",
       "createSubtitle": "Let's create a new city",
       "editSubtitle": "Update the city details",
       "nameLabel": "City Name",
       "namePlaceholder": "Enter city name",
       "countryLabel": "Country",
-      "countryPlaceholder": "Select Country",
+      "countryPlaceholder": "Select country",
       "timeSlotsLabel": "Time Slots",
       "startTimeLabel": "Start Time",
       "endTimeLabel": "End Time",
@@ -410,18 +410,18 @@
       "action": "Action",
       "view": "View",
       "edit": "Edit",
-      "noRoles": "No Roles found"
+      "noRoles": "No roles found"
     },
     "messages": {
       "loadFailed": "Failed to load roles"
     },
     "modal": {
-      "createTitle": "Create a new Role",
+      "createTitle": "Create a new role",
       "editTitle": "Edit Role",
       "createSubtitle": "Let's create a new role",
       "editSubtitle": "Update the role details",
       "nameLabel": "Name",
-      "namePlaceholder": "Enter Role Name",
+      "namePlaceholder": "Enter role name",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter Description",
       "permissionsLabel": "Permissions",
@@ -453,13 +453,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noLanguages": "No Languages found"
+      "noLanguages": "No languages found"
     },
     "messages": {
       "loadFailed": "Failed to load languages"
     },
     "modal": {
-      "createTitle": "Create a new Language",
+      "createTitle": "Create a new language",
       "editTitle": "Edit Language",
       "createSubtitle": "Let's create a new language",
       "editSubtitle": "Update the language details",
@@ -484,13 +484,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noPrograms": "No Programmes found"
+      "noPrograms": "No programmes found"
     },
     "messages": {
       "loadFailed": "Failed to load programmes"
     },
     "modal": {
-      "createTitle": "Create a new Programme",
+      "createTitle": "Create a new programme",
       "editTitle": "Edit Programme",
       "createSubtitle": "Let's create a new programme",
       "editSubtitle": "Update the programme details",
@@ -538,13 +538,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noIntakes": "No Intakes found"
+      "noIntakes": "No intakes found"
     },
     "messages": {
       "loadFailed": "Failed to load intakes"
     },
     "modal": {
-      "createTitle": "Create a new Intake",
+      "createTitle": "Create a new intake",
       "editTitle": "Edit Intake",
       "nameLabel": "Intake Name",
       "namePlaceholder": "Enter intake name",
@@ -559,8 +559,8 @@
       "registrationDeadlineLabel": "Registration Deadline",
       "studentsPerBatchLabel": "Students Per Group",
       "studentsPerBatchPlaceholder": "Enter students per group",
-      "maxStudentEnrollmentLabel": "Max Student Enrollment",
-      "maxStudentEnrollmentPlaceholder": "Enter max enrollment",
+      "maxStudentEnrollmentLabel": "Max student enrolment",
+      "maxStudentEnrollmentPlaceholder": "Enter max enrolment",
       "searchPrograms": "Search programmes..."
     },
     "details": {
@@ -568,10 +568,10 @@
       "loadFailed": "Failed to load enrollment details",
       "tabs": {
         "batches": "Groups",
-        "enrollments": "Enrollments"
+        "enrollments": "Enrolments"
       },
       "cards": {
-        "totalEnrollments": "Total Enrollments",
+        "totalEnrollments": "Total enrolments",
         "totalBatches": "Total Groups",
         "startDate": "Start Date",
         "endDate": "End Date"
@@ -610,22 +610,22 @@
       "phone": "Phone",
       "roleName": "Role Name",
       "status": "Status",
-      "noAdmins": "No Admins found"
+      "noAdmins": "No admins found"
     },
     "messages": {
       "loadFailed": "Failed to load admins"
     },
     "modal": {
-      "createTitle": "Create a new Admin",
+      "createTitle": "Create a new admin",
       "createSubtitle": "Let's create a new admin",
       "firstNameLabel": "First Name",
-      "firstNamePlaceholder": "Enter First Name",
+      "firstNamePlaceholder": "Enter first name",
       "lastNameLabel": "Last Name",
-      "lastNamePlaceholder": "Enter Last Name",
+      "lastNamePlaceholder": "Enter last name",
       "emailLabel": "Email",
-      "emailPlaceholder": "Enter Email",
+      "emailPlaceholder": "Enter email",
       "phoneLabel": "Phone",
-      "phonePlaceholder": "Enter Phone",
+      "phonePlaceholder": "Enter phone",
       "roleLabel": "Role",
       "rolePlaceholder": "Select a role",
       "loadingRoles": "Loading roles...",
@@ -652,7 +652,7 @@
       "percentage": "Percentage",
       "result": "Result",
       "submittedAt": "Submitted At",
-      "noBatches": "No Groups found",
+      "noBatches": "No groups found",
       "noStudents": "No students found",
       "noResults": "No exam results found for this group.",
       "unnamedExam": "Unnamed Exam"
@@ -681,7 +681,7 @@
         "program": "Programme"
       },
       "info": {
-        "title": "Group Information",
+        "title": "Group information",
         "intakeName": "Intake Name",
         "program": "Programme",
         "capacity": "Capacity",
@@ -694,7 +694,7 @@
       "batchLabel": "Group",
       "batchPlaceholder": "Select group",
       "moveStudent": {
-        "title": "Move Student to Another Group",
+        "title": "Move student to another group",
         "description": "Review the student details and choose a new group to continue.",
         "studentId": "Student ID",
         "studentName": "Student Name",
@@ -769,7 +769,7 @@
       "batch": "Group",
       "enrolledDate": "Enrolled Date",
       "status": "Status",
-      "noStudents": "No Students found"
+      "noStudents": "No students found"
     },
     "messages": {
       "loadFailed": "Failed to load students"
@@ -815,13 +815,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noAcademics": "No Academic Years found"
+      "noAcademics": "No academic years found"
     },
     "messages": {
       "loadFailed": "Failed to load academic years"
     },
     "modal": {
-      "createTitle": "Create a new Academic Year",
+      "createTitle": "Create a new academic year",
       "editTitle": "Edit Academic Year",
       "nameLabel": "Academic Year Name",
       "namePlaceholder": "Auto-filled from start and end dates",
@@ -858,7 +858,7 @@
       "paymentStatus": "Payment Status",
       "status": "Status",
       "action": "Action",
-      "noApplications": "No Applications found"
+      "noApplications": "No applications found"
     },
     "messages": {
       "loadFailed": "Failed to load applications"
@@ -880,13 +880,13 @@
       "remarksPlaceholder": "Enter any remarks to add before forwarding",
       "processing": "Processing...",
       "reject": "Reject",
-      "waitlist": "On Progress",
+      "waitlist": "In progress",
       "accept": "Accept"
     },
     "status": {
       "pending": "Pending",
       "drafted": "Drafted",
-      "waitlisted": "On Progress",
+      "waitlisted": "In progress",
       "resubmitted": "Resubmitted",
       "approved": "Approved",
       "rejected": "Rejected"
@@ -932,13 +932,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noTitles": "No Lecturer Titles found"
+      "noTitles": "No lecturer titles found"
     },
     "messages": {
       "loadFailed": "Failed to load lecturer titles"
     },
     "modal": {
-      "createTitle": "Create a new Lecturer Title",
+      "createTitle": "Create a new lecturer title",
       "editTitle": "Edit Lecturer Title",
       "createSubtitle": "Let's create a new lecturer title",
       "editSubtitle": "Update the lecturer title details",
@@ -964,13 +964,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noRoles": "No Lecturer Roles found"
+      "noRoles": "No lecturer roles found"
     },
     "messages": {
       "loadFailed": "Failed to load lecturer roles"
     },
     "modal": {
-      "createTitle": "Create a new Lecturer Role",
+      "createTitle": "Create a new lecturer role",
       "editTitle": "Edit Lecturer Role",
       "createSubtitle": "Let's create a new lecturer role",
       "editSubtitle": "Update the lecturer role details",
@@ -997,13 +997,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noTeachers": "No Lecturers found"
+      "noTeachers": "No lecturers found"
     },
     "messages": {
       "loadFailed": "Failed to load lecturers"
     },
     "modal": {
-      "createTitle": "Create a new Lecturer",
+      "createTitle": "Create a new lecturer",
       "editTitle": "Edit Lecturer",
       "createSubtitle": "Let's create a new lecturer",
       "editSubtitle": "Update the lecturer details",
@@ -1151,7 +1151,7 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noPlannings": "No Plannings found"
+      "noPlannings": "No plannings found"
     },
     "messages": {
       "loadFailed": "Failed to load plannings"
@@ -1164,7 +1164,7 @@
       "reject": "Reject"
     },
     "modal": {
-      "createTitle": "Create a new Planning",
+      "createTitle": "Create a new planning",
       "editTitle": "Edit Planning",
       "createSubtitle": "Let's create a new planning",
       "editSubtitle": "Update the planning details",
@@ -1225,16 +1225,16 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "ongoingCourses": "Ongoing Programmes",
-    "finishedCourses": "Finished Programmes",
-    "courseEnrollmentTrend": "Programme Enrollment Trend",
+    "ongoingCourses": "Ongoing programmes",
+    "finishedCourses": "Finished programmes",
+    "courseEnrollmentTrend": "Programme enrolment trend",
     "comparedToLastMonth": "{{percent}} compared to last month"
   },
   "exam": {
     "title": "Exams",
     "search": "Search exams...",
-    "createExam": "Create Exam",
-    "editExam": "Edit Exam",
+    "createExam": "Create exam",
+    "editExam": "Edit exam",
     "createSubtitle": "Fill in the exam details",
     "editSubtitle": "Update the exam details",
     "loading": "Loading exam...",
@@ -1264,7 +1264,7 @@
       "edit": "Edit",
       "publish": "Publish",
       "archive": "Archive",
-      "noExams": "No Exams found"
+      "noExams": "No exams found"
     },
     "messages": {
       "loadFailed": "Failed to load exams"
@@ -1306,8 +1306,8 @@
     }
   },
   "componentManagement": {
-    "createTitle": "Create Programme Module",
-    "editTitle": "Edit Programme Module",
+    "createTitle": "Create programme module",
+    "editTitle": "Edit programme module",
     "typeLabel": "Type",
     "typePlaceholder": "Select type",
     "nameLabel": "Name",
@@ -1409,7 +1409,7 @@
       "action": "Action",
       "edit": "Edit",
       "delete": "Delete",
-      "noQuestionBanks": "No Question Banks found"
+      "noQuestionBanks": "No question banks found"
     },
     "questionList": {
       "addQuestion": "Add Question",
@@ -1422,7 +1422,7 @@
       "edit": "Edit",
       "delete": "Delete",
       "noQuestionBanks": "No Question Banks found",
-      "noQuestions": "No Questions Found"
+      "noQuestions": "No questions found"
     },
     "form": {
       "name": "Name",
@@ -1488,11 +1488,11 @@
     "otpSentInstructions": "Enter the 6-digit code sent to your email address",
     "toast": {
       "emailRequired": "Please enter your email address",
-      "otpSentSuccess": "OTP sent to your email!",
-      "otpSentError": "Failed to send OTP. Please try again.",
-      "otpRequired": "Please enter OTP",
+      "otpSentSuccess": "Login code sent to your email!",
+      "otpSentError": "Failed to send Login code. Please try again.",
+      "otpRequired": "Please enter Login code",
       "loginSuccess": "Successfully logged in!",
-      "otpInvalid": "Invalid OTP. Please try again."
+      "otpInvalid": "Invalid Login code. Please try again."
     }
   },
   "resultsManagement": {
@@ -1504,13 +1504,13 @@
     "filterSubtitle": "Narrow down student exam results",
     "failedOnly": "Failed Only",
     "filter": {
-      "program": "Program",
-      "programPlaceholder": "All Programs",
-      "programSearchPlaceholder": "Search programs...",
-      "batch": "Batch",
-      "batchPlaceholder": "All Batches",
-      "batchPlaceholderDisabled": "Select a Program First",
-      "batchSearchPlaceholder": "Search batches...",
+      "program": "Programme",
+      "programPlaceholder": "All programmes",
+      "programSearchPlaceholder": "Search programmes...",
+      "batch": "Group",
+      "batchPlaceholder": "All groups",
+      "batchPlaceholderDisabled": "Select a programme first",
+      "batchSearchPlaceholder": "Search groups...",
       "academic": "Academic Year",
       "academicPlaceholder": "All Academic Years",
       "exam": "Exam",
@@ -1521,8 +1521,8 @@
     "table": {
       "student": "Student",
       "uid": "UID",
-      "program": "Program",
-      "batch": "Batch",
+      "program": "Programme",
+      "batch": "Group",
       "academic": "Academic Year",
       "exam": "Exam",
       "score": "Score",
@@ -1595,7 +1595,7 @@
   },
   "lti": {
     "platformConfig": {
-      "title": "LTI Platform Configuration",
+      "title": "LTI platform configuration",
       "subtitle": "Share these values with Enatom to register the HUB as a trusted platform.",
       "exportJson": "Export JSON",
       "issuer": "Issuer (iss)",
@@ -1608,8 +1608,8 @@
       "copyToClipboard": "Copy to clipboard"
     },
     "registerTool": {
-      "createTitle": "Register LTI Tool",
-      "editTitle": "Edit LTI Tool",
+      "createTitle": "Register LTI tool",
+      "editTitle": "Edit LTI tool",
       "createSubtitle": "Add a new LTI 1.3 external tool (e.g. Enatom)",
       "editSubtitle": "Update the LTI 1.3 tool credentials",
       "nameLabel": "Tool Name",
@@ -1638,8 +1638,8 @@
   },
   "notification": {
     "modal": {
-      "createTitle": "Create Notification",
-      "editTitle": "Edit Notification",
+      "createTitle": "Create notification",
+      "editTitle": "Edit notification",
       "createSubtitle": "Draft a new notification",
       "editSubtitle": "Update the notification details",
       "subjectLabel": "Subject",
