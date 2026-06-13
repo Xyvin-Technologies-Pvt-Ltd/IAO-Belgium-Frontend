@@ -1,13 +1,13 @@
 {
   "header": {
     "location": "Locatie",
-    "locationValue": "Nederland",
+    "locationValue": "{{value}}",
     "nav": {
       "dashboard": "Dashboard",
-      "myCourses": "Mijn Opleidingen",
+      "myCourses": "Mijn opleidingen",
       "myApp": "Mijn APP",
       "invoices": "Facturen",
-      "assessment": "Beoordeling"
+      "assessment": "Toetsing"
     },
     "dropdown": {
       "profile": "Profiel",
@@ -19,50 +19,50 @@
   "sidebar": {
     "logo": "IAO Back office",
     "teacher": {
-      "title": "Docenten Dashboard",
+      "title": "Docentenportaal",
       "main": "Hoofd",
       "operations": "Operaties",
       "dashboard": "Dashboard",
       "schedules": "Roosters",
       "planning": "Planning",
-      "evaluations": "Feedback",
+      "evaluations": "Evaluaties",
       "exams": "Examens",
       "otherExams": "Overige examens"
     },
     "admin": {
-      "title": "Admin Dashboard",
+      "title": "Beheerdersportaal",
       "main": "Hoofd",
       "operations": "Operaties",
-      "academicManagement": "Academisch Beheer",
-      "financeManagement": "Financieel Beheer",
+      "academicManagement": "Academisch beheer",
+      "financeManagement": "Financieel beheer",
       "masterData": "Stamgegevens",
       "settings": "Instellingen",
       "dashboard": "Dashboard",
-      "programAdministration": "Programma Administratie",
+      "programAdministration": "Opleidingsbeheer",
       "locations": "Locaties",
       "languages": "Talen",
-      "specialExceptions": "Speciale Uitzonderingen",
-      "teacherQualifications": "Docentkwalificaties",
+      "specialExceptions": "Speciale uitzonderingen",
+      "teacherQualifications": "Kwalificaties docenten",
       "teacherData": "Docentgegevens",
       "admissionAdministration": "Toelatingsadministratie",
-      "applicationReview": "Candidaturen Beoordelen",
-      "academics": "Academische Jaren",
+      "applicationReview": "Beoordeling candidaturen",
+      "academics": "Academisch",
       "planning": "Planning",
-      "teacherManagement": "Docentbeheer",
-      "studentManagement": "Studentbeheer",
-      "financeReports": "Financiële Rapporten",
-      "adminManagement": "Admin Beheer",
-      "roleManagement": "Rollenbeheer",
-      "adminLogs": "Admin Logs",
-      "examination": "Examen",
+      "teacherManagement": "Docentenbeheer",
+      "studentManagement": "Studentenbeheer",
+      "financeReports": "Financiële rapporten",
+      "adminManagement": "Beheerdersbeheer",
+      "roleManagement": "Rolbeheer",
+      "adminLogs": "Beheerderslogboeken",
+      "examination": "Examens",
       "questionBanks": "Vragenbanken",
       "exams": "Examens",
       "results": "Resultaten",
-      "createInvoice": "Aangepaste factuur maken"
+      "createInvoice": "Factuur aanmaken"
     },
     "user": {
       "loading": "Laden...",
-      "noRole": "Geen rol",
+      "noRole": "Geen rol toegewezen",
       "signOut": "Afmelden"
     }
   },
@@ -88,19 +88,19 @@
     "deleted": "Verwijderd",
     "archived": "Gearchiveerd",
     "unknown": "Onbekend",
-    "notAvailable": "N/V",
+    "notAvailable": "N/B",
     "dash": "-",
     "document": "document",
     "today": "Vandaag",
     "more": "meer",
-    "tba": "TBA",
+    "tba": "Nader te bepalen",
     "view": "Bekijken",
     "download": "Downloaden",
     "loading": "Laden...",
     "teacher": "Docent",
     "student": "Student",
     "name": "Naam",
-    "email": "E-mail",
+    "email": "E-mailadres",
     "status": "Status",
     "file": "Bestand",
     "actions": "Acties",
@@ -110,26 +110,26 @@
     "searchCountries": "Landen zoeken...",
     "admissionAdministration": "Toelatingsadministratie",
     "academicYears": "Academische jaren",
-    "academics": "Academici",
+    "academics": "Academisch",
     "intakes": "Instroom",
     "intakeDetails": "Instroomdetails",
     "batchDetails": "Groepsdetails",
-    "mins": "minuten",
+    "mins": "min",
     "min": "min",
     "description": "Beschrijving:",
     "instructions": "Instructies:",
     "source": "Bron",
     "numberOfQuestions": "Aantal vragen",
     "viewFile": "Bestand bekijken",
-    "unknownType": "Onbekende {{type}}",
+    "unknownType": "Onbekend {{type}}",
     "noContracts": "Geen contracten gevonden",
     "noStudentContracts": "Geen studentcontracten gevonden",
     "searchContracts": "Contracten zoeken...",
-    "searchStudentNameEmail": "Zoeken op studentnaam of e-mail...",
+    "searchStudentNameEmail": "Zoeken op naam of e-mailadres student...",
     "allStatuses": "Alle statussen",
-    "chooseStatus": "Kies status",
+    "chooseStatus": "Status kiezen",
     "signed": "Ondertekend",
-    "pending": "In afwachting",
+    "pending": "In behandeling",
     "contract": "Contract",
     "version": "Versie",
     "signedAt": "Ondertekend op",
@@ -139,19 +139,19 @@
     "failedToLoadStudentContracts": "Laden van studentcontracten mislukt",
     "yearLog": "Jaarlogboek",
     "batch": "groep",
-    "exam": "Examen",
+    "exam": "examen",
     "searchCities": "Steden zoeken...",
     "searchLanguages": "Talen zoeken...",
     "searchTitles": "Academische graden zoeken...",
     "searchRoles": "Docentrollen zoeken...",
     "paymentId": "Betalings-ID",
-    "invoiceId": "Factuur ID",
-    "receiptId": "Ontvangstbewijs ID",
-    "downloadReceipt": "Kassabon downloaden",
-    "studentName": "Studentnaam",
-    "intake": "Intake",
+    "invoiceId": "Factuur-ID",
+    "receiptId": "Ontvangstbewijs-ID",
+    "downloadReceipt": "Ontvangstbewijs downloaden",
+    "studentName": "Naam student",
+    "intake": "Instroom",
     "program": "Opleiding",
-    "purpose": "Doeleinde",
+    "purpose": "Doel",
     "amount": "Bedrag",
     "date": "Datum",
     "trxCount": "Aantal transacties",
@@ -165,7 +165,7 @@
     "batchReports": "Groepsrapporten",
     "studentReports": "Studentrapporten",
     "financeReports": "Financiële rapporten",
-    "others": "Anderen",
+    "others": "Overige",
     "total": "Totaal",
     "noTimes": "Geen tijden",
     "noVenues": "Geen locaties",
@@ -177,21 +177,21 @@
     "welcome": {
       "back": "Welkom terug!",
       "backWithName": "Welkom terug, {{name}}!",
-      "subtitle": "Al je opleidingen, voortgang en updates op één plek."
+      "subtitle": "Al uw opleidingen, voortgang en updates op één plek."
     },
     "deleteConfirm": {
-      "title": "Bevestig verwijderen",
-      "message": "Weet je zeker dat je {{count}} {{data}} wilt verwijderen? {{cannotUndo}}",
+      "title": "Verwijdering bevestigen",
+      "message": "Weet u zeker dat u {{count}} {{data}} wilt verwijderen? {{cannotUndo}}",
       "cannotUndo": "Deze actie kan niet ongedaan worden gemaakt.",
       "cancel": "Annuleren",
       "delete": "Verwijderen",
       "deleting": "Verwijderen..."
     },
     "sendConfirm": {
-      "title": "Melding verzenden",
-      "message": "Dit verzendt de melding onmiddellijk naar alle ontvangers. Deze actie kan niet ongedaan worden gemaakt.",
-      "send": "Verzenden",
-      "sending": "Verzenden...",
+      "title": "Melding versturen",
+      "message": "Hiermee wordt de melding onmiddellijk naar alle ontvangers verstuurd. Deze actie kan niet ongedaan worden gemaakt.",
+      "send": "Versturen",
+      "sending": "Versturen...",
       "cancel": "Annuleren"
     }
   },
@@ -201,7 +201,7 @@
       "totalRevenue": "Totale omzet",
       "totalTransactions": "Totaal aantal transacties",
       "paidTransactions": "Betaalde transacties",
-      "revenueBreakdown": "Omzetoverzicht",
+      "revenueBreakdown": "Omzet uitsplitsing",
       "revenueDistribution": "Omzetverdeling",
       "paymentStatus": "Betalingsstatus",
       "detailedData": "Gedetailleerde gegevens",
@@ -211,8 +211,8 @@
       "title": "Filters",
       "filterReports": "Rapporten filteren",
       "filterCityReports": "Stadsrapporten filteren",
-      "narrowDownPayments": "Betalingslijst verfijnen",
-      "narrowDownCityAnalytics": "Stadsanalyse verfijnen",
+      "narrowDownPayments": "Betalingslijst beperken",
+      "narrowDownCityAnalytics": "Stadsanalyse beperken",
       "allStatuses": "Alle statussen",
       "allPurposes": "Alle doeleinden",
       "dateRange": "Datumbereik",
@@ -222,7 +222,7 @@
       "applyFilters": "Filters toepassen"
     },
     "purposes": {
-      "admissionFee": "Inschrijfgeld",
+      "admissionFee": "Inschrijvingsgeld",
       "modulePurchase": "Module-aankoop",
       "customInvoice": "Aangepaste factuur"
     },
@@ -238,7 +238,7 @@
     "reports": {
       "all": {
         "title": "Alle rapporten",
-        "description": "Bekijk alle betalingstransacties"
+        "description": "Alle betalingstransacties bekijken"
       },
       "city": {
         "title": "Stadsrapporten",
@@ -257,12 +257,12 @@
         "description": "Betalingsanalyse per student"
       },
       "createInvoice": {
-        "title": "Aangepaste factuur maken",
-        "student": "Selecteer student",
-        "searchStudent": "Zoek naar een student...",
-        "invoiceTitle": "Factuurtitel / Beschrijving",
-        "titlePlaceholder": "bijv. Semesterkosten, Aanpassing studiebeurs",
-        "submit": "Aangepaste factuur maken"
+        "title": "Aangepaste factuur aanmaken",
+        "student": "Student selecteren",
+        "searchStudent": "Zoeken naar een student...",
+        "invoiceTitle": "Factuurtitel / omschrijving",
+        "titlePlaceholder": "bijv. Semester Fee, Scholarship Adjustment",
+        "submit": "Aangepaste factuur aanmaken"
       },
       "customInvoices": {
         "title": "Aangepaste facturen"
@@ -270,14 +270,14 @@
     }
   },
   "ltiManagement": {
-    "title": "LTI-tool beheer",
-    "subtitle": "Beheer LTI 1.3 externe tools geïntegreerd in de HUB",
+    "title": "LTI-beheer",
+    "subtitle": "Beheer externe LTI 1.3-tools die zijn geïntegreerd met het platform.",
     "registerTool": "Tool registreren",
     "table": {
       "name": "Naam",
-      "clientId": "Client ID",
-      "deploymentId": "Deployment ID",
-      "oidcLoginUrl": "OIDC Login URL",
+      "clientId": "Client-ID",
+      "deploymentId": "Deployment-ID",
+      "oidcLoginUrl": "OIDC-aanmeldings-URL",
       "active": "Actief",
       "actions": "Acties"
     },
@@ -287,14 +287,14 @@
       "deactivate": "Deactiveren"
     },
     "messages": {
-      "noTools": "Geen LTI-tools geregistreerd",
-      "clickToRegister": "Klik op \"Tool registreren\" om Enatom of een andere LTI 1.3 tool toe te voegen.",
+      "noTools": "Nog geen LTI-tools geregistreerd",
+      "clickToRegister": "Klik op \"Tool registreren\" om uw eerste externe tool toe te voegen.",
       "loadFailed": "Laden van LTI-tools mislukt"
     }
   },
   "userCard": {
-    "intake": "Intake",
-    "unknownUser": "Onbekende {{type}}"
+    "intake": "Instroom",
+    "unknownUser": "Onbekend {{type}}"
   },
   "calendar": {
     "session": "Sessie",
@@ -342,16 +342,16 @@
       "loadFailed": "Laden van landen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuw land aanmaken",
+      "createTitle": "Nieuw land aanmaken",
       "editTitle": "Land bewerken",
-      "createSubtitle": "Laten we een nieuw land aanmaken",
+      "createSubtitle": "Maak een nieuw land aan",
       "editSubtitle": "Landgegevens bijwerken",
       "nameLabel": "Naam",
-      "namePlaceholder": "Voer landnaam in",
+      "namePlaceholder": "Landnaam invoeren",
       "descriptionLabel": "Beschrijving",
-      "descriptionPlaceholder": "Voer een beschrijving in",
+      "descriptionPlaceholder": "Beschrijving invoeren",
       "codeLabel": "Landcode",
-      "codePlaceholder": "Voer landcode in (bijv. NL, BE, DE)",
+      "codePlaceholder": "Landcode invoeren (bijv. NL, BE, DE)",
       "currencyLabel": "Valuta",
       "currencyPlaceholder": "Selecteer een valuta",
       "statusLabel": "Actief",
@@ -377,16 +377,16 @@
       "loadFailed": "Laden van steden mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe stad aanmaken",
+      "createTitle": "Nieuwe stad aanmaken",
       "editTitle": "Stad bewerken",
-      "createSubtitle": "Laten we een nieuwe stad aanmaken",
+      "createSubtitle": "Maak een nieuwe stad aan",
       "editSubtitle": "Stadsgegevens bijwerken",
       "nameLabel": "Stadsnaam",
-      "namePlaceholder": "Voer stadsnaam in",
+      "namePlaceholder": "Stadsnaam invoeren",
       "countryLabel": "Land",
-      "countryPlaceholder": "Selecteer land",
-      "timeSlotsLabel": "Tijdsloten",
-      "startTimeLabel": "Starttijd",
+      "countryPlaceholder": "Land selecteren",
+      "timeSlotsLabel": "Tijdslots",
+      "startTimeLabel": "Begintijd",
       "endTimeLabel": "Eindtijd",
       "venuesLabel": "Locaties",
       "venueLabel": "Locatie",
@@ -394,14 +394,14 @@
     }
   },
   "roleManagement": {
-    "title": "Rollenbeheer",
+    "title": "Rolbeheer",
     "search": "Zoeken...",
     "delete": "Verwijderen",
     "createRole": "Rol aanmaken",
     "table": {
       "name": "Naam",
       "description": "Beschrijving",
-      "permissions": "Permissies",
+      "permissions": "Machtigingen",
       "status": "Status",
       "action": "Actie",
       "view": "Bekijken",
@@ -412,31 +412,31 @@
       "loadFailed": "Laden van rollen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe rol aanmaken",
+      "createTitle": "Nieuwe rol aanmaken",
       "editTitle": "Rol bewerken",
-      "createSubtitle": "Laten we een nieuwe rol aanmaken",
+      "createSubtitle": "Maak een nieuwe rol aan",
       "editSubtitle": "Rolgegevens bijwerken",
       "nameLabel": "Naam",
-      "namePlaceholder": "Voer rolnaam in",
+      "namePlaceholder": "Rolnaam invoeren",
       "descriptionLabel": "Beschrijving",
-      "descriptionPlaceholder": "Voer een beschrijving in",
-      "permissionsLabel": "Permissies",
+      "descriptionPlaceholder": "Beschrijving invoeren",
+      "permissionsLabel": "Machtigingen",
       "viewLabel": "Bekijken",
       "modifyLabel": "Wijzigen",
       "loadingDetails": "Rolgegevens laden..."
     },
     "view": {
       "title": "Rolweergave",
-      "subtitle": "Roldetails en permissies"
+      "subtitle": "Roldetails en machtigingen"
     },
     "permissions": {
-      "rolesManagement": "Rollenbeheer",
-      "adminManagement": "Admin Beheer",
-      "operationsManagement": "Operaties Beheer",
-      "academicManagement": "Academisch Beheer",
-      "financeManagement": "Financieel Beheer",
-      "masterDataManagement": "Stamgegevens Beheer",
-      "logsManagement": "Logs Beheer"
+      "rolesManagement": "Rolbeheer",
+      "adminManagement": "Beheerdersbeheer",
+      "operationsManagement": "Operationeel beheer",
+      "academicManagement": "Academisch beheer",
+      "financeManagement": "Financieel beheer",
+      "masterDataManagement": "Stamgegevensbeheer",
+      "logsManagement": "Logboekbeheer"
     }
   },
   "languageManagement": {
@@ -455,12 +455,12 @@
       "loadFailed": "Laden van talen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe taal aanmaken",
+      "createTitle": "Nieuwe taal aanmaken",
       "editTitle": "Taal bewerken",
-      "createSubtitle": "Laten we een nieuwe taal aanmaken",
+      "createSubtitle": "Maak een nieuwe taal aan",
       "editSubtitle": "Taalgegevens bijwerken",
       "nameLabel": "Taalnaam",
-      "namePlaceholder": "Voer taalnaam in"
+      "namePlaceholder": "Taalnaam invoeren"
     }
   },
   "programManagement": {
@@ -486,82 +486,82 @@
       "loadFailed": "Laden van opleidingen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe opleiding aanmaken",
+      "createTitle": "Nieuwe opleiding aanmaken",
       "editTitle": "Opleiding bewerken",
-      "createSubtitle": "Laten we een nieuwe opleiding aanmaken",
+      "createSubtitle": "Maak een nieuwe opleiding aan",
       "editSubtitle": "Opleidingsgegevens bijwerken",
-      "nameLabel": "Opleidingsnaam",
-      "namePlaceholder": "Voer opleidingsnaam in",
+      "nameLabel": "Naam opleiding",
+      "namePlaceholder": "Naam opleiding invoeren",
       "codeLabel": "Opleidingscode",
-      "codePlaceholder": "Voer code in",
-      "programTypeLabel": "Opleidingstype",
-      "programTypePlaceholder": "Selecteer opleidingstype",
+      "codePlaceholder": "Opleidingscode invoeren",
+      "programTypeLabel": "Type opleiding",
+      "programTypePlaceholder": "Type opleiding selecteren",
       "durationLabel": "Duur van de opleiding",
-      "durationPlaceholder": "Voer duur in jaren in (bijv. 1, 2, 3)",
+      "durationPlaceholder": "Duur in jaren invoeren (bijv. 1, 2, 3)",
       "languageLabel": "Taal",
-      "languagePlaceholder": "Selecteer taal",
+      "languagePlaceholder": "Taal selecteren",
       "countryLabel": "Land",
-      "countryPlaceholder": "Selecteer land",
+      "countryPlaceholder": "Land selecteren",
       "cityLabel": "Stad",
-      "cityPlaceholder": "Selecteer stad",
-      "cityPlaceholderDisabled": "Selecteer eerst het land",
+      "cityPlaceholder": "Stad selecteren",
+      "cityPlaceholderDisabled": "Selecteer eerst een land",
       "searchLanguages": "Talen zoeken...",
       "searchCountries": "Landen zoeken...",
       "searchCities": "Steden zoeken...",
       "programTypes": {
         "masterOfScience": "Master of Science",
-        "lateralEntry": "Master of Science (Zij-instroom)",
+        "lateralEntry": "Laterale instroom Master of Science",
         "diploma": "Diploma",
-        "manualTherapie": "Manuele Therapie",
-        "postAcademic": "Postacademische module"
+        "manualTherapie": "Manuele therapie",
+        "postAcademic": "Post-academische module"
       }
     }
   },
   "intakeManagement": {
-    "title": "Intakes",
+    "title": "Instroom",
     "search": "Zoeken...",
     "delete": "Verwijderen",
-    "createIntake": "Intake aanmaken",
+    "createIntake": "Instroom aanmaken",
     "table": {
       "name": "Naam",
       "program": "Opleiding",
       "city": "Stad",
       "language": "Taal",
-      "registrationFee": "Inschrijfgeld",
+      "registrationFee": "Inschrijvingsgeld",
       "startDate": "Startdatum",
       "endDate": "Einddatum",
-      "registrationDeadline": "Inschrijfdeadline",
+      "registrationDeadline": "Inschrijvingsdeadline",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
-      "noIntakes": "Geen intakes gevonden"
+      "noIntakes": "Geen instroom gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van intakes mislukt"
+      "loadFailed": "Laden van instroom mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe intake aanmaken",
-      "editTitle": "Intake bewerken",
-      "nameLabel": "Intakenaam",
-      "namePlaceholder": "Voer intakenaam in",
+      "createTitle": "Nieuwe instroom aanmaken",
+      "editTitle": "Instroom bewerken",
+      "nameLabel": "Naam instroom",
+      "namePlaceholder": "Naam instroom invoeren",
       "programLabel": "Opleiding",
-      "programPlaceholder": "Selecteer opleiding",
-      "registrationFeeLabel": "Inschrijfgeld",
-      "registrationFeePlaceholder": "Voer inschrijfgeld in",
-      "freeIntakeLabel": "Gratis Intake",
-      "freeIntakeDescription": "Inschakelen als er geen inschrijfgeld vereist is voor deze intake",
+      "programPlaceholder": "Opleiding selecteren",
+      "registrationFeeLabel": "Inschrijvingsgeld",
+      "registrationFeePlaceholder": "Inschrijvingsgeld invoeren",
+      "freeIntakeLabel": "Gratis instroom",
+      "freeIntakeDescription": "Activeer als voor deze instroom geen inschrijvingsgeld vereist is",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Einddatum",
-      "registrationDeadlineLabel": "Inschrijfdeadline",
+      "registrationDeadlineLabel": "Inschrijvingsdeadline",
       "studentsPerBatchLabel": "Studenten per groep",
-      "studentsPerBatchPlaceholder": "Voer studenten per groep in",
-      "maxStudentEnrollmentLabel": "Max studenten inschrijving",
-      "maxStudentEnrollmentPlaceholder": "Voer max inschrijving in",
+      "studentsPerBatchPlaceholder": "Aantal studenten per groep invoeren",
+      "maxStudentEnrollmentLabel": "Maximale inschrijving studenten",
+      "maxStudentEnrollmentPlaceholder": "Maximum inschrijving invoeren",
       "searchPrograms": "Opleidingen zoeken..."
     },
     "details": {
-      "loading": "Intake details laden...",
-      "loadFailed": "Laden van intake details mislukt",
+      "loading": "Instroomdetails laden...",
+      "loadFailed": "Laden van inschrijvingsdetails mislukt",
       "tabs": {
         "batches": "Groepen",
         "enrollments": "Inschrijvingen"
@@ -573,9 +573,9 @@
         "endDate": "Einddatum"
       },
       "badges": {
-        "intakeId": "Intake ID",
-        "registrationFee": "Inschrijfgeld",
-        "registrationDeadline": "Inschrijfdeadline"
+        "intakeId": "Instroom-ID",
+        "registrationFee": "Inschrijvingsgeld",
+        "registrationDeadline": "Inschrijvingsdeadline"
       }
     },
     "filters": {
@@ -585,43 +585,43 @@
       "language": "Taal",
       "allLanguages": "Alle talen",
       "location": "Locatie",
-      "countryHelper": "Land (Hulp)",
-      "selectCountryFirst": "Selecteer eerst een land om steden te filteren",
+      "countryHelper": "Land (hulpveld)",
+      "selectCountryFirst": "Selecteer een land om steden te filteren",
       "searchCountries": "Landen zoeken...",
       "city": "Stad",
       "allCities": "Alle steden",
       "searchCities": "Steden zoeken...",
       "clearAll": "Alles wissen",
       "applyFilters": "Filters toepassen",
-      "narrowDownIntakes": "Verfijn de lijst met intakes"
+      "narrowDownIntakes": "Instroomlijst beperken"
     }
   },
   "adminManagement": {
-    "title": "Admin Beheer",
+    "title": "Beheerdersbeheer",
     "search": "Zoeken...",
-    "createAdmin": "Admin aanmaken",
+    "createAdmin": "Beheerder aanmaken",
     "table": {
       "name": "Naam",
-      "email": "E-mail",
+      "email": "E-mailadres",
       "phone": "Telefoon",
       "roleName": "Rolnaam",
       "status": "Status",
-      "noAdmins": "Geen admins gevonden"
+      "noAdmins": "Geen beheerders gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van admins mislukt"
+      "loadFailed": "Laden van beheerders mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe admin aanmaken",
-      "createSubtitle": "Laten we een nieuwe admin aanmaken",
+      "createTitle": "Nieuwe beheerder aanmaken",
+      "createSubtitle": "Maak een nieuwe beheerder aan",
       "firstNameLabel": "Voornaam",
-      "firstNamePlaceholder": "Voer voornaam in",
+      "firstNamePlaceholder": "Voornaam invoeren",
       "lastNameLabel": "Achternaam",
-      "lastNamePlaceholder": "Voer achternaam in",
-      "emailLabel": "E-mail",
-      "emailPlaceholder": "Voer e-mail in",
+      "lastNamePlaceholder": "Achternaam invoeren",
+      "emailLabel": "E-mailadres",
+      "emailPlaceholder": "E-mailadres invoeren",
       "phoneLabel": "Telefoon",
-      "phonePlaceholder": "Voer telefoonnummer in",
+      "phonePlaceholder": "Telefoonnummer invoeren",
       "roleLabel": "Rol",
       "rolePlaceholder": "Selecteer een rol",
       "loadingRoles": "Rollen laden...",
@@ -633,10 +633,10 @@
     "title": "Groepsbeheer",
     "search": "Groepen zoeken...",
     "createBatch": "Groep aanmaken",
-    "createBatchConfirmation": "Weet je zeker dat je een nieuwe groep wilt aanmaken voor deze intake?",
+    "createBatchConfirmation": "Weet u zeker dat u een nieuwe groep wilt aanmaken voor deze instroom?",
     "searchStudent": "Studenten zoeken...",
     "table": {
-      "batchId": "Groep ID",
+      "batchId": "Groeps-ID",
       "batchName": "Groepsnaam",
       "capacity": "Capaciteit",
       "enrolled": "Ingeschreven",
@@ -658,8 +658,8 @@
       "loadResultsFailed": "Laden van resultaten mislukt"
     },
     "details": {
-      "loading": "Groepsgegevens laden...",
-      "loadFailed": "Laden van groepsgegevens mislukt",
+      "loading": "Groepsdetails laden...",
+      "loadFailed": "Laden van groepsdetails mislukt",
       "tabs": {
         "overview": "Overzicht",
         "students": "Studenten",
@@ -669,37 +669,37 @@
       "cards": {
         "enrolledStudents": "Ingeschreven studenten",
         "totalSessions": "Totaal sessies",
-        "completed": "Voltooid",
+        "completed": "Afgerond",
         "avgAttendance": "Gem. aanwezigheid"
       },
       "badges": {
-        "batchId": "Groep ID",
+        "batchId": "Groeps-ID",
         "program": "Opleiding"
       },
       "info": {
         "title": "Groepsinformatie",
-        "intakeName": "Intakenaam",
+        "intakeName": "Naam instroom",
         "program": "Opleiding",
         "capacity": "Capaciteit",
-        "intakeStartDate": "Intake startdatum",
-        "intakeEndDate": "Intake einddatum",
+        "intakeStartDate": "Startdatum instroom",
+        "intakeEndDate": "Einddatum instroom",
         "students": "Studenten"
       }
     },
     "modal": {
       "batchLabel": "Groep",
-      "batchPlaceholder": "Selecteer groep",
+      "batchPlaceholder": "Groep selecteren",
       "moveStudent": {
-        "title": "Student verplaatsen naar andere groep",
-        "description": "Bekijk de studentgegevens en kies een nieuwe groep om door te gaan.",
-        "studentId": "Student ID",
-        "studentName": "Studentnaam",
+        "title": "Student naar een andere groep verplaatsen",
+        "description": "Bekijk de studentgegevens en kies een nieuwe groep om verder te gaan.",
+        "studentId": "Student-ID",
+        "studentName": "Naam student",
         "currentBatch": "Huidige groep",
         "assignToBatch": "Toewijzen aan groep",
         "selectBatch": "Selecteer een groep",
         "noAvailableBatches": "Geen beschikbare groepen",
         "studentsCount": "studenten",
-        "warningMessage": "De student wordt verwijderd uit de huidige groep.",
+        "warningMessage": "De student wordt uit de huidige groep verwijderd.",
         "cancel": "Annuleren",
         "move": "Student verplaatsen",
         "moving": "Verplaatsen...",
@@ -713,7 +713,7 @@
       "cancel": "Annuleren",
       "creating": "Aanmaken...",
       "createBatch": "Groep aanmaken",
-      "moveToAnotherBatch": "Verplaatsen naar een andere groep"
+      "moveToAnotherBatch": "Naar een andere groep verplaatsen"
     },
     "yearLog": {
       "year": "Jaar",
@@ -722,26 +722,26 @@
       "details": "Details",
       "date": "Datum",
       "actions": "Acties",
-      "recalculate": "Herbereken jaarvoltooiing",
-      "noLogs": "Geen jaarvoltooiingslogs gevonden voor deze groep."
+      "recalculate": "Jaarafsluiting herberekenen",
+      "noLogs": "Geen jaarafsluitingslogs gevonden voor deze groep."
     }
   },
   "studentManagement": {
-    "title": "Studentbeheer",
+    "title": "Studentenbeheer",
     "search": "Studenten zoeken...",
     "table": {
       "uid": "UID",
-      "studentId": "Aanmeldings ID",
-      "studentName": "Studentnaam",
+      "studentId": "Candidatuur-ID",
+      "studentName": "Naam student",
       "name": "Naam",
-      "email": "E-mail",
+      "email": "E-mailadres",
       "phone": "Telefoon",
       "country": "Land",
       "city": "Stad",
       "previousEducation": "Vooropleiding",
       "program": "Opleiding",
       "batch": "Groep",
-      "enrolledDate": "Ingeschreven op",
+      "enrolledDate": "Inschrijvingsdatum",
       "status": "Status",
       "noStudents": "Geen studenten gevonden"
     },
@@ -749,7 +749,7 @@
       "loadFailed": "Laden van studenten mislukt"
     },
     "modal": {
-      "basicInfo": "Basisgegevens",
+      "basicInfo": "Basisinformatie",
       "phoneNumber": "Telefoonnummer",
       "emailAddress": "E-mailadres",
       "batch": "Groep",
@@ -757,8 +757,8 @@
       "country": "Land",
       "city": "Stad",
       "postalCode": "Postcode",
-      "studentId": "Student ID",
-      "enrolledDate": "Ingeschreven op",
+      "studentId": "Student-ID",
+      "enrolledDate": "Inschrijvingsdatum",
       "previousEducation": "Vooropleiding",
       "documents": "Documenten",
       "noDocuments": "Geen documenten beschikbaar",
@@ -777,7 +777,7 @@
     }
   },
   "academicManagement": {
-    "title": "Academisch Beheer",
+    "title": "Academisch beheer",
     "search": "Academische jaren zoeken...",
     "delete": "Verwijderen",
     "duplicate": "Dupliceren",
@@ -795,10 +795,10 @@
       "loadFailed": "Laden van academische jaren mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuw academisch jaar aanmaken",
+      "createTitle": "Nieuw academisch jaar aanmaken",
       "editTitle": "Academisch jaar bewerken",
       "nameLabel": "Naam academisch jaar",
-      "namePlaceholder": "Automatisch ingevuld op basis van de datums",
+      "namePlaceholder": "Automatisch ingevuld op basis van start- en einddatum",
       "startDateLabel": "Startdatum",
       "endDateLabel": "Einddatum",
       "registrationStartDateLabel": "Startdatum inschrijving",
@@ -806,7 +806,7 @@
     },
     "emptyState": {
       "title": "Nog geen academische jaren aangemaakt",
-      "subtitle": "Begin met het maken van een academisch jaar om opleidingen, groepen en toelatingen efficiënt te beheren."
+      "subtitle": "Begin met het aanmaken van een academisch jaar om opleidingen, groepen en toelatingen efficiënt te beheren."
     },
     "card": {
       "academicYear": "Academisch jaar",
@@ -817,12 +817,12 @@
     }
   },
   "applicationReview": {
-    "title": "Candidaturen Beoordelen",
+    "title": "Beoordeling candidaturen",
     "search": "Zoeken...",
     "table": {
       "uid": "UID",
       "name": "Naam",
-      "email": "E-mail",
+      "email": "E-mailadres",
       "phone": "Telefoon",
       "previousEducation": "Vooropleiding",
       "address": "Adres",
@@ -832,13 +832,13 @@
       "paymentStatus": "Betalingsstatus",
       "status": "Status",
       "action": "Actie",
-      "noApplications": "Geen candidatuuren gevonden"
+      "noApplications": "Geen candidaturen gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van candidatuuren mislukt"
+      "loadFailed": "Laden van candidaturen mislukt"
     },
     "modal": {
-      "basicInfo": "Basisinfo",
+      "basicInfo": "Basisinformatie",
       "attachedDocuments": "Bijgevoegde documenten",
       "actions": "Acties",
       "phoneNumber": "Telefoonnummer",
@@ -846,19 +846,19 @@
       "previousEducation": "Vooropleiding",
       "program": "Opleiding",
       "address": "Adres",
-      "applicationId": "Candidatuur ID",
+      "applicationId": "Candidatuur-ID",
       "noDocuments": "Geen documenten bijgevoegd",
-      "unknownApplicant": "Onbekende aanvrager",
-      "requestAdditionalInfo": "Extra informatie opvragen",
+      "unknownApplicant": "Onbekende kandidaat",
+      "requestAdditionalInfo": "Aanvullende informatie opvragen",
       "remarks": "Opmerkingen",
-      "remarksPlaceholder": "Voer eventuele opmerkingen in voor het doorsturen",
+      "remarksPlaceholder": "Eventuele opmerkingen invoeren voor doorsturen",
       "processing": "Verwerken...",
       "reject": "Afwijzen",
       "waitlist": "In behandeling",
       "accept": "Accepteren"
     },
     "status": {
-      "pending": "In afwachting",
+      "pending": "In behandeling",
       "drafted": "Concept",
       "waitlisted": "In behandeling",
       "resubmitted": "Opnieuw ingediend",
@@ -866,7 +866,7 @@
       "rejected": "Afgewezen"
     },
     "documents": {
-      "idCard": "ID-kaart",
+      "idCard": "Identiteitskaart",
       "qualificationCertificate": "Kwalificatiecertificaat",
       "pdfDocument": "PDF-document",
       "view": "Bekijken",
@@ -881,16 +881,16 @@
     "search": "Contracten zoeken...",
     "createContract": "Contract aanmaken",
     "editContract": "Contract bewerken",
-    "createSubtitle": "Upload een nieuwe contractversie",
+    "createSubtitle": "Nieuwe contractversie uploaden",
     "editSubtitle": "Contractgegevens bijwerken",
     "modal": {
       "nameLabel": "Contractnaam",
-      "namePlaceholder": "Voer contractnaam in",
+      "namePlaceholder": "Contractnaam invoeren",
       "fileLabel": "Contractbestand",
       "fileSelected": "Bestand geselecteerd",
-      "viewCurrent": "Bekijk huidig document",
+      "viewCurrent": "Huidig document bekijken",
       "clickReplace": "Klik om te vervangen",
-      "uploadHint": "Klik om PDF- of Word-document te uploaden"
+      "uploadHint": "Klik om PDF of Word-document te uploaden"
     },
     "messages": {
       "uploadFailed": "Uploaden van bestand mislukt"
@@ -912,17 +912,17 @@
       "loadFailed": "Laden van docenttitels mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe docenttitel aanmaken",
+      "createTitle": "Nieuwe docenttitel aanmaken",
       "editTitle": "Docenttitel bewerken",
-      "createSubtitle": "Laten we een nieuwe docenttitel aanmaken",
+      "createSubtitle": "Maak een nieuwe docenttitel aan",
       "editSubtitle": "Docenttitelgegevens bijwerken",
-      "nameLabel": "Titelnaam",
-      "namePlaceholder": "Voer titel in (bijv. Dr., Prof., Dhr., Mw.)",
+      "nameLabel": "Naam titel",
+      "namePlaceholder": "Titelnaam invoeren (bijv. Dr., Prof., Dhr., Mevr.)",
       "nameRequired": "Titelnaam is verplicht"
     }
   },
   "teacherQualification": {
-    "title": "Docentkwalificaties",
+    "title": "Kwalificaties docenten",
     "tabs": {
       "titles": "Titels",
       "roles": "Rollen"
@@ -944,24 +944,24 @@
       "loadFailed": "Laden van docentrollen mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe docentrol aanmaken",
+      "createTitle": "Nieuwe docentrol aanmaken",
       "editTitle": "Docentrol bewerken",
-      "createSubtitle": "Laten we een nieuwe docentrol aanmaken",
+      "createSubtitle": "Maak een nieuwe docentrol aan",
       "editSubtitle": "Docentrolgegevens bijwerken",
       "nameLabel": "Rolnaam",
-      "namePlaceholder": "Voer rol in (bijv. Assistent-professor, Docent)",
+      "namePlaceholder": "Rolnaam invoeren (bijv. Assistent-docent, Docent, Senior Docent)",
       "nameRequired": "Rolnaam is verplicht"
     }
   },
   "teacherManagement": {
-    "title": "Docentbeheer",
+    "title": "Docentenbeheer",
     "search": "Docenten zoeken...",
     "delete": "Verwijderen",
     "createTeacher": "Docent aanmaken",
     "table": {
-      "teacherId": "Docent ID",
+      "teacherId": "Docent-ID",
       "name": "Naam",
-      "email": "E-mail",
+      "email": "E-mailadres",
       "phone": "Telefoon",
       "academicDegree": "Academische graad",
       "role": "Rol",
@@ -977,30 +977,30 @@
       "loadFailed": "Laden van docenten mislukt"
     },
     "modal": {
-      "createTitle": "Een nieuwe docent aanmaken",
+      "createTitle": "Nieuwe docent aanmaken",
       "editTitle": "Docent bewerken",
-      "createSubtitle": "Laten we een nieuwe docent aanmaken",
+      "createSubtitle": "Maak een nieuwe docent aan",
       "editSubtitle": "Docentgegevens bijwerken",
       "firstNameLabel": "Voornaam",
-      "firstNamePlaceholder": "Voer voornaam in",
+      "firstNamePlaceholder": "Voornaam invoeren",
       "lastNameLabel": "Achternaam",
-      "lastNamePlaceholder": "Voer achternaam in",
-      "emailLabel": "E-mail",
-      "emailPlaceholder": "Voer e-mailadres in",
+      "lastNamePlaceholder": "Achternaam invoeren",
+      "emailLabel": "E-mailadres",
+      "emailPlaceholder": "E-mailadres invoeren",
       "phoneLabel": "Telefoon",
-      "phonePlaceholder": "Voer telefoonnummer in",
+      "phonePlaceholder": "Telefoonnummer invoeren",
       "countryLabel": "Land",
-      "countryPlaceholder": "Selecteer land",
-      "citiesLabel": "Steden",
-      "citiesPlaceholder": "Selecteer steden",
-      "languageLabel": "Taal",
-      "languagePlaceholder": "Selecteer taal",
+      "countryPlaceholder": "Land selecteren",
+      "citiesLabel": "Voorkeurssteden",
+      "citiesPlaceholder": "Selecteer steden waar de docent les kan geven",
+      "languageLabel": "Voorkeurstalen",
+      "languagePlaceholder": "Selecteer talen waarin de docent les kan geven",
       "academicDegreeLabel": "Academische graad",
-      "academicDegreePlaceholder": "Selecteer graad",
+      "academicDegreePlaceholder": "Graad selecteren",
       "teacherRoleLabel": "Docentrol",
-      "teacherRolePlaceholder": "Selecteer rol",
+      "teacherRolePlaceholder": "Rol selecteren",
       "employmentStartDateLabel": "Startdatum",
-      "employmentStartDatePlaceholder": "Selecteer startdatum"
+      "employmentStartDatePlaceholder": "Startdatum selecteren"
     }
   },
   "programDetail": {
@@ -1008,34 +1008,34 @@
     "loading": "Opleidingsdetails laden...",
     "loadFailed": "Laden van opleidingsdetails mislukt",
     "cards": {
-      "programName": "Opleidingsnaam",
+      "programName": "Naam opleiding",
       "duration": "Duur",
       "noOfModules": "Aantal modules",
-      "registrationFee": "Inschrijfgeld",
+      "registrationFee": "Inschrijvingsgeld",
       "years": "jaar",
       "free": "Gratis"
     },
     "tabs": {
       "learningModules": "Leermodule",
-      "applications": "Toegepaste Professionele Praktijk (APP)",
+      "applications": "Applied Professional Practice (APP)",
       "resources": "Onderzoek",
       "examComponents": "Examen"
     },
     "emptyState": {
       "title": "Nog geen opleidingsmodules toegevoegd",
-      "subtitle": "Begin met het toevoegen van modules, apps, bronnen of examens om deze opleiding effectief op te bouwen en te beheren.",
+      "subtitle": "Begin met het toevoegen van modules, APPs, onderzoek of examens om deze opleiding te beheren.",
       "createButton": "Opleidingsmodule aanmaken"
     }
   },
   "learningModule": {
     "search": "Modules zoeken...",
     "table": {
-      "learningUID": "Leermodule UID",
+      "learningUID": "Leer-UID",
       "moduleName": "Modulenaam",
       "year": "Jaar",
       "moduleNumber": "Modulenummer",
       "files": "Bestanden",
-      "amount": "Aantal",
+      "amount": "Bedrag",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
@@ -1046,26 +1046,26 @@
     }
   },
   "appModule": {
-    "search": "Aanmeldingen zoeken...",
+    "search": "Candidaturen zoeken...",
     "table": {
-      "appId": "App ID",
-      "appName": "App-naam",
+      "appId": "APP-ID",
+      "appName": "APP-naam",
       "year": "Jaar",
       "files": "Bestanden",
       "deadline": "Deadline",
       "status": "Status",
       "actions": "Acties",
       "edit": "Bewerken",
-      "noApps": "Geen applicatie componenten gevonden"
+      "noApps": "Geen APP-componenten gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van applicatiecomponenten mislukt"
+      "loadFailed": "Laden van APP-componenten mislukt"
     }
   },
   "examModule": {
     "search": "Examencomponenten zoeken...",
     "table": {
-      "examModuleId": "Examenmodule ID",
+      "examModuleId": "Examenmodule-ID",
       "linkedExam": "Gekoppeld examen",
       "linkedModule": "Gekoppelde module",
       "status": "Status",
@@ -1078,35 +1078,35 @@
     }
   },
   "resourceModule": {
-    "search": "Bronnen zoeken...",
+    "search": "Onderzoeksresources zoeken...",
     "table": {
-      "resourceUID": "Bron UID",
-      "resourceName": "Bronnaam",
+      "resourceUID": "Resource-UID",
+      "resourceName": "Resourcenaam",
       "year": "Jaar",
       "files": "Bestanden",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
-      "noResources": "Geen bron componenten gevonden"
+      "noResources": "Geen onderzoeksresources gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van bron componenten mislukt"
+      "loadFailed": "Laden van onderzoeksresources mislukt"
     },
     "resources": {
-      "title": "Bronnen",
-      "noResources": "Nog geen bronnen toegevoegd",
+      "title": "Resources",
+      "noResources": "Nog geen resources toegevoegd",
       "uploadFile": "Bestand uploaden",
       "addLink": "Link toevoegen",
-      "enterUrl": "URL invoeren (Link)",
+      "enterUrl": "URL invoeren (link)",
       "existingFile": "Bestaand bestand",
-      "resourceNameOptional": "Bronnaam (Optioneel)"
+      "resourceNameOptional": "Resourcenaam (optioneel)"
     }
   },
   "planningManagement": {
-    "title": "Planning Beheer",
+    "title": "Planningsbeheer",
     "search": "Zoeken...",
     "delete": "Verwijderen",
-    "createPlanning": "Planning Aanmaken",
+    "createPlanning": "Planning aanmaken",
     "table": {
       "program": "Opleiding",
       "batch": "Groep",
@@ -1127,43 +1127,43 @@
       "location": "Locatie",
       "actions": "Acties",
       "accept": "Accepteren",
-      "reject": "Weigeren"
+      "reject": "Afwijzen"
     },
     "modal": {
-      "createTitle": "Een nieuwe planning aanmaken",
+      "createTitle": "Nieuwe planning aanmaken",
       "editTitle": "Planning bewerken",
-      "createSubtitle": "Laten we een nieuwe planning aanmaken",
-      "editSubtitle": "Planning gegevens bijwerken",
+      "createSubtitle": "Maak een nieuwe planning aan",
+      "editSubtitle": "Planningsgegevens bijwerken",
       "programLabel": "Opleiding",
       "searchPrograms": "Opleidingen zoeken...",
       "batchLabel": "Groep",
-      "batchPlaceholder": "Selecteer groep",
+      "batchPlaceholder": "Groep selecteren",
       "searchBatches": "Groepen zoeken...",
       "moduleLabel": "Module",
-      "modulePlaceholder": "Selecteer module",
+      "modulePlaceholder": "Module selecteren",
       "searchComponents": "Componenten zoeken...",
       "venueLabel": "Locatie",
-      "venuePlaceholder": "Voer locatienaam in",
+      "venuePlaceholder": "Locatienaam invoeren",
       "preferredVenues": "Voorkeurslocaties",
       "descriptionLabel": "Beschrijving",
-      "descriptionPlaceholder": "Voer een beschrijving in",
+      "descriptionPlaceholder": "Beschrijving invoeren",
       "sessionsLabel": "Sessies",
       "sessionLabel": "Sessie",
       "sessionNameLabel": "Sessienaam",
-      "sessionNamePlaceholder": "Voer sessienaam in",
+      "sessionNamePlaceholder": "Sessienaam invoeren",
       "dateLabel": "Sessiedatum",
-      "timeFromLabel": "Tijd van",
-      "timeTillLabel": "Tijd tot",
+      "timeFromLabel": "Begintijd",
+      "timeTillLabel": "Eindtijd",
       "preferredTimes": "Voorkeurtijden",
       "teachersLabel": "Docenten",
-      "teachersPlaceholder": "Selecteer docenten",
+      "teachersPlaceholder": "Docenten selecteren",
       "searchTeachers": "Docenten zoeken...",
-      "assistantsLabel": "Assistenten",
-      "assistantsPlaceholder": "Selecteer assistenten",
-      "searchAssistants": "Assistenten zoeken...",
-      "traineesLabel": "Trainees",
-      "traineesPlaceholder": "Selecteer trainees",
-      "searchTrainees": "Trainees zoeken...",
+      "assistantsLabel": "Assistent",
+      "assistantsPlaceholder": "Assistent selecteren",
+      "searchAssistants": "Assistent zoeken...",
+      "traineesLabel": "Stagiairs",
+      "traineesPlaceholder": "Stagiairs selecteren",
+      "searchTrainees": "Stagiairs zoeken...",
       "addSession": "Nog een sessie toevoegen"
     },
     "view": {
@@ -1175,8 +1175,8 @@
       "sessionsLabel": "Sessies",
       "sessionNameLabel": "Sessienaam",
       "dateLabel": "Datum",
-      "timeFromLabel": "Tijd van",
-      "timeTillLabel": "Tijd tot",
+      "timeFromLabel": "Begintijd",
+      "timeTillLabel": "Eindtijd",
       "teachersLabel": "Docenten",
       "venueLabel": "Locatie"
     },
@@ -1191,9 +1191,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "ongoingCourses": "Lopende Opleidingen",
-    "finishedCourses": "Afgeronde Opleidingen",
-    "courseEnrollmentTrend": "Trend Opleidingsinschrijvingen",
+    "ongoingCourses": "Lopende opleidingen",
+    "finishedCourses": "Afgeronde opleidingen",
+    "courseEnrollmentTrend": "Inschrijvingstrend opleiding",
     "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
   },
   "exam": {
@@ -1206,7 +1206,7 @@
     "loading": "Examen laden...",
     "questions": "vragen",
     "minutes": "min",
-    "cannotEditPublished": "Kan een gepubliceerd examen niet bewerken. Archiveer het eerst.",
+    "cannotEditPublished": "Gepubliceerd examen kan niet worden bewerkt. Archiveer het eerst.",
     "edit": "Bewerken",
     "publish": "Publiceren",
     "archive": "Archiveren",
@@ -1222,7 +1222,7 @@
       "name": "Naam",
       "questions": "Vragen",
       "duration": "Duur",
-      "passingMarks": "Behaald",
+      "passingMarks": "Slaaggrens",
       "module": "Module",
       "language": "Taal",
       "status": "Status",
@@ -1237,14 +1237,14 @@
     },
     "form": {
       "name": "Naam",
-      "namePlaceholder": "Voer examennaam in",
+      "namePlaceholder": "Examennaam invoeren",
       "description": "Beschrijving",
-      "descriptionPlaceholder": "Voer een beschrijving in",
+      "descriptionPlaceholder": "Beschrijving invoeren",
       "instructions": "Instructies",
-      "instructionsPlaceholder": "Instructies die getoond worden voor aanvang van het examen",
+      "instructionsPlaceholder": "Instructies weergegeven voor aanvang van het examen",
       "questionSources": "Vraagbronnen",
-      "addQuestionSource": "Bron Toevoegen",
-      "selectQuestionBank": "Selecteer Vragenbank",
+      "addQuestionSource": "Bron toevoegen",
+      "selectQuestionBank": "Vragenbank selecteren",
       "language": "Taal",
       "questionsAvailable": "beschikbaar",
       "questions": "vragen",
@@ -1252,20 +1252,20 @@
       "noQuestionBanks": "Geen vragenbanken beschikbaar",
       "duration": "Duur (minuten)",
       "marksPerQuestion": "Punten per vraag",
-      "passingMarks": "Slagingsgrens",
-      "passingType": "Slagingstype",
+      "passingMarks": "Slaaggrens",
+      "passingType": "Type slaagcriterium",
       "marks": "Punten",
       "percentage": "Percentage",
       "settings": "Instellingen",
-      "randomizeQuestions": "Vragen randomiseren",
-      "randomizeOptions": "Antwoordopties randomiseren",
-      "autoSubmitOnTimeout": "Automatisch indienen bij timeout",
+      "randomizeQuestions": "Vragen willekeurig ordenen",
+      "randomizeOptions": "Antwoordopties willekeurig ordenen",
+      "autoSubmitOnTimeout": "Automatisch indienen bij verstrijken tijd",
       "maxAttempts": "Maximaal aantal pogingen"
     },
     "detail": {
       "totalQuestions": "Totaal aantal vragen",
-      "totalMarks": "Totaal aantal punten",
-      "passingMarks": "Slagingsgrens",
+      "totalMarks": "Totaal punten",
+      "passingMarks": "Slaaggrens",
       "duration": "Duur",
       "questionSources": "Vraagbronnen",
       "available": "beschikbaar"
@@ -1275,56 +1275,56 @@
     "createTitle": "Opleidingsmodule aanmaken",
     "editTitle": "Opleidingsmodule bewerken",
     "typeLabel": "Type",
-    "typePlaceholder": "Selecteer type",
+    "typePlaceholder": "Type selecteren",
     "nameLabel": "Naam",
-    "namePlaceholder": "Voer naam in",
+    "namePlaceholder": "Naam invoeren",
     "yearLabel": "Jaar",
-    "yearPlaceholder": "Selecteer jaar",
+    "yearPlaceholder": "Jaar selecteren",
     "year": "Jaar",
     "moduleNumberLabel": "Modulenummer",
-    "moduleNumberPlaceholder": "Voer modulenummer in",
+    "moduleNumberPlaceholder": "Modulenummer invoeren",
     "amountLabel": "Bedrag",
-    "amountPlaceholder": "Voer bedrag in",
+    "amountPlaceholder": "Bedrag invoeren",
     "freeComponentLabel": "Gratis module",
-    "freeComponentDescription": "Inschakelen als er geen extra betaling vereist is voor deze module",
+    "freeComponentDescription": "Activeer als voor deze module geen aanvullende betaling vereist is",
     "linkedModuleLabel": "Gekoppelde module",
-    "linkedModuleHint": "Examen gepland voor deze module",
-    "linkedModulePlaceholder": "Selecteer module",
+    "linkedModuleHint": "Examen gepland vóór deze module",
+    "linkedModulePlaceholder": "Module selecteren",
     "noModulesFound": "Geen modules gevonden",
     "linkedExamLabel": "Gekoppeld examen",
-    "linkedExamPlaceholder": "Selecteer examen",
+    "linkedExamPlaceholder": "Examen selecteren",
     "noPublishedExams": "Geen gepubliceerde examens gevonden",
     "submissionDeadlineLabel": "Inleverdeadline",
-    "submissionDeadlinePlaceholder": "Selecteer deadline",
+    "submissionDeadlinePlaceholder": "Deadline selecteren",
     "instructionsLabel": "Instructies",
-    "instructionsPlaceholder": "Voer instructies in",
+    "instructionsPlaceholder": "Instructies invoeren",
     "instructionVideoLabel": "Instructievideo (URL)",
-    "instructionVideoPlaceholder": "Voer video-URL in",
-    "submissionTypesLabel": "Inlevertypes",
-    "caseStudies": "Casuïstiek",
+    "instructionVideoPlaceholder": "Video-URL invoeren",
+    "submissionTypesLabel": "Inlevertypen",
+    "caseStudies": "Casestudies",
     "essays": "Essays",
-    "internships": "Praktijk / Stage",
+    "internships": "Praktijk",
     "activeStatus": "Actieve status",
     "uploadingFiles": "Bestanden uploaden...",
     "types": {
       "module": "Leermodule",
-      "app": "Toegepaste Professionele Praktijk (APP)",
+      "app": "Applied Professional Practice (APP)",
       "resource": "Onderzoek",
       "exam": "Examen"
     }
   },
   "programConfig": {
     "title": "Opleidingsconfiguratie",
-    "subtitle": "Academische vereisten en drempels configureren",
-    "selectYear": "Selecteer jaar",
+    "subtitle": "Academische vereisten en drempelwaarden configureren",
+    "selectYear": "Jaar selecteren",
     "newYear": "Nieuw jaar",
-    "yearLabel": "Jaar (1e, 2e, 3e, etc.)",
+    "yearLabel": "Jaar (1e, 2e, 3e, enz.)",
     "yearPlaceholder": "bijv. 1 voor het eerste jaar",
     "yearHint": "Configuratie aanmaken voor een nieuw opleidingsjaar",
     "programYear": "Opleidingsjaar",
     "yearPlaceholderSelect": "Selecteer een jaar",
     "yearDisplay": "Jaar {{year}}",
-    "yearViewing": "Configuratie bekijken voor Jaar {{year}}",
+    "yearViewing": "Configuratie bekijken voor jaar {{year}}",
     "activeStatus": "Actieve status",
     "activeStatusHint": "Deze configuratie in- of uitschakelen",
     "noConfigs": "Nog geen configuraties. Klik op \"Nieuw jaar\" om er een aan te maken.",
@@ -1336,26 +1336,26 @@
     "requirements": {
       "exam": {
         "title": "Examenvereisten",
-        "required": "Examens vereist",
-        "hint": "Studenten moeten slagen voor alle module-examens om verder te gaan"
+        "required": "Examens verplicht",
+        "hint": "Studenten moeten alle module-examens slagen om te kunnen vorderen"
       },
       "attendance": {
         "title": "Aanwezigheidsvereisten",
-        "overallMin": "Globaal minimumpercentage (%)",
-        "perModuleMin": "Minimumpercentage per module (%)"
+        "overallMin": "Minimaal algeheel percentage (%)",
+        "perModuleMin": "Minimaal percentage per module (%)"
       },
       "submission": {
         "title": "Inleververeisten",
-        "caseStudies": "Casuïstiek",
+        "caseStudies": "Casestudies",
         "essays": "Essays",
-        "internships": "Praktijk / Stage",
-        "mandatoryHint": "Verplicht voor voltooiing van het jaar",
-        "minPass": "Min. slagingspercentage (%)",
+        "internships": "Praktijk",
+        "mandatoryHint": "Verplicht voor afsluiting van het jaar",
+        "minPass": "Min. slaagpercentage (%)",
         "passMark": "Slaaggrens (%)"
       },
       "internship": {
-        "title": "Praktijk-/Stagevereisten",
-        "minCases": "Minimum aantal casussen"
+        "title": "Praktijkvereisten",
+        "minCases": "Minimaal aantal gevallen"
       }
     }
   },
@@ -1379,7 +1379,7 @@
     },
     "questionList": {
       "addQuestion": "Vraag toevoegen",
-      "bulkUpload": "Bulk upload",
+      "bulkUpload": "Bulkupload",
       "uid": "UID",
       "question": "Vraag",
       "difficulty": "Moeilijkheidsgraad",
@@ -1392,14 +1392,14 @@
     },
     "form": {
       "name": "Naam",
-      "namePlaceholder": "Voer naam in",
+      "namePlaceholder": "Naam invoeren",
       "language": "Taal",
-      "description": "Omschrijving",
-      "descriptionPlaceholder": "Voer omschrijving in"
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Beschrijving invoeren"
     },
     "bulkUpload": {
-      "title": "Vragen bulk-uploaden",
-      "description": "Upload een CSV-bestand met vragen. Download het onderstaande sjabloon voor het vereiste formaat.",
+      "title": "Vragen bulksgewijs uploaden",
+      "description": "Upload een CSV-bestand met vragen. Download het sjabloon hieronder voor het vereiste formaat.",
       "downloadTemplate": "Sjabloon downloaden",
       "selectFile": "Bestand selecteren",
       "upload": "Vragen uploaden"
@@ -1407,67 +1407,67 @@
     "questionForm": {
       "addQuestion": "Vraag toevoegen",
       "editQuestion": "Vraag bewerken",
-      "createSubtitle": "Vul de details van de vraag in",
-      "editSubtitle": "Details van de vraag bijwerken",
+      "createSubtitle": "Vul de vraagdetails in",
+      "editSubtitle": "Vraagdetails bijwerken",
       "questionText": "Vraagtekst",
-      "questionTextPlaceholder": "Voer vraagtekst in",
+      "questionTextPlaceholder": "Vraagtekst invoeren",
       "options": "Opties",
       "addOption": "Optie toevoegen",
       "option": "Optie",
       "correct": "Correct",
-      "enterOption": "Voer optietekst in",
-      "explanation": "Uitleg",
-      "explanationPlaceholder": "Voer uitleg in voor het juiste antwoord",
+      "enterOption": "Optietekst invoeren",
+      "explanation": "Toelichting",
+      "explanationPlaceholder": "Toelichting op het juiste antwoord invoeren",
       "difficulty": "Moeilijkheidsgraad",
-      "easy": "Makkelijk",
+      "easy": "Gemakkelijk",
       "medium": "Gemiddeld",
       "hard": "Moeilijk",
       "marks": "Punten"
     }
   },
   "currencies": {
-    "USD": "Amerikaanse Dollar",
+    "USD": "Amerikaanse dollar",
     "EUR": "Euro",
-    "GBP": "Britse Pond",
-    "CAD": "Canadese Dollar",
-    "AUD": "Australische Dollar",
-    "JPY": "Japanse Yen",
-    "CNY": "Chinese Yuan",
-    "INR": "Indiase Roepee",
-    "CHF": "Zwitserse Frank",
-    "SEK": "Zweedse Kroon",
-    "DKK": "Deense Kroon"
+    "GBP": "Brits pond",
+    "CAD": "Canadese dollar",
+    "AUD": "Australische dollar",
+    "JPY": "Japanse yen",
+    "CNY": "Chinese yuan",
+    "INR": "Indiase roepie",
+    "CHF": "Zwitserse frank",
+    "SEK": "Zweedse kroon",
+    "DKK": "Deense kroon"
   },
   "login": {
-    "title": "IAO Kantoor",
-    "subtitle": "Log in op ons beveiligde back-office systeem om de dagelijkse activiteiten van IAO te beheren",
-    "emailLabel": "E-mail",
-    "emailPlaceholder": "Voer uw IAO e-mail in",
-    "otpLabel": "Voer verificatiecode in",
+    "title": "IAO-kantoor",
+    "subtitle": "Meld u aan bij ons beveiligde backoffice-systeem om de dagelijkse activiteiten van IAO te beheren",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "Voer uw IAO-e-mailadres in",
+    "otpLabel": "Verificatiecode invoeren",
     "otpPlaceholder": "Voer de 6-cijferige verificatiecode in",
-    "loginCodeButton": "Inlogcode",
-    "loginCodeSending": "Inlogcode wordt verzonden...",
-    "verifyCodeButton": "Code Verifiëren",
+    "loginCodeButton": "Aanmeldcode",
+    "loginCodeSending": "Aanmeldcode verzenden...",
+    "verifyCodeButton": "Code verifiëren",
     "verifyingCode": "Verifiëren...",
-    "changeEmail": "E-mail wijzigen",
-    "otpInstructions": "We sturen een eenmalige inlogcode naar uw e-mailadres",
+    "changeEmail": "E-mailadres wijzigen",
+    "otpInstructions": "We sturen een eenmalige aanmeldcode naar uw e-mailadres",
     "otpSentInstructions": "Voer de 6-cijferige code in die naar uw e-mailadres is verzonden",
     "toast": {
       "emailRequired": "Voer uw e-mailadres in",
-      "otpSentSuccess": "OTP verzonden naar uw e-mail!",
-      "otpSentError": "Verzenden van OTP mislukt. Probeer het opnieuw.",
-      "otpRequired": "Voer OTP in",
-      "loginSuccess": "Succesvol ingelogd!",
-      "otpInvalid": "Ongeldige OTP. Probeer het opnieuw."
+      "otpSentSuccess": "Aanmeldcode verzonden naar uw e-mailadres!",
+      "otpSentError": "Verzenden van aanmeldcode mislukt. Probeer het opnieuw.",
+      "otpRequired": "Voer de aanmeldcode in",
+      "loginSuccess": "Succesvol aangemeld!",
+      "otpInvalid": "Ongeldige aanmeldcode. Probeer het opnieuw."
     }
   },
   "resultsManagement": {
     "title": "Examenresultaten",
-    "subtitle": "Volg, controleer en exporteer prestatieresultaten van studenten",
+    "subtitle": "Studentprestaties volgen, monitoren en exporteren",
     "exportBtn": "Resultaten exporteren",
-    "searchPlaceholder": "Zoek student...",
+    "searchPlaceholder": "Student zoeken...",
     "filterTitle": "Resultaten filteren",
-    "filterSubtitle": "Verfijn examenresultaten van studenten",
+    "filterSubtitle": "Examenresultaten studenten beperken",
     "failedOnly": "Alleen mislukt",
     "filter": {
       "program": "Opleiding",
@@ -1493,27 +1493,27 @@
       "exam": "Examen",
       "score": "Score",
       "status": "Status",
-      "date": "Indieningsdatum",
-      "noResults": "Geen resultaten gevonden die voldoen aan de zoek-/filtercriteria."
+      "date": "Ingediend op",
+      "noResults": "Geen resultaten gevonden op basis van zoek- en filtercriteria."
     },
     "messages": {
-      "loadFailed": "Laden van resultaten mislukt"
+      "loadFailed": "Laden van resultatengegevens mislukt"
     }
   },
   "specialExceptions": {
-    "title": "Bijzondere Uitzonderingen",
-    "searchPlaceholder": "Bijzondere uitzonderingen zoeken...",
+    "title": "Speciale uitzonderingen",
+    "searchPlaceholder": "Speciale uitzonderingen zoeken...",
     "addExceptionBtn": "Uitzondering toevoegen",
-    "conditionName": "Naam voorwaarde",
-    "extraTimeMinutes": "Extra tijd (Minuten)",
+    "conditionName": "Naam aandoening",
+    "extraTimeMinutes": "Extra tijd (minuten)",
     "actions": "Acties",
-    "loadFailed": "Laden van bijzondere uitzonderingen mislukt",
-    "noExceptions": "Geen bijzondere uitzonderingen gevonden.",
-    "addTitle": "Bijzondere uitzondering toevoegen",
-    "editTitle": "Bijzondere uitzondering bewerken",
+    "loadFailed": "Laden van speciale uitzonderingen mislukt",
+    "noExceptions": "Geen speciale uitzonderingen gevonden.",
+    "addTitle": "Speciale uitzondering toevoegen",
+    "editTitle": "Speciale uitzondering bewerken",
     "nameLabel": "Naam uitzondering",
     "namePlaceholder": "bijv. Dyslexie, ADHD, Dyscalculie",
-    "timeLabel": "Extra tijd (Minuten)",
+    "timeLabel": "Extra tijd (minuten)",
     "timePlaceholder": "bijv. 15",
     "nameRequired": "Naam is verplicht",
     "timeInvalid": "Extra tijd moet 0 of meer minuten zijn",
@@ -1521,16 +1521,16 @@
     "saveChanges": "Wijzigingen opslaan",
     "createException": "Uitzondering aanmaken",
     "cancel": "Annuleren",
-    "updateFailed": "Bijwerken van bijzondere uitzondering mislukt",
-    "createFailed": "Aanmaken van bijzondere uitzondering mislukt",
-    "deleteContext": "Bijzondere uitzondering",
+    "updateFailed": "Bijwerken van speciale uitzondering mislukt",
+    "createFailed": "Aanmaken van speciale uitzondering mislukt",
+    "deleteContext": "Speciale uitzondering",
     "extraTimeMinShort": "+{{minutes}} min",
     "edit": "Bewerken",
     "delete": "Verwijderen"
   },
   "studentCornerCMS": {
-    "title": "Student Corner",
-    "subtitle": "Beheer inhoud voor de Student Corner-pagina.",
+    "title": "Studentenhoek",
+    "subtitle": "Inhoud voor de Studentenhoek-pagina beheren.",
     "saveChanges": "Wijzigingen opslaan",
     "bannerSection": "Banner",
     "teacherCtaSection": "Docent CTA",
@@ -1542,14 +1542,14 @@
     "descriptionLabel": "Beschrijving",
     "buttonTextLabel": "Knoptekst",
     "buttonLinkLabel": "Knoplink",
-    "applyLinkLabel": "Aanmeldlink",
-    "learnMoreLinkLabel": "Meer info link",
+    "applyLinkLabel": "Candidatuurlink",
+    "learnMoreLinkLabel": "Meer weten-link",
     "addDocument": "Document toevoegen",
     "addLink": "Link toevoegen",
     "addVideo": "Video toevoegen",
     "documentTitlePlaceholder": "Documenttitel",
     "clickToReplace": "Klik om te vervangen",
-    "clickToAttach": "Klik om document bij te voegen (wordt geüpload bij opslaan)",
+    "clickToAttach": "Klik om document bij te voegen (geüpload bij opslaan)",
     "noDocuments": "Geen documenten toegevoegd.",
     "noQuickLinks": "Geen snelle links toegevoegd.",
     "noVideos": "Geen video's toegevoegd.",
@@ -1557,94 +1557,94 @@
     "uploadFailed": "Uploaden mislukt voor {{name}}",
     "placeholderTitle": "Titel",
     "placeholderUrl": "URL",
-    "placeholderVideoUrl": "Video URL"
+    "placeholderVideoUrl": "Video-URL"
   },
   "lti": {
     "platformConfig": {
-      "title": "LTI Platform Configuratie",
-      "subtitle": "Deel deze waarden met Enatom om de HUB te registreren als een vertrouwd platform.",
+      "title": "LTI-platformconfiguratie",
+      "subtitle": "Deel deze waarden met Enatom om de HUB als vertrouwd platform te registreren.",
       "exportJson": "JSON exporteren",
       "issuer": "Issuer (iss)",
-      "clientId": "Client ID",
-      "deploymentId": "Deployment ID",
-      "jwksUrl": "JWKS URL",
-      "oidcAuthEndpoint": "OIDC Authenticatie Endpoint",
-      "accessTokenUrl": "Access Token URL",
-      "oidcConfigUrl": "OpenID Configuratie URL (Dynamische Registratie)",
-      "copyToClipboard": "Kopieer naar klembord"
+      "clientId": "Client-ID",
+      "deploymentId": "Deployment-ID",
+      "jwksUrl": "JWKS-URL",
+      "oidcAuthEndpoint": "OIDC-authenticatie-eindpunt",
+      "accessTokenUrl": "Toegangstoken-URL",
+      "oidcConfigUrl": "OpenID-configuratie-URL (dynamische registratie)",
+      "copyToClipboard": "Kopiëren naar klembord"
     },
     "registerTool": {
-      "createTitle": "LTI Tool Registreren",
-      "editTitle": "LTI Tool Bewerken",
-      "createSubtitle": "Voeg een nieuwe LTI 1.3 externe tool toe (bijv. Enatom)",
-      "editSubtitle": "LTI 1.3 tool inloggegevens bijwerken",
-      "nameLabel": "Tool Naam",
-      "namePlaceholder": "Voer een weergavenaam in voor deze tool",
-      "clientIdLabel": "Client ID",
-      "clientIdPlaceholder": "Unieke identifier geleverd door de externe tool",
-      "deploymentIdLabel": "Deployment ID",
-      "deploymentIdPlaceholder": "Deployment identifier van de toolprovider",
+      "createTitle": "LTI-tool registreren",
+      "editTitle": "LTI-tool bewerken",
+      "createSubtitle": "Nieuwe externe LTI 1.3-tool toevoegen (bijv. Enatom)",
+      "editSubtitle": "LTI 1.3-toolreferenties bijwerken",
+      "nameLabel": "Toolnaam",
+      "namePlaceholder": "Weergavenaam voor deze tool invoeren",
+      "clientIdLabel": "Client-ID",
+      "clientIdPlaceholder": "Unieke identifier verstrekt door de externe tool",
+      "deploymentIdLabel": "Deployment-ID",
+      "deploymentIdPlaceholder": "Deployment-identifier van de toolprovider",
       "generatedByPlatform": "Gegenereerd en beheerd door het platform",
-      "oidcLoginUrlLabel": "OIDC Login URL",
+      "oidcLoginUrlLabel": "OIDC-aanmeldings-URL",
       "oidcLoginUrlPlaceholder": "https://tool-provider.com/lti/login",
-      "redirectUriLabel": "Redirect URI",
+      "redirectUriLabel": "Doorstuur-URI",
       "redirectUriPlaceholder": "https://tool-provider.com/lti/callback",
-      "jwksUrlLabel": "JWKS URL",
+      "jwksUrlLabel": "JWKS-URL",
       "jwksUrlPlaceholder": "https://tool-provider.com/.well-known/jwks.json",
-      "launchUrlLabel": "Launch URL",
+      "launchUrlLabel": "Start-URL",
       "launchUrlPlaceholder": "https://tool-provider.com/app (optioneel)",
       "errors": {
         "nameRequired": "Naam is verplicht",
-        "oidcLoginUrlRequired": "OIDC Login URL is verplicht",
-        "redirectUriRequired": "Redirect URI is verplicht",
-        "jwksUrlRequired": "JWKS URL is verplicht",
-        "invalidHttps": "Moet een geldige HTTPS URL zijn"
+        "oidcLoginUrlRequired": "OIDC-aanmeldings-URL is verplicht",
+        "redirectUriRequired": "Doorstuur-URI is verplicht",
+        "jwksUrlRequired": "JWKS-URL is verplicht",
+        "invalidHttps": "Moet een geldige HTTPS-URL zijn"
       }
     }
   },
   "notification": {
     "modal": {
-      "createTitle": "Notificatie Aanmaken",
-      "editTitle": "Notificatie Bewerken",
-      "createSubtitle": "Schrijf een nieuwe notificatie",
-      "editSubtitle": "Notificatiegegevens bijwerken",
+      "createTitle": "Melding aanmaken",
+      "editTitle": "Melding bewerken",
+      "createSubtitle": "Nieuwe melding opstellen",
+      "editSubtitle": "Meldingsgegevens bijwerken",
       "subjectLabel": "Onderwerp",
-      "subjectPlaceholder": "Onderwerp van de notificatie",
+      "subjectPlaceholder": "Onderwerp melding",
       "messageLabel": "Bericht",
-      "messagePlaceholder": "Bericht van de notificatie",
+      "messagePlaceholder": "Inhoud melding",
       "typeLabel": "Type",
-      "typeInApp": "In-App",
+      "typeInApp": "In-app",
       "typeEmail": "E-mail",
       "sendToLabel": "Verzenden naar",
-      "sendToPlaceholder": "Selecteer ontvangers...",
-      "allUsers": "Alle Gebruikers",
+      "sendToPlaceholder": "Ontvangers selecteren...",
+      "allUsers": "Alle gebruikers",
       "teachers": "Docenten",
       "students": "Studenten",
       "sendToAll": "Verzenden naar alle {{role}}",
-      "noContactsSelected": "Selecteer ten minste één contactpersoon",
+      "noContactsSelected": "Selecteer minstens één contact",
       "sendSuccess": "E-mails succesvol verzonden!",
       "sendError": "Verzenden van e-mails mislukt",
-      "searchPlaceholder": "Zoek {{role}}...",
+      "searchPlaceholder": "{{role}} zoeken...",
       "errors": {
         "subjectRequired": "Onderwerp is verplicht",
         "messageRequired": "Bericht is verplicht",
-        "typeRequired": "Selecteer minimaal één type",
-        "recipientRequired": "Selecteer minimaal één ontvanger"
+        "typeRequired": "Selecteer minstens één type",
+        "recipientRequired": "Selecteer minstens één ontvanger"
       }
     },
     "view": {
-      "title": "Notificatie Details",
+      "title": "Meldingsdetails",
       "message": "Bericht",
       "recipients": "Ontvangers",
       "type": "Type",
-      "created": "Aangemaakt op",
+      "created": "Aangemaakt",
       "sentAt": "Verzonden op",
-      "allUsers": "Alle Gebruikers",
-      "allTeachers": "Alle Docenten",
-      "allStudents": "Alle Studenten",
-      "selectedTeachers": "Geselecteerde Docenten",
-      "selectedStudents": "Geselecteerde Studenten",
-      "selectedUsers": "Geselecteerde Gebruikers",
+      "allUsers": "Alle gebruikers",
+      "allTeachers": "Alle docenten",
+      "allStudents": "Alle studenten",
+      "selectedTeachers": "Geselecteerde docenten",
+      "selectedStudents": "Geselecteerde studenten",
+      "selectedUsers": "Geselecteerde gebruikers",
       "system": "Systeem"
     }
   }
