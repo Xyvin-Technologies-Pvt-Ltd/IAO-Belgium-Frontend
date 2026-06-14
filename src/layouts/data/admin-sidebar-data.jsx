@@ -114,7 +114,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: FileText,
           },
           {
-            title: t("sidebar.admin.customInvoices", { defaultValue: "Custom Invoices" }),
+            title: t("sidebar.admin.customInvoices"),
             url: "/admin/custom-invoices",
             icon: NotebookText,
           },
