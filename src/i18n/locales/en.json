@@ -51,6 +51,7 @@
       "teacherManagement": "Lecturer Management",
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
+      "customInvoices": "Custom Invoices",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "adminLogs": "Admin Logs",
