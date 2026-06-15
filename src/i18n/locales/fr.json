@@ -1192,7 +1192,9 @@
   "dashboard": {
     "title": "Tableau de bord",
     "ongoingCourses": "Formations en cours",
-    "finishedCourses": "Formations terminées",
+    "pendingApplications": "Candidatures en attente",
+    "activeStudents": "Étudiants actifs",
+    "activeLecturers": "Enseignants actifs",
     "courseEnrollmentTrend": "Tendance d'inscription aux formations",
     "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
   },

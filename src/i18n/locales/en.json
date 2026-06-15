@@ -1227,7 +1227,9 @@
   "dashboard": {
     "title": "Dashboard",
     "ongoingCourses": "Ongoing programmes",
-    "finishedCourses": "Finished programmes",
+    "pendingApplications": "Pending applications",
+    "activeStudents": "Active students",
+    "activeLecturers": "Active lecturers",
     "courseEnrollmentTrend": "Programme enrolment trend",
     "comparedToLastMonth": "{{percent}} compared to last month"
   },

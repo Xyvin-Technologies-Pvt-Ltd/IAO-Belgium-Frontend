@@ -1193,7 +1193,9 @@
   "dashboard": {
     "title": "Dashboard",
     "ongoingCourses": "Lopende opleidingen",
-    "finishedCourses": "Afgeronde opleidingen",
+    "pendingApplications": "Openstaande aanmeldingen",
+    "activeStudents": "Actieve studenten",
+    "activeLecturers": "Actieve docenten",
     "courseEnrollmentTrend": "Inschrijvingstrend opleiding",
     "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
   },

@@ -1191,7 +1191,9 @@
   "dashboard": {
     "title": "Dashboard",
     "ongoingCourses": "Laufende Ausbildungen",
-    "finishedCourses": "Abgeschlossene Ausbildungen",
+    "pendingApplications": "Ausstehende Bewerbungen",
+    "activeStudents": "Aktive Studierende",
+    "activeLecturers": "Aktive Lehrkräfte",
     "courseEnrollmentTrend": "Einschreibungstrend Ausbildung",
     "comparedToLastMonth": "{{percent}} im Vergleich zum Vormonat"
   },
