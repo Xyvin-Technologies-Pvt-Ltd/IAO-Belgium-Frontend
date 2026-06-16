@@ -196,7 +196,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
       role: "teacher",
-      teacher_role: "Teacher",
+      teacher_role_key: "teacher",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open && !!selectedLanguageId },
@@ -206,7 +206,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     {
       ...(assistantSearchTerm && { search: assistantSearchTerm }),
       role: "teacher",
-      teacher_role: "Assistant",
+      teacher_role_key: "assistant",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open && !!selectedLanguageId },
@@ -216,7 +216,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     {
       ...(traineeSearchTerm && { search: traineeSearchTerm }),
       role: "teacher",
-      teacher_role: "Trainee",
+      teacher_role_key: "trainee",
       ...(selectedLanguageId && { language: selectedLanguageId }),
     },
     { enabled: open && !!selectedLanguageId },

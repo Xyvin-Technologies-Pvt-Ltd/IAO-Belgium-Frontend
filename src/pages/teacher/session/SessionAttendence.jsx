@@ -17,12 +17,12 @@ import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
 import {
   useGetStudentsByComponent,
-  useGetComponentById,
 } from "@/store/useComponentStore";
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { getMoment } from "@/utils/dateUtils";
+
 
 const SessionAttendence = () => {
   const { t } = useTranslation();
@@ -36,6 +36,7 @@ const SessionAttendence = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
+
 
   const debouncedSearch = useDebounce(searchText, 500);
 
@@ -72,7 +73,7 @@ const SessionAttendence = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [component]);
+  }, [component, planningId, updateBreadcrumbs]);
 
   const handleAttendanceUpdate = (applicationId, status) => {
     markAttendanceMutation.mutate({
@@ -81,6 +82,8 @@ const SessionAttendence = () => {
       status: status,
     });
   };
+
+
 
   return (
     <div className="space-y-6 mt-4">
@@ -124,6 +127,7 @@ const SessionAttendence = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Student Name</TableHead>
+            <TableHead>Enrollment Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -131,10 +135,10 @@ const SessionAttendence = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={2} />
+            <TableSkeleton rows={rowsPerPage} columns={3} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={2} className="text-center p-8">
+              <TableCell colSpan={3} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -155,6 +159,17 @@ const SessionAttendence = () => {
                       "N/A"}
                   </TableCell>
                   <TableCell>
+                    {student.purchased ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                        Enrolled
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                        Not Enrolled
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -163,17 +178,19 @@ const SessionAttendence = () => {
                         }
                         className={
                           currentStatus === "present"
-                            ? "bg-[#49BA6C] hover:bg-[#49BA6C]/90 text-white"
+                            ? "bg-[#49BA6C]! text-white! hover:bg-[#49BA6C]/90!"
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
+                        style={
+                          currentStatus === "present" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                            ? { backgroundColor: "#49BA6C", color: "#ffffff", opacity: 0.7 }
+                            : {}
+                        }
                         onClick={() =>
-                          handleAttendanceUpdate(
-                            student.application_id,
-                            "present",
-                          )
+                          handleAttendanceUpdate(student.application_id, "present")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture
+                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
                         }
                       >
                         <Check className="h-4 w-4 mr-1" />
@@ -186,17 +203,19 @@ const SessionAttendence = () => {
                         }
                         className={
                           currentStatus === "absent"
-                            ? "bg-[#E7000B] hover:bg-[#E7000B]/90 text-white"
+                            ? "bg-[#E7000B]! text-white! hover:bg-[#E7000B]/90!"
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
+                        style={
+                          currentStatus === "absent" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                            ? { backgroundColor: "#E7000B", color: "#ffffff", opacity: 0.7 }
+                            : {}
+                        }
                         onClick={() =>
-                          handleAttendanceUpdate(
-                            student.application_id,
-                            "absent",
-                          )
+                          handleAttendanceUpdate(student.application_id, "absent")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture
+                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
                         }
                       >
                         <X className="h-4 w-4 mr-1" />
@@ -209,7 +228,7 @@ const SessionAttendence = () => {
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={2} className="text-center">
+              <TableCell colSpan={3} className="text-center">
                 No students found
               </TableCell>
             </TableRow>
@@ -223,6 +242,8 @@ const SessionAttendence = () => {
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
       />
+
+
     </div>
   );
 };

@@ -1,23 +1,32 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
+import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 import { useTranslation } from "react-i18next";
 import { useCreateTeacherRole, useUpdateTeacherRole } from "@/store/useTeacherRoleStore";
 
 const CreateTeacherRole = ({ open, onClose, roleData }) => {
   const { t } = useTranslation();
 
+  const roleTypeItems = [
+    { _id: "teacher", name: t("teacherRoleManagement.functionalRoles.teacher", "Teacher") },
+    { _id: "assistant", name: t("teacherRoleManagement.functionalRoles.assistant", "Assistant") },
+    { _id: "trainee", name: t("teacherRoleManagement.functionalRoles.trainee", "Trainee") },
+  ];
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
       name: "",
+      keys: [roleTypeItems[0]],
     },
   });
 
@@ -27,19 +36,28 @@ const CreateTeacherRole = ({ open, onClose, roleData }) => {
 
 
   const handleClose = () => {
-    reset();
+    reset({
+      name: "",
+      keys: [roleTypeItems[0]],
+    });
     onClose();
   };
 
   useEffect(() => {
     if (roleData && isEdit && open) {
       setValue("name", roleData.name || "");
+      const mappedKeys = (roleData.keys || []).map(k => {
+        const item = roleTypeItems.find(item => item._id === k);
+        return item || { _id: k, name: k };
+      });
+      setValue("keys", mappedKeys);
     }
   }, [roleData, isEdit, setValue, open]);
 
   const onSubmit = (formData) => {
     const payload = {
       name: formData.name,
+      keys: (formData.keys || []).map(k => k._id),
     };
 
     const mutation = isEdit ? updateRole : createRole;
@@ -89,6 +107,24 @@ const CreateTeacherRole = ({ open, onClose, roleData }) => {
             {...register("name", {
               required: t("teacherRoleManagement.modal.nameRequired"),
             })}
+          />
+
+          <Controller
+            name="keys"
+            control={control}
+            rules={{ required: t("teacherRoleManagement.modal.keysRequired", "At least one functional role is required") }}
+            render={({ field }) => (
+              <SearchableMultiSelect
+                label={t("teacherRoleManagement.modal.functionalRolesLabel", "Functional Roles")}
+                placeholder={t("teacherRoleManagement.modal.functionalRolesPlaceholder", "Select functional categories...")}
+                searchPlaceholder={t("teacherRoleManagement.modal.searchFunctionalRoles", "Search categories...")}
+                items={roleTypeItems}
+                selected={field.value || []}
+                onChange={field.onChange}
+                error={errors.keys?.message}
+                required
+              />
+            )}
           />
 
           <FormActions
