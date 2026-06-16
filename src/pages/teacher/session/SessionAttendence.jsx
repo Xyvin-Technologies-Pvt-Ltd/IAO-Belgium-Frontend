@@ -23,6 +23,7 @@ import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { getMoment } from "@/utils/dateUtils";
 
+
 const SessionAttendence = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -35,6 +36,7 @@ const SessionAttendence = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
+
 
   const debouncedSearch = useDebounce(searchText, 500);
 
@@ -71,7 +73,7 @@ const SessionAttendence = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [component]);
+  }, [component, planningId, updateBreadcrumbs]);
 
   const handleAttendanceUpdate = (applicationId, status) => {
     markAttendanceMutation.mutate({
@@ -80,6 +82,8 @@ const SessionAttendence = () => {
       status: status,
     });
   };
+
+
 
   return (
     <div className="space-y-6 mt-4">
@@ -174,14 +178,16 @@ const SessionAttendence = () => {
                         }
                         className={
                           currentStatus === "present"
-                            ? "bg-[#49BA6C] hover:bg-[#49BA6C]/90 text-white"
+                            ? "bg-[#49BA6C]! text-white! hover:bg-[#49BA6C]/90!"
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
+                        style={
+                          currentStatus === "present" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                            ? { backgroundColor: "#49BA6C", color: "#ffffff", opacity: 0.7 }
+                            : {}
+                        }
                         onClick={() =>
-                          handleAttendanceUpdate(
-                            student.application_id,
-                            "present",
-                          )
+                          handleAttendanceUpdate(student.application_id, "present")
                         }
                         disabled={
                           markAttendanceMutation.isPending || isSessionFuture || !student.purchased
@@ -197,14 +203,16 @@ const SessionAttendence = () => {
                         }
                         className={
                           currentStatus === "absent"
-                            ? "bg-[#E7000B] hover:bg-[#E7000B]/90 text-white"
+                            ? "bg-[#E7000B]! text-white! hover:bg-[#E7000B]/90!"
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
+                        style={
+                          currentStatus === "absent" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                            ? { backgroundColor: "#E7000B", color: "#ffffff", opacity: 0.7 }
+                            : {}
+                        }
                         onClick={() =>
-                          handleAttendanceUpdate(
-                            student.application_id,
-                            "absent",
-                          )
+                          handleAttendanceUpdate(student.application_id, "absent")
                         }
                         disabled={
                           markAttendanceMutation.isPending || isSessionFuture || !student.purchased
@@ -234,6 +242,8 @@ const SessionAttendence = () => {
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
       />
+
+
     </div>
   );
 };

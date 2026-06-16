@@ -95,16 +95,17 @@ const TeacherRole = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("teacherRoleManagement.table.name")}</TableHead>
+            <TableHead>{t("teacherRoleManagement.table.functionalRoles", "Functional Roles")}</TableHead>
             <TableHead>{t("teacherRoleManagement.table.status")}</TableHead>
             <TableHead>{t("teacherRoleManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={3} />
+            <TableSkeleton rows={rowsPerPage} columns={4} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center p-8">
+              <TableCell colSpan={4} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -119,6 +120,11 @@ const TeacherRole = () => {
             roles?.map((i) => (
               <TableRow key={i._id}>
                 <TableCell>{i?.name}</TableCell>
+                <TableCell className="capitalize">
+                  {i?.keys && i.keys.length > 0
+                    ? i.keys.map(k => t(`teacherRoleManagement.functionalRoles.${k}`, k)).join(", ")
+                    : "N/A"}
+                </TableCell>
                 <TableCell>
                   <Switch
                     checked={i?.status}
@@ -148,7 +154,7 @@ const TeacherRole = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={3} className="text-center">
+              <TableCell colSpan={4} className="text-center">
                 {t("teacherRoleManagement.table.noRoles")}
               </TableCell>
             </TableRow>
