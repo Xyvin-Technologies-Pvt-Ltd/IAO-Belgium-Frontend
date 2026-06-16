@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
 import {
   useGetStudentsByComponent,
-  useGetComponentById,
 } from "@/store/useComponentStore";
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
@@ -124,6 +123,7 @@ const SessionAttendence = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Student Name</TableHead>
+            <TableHead>Enrollment Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -131,10 +131,10 @@ const SessionAttendence = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={2} />
+            <TableSkeleton rows={rowsPerPage} columns={3} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={2} className="text-center p-8">
+              <TableCell colSpan={3} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -155,6 +155,17 @@ const SessionAttendence = () => {
                       "N/A"}
                   </TableCell>
                   <TableCell>
+                    {student.purchased ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                        Enrolled
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                        Not Enrolled
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -173,7 +184,7 @@ const SessionAttendence = () => {
                           )
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture
+                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
                         }
                       >
                         <Check className="h-4 w-4 mr-1" />
@@ -196,7 +207,7 @@ const SessionAttendence = () => {
                           )
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture
+                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
                         }
                       >
                         <X className="h-4 w-4 mr-1" />
@@ -209,7 +220,7 @@ const SessionAttendence = () => {
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={2} className="text-center">
+              <TableCell colSpan={3} className="text-center">
                 No students found
               </TableCell>
             </TableRow>
