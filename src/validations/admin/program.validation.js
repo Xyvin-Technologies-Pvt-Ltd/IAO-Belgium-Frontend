@@ -13,9 +13,12 @@ export const programSchema = z.object({
     errorMap: () => ({ message: "Please select a valid program type" }),
   }),
   year: z.coerce
-    .number({ invalid_type_error: "Year must be a number" })
-    .min(1, "Year must be at least 1")
-    .max(10, "Year must be at most 10"),
+    .number({ invalid_type_error: "Duration must be a number" })
+    .min(1, "Duration must be at least 1")
+    .max(1000, "Duration must be at most 1000"),
+  duration_unit: z.enum(["years", "months", "weeks", "days"], {
+    errorMap: () => ({ message: "Please select a valid duration unit" }),
+  }).optional().default("years"),
   language: z.string().min(1, "Language is required"),
   country: z.string().min(1, "Country is required"),
   city: z.string().min(1, "City is required"),

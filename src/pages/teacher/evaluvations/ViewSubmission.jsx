@@ -6,7 +6,7 @@ import {
   useEvaluateSubmission,
   useGetSubmissionById,
 } from "@/store/useSubmission";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +42,8 @@ const ViewSubmission = () => {
   const { t } = useTranslation();
   const { data, isLoading, error } = useGetSubmissionById(id);
   const submissionData = data?.data;
+
+  const [selectedDocIndex, setSelectedDocIndex] = useState(0);
 
   const { mutate: evaluate, isPending } = useEvaluateSubmission();
 
@@ -211,7 +213,8 @@ const ViewSubmission = () => {
       : "N/A";
 
   const isEvolvable = submissionData?.status === "submitted";
-  const documentFile = submissionData?.documents?.[0];
+  const documents = submissionData?.documents || [];
+  const documentFile = documents[selectedDocIndex] || documents[0];
   const pdfUrl = documentFile?.url ? encodeURI(documentFile.url) : null;
 
   return (
@@ -230,15 +233,40 @@ const ViewSubmission = () => {
                   <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 </button>
 
-                <span className="font-semibold text-gray-800 dark:text-gray-100 text-lg">
-                  {documentFile.url.split("/").pop() || "Document.pdf"}
+                <span className="font-semibold text-gray-800 dark:text-gray-100 text-lg truncate max-w-md">
+                  {decodeURIComponent(documentFile.url.split("/").pop() || "Document.pdf").replace(/^\d{10,13}_/, "")}
                 </span>
               </div>
+
+              {/* Tabs for Multiple Documents */}
+              {documents.length > 1 && (
+                <div className="flex items-center gap-2 px-4 py-2 border-b dark:border-white/10 bg-gray-50 dark:bg-gray-800/40 overflow-x-auto scrollbar-none shrink-0">
+                  {documents.map((doc, index) => {
+                    const fileName = doc.url.split("/").pop() || `Document ${index + 1}`;
+                    const decodedName = decodeURIComponent(fileName).replace(/^\d{10,13}_/, "");
+                    const isActive = index === selectedDocIndex;
+                    return (
+                      <button
+                        key={doc._id || index}
+                        onClick={() => setSelectedDocIndex(index)}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition border ${
+                          isActive
+                            ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-primary shadow-sm"
+                            : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                        }`}
+                      >
+                        {decodedName}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* PDF Viewer */}
               <div className="flex-1 overflow-hidden bg-gray-100 dark:bg-gray-900">
                 <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                   <Viewer
+                    key={pdfUrl}
                     fileUrl={pdfUrl}
                     plugins={[defaultLayoutPluginInstance]}
                   />

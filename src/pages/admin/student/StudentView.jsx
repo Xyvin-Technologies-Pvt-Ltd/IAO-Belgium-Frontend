@@ -118,7 +118,9 @@ const StudentView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              Year {y}
+              {studentData?.duration_unit && studentData.duration_unit !== "years"
+                ? `${t("common.level", "Level")} ${y}`
+                : `${t("common.year", "Year")} ${y}`}
             </button>
           ))}
         </nav>

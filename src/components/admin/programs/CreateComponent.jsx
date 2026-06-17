@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
 import { useDebounce } from "@/hooks/useDebounce";
 import ResourceSection from "./resources/ResourceSection";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const CreateComponent = ({
   open,
@@ -65,6 +66,16 @@ const CreateComponent = ({
   const [showModuleSuggestions, setShowModuleSuggestions] = useState(false);
   const [selectedSystemId, setSelectedSystemId] = useState(null);
   const debouncedModuleName = useDebounce(moduleNameSearch, 200);
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: !!programId && open });
+  const program = programRes?.data;
+  const totalStages = program?.year || 1;
+  const stageOptions = Array.from({ length: totalStages }, (_, i) => i + 1);
+
+  const durationUnit = program?.duration_unit || "years";
+  const singularUnitKey = durationUnit.endsWith("s") ? durationUnit.slice(0, -1) : durationUnit;
+  const unitLabel = t(`common.durationUnits.${singularUnitKey}`, singularUnitKey);
+  const capitalizedUnitLabel = unitLabel.charAt(0).toUpperCase() + unitLabel.slice(1);
 
   const {
     register,
@@ -525,7 +536,7 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    {t("componentManagement.yearLabel")}{" "}
+                    {capitalizedUnitLabel}{" "}
                     <span className="text-red-500">*</span>
                   </Label>
                   <Select
@@ -537,13 +548,16 @@ const CreateComponent = ({
                   >
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={t("componentManagement.yearPlaceholder")}
+                        placeholder={t("componentManagement.selectUnitPlaceholder", {
+                          defaultValue: `Select ${unitLabel}`,
+                          unit: unitLabel,
+                        })}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {[1, 2, 3, 4, 5].map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {t("componentManagement.year")} {year}
+                      {stageOptions.map((stage) => (
+                        <SelectItem key={stage} value={stage.toString()}>
+                          {`${capitalizedUnitLabel} ${stage}`}
                         </SelectItem>
                       ))}
                     </SelectContent>

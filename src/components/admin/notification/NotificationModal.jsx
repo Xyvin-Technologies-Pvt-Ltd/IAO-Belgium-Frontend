@@ -79,7 +79,7 @@ const AudienceFilters = ({
 }) => (
   <div className="space-y-4">
     <SinglePillGroup label="Language Group" options={languagesData?.data || []} selected={language} onChange={onLanguageChange} />
-    <SinglePillGroup label="Year" options={[1,2,3,4,5].map(y => ({ id: String(y), label: String(y) }))} valueKey="id" labelKey="label" selected={year} onChange={onYearChange} />
+    <SinglePillGroup label="Year/Level" options={[1,2,3,4,5].map(y => ({ id: String(y), label: String(y) }))} valueKey="id" labelKey="label" selected={year} onChange={onYearChange} />
     <SinglePillGroup label="Academic Year" options={academicYearsData?.data || []} selected={academicYear} onChange={onAcademicYearChange} />
     <SinglePillGroup label="Country" options={countriesData?.data || []} selected={country} onChange={onCountryChange} />
     {country && (

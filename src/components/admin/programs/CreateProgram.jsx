@@ -72,6 +72,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: "",
       program_type: "",
       year: "",
+      duration_unit: "years",
       language: "",
       city: "",
       country: "",
@@ -85,6 +86,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const selectedLanguage = watch("language");
   const selectedCity = watch("city");
   const watchedCountry = watch("country");
+  const selectedDurationUnit = watch("duration_unit");
 
   useEffect(() => {
     if (watchedCountry !== selectedCountry) {
@@ -101,6 +103,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: "",
       program_type: "",
       year: "",
+      duration_unit: "years",
       language: "",
       city: "",
       country: "",
@@ -120,6 +123,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: programData.program_code || "",
       program_type: programData.program_type || "",
       year: programData.year || "",
+      duration_unit: programData.duration_unit || "years",
       language: programData.language?._id || "",
       country: programData.city?.country?._id || "",
       city: programData.city?._id || "",
@@ -136,6 +140,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: formData.program_code,
       program_type: formData.program_type,
       year: formData.year,
+      duration_unit: formData.duration_unit || "years",
       language: formData.language,
       city: formData.city,
     };
@@ -198,6 +203,62 @@ const CreateProgram = ({ open, onClose, programData }) => {
               {...register("name")}
             />
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label={t("programManagement.modal.durationLabel")}
+                placeholder={t(
+                  `programManagement.modal.durationPlaceholder_${selectedDurationUnit}`,
+                  t("programManagement.modal.durationPlaceholder")
+                )}
+                type="number"
+                error={errors.year?.message}
+                required
+                {...register("year")}
+              />
+
+              <div className="space-y-2">
+                <Label>
+                  {t("programManagement.modal.durationUnitLabel", "Duration Unit")}{" "}
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  key={selectedDurationUnit || "empty-unit"}
+                  value={selectedDurationUnit || "years"}
+                  onValueChange={(value) =>
+                    setValue("duration_unit", value, { shouldValidate: true })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={t(
+                        "programManagement.modal.durationUnitPlaceholder",
+                        "Select unit"
+                      )}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="years">
+                      {t("common.durationUnits.years", "Years")}
+                    </SelectItem>
+                    <SelectItem value="months">
+                      {t("common.durationUnits.months", "Months")}
+                    </SelectItem>
+                    <SelectItem value="weeks">
+                      {t("common.durationUnits.weeks", "Weeks")}
+                    </SelectItem>
+                    <SelectItem value="days">
+                      {t("common.durationUnits.days", "Days")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.duration_unit && (
+                  <p className="text-red-500 text-sm">
+                    {errors.duration_unit.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>
                 {t("programManagement.modal.programTypeLabel")}{" "}
@@ -241,15 +302,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 </p>
               )}
             </div>
-
-            <FormField
-              label={t("programManagement.modal.durationLabel")}
-              placeholder={t("programManagement.modal.durationPlaceholder")}
-              type="number"
-              error={errors.year?.message}
-              required
-              {...register("year")}
-            />
             <FormField
               label={t("programManagement.modal.codeLabel")}
               placeholder={t("programManagement.modal.codePlaceholder")}

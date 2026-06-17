@@ -21,6 +21,7 @@ import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const AppModule = ({ programId, onComponentCreated,languageId }) => {
   const { t, i18n } = useTranslation();
@@ -36,6 +37,9 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: !!programId });
+  const program = programRes?.data;
 
   useEffect(() => {
     setPage(1);
@@ -86,7 +90,11 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
           <TableRow>
             <TableHead>{t("appModule.table.appId")}</TableHead>
             <TableHead>{t("appModule.table.appName")}</TableHead>
-            <TableHead>{t("appModule.table.year")}</TableHead>
+            <TableHead>
+              {program?.duration_unit && program.duration_unit !== "years"
+                ? t("appModule.table.level", "Level")
+                : t("appModule.table.year")}
+            </TableHead>
             <TableHead>{t("appModule.table.files")}</TableHead>
             <TableHead>{t("appModule.table.deadline")}</TableHead>
             <TableHead>{t("appModule.table.status")}</TableHead>
@@ -176,6 +184,7 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
         open={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         componentData={selectedModule}
+        program={program}
       />
     </div>
   );

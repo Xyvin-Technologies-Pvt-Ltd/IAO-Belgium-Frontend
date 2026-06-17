@@ -26,6 +26,7 @@ import {
   useCreateProgramConfig,
   useUpdateProgramConfig,
 } from "@/store/useProgramConfigStore";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const ProgramConfigDrawer = ({ programId }) => {
   const { t } = useTranslation();
@@ -60,6 +61,9 @@ const ProgramConfigDrawer = ({ programId }) => {
     },
     status: true,
   });
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: isOpen && !!programId });
+  const program = programRes?.data;
 
   const { data: configsData, isLoading } = useGetProgramConfigs(
     { program: programId },
@@ -183,6 +187,7 @@ const ProgramConfigDrawer = ({ programId }) => {
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
+  const durationUnit = program?.duration_unit || "years";
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -247,13 +252,15 @@ const ProgramConfigDrawer = ({ programId }) => {
                     className="h-8 gap-1.5"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    {t("programConfig.newYear")}
+                    {t([`programConfig.newYear_${durationUnit}`, "programConfig.newYear_level", "programConfig.newYear"])}
                   </Button>
                 </div>
                 
                 {isCreatingNew ? (
                   <div className="space-y-2">
-                    <Label htmlFor="year">{t("programConfig.yearLabel")}</Label>
+                    <Label htmlFor="year">
+                      {t([`programConfig.yearLabel_${durationUnit}`, "programConfig.levelLabel", "programConfig.yearLabel"])}
+                    </Label>
                     <Input
                       id="year"
                       type="number"
@@ -261,29 +268,32 @@ const ProgramConfigDrawer = ({ programId }) => {
                       value={formData.year}
                       onChange={(e) => updateField("year", parseInt(e.target.value))}
                       className="bg-sidebar border-sidebar-border"
-                      placeholder={t("programConfig.yearPlaceholder")}
+                      placeholder={t([`programConfig.yearPlaceholder_${durationUnit}`, "programConfig.levelPlaceholder", "programConfig.yearPlaceholder"])}
                     />
                     <p className="text-xs text-dashboard-text-secondary">
-                      {t("programConfig.yearHint")}
+                      {t([`programConfig.yearHint_${durationUnit}`, "programConfig.levelHint", "programConfig.yearHint"])}
                     </p>
                   </div>
                 ) : allConfigs.length > 0 ? (
                   <div className="space-y-2">
-                    <Label htmlFor="year-select">{t("programConfig.programYear")}</Label>
+                    <Label htmlFor="year-select">
+                      {t([`programConfig.programYear_${durationUnit}`, "programConfig.programLevel", "programConfig.programYear"])}
+                    </Label>
                     <Select value={selectedYear?.toString()} onValueChange={handleYearChange}>
                       <SelectTrigger className="bg-sidebar border-sidebar-border">
-                        <SelectValue placeholder={t("programConfig.yearPlaceholderSelect")} />
+                        <SelectValue placeholder={t([`programConfig.yearPlaceholderSelect_${durationUnit}`, "programConfig.yearPlaceholderSelect"])} />
                       </SelectTrigger>
                       <SelectContent>
                         {allConfigs.map((config) => (
                           <SelectItem key={config._id} value={config.year.toString()}>
-                            {t("programConfig.yearDisplay", { year: config.year })} {!config.status && `(${t("common.inactive")})`}
+                            {t([`programConfig.yearDisplay_${durationUnit}`, "programConfig.levelDisplay", "programConfig.yearDisplay"], { year: config.year, level: config.year })}{" "}
+                            {!config.status && `(${t("common.inactive")})`}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-dashboard-text-secondary">
-                      {t("programConfig.yearViewing", { year: selectedYear })}
+                      {t([`programConfig.yearViewing_${durationUnit}`, "programConfig.levelViewing", "programConfig.yearViewing"], { year: selectedYear, level: selectedYear })}
                     </p>
                   </div>
                 ) : (

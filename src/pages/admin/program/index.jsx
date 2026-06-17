@@ -188,7 +188,11 @@ const Programs = () => {
                 <TableCell>{i?.program_type}</TableCell>
                 <TableCell>{i?.program_code}</TableCell>
 
-                <TableCell>{i?.year}</TableCell>
+                <TableCell>
+                  {i?.year} {i?.year === 1 
+                    ? t(`common.durationUnits.${(i?.duration_unit || "years").slice(0, -1)}`, (i?.duration_unit || "years").slice(0, -1)) 
+                    : t(`common.durationUnits.${i?.duration_unit || "years"}`, i?.duration_unit || "Years")}
+                </TableCell>
                 <TableCell>{i?.city?.name}</TableCell>
                 <TableCell>{i?.language?.name}</TableCell>
                 <TableCell>

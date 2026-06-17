@@ -20,6 +20,7 @@ import CreateComponent from "./CreateComponent";
 import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const LearningModule = ({ programId, onComponentCreated,languageId }) => {
   const { t } = useTranslation();
@@ -30,6 +31,9 @@ const LearningModule = ({ programId, onComponentCreated,languageId }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: !!programId });
+  const program = programRes?.data;
 
   useEffect(() => {
     setPage(1);
@@ -79,7 +83,11 @@ const LearningModule = ({ programId, onComponentCreated,languageId }) => {
           <TableRow>
             <TableHead>{t("learningModule.table.learningUID")}</TableHead>
             <TableHead>{t("learningModule.table.moduleName")}</TableHead>
-            <TableHead>{t("learningModule.table.year")}</TableHead>
+            <TableHead>
+              {program?.duration_unit && program.duration_unit !== "years"
+                ? t("learningModule.table.level", "Level")
+                : t("learningModule.table.year")}
+            </TableHead>
             <TableHead>{t("learningModule.table.moduleNumber")}</TableHead>
             <TableHead>{t("learningModule.table.files")}</TableHead>
             <TableHead>{t("learningModule.table.amount")}</TableHead>
@@ -173,6 +181,7 @@ const LearningModule = ({ programId, onComponentCreated,languageId }) => {
         open={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         componentData={selectedModule}
+        program={program}
       />
     </div>
   );

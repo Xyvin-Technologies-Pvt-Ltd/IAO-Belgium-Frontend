@@ -154,7 +154,11 @@ const ProgramDetail = () => {
 
         <DashboardCard
           title={t("programDetail.cards.duration")}
-          value={`${programData.year} ${t("programDetail.cards.years")}`}
+          value={`${programData.year} ${
+            programData.year === 1
+              ? t(`common.durationUnits.${(programData.duration_unit || "years").slice(0, -1)}`, (programData.duration_unit || "years").slice(0, -1))
+              : t(`common.durationUnits.${programData.duration_unit || "years"}`, programData.duration_unit || "Years")
+          }`}
           icon={Clock}
         />
 
