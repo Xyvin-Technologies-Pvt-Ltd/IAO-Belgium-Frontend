@@ -243,7 +243,7 @@ const ProgramConfigDrawer = ({ programId }) => {
               <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
-                    {t("programConfig.selectYear")}
+                    {t([`programConfig.selectYear_${durationUnit}`, "programConfig.selectYear_level", "programConfig.selectYear"])}
                   </p>
                   <Button
                     size="sm"
