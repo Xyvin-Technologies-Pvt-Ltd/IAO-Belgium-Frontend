@@ -520,6 +520,8 @@
       "cityLabel": "Stadt",
       "cityPlaceholder": "Stadt auswählen",
       "cityPlaceholderDisabled": "Bitte zuerst ein Land auswählen",
+      "isOnlineLabel": "Online-Programm",
+      "isOnlineHint": "Wenn aktiviert, werden Anwesenheitsprüfungen und Planungen für Live-Sitzungen umgangen.",
       "searchLanguages": "Sprachen suchen...",
       "searchCountries": "Länder suchen...",
       "searchCities": "Städte suchen...",
@@ -1397,7 +1399,8 @@
       "attendance": {
         "title": "Anwesenheitsanforderungen",
         "overallMin": "Mindest-Gesamtprozentsatz (%)",
-        "perModuleMin": "Mindestprozentsatz pro Modul (%)"
+        "perModuleMin": "Mindestprozentsatz pro Modul (%)",
+        "onlineBypassed": "Nicht zutreffend: Anwesenheitskontrollen werden für Online-Programme umgangen."
       },
       "submission": {
         "title": "Einreichungsanforderungen",

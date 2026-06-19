@@ -148,7 +148,7 @@ const ProgramDetail = () => {
         <DashboardCard
           title={t("programDetail.cards.programName")}
           value={programData?.name}
-          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}`}
+          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}${programData?.is_online ? ` • ${t("common.online", "Online")}` : ""}`}
           icon={Layers}
         />
 

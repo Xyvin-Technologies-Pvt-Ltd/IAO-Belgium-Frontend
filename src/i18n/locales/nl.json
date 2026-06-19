@@ -88,6 +88,7 @@
     "year": "Jaar",
     "filters": "Filters",
     "dashboard": "Dashboard",
+    "online": "Online",
     "create": "Aanmaken",
     "update": "Bijwerken",
     "cancel": "Annuleren",
@@ -522,6 +523,8 @@
       "cityLabel": "Stad",
       "cityPlaceholder": "Stad selecteren",
       "cityPlaceholderDisabled": "Selecteer eerst een land",
+      "isOnlineLabel": "Online Opleiding",
+      "isOnlineHint": "Indien ingeschakeld, worden aanwezigheidscontroles en planningen voor live-sessies overgeslagen.",
       "searchLanguages": "Talen zoeken...",
       "searchCountries": "Landen zoeken...",
       "searchCities": "Steden zoeken...",
@@ -1399,7 +1402,8 @@
       "attendance": {
         "title": "Aanwezigheidsvereisten",
         "overallMin": "Minimaal algeheel percentage (%)",
-        "perModuleMin": "Minimaal percentage per module (%)"
+        "perModuleMin": "Minimaal percentage per module (%)",
+        "onlineBypassed": "Niet van toepassing: Aanwezigheidscontroles worden overgeslagen voor online programma's."
       },
       "submission": {
         "title": "Inleververeisten",

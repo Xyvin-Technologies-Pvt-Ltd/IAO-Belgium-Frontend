@@ -22,4 +22,5 @@ export const programSchema = z.object({
   language: z.string().min(1, "Language is required"),
   country: z.string().min(1, "Country is required"),
   city: z.string().min(1, "City is required"),
+  is_online: z.boolean().optional().default(false),
 });

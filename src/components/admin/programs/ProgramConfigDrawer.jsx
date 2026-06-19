@@ -330,32 +330,38 @@ const ProgramConfigDrawer = ({ programId }) => {
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
                   {t("programConfig.requirements.attendance.title")}
                 </p>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="overall-attendance">{t("programConfig.requirements.attendance.overallMin")}</Label>
-                    <Input
-                      id="overall-attendance"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.attendance.overall_min_percentage}
-                      onChange={(e) => updateField("attendance.overall_min_percentage", parseFloat(e.target.value))}
-                      className="bg-sidebar border-sidebar-border"
-                    />
+                {program?.is_online ? (
+                  <div className="text-sm text-[#ff8904] bg-[#ff8904]/10 p-3 rounded-lg border border-[#ff8904]/20 font-medium">
+                    {t("programConfig.requirements.attendance.onlineBypassed", "Not applicable: Attendance checks are bypassed for online programs.")}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="module-attendance">{t("programConfig.requirements.attendance.perModuleMin")}</Label>
-                    <Input
-                      id="module-attendance"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.attendance.per_module_min_percentage}
-                      onChange={(e) => updateField("attendance.per_module_min_percentage", parseFloat(e.target.value))}
-                      className="bg-sidebar border-sidebar-border"
-                    />
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="overall-attendance">{t("programConfig.requirements.attendance.overallMin")}</Label>
+                      <Input
+                        id="overall-attendance"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={formData.attendance.overall_min_percentage}
+                        onChange={(e) => updateField("attendance.overall_min_percentage", parseFloat(e.target.value))}
+                        className="bg-sidebar border-sidebar-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="module-attendance">{t("programConfig.requirements.attendance.perModuleMin")}</Label>
+                      <Input
+                        id="module-attendance"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={formData.attendance.per_module_min_percentage}
+                        onChange={(e) => updateField("attendance.per_module_min_percentage", parseFloat(e.target.value))}
+                        className="bg-sidebar border-sidebar-border"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Submissions */}

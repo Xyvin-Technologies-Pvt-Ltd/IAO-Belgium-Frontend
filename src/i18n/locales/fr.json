@@ -522,6 +522,8 @@
       "cityLabel": "Ville",
       "cityPlaceholder": "Sélectionner une ville",
       "cityPlaceholderDisabled": "Sélectionnez d'abord un pays",
+      "isOnlineLabel": "Programme en Ligne",
+      "isOnlineHint": "Si activé, les contrôles de présence et la planification des sessions en direct seront ignorés.",
       "searchLanguages": "Rechercher des langues...",
       "searchCountries": "Rechercher des pays...",
       "searchCities": "Rechercher des villes...",
@@ -1398,7 +1400,8 @@
       "attendance": {
         "title": "Exigences de présence",
         "overallMin": "Pourcentage global minimum (%)",
-        "perModuleMin": "Pourcentage minimum par module (%)"
+        "perModuleMin": "Pourcentage minimum par module (%)",
+        "onlineBypassed": "Non applicable: Les contrôles de présence sont ignorés pour les programmes en ligne."
       },
       "submission": {
         "title": "Exigences de soumission",

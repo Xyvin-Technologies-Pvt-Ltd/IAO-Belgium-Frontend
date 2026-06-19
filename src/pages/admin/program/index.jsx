@@ -183,7 +183,16 @@ const Programs = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{i?.name}</span>
+                    {i?.is_online && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-[#ff8904]/10 text-[#ff8904] border border-[#ff8904]/20">
+                        {t("common.online", "Online")}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
 
                 <TableCell>{i?.program_type}</TableCell>
                 <TableCell>{i?.program_code}</TableCell>

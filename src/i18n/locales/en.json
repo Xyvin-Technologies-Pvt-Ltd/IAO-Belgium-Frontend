@@ -88,6 +88,7 @@
     "year": "Year",
     "filters": "Filters",
     "dashboard": "Dashboard",
+    "online": "Online",
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
@@ -526,6 +527,8 @@
       "cityLabel": "City",
       "cityPlaceholder": "Select city",
       "cityPlaceholderDisabled": "Select country first",
+      "isOnlineLabel": "Online Programme",
+      "isOnlineHint": "If enabled, attendance checks and live session plannings will be bypassed.",
       "searchLanguages": "Search languages...",
       "searchCountries": "Search countries...",
       "searchCities": "Search cities...",
@@ -1433,7 +1436,8 @@
       "attendance": {
         "title": "Attendance Requirements",
         "overallMin": "Overall Minimum Percentage (%)",
-        "perModuleMin": "Per Module Minimum Percentage (%)"
+        "perModuleMin": "Per Module Minimum Percentage (%)",
+        "onlineBypassed": "Not applicable: Attendance checks are bypassed for online programs."
       },
       "submission": {
         "title": "Submission Requirements",

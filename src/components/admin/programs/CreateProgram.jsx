@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   useGetAllCountries,
   useGetAllCities,
@@ -76,6 +77,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       language: "",
       city: "",
       country: "",
+      is_online: false,
     },
   });
 
@@ -87,6 +89,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const selectedCity = watch("city");
   const watchedCountry = watch("country");
   const selectedDurationUnit = watch("duration_unit");
+  const isOnlineValue = watch("is_online");
 
   useEffect(() => {
     if (watchedCountry !== selectedCountry) {
@@ -107,6 +110,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       language: "",
       city: "",
       country: "",
+      is_online: false,
     });
     setCountrySearchTerm("");
     setCitySearchTerm("");
@@ -127,6 +131,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       language: programData.language?._id || "",
       country: programData.city?.country?._id || "",
       city: programData.city?._id || "",
+      is_online: programData.is_online || false,
     });
 
     if (programData.city?.country?._id) {
@@ -143,6 +148,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       duration_unit: formData.duration_unit || "years",
       language: formData.language,
       city: formData.city,
+      is_online: formData.is_online || false,
     };
 
     const mutation = isEdit ? updateProgram : createProgram;
@@ -309,6 +315,21 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
+
+            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
+              <div className="space-y-0.5">
+                <Label htmlFor="is-online" className="font-semibold text-sm">
+                  {t("programManagement.modal.isOnlineLabel", "Online Programme")}
+                </Label>
+              </div>
+              <Switch
+                id="is-online"
+                checked={isOnlineValue || false}
+                onCheckedChange={(checked) =>
+                  setValue("is_online", checked, { shouldValidate: true })
+                }
+              />
+            </div>
             <SearchableSelect
               label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}
