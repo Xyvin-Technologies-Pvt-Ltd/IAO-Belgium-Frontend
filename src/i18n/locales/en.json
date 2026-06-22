@@ -901,7 +901,11 @@
       "processing": "Processing...",
       "reject": "Reject",
       "waitlist": "In progress",
-      "accept": "Accept"
+      "accept": "Accept",
+      "qualificationStatus": "Qualification status",
+      "stillCompletingQualification": "Still completing qualification",
+      "qualificationNotDeferred": "Not deferred",
+      "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet."
     },
     "status": {
       "pending": "Pending",

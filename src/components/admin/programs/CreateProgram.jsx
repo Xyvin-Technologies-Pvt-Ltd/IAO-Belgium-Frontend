@@ -78,6 +78,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       city: "",
       country: "",
       is_online: false,
+      document_required: true,
     },
   });
 
@@ -90,6 +91,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const watchedCountry = watch("country");
   const selectedDurationUnit = watch("duration_unit");
   const isOnlineValue = watch("is_online");
+  const documentRequiredValue = watch("document_required");
 
   useEffect(() => {
     if (watchedCountry !== selectedCountry) {
@@ -111,6 +113,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       city: "",
       country: "",
       is_online: false,
+      document_required: true,
     });
     setCountrySearchTerm("");
     setCitySearchTerm("");
@@ -132,6 +135,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: programData.city?.country?._id || "",
       city: programData.city?._id || "",
       is_online: programData.is_online || false,
+      document_required: programData.document_required !== false,
     });
 
     if (programData.city?.country?._id) {
@@ -149,6 +153,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       language: formData.language,
       city: formData.city,
       is_online: formData.is_online || false,
+      document_required: formData.document_required !== false,
     };
 
     const mutation = isEdit ? updateProgram : createProgram;
@@ -330,8 +335,27 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 }
               />
             </div>
+            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
+              <div className="space-y-0.5">
+                <Label htmlFor="document-required" className="font-semibold text-sm">
+                  {t("programManagement.modal.documentRequiredLabel", "Documents Required")}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "programManagement.modal.documentRequiredDescription",
+                    "Require ID and qualification uploads during application",
+                  )}
+                </p>
+              </div>
+              <Switch
+                id="document-required"
+                checked={documentRequiredValue !== false}
+                onCheckedChange={(checked) =>
+                  setValue("document_required", checked, { shouldValidate: true })
+                }
+              />
+            </div>
             <SearchableSelect
-              label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}
               searchPlaceholder="Search languages..."
               items={languagesData?.data || []}

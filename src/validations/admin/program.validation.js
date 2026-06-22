@@ -23,4 +23,5 @@ export const programSchema = z.object({
   country: z.string().min(1, "Country is required"),
   city: z.string().min(1, "City is required"),
   is_online: z.boolean().optional().default(false),
+  document_required: z.boolean().optional().default(true),
 });
