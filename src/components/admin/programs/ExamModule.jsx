@@ -152,7 +152,6 @@ const ExamModule = ({ programId, onComponentCreated,languageId }) => {
         onComponentCreated={(componentType) => {
           setSelectedModule(null);
           setIsModalOpen(false);
-          refetch();
           if (onComponentCreated) {
             onComponentCreated(componentType);
           }

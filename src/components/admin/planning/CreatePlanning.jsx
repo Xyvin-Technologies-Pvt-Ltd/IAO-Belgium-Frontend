@@ -79,6 +79,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
   const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
     {
+      is_online: false,
       ...(programSearchTerm && { search: programSearchTerm }),
       ...(activeCity && activeCity !== "all" && { city: activeCity }),
     },

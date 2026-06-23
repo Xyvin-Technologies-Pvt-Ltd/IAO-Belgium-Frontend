@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
@@ -38,7 +38,7 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     resolver: zodResolver(intakeSchema),
     mode: "onChange",
     defaultValues: {
-      ...(isEdit && { name: "" }),
+      name: "",
       program: [],
       admission_fee: "",
       is_free: false,
@@ -55,20 +55,35 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
 
   const selectedPrograms = watch("program");
   const isFree = watch("is_free");
+  const requiresIntakeName = selectedPrograms.some((p) => p.is_online);
+  const showIntakeNameField =
+    requiresIntakeName || (isEdit && intakeData?.program?.is_online);
 
   const formatProgramData = (program) => {
     if (!program) return null;
+    const location =
+      program.city?.name || (program.is_online ? "Online" : "");
+    const label = [program.name, location, program.language?.name]
+      .filter(Boolean)
+      .join(" - ");
     return {
       ...program,
-      name: `${program.name} - ${program.city?.name || ""} - ${program.language?.name || ""}`,
+      program_name: program.name,
+      name: label,
     };
   };
+
+  const suggestIntakeName = useCallback((programs) => {
+    if (programs.length !== 1 || !programs[0].is_online) return "";
+    const programName = programs[0].program_name || programs[0].name || "";
+    return programName ? `Online ${programName}` : "Online";
+  }, []);
 
   const formattedProgramsData = programsData?.data?.map(formatProgramData) || [];
 
   const handleClose = () => {
     reset({
-      ...(isEdit && { name: "" }),
+      name: "",
       program: [],
       admission_fee: "",
       is_free: false,
@@ -108,6 +123,26 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
   }, [open, intakeData, reset]);
 
   useEffect(() => {
+    if (isEdit || !open) return;
+
+    if (requiresIntakeName) {
+      const suggested = suggestIntakeName(selectedPrograms);
+      if (suggested) {
+        setValue("name", suggested, { shouldValidate: true });
+      }
+    } else {
+      setValue("name", "", { shouldValidate: true });
+    }
+  }, [
+    selectedPrograms,
+    requiresIntakeName,
+    isEdit,
+    open,
+    setValue,
+    suggestIntakeName,
+  ]);
+
+  useEffect(() => {
     if (isFree) {
       setValue("admission_fee", 0, { shouldValidate: true });
     }
@@ -117,8 +152,10 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
     const isDeadlinePassed = moment(formData.registration_deadline).endOf("day").isBefore(moment());
     const status = isDeadlinePassed ? "closed" : "open";
 
+    const hasOnlineProgram = formData.program.some((p) => p.is_online);
+
     const payload = {
-      ...(isEdit && { name: formData.name }),
+      ...(hasOnlineProgram && { name: formData.name?.trim() }),
       program: formData.program.map((p) => p._id),
       admission_fee: formData.is_free ? 0 : Number(formData.admission_fee),
       start_date: formData.start_date,
@@ -165,16 +202,6 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
           </button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {isEdit && (
-            <FormField
-              label={t("intakeManagement.modal.nameLabel")}
-              placeholder={t("intakeManagement.modal.namePlaceholder")}
-              error={errors.name?.message}
-              disabled={true}
-              {...register("name")}
-            />
-          )}
-
           <SearchableMultiSelect
             label={t("intakeManagement.modal.programLabel")}
             placeholder={t("intakeManagement.modal.programPlaceholder")}
@@ -189,6 +216,17 @@ const CreateIntake = ({ open, onClose, intakeData, academicId }) => {
             error={errors.program?.message}
             required
           />
+
+          {showIntakeNameField && (
+            <FormField
+              label={t("intakeManagement.modal.nameLabel")}
+              placeholder={t("intakeManagement.modal.namePlaceholder")}
+              error={errors.name?.message}
+              disabled={isEdit}
+              required={requiresIntakeName && !isEdit}
+              {...register("name")}
+            />
+          )}
 
           <div className="flex items-center space-x-3 bg-gray-50 dark:bg-zinc-900/50 p-3 rounded-lg border dark:border-white/10">
             <Controller

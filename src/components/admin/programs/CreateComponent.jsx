@@ -29,8 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import { cn } from "@/lib/utils";
 
@@ -128,7 +126,7 @@ const CreateComponent = ({
     },
     {
       enabled:
-        selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
+        open && selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
     },
   );
 
@@ -139,7 +137,7 @@ const CreateComponent = ({
       program: programId,
     },
     {
-      enabled: selectedType === "exam" && !!programId,
+      enabled: open && selectedType === "exam" && !!programId,
     },
   );
   const programModules = programModulesData?.data || [];
@@ -152,7 +150,7 @@ const CreateComponent = ({
       ...(programLanguageId && { exam_language: programLanguageId }),
     },
     {
-      enabled: selectedType === "exam",
+      enabled: open && selectedType === "exam",
     },
   );
   const publishedExams = publishedExamsData?.data || [];

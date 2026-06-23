@@ -164,7 +164,6 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
         onComponentCreated={(componentType) => {
           setSelectedModule(null);
           setIsModalOpen(false);
-          refetch();
           // Call parent callback if provided
           if (onComponentCreated) {
             onComponentCreated(componentType);
