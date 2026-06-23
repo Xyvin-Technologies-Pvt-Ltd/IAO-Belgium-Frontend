@@ -383,40 +383,44 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
             />
 
-            <SearchableSelect
-              label={t("programManagement.modal.countryLabel")}
-              placeholder={t("programManagement.modal.countryPlaceholder")}
-              searchPlaceholder="Search countries..."
-              items={countriesData?.data || []}
-              value={watchedCountry || ""}
-              onChange={(value) =>
-                setValue("country", value, { shouldValidate: true })
-              }
-              onSearch={setCountrySearchTerm}
-              isLoading={countriesLoading}
-              error={errors.country?.message}
-              required={!isOnlineValue}
-            />
+            {!isOnlineValue && (
+              <>
+                <SearchableSelect
+                  label={t("programManagement.modal.countryLabel")}
+                  placeholder={t("programManagement.modal.countryPlaceholder")}
+                  searchPlaceholder="Search countries..."
+                  items={countriesData?.data || []}
+                  value={watchedCountry || ""}
+                  onChange={(value) =>
+                    setValue("country", value, { shouldValidate: true })
+                  }
+                  onSearch={setCountrySearchTerm}
+                  isLoading={countriesLoading}
+                  error={errors.country?.message}
+                  required
+                />
 
-            <SearchableSelect
-              label={t("programManagement.modal.cityLabel")}
-              placeholder={
-                selectedCountry
-                  ? t("programManagement.modal.cityPlaceholder")
-                  : t("programManagement.modal.cityPlaceholderDisabled")
-              }
-              searchPlaceholder="Search cities..."
-              items={citiesData?.data || []}
-              value={selectedCity || ""}
-              onChange={(value) =>
-                setValue("city", value, { shouldValidate: true })
-              }
-              onSearch={setCitySearchTerm}
-              isLoading={citiesLoading}
-              error={errors.city?.message}
-              required={!isOnlineValue}
-              disabled={!isOnlineValue && !selectedCountry}
-            />
+                <SearchableSelect
+                  label={t("programManagement.modal.cityLabel")}
+                  placeholder={
+                    selectedCountry
+                      ? t("programManagement.modal.cityPlaceholder")
+                      : t("programManagement.modal.cityPlaceholderDisabled")
+                  }
+                  searchPlaceholder="Search cities..."
+                  items={citiesData?.data || []}
+                  value={selectedCity || ""}
+                  onChange={(value) =>
+                    setValue("city", value, { shouldValidate: true })
+                  }
+                  onSearch={setCitySearchTerm}
+                  isLoading={citiesLoading}
+                  error={errors.city?.message}
+                  required
+                  disabled={!selectedCountry}
+                />
+              </>
+            )}
 
             <FormActions
               onCancel={handleClose}
