@@ -55,10 +55,13 @@ const SessionAttendence = () => {
   const sessionDate = data?.data?.session_date;
   const totalRows = data?.total_count || 0;
   const component = data?.data?.component_name;
-  // Check if session date is in the future (before today)
-  const isSessionFuture = sessionDate
-    ? getMoment(sessionDate).startOf("day").isAfter(getMoment().startOf("day"))
-    : false;
+
+  const sessionDay = sessionDate ? getMoment(sessionDate).startOf("day") : null;
+  const today = getMoment().startOf("day");
+  const isSessionFuture = sessionDay ? sessionDay.isAfter(today) : false;
+  const isSessionPast = sessionDay ? sessionDay.isBefore(today) : false;
+  const canMarkAttendance = sessionDay ? sessionDay.isSame(today) : false;
+  const isAttendanceLocked = !canMarkAttendance;
 
   useEffect(() => {
     if (component) {
@@ -107,7 +110,15 @@ const SessionAttendence = () => {
             <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md">
               <p className="text-sm text-yellow-800">
                 Attendance marking is not available yet. You can mark attendance
-                on or after the session date.
+                only on the session date.
+              </p>
+            </div>
+          )}
+
+          {isSessionPast && (
+            <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-800">
+                Attendance marking is closed. The session date has passed.
               </p>
             </div>
           )}
@@ -182,7 +193,7 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "present" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                          currentStatus === "present" && (markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased)
                             ? { backgroundColor: "#49BA6C", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
@@ -190,7 +201,7 @@ const SessionAttendence = () => {
                           handleAttendanceUpdate(student.application_id, "present")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
+                          markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased
                         }
                       >
                         <Check className="h-4 w-4 mr-1" />
@@ -207,7 +218,7 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "absent" && (markAttendanceMutation.isPending || isSessionFuture || !student.purchased)
+                          currentStatus === "absent" && (markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased)
                             ? { backgroundColor: "#E7000B", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
@@ -215,7 +226,7 @@ const SessionAttendence = () => {
                           handleAttendanceUpdate(student.application_id, "absent")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isSessionFuture || !student.purchased
+                          markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased
                         }
                       >
                         <X className="h-4 w-4 mr-1" />

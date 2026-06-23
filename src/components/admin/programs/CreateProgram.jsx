@@ -151,10 +151,19 @@ const CreateProgram = ({ open, onClose, programData }) => {
       year: formData.year,
       duration_unit: formData.duration_unit || "years",
       language: formData.language,
-      city: formData.city,
       is_online: formData.is_online || false,
       document_required: formData.document_required !== false,
     };
+
+    if (formData.is_online) {
+      if (formData.city) {
+        payload.city = formData.city;
+      } else if (isEdit) {
+        payload.city = null;
+      }
+    } else {
+      payload.city = formData.city;
+    }
 
     const mutation = isEdit ? updateProgram : createProgram;
     const mutationData = isEdit
@@ -330,9 +339,14 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <Switch
                 id="is-online"
                 checked={isOnlineValue || false}
-                onCheckedChange={(checked) =>
-                  setValue("is_online", checked, { shouldValidate: true })
-                }
+                onCheckedChange={(checked) => {
+                  setValue("is_online", checked, { shouldValidate: true });
+                  if (checked) {
+                    setValue("country", "", { shouldValidate: true });
+                    setValue("city", "", { shouldValidate: true });
+                    setSelectedCountry("");
+                  }
+                }}
               />
             </div>
             <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
@@ -381,7 +395,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               onSearch={setCountrySearchTerm}
               isLoading={countriesLoading}
               error={errors.country?.message}
-              required
+              required={!isOnlineValue}
             />
 
             <SearchableSelect
@@ -400,8 +414,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
               onSearch={setCitySearchTerm}
               isLoading={citiesLoading}
               error={errors.city?.message}
-              required
-              disabled={!selectedCountry}
+              required={!isOnlineValue}
+              disabled={!isOnlineValue && !selectedCountry}
             />
 
             <FormActions
