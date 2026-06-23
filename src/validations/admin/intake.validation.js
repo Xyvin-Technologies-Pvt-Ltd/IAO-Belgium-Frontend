@@ -43,11 +43,16 @@ export const intakeSchema = z
     path: ["end_date"],
   })
   .refine(
-    (data) => new Date(data.registration_deadline) < new Date(data.start_date),
+    (data) => {
+      const allOnline =
+        data.program.length > 0 && data.program.every((p) => p.is_online);
+      if (allOnline) return true;
+      return new Date(data.registration_deadline) < new Date(data.start_date);
+    },
     {
       message: "Registration deadline must be before start date",
       path: ["registration_deadline"],
-    }
+    },
   )
   .refine((data) => data.student_per_batch <= data.max_student_enrollment, {
     message: "Cannot exceed max student enrollment",

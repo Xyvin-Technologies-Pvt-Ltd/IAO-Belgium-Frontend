@@ -1157,7 +1157,13 @@
       "addLink": "Add Link",
       "enterUrl": "Enter URL (Link)",
       "existingFile": "Existing File",
-      "resourceNameOptional": "Resource Name (Optional)"
+      "resourceNameOptional": "Resource Name (Optional)",
+      "uploading": "Uploading… {{progress}}%",
+      "processing": "Saving to storage…",
+      "uploadFailed": "Failed to upload {{name}}",
+      "uploadFailedShort": "Upload failed",
+      "retryUpload": "Retry",
+      "pendingUpload": "Uploads on save"
     }
   },
   "planningManagement": {
@@ -1369,6 +1375,8 @@
     "internships": "Clinical Practice",
     "activeStatus": "Active Status",
     "uploadingFiles": "Uploading files...",
+    "waitForUploads": "Please wait for file uploads to finish",
+    "pendingUploads": "Some files have not finished uploading yet",
     "types": {
       "module": "Learning Module",
       "app": "Applied Professional Practice (APP)",
