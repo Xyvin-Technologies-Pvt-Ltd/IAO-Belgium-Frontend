@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import SafeHtml from "@/components/common/SafeHtml";
 import {
   Sheet,
   SheetContent,
@@ -163,13 +164,14 @@ const TeacherNotificationDrawer = () => {
                         {notification.subject}
                       </p>
                     )}
-                    <p
+                    <SafeHtml
+                      as="div"
                       className={`text-sm ${
                         !notification.read
                           ? "font-medium text-sidebar-foreground"
                           : "text-dashboard-text-secondary"
                       } ${notification.subject ? "text-xs opacity-80 mt-0.5" : ""} prose prose-xs max-w-none`}
-                      dangerouslySetInnerHTML={{ __html: notification.message }}
+                      html={notification.message}
                     />
                     <p className="text-xs text-dashboard-text-secondary mt-1 opacity-70">
                       {moment(notification.createdAt).fromNow()}

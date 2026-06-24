@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SafeHtml from "@/components/common/SafeHtml";
 import { useForm } from "react-hook-form";
 import { X, Users, Check, ChevronRight, Bell, GraduationCap, Paperclip, Trash2, UploadCloud, File as FileIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -828,7 +829,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="border-t pt-3">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Message</p>
-                  <div className="text-sm text-foreground/80 prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5" dangerouslySetInnerHTML={{ __html: messageContent }} />
+                  <SafeHtml className="text-sm text-foreground/80 prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5" html={messageContent} />
                 </div>
                 {attachments.length > 0 && (
                   <div className="border-t pt-3">

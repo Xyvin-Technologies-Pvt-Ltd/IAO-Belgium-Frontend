@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import SafeHtml from "@/components/common/SafeHtml";
 import { useForm } from "react-hook-form";
 import { X, Users, Check, ChevronRight, Bell, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -288,9 +289,9 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="pt-3 border-t">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Message Body</p>
-                  <div 
+                  <SafeHtml
                     className="text-sm text-foreground/90 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: messageContent }}
+                    html={messageContent}
                   />
                 </div>
               </div>

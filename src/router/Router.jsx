@@ -11,6 +11,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { publicRoutes } from "./routes/publicRoutes.jsx";
 import { teacherRoutes } from "./routes/teacherRoutes.jsx";
 import { adminRoutes } from "./routes/adminRoutes.jsx";
+import { PORTAL } from "../config/portal";
 
 // Root route
 const rootRoute = createRootRoute({
@@ -45,9 +46,15 @@ const publicRouteObjects = publicRoutes.map(({ path, component }) =>
   createPublicRoute(path, component)
 );
 
+// Only mount the route tree(s) for the portal this domain serves, so
+// admin.* never ships teacher routes and vice-versa. "both" (local/legacy
+// single domain) keeps the original behaviour of mounting both trees.
+const activeTeacherRoutes = PORTAL === "admin" ? [] : teacherRoutes;
+const activeAdminRoutes = PORTAL === "teacher" ? [] : adminRoutes;
+
 const protectedRouteObjects = [
-  ...teacherRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
-  ...adminRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
+  ...activeTeacherRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
+  ...activeAdminRoutes.map(({ path, component }) => createProtectedRoute(path, component)),
 ];
 
 // Create the route tree

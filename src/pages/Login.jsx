@@ -7,6 +7,7 @@ import { CircleAlert, Languages, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { sendOtp } from "@/api/authApi";
+import { isRoleAllowedOnPortal, PORTAL } from "@/config/portal";
 import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
@@ -50,6 +51,10 @@ const Login = () => {
 
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
+      // Don't auto-redirect a session whose role doesn't belong on this portal.
+      if (!isRoleAllowedOnPortal(role)) {
+        return;
+      }
       if (role === "admin") {
         navigate({ to: "/admin/dashboard" });
       } else if (role === "teacher") {
@@ -90,6 +95,19 @@ const Login = () => {
     try {
       const response = await verifyOtp(email, otp);
       const userRole = response?.data?.user?.role;
+
+      // Per-portal access: an admin must not enter the teacher portal, etc.
+      // (UX guard; the backend is the real boundary.)
+      if (!isRoleAllowedOnPortal(userRole)) {
+        await useAuthStore.getState().logout();
+        toast.error(
+          PORTAL === "admin"
+            ? "This is the admin portal. Teachers, please use the teacher portal."
+            : "This is the teacher portal. Admins, please use the admin portal."
+        );
+        return;
+      }
+
       toast.success(t("login.toast.loginSuccess"));
 
       // Navigate based on user role

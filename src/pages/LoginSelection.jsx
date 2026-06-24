@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,18 +28,21 @@ const LoginSelection = () => {
     navigate({ to: "/login" });
   };
 
+  const studentPortalBase =
+    import.meta.env.VITE_STUDENT_PORTAL_URL || "https://student-iao.xyvin.com";
+
   const handleStudentLogin = () => {
     if (!selectedProgram) {
       return;
     }
-    
-    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+
+    const studentLoginUrl = `${studentPortalBase}/login?programId=${selectedProgram}`;
     window.open(studentLoginUrl, '_blank');
   };
 
   const handleCopyUrl = async () => {
     if (!selectedProgram) return;
-    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    const studentLoginUrl = `${studentPortalBase}/login?programId=${selectedProgram}`;
     try {
       await navigator.clipboard.writeText(studentLoginUrl);
       setCopied(true);

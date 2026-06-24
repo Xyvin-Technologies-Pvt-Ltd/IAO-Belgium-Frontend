@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { Navigate } from "@tanstack/react-router";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
   const { profile, isAuthenticated } = useAuthStore();
@@ -7,6 +8,16 @@ const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Profile is fetched AFTER login. Until it resolves, permissions are unknown,
+  // so show a spinner rather than flashing "Access Denied" at a legitimate user.
+  if (requiredPermissions.length > 0 && !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" text="Loading..." />
+      </div>
+    );
   }
 
   // Get user permissions

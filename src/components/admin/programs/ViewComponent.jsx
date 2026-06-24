@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import SafeHtml from "@/components/common/SafeHtml";
 import { useTranslation } from "react-i18next";
 import { X, FileText, CheckCircle, XCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -161,11 +162,9 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                   {t("componentManagement.instructionsLabel")}
                 </h3>
                 <div className="bg-muted rounded-lg p-4">
-                  <div
+                  <SafeHtml
                     className="text-sm leading-relaxed instruction-content"
-                    dangerouslySetInnerHTML={{
-                      __html: componentData.instruction,
-                    }}
+                    html={componentData.instruction}
                   />
                 </div>
               </div>
