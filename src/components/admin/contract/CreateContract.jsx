@@ -28,7 +28,19 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const [fileName, setFileName] = useState("");
 
   const { data: programsRes } = useGetAllPrograms();
-  const programs = programsRes?.data || [];
+  const programs = [...(programsRes?.data || [])];
+
+  if (isEdit && contractData?.program) {
+    const progObj = typeof contractData.program === "object" ? contractData.program : null;
+    const progId = progObj?._id || contractData.program;
+    const exists = programs.some((p) => p._id === progId);
+    if (!exists) {
+      programs.push({
+        _id: progId,
+        name: progObj?.name || "Selected Program",
+      });
+    }
+  }
 
   const {
     register,
@@ -154,58 +166,47 @@ const CreateContract = ({ open, onClose, contractData }) => {
             {...register("name")}
           />
 
-          <Controller
-            control={control}
-            name="program"
-            render={({ field }) => (
-              <FormField
-                label="Program"
-                error={errors.program?.message}
-                required
-              >
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
-                    <SelectValue placeholder="Select a Program" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {programs.map((p) => (
-                      <SelectItem key={p._id} value={p._id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            )}
-          />
+          <FormField
+            label="Program"
+            error={errors.program?.message}
+            required
+          >
+            <Select
+              key={programs.length + "-" + (watch("program") || "empty")}
+              value={watch("program") || ""}
+              onValueChange={(val) => setValue("program", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select a Program" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {programs.map((p) => (
+                  <SelectItem key={p._id} value={p._id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
 
-          <Controller
-            control={control}
-            name="contract_type"
-            render={({ field }) => (
-              <FormField
-                label="Contract Type"
-                error={errors.contract_type?.message}
-                required
-              >
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
-                    <SelectValue placeholder="Select Contract Type" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="student_contract">Student Contract</SelectItem>
-                    <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormField>
-            )}
-          />
+          <FormField
+            label="Contract Type"
+            error={errors.contract_type?.message}
+            required
+          >
+            <Select
+              value={watch("contract_type") || ""}
+              onValueChange={(val) => setValue("contract_type", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select Contract Type" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="student_contract">Student Contract</SelectItem>
+                <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-900 dark:text-white">
