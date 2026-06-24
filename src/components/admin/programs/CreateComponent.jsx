@@ -489,7 +489,7 @@ const CreateComponent = ({
     } catch (error) {
       console.error("Submit error:", error);
       if (!error?.message?.includes("Upload failed")) {
-        toast.error(error?.message || "Failed to save component");
+        // toast.error(error?.message || "Failed to save component");
       }
     } finally {
       setIsUploadingFiles(false);
