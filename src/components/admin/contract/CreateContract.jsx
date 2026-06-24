@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Upload, FileText, ExternalLink } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
@@ -8,9 +8,16 @@ import { Label } from "@/components/ui/label";
 import { contractSchema } from "@/validations/admin/contract.validation";
 import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
-import { useGetPrograms } from "@/store/useProgramStore";
+import { useGetAllPrograms } from "@/store/useDropdownStore";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CreateContract = ({ open, onClose, contractData }) => {
   const { t } = useTranslation();
@@ -20,7 +27,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const [pendingFile, setPendingFile] = useState(null); // raw File object, not yet uploaded
   const [fileName, setFileName] = useState("");
 
-  const { data: programsRes } = useGetPrograms({ limit: 1000 });
+  const { data: programsRes } = useGetAllPrograms();
   const programs = programsRes?.data || [];
 
   const {
@@ -29,6 +36,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(contractSchema),
@@ -119,7 +127,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-96 p-6">
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-[32rem] p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -146,35 +154,58 @@ const CreateContract = ({ open, onClose, contractData }) => {
             {...register("name")}
           />
 
-          <FormField
-            label="Program"
-            error={errors.program?.message}
-            required
-          >
-            <select
-              {...register("program")}
-              className="w-full border rounded-lg p-2 bg-transparent text-sm border-gray-200 dark:border-white/20 text-gray-900 dark:text-white focus:outline-none focus:border-primary"
-            >
-              <option value="" className="bg-white dark:bg-black">Select a Program</option>
-              {programs.map(p => (
-                <option key={p._id} value={p._id} className="bg-white dark:bg-black">{p.name}</option>
-              ))}
-            </select>
-          </FormField>
+          <Controller
+            control={control}
+            name="program"
+            render={({ field }) => (
+              <FormField
+                label="Program"
+                error={errors.program?.message}
+                required
+              >
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                    <SelectValue placeholder="Select a Program" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    {programs.map((p) => (
+                      <SelectItem key={p._id} value={p._id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+            )}
+          />
 
-          <FormField
-            label="Contract Type"
-            error={errors.contract_type?.message}
-            required
-          >
-            <select
-              {...register("contract_type")}
-              className="w-full border rounded-lg p-2 bg-transparent text-sm border-gray-200 dark:border-white/20 text-gray-900 dark:text-white focus:outline-none focus:border-primary"
-            >
-              <option value="student_contract" className="bg-white dark:bg-black">Student Contract</option>
-              <option value="internal_regulations" className="bg-white dark:bg-black">Internal Regulations</option>
-            </select>
-          </FormField>
+          <Controller
+            control={control}
+            name="contract_type"
+            render={({ field }) => (
+              <FormField
+                label="Contract Type"
+                error={errors.contract_type?.message}
+                required
+              >
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                    <SelectValue placeholder="Select Contract Type" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="student_contract">Student Contract</SelectItem>
+                    <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormField>
+            )}
+          />
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-900 dark:text-white">
