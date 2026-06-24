@@ -118,23 +118,27 @@ const BatchDetails = () => {
             icon={Users}
           />
 
-          <DashboardCard
-            title={t("batchManagement.details.cards.totalSessions")}
-            value={batchData?.total_batch_count || 0}
-            icon={BookOpen}
-          />
+          {!batchData.is_online && (
+            <>
+              <DashboardCard
+                title={t("batchManagement.details.cards.totalSessions")}
+                value={batchData?.total_batch_count || 0}
+                icon={BookOpen}
+              />
 
-          <DashboardCard
-            title={t("batchManagement.details.cards.completed")}
-            value={batchData?.completed || 0}
-            icon={CalendarCheck}
-          />
+              <DashboardCard
+                title={t("batchManagement.details.cards.completed")}
+                value={batchData?.completed || 0}
+                icon={CalendarCheck}
+              />
 
-          <DashboardCard
-            title={t("batchManagement.details.cards.avgAttendance")}
-            value={`${batchData?.average_attendance || 0}%`}
-            icon={BarChart3}
-          />
+              <DashboardCard
+                title={t("batchManagement.details.cards.avgAttendance")}
+                value={`${batchData?.average_attendance || 0}%`}
+                icon={BarChart3}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -148,18 +152,22 @@ const BatchDetails = () => {
             key: "Students",
             label: t("batchManagement.details.tabs.students"),
           },
+          ...(!batchData.is_online
+            ? [
+                {
+                  key: "Attendence",
+                  label: t("batchManagement.details.tabs.attendence"),
+                },
+              ]
+            : []),
           {
-            key: "Attendence",
-            label: t("batchManagement.details.tabs.attendence"),
-          },
-          {
-            key:"Results",
+            key: "Results",
             label: t("batchManagement.details.tabs.results"),
           },
           {
             key: "Year",
             label: t("common.yearLog"),
-          }
+          },
         ].map((tab) => (
           <button
             key={tab.key}

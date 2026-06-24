@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { contractSchema } from "@/validations/admin/contract.validation";
 import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
+import { useGetPrograms } from "@/store/useProgramStore";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
 
@@ -19,6 +20,9 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const [pendingFile, setPendingFile] = useState(null); // raw File object, not yet uploaded
   const [fileName, setFileName] = useState("");
 
+  const { data: programsRes } = useGetPrograms({ limit: 1000 });
+  const programs = programsRes?.data || [];
+
   const {
     register,
     handleSubmit,
@@ -28,7 +32,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(contractSchema),
-    defaultValues: { name: "", file: "" },
+    defaultValues: { name: "", file: "", program: "", contract_type: "student_contract" },
   });
 
   const fileValue = watch("file");
@@ -36,7 +40,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const updateContract = useUpdateContract();
 
   const handleClose = () => {
-    reset({ name: "", file: "" });
+    reset({ name: "", file: "", program: "", contract_type: "student_contract" });
     setFileName("");
     setPendingFile(null);
     setIsUploading(false);
@@ -46,7 +50,12 @@ const CreateContract = ({ open, onClose, contractData }) => {
   useEffect(() => {
     if (open) {
       if (contractData && isEdit) {
-        reset({ name: contractData.name || "", file: contractData.file || "" });
+        reset({
+          name: contractData.name || "",
+          file: contractData.file || "",
+          program: contractData.program?._id || contractData.program || "",
+          contract_type: contractData.contract_type || "student_contract"
+        });
         if (contractData.file) {
           const urlFileName = contractData.file.split("/").pop().split("?")[0];
           setFileName(urlFileName || "Current file");
@@ -54,7 +63,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
           setFileName("");
         }
       } else {
-        reset({ name: "", file: "" });
+        reset({ name: "", file: "", program: "", contract_type: "student_contract" });
         setFileName("");
       }
       setPendingFile(null);
@@ -82,7 +91,12 @@ const CreateContract = ({ open, onClose, contractData }) => {
         if (!fileUrl) throw new Error("Upload failed");
       }
 
-      const payload = { name: formData.name, file: fileUrl };
+      const payload = {
+        name: formData.name,
+        file: fileUrl,
+        program: formData.program,
+        contract_type: formData.contract_type
+      };
 
       if (isEdit) {
         updateContract.mutate(
@@ -131,6 +145,36 @@ const CreateContract = ({ open, onClose, contractData }) => {
             required
             {...register("name")}
           />
+
+          <FormField
+            label="Program"
+            error={errors.program?.message}
+            required
+          >
+            <select
+              {...register("program")}
+              className="w-full border rounded-lg p-2 bg-transparent text-sm border-gray-200 dark:border-white/20 text-gray-900 dark:text-white focus:outline-none focus:border-primary"
+            >
+              <option value="" className="bg-white dark:bg-black">Select a Program</option>
+              {programs.map(p => (
+                <option key={p._id} value={p._id} className="bg-white dark:bg-black">{p.name}</option>
+              ))}
+            </select>
+          </FormField>
+
+          <FormField
+            label="Contract Type"
+            error={errors.contract_type?.message}
+            required
+          >
+            <select
+              {...register("contract_type")}
+              className="w-full border rounded-lg p-2 bg-transparent text-sm border-gray-200 dark:border-white/20 text-gray-900 dark:text-white focus:outline-none focus:border-primary"
+            >
+              <option value="student_contract" className="bg-white dark:bg-black">Student Contract</option>
+              <option value="internal_regulations" className="bg-white dark:bg-black">Internal Regulations</option>
+            </select>
+          </FormField>
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-900 dark:text-white">

@@ -185,7 +185,16 @@ const Intakes = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.name}</TableCell>
-                <TableCell>{i?.program?.name || "N/A"}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{i?.program?.name || "N/A"}</span>
+                    {i?.program?.is_online && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-[#ff8904]/10 text-[#ff8904] border border-[#ff8904]/20">
+                        {t("common.online", "Online")}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{i?.program?.city?.name || "N/A"}</TableCell>
                 <TableCell>{i?.program?.language?.name || "N/A"}</TableCell>
                 <TableCell>{i?.admission_fee || 0}</TableCell>
