@@ -3,7 +3,7 @@ name: Deploy IAO Belgium Frontend to AWS Lightsail
 on:
   push:
     branches:
-      - test
+      - uat
   workflow_dispatch:
 
 jobs:
