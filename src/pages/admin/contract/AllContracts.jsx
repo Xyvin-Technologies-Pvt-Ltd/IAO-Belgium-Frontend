@@ -68,7 +68,8 @@ const AllContracts = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("common.name")}</TableHead>
-            <TableHead>Program</TableHead>
+            <TableHead>Program Type</TableHead>
+            <TableHead>Language</TableHead>
             <TableHead>Contract Type</TableHead>
             <TableHead>{t("common.version")}</TableHead>
             <TableHead>{t("common.status")}</TableHead>
@@ -78,10 +79,10 @@ const AllContracts = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("common.failedToLoadContracts")}
                   onRetry={refetch}
@@ -93,7 +94,8 @@ const AllContracts = () => {
             contracts.map((contract) => (
               <TableRow key={contract._id}>
                 <TableCell>{contract.name}</TableCell>
-                <TableCell>{contract.program?.name || "Global"}</TableCell>
+                <TableCell>{contract.program_type || "—"}</TableCell>
+                <TableCell>{contract.language?.name || "—"}</TableCell>
                 <TableCell className="capitalize">{contract.contract_type?.replace("_", " ")}</TableCell>
                 <TableCell>v{contract.version}</TableCell>
                 <TableCell>
@@ -136,7 +138,7 @@ const AllContracts = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={8} className="text-center">
                 {t("common.noContracts")}
               </TableCell>
             </TableRow>

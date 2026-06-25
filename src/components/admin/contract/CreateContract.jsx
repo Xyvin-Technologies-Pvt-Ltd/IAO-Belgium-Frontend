@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { contractSchema } from "@/validations/admin/contract.validation";
 import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
-import { useGetAllPrograms } from "@/store/useDropdownStore";
+import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
 import {
@@ -27,20 +27,16 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const [pendingFile, setPendingFile] = useState(null); // raw File object, not yet uploaded
   const [fileName, setFileName] = useState("");
 
-  const { data: programsRes } = useGetAllPrograms();
-  const programs = [...(programsRes?.data || [])];
+  const programTypes = [
+    "Master of Science",
+    "Lateral Entry Master of Science",
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module",
+  ];
 
-  if (isEdit && contractData?.program) {
-    const progObj = typeof contractData.program === "object" ? contractData.program : null;
-    const progId = progObj?._id || contractData.program;
-    const exists = programs.some((p) => p._id === progId);
-    if (!exists) {
-      programs.push({
-        _id: progId,
-        name: progObj?.name || "Selected Program",
-      });
-    }
-  }
+  const { data: languagesRes } = useGetAllLanguages();
+  const languages = languagesRes?.data || [];
 
   const {
     register,
@@ -52,7 +48,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(contractSchema),
-    defaultValues: { name: "", file: "", program: "", contract_type: "student_contract" },
+    defaultValues: { name: "", file: "", program_type: "", language: "", contract_type: "student_contract" },
   });
 
   const fileValue = watch("file");
@@ -60,7 +56,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const updateContract = useUpdateContract();
 
   const handleClose = () => {
-    reset({ name: "", file: "", program: "", contract_type: "student_contract" });
+    reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
     setFileName("");
     setPendingFile(null);
     setIsUploading(false);
@@ -73,7 +69,8 @@ const CreateContract = ({ open, onClose, contractData }) => {
         reset({
           name: contractData.name || "",
           file: contractData.file || "",
-          program: contractData.program?._id || contractData.program || "",
+          program_type: contractData.program_type || "",
+          language: contractData.language?._id || contractData.language || "",
           contract_type: contractData.contract_type || "student_contract"
         });
         if (contractData.file) {
@@ -83,7 +80,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
           setFileName("");
         }
       } else {
-        reset({ name: "", file: "", program: "", contract_type: "student_contract" });
+        reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
         setFileName("");
       }
       setPendingFile(null);
@@ -114,7 +111,8 @@ const CreateContract = ({ open, onClose, contractData }) => {
       const payload = {
         name: formData.name,
         file: fileUrl,
-        program: formData.program,
+        program_type: formData.program_type,
+        language: formData.language,
         contract_type: formData.contract_type
       };
 
@@ -167,22 +165,44 @@ const CreateContract = ({ open, onClose, contractData }) => {
           />
 
           <FormField
-            label="Program"
-            error={errors.program?.message}
+            label="Program Type"
+            error={errors.program_type?.message}
             required
           >
             <Select
-              key={programs.length + "-" + (watch("program") || "empty")}
-              value={watch("program") || ""}
-              onValueChange={(val) => setValue("program", val, { shouldValidate: true })}
+              value={watch("program_type") || ""}
+              onValueChange={(val) => setValue("program_type", val, { shouldValidate: true })}
             >
               <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
-                <SelectValue placeholder="Select a Program" />
+                <SelectValue placeholder="Select a Program Type" />
               </SelectTrigger>
               <SelectContent position="popper">
-                {programs.map((p) => (
-                  <SelectItem key={p._id} value={p._id}>
-                    {p.name}
+                {programTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+
+          <FormField
+            label="Language"
+            error={errors.language?.message}
+            required
+          >
+            <Select
+              key={languages.length + "-" + (watch("language") || "empty")}
+              value={watch("language") || ""}
+              onValueChange={(val) => setValue("language", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select a Language" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {languages.map((l) => (
+                  <SelectItem key={l._id} value={l._id}>
+                    {l.name}
                   </SelectItem>
                 ))}
               </SelectContent>

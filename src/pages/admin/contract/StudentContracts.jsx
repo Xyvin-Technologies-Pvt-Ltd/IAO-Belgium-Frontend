@@ -81,7 +81,8 @@ const StudentContracts = () => {
           <TableRow>
             <TableHead>{t("common.student")}</TableHead>
             <TableHead>{t("common.email")}</TableHead>
-            <TableHead>Program</TableHead>
+            <TableHead>Program Type</TableHead>
+            <TableHead>Language</TableHead>
             <TableHead>{t("common.contract")}</TableHead>
             <TableHead>Contract Type</TableHead>
             <TableHead>{t("common.version")}</TableHead>
@@ -93,10 +94,10 @@ const StudentContracts = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("common.failedToLoadStudentContracts")
@@ -114,7 +115,8 @@ const StudentContracts = () => {
                   {item.application?.user?.first_name}
                 </TableCell>
                 <TableCell>{item.application?.user?.email}</TableCell>
-                <TableCell>{item.contract?.program?.name ?? "—"}</TableCell>
+                <TableCell>{item.contract?.program_type ?? "—"}</TableCell>
+                <TableCell>{item.contract?.language?.name ?? "—"}</TableCell>
                 <TableCell>{item.contract?.name ?? "—"}</TableCell>
                 <TableCell className="capitalize">
                   {item.contract?.contract_type?.replace("_", " ") ?? item.contract_type?.replace("_", " ") ?? "—"}
@@ -146,7 +148,7 @@ const StudentContracts = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("common.noStudentContracts")}
               </TableCell>
             </TableRow>
