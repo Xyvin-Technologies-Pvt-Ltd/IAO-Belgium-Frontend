@@ -29,12 +29,22 @@ const StudentContracts = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [contractType, setContractType] = useState("");
+  const [programType, setProgramType] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const programTypes = [
+    "Master of Science",
+    "Lateral Entry Master of Science",
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module",
+  ];
+
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status]);
+  }, [debouncedSearch, status, contractType, programType]);
 
   const { data, isLoading, error, refetch, isFetching } =
     useGetStudentsContracts({
@@ -42,6 +52,8 @@ const StudentContracts = () => {
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       ...(status ? { status } : {}),
+      ...(contractType ? { contract_type: contractType } : {}),
+      ...(programType ? { program_type: programType } : {}),
     });
 
   const contracts = data?.data || [];
@@ -49,7 +61,7 @@ const StudentContracts = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Input
           placeholder={t("common.searchStudentNameEmail")}
           className="max-w-xs"
@@ -72,6 +84,41 @@ const StudentContracts = () => {
             <SelectItem value="all">{t("common.allStatuses")}</SelectItem>
             <SelectItem value="pending">{t("common.pending")}</SelectItem>
             <SelectItem value="signed">{t("common.signed")}</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={contractType}
+          onValueChange={(val) => {
+            setContractType(val === "all" ? "" : val);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All Contract Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Contract Types</SelectItem>
+            <SelectItem value="student_contract">Student Contract</SelectItem>
+            <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={programType}
+          onValueChange={(val) => {
+            setProgramType(val === "all" ? "" : val);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All Program Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Program Types</SelectItem>
+            {programTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
