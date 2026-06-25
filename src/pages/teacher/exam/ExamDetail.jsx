@@ -174,7 +174,7 @@ const ExamDetail = () => {
   }
 
   const exam = examData.data;
-  const isNonSessionExam = exam.type === "practical" || exam.type === "sit-at-home";
+  const isNonSessionExam = exam.type === "practical";
 
   return (
     <div className="space-y-6 mt-4">
@@ -196,11 +196,6 @@ const ExamDetail = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {exam.type === "sit-at-home" && (
-            <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-              {t("exam.type.sitAtHome", { defaultValue: "Sit-at-home" })}
-            </Badge>
-          )}
           {exam.type === "practical" && (
             <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
               {t("exam.type.practical", { defaultValue: "Practical/Clinical" })}

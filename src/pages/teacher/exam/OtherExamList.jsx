@@ -46,13 +46,6 @@ const OtherExamList = () => {
 
   const getTypeBadge = (exam) => {
     const type = exam.type || exam.exam_type;
-    if (type === "sit-at-home") {
-      return (
-        <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-          {t("exam.type.sitAtHome", { defaultValue: "Sit-at-home" })}
-        </Badge>
-      );
-    }
     if (type === "practical") {
       return (
         <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">

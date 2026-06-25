@@ -121,7 +121,7 @@ const ExamDetail = () => {
                   {t("planningManagement.modal.batchLabel")}: {exam.batch?.name || exam.batch}
                 </span>
               )}
-              {exam.teachers && exam.teachers.length > 0 && (
+              {exam.teachers && exam.teachers.length > 0 && exam.type === "practical" && (
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full font-medium">
                   {t("exam.form.teachers", "Teachers")}: {exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}
                 </span>
@@ -191,7 +191,7 @@ const ExamDetail = () => {
                 <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
               </div>
             )}
-            {exam.teachers && exam.teachers.length > 0 && (
+            {exam.teachers && exam.teachers.length > 0 && exam.type === "practical" && (
               <div>
                 <p className="text-xs text-muted-foreground font-medium">{t("exam.form.teachers", "Teachers")}</p>
                 <p className="font-semibold text-foreground">{exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}</p>

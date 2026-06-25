@@ -45,6 +45,7 @@ const Programs = () => {
     city: "all",
     country: "all",
     status: "all",
+    is_online: "all",
   });
   const [draftFilters, setDraftFilters] = useState({
     program_type: "all",
@@ -52,6 +53,7 @@ const Programs = () => {
     city: "all",
     country: "all",
     status: "all",
+    is_online: "all",
   });
 
   const debouncedSearch = useDebounce(search, 500);
@@ -73,6 +75,9 @@ const Programs = () => {
     ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
     ...(appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
+      : {}),
+    ...(appliedFilters.is_online !== "all"
+      ? { is_online: appliedFilters.is_online }
       : {}),
   });
   const { mutateAsync: deleteProgram, isPending: isDeleting } =
@@ -133,6 +138,50 @@ const Programs = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          <div className="flex items-center border border-input rounded-md overflow-hidden bg-background h-10">
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "all" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "all" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold transition-colors ${
+                appliedFilters.is_online === "all"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "true" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "true" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold border-l border-input transition-colors ${
+                appliedFilters.is_online === "true"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              Online
+            </button>
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "false" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "false" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold border-l border-input transition-colors ${
+                appliedFilters.is_online === "false"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              Offline
+            </button>
+          </div>
           <ProgramsFilterDrawer
             draftFilters={draftFilters}
             setDraftFilters={setDraftFilters}
