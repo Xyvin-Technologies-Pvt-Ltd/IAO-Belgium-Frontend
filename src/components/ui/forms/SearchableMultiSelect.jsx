@@ -93,31 +93,33 @@ const SearchableMultiSelect = ({
         <div
           onClick={handleToggle}
           className={cn(
-            "min-h-9 w-full px-3 py-2 bg-white dark:bg-input/30 border border-input rounded-[6px] transition-colors cursor-pointer flex items-center justify-between gap-2",
+            "min-h-9 w-full px-3 py-2 bg-white dark:bg-input/30 border border-input rounded-[6px] transition-colors cursor-pointer flex items-center justify-between gap-2 overflow-hidden",
             "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             error && "border-destructive ring-destructive/20",
             disabled && "cursor-not-allowed opacity-50"
           )}
         >
-          <div className="flex flex-wrap gap-1 min-h-5 flex-1">
+          <div className="flex flex-wrap gap-1 min-h-5 flex-1 min-w-0 overflow-hidden">
             {selected.length === 0 ? (
-              <span className="text-muted-foreground text-sm">{placeholder}</span>
+              <span className="text-muted-foreground text-sm truncate">{placeholder}</span>
             ) : (
               selected.map((item) => (
                 <Badge
                   key={item._id}
                   variant="secondary"
-                  className="text-xs flex items-center gap-1"
+                  className="text-xs flex items-center gap-1 max-w-full min-w-0 shrink overflow-hidden rounded-md"
                 >
-                  {item.name}
+                  <span className="truncate" title={item.name}>
+                    {item.name}
+                  </span>
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRemove(item._id);
                     }}
-                    className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                    className="shrink-0 hover:bg-destructive/20 rounded-full p-0.5"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -170,12 +172,14 @@ const SearchableMultiSelect = ({
                       className={cn(
                         "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground",
                         "focus:bg-accent focus:text-accent-foreground focus:outline-none",
-                        "flex items-center justify-between",
+                        "flex items-center justify-between gap-2 min-w-0",
                         isSelected && "bg-accent/50"
                       )}
                     >
-                      <span>{item.name}</span>
-                      {isSelected && <Check className="h-4 w-4" />}
+                      <span className="truncate flex-1 min-w-0" title={item.name}>
+                        {item.name}
+                      </span>
+                      {isSelected && <Check className="h-4 w-4 shrink-0" />}
                     </button>
                   );
                 })}

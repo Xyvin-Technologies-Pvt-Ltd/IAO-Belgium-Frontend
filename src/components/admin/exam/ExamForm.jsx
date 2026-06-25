@@ -117,7 +117,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       ...(teacherSearchTerm && { search: teacherSearchTerm }),
       role: "teacher",
     },
-    { enabled: open && (selectedType === "sit-at-home" || selectedType === "practical") }
+    { enabled: open && selectedType === "practical" }
   );
 
   const rawTeachers = teachersRawData?.data;
@@ -259,16 +259,17 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         finalValues.max_attempts = Number(values.max_attempts) || 2;
         finalValues.cooldown_days = Number(values.cooldown_days) ?? 7;
         finalValues.deadline = values.deadline || null;
+        finalValues.teachers = [];
       } else {
         delete finalValues.max_attempts;
         delete finalValues.cooldown_days;
         delete finalValues.deadline;
         finalValues.question_sources = [];
         finalValues.exam_language = null;
+        finalValues.teachers = values.teachers || [];
       }
       finalValues.batch = values.batch || null;
       finalValues.module = values.module || null;
-      finalValues.teachers = values.teachers || [];
     } else {
       delete finalValues.program;
       delete finalValues.batch;
@@ -334,6 +335,9 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                     setValue("program", "");
                     setValue("batch", "");
                     setValue("module", "");
+                    setValue("teachers", []);
+                  }
+                  if (v === "sit-at-home") {
                     setValue("teachers", []);
                   }
                   if (v === "practical") {
@@ -415,20 +419,21 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                   />
                 )}
 
-                <SearchableMultiSelect
-                  label={t("exam.form.teachersLabel", "Teachers")}
-                  placeholder={t("exam.form.teachersPlaceholder", "Select Teachers")}
-                  searchPlaceholder={t("exam.form.searchTeachers", "Search Teachers")}
-                  items={teachersList}
-                  selected={selectedTeachersObjects}
-                  onChange={(selectedItems) => {
-                    setValue("teachers", selectedItems.map(item => item._id), { shouldValidate: true });
-                  }}
-                  onSearch={setTeacherSearchTerm}
-                  isLoading={teachersLoading}
-                  error={errors.teachers?.message}
-                  required
-                />
+                {watch("type") === "practical" && (
+                  <SearchableMultiSelect
+                    label={t("exam.form.teachersLabel", "Teachers")}
+                    placeholder={t("exam.form.teachersPlaceholder", "Select Teachers")}
+                    searchPlaceholder={t("exam.form.searchTeachers", "Search Teachers")}
+                    items={teachersList}
+                    selected={selectedTeachersObjects}
+                    onChange={(selectedItems) => {
+                      setValue("teachers", selectedItems.map(item => item._id), { shouldValidate: true });
+                    }}
+                    onSearch={setTeacherSearchTerm}
+                    isLoading={teachersLoading}
+                    error={errors.teachers?.message}
+                  />
+                )}
 
                 {watch("type") === "sit-at-home" && (
                   <>

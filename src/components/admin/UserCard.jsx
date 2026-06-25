@@ -36,11 +36,18 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
               </span>
             )}
           </div>
-          <p className="text-sm font-medium text-sidebar-foreground/70">
-            {isTeacher
-              ? user?.teacher_role?.name || t("common.notAvailable")
-              : user?.program_name || t("common.notAvailable")}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-sidebar-foreground/70">
+              {isTeacher
+                ? user?.teacher_role?.name || t("common.notAvailable")
+                : user?.program_name || t("common.notAvailable")}
+            </p>
+            {!isTeacher && user?.is_online && (
+              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border border-green-200 dark:border-green-900/50">
+                {t("common.online", "Online")}
+              </span>
+            )}
+          </div>
         </div>
       </div>
       <div>

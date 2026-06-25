@@ -29,12 +29,22 @@ const StudentContracts = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [contractType, setContractType] = useState("");
+  const [programType, setProgramType] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const programTypes = [
+    "Master of Science",
+    "Lateral Entry Master of Science",
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module",
+  ];
+
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status]);
+  }, [debouncedSearch, status, contractType, programType]);
 
   const { data, isLoading, error, refetch, isFetching } =
     useGetStudentsContracts({
@@ -42,6 +52,8 @@ const StudentContracts = () => {
       limit: rowsPerPage,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       ...(status ? { status } : {}),
+      ...(contractType ? { contract_type: contractType } : {}),
+      ...(programType ? { program_type: programType } : {}),
     });
 
   const contracts = data?.data || [];
@@ -49,10 +61,10 @@ const StudentContracts = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 max-w-4xl">
         <Input
           placeholder={t("common.searchStudentNameEmail")}
-          className="max-w-xs"
+          className="w-full"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -63,7 +75,7 @@ const StudentContracts = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full">
             <SelectValue
               placeholder={t("common.chooseStatus") || t("common.allStatuses")}
             />
@@ -74,6 +86,41 @@ const StudentContracts = () => {
             <SelectItem value="signed">{t("common.signed")}</SelectItem>
           </SelectContent>
         </Select>
+        <Select
+          value={contractType}
+          onValueChange={(val) => {
+            setContractType(val === "all" ? "" : val);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Contract Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Contract Types</SelectItem>
+            <SelectItem value="student_contract">Student Contract</SelectItem>
+            <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={programType}
+          onValueChange={(val) => {
+            setProgramType(val === "all" ? "" : val);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Program Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Program Types</SelectItem>
+            {programTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <Table>
@@ -81,7 +128,10 @@ const StudentContracts = () => {
           <TableRow>
             <TableHead>{t("common.student")}</TableHead>
             <TableHead>{t("common.email")}</TableHead>
+            <TableHead>Program Type</TableHead>
+            <TableHead>Language</TableHead>
             <TableHead>{t("common.contract")}</TableHead>
+            <TableHead>Contract Type</TableHead>
             <TableHead>{t("common.version")}</TableHead>
             <TableHead>{t("common.status")}</TableHead>
             <TableHead>{t("common.signedAt")}</TableHead>
@@ -91,10 +141,10 @@ const StudentContracts = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("common.failedToLoadStudentContracts")
@@ -112,7 +162,12 @@ const StudentContracts = () => {
                   {item.application?.user?.first_name}
                 </TableCell>
                 <TableCell>{item.application?.user?.email}</TableCell>
+                <TableCell>{item.contract?.program_type ?? "—"}</TableCell>
+                <TableCell>{item.contract?.language?.name ?? "—"}</TableCell>
                 <TableCell>{item.contract?.name ?? "—"}</TableCell>
+                <TableCell className="capitalize">
+                  {item.contract?.contract_type?.replace("_", " ") ?? item.contract_type?.replace("_", " ") ?? "—"}
+                </TableCell>
                 <TableCell>
                   {item.contract?.version ? `v${item.contract.version}` : "—"}
                 </TableCell>
@@ -140,7 +195,7 @@ const StudentContracts = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("common.noStudentContracts")}
               </TableCell>
             </TableRow>

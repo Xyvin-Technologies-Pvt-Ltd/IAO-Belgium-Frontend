@@ -29,8 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +43,7 @@ import { toast } from "sonner";
 import { componentSchema } from "@/validations/admin";
 import { useDebounce } from "@/hooks/useDebounce";
 import ResourceSection from "./resources/ResourceSection";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const CreateComponent = ({
   open,
@@ -59,12 +58,23 @@ const CreateComponent = ({
   const isEdit = !!componentData;
 
   const [selectedType, setSelectedType] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+  const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [instructionContent, setInstructionContent] = useState("");
   const [moduleNameSearch, setModuleNameSearch] = useState("");
   const [showModuleSuggestions, setShowModuleSuggestions] = useState(false);
   const [selectedSystemId, setSelectedSystemId] = useState(null);
   const debouncedModuleName = useDebounce(moduleNameSearch, 200);
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: !!programId && open });
+  const program = programRes?.data;
+  const totalStages = program?.year || 1;
+  const stageOptions = Array.from({ length: totalStages }, (_, i) => i + 1);
+
+  const durationUnit = program?.duration_unit || "years";
+  const singularUnitKey = durationUnit.endsWith("s") ? durationUnit.slice(0, -1) : durationUnit;
+  const unitLabel = t(`common.durationUnits.${singularUnitKey}`, singularUnitKey);
+  const capitalizedUnitLabel = unitLabel.charAt(0).toUpperCase() + unitLabel.slice(1);
 
   const {
     register,
@@ -72,6 +82,7 @@ const CreateComponent = ({
     reset,
     setValue,
     watch,
+    getValues,
     control,
     formState: { errors },
   } = useForm({
@@ -117,7 +128,7 @@ const CreateComponent = ({
     },
     {
       enabled:
-        selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
+        open && selectedType === "module" && debouncedModuleName.length > 2 && !isEdit,
     },
   );
 
@@ -128,7 +139,7 @@ const CreateComponent = ({
       program: programId,
     },
     {
-      enabled: selectedType === "exam" && !!programId,
+      enabled: open && selectedType === "exam" && !!programId,
     },
   );
   const programModules = programModulesData?.data || [];
@@ -141,7 +152,7 @@ const CreateComponent = ({
       ...(programLanguageId && { exam_language: programLanguageId }),
     },
     {
-      enabled: selectedType === "exam",
+      enabled: open && selectedType === "exam",
     },
   );
   const publishedExams = publishedExamsData?.data || [];
@@ -202,8 +213,114 @@ const CreateComponent = ({
     setModuleNameSearch("");
     setShowModuleSuggestions(false);
     setSelectedSystemId(null);
+    setFileUploadProgress({});
+    setIsUploadingFiles(false);
     lastLoadedId.current = null;
     onClose();
+  };
+
+  const mapResourcesToPayloadFiles = (resources = []) =>
+    resources
+      .map((resource) => {
+        if (resource.type === "file" && resource.url) {
+          return {
+            name: resource.name || resource.url.split("/").pop(),
+            url: resource.url,
+            type: "file",
+          };
+        }
+
+        if (resource.type === "link" && resource.url) {
+          return {
+            name: resource.name || resource.url,
+            url: resource.url,
+            type: "link",
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+
+  const uploadResourceFile = async (fieldId, index, file) => {
+    setFileUploadProgress((prev) => ({
+      ...prev,
+      [fieldId]: {
+        progress: 0,
+        status: "uploading",
+        fileName: file.name,
+        fileSize: file.size,
+      },
+    }));
+
+    const response = await uploadFile(file, (event) => {
+      const phase = event.phase || "uploading";
+      setFileUploadProgress((prev) => ({
+        ...prev,
+        [fieldId]: {
+          ...prev[fieldId],
+          progress: event.percent ?? 0,
+          phase,
+          status: phase === "complete" ? "complete" : phase,
+          fileName: file.name,
+          fileSize: file.size,
+        },
+      }));
+    });
+
+    const fileUrl = response?.data?.file_url;
+    if (!fileUrl) {
+      throw new Error(`Upload failed for ${file.name}`);
+    }
+
+    setValue(
+      `resources.${index}`,
+      {
+        type: "file",
+        name: file.name.split(".")[0],
+        url: fileUrl,
+        file: null,
+      },
+      { shouldValidate: true },
+    );
+
+    setFileUploadProgress((prev) => ({
+      ...prev,
+      [fieldId]: {
+        ...prev[fieldId],
+        progress: 100,
+        status: "complete",
+        fileName: file.name,
+        fileSize: file.size,
+      },
+    }));
+  };
+
+  const handleRetryUpload = async (fieldId, index) => {
+    const resource = getValues(`resources.${index}`);
+    if (!resource?.file) return;
+
+    setIsUploadingFiles(true);
+    try {
+      await uploadResourceFile(fieldId, index, resource.file);
+    } catch (error) {
+      setFileUploadProgress((prev) => ({
+        ...prev,
+        [fieldId]: {
+          ...prev[fieldId],
+          status: "error",
+        },
+      }));
+      toast.error(
+        error?.message ||
+          t("resourceModule.resources.uploadFailed", {
+            name: resource.file.name,
+            defaultValue: `Failed to upload ${resource.file.name}`,
+          }),
+      );
+    } finally {
+      setIsUploadingFiles(false);
+    }
   };
 
   const handleSuccessfulSubmit = (componentType) => {
@@ -294,9 +411,44 @@ const CreateComponent = ({
   }, [isFree, setValue]);
 
   const onSubmit = async (data) => {
-    setIsUploading(true);
+    setIsUploadingFiles(true);
 
     try {
+      const resources = data.resources || [];
+
+      for (let i = 0; i < resources.length; i++) {
+        const resource = resources[i];
+        const fieldId = fields[i]?.id;
+
+        if (
+          resource.type === "file" &&
+          resource.file &&
+          !resource.url &&
+          fieldId
+        ) {
+          try {
+            await uploadResourceFile(fieldId, i, resource.file);
+          } catch (error) {
+            setFileUploadProgress((prev) => ({
+              ...prev,
+              [fieldId]: {
+                ...prev[fieldId],
+                status: "error",
+              },
+            }));
+            toast.error(
+              error?.message ||
+                t("resourceModule.resources.uploadFailed", {
+                  name: resource.file.name,
+                  defaultValue: `Failed to upload ${resource.file.name}`,
+                }),
+            );
+            return;
+          }
+        }
+      }
+
+      const updatedResources = getValues("resources") || [];
       const payload = {
         type: data.type,
         program: programId,
@@ -306,57 +458,12 @@ const CreateComponent = ({
       if (data.type !== "exam") {
         payload.name = data.type === "app" ? "APP" : data.name;
         payload.year = data.year;
-
-        // Process resources: upload files in parallel using Promise.all
-        const resources = data.resources || [];
-
-        const processedFiles = await Promise.all(
-          resources.map(async (resource) => {
-            if (resource.type === "file" && resource.file) {
-              // Upload new file
-              try {
-                if (resource.file.size === 0) {
-                  console.error(
-                    "[CreateComponent] ❌ resource.file.size is 0 — empty file",
-                  );
-                }
-                const response = await uploadFile(resource.file);
-                const fileUrl = response?.data?.file_url;
-
-                if (!fileUrl) {
-                  throw new Error(`Upload failed for ${resource.file.name}`);
-                }
-
-                return {
-                  name: resource.name || resource.file.name.split(".")[0],
-                  url: fileUrl,
-                  type: "file",
-                };
-              } catch (error) {
-                toast.error(`Failed to upload ${resource.file.name}`);
-                throw error;
-              }
-            } else if (resource.url) {
-              // Existing resource or manually entered link
-              return {
-                name:
-                  resource.name ||
-                  (resource.type === "file" ? "Existing File" : resource.url),
-                url: resource.url,
-                type: resource.type || "file",
-              };
-            }
-            return null;
-          }),
-        );
-
-        payload.files = processedFiles.filter(Boolean);
+        payload.files = mapResourcesToPayloadFiles(updatedResources);
       }
 
       if (data.type === "module") {
         payload.amount = data.is_free ? 0 : Number(data.amount);
         payload.module_number = data.module_number;
-        // Include system_id if a module was selected from suggestions
         if (selectedSystemId) {
           payload.system_id = selectedSystemId;
         }
@@ -377,28 +484,24 @@ const CreateComponent = ({
       const mutation = isEdit ? updateComponent : createComponent;
       const args = isEdit ? { id: componentData._id, data: payload } : payload;
 
-      mutation.mutate(args, {
-        onSuccess: () => {
-          setIsUploading(false);
-          handleSuccessfulSubmit(data.type);
-        },
-        onError: (error) => {
-          console.error("Save error:", error);
-          setIsUploading(false);
-          // toast.error(error?.message || "Failed to save component");
-        },
-      });
+      await mutation.mutateAsync(args);
+      handleSuccessfulSubmit(data.type);
     } catch (error) {
       console.error("Submit error:", error);
-      setIsUploading(false);
-      toast.error(error?.message || "Failed to upload files");
+      if (!error?.message?.includes("Upload failed")) {
+        // toast.error(error?.message || "Failed to save component");
+      }
+    } finally {
+      setIsUploadingFiles(false);
     }
   };
 
   if (!open) return null;
 
   const isSubmitting =
-    createComponent.isPending || updateComponent.isPending || isUploading;
+    createComponent.isPending ||
+    updateComponent.isPending ||
+    isUploadingFiles;
 
   return (
     <div
@@ -525,7 +628,7 @@ const CreateComponent = ({
 
                 <div className="space-y-2">
                   <Label>
-                    {t("componentManagement.yearLabel")}{" "}
+                    {capitalizedUnitLabel}{" "}
                     <span className="text-red-500">*</span>
                   </Label>
                   <Select
@@ -537,13 +640,16 @@ const CreateComponent = ({
                   >
                     <SelectTrigger>
                       <SelectValue
-                        placeholder={t("componentManagement.yearPlaceholder")}
+                        placeholder={t("componentManagement.selectUnitPlaceholder", {
+                          defaultValue: `Select ${unitLabel}`,
+                          unit: unitLabel,
+                        })}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {[1, 2, 3, 4, 5].map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {t("componentManagement.year")} {year}
+                      {stageOptions.map((stage) => (
+                        <SelectItem key={stage} value={stage.toString()}>
+                          {`${capitalizedUnitLabel} ${stage}`}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -776,11 +882,12 @@ const CreateComponent = ({
               <ResourceSection
                 control={control}
                 register={register}
-                setValue={setValue}
                 append={append}
                 remove={remove}
                 fields={fields}
                 errors={errors}
+                uploadProgress={fileUploadProgress}
+                onRetryUpload={handleRetryUpload}
               />
             )}
 
@@ -797,7 +904,7 @@ const CreateComponent = ({
               isLoading={isSubmitting}
               isEdit={isEdit}
               submitText={
-                isUploading
+                isUploadingFiles
                   ? t("componentManagement.uploadingFiles")
                   : undefined
               }

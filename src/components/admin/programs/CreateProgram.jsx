@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   useGetAllCountries,
   useGetAllCities,
@@ -72,9 +73,12 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: "",
       program_type: "",
       year: "",
+      duration_unit: "years",
       language: "",
       city: "",
       country: "",
+      is_online: false,
+      document_required: true,
     },
   });
 
@@ -85,6 +89,9 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const selectedLanguage = watch("language");
   const selectedCity = watch("city");
   const watchedCountry = watch("country");
+  const selectedDurationUnit = watch("duration_unit");
+  const isOnlineValue = watch("is_online");
+  const documentRequiredValue = watch("document_required");
 
   useEffect(() => {
     if (watchedCountry !== selectedCountry) {
@@ -101,9 +108,12 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: "",
       program_type: "",
       year: "",
+      duration_unit: "years",
       language: "",
       city: "",
       country: "",
+      is_online: false,
+      document_required: true,
     });
     setCountrySearchTerm("");
     setCitySearchTerm("");
@@ -120,9 +130,12 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: programData.program_code || "",
       program_type: programData.program_type || "",
       year: programData.year || "",
+      duration_unit: programData.duration_unit || "years",
       language: programData.language?._id || "",
       country: programData.city?.country?._id || "",
       city: programData.city?._id || "",
+      is_online: programData.is_online || false,
+      document_required: programData.document_required !== false,
     });
 
     if (programData.city?.country?._id) {
@@ -136,9 +149,21 @@ const CreateProgram = ({ open, onClose, programData }) => {
       program_code: formData.program_code,
       program_type: formData.program_type,
       year: formData.year,
+      duration_unit: formData.duration_unit || "years",
       language: formData.language,
-      city: formData.city,
+      is_online: formData.is_online || false,
+      document_required: formData.document_required !== false,
     };
+
+    if (formData.is_online) {
+      if (formData.city) {
+        payload.city = formData.city;
+      } else if (isEdit) {
+        payload.city = null;
+      }
+    } else {
+      payload.city = formData.city;
+    }
 
     const mutation = isEdit ? updateProgram : createProgram;
     const mutationData = isEdit
@@ -198,6 +223,62 @@ const CreateProgram = ({ open, onClose, programData }) => {
               {...register("name")}
             />
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label={t("programManagement.modal.durationLabel")}
+                placeholder={t(
+                  `programManagement.modal.durationPlaceholder_${selectedDurationUnit}`,
+                  t("programManagement.modal.durationPlaceholder")
+                )}
+                type="number"
+                error={errors.year?.message}
+                required
+                {...register("year")}
+              />
+
+              <div className="space-y-2">
+                <Label>
+                  {t("programManagement.modal.durationUnitLabel", "Duration Unit")}{" "}
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  key={selectedDurationUnit || "empty-unit"}
+                  value={selectedDurationUnit || "years"}
+                  onValueChange={(value) =>
+                    setValue("duration_unit", value, { shouldValidate: true })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={t(
+                        "programManagement.modal.durationUnitPlaceholder",
+                        "Select unit"
+                      )}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="years">
+                      {t("common.durationUnits.years", "Years")}
+                    </SelectItem>
+                    <SelectItem value="months">
+                      {t("common.durationUnits.months", "Months")}
+                    </SelectItem>
+                    <SelectItem value="weeks">
+                      {t("common.durationUnits.weeks", "Weeks")}
+                    </SelectItem>
+                    <SelectItem value="days">
+                      {t("common.durationUnits.days", "Days")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.duration_unit && (
+                  <p className="text-red-500 text-sm">
+                    {errors.duration_unit.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>
                 {t("programManagement.modal.programTypeLabel")}{" "}
@@ -241,15 +322,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 </p>
               )}
             </div>
-
-            <FormField
-              label={t("programManagement.modal.durationLabel")}
-              placeholder={t("programManagement.modal.durationPlaceholder")}
-              type="number"
-              error={errors.year?.message}
-              required
-              {...register("year")}
-            />
             <FormField
               label={t("programManagement.modal.codeLabel")}
               placeholder={t("programManagement.modal.codePlaceholder")}
@@ -257,8 +329,47 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
+
+            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
+              <div className="space-y-0.5">
+                <Label htmlFor="is-online" className="font-semibold text-sm">
+                  {t("programManagement.modal.isOnlineLabel", "Online Programme")}
+                </Label>
+              </div>
+              <Switch
+                id="is-online"
+                checked={isOnlineValue || false}
+                onCheckedChange={(checked) => {
+                  setValue("is_online", checked, { shouldValidate: true });
+                  if (checked) {
+                    setValue("country", "", { shouldValidate: true });
+                    setValue("city", "", { shouldValidate: true });
+                    setSelectedCountry("");
+                  }
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
+              <div className="space-y-0.5">
+                <Label htmlFor="document-required" className="font-semibold text-sm">
+                  {t("programManagement.modal.documentRequiredLabel", "Documents Required")}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "programManagement.modal.documentRequiredDescription",
+                    "Require ID and qualification uploads during application",
+                  )}
+                </p>
+              </div>
+              <Switch
+                id="document-required"
+                checked={documentRequiredValue !== false}
+                onCheckedChange={(checked) =>
+                  setValue("document_required", checked, { shouldValidate: true })
+                }
+              />
+            </div>
             <SearchableSelect
-              label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}
               searchPlaceholder="Search languages..."
               items={languagesData?.data || []}
@@ -272,40 +383,44 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
             />
 
-            <SearchableSelect
-              label={t("programManagement.modal.countryLabel")}
-              placeholder={t("programManagement.modal.countryPlaceholder")}
-              searchPlaceholder="Search countries..."
-              items={countriesData?.data || []}
-              value={watchedCountry || ""}
-              onChange={(value) =>
-                setValue("country", value, { shouldValidate: true })
-              }
-              onSearch={setCountrySearchTerm}
-              isLoading={countriesLoading}
-              error={errors.country?.message}
-              required
-            />
+            {!isOnlineValue && (
+              <>
+                <SearchableSelect
+                  label={t("programManagement.modal.countryLabel")}
+                  placeholder={t("programManagement.modal.countryPlaceholder")}
+                  searchPlaceholder="Search countries..."
+                  items={countriesData?.data || []}
+                  value={watchedCountry || ""}
+                  onChange={(value) =>
+                    setValue("country", value, { shouldValidate: true })
+                  }
+                  onSearch={setCountrySearchTerm}
+                  isLoading={countriesLoading}
+                  error={errors.country?.message}
+                  required
+                />
 
-            <SearchableSelect
-              label={t("programManagement.modal.cityLabel")}
-              placeholder={
-                selectedCountry
-                  ? t("programManagement.modal.cityPlaceholder")
-                  : t("programManagement.modal.cityPlaceholderDisabled")
-              }
-              searchPlaceholder="Search cities..."
-              items={citiesData?.data || []}
-              value={selectedCity || ""}
-              onChange={(value) =>
-                setValue("city", value, { shouldValidate: true })
-              }
-              onSearch={setCitySearchTerm}
-              isLoading={citiesLoading}
-              error={errors.city?.message}
-              required
-              disabled={!selectedCountry}
-            />
+                <SearchableSelect
+                  label={t("programManagement.modal.cityLabel")}
+                  placeholder={
+                    selectedCountry
+                      ? t("programManagement.modal.cityPlaceholder")
+                      : t("programManagement.modal.cityPlaceholderDisabled")
+                  }
+                  searchPlaceholder="Search cities..."
+                  items={citiesData?.data || []}
+                  value={selectedCity || ""}
+                  onChange={(value) =>
+                    setValue("city", value, { shouldValidate: true })
+                  }
+                  onSearch={setCitySearchTerm}
+                  isLoading={citiesLoading}
+                  error={errors.city?.message}
+                  required
+                  disabled={!selectedCountry}
+                />
+              </>
+            )}
 
             <FormActions
               onCancel={handleClose}

@@ -2,10 +2,11 @@ import { z } from "zod";
 
 export const intakeSchema = z
   .object({
-    name: z.string().optional(),
+    name: z.string().trim().optional(),
     program: z.array(z.object({
       _id: z.string(),
-      name: z.string()
+      name: z.string(),
+      is_online: z.boolean().optional(),
     })).min(1, "At least one program is required"),
     is_free: z.boolean().optional(),
     admission_fee: z.coerce
@@ -42,13 +43,31 @@ export const intakeSchema = z
     path: ["end_date"],
   })
   .refine(
-    (data) => new Date(data.registration_deadline) < new Date(data.start_date),
+    (data) => {
+      const allOnline =
+        data.program.length > 0 && data.program.every((p) => p.is_online);
+      if (allOnline) return true;
+      return new Date(data.registration_deadline) < new Date(data.start_date);
+    },
     {
       message: "Registration deadline must be before start date",
       path: ["registration_deadline"],
-    }
+    },
   )
   .refine((data) => data.student_per_batch <= data.max_student_enrollment, {
     message: "Cannot exceed max student enrollment",
     path: ["student_per_batch"],
-  });
+  })
+  .refine(
+    (data) => {
+      const hasOnlineProgram = data.program.some((p) => p.is_online);
+      if (hasOnlineProgram && !data.name?.trim()) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Intake name is required for online programs",
+      path: ["name"],
+    },
+  );

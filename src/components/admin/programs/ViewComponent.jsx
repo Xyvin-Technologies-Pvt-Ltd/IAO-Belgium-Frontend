@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 
-const ViewComponent = ({ open, onClose, componentData }) => {
+const ViewComponent = ({ open, onClose, componentData, program }) => {
   const { t, i18n } = useTranslation();
 
   useMemo(() => {
@@ -90,7 +90,9 @@ const ViewComponent = ({ open, onClose, componentData }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground">
-                  {t("componentManagement.year")}
+                  {program?.duration_unit && program.duration_unit !== "years"
+                    ? t("componentManagement.levelLabel", "Level")
+                    : t("componentManagement.year")}
                 </h3>
                 <p className="text-lg">{componentData.year}</p>
               </div>
@@ -130,7 +132,11 @@ const ViewComponent = ({ open, onClose, componentData }) => {
                   <p className="text-base font-semibold">
                     {componentData.linked_module?.name || t("common.notAvailable")}
                     {componentData.linked_module?.module_number &&
-                      ` (${t("componentManagement.year")} ${componentData.linked_module.module_number})`}
+                      ` (${
+                        program?.duration_unit && program.duration_unit !== "years"
+                          ? t("componentManagement.levelLabel", "Level")
+                          : t("componentManagement.year")
+                      } ${componentData.linked_module.module_number})`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 italic">
                     {t("componentManagement.linkedModuleHint")}

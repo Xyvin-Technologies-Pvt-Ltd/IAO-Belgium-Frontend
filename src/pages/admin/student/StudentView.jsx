@@ -118,7 +118,9 @@ const StudentView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              Year {y}
+              {studentData?.duration_unit && studentData.duration_unit !== "years"
+                ? `${t("common.level", "Level")} ${y}`
+                : `${t("common.year", "Year")} ${y}`}
             </button>
           ))}
         </nav>
@@ -225,39 +227,43 @@ const StudentView = () => {
           </Table>
         </div>
         <div className="col-span-12 lg:col-span-4">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold">Attendance</h3>
-            <button 
-              onClick={() => navigate({ to: `/admin/student-management/${id}/attendence` })}
-              className="text-blue-500 hover:text-blue-700 font-medium text-sm transition-colors cursor-pointer"
-            >
-              See more
-            </button>
-          </div>
-          <div className="border border-sidebar-border rounded-lg p-6 flex items-center justify-center relative">
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={attendanceData}
-                  dataKey="value"
-                  startAngle={180}
-                  endAngle={0}
-                  cx="50%"
-                  cy="90%"
-                  innerRadius={80}
-                  outerRadius={100}
-                  stroke="none"
+          {!studentData?.is_online && (
+            <>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-semibold">Attendance</h3>
+                <button 
+                  onClick={() => navigate({ to: `/admin/student-management/${id}/attendence` })}
+                  className="text-blue-500 hover:text-blue-700 font-medium text-sm transition-colors cursor-pointer"
                 >
-                  {attendanceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute text-3xl font-semibold text-black">
-              {attendance}%
-            </div>
-          </div>
+                  See more
+                </button>
+              </div>
+              <div className="border border-sidebar-border rounded-lg p-6 flex items-center justify-center relative">
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie
+                      data={attendanceData}
+                      dataKey="value"
+                      startAngle={180}
+                      endAngle={0}
+                      cx="50%"
+                      cy="90%"
+                      innerRadius={80}
+                      outerRadius={100}
+                      stroke="none"
+                    >
+                      {attendanceData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute text-3xl font-semibold text-black">
+                  {attendance}%
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Medical / Special Exceptions Section */}
           <div className="mt-6">

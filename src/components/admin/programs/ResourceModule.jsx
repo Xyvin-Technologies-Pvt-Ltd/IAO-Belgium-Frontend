@@ -20,6 +20,7 @@ import CreateComponent from "./CreateComponent";
 import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
+import { useGetProgramById } from "@/store/useProgramStore";
 
 const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
   const { t } = useTranslation();
@@ -30,6 +31,9 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
+
+  const { data: programRes } = useGetProgramById(programId, { enabled: !!programId });
+  const program = programRes?.data;
 
   useEffect(() => {
     setPage(1);
@@ -80,7 +84,11 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
           <TableRow>
             <TableHead>{t("resourceModule.table.resourceUID")}</TableHead>
             <TableHead>{t("resourceModule.table.resourceName")}</TableHead>
-            <TableHead>{t("resourceModule.table.year")}</TableHead>
+            <TableHead>
+              {program?.duration_unit && program.duration_unit !== "years"
+                ? t("resourceModule.table.level", "Level")
+                : t("resourceModule.table.year")}
+            </TableHead>
             <TableHead>{t("resourceModule.table.files")}</TableHead>
             <TableHead>{t("resourceModule.table.status")}</TableHead>
             <TableHead>{t("resourceModule.table.action")}</TableHead>
@@ -156,7 +164,6 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
         onComponentCreated={(componentType) => {
           setSelectedModule(null);
           setIsModalOpen(false);
-          refetch();
           // Call parent callback if provided
           if (onComponentCreated) {
             onComponentCreated(componentType);
@@ -169,6 +176,7 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
         open={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         componentData={selectedModule}
+        program={program}
       />
     </div>
   );

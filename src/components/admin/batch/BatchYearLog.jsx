@@ -13,7 +13,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useGetBatchYearLog, useRecalculateYearCompletion, useMarkStudentAsFailed } from "@/store/useBatchStore";
-import { formatTZ, getMoment } from "@/utils/dateUtils";
+import { formatInstant } from "@/utils/dateUtils";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -125,7 +125,7 @@ const BatchYearLog = () => {
                     {log.details || t("common.dash")}
                   </TableCell>
                   <TableCell className="text-center text-muted-foreground whitespace-nowrap">
-                    {getMoment(log.createdAt).format("DD-MM-YYYY, HH:mm")}
+                    {formatInstant(log.createdAt)}
                   </TableCell>
                   <TableCell className="text-center">
                     {log.application?.user?.current_year === log.year ? (

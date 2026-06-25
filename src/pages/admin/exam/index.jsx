@@ -25,6 +25,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import ExamForm from "@/components/admin/exam/ExamForm";
 import StatusBadge from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import {
   useGetExams,
   usePublishExam,
@@ -106,6 +107,28 @@ const Exams = () => {
     });
   };
 
+  const getTypeBadge = (type = "online") => {
+    if (type === "sit-at-home") {
+      return (
+        <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          {t("exam.form.sitAtHome", "Sit-at-home")}
+        </Badge>
+      );
+    }
+    if (type === "practical") {
+      return (
+        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+          {t("exam.form.practical", "Practical")}
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+        {t("exam.form.online", "Online")}
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-6 mt-4">
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
@@ -150,6 +173,7 @@ const Exams = () => {
           <TableRow>
             <TableHead>{t("exam.table.uid")}</TableHead>
             <TableHead>{t("exam.table.name")}</TableHead>
+            <TableHead>{t("exam.table.type", "Type")}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
@@ -160,10 +184,10 @@ const Exams = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -180,6 +204,7 @@ const Exams = () => {
               >
                 <TableCell>{i?.uid}</TableCell>
                 <TableCell>{i?.name}</TableCell>
+                <TableCell>{getTypeBadge(i?.type)}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
                 <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
                 <TableCell>
@@ -225,7 +250,7 @@ const Exams = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>

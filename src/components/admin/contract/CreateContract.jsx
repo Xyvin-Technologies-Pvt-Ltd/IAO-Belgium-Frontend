@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Upload, FileText, ExternalLink } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
@@ -8,8 +8,16 @@ import { Label } from "@/components/ui/label";
 import { contractSchema } from "@/validations/admin/contract.validation";
 import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
+import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CreateContract = ({ open, onClose, contractData }) => {
   const { t } = useTranslation();
@@ -19,16 +27,28 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const [pendingFile, setPendingFile] = useState(null); // raw File object, not yet uploaded
   const [fileName, setFileName] = useState("");
 
+  const programTypes = [
+    "Master of Science",
+    "Lateral Entry Master of Science",
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module",
+  ];
+
+  const { data: languagesRes } = useGetAllLanguages(undefined, { enabled: open });
+  const languages = languagesRes?.data || [];
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(contractSchema),
-    defaultValues: { name: "", file: "" },
+    defaultValues: { name: "", file: "", program_type: "", language: "", contract_type: "student_contract" },
   });
 
   const fileValue = watch("file");
@@ -36,7 +56,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const updateContract = useUpdateContract();
 
   const handleClose = () => {
-    reset({ name: "", file: "" });
+    reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
     setFileName("");
     setPendingFile(null);
     setIsUploading(false);
@@ -46,7 +66,13 @@ const CreateContract = ({ open, onClose, contractData }) => {
   useEffect(() => {
     if (open) {
       if (contractData && isEdit) {
-        reset({ name: contractData.name || "", file: contractData.file || "" });
+        reset({
+          name: contractData.name || "",
+          file: contractData.file || "",
+          program_type: contractData.program_type || "",
+          language: contractData.language?._id || contractData.language || "",
+          contract_type: contractData.contract_type || "student_contract"
+        });
         if (contractData.file) {
           const urlFileName = contractData.file.split("/").pop().split("?")[0];
           setFileName(urlFileName || "Current file");
@@ -54,7 +80,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
           setFileName("");
         }
       } else {
-        reset({ name: "", file: "" });
+        reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
         setFileName("");
       }
       setPendingFile(null);
@@ -82,7 +108,13 @@ const CreateContract = ({ open, onClose, contractData }) => {
         if (!fileUrl) throw new Error("Upload failed");
       }
 
-      const payload = { name: formData.name, file: fileUrl };
+      const payload = {
+        name: formData.name,
+        file: fileUrl,
+        program_type: formData.program_type,
+        language: formData.language,
+        contract_type: formData.contract_type
+      };
 
       if (isEdit) {
         updateContract.mutate(
@@ -105,7 +137,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-96 p-6">
+      <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-[32rem] p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -131,6 +163,70 @@ const CreateContract = ({ open, onClose, contractData }) => {
             required
             {...register("name")}
           />
+
+          <FormField
+            label="Program Type"
+            error={errors.program_type?.message}
+            required
+          >
+            <Select
+              value={watch("program_type") || ""}
+              onValueChange={(val) => setValue("program_type", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select a Program Type" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {programTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+
+          <FormField
+            label="Language"
+            error={errors.language?.message}
+            required
+          >
+            <Select
+              key={languages.length + "-" + (watch("language") || "empty")}
+              value={watch("language") || ""}
+              onValueChange={(val) => setValue("language", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select a Language" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {languages.map((l) => (
+                  <SelectItem key={l._id} value={l._id}>
+                    {l.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+
+          <FormField
+            label="Contract Type"
+            error={errors.contract_type?.message}
+            required
+          >
+            <Select
+              value={watch("contract_type") || ""}
+              onValueChange={(val) => setValue("contract_type", val, { shouldValidate: true })}
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="Select Contract Type" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="student_contract">Student Contract</SelectItem>
+                <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-900 dark:text-white">

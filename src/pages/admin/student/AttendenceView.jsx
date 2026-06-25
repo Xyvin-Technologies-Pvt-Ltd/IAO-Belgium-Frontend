@@ -18,8 +18,10 @@ import { Check, X, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
 
 const AttendenceView = () => {
+  const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
   const navigate = useNavigate();
@@ -109,7 +111,9 @@ const AttendenceView = () => {
                 )}
                 {studentInfo.year && (
                   <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-muted text-muted-foreground">
-                    Year {filter.year}
+                    {studentInfo.duration_unit && studentInfo.duration_unit !== "years"
+                      ? `${t("common.level", "Level")} ${filter.year}`
+                      : `${t("common.year", "Year")} ${filter.year}`}
                   </span>
                 )}
               </div>
@@ -142,7 +146,9 @@ const AttendenceView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              Year {y}
+              {studentInfo?.duration_unit && studentInfo?.duration_unit !== "years"
+                ? `${t("common.level", "Level")} ${y}`
+                : `${t("common.year", "Year")} ${y}`}
             </button>
           ))}
         </nav>

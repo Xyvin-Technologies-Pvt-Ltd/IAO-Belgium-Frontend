@@ -85,6 +85,7 @@ const ProgramsFilterDrawer = ({
       city: "all",
       country: "all",
       status: "all",
+      is_online: "all",
     };
     setDraftFilters(resetObj);
     setAppliedFilters(resetObj);
@@ -210,6 +211,24 @@ const ProgramsFilterDrawer = ({
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="true">Active</SelectItem>
                   <SelectItem value="false">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </FilterSection>
+
+            <FilterSection label="Online Programme">
+              <Select
+                value={draftFilters.is_online}
+                onValueChange={(val) =>
+                  setDraftFilters((prev) => ({ ...prev, is_online: val }))
+                }
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue placeholder="All Modes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Modes</SelectItem>
+                  <SelectItem value="true">Online</SelectItem>
+                  <SelectItem value="false">Offline</SelectItem>
                 </SelectContent>
               </Select>
             </FilterSection>

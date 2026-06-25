@@ -153,6 +153,20 @@ const ViewApplication = ({ open, onClose, application }) => {
               <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
+              <InfoItem
+                label={t("applicationReview.modal.qualificationStatus", "Qualification status")}
+                value={
+                  application?.completing_qualification
+                    ? t(
+                        "applicationReview.modal.stillCompletingQualification",
+                        "Still completing qualification",
+                      )
+                    : t(
+                        "applicationReview.modal.qualificationNotDeferred",
+                        "Not deferred",
+                      )
+                }
+              />
             </div>
           </div>
 
@@ -160,6 +174,18 @@ const ViewApplication = ({ open, onClose, application }) => {
             <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
               {t("applicationReview.modal.attachedDocuments")}
             </h3>
+
+            {application?.completing_qualification && (
+              <div className="flex items-start gap-2 p-3 mb-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-100">
+                <FileText size={18} className="shrink-0 mt-0.5" />
+                <p className="text-sm">
+                  {t(
+                    "applicationReview.modal.completingQualificationNotice",
+                    "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet.",
+                  )}
+                </p>
+              </div>
+            )}
 
             {application?.id_card?.url && (
               <DocumentRow 
@@ -186,7 +212,8 @@ const ViewApplication = ({ open, onClose, application }) => {
 
             {!application?.id_card?.url && 
              (!Array.isArray(application?.qualification_certificate) || 
-              application.qualification_certificate.length === 0) && (
+              application.qualification_certificate.length === 0) &&
+             !application?.completing_qualification && (
               <p className="text-sm text-muted-foreground dark:text-white/70">{t("applicationReview.modal.noDocuments")}</p>
             )}
           </div>

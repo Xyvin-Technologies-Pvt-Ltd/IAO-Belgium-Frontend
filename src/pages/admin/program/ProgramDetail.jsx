@@ -25,6 +25,7 @@ const ProgramDetail = () => {
     const storageKey = `programActiveTab_${id}`;
     return localStorage.getItem(storageKey) || "";
   });
+  const [pendingTab, setPendingTab] = useState(null);
 
   const { data: program, isLoading, error, refetch } = useGetProgramById(id);
 
@@ -35,39 +36,24 @@ const ProgramDetail = () => {
   };
 
   const handleComponentCreated = (componentType) => {
-    // Refresh program data to update counts and types
-    refetch();
-
-    // Switch to the tab corresponding to the created component type
-    // We use a small timeout to ensure the tabs have been re-calculated after refetch
-    setTimeout(() => {
-      if (componentType) {
-        setActiveTab(componentType);
-        const storageKey = `programActiveTab_${id}`;
-        localStorage.setItem(storageKey, componentType);
-      }
-    }, 100);
-
     setIsModalOpen(false);
+
+    if (!componentType) return;
+
+    const storageKey = `programActiveTab_${id}`;
+    if (program?.data?.types?.includes(componentType)) {
+      setActiveTab(componentType);
+      localStorage.setItem(storageKey, componentType);
+    } else {
+      setPendingTab(componentType);
+    }
   };
-  // Component mapping for different types
-  const componentMap = {
-    module: {
-      label: t("programDetail.tabs.learningModules"),
-      component: () => <LearningModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id}/>,
-    },
-    app: {
-      label: t("programDetail.tabs.applications"),
-      component: () => <AppModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id} />,
-    },
-    resource: {
-      label: t("programDetail.tabs.resources"),
-      component: () => <ResourceModule programId={id} onComponentCreated={handleComponentCreated}languageId={program?.data?.language?._id} />,
-    },
-    exam: {
-      label: t("programDetail.tabs.examComponents"),
-      component: () => <ExamModule programId={id} onComponentCreated={handleComponentCreated} languageId={program?.data?.language?._id}/>,
-    },
+
+  const tabLabels = {
+    module: t("programDetail.tabs.learningModules"),
+    app: t("programDetail.tabs.applications"),
+    resource: t("programDetail.tabs.resources"),
+    exam: t("programDetail.tabs.examComponents"),
   };
 
   const tabs =
@@ -75,9 +61,9 @@ const ProgramDetail = () => {
       ? program.data.types
           .map((type) => ({
             id: type,
-            ...componentMap[type],
+            label: tabLabels[type],
           }))
-          .filter((tab) => tab.label) 
+          .filter((tab) => tab.label)
       : [];
 
   // Set default active tab when tabs are available
@@ -90,6 +76,16 @@ const ProgramDetail = () => {
     }
   }, [tabs.length, activeTab, id]);
 
+  // Switch to newly created component tab once program types include it
+  useEffect(() => {
+    if (!pendingTab || !program?.data?.types?.includes(pendingTab)) return;
+
+    setActiveTab(pendingTab);
+    const storageKey = `programActiveTab_${id}`;
+    localStorage.setItem(storageKey, pendingTab);
+    setPendingTab(null);
+  }, [pendingTab, program?.data?.types, id]);
+
   useEffect(() => {
     if (activeTab) {
       const storageKey = `programActiveTab_${id}`;
@@ -97,7 +93,26 @@ const ProgramDetail = () => {
     }
   }, [activeTab, id]);
 
-  const ActiveComponent = tabs.find((tab) => tab.id === activeTab)?.component;
+  const renderActiveTab = () => {
+    const moduleProps = {
+      programId: id,
+      onComponentCreated: handleComponentCreated,
+      languageId: program?.data?.language?._id,
+    };
+
+    switch (activeTab) {
+      case "module":
+        return <LearningModule {...moduleProps} />;
+      case "app":
+        return <AppModule {...moduleProps} />;
+      case "resource":
+        return <ResourceModule {...moduleProps} />;
+      case "exam":
+        return <ExamModule {...moduleProps} />;
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     if (program?.data) {
@@ -148,13 +163,17 @@ const ProgramDetail = () => {
         <DashboardCard
           title={t("programDetail.cards.programName")}
           value={programData?.name}
-          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}`}
+          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}${programData?.is_online ? ` • ${t("common.online", "Online")}` : ""}`}
           icon={Layers}
         />
 
         <DashboardCard
           title={t("programDetail.cards.duration")}
-          value={`${programData.year} ${t("programDetail.cards.years")}`}
+          value={`${programData.year} ${
+            programData.year === 1
+              ? t(`common.durationUnits.${(programData.duration_unit || "years").slice(0, -1)}`, (programData.duration_unit || "years").slice(0, -1))
+              : t(`common.durationUnits.${programData.duration_unit || "years"}`, programData.duration_unit || "Years")
+          }`}
           icon={Clock}
         />
 
@@ -195,7 +214,7 @@ const ProgramDetail = () => {
             </nav>
           </div>
 
-          <div className="mt-6">{ActiveComponent && <ActiveComponent />}</div>
+          <div className="mt-6">{renderActiveTab()}</div>
         </>
       )}
 

@@ -18,9 +18,20 @@ export const useCreateComponent = () => {
 
   return useMutation({
     mutationFn: createComponent,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["components"] });
-      queryClient.invalidateQueries({ queryKey: ["program"] });
+    onSuccess: (response, variables) => {
+      const programId = variables?.program;
+      const componentType = variables?.type;
+
+      if (programId && componentType) {
+        queryClient.invalidateQueries({
+          queryKey: ["components", { type: componentType, program: programId }],
+        });
+        queryClient.invalidateQueries({ queryKey: ["program", programId] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["components"] });
+        queryClient.invalidateQueries({ queryKey: ["program"] });
+      }
+
       toast.success(response?.message || "Component created successfully!");
     },
     onError: (error) => {
@@ -35,8 +46,19 @@ export const useUpdateComponent = () => {
   return useMutation({
     mutationFn: ({ id, data }) => updateComponent(id, data),
     onSuccess: (response, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["components"] });
-      queryClient.invalidateQueries({ queryKey: ["program", variables.id] });
+      const programId = variables?.data?.program;
+      const componentType = variables?.data?.type;
+
+      if (programId && componentType) {
+        queryClient.invalidateQueries({
+          queryKey: ["components", { type: componentType, program: programId }],
+        });
+        queryClient.invalidateQueries({ queryKey: ["program", programId] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["components"] });
+        queryClient.invalidateQueries({ queryKey: ["program"] });
+      }
+
       toast.success(response?.message || "Component updated successfully!");
     },
     onError: (error) => {

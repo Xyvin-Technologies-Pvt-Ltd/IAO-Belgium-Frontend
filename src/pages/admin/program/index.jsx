@@ -45,6 +45,7 @@ const Programs = () => {
     city: "all",
     country: "all",
     status: "all",
+    is_online: "all",
   });
   const [draftFilters, setDraftFilters] = useState({
     program_type: "all",
@@ -52,6 +53,7 @@ const Programs = () => {
     city: "all",
     country: "all",
     status: "all",
+    is_online: "all",
   });
 
   const debouncedSearch = useDebounce(search, 500);
@@ -73,6 +75,9 @@ const Programs = () => {
     ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
     ...(appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
+      : {}),
+    ...(appliedFilters.is_online !== "all"
+      ? { is_online: appliedFilters.is_online }
       : {}),
   });
   const { mutateAsync: deleteProgram, isPending: isDeleting } =
@@ -133,6 +138,50 @@ const Programs = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          <div className="flex items-center border border-input rounded-md overflow-hidden bg-background h-10">
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "all" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "all" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold transition-colors ${
+                appliedFilters.is_online === "all"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "true" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "true" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold border-l border-input transition-colors ${
+                appliedFilters.is_online === "true"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              Online
+            </button>
+            <button
+              onClick={() => {
+                setAppliedFilters((prev) => ({ ...prev, is_online: "false" }));
+                setDraftFilters((prev) => ({ ...prev, is_online: "false" }));
+                setPage(1);
+              }}
+              className={`px-4 h-full text-xs font-semibold border-l border-input transition-colors ${
+                appliedFilters.is_online === "false"
+                  ? "bg-[#ff8904] text-white"
+                  : "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-zinc-400"
+              }`}
+            >
+              Offline
+            </button>
+          </div>
           <ProgramsFilterDrawer
             draftFilters={draftFilters}
             setDraftFilters={setDraftFilters}
@@ -183,12 +232,25 @@ const Programs = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{i?.name}</span>
+                    {i?.is_online && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-[#ff8904]/10 text-[#ff8904] border border-[#ff8904]/20">
+                        {t("common.online", "Online")}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
 
                 <TableCell>{i?.program_type}</TableCell>
                 <TableCell>{i?.program_code}</TableCell>
 
-                <TableCell>{i?.year}</TableCell>
+                <TableCell>
+                  {i?.year} {i?.year === 1 
+                    ? t(`common.durationUnits.${(i?.duration_unit || "years").slice(0, -1)}`, (i?.duration_unit || "years").slice(0, -1)) 
+                    : t(`common.durationUnits.${i?.duration_unit || "years"}`, i?.duration_unit || "Years")}
+                </TableCell>
                 <TableCell>{i?.city?.name}</TableCell>
                 <TableCell>{i?.language?.name}</TableCell>
                 <TableCell>

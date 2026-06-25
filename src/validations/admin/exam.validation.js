@@ -76,14 +76,6 @@ export const examSchema = z.object({
   path: ["question_sources"],
 }).refine((data) => {
   if (data.type === "sit-at-home") {
-    return data.teachers && data.teachers.length >= 1 && data.teachers.length <= 2;
-  }
-  return true;
-}, {
-  message: "One or two teachers must be assigned to sit-at-home exams",
-  path: ["teachers"],
-}).refine((data) => {
-  if (data.type === "sit-at-home") {
     return !!data.deadline && data.deadline.trim() !== "";
   }
   return true;
