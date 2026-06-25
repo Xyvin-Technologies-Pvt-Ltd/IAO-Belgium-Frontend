@@ -18,6 +18,13 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useGetContracts } from "@/store/useContractStore";
 import CreateContract from "@/components/admin/contract/CreateContract";
 import { useTranslation } from "react-i18next";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AllContracts = () => {
   const { t } = useTranslation();
@@ -27,16 +34,29 @@ const AllContracts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
 
+  const [contractType, setContractType] = useState("");
+  const [programType, setProgramType] = useState("");
+
+  const programTypes = [
+    "Master of Science",
+    "Lateral Entry Master of Science",
+    "Diploma",
+    "Manual Therapie",
+    "Post Academic Module",
+  ];
+
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, contractType, programType]);
   
   const { data, isLoading, error, refetch, isFetching } = useGetContracts({
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(contractType ? { contract_type: contractType } : {}),
+    ...(programType ? { program_type: programType } : {}),
   });
 
   const contracts = data?.data || [];
@@ -54,14 +74,53 @@ const AllContracts = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between gap-2">
-        <Input
-          placeholder={t("common.searchContracts")}
-          className="max-w-xs"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Button onClick={handleOpenCreate}>{t("common.createContract")}</Button>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1 max-w-3xl">
+          <Input
+            placeholder={t("common.searchContracts")}
+            className="w-full"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Select
+            value={contractType}
+            onValueChange={(val) => {
+              setContractType(val === "all" ? "" : val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Contract Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Contract Types</SelectItem>
+              <SelectItem value="student_contract">Student Contract</SelectItem>
+              <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={programType}
+            onValueChange={(val) => {
+              setProgramType(val === "all" ? "" : val);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Program Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Program Types</SelectItem>
+              {programTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex justify-end shrink-0">
+          <Button onClick={handleOpenCreate}>{t("common.createContract")}</Button>
+        </div>
       </div>
 
       <Table>

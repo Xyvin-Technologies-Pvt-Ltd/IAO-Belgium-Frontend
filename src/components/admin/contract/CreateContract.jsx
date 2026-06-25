@@ -35,7 +35,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
     "Post Academic Module",
   ];
 
-  const { data: languagesRes } = useGetAllLanguages();
+  const { data: languagesRes } = useGetAllLanguages(undefined, { enabled: open });
   const languages = languagesRes?.data || [];
 
   const {

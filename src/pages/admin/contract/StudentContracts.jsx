@@ -61,10 +61,10 @@ const StudentContracts = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 max-w-4xl">
         <Input
           placeholder={t("common.searchStudentNameEmail")}
-          className="max-w-xs"
+          className="w-full"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -75,7 +75,7 @@ const StudentContracts = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full">
             <SelectValue
               placeholder={t("common.chooseStatus") || t("common.allStatuses")}
             />
@@ -93,7 +93,7 @@ const StudentContracts = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="All Contract Types" />
           </SelectTrigger>
           <SelectContent>
@@ -109,7 +109,7 @@ const StudentContracts = () => {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="All Program Types" />
           </SelectTrigger>
           <SelectContent>
