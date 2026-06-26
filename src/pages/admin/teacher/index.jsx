@@ -22,7 +22,10 @@ import { useDeleteTeacher, useGetTeachers } from "@/store/useTeacherStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
-import TeacherFilterDrawer from "./TeacherFilterDrawer";
+import TeacherFilterDrawer, {
+  MULTI_FILTER_KEYS,
+  createEmptyFilters,
+} from "./TeacherFilterDrawer";
 
 const Teachers = () => {
   const { t } = useTranslation();
@@ -36,31 +39,27 @@ const Teachers = () => {
   const [deleteId, setDeleteId] = useState(null);
 
   // Filter States
-  const [appliedFilters, setAppliedFilters] = useState({
-    location: "all",
-    language: "all",
-    teacher_role: "all",
-    academic_degree: "all",
-    country: "all",
-    status: "all",
-  });
-  const [draftFilters, setDraftFilters] = useState({ ...appliedFilters });
+  const [appliedFilters, setAppliedFilters] = useState(createEmptyFilters());
+  const [draftFilters, setDraftFilters] = useState(createEmptyFilters());
 
   const debouncedSearch = useDebounce(search, 500);
    useEffect(() => {
      setPage(1);
    }, [debouncedSearch]);
-   
+
+  // Multi-select filters are sent as comma-joined id lists; the backend expands them into $in
+  const multiFilterParams = MULTI_FILTER_KEYS.reduce((acc, key) => {
+    const ids = (appliedFilters[key] || []).map((item) => item._id);
+    if (ids.length) acc[key] = ids.join(",");
+    return acc;
+  }, {});
+
   const { data, isLoading, error, refetch, isFetching } = useGetTeachers({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...multiFilterParams,
     ...(appliedFilters.location !== "all" && { location: appliedFilters.location }),
-    ...(appliedFilters.language !== "all" && { language: appliedFilters.language }),
-    ...(appliedFilters.teacher_role !== "all" && { teacher_role: appliedFilters.teacher_role }),
-    ...(appliedFilters.academic_degree !== "all" && {
-      academic_degree: appliedFilters.academic_degree,
-    }),
     ...(appliedFilters.status !== "all" && { status: appliedFilters.status }),
   });
   const { mutateAsync: deleteTeacher, isPending: isDeleting } =
@@ -162,7 +161,11 @@ const Teachers = () => {
                 <TableCell className={"capitalize"}>{i?.last_name + " " + i?.first_name}</TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.phone}</TableCell>
-                <TableCell>{i?.academic_degree?.name}</TableCell>
+                <TableCell>
+                  {Array.isArray(i?.academic_degree)
+                    ? i.academic_degree.map((d) => d?.name).filter(Boolean).join(", ") || "-"
+                    : i?.academic_degree?.name || "-"}
+                </TableCell>
                 <TableCell>{i?.teacher_role?.name}</TableCell>
                 <TableCell>
                   {moment(i?.iao_employment_start_date).format("DD-MM-YYYY")}

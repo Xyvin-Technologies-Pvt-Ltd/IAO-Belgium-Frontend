@@ -134,6 +134,26 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: Languages,
           },
           {
+            title: t("sidebar.admin.contractTypes", "Contract Types"),
+            url: "/admin/contract-types",
+            icon: ScrollText,
+          },
+          {
+            title: t("sidebar.admin.departments", "Departments"),
+            url: "/admin/departments",
+            icon: Users,
+          },
+          {
+            title: t("sidebar.admin.regions", "Regions"),
+            url: "/admin/regions",
+            icon: MapPin,
+          },
+          {
+            title: t("sidebar.admin.teachingRegions", "Teaching Regions"),
+            url: "/admin/teaching-regions",
+            icon: MapPin,
+          },
+          {
             title: t("sidebar.admin.specialExceptions", "Special Exceptions"),
             url: "/admin/special-exceptions",
             icon: Activity,

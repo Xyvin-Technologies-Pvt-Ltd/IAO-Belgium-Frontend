@@ -14,6 +14,10 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/custom-invoices": ["finance_management_view", "finance_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/contract-types": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/departments": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/regions": ["master_data_management_view", "master_data_management_modify"],
+  "/admin/teaching-regions": ["master_data_management_view", "master_data_management_modify"],
   "/admin/special-exceptions": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-qualifications": ["master_data_management_view", "master_data_management_modify"],
   "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"], // Fallback just in case

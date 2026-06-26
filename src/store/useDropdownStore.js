@@ -11,6 +11,10 @@ import {
   getUsers,
   getTeacherModules,
   getAllAcademicYears,
+  getAllContractTypes,
+  getAllDepartments,
+  getAllRegions,
+  getAllTeachingRegions,
 } from "@/api/dropDownApi";
 import { useQuery } from "@tanstack/react-query";
 
@@ -152,6 +156,46 @@ export const useGetAllAcademicYears = (filter, options = {}) => {
   return useQuery({
     queryKey: ["all-academic-years", filter],
     queryFn: () => getAllAcademicYears(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetAllContractTypes = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-contract-types", filter],
+    queryFn: () => getAllContractTypes(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetAllDepartments = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-departments", filter],
+    queryFn: () => getAllDepartments(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetAllRegions = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-regions", filter],
+    queryFn: () => getAllRegions(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetAllTeachingRegions = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-teaching-regions", filter],
+    queryFn: () => getAllTeachingRegions(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
