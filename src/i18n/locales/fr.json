@@ -1523,6 +1523,7 @@
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",
+    "questions": "Questions",
     "table": {
       "uid": "UID",
       "name": "Nom",

@@ -1571,6 +1571,7 @@
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
+    "questions": "Questions",
     "table": {
       "uid": "UID",
       "name": "Name",

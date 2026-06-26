@@ -126,6 +126,7 @@ const Teachers = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("teacherManagement.table.teacherId")}</TableHead>
+            <TableHead>IAO ID</TableHead>
             <TableHead>{t("teacherManagement.table.name")}</TableHead>
             <TableHead>{t("teacherManagement.table.email")}</TableHead>
             <TableHead>{t("teacherManagement.table.phone")}</TableHead>
@@ -145,10 +146,10 @@ const Teachers = () => {
         </TableHeader>
        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={16} />
+            <TableSkeleton rows={rowsPerPage} columns={17} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={16} className="text-center p-8">
+              <TableCell colSpan={17} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("teacherManagement.messages.loadFailed")
@@ -163,6 +164,7 @@ const Teachers = () => {
               <TableRow key={i._id}  className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}>
                 <TableCell>{i?.uid}</TableCell>
+                <TableCell>{i?.iao_id || "-"}</TableCell>
                 <TableCell className={"capitalize"}>{i?.last_name + " " + i?.first_name}</TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.phone}</TableCell>
@@ -226,7 +228,7 @@ const Teachers = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={16} className="text-center">
+              <TableCell colSpan={17} className="text-center">
                 {t("teacherManagement.table.noTeachers")}
               </TableCell>
             </TableRow>

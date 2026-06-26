@@ -1522,6 +1522,7 @@
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
     "question": "Frage",
+    "questions": "Fragen",
     "table": {
       "uid": "UID",
       "name": "Name",
