@@ -25,6 +25,14 @@ const statusVariants = {
   open: "text-green-600",
   re_enrolled: "text-blue-600",
 
+  // Bloom levels (Difficulty)
+  remember: "text-green-600",
+  understand: "text-amber-600",
+  apply: "text-red-500",
+  analyze: "text-blue-600",
+  evaluate: "text-purple-600",
+  create: "text-indigo-600",
+
   // Year Completion logs
   validation_check: "text-blue-600",
   validation_failed: "text-red-600",

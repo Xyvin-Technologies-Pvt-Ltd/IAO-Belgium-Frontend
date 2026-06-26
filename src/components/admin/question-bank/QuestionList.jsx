@@ -22,18 +22,29 @@ import {
   useDeleteQuestion,
 } from "@/store/useQuestionBankStore";
 import moment from "moment";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import StatusBadge from "@/components/StatusBadge";
 
 const DIFFICULTY_LABELS = {
-  easy: "Easy",
-  medium: "Medium",
-  hard: "Hard",
+  remember: "Remember",
+  understand: "Understand",
+  apply: "Apply",
+  analyze: "Analyze",
+  evaluate: "Evaluate",
+  create: "Create",
 };
 
 const QuestionList = ({ questionBankId }) => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [difficulty, setDifficulty] = useState("");
+  const [difficulty, setDifficulty] = useState("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isBulkOpen, setIsBulkOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
@@ -47,7 +58,7 @@ const QuestionList = ({ questionBankId }) => {
     {
       page,
       limit: rowsPerPage,
-      ...(difficulty ? { difficulty } : {}),
+      ...(difficulty && difficulty !== "all" ? { difficulty } : {}),
       sort_by: sortBy,
       sort_order: sortOrder,
     },
@@ -107,6 +118,25 @@ const QuestionList = ({ questionBankId }) => {
             {t("questionBank.questionList.bulkUpload")}
           </Button>
         </div>
+        <div className="flex items-center gap-2">
+          <Select
+            value={difficulty}
+            onValueChange={setDifficulty}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("questionBank.questionForm.selectDifficultyPlaceholder", "All Difficulties")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("common.all", "All") || "All"}</SelectItem>
+              <SelectItem value="remember">{t("questionBank.questionForm.remember")}</SelectItem>
+              <SelectItem value="understand">{t("questionBank.questionForm.understand")}</SelectItem>
+              <SelectItem value="apply">{t("questionBank.questionForm.apply")}</SelectItem>
+              <SelectItem value="analyze">{t("questionBank.questionForm.analyze")}</SelectItem>
+              <SelectItem value="evaluate">{t("questionBank.questionForm.evaluate")}</SelectItem>
+              <SelectItem value="create">{t("questionBank.questionForm.create")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Table>
@@ -158,7 +188,7 @@ const QuestionList = ({ questionBankId }) => {
                   {i?.question_text || "-"}
                 </TableCell>
                 <TableCell>
-                  {t(`questionBank.questionForm.${i?.difficulty || "medium"}`)}
+                  <StatusBadge status={i?.difficulty || "understand"} />
                 </TableCell>
                 <TableCell>{i?.marks ?? 1}</TableCell>
                 <TableCell className="whitespace-nowrap">

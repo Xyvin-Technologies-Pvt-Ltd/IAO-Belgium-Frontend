@@ -131,19 +131,24 @@ const Teachers = () => {
             <TableHead>{t("teacherManagement.table.phone")}</TableHead>
             <TableHead>{t("teacherManagement.table.academicDegree")}</TableHead>
             <TableHead>{t("teacherManagement.table.role")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.contractTypeLabel", "Contract Type")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.departmentLabel", "Department")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.regionLabel", "Region")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.teachingRegionsLabel", "Regions Where They Teach")}</TableHead>
             <TableHead>{t("teacherManagement.table.employmentStartDate")}</TableHead>
             <TableHead>{t("teacherManagement.table.location")}</TableHead>
             <TableHead>{t("teacherManagement.table.language")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.motherTongueLabel", "Mother Tongue")}</TableHead>
             <TableHead>{t("teacherManagement.table.status")}</TableHead>
             <TableHead>{t("teacherManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={11} />
+            <TableSkeleton rows={rowsPerPage} columns={16} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={11} className="text-center p-8">
+              <TableCell colSpan={16} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("teacherManagement.messages.loadFailed")
@@ -166,7 +171,23 @@ const Teachers = () => {
                     ? i.academic_degree.map((d) => d?.name).filter(Boolean).join(", ") || "-"
                     : i?.academic_degree?.name || "-"}
                 </TableCell>
-                <TableCell>{i?.teacher_role?.name}</TableCell>
+                <TableCell>{i?.teacher_role?.name || "-"}</TableCell>
+                <TableCell>{i?.contract_type?.name || "-"}</TableCell>
+                <TableCell>
+                  {Array.isArray(i?.department) && i.department.length > 0
+                    ? i.department.map((d) => d?.name).filter(Boolean).join(", ")
+                    : i?.department?.name || "-"}
+                </TableCell>
+                <TableCell>
+                  {Array.isArray(i?.region) && i.region.length > 0
+                    ? i.region.map((r) => r?.name).filter(Boolean).join(", ")
+                    : i?.region?.name || "-"}
+                </TableCell>
+                <TableCell>
+                  {Array.isArray(i?.teaching_regions) && i.teaching_regions.length > 0
+                    ? i.teaching_regions.map((tr) => tr?.name).filter(Boolean).join(", ")
+                    : i?.teaching_regions?.name || "-"}
+                </TableCell>
                 <TableCell>
                   {moment(i?.iao_employment_start_date).format("DD-MM-YYYY")}
                 </TableCell>
@@ -181,6 +202,7 @@ const Teachers = () => {
                     ? i.language.map((lang) => lang.name).join(", ")
                     : "-"}
                 </TableCell>
+                <TableCell>{i?.mother_tongue?.name || "-"}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -204,7 +226,7 @@ const Teachers = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={11} className="text-center">
+              <TableCell colSpan={16} className="text-center">
                 {t("teacherManagement.table.noTeachers")}
               </TableCell>
             </TableRow>

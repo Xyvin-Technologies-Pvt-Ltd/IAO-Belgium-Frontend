@@ -1,5 +1,5 @@
 
-import { createComponent, getComponentById, getComponents, getStudentsByComponent, updateComponent } from "@/api/componentApi";
+import { createComponent, getComponentById, getComponentFilterOptions, getComponents, getStudentsByComponent, updateComponent } from "@/api/componentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -77,6 +77,16 @@ export const useGetStudentsByComponent=(id,filter,options={})=>{
     ...options,
   });
 }
+
+export const useGetComponentFilterOptions = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["component-filter-options", filter],
+    queryFn: () => getComponentFilterOptions(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
 
 export const useGetComponentById=(id,options={})=>{
   return useQuery({

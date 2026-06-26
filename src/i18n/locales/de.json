@@ -46,7 +46,7 @@
       "regions": "Regionen",
       "teachingRegions": "Unterrichtsregionen",
       "specialExceptions": "Sonderausnahmen",
-      "teacherQualifications": "Qualifikationen der Dozenten",
+      "teacherQualifications": "Dozentendaten",
       "teacherData": "Dozentendaten",
       "admissionAdministration": "Zulassungsverwaltung",
       "applicationReview": "Bewerbungsüberprüfung",
@@ -980,7 +980,7 @@
     }
   },
   "teacherQualification": {
-    "title": "Qualifikationen der Dozenten",
+    "title": "Dozentendaten",
     "tabs": {
       "titles": "Titel",
       "roles": "Rollen"
@@ -1128,6 +1128,23 @@
   },
   "learningModule": {
     "search": "Module suchen...",
+    "filters": {
+      "yearPlaceholder": "Nach Jahr filtern",
+      "moduleNumberLabel": "Modulnummer",
+      "moduleNumberPlaceholder": "Nach Modulnummer filtern",
+      "statusLabel": "Status",
+      "all": "Alle",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "sort": {
+      "sortByLabel": "Sortieren nach",
+      "learningUid": "Lern-UID",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "yearAsc": "Jahr (aufsteigend)",
+      "yearDesc": "Jahr (absteigend)"
+    },
     "table": {
       "learningUID": "Lern-UID",
       "moduleName": "Modulname",
@@ -1559,9 +1576,12 @@
       "explanation": "Erklärung",
       "explanationPlaceholder": "Erklärung zur richtigen Antwort eingeben",
       "difficulty": "Schwierigkeitsgrad",
-      "easy": "Einfach",
-      "medium": "Mittel",
-      "hard": "Schwer",
+      "remember": "Erinnern",
+      "understand": "Verstehen",
+      "apply": "Anwenden",
+      "analyze": "Analysieren",
+      "evaluate": "Evaluieren",
+      "create": "Kreieren",
       "marks": "Punkte"
     }
   },

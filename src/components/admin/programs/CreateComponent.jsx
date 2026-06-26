@@ -61,6 +61,7 @@ const CreateComponent = ({
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [instructionContent, setInstructionContent] = useState("");
+  const [additionalContextContent, setAdditionalContextContent] = useState("");
   const [moduleNameSearch, setModuleNameSearch] = useState("");
   const [showModuleSuggestions, setShowModuleSuggestions] = useState(false);
   const [selectedSystemId, setSelectedSystemId] = useState(null);
@@ -97,6 +98,7 @@ const CreateComponent = ({
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
+      additional_context: "",
       resources: [],
       submissions: {
         case_studies: false,
@@ -198,6 +200,7 @@ const CreateComponent = ({
       submission_deadline: "",
       instruction: "",
       instruction_video: "",
+      additional_context: "",
       resources: [],
       submissions: {
         case_studies: false,
@@ -210,6 +213,7 @@ const CreateComponent = ({
     });
     setSelectedType(preselectedType || "");
     setInstructionContent("");
+    setAdditionalContextContent("");
     setModuleNameSearch("");
     setShowModuleSuggestions(false);
     setSelectedSystemId(null);
@@ -357,6 +361,7 @@ const CreateComponent = ({
       submission_deadline: formattedDeadline,
       instruction: componentData.instruction || "",
       instruction_video: componentData.instruction_video || "",
+      additional_context: componentData.additional_context || "",
       resources: componentData.files
         ? componentData.files.map((file) => ({
             name: file.name,
@@ -386,6 +391,11 @@ const CreateComponent = ({
     const instructionText = componentData.instruction || "";
     setInstructionContent(instructionText);
     setValue("instruction", instructionText);
+
+    // Set additional context content separately to ensure RichTextEditor updates
+    const additionalContextText = componentData.additional_context || "";
+    setAdditionalContextContent(additionalContextText);
+    setValue("additional_context", additionalContextText);
   }, [componentData, open, reset, setValue]);
 
   useEffect(() => {
@@ -403,6 +413,11 @@ const CreateComponent = ({
   useEffect(() => {
     setValue("instruction", instructionContent);
   }, [instructionContent, setValue]);
+
+  // Sync additional context content with form validation
+  useEffect(() => {
+    setValue("additional_context", additionalContextContent);
+  }, [additionalContextContent, setValue]);
 
   useEffect(() => {
     if (isFree) {
@@ -464,6 +479,7 @@ const CreateComponent = ({
       if (data.type === "module") {
         payload.amount = data.is_free ? 0 : Number(data.amount);
         payload.module_number = data.module_number;
+        payload.additional_context = additionalContextContent.trim();
         if (selectedSystemId) {
           payload.system_id = selectedSystemId;
         }
@@ -705,6 +721,25 @@ const CreateComponent = ({
                     {...register("amount")}
                   />
                 )}
+                <div className="space-y-2">
+                  <Label>
+                    {t("componentManagement.additionalContextLabel", "Additional Context")}
+                  </Label>
+                  <RichTextEditor
+                    value={additionalContextContent}
+                    onChange={setAdditionalContextContent}
+                    placeholder={t(
+                      "componentManagement.additionalContextPlaceholder",
+                      "Enter additional context for the module..."
+                    )}
+                    className={cn(errors.additional_context && "border-destructive")}
+                  />
+                  {errors.additional_context && (
+                    <p className="text-sm text-destructive">
+                      {errors.additional_context.message}
+                    </p>
+                  )}
+                </div>
               </>
             )}
             {selectedType === "exam" && (

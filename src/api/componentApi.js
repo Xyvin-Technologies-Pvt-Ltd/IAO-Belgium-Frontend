@@ -39,6 +39,17 @@ export const getStudentsByComponent = async (id,filter) => {
   }
 };
 
+export const getComponentFilterOptions = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/components/filter-options`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getComponentById= async (id) => {
   try {
     const response = await axiosInstance.get(`/components/${id}`);

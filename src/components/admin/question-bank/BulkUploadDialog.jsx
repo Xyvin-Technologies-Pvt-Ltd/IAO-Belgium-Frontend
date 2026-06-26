@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { useBulkUploadQuestions } from "@/store/useQuestionBankStore";
 
 const CSV_TEMPLATE = `question_text;option_a;option_b;option_c;option_d;correct_answer;explanation;difficulty
-"What is 2+2?";"3";"4";"5";"6";"B";"Basic arithmetic";"easy"
-"What is the capital of France?";"London";"Paris";"Berlin";"Madrid";"B";"Paris is the capital";"medium"`;
+"What is 2+2?";"3";"4";"5";"6";"B";"Basic arithmetic";"remember"
+"What is the capital of France?";"London";"Paris";"Berlin";"Madrid";"B";"Paris is the capital";"understand"`;
 
 const BulkUploadDialog = ({ open, onClose, questionBankId, onSuccess }) => {
   const { t } = useTranslation();

@@ -46,7 +46,7 @@
       "regions": "Regio's",
       "teachingRegions": "Lesregio's",
       "specialExceptions": "Speciale uitzonderingen",
-      "teacherQualifications": "Kwalificaties docenten",
+      "teacherQualifications": "Docentgegevens",
       "teacherData": "Docentgegevens",
       "admissionAdministration": "Toelatingsadministratie",
       "applicationReview": "Beoordeling candidaturen",
@@ -983,7 +983,7 @@
     }
   },
   "teacherQualification": {
-    "title": "Kwalificaties docenten",
+    "title": "Docentgegevens",
     "tabs": {
       "titles": "Titels",
       "roles": "Rollen"
@@ -1131,6 +1131,23 @@
   },
   "learningModule": {
     "search": "Modules zoeken...",
+    "filters": {
+      "yearPlaceholder": "Filter op jaar",
+      "moduleNumberLabel": "Modulenummer",
+      "moduleNumberPlaceholder": "Filter op modulenummer",
+      "statusLabel": "Status",
+      "all": "Alle",
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "sort": {
+      "sortByLabel": "Sorteren op",
+      "learningUid": "Leer-UID",
+      "nameAsc": "Naam (A-Z)",
+      "nameDesc": "Naam (Z-A)",
+      "yearAsc": "Jaar (oplopend)",
+      "yearDesc": "Jaar (aflopend)"
+    },
     "table": {
       "learningUID": "Leer-UID",
       "moduleName": "Modulenaam",
@@ -1562,9 +1579,12 @@
       "explanation": "Toelichting",
       "explanationPlaceholder": "Toelichting op het juiste antwoord invoeren",
       "difficulty": "Moeilijkheidsgraad",
-      "easy": "Gemakkelijk",
-      "medium": "Gemiddeld",
-      "hard": "Moeilijk",
+      "remember": "Onthouden",
+      "understand": "Begrijpen",
+      "apply": "Toepassen",
+      "analyze": "Analyseren",
+      "evaluate": "Evalueren",
+      "create": "Creëren",
       "marks": "Punten"
     }
   },

@@ -17,6 +17,6 @@ export const questionSchema = z
         "Exactly one option must be marked as correct",
       ),
     explanation: z.string().optional(),
-    difficulty: z.enum(["easy", "medium", "hard"]).default("medium"),
+    difficulty: z.enum(["remember", "understand", "apply", "analyze", "evaluate", "create"]).default("understand"),
     marks: z.coerce.number().min(0).default(1),
   });

@@ -46,7 +46,7 @@
       "regions": "Regions",
       "teachingRegions": "Teaching Regions",
       "specialExceptions": "Special Exceptions",
-      "teacherQualifications": "Lecturer Qualifications",
+      "teacherQualifications": "Lecturer Data",
       "teacherData": "Lecturer Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
@@ -1013,7 +1013,7 @@
     }
   },
   "teacherQualification": {
-    "title": "Lecturer Qualifications",
+    "title": "Lecturer Data",
     "tabs": {
       "titles": "Titles",
       "roles": "Roles"
@@ -1169,6 +1169,23 @@
   },
   "learningModule": {
     "search": "Search modules...",
+    "filters": {
+      "yearPlaceholder": "Filter by year",
+      "moduleNumberLabel": "Module Number",
+      "moduleNumberPlaceholder": "Filter by module number",
+      "statusLabel": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "sort": {
+      "sortByLabel": "Sort by",
+      "learningUid": "Learning UID",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "yearAsc": "Year (Ascending)",
+      "yearDesc": "Year (Descending)"
+    },
     "table": {
       "learningUID": "Learning UID",
       "moduleName": "Module Name",
@@ -1608,9 +1625,12 @@
       "explanation": "Explanation",
       "explanationPlaceholder": "Enter explanation for the correct answer",
       "difficulty": "Difficulty",
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard",
+      "remember": "Remember",
+      "understand": "Understand",
+      "apply": "Apply",
+      "analyze": "Analyze",
+      "evaluate": "Evaluate",
+      "create": "Create",
       "marks": "Marks"
     }
   },

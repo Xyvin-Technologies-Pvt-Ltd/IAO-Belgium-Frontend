@@ -110,10 +110,10 @@ export const adminRoutes = [
     ),
   },
   {
-    path: "/admin/teacher-qualifications",
+    path: "/admin/lecturer-data",
     component: withPermissionProtection(
       TeacherQualification,
-      "/admin/teacher-qualification",
+      "/admin/lecturer-data",
     ),
   },
   {

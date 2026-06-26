@@ -48,6 +48,7 @@ const moduleComponentSchema = baseComponentSchema.extend({
   module_number: z.coerce
     .number({ invalid_type_error: "Module number must be a number" })
     .min(1, "Module number must be at least 1"),
+  additional_context: z.string().optional().or(z.literal("")),
 });
 
 const appComponentSchema = baseComponentSchema.extend({
