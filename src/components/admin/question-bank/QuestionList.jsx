@@ -121,7 +121,10 @@ const QuestionList = ({ questionBankId }) => {
         <div className="flex items-center gap-2">
           <Select
             value={difficulty}
-            onValueChange={setDifficulty}
+            onValueChange={(val) => {
+              setDifficulty(val);
+              setPage(1);
+            }}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={t("questionBank.questionForm.selectDifficultyPlaceholder", "All Difficulties")} />
