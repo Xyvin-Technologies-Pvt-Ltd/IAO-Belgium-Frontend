@@ -53,11 +53,30 @@ export const teacherSchema = z.object({
   language: z.array(z.object({
     _id: z.string(),
     name: z.string()
-  })).min(1, "At least one preferred language is required"),
+  })).min(1, "At least one language of instruction is required"),
 
-  academic_degree: z.string().min(1, "Academic degree is required"),
-  teacher_role: z.string().min(1, "Teacher role is required"),
+  academic_degree: z.array(z.object({
+    _id: z.string(),
+    name: z.string()
+  })).min(1, "At least one academic degree is required"),
+  teacher_role: z.string().min(1, "Lecturer role is required"),
+
+  // Optional master-data backed fields
+  mother_tongue: z.string().optional(),
+  contract_type: z.string().optional(),
+  department: z.array(z.object({
+    _id: z.string(),
+    name: z.string()
+  })).optional(),
+  region: z.array(z.object({
+    _id: z.string(),
+    name: z.string()
+  })).optional(),
+  teaching_regions: z.array(z.object({
+    _id: z.string(),
+    name: z.string()
+  })).optional(),
+
   iao_employment_start_date: z.string().min(1, "Employment start date is required"),
   status: z.boolean().optional(),
-  iao_id: z.string().optional(),
 });

@@ -95,7 +95,7 @@ export default function AdminTeacherLayoutComponent() {
             </div>
           </div>
 
-          <div className="flex-1 p-4 overflow-auto bg-gradient-to-r from-dashboard-gradient-from to-dashboard-gradient-to">
+          <div className="flex-1 p-4 overflow-auto [scrollbar-gutter:stable] bg-gradient-to-r from-dashboard-gradient-from to-dashboard-gradient-to">
             <Outlet />
           </div>
         </main>

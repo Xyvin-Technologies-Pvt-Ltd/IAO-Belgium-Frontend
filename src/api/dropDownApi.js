@@ -125,3 +125,47 @@ export const getAllAcademicYears = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const getAllContractTypes = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/master-data/contract-type/dropdown`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAllDepartments = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/master-data/department/dropdown`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAllRegions = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/master-data/region/dropdown`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAllTeachingRegions = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/master-data/teaching-region/dropdown`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

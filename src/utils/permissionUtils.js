@@ -15,8 +15,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
   "/admin/special-exceptions": ["master_data_management_view", "master_data_management_modify"],
-  "/admin/teacher-qualifications": ["master_data_management_view", "master_data_management_modify"],
-  "/admin/teacher-qualification": ["master_data_management_view", "master_data_management_modify"], // Fallback just in case
+  "/admin/lecturer-data": ["master_data_management_view", "master_data_management_modify"],
   "/admin/admin-management": ["admin_management_view", "admin_management_modify"],
   "/admin/role-management": ["roles_management_view", "roles_management_modify"],
   "/admin/lti-management": ["admin_management_view", "admin_management_modify"],

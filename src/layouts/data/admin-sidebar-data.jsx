@@ -138,9 +138,9 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/special-exceptions",
             icon: Activity,
           },
-           {
+          {
             title: t("sidebar.admin.teacherQualifications"),
-            url: "/admin/teacher-qualifications",
+            url: "/admin/lecturer-data",
             icon: Award,
           },
           {

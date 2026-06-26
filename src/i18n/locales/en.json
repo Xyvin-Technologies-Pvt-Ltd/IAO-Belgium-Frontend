@@ -41,8 +41,12 @@
       "programAdministration": "Program Administration",
       "locations": "Locations",
       "languages": "Languages",
+      "contractTypes": "Contract Types",
+      "departments": "Departments",
+      "regions": "Regions",
+      "teachingRegions": "Teaching Regions",
       "specialExceptions": "Special Exceptions",
-      "teacherQualifications": "Lecturer Qualifications",
+      "teacherQualifications": "Lecturer Data",
       "teacherData": "Lecturer Data",
       "admissionAdministration": "Admission Administration",
       "applicationReview": "Application Review",
@@ -121,6 +125,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "selectCountryFirst": "Please select a country first",
+    "search": "Search...",
     "searchCountries": "Search countries...",
     "admissionAdministration": "Admission administration",
     "academicYears": "Academic Years",
@@ -480,6 +485,42 @@
       "nameLabel": "Language Name",
       "namePlaceholder": "Enter language name"
     }
+  },
+  "contractTypeManagement": {
+    "title": "Contract Types",
+    "search": "Search...",
+    "create": "Create Contract Type",
+    "entity": "Contract Type",
+    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No contract types found" },
+    "messages": { "loadFailed": "Failed to load contract types", "created": "Contract type created successfully", "updated": "Contract type updated successfully", "deleted": "Contract type deleted successfully", "createFailed": "Failed to create contract type", "updateFailed": "Failed to update contract type", "deleteFailed": "Failed to delete contract type" },
+    "modal": { "createTitle": "Create a new contract type", "editTitle": "Edit Contract Type", "createSubtitle": "Let's create a new contract type", "editSubtitle": "Update the contract type details", "nameLabel": "Contract Type Name", "namePlaceholder": "Enter contract type name", "nameRequired": "Name is required" }
+  },
+  "departmentManagement": {
+    "title": "Departments",
+    "search": "Search...",
+    "create": "Create Department",
+    "entity": "Department",
+    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No departments found" },
+    "messages": { "loadFailed": "Failed to load departments", "created": "Department created successfully", "updated": "Department updated successfully", "deleted": "Department deleted successfully", "createFailed": "Failed to create department", "updateFailed": "Failed to update department", "deleteFailed": "Failed to delete department" },
+    "modal": { "createTitle": "Create a new department", "editTitle": "Edit Department", "createSubtitle": "Let's create a new department", "editSubtitle": "Update the department details", "nameLabel": "Department Name", "namePlaceholder": "Enter department name", "nameRequired": "Name is required" }
+  },
+  "regionManagement": {
+    "title": "Regions",
+    "search": "Search...",
+    "create": "Create Region",
+    "entity": "Region",
+    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No regions found" },
+    "messages": { "loadFailed": "Failed to load regions", "created": "Region created successfully", "updated": "Region updated successfully", "deleted": "Region deleted successfully", "createFailed": "Failed to create region", "updateFailed": "Failed to update region", "deleteFailed": "Failed to delete region" },
+    "modal": { "createTitle": "Create a new region", "editTitle": "Edit Region", "createSubtitle": "Let's create a new region", "editSubtitle": "Update the region details", "nameLabel": "Region Name", "namePlaceholder": "Enter region name", "nameRequired": "Name is required" }
+  },
+  "teachingRegionManagement": {
+    "title": "Teaching Regions",
+    "search": "Search...",
+    "create": "Create Teaching Region",
+    "entity": "Teaching Region",
+    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No teaching regions found" },
+    "messages": { "loadFailed": "Failed to load teaching regions", "created": "Teaching region created successfully", "updated": "Teaching region updated successfully", "deleted": "Teaching region deleted successfully", "createFailed": "Failed to create teaching region", "updateFailed": "Failed to update teaching region", "deleteFailed": "Failed to delete teaching region" },
+    "modal": { "createTitle": "Create a new teaching region", "editTitle": "Edit Teaching Region", "createSubtitle": "Let's create a new teaching region", "editSubtitle": "Update the teaching region details", "nameLabel": "Teaching Region Name", "namePlaceholder": "Enter teaching region name", "nameRequired": "Name is required" }
   },
   "programManagement": {
     "title": "Programmes",
@@ -972,7 +1013,7 @@
     }
   },
   "teacherQualification": {
-    "title": "Lecturer Qualifications",
+    "title": "Lecturer Data",
     "tabs": {
       "titles": "Titles",
       "roles": "Roles"
@@ -1043,12 +1084,22 @@
       "countryPlaceholder": "Select country",
       "citiesLabel": "Preferred Cities",
       "citiesPlaceholder": "Select cities where lecturer can teach",
-      "languageLabel": "Preferred Languages",
+      "languageLabel": "Language of Instruction",
       "languagePlaceholder": "Select languages lecturer can teach",
       "academicDegreeLabel": "Academic Degree",
-      "academicDegreePlaceholder": "Select degree",
+      "academicDegreePlaceholder": "Select degree(s)",
       "teacherRoleLabel": "Lecturer Role",
       "teacherRolePlaceholder": "Select role",
+      "motherTongueLabel": "Mother Tongue",
+      "motherTonguePlaceholder": "Select mother tongue",
+      "contractTypeLabel": "Contract Type",
+      "contractTypePlaceholder": "Select contract type",
+      "departmentLabel": "Department",
+      "departmentPlaceholder": "Select department(s)",
+      "regionLabel": "Region",
+      "regionPlaceholder": "Select region(s)",
+      "teachingRegionsLabel": "Regions Where They Teach",
+      "teachingRegionsPlaceholder": "Select region(s)",
       "employmentStartDateLabel": "Start Date",
       "employmentStartDatePlaceholder": "Select start date",
       "personalDetails": "Personal Details",
@@ -1059,6 +1110,37 @@
       "postalCodePlaceholder": "Enter postal code (e.g., 123456 or AB-123)",
       "cityLabel": "City",
       "cityPlaceholder": "Select city"
+    },
+    "filters": {
+      "title": "Filters",
+      "heading": "Filter Teachers",
+      "subheading": "Narrow down the teachers list",
+      "teacherRole": "Lecturer Role",
+      "allRoles": "All Roles",
+      "academicDegree": "Academic Degree",
+      "allDegrees": "All Degrees",
+      "contractType": "Contract Type",
+      "allContractTypes": "All Contract Types",
+      "department": "Department",
+      "allDepartments": "All Departments",
+      "language": "Language of Instruction",
+      "allLanguages": "All Languages",
+      "motherTongue": "Mother Tongue",
+      "region": "Region",
+      "allRegions": "All Regions",
+      "teachingRegions": "Regions Where They Teach",
+      "languageAndRegion": "Language & Region",
+      "country": "Country (Helper)",
+      "selectCountry": "Select Country",
+      "city": "City",
+      "allCities": "All Cities",
+      "status": "Status",
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "deleted": "Deleted",
+      "clearAll": "Clear All",
+      "apply": "Apply Filters"
     }
   },
   "programDetail": {
@@ -1087,6 +1169,23 @@
   },
   "learningModule": {
     "search": "Search modules...",
+    "filters": {
+      "yearPlaceholder": "Filter by year",
+      "moduleNumberLabel": "Module Number",
+      "moduleNumberPlaceholder": "Filter by module number",
+      "statusLabel": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "sort": {
+      "sortByLabel": "Sort by",
+      "learningUid": "Learning UID",
+      "nameAsc": "Name (A-Z)",
+      "nameDesc": "Name (Z-A)",
+      "yearAsc": "Year (Ascending)",
+      "yearDesc": "Year (Descending)"
+    },
     "table": {
       "learningUID": "Learning UID",
       "moduleName": "Module Name",
@@ -1472,6 +1571,7 @@
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
+    "questions": "Questions",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -1526,9 +1626,12 @@
       "explanation": "Explanation",
       "explanationPlaceholder": "Enter explanation for the correct answer",
       "difficulty": "Difficulty",
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard",
+      "remember": "Remember",
+      "understand": "Understand",
+      "apply": "Apply",
+      "analyze": "Analyze",
+      "evaluate": "Evaluate",
+      "create": "Create",
       "marks": "Marks"
     }
   },

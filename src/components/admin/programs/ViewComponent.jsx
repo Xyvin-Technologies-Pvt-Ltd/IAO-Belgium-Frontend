@@ -155,6 +155,22 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
               </div>
             )}
 
+            {componentData.type === "module" && componentData.additional_context && (
+              <div>
+                <h3 className="font-medium text-sm text-muted-foreground mb-2">
+                  {t("componentManagement.additionalContextLabel", "Additional Context")}
+                </h3>
+                <div className="bg-muted rounded-lg p-4">
+                  <div
+                    className="text-sm leading-relaxed instruction-content"
+                    dangerouslySetInnerHTML={{
+                      __html: componentData.additional_context,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             {componentData.instruction && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-2">

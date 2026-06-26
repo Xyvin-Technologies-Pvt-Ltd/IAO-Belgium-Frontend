@@ -25,6 +25,10 @@ import {
   useGetAllLanguages,
   useGetAllTeacherTitle,
   useGetAllTeacherRoles,
+  useGetAllContractTypes,
+  useGetAllDepartments,
+  useGetAllRegions,
+  useGetAllTeachingRegions,
 } from "@/store/useDropdownStore";
 
 import { teacherSchema } from "@/validations/admin";
@@ -38,6 +42,11 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   const [languageSearchTerm, setLanguageSearchTerm] = useState("");
   const [titleSearchTerm, setTitleSearchTerm] = useState("");
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
+  const [motherTongueSearchTerm, setMotherTongueSearchTerm] = useState("");
+  const [contractTypeSearchTerm, setContractTypeSearchTerm] = useState("");
+  const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
+  const [regionSearchTerm, setRegionSearchTerm] = useState("");
+  const [teachingRegionSearchTerm, setTeachingRegionSearchTerm] = useState("");
 
   useEffect(() => {
     GetCountries().then((result) => {
@@ -64,6 +73,30 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
     },
     { enabled: open }
   );
+  const { data: motherTonguesData, isLoading: motherTonguesLoading } =
+    useGetAllLanguages(
+      { ...(motherTongueSearchTerm && { search: motherTongueSearchTerm }) },
+      { enabled: open }
+    );
+  const { data: contractTypesData, isLoading: contractTypesLoading } =
+    useGetAllContractTypes(
+      { ...(contractTypeSearchTerm && { search: contractTypeSearchTerm }) },
+      { enabled: open }
+    );
+  const { data: departmentsData, isLoading: departmentsLoading } =
+    useGetAllDepartments(
+      { ...(departmentSearchTerm && { search: departmentSearchTerm }) },
+      { enabled: open }
+    );
+  const { data: regionsData, isLoading: regionsLoading } = useGetAllRegions(
+    { ...(regionSearchTerm && { search: regionSearchTerm }) },
+    { enabled: open }
+  );
+  const { data: teachingRegionsData, isLoading: teachingRegionsLoading } =
+    useGetAllTeachingRegions(
+      { ...(teachingRegionSearchTerm && { search: teachingRegionSearchTerm }) },
+      { enabled: open }
+    );
 
   const createTeacher = useCreateTeacher();
   const updateTeacher = useUpdateTeacher();
@@ -90,10 +123,14 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       city: "",
       location: [],
       language: [],
-      academic_degree: "",
+      academic_degree: [],
       teacher_role: "",
+      mother_tongue: "",
+      contract_type: "",
+      department: [],
+      region: [],
+      teaching_regions: [],
       iao_employment_start_date: "",
-      iao_id: "",
     },
   });
 
@@ -122,23 +159,39 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       city: "",
       location: [],
       language: [],
-      academic_degree: "",
+      academic_degree: [],
       teacher_role: "",
+      mother_tongue: "",
+      contract_type: "",
+      department: [],
+      region: [],
+      teaching_regions: [],
       iao_employment_start_date: "",
-      iao_id: "",
     });
     setPreferredCitySearchTerm("");
     setLanguageSearchTerm("");
     setTitleSearchTerm("");
     setRoleSearchTerm("");
+    setMotherTongueSearchTerm("");
+    setContractTypeSearchTerm("");
+    setDepartmentSearchTerm("");
+    setRegionSearchTerm("");
+    setTeachingRegionSearchTerm("");
     onClose();
   };
 
   useEffect(() => {
     if (!open || !teacherData) return;
 
-    const academicDegreeId = teacherData.academic_degree?._id || teacherData.academic_degree || "";
     const teacherRoleId = teacherData.teacher_role?._id || teacherData.teacher_role || "";
+    const motherTongueId = teacherData.mother_tongue?._id || teacherData.mother_tongue || "";
+    const contractTypeId = teacherData.contract_type?._id || teacherData.contract_type || "";
+    // academic_degree may arrive as a single object (legacy) or an array (new)
+    const academicDegreeArr = Array.isArray(teacherData.academic_degree)
+      ? teacherData.academic_degree
+      : teacherData.academic_degree
+        ? [teacherData.academic_degree]
+        : [];
 
     reset({
       first_name: teacherData.first_name || "",
@@ -149,11 +202,17 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       postal_code: teacherData.postal_code || "",
       country: teacherData.country || "",
       city: teacherData.city || "",
-      academic_degree: academicDegreeId,
+      academic_degree: academicDegreeArr,
       teacher_role: teacherRoleId,
+      mother_tongue: motherTongueId,
+      contract_type: contractTypeId,
+      department: Array.isArray(teacherData.department) ? teacherData.department : [],
+      region: Array.isArray(teacherData.region) ? teacherData.region : [],
+      teaching_regions: Array.isArray(teacherData.teaching_regions)
+        ? teacherData.teaching_regions
+        : [],
       iao_employment_start_date:
         teacherData.iao_employment_start_date?.split("T")[0] || "",
-      iao_id: teacherData.iao_id || "",
       location: Array.isArray(teacherData.location) ? teacherData.location : [],
       language: Array.isArray(teacherData.language) ? teacherData.language : [],
     });
@@ -164,7 +223,15 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       ...data,
       location: data.location.map((l) => l._id),
       language: data.language.map((l) => l._id),
+      academic_degree: (data.academic_degree || []).map((d) => d._id),
+      department: (data.department || []).map((d) => d._id),
+      region: (data.region || []).map((r) => r._id),
+      teaching_regions: (data.teaching_regions || []).map((r) => r._id),
     };
+
+    // Drop empty optional single-selects so the backend doesn't receive blank ids
+    if (!payload.mother_tongue) delete payload.mother_tongue;
+    if (!payload.contract_type) delete payload.contract_type;
 
     if (isEdit && teacherData) {
       if (data.email === teacherData.email) {
@@ -315,6 +382,27 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                 error={errors.city?.message}
                 required
               />
+
+              <Controller
+                name="mother_tongue"
+                control={control}
+                render={({ field }) => (
+                  <SearchableSelect
+                    label={t("teacherManagement.modal.motherTongueLabel", "Mother Tongue")}
+                    placeholder={t(
+                      "teacherManagement.modal.motherTonguePlaceholder",
+                      "Select mother tongue",
+                    )}
+                    searchPlaceholder={t("common.searchLanguages")}
+                    items={motherTonguesData?.data || []}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onSearch={setMotherTongueSearchTerm}
+                    isLoading={motherTonguesLoading}
+                    error={errors.mother_tongue?.message}
+                  />
+                )}
+              />
             </div>
 
             <div className="py-6">
@@ -376,19 +464,19 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 gap-4 mt-4">
                 <Controller
                   name="academic_degree"
                   control={control}
                   render={({ field }) => (
-                    <SearchableSelect
+                    <SearchableMultiSelect
                       label={t("teacherManagement.modal.academicDegreeLabel")}
                       placeholder={t(
                         "teacherManagement.modal.academicDegreePlaceholder",
                       )}
                       searchPlaceholder={t("common.searchTitles")}
                       items={titlesData?.data || []}
-                      value={field.value}
+                      selected={field.value}
                       onChange={field.onChange}
                       onSearch={setTitleSearchTerm}
                       isLoading={titlesLoading}
@@ -397,7 +485,9 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                     />
                   )}
                 />
+              </div>
 
+              <div className="grid grid-cols-2 gap-4 mt-4">
                 <Controller
                   name="teacher_role"
                   control={control}
@@ -416,21 +506,104 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
                     />
                   )}
                 />
+
+                <Controller
+                  name="contract_type"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      label={t("teacherManagement.modal.contractTypeLabel", "Contract Type")}
+                      placeholder={t(
+                        "teacherManagement.modal.contractTypePlaceholder",
+                        "Select contract type",
+                      )}
+                      searchPlaceholder={t("common.search", "Search...")}
+                      items={contractTypesData?.data || []}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onSearch={setContractTypeSearchTerm}
+                      isLoading={contractTypesLoading}
+                      error={errors.contract_type?.message}
+                    />
+                  )}
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 mt-4">
+                <Controller
+                  name="department"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableMultiSelect
+                      label={t("teacherManagement.modal.departmentLabel", "Department")}
+                      placeholder={t(
+                        "teacherManagement.modal.departmentPlaceholder",
+                        "Select department(s)",
+                      )}
+                      searchPlaceholder={t("common.search", "Search...")}
+                      items={departmentsData?.data || []}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      onSearch={setDepartmentSearchTerm}
+                      isLoading={departmentsLoading}
+                      error={errors.department?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="region"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableMultiSelect
+                      label={t("teacherManagement.modal.regionLabel", "Region")}
+                      placeholder={t(
+                        "teacherManagement.modal.regionPlaceholder",
+                        "Select region(s)",
+                      )}
+                      searchPlaceholder={t("common.search", "Search...")}
+                      items={regionsData?.data || []}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      onSearch={setRegionSearchTerm}
+                      isLoading={regionsLoading}
+                      error={errors.region?.message}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="teaching_regions"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableMultiSelect
+                      label={t(
+                        "teacherManagement.modal.teachingRegionsLabel",
+                        "Regions Where They Teach",
+                      )}
+                      placeholder={t(
+                        "teacherManagement.modal.teachingRegionsPlaceholder",
+                        "Select region(s)",
+                      )}
+                      searchPlaceholder={t("common.search", "Search...")}
+                      items={teachingRegionsData?.data || []}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      onSearch={setTeachingRegionSearchTerm}
+                      isLoading={teachingRegionsLoading}
+                      error={errors.teaching_regions?.message}
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
                 <FormField
                   label={t("teacherManagement.modal.employmentStartDateLabel")}
                   type="date"
                   {...register("iao_employment_start_date")}
                   error={errors.iao_employment_start_date?.message}
                   required
-                />
-                <FormField
-                  label="IAO ID"
-                  placeholder="Enter IAO ID"
-                  {...register("iao_id")}
-                  error={errors.iao_id?.message}
                 />
               </div>
             </div>

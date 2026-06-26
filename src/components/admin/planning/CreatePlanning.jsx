@@ -110,6 +110,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         ...(componentSearchTerm && { search: componentSearchTerm }),
         program: selectedProgram,
         type: "module",
+        status: true,
       },
       { enabled: open && !!selectedProgram },
     );

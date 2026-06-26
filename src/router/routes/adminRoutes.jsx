@@ -43,6 +43,10 @@ import LtiManagement from "@/pages/admin/lti";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
 import Results from "@/pages/admin/results";
+import ContractTypes from "@/pages/admin/contract-type";
+import Departments from "@/pages/admin/department";
+import Regions from "@/pages/admin/region";
+import TeachingRegions from "@/pages/admin/teaching-region";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -83,6 +87,22 @@ export const adminRoutes = [
     component: withPermissionProtection(Language, "/admin/languages"),
   },
   {
+    path: "/admin/contract-types",
+    component: withPermissionProtection(ContractTypes, "/admin/contract-types"),
+  },
+  {
+    path: "/admin/departments",
+    component: withPermissionProtection(Departments, "/admin/departments"),
+  },
+  {
+    path: "/admin/regions",
+    component: withPermissionProtection(Regions, "/admin/regions"),
+  },
+  {
+    path: "/admin/teaching-regions",
+    component: withPermissionProtection(TeachingRegions, "/admin/teaching-regions"),
+  },
+  {
     path: "/admin/special-exceptions",
     component: withPermissionProtection(
       SpecialExceptions,
@@ -90,10 +110,10 @@ export const adminRoutes = [
     ),
   },
   {
-    path: "/admin/teacher-qualifications",
+    path: "/admin/lecturer-data",
     component: withPermissionProtection(
       TeacherQualification,
-      "/admin/teacher-qualification",
+      "/admin/lecturer-data",
     ),
   },
   {

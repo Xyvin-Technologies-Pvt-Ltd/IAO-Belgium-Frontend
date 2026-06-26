@@ -22,7 +22,10 @@ import { useDeleteTeacher, useGetTeachers } from "@/store/useTeacherStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useNavigate } from "@tanstack/react-router";
-import TeacherFilterDrawer from "./TeacherFilterDrawer";
+import TeacherFilterDrawer, {
+  MULTI_FILTER_KEYS,
+  createEmptyFilters,
+} from "./TeacherFilterDrawer";
 
 const Teachers = () => {
   const { t } = useTranslation();
@@ -36,31 +39,27 @@ const Teachers = () => {
   const [deleteId, setDeleteId] = useState(null);
 
   // Filter States
-  const [appliedFilters, setAppliedFilters] = useState({
-    location: "all",
-    language: "all",
-    teacher_role: "all",
-    academic_degree: "all",
-    country: "all",
-    status: "all",
-  });
-  const [draftFilters, setDraftFilters] = useState({ ...appliedFilters });
+  const [appliedFilters, setAppliedFilters] = useState(createEmptyFilters());
+  const [draftFilters, setDraftFilters] = useState(createEmptyFilters());
 
   const debouncedSearch = useDebounce(search, 500);
    useEffect(() => {
      setPage(1);
    }, [debouncedSearch]);
-   
+
+  // Multi-select filters are sent as comma-joined id lists; the backend expands them into $in
+  const multiFilterParams = MULTI_FILTER_KEYS.reduce((acc, key) => {
+    const ids = (appliedFilters[key] || []).map((item) => item._id);
+    if (ids.length) acc[key] = ids.join(",");
+    return acc;
+  }, {});
+
   const { data, isLoading, error, refetch, isFetching } = useGetTeachers({
     page: page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...multiFilterParams,
     ...(appliedFilters.location !== "all" && { location: appliedFilters.location }),
-    ...(appliedFilters.language !== "all" && { language: appliedFilters.language }),
-    ...(appliedFilters.teacher_role !== "all" && { teacher_role: appliedFilters.teacher_role }),
-    ...(appliedFilters.academic_degree !== "all" && {
-      academic_degree: appliedFilters.academic_degree,
-    }),
     ...(appliedFilters.status !== "all" && { status: appliedFilters.status }),
   });
   const { mutateAsync: deleteTeacher, isPending: isDeleting } =
@@ -127,24 +126,30 @@ const Teachers = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("teacherManagement.table.teacherId")}</TableHead>
+            <TableHead>IAO ID</TableHead>
             <TableHead>{t("teacherManagement.table.name")}</TableHead>
             <TableHead>{t("teacherManagement.table.email")}</TableHead>
             <TableHead>{t("teacherManagement.table.phone")}</TableHead>
             <TableHead>{t("teacherManagement.table.academicDegree")}</TableHead>
             <TableHead>{t("teacherManagement.table.role")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.contractTypeLabel", "Contract Type")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.departmentLabel", "Department")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.regionLabel", "Region")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.teachingRegionsLabel", "Regions Where They Teach")}</TableHead>
             <TableHead>{t("teacherManagement.table.employmentStartDate")}</TableHead>
             <TableHead>{t("teacherManagement.table.location")}</TableHead>
             <TableHead>{t("teacherManagement.table.language")}</TableHead>
+            <TableHead>{t("teacherManagement.modal.motherTongueLabel", "Mother Tongue")}</TableHead>
             <TableHead>{t("teacherManagement.table.status")}</TableHead>
             <TableHead>{t("teacherManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
        <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={11} />
+            <TableSkeleton rows={rowsPerPage} columns={17} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={11} className="text-center p-8">
+              <TableCell colSpan={17} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("teacherManagement.messages.loadFailed")
@@ -159,11 +164,32 @@ const Teachers = () => {
               <TableRow key={i._id}  className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}>
                 <TableCell>{i?.uid}</TableCell>
+                <TableCell>{i?.iao_id || "-"}</TableCell>
                 <TableCell className={"capitalize"}>{i?.last_name + " " + i?.first_name}</TableCell>
                 <TableCell>{i?.email}</TableCell>
                 <TableCell>{i?.phone}</TableCell>
-                <TableCell>{i?.academic_degree?.name}</TableCell>
-                <TableCell>{i?.teacher_role?.name}</TableCell>
+                <TableCell>
+                  {Array.isArray(i?.academic_degree)
+                    ? i.academic_degree.map((d) => d?.name).filter(Boolean).join(", ") || "-"
+                    : i?.academic_degree?.name || "-"}
+                </TableCell>
+                <TableCell>{i?.teacher_role?.name || "-"}</TableCell>
+                <TableCell>{i?.contract_type?.name || "-"}</TableCell>
+                <TableCell>
+                  {Array.isArray(i?.department) && i.department.length > 0
+                    ? i.department.map((d) => d?.name).filter(Boolean).join(", ")
+                    : i?.department?.name || "-"}
+                </TableCell>
+                <TableCell>
+                  {Array.isArray(i?.region) && i.region.length > 0
+                    ? i.region.map((r) => r?.name).filter(Boolean).join(", ")
+                    : i?.region?.name || "-"}
+                </TableCell>
+                <TableCell>
+                  {Array.isArray(i?.teaching_regions) && i.teaching_regions.length > 0
+                    ? i.teaching_regions.map((tr) => tr?.name).filter(Boolean).join(", ")
+                    : i?.teaching_regions?.name || "-"}
+                </TableCell>
                 <TableCell>
                   {moment(i?.iao_employment_start_date).format("DD-MM-YYYY")}
                 </TableCell>
@@ -178,6 +204,7 @@ const Teachers = () => {
                     ? i.language.map((lang) => lang.name).join(", ")
                     : "-"}
                 </TableCell>
+                <TableCell>{i?.mother_tongue?.name || "-"}</TableCell>
                 <TableCell>
                   <StatusBadge status={i?.status} />
                 </TableCell>
@@ -201,7 +228,7 @@ const Teachers = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={11} className="text-center">
+              <TableCell colSpan={17} className="text-center">
                 {t("teacherManagement.table.noTeachers")}
               </TableCell>
             </TableRow>

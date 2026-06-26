@@ -89,11 +89,50 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
             <>
               <InfoItem
                 label={t("studentManagement.modal.academicDegree")}
-                value={user?.academic_degree?.name || t("common.notAvailable")}
+                value={
+                  Array.isArray(user?.academic_degree)
+                    ? user.academic_degree
+                        .map((d) => d?.name)
+                        .filter(Boolean)
+                        .join(", ") || t("common.notAvailable")
+                    : user?.academic_degree?.name || t("common.notAvailable")
+                }
               />
               <InfoItem
                 label={t("studentManagement.modal.teacherRole")}
                 value={user?.teacher_role?.name || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("teacherManagement.modal.motherTongueLabel", "Mother Tongue")}
+                value={user?.mother_tongue?.name || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("teacherManagement.modal.contractTypeLabel", "Contract Type")}
+                value={user?.contract_type?.name || t("common.notAvailable")}
+              />
+              <InfoItem
+                label={t("teacherManagement.modal.departmentLabel", "Department")}
+                value={
+                  user?.department?.length > 0
+                    ? user.department.map((d) => d.name).join(", ")
+                    : t("common.notAvailable")
+                }
+              />
+              <InfoItem
+                label={t("teacherManagement.modal.regionLabel", "Region")}
+                value={
+                  user?.region?.length > 0
+                    ? user.region.map((r) => r.name).join(", ")
+                    : t("common.notAvailable")
+                }
+              />
+              <InfoItem
+                label={t("teacherManagement.modal.teachingRegionsLabel", "Regions Where They Teach")}
+                value={
+                  user?.teaching_regions?.length > 0
+                    ? user.teaching_regions.map((r) => r.name).join(", ")
+                    : t("common.notAvailable")
+                }
               />
               <InfoItem
                 label={t("studentManagement.modal.employmentStartDate")}
@@ -110,7 +149,7 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
                 value={user?.iao_id || t("common.notAvailable")}
               />
               <InfoItem
-                label={t("studentManagement.modal.languages")}
+                label={t("teacherManagement.modal.languageLabel")}
                 value={
                   user?.language?.length > 0
                     ? user.language.map((lang) => lang.name).join(", ")

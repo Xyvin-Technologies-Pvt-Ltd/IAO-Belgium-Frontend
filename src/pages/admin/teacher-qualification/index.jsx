@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Titles from "./Titles";
 import TeacherRole from "./TeacherRole";
+import ContractTypes from "../contract-type";
+import Departments from "../department";
+import Regions from "../region";
+import TeachingRegions from "../teaching-region";
 
 const TeacherQualification = () => {
   const { t } = useTranslation();
@@ -23,6 +27,26 @@ const TeacherQualification = () => {
       id: "roles",
       label: t("teacherQualification.tabs.roles"),
       component: TeacherRole,
+    },
+    {
+      id: "departments",
+      label: t("sidebar.admin.departments", "Departments"),
+      component: Departments,
+    },
+    {
+      id: "regions",
+      label: t("sidebar.admin.regions", "Regions"),
+      component: Regions,
+    },
+    {
+      id: "teaching-regions",
+      label: t("sidebar.admin.teachingRegions", "Teaching Regions"),
+      component: TeachingRegions,
+    },
+    {
+      id: "contract-types",
+      label: t("sidebar.admin.contractTypes", "Contract Types"),
+      component: ContractTypes,
     },
   ];
 

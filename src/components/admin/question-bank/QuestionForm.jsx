@@ -47,7 +47,7 @@ const QuestionForm = ({
         { option_text: "", is_correct: false },
       ],
       explanation: "",
-      difficulty: "medium",
+      difficulty: "understand",
       marks: 1,
     },
   });
@@ -64,7 +64,7 @@ const QuestionForm = ({
         { option_text: "", is_correct: false },
       ],
       explanation: "",
-      difficulty: "medium",
+      difficulty: "understand",
       marks: 1,
     });
     onClose();
@@ -83,12 +83,12 @@ const QuestionForm = ({
           { option_text: "", is_correct: false },
         ],
         explanation: questionData.explanation || "",
-        difficulty: questionData.difficulty || "medium",
+        difficulty: questionData.difficulty || "understand",
         marks: questionData.marks ?? 1,
       };
       
       reset(formData);
-      setValue("difficulty", questionData.difficulty || "medium", { shouldValidate: true });
+      setValue("difficulty", questionData.difficulty || "understand", { shouldValidate: true });
     } else if (!questionData && open) {
       reset({
         question_text: "",
@@ -97,7 +97,7 @@ const QuestionForm = ({
           { option_text: "", is_correct: false },
         ],
         explanation: "",
-        difficulty: "medium",
+        difficulty: "understand",
         marks: 1,
       });
     }
@@ -312,9 +312,9 @@ const QuestionForm = ({
                 </Label>
                 <Select
                   key={`difficulty-${questionData?._id || "new"}-${watch("difficulty")}`}
-                  value={watch("difficulty") || "medium"}
+                  value={watch("difficulty") || "understand"}
                   onValueChange={(v) => {
-                    if (v && (v === "easy" || v === "medium" || v === "hard")) {
+                    if (v && ["remember", "understand", "apply", "analyze", "evaluate", "create"].includes(v)) {
                       setValue("difficulty", v, { shouldValidate: true });
                     }
                   }}
@@ -325,14 +325,23 @@ const QuestionForm = ({
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="easy">
-                      {t("questionBank.questionForm.easy")}
+                    <SelectItem value="remember">
+                      {t("questionBank.questionForm.remember")}
                     </SelectItem>
-                    <SelectItem value="medium">
-                      {t("questionBank.questionForm.medium")}
+                    <SelectItem value="understand">
+                      {t("questionBank.questionForm.understand")}
                     </SelectItem>
-                    <SelectItem value="hard">
-                      {t("questionBank.questionForm.hard")}
+                    <SelectItem value="apply">
+                      {t("questionBank.questionForm.apply")}
+                    </SelectItem>
+                    <SelectItem value="analyze">
+                      {t("questionBank.questionForm.analyze")}
+                    </SelectItem>
+                    <SelectItem value="evaluate">
+                      {t("questionBank.questionForm.evaluate")}
+                    </SelectItem>
+                    <SelectItem value="create">
+                      {t("questionBank.questionForm.create")}
                     </SelectItem>
                   </SelectContent>
                 </Select>
