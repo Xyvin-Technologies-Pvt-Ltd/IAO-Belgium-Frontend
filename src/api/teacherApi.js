@@ -44,6 +44,30 @@ export const deleteTeacher = async (id) => {
   }
 };
 
+export const bulkUploadTeachers = async (file, { dryRun = false } = {}) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (dryRun) formData.append("dry_run", "true");
+    const response = await axiosInstance.post(
+      `/user/teacher/bulk-upload`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const downloadTeacherTemplate = async () => {
+  const response = await axiosInstance.get(
+    `/user/teacher/bulk-upload/template`,
+    { responseType: "blob" },
+  );
+  return response.data;
+};
+
 export const getSessionsByTeacherId = async (teacherId, params) => {
   try {
     const response = await axiosInstance.get(`/planning/teacher/${teacherId}/sessions`, { params });

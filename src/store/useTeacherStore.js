@@ -6,7 +6,8 @@ import {
   updateTeacher,
   getSessionsByTeacherId,
   addTeacherAttachment,
-  deleteTeacherAttachment
+  deleteTeacherAttachment,
+  bulkUploadTeachers,
 } from "@/api/teacherApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -72,6 +73,26 @@ export const useDeleteTeacher = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to delete teacher");
+    },
+  });
+};
+
+export const useBulkUploadTeachers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ file, dryRun = false }) =>
+      bulkUploadTeachers(file, { dryRun }),
+    onSuccess: (response, variables) => {
+      //* Preview (dry-run) must not change data or fire a success toast.
+      if (variables?.dryRun) return;
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+      if (response?.data?.imported > 0) {
+        toast.success(response?.message || "Teachers imported successfully!");
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to import teachers");
     },
   });
 };
