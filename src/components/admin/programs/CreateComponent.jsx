@@ -101,6 +101,9 @@ const CreateComponent = ({
       additional_context: "",
       resources: [],
       submissions: {
+        onboarding: false,
+        scientific_research_intro: false,
+        peer_groups: false,
         case_studies: false,
         essays: false,
         internships: false,
@@ -203,6 +206,9 @@ const CreateComponent = ({
       additional_context: "",
       resources: [],
       submissions: {
+        onboarding: false,
+        scientific_research_intro: false,
+        peer_groups: false,
         case_studies: false,
         essays: false,
         internships: false,
@@ -371,6 +377,9 @@ const CreateComponent = ({
           }))
         : [],
       submissions: {
+        onboarding: submissions.onboarding || false,
+        scientific_research_intro: submissions.scientific_research_intro || false,
+        peer_groups: submissions.peer_groups || false,
         case_studies: submissions.case_studies || false,
         essays: submissions.essays || false,
         internships: submissions.internships || false,
@@ -878,12 +887,45 @@ const CreateComponent = ({
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="case_studies"
+                        id="onboarding"
                         className="rounded border-gray-300"
-                        {...register("submissions.case_studies")}
+                        {...register("submissions.onboarding")}
                       />
-                      <Label htmlFor="case_studies" className="text-sm">
-                        {t("componentManagement.caseStudies")}
+                      <Label htmlFor="onboarding" className="text-sm">
+                        {t("componentManagement.onboarding")}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="scientific_research_intro"
+                        className="rounded border-gray-300"
+                        {...register("submissions.scientific_research_intro")}
+                      />
+                      <Label htmlFor="scientific_research_intro" className="text-sm">
+                        {t("componentManagement.scientificResearchIntro")}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="peer_groups"
+                        className="rounded border-gray-300"
+                        {...register("submissions.peer_groups")}
+                      />
+                      <Label htmlFor="peer_groups" className="text-sm">
+                        {t("componentManagement.peerGroups")}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="internships"
+                        className="rounded border-gray-300"
+                        {...register("submissions.internships")}
+                      />
+                      <Label htmlFor="internships" className="text-sm">
+                        {t("componentManagement.internships")}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -900,12 +942,12 @@ const CreateComponent = ({
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="internships"
+                        id="case_studies"
                         className="rounded border-gray-300"
-                        {...register("submissions.internships")}
+                        {...register("submissions.case_studies")}
                       />
-                      <Label htmlFor="internships" className="text-sm">
-                        {t("componentManagement.internships")}
+                      <Label htmlFor="case_studies" className="text-sm">
+                        {t("componentManagement.caseStudies")}
                       </Label>
                     </div>
                   </div>

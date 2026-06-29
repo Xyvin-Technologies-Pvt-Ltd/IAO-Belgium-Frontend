@@ -166,9 +166,12 @@ const SubmissionsFilterDrawer = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="case_studies">Case Studies</SelectItem>
-                    <SelectItem value="essays">Essays</SelectItem>
-                    <SelectItem value="internships">Internships</SelectItem>
+                    <SelectItem value="onboarding">Onboarding</SelectItem>
+                    <SelectItem value="scientific_research_intro">Scientific Research Intro</SelectItem>
+                    <SelectItem value="peer_groups">Peer Groups</SelectItem>
+                    <SelectItem value="internships">Internship</SelectItem>
+                    <SelectItem value="essays">Essay</SelectItem>
+                    <SelectItem value="case_studies">Case Study</SelectItem>
                   </SelectContent>
                 </Select>
               </FilterSection>

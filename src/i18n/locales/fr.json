@@ -1017,6 +1017,24 @@
     "search": "Rechercher des enseignants...",
     "delete": "Supprimer",
     "createTeacher": "Créer un enseignant",
+    "bulkUpload": {
+      "button": "Import en masse",
+      "title": "Import en masse d'enseignants",
+      "description": "Téléversez un fichier Excel pour importer plusieurs enseignants. Les colonnes de données de référence (Langue, Diplôme, Département, etc.) acceptent des noms ; séparez plusieurs valeurs par une virgule. Les valeurs inconnues sont créées automatiquement.",
+      "downloadTemplate": "Télécharger le modèle",
+      "selectFile": "Sélectionner un fichier",
+      "upload": "Téléverser",
+      "preview": "Aperçu",
+      "previewLabel": "Aperçu - rien n'est encore enregistré",
+      "wouldImport": "Seraient importés",
+      "wouldSkip": "Seraient ignorés",
+      "newMasterData": "Nouvelles valeurs qui seront créées",
+      "imported": "Importés",
+      "skipped": "Ignorés",
+      "errors": "Erreurs",
+      "invalidFile": "Fichier invalide. Veuillez téléverser un fichier Excel (.xlsx) ou CSV.",
+      "templateFailed": "Échec du téléchargement du modèle"
+    },
     "table": {
       "teacherId": "ID de l'enseignant",
       "name": "Nom",
@@ -1126,6 +1144,18 @@
       "subtitle": "Commencez par ajouter des modules, des APPs, des recherches ou des examens pour gérer cette formation.",
       "createButton": "Créer un module de formation"
     }
+  },
+  "examAnswerSheet": {
+    "title": "Feuille de réponses",
+    "result": "Résultat",
+    "score": "Score",
+    "percentage": "Pourcentage",
+    "submittedAt": "Soumis le",
+    "studentAnswer": "Réponse de l'étudiant",
+    "notAnswered": "Sans réponse",
+    "explanation": "Explication",
+    "loadFailed": "Échec du chargement de la feuille de réponses",
+    "notFound": "Feuille de réponses introuvable"
   },
   "learningModule": {
     "search": "Rechercher des modules...",
@@ -1423,9 +1453,12 @@
     "instructionVideoLabel": "Vidéo d'instruction (URL)",
     "instructionVideoPlaceholder": "Saisir l'URL de la vidéo",
     "submissionTypesLabel": "Types de soumission",
-    "caseStudies": "Études de cas",
-    "essays": "Essais",
-    "internships": "Stage clinique",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Introduction à la recherche scientifique",
+    "peerGroups": "Séance d'intervision",
+    "caseStudies": "Étude de cas",
+    "essays": "Essai",
+    "internships": "Stage",
     "activeStatus": "Statut actif",
     "uploadingFiles": "Téléversement des fichiers...",
     "types": {
@@ -1504,15 +1537,18 @@
       },
       "submission": {
         "title": "Exigences de soumission",
-        "caseStudies": "Études de cas",
-        "essays": "Essais",
-        "internships": "Stage clinique",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Introduction à la recherche scientifique",
+        "peerGroups": "Séance d'intervision",
+        "caseStudies": "Étude de cas",
+        "essays": "Essai",
+        "internships": "Stage",
         "mandatoryHint": "Obligatoire pour la clôture de l'année",
         "minPass": "Taux de réussite minimum (%)",
         "passMark": "Note de passage (%)"
       },
       "internship": {
-        "title": "Exigences de stage clinique",
+        "title": "Exigences de stage",
         "minCases": "Nombre minimum de cas"
       }
     }

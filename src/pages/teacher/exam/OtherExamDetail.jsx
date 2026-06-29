@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGetOtherExamDetail, useGetOtherExamStudents } from "@/store/useExamStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import AnswerSheetModal from "@/components/teacher/exam/AnswerSheetModal";
 import StatusBadge from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -32,6 +33,7 @@ const OtherExamDetail = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [expandedRows, setExpandedRows] = useState({});
+  const [answerSheetAttemptId, setAnswerSheetAttemptId] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -235,7 +237,8 @@ const OtherExamDetail = () => {
                     {isExpanded && hasAttempts && item.attempts.map((attempt) => (
                       <TableRow
                         key={attempt._id}
-                        className="bg-muted/30 dark:bg-muted/10"
+                        className="bg-muted/30 dark:bg-muted/10 cursor-pointer hover:bg-muted/50"
+                        onClick={() => setAnswerSheetAttemptId(attempt._id)}
                       >
                         <TableCell className="px-3 py-2"></TableCell>
                         <TableCell className="px-4 py-2">
@@ -300,6 +303,12 @@ const OtherExamDetail = () => {
           />
         )}
       </div>
+
+      <AnswerSheetModal
+        open={!!answerSheetAttemptId}
+        attemptId={answerSheetAttemptId}
+        onClose={() => setAnswerSheetAttemptId(null)}
+      />
     </div>
   );
 };

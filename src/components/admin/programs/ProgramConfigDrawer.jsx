@@ -43,24 +43,27 @@ const ProgramConfigDrawer = ({ programId }) => {
       per_module_min_percentage: 60,
     },
     submissions: {
-      case_studies: {
-        required: false,
-        min_pass_percentage: 50,
-      },
-      essays: {
-        required: false,
-        min_pass_percentage: 50,
-      },
-      internships: {
-        required: false,
-        min_pass_percentage: 50,
-      },
+      onboarding: { required: false, min_pass_percentage: 50 },
+      scientific_research_intro: { required: false, min_pass_percentage: 50 },
+      peer_groups: { required: false, min_pass_percentage: 50 },
+      case_studies: { required: false, min_pass_percentage: 50 },
+      essays: { required: false, min_pass_percentage: 50 },
+      internships: { required: false, min_pass_percentage: 50 },
     },
     internship: {
       min_cases: 0,
     },
     status: true,
   });
+
+  const submissionFields = [
+    { key: "onboarding", labelKey: "programConfig.requirements.submission.onboarding" },
+    { key: "scientific_research_intro", labelKey: "programConfig.requirements.submission.scientificResearchIntro" },
+    { key: "peer_groups", labelKey: "programConfig.requirements.submission.peerGroups" },
+    { key: "internships", labelKey: "programConfig.requirements.submission.internships" },
+    { key: "essays", labelKey: "programConfig.requirements.submission.essays" },
+    { key: "case_studies", labelKey: "programConfig.requirements.submission.caseStudies" },
+  ];
 
   const { data: programRes } = useGetProgramById(programId, { enabled: isOpen && !!programId });
   const program = programRes?.data;
@@ -97,6 +100,18 @@ const ProgramConfigDrawer = ({ programId }) => {
           per_module_min_percentage: existingConfig.attendance?.per_module_min_percentage || 60,
         },
         submissions: {
+          onboarding: {
+            required: existingConfig.submissions?.onboarding?.required || false,
+            min_pass_percentage: existingConfig.submissions?.onboarding?.min_pass_percentage || 50,
+          },
+          scientific_research_intro: {
+            required: existingConfig.submissions?.scientific_research_intro?.required || false,
+            min_pass_percentage: existingConfig.submissions?.scientific_research_intro?.min_pass_percentage || 50,
+          },
+          peer_groups: {
+            required: existingConfig.submissions?.peer_groups?.required || false,
+            min_pass_percentage: existingConfig.submissions?.peer_groups?.min_pass_percentage || 50,
+          },
           case_studies: {
             required: existingConfig.submissions?.case_studies?.required || false,
             min_pass_percentage: existingConfig.submissions?.case_studies?.min_pass_percentage || 50,
@@ -124,6 +139,9 @@ const ProgramConfigDrawer = ({ programId }) => {
         exams: { required: true },
         attendance: { overall_min_percentage: 80, per_module_min_percentage: 60 },
         submissions: {
+          onboarding: { required: false, min_pass_percentage: 50 },
+          scientific_research_intro: { required: false, min_pass_percentage: 50 },
+          peer_groups: { required: false, min_pass_percentage: 50 },
           case_studies: { required: false, min_pass_percentage: 50 },
           essays: { required: false, min_pass_percentage: 50 },
           internships: { required: false, min_pass_percentage: 50 },
@@ -370,92 +388,43 @@ const ProgramConfigDrawer = ({ programId }) => {
                   {t("programConfig.requirements.submission.title")}
                 </p>
 
-                {/* Case Studies */}
-                <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="case-studies-required" className="font-medium">{t("programConfig.requirements.submission.caseStudies")}</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
+                {submissionFields.map((field) => (
+                  <div key={field.key} className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor={`${field.key}-required`} className="font-medium">
+                          {t(field.labelKey)}
+                        </Label>
+                        <p className="text-[10px] text-dashboard-text-secondary">
+                          {t("programConfig.requirements.submission.mandatoryHint")}
+                        </p>
+                      </div>
+                      <Switch
+                        id={`${field.key}-required`}
+                        checked={formData.submissions[field.key]?.required || false}
+                        onCheckedChange={(checked) => updateField(`submissions.${field.key}.required`, checked)}
+                      />
                     </div>
-                    <Switch
-                      id="case-studies-required"
-                      checked={formData.submissions.case_studies.required}
-                      onCheckedChange={(checked) => updateField("submissions.case_studies.required", checked)}
-                    />
-                  </div>
-                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
-                    <Label htmlFor="case-studies-pass" className="text-xs">
-                      {formData.submissions.case_studies.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
-                    </Label>
-                    <Input
-                      id="case-studies-pass"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.submissions.case_studies.min_pass_percentage}
-                      onChange={(e) => updateField("submissions.case_studies.min_pass_percentage", parseFloat(e.target.value))}
-                      className="bg-sidebar border-sidebar-border"
-                    />
-                  </div>
-                </div>
-
-                {/* Essays */}
-                <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="essays-required" className="font-medium">{t("programConfig.requirements.submission.essays")}</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
+                    <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
+                      <Label htmlFor={`${field.key}-pass`} className="text-xs">
+                        {formData.submissions[field.key]?.required
+                          ? t("programConfig.requirements.submission.minPass")
+                          : t("programConfig.requirements.submission.passMark")}
+                      </Label>
+                      <Input
+                        id={`${field.key}-pass`}
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={formData.submissions[field.key]?.min_pass_percentage ?? 50}
+                        onChange={(e) =>
+                          updateField(`submissions.${field.key}.min_pass_percentage`, parseFloat(e.target.value) || 0)
+                        }
+                        className="bg-sidebar border-sidebar-border"
+                      />
                     </div>
-                    <Switch
-                      id="essays-required"
-                      checked={formData.submissions.essays.required}
-                      onCheckedChange={(checked) => updateField("submissions.essays.required", checked)}
-                    />
                   </div>
-                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
-                    <Label htmlFor="essays-pass" className="text-xs">
-                      {formData.submissions.essays.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
-                    </Label>
-                    <Input
-                      id="essays-pass"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.submissions.essays.min_pass_percentage}
-                      onChange={(e) => updateField("submissions.essays.min_pass_percentage", parseFloat(e.target.value))}
-                      className="bg-sidebar border-sidebar-border"
-                    />
-                  </div>
-                </div>
-
-                {/* Internships */}
-                <div className="space-y-3 p-4 bg-sidebar-accent rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="internships-required" className="font-medium">{t("programConfig.requirements.submission.internships")}</Label>
-                      <p className="text-[10px] text-dashboard-text-secondary">{t("programConfig.requirements.submission.mandatoryHint")}</p>
-                    </div>
-                    <Switch
-                      id="internships-required"
-                      checked={formData.submissions.internships.required}
-                      onCheckedChange={(checked) => updateField("submissions.internships.required", checked)}
-                    />
-                  </div>
-                  <div className="space-y-2 border-t border-sidebar-border/50 pt-2">
-                    <Label htmlFor="internships-pass" className="text-xs">
-                      {formData.submissions.internships.required ? t("programConfig.requirements.submission.minPass") : t("programConfig.requirements.submission.passMark")}
-                    </Label>
-                    <Input
-                      id="internships-pass"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.submissions.internships.min_pass_percentage}
-                      onChange={(e) => updateField("submissions.internships.min_pass_percentage", parseFloat(e.target.value))}
-                      className="bg-sidebar border-sidebar-border"
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Internship */}

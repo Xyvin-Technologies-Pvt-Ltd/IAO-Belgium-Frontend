@@ -57,6 +57,9 @@ const appComponentSchema = baseComponentSchema.extend({
   instruction: z.string().min(1, "Instruction is required"),
   instruction_video: z.string().optional().or(z.literal("")),
   submissions: z.object({
+    onboarding: z.boolean(),
+    scientific_research_intro: z.boolean(),
+    peer_groups: z.boolean(),
     case_studies: z.boolean(),
     essays: z.boolean(),
     internships: z.boolean(),

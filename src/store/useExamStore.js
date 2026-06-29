@@ -14,6 +14,7 @@ import {
   startExamSession,
   endExamSession,
   getExamResults,
+  getStudentAnswerSheet,
   getAdminExamResults,
   exportAdminExamResults,
 } from "@/api/examApi";
@@ -202,6 +203,16 @@ export const useGetExamResults = (
     queryKey: ["exam-results", exam_id, planning_id, params],
     queryFn: () => getExamResults(exam_id, planning_id, params),
     enabled: !!exam_id && !!planning_id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetStudentAnswerSheet = (attempt_id, options = {}) => {
+  return useQuery({
+    queryKey: ["student-answer-sheet", attempt_id],
+    queryFn: () => getStudentAnswerSheet(attempt_id),
+    enabled: !!attempt_id,
     staleTime: 30000,
     ...options,
   });

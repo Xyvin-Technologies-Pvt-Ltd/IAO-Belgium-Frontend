@@ -26,6 +26,7 @@ import {
 } from "@/store/useExamStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
+import AnswerSheetModal from "@/components/teacher/exam/AnswerSheetModal";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
@@ -52,6 +53,7 @@ const ExamDetail = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const [answerSheetAttemptId, setAnswerSheetAttemptId] = useState(null);
 
   // Reset page when search changes
   useEffect(() => {
@@ -347,7 +349,8 @@ const ExamDetail = () => {
                 resultsData.data.map((result) => (
                   <TableRow
                     key={result._id}
-                    className="transition-colors hover:bg-muted/50"
+                    className="transition-colors hover:bg-muted/50 cursor-pointer"
+                    onClick={() => setAnswerSheetAttemptId(result._id)}
                   >
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
@@ -398,6 +401,12 @@ const ExamDetail = () => {
           )}
         </div>
       )}
+
+      <AnswerSheetModal
+        open={!!answerSheetAttemptId}
+        attemptId={answerSheetAttemptId}
+        onClose={() => setAnswerSheetAttemptId(null)}
+      />
     </div>
   );
 };

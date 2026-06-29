@@ -1019,6 +1019,24 @@
     "search": "Docenten zoeken...",
     "delete": "Verwijderen",
     "createTeacher": "Docent aanmaken",
+    "bulkUpload": {
+      "button": "Bulk uploaden",
+      "title": "Docenten bulk uploaden",
+      "description": "Upload een Excel-bestand om meerdere docenten te importeren. Masterdatakolommen (Taal, Academische graad, Afdeling, enz.) accepteren namen; scheid meerdere waarden met een komma. Onbekende waarden worden automatisch aangemaakt.",
+      "downloadTemplate": "Sjabloon downloaden",
+      "selectFile": "Bestand selecteren",
+      "upload": "Uploaden",
+      "preview": "Voorbeeld",
+      "previewLabel": "Voorbeeld - nog niets opgeslagen",
+      "wouldImport": "Wordt geïmporteerd",
+      "wouldSkip": "Wordt overgeslagen",
+      "newMasterData": "Nieuwe waarden die worden aangemaakt",
+      "imported": "Geïmporteerd",
+      "skipped": "Overgeslagen",
+      "errors": "Fouten",
+      "invalidFile": "Ongeldig bestand. Upload een Excel (.xlsx) of CSV-bestand.",
+      "templateFailed": "Downloaden van sjabloon mislukt"
+    },
     "table": {
       "teacherId": "Docent-ID",
       "name": "Naam",
@@ -1128,6 +1146,18 @@
       "subtitle": "Begin met het toevoegen van modules, APPs, onderzoek of examens om deze opleiding te beheren.",
       "createButton": "Opleidingsmodule aanmaken"
     }
+  },
+  "examAnswerSheet": {
+    "title": "Antwoordblad",
+    "result": "Resultaat",
+    "score": "Score",
+    "percentage": "Percentage",
+    "submittedAt": "Ingediend op",
+    "studentAnswer": "Antwoord student",
+    "notAnswered": "Niet beantwoord",
+    "explanation": "Toelichting",
+    "loadFailed": "Antwoordblad laden mislukt",
+    "notFound": "Antwoordblad niet gevonden"
   },
   "learningModule": {
     "search": "Modules zoeken...",
@@ -1425,9 +1455,12 @@
     "instructionVideoLabel": "Instructievideo (URL)",
     "instructionVideoPlaceholder": "Video-URL invoeren",
     "submissionTypesLabel": "Inlevertypen",
-    "caseStudies": "Casestudies",
-    "essays": "Essays",
-    "internships": "Praktijk",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Inleiding tot wetenschappelijk onderzoek",
+    "peerGroups": "Intervisie",
+    "caseStudies": "Casestudy",
+    "essays": "Essay",
+    "internships": "Stage",
     "activeStatus": "Actieve status",
     "uploadingFiles": "Bestanden uploaden...",
     "types": {
@@ -1506,15 +1539,18 @@
       },
       "submission": {
         "title": "Inleververeisten",
-        "caseStudies": "Casestudies",
-        "essays": "Essays",
-        "internships": "Praktijk",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Inleiding tot wetenschappelijk onderzoek",
+        "peerGroups": "Intervisie",
+        "caseStudies": "Casestudy",
+        "essays": "Essay",
+        "internships": "Stage",
         "mandatoryHint": "Verplicht voor afsluiting van het jaar",
         "minPass": "Min. slaagpercentage (%)",
         "passMark": "Slaaggrens (%)"
       },
       "internship": {
-        "title": "Praktijkvereisten",
+        "title": "Stagevereisten",
         "minCases": "Minimaal aantal gevallen"
       }
     }

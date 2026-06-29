@@ -18,6 +18,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import CreateTeacher from "@/components/admin/teacher/CreateTeacher";
+import TeacherBulkUploadDialog from "@/components/admin/teacher/TeacherBulkUploadDialog";
 import { useDeleteTeacher, useGetTeachers } from "@/store/useTeacherStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
@@ -35,6 +36,7 @@ const Teachers = () => {
   const [search, setSearch] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkOpen, setIsBulkOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
@@ -117,9 +119,14 @@ const Teachers = () => {
             setPage={setPage}
           />
         </div>
-        <Button onClick={handleOpenCreate}>
-          {t("teacherManagement.createTeacher")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
+            {t("teacherManagement.bulkUpload.button", "Bulk Upload")}
+          </Button>
+          <Button onClick={handleOpenCreate}>
+            {t("teacherManagement.createTeacher")}
+          </Button>
+        </div>
       </div>
 
       <Table>
@@ -247,6 +254,11 @@ const Teachers = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         teacherData={selectedTeacher}
+      />
+
+      <TeacherBulkUploadDialog
+        open={isBulkOpen}
+        onClose={() => setIsBulkOpen(false)}
       />
 
       <DeleteConfirm
