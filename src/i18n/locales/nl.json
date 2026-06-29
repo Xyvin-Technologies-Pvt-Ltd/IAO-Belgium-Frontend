@@ -1129,6 +1129,18 @@
       "createButton": "Opleidingsmodule aanmaken"
     }
   },
+  "examAnswerSheet": {
+    "title": "Antwoordblad",
+    "result": "Resultaat",
+    "score": "Score",
+    "percentage": "Percentage",
+    "submittedAt": "Ingediend op",
+    "studentAnswer": "Antwoord student",
+    "notAnswered": "Niet beantwoord",
+    "explanation": "Toelichting",
+    "loadFailed": "Antwoordblad laden mislukt",
+    "notFound": "Antwoordblad niet gevonden"
+  },
   "learningModule": {
     "search": "Modules zoeken...",
     "filters": {
@@ -1425,9 +1437,12 @@
     "instructionVideoLabel": "Instructievideo (URL)",
     "instructionVideoPlaceholder": "Video-URL invoeren",
     "submissionTypesLabel": "Inlevertypen",
-    "caseStudies": "Casestudies",
-    "essays": "Essays",
-    "internships": "Praktijk",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Inleiding tot wetenschappelijk onderzoek",
+    "peerGroups": "Intervisie",
+    "caseStudies": "Casestudy",
+    "essays": "Essay",
+    "internships": "Stage",
     "activeStatus": "Actieve status",
     "uploadingFiles": "Bestanden uploaden...",
     "types": {
@@ -1506,15 +1521,18 @@
       },
       "submission": {
         "title": "Inleververeisten",
-        "caseStudies": "Casestudies",
-        "essays": "Essays",
-        "internships": "Praktijk",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Inleiding tot wetenschappelijk onderzoek",
+        "peerGroups": "Intervisie",
+        "caseStudies": "Casestudy",
+        "essays": "Essay",
+        "internships": "Stage",
         "mandatoryHint": "Verplicht voor afsluiting van het jaar",
         "minPass": "Min. slaagpercentage (%)",
         "passMark": "Slaaggrens (%)"
       },
       "internship": {
-        "title": "Praktijkvereisten",
+        "title": "Stagevereisten",
         "minCases": "Minimaal aantal gevallen"
       }
     }

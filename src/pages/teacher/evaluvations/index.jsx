@@ -3,7 +3,7 @@ import TeacherSubmissionsTable from "./TeacherSubmissionsTable";
 
 const Evaluations = () => {
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("evaluationsActiveTab") || "case_studies";
+    return localStorage.getItem("evaluationsActiveTab") || "onboarding";
   });
 
   useEffect(() => {
@@ -11,9 +11,12 @@ const Evaluations = () => {
   }, [activeTab]);
 
   const tabs = [
+    { id: "onboarding", label: "Onboarding", submissionType: "onboarding" },
+    { id: "scientific_research_intro", label: "Scientific Research Intro", submissionType: "scientific_research_intro" },
+    { id: "peer_groups", label: "Peer Groups", submissionType: "peer_groups" },
+    { id: "internships", label: "Internship", submissionType: "internships" },
+    { id: "essays", label: "Essay", submissionType: "essays" },
     { id: "case_studies", label: "Case Study", submissionType: "case_studies" },
-    { id: "essays", label: "Essays", submissionType: "essays" },
-    { id: "internships", label: "Internships", submissionType: "internships" },
   ];
 
   const activeTabItem = tabs.find(tab => tab.id === activeTab);

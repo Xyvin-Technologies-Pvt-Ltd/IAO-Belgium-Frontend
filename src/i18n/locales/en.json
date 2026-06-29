@@ -1167,6 +1167,18 @@
       "createButton": "Create Programme Module"
     }
   },
+  "examAnswerSheet": {
+    "title": "Answer Sheet",
+    "result": "Result",
+    "score": "Score",
+    "percentage": "Percentage",
+    "submittedAt": "Submitted At",
+    "studentAnswer": "Student answer",
+    "notAnswered": "Not answered",
+    "explanation": "Explanation",
+    "loadFailed": "Failed to load answer sheet",
+    "notFound": "Answer sheet not found"
+  },
   "learningModule": {
     "search": "Search modules...",
     "filters": {
@@ -1469,9 +1481,12 @@
     "instructionVideoLabel": "Instruction Video (URL)",
     "instructionVideoPlaceholder": "Enter video URL",
     "submissionTypesLabel": "Submission Types",
-    "caseStudies": "Case Studies",
-    "essays": "Essays",
-    "internships": "Clinical Practice",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Scientific Research Intro",
+    "peerGroups": "Peer Groups",
+    "caseStudies": "Case Study",
+    "essays": "Essay",
+    "internships": "Internship",
     "activeStatus": "Active Status",
     "uploadingFiles": "Uploading files...",
     "waitForUploads": "Please wait for file uploads to finish",
@@ -1552,15 +1567,18 @@
       },
       "submission": {
         "title": "Submission Requirements",
-        "caseStudies": "Case Studies",
-        "essays": "Essays",
-        "internships": "Clinical Practice",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Scientific Research Intro",
+        "peerGroups": "Peer Groups",
+        "caseStudies": "Case Study",
+        "essays": "Essay",
+        "internships": "Internship",
         "mandatoryHint": "Mandatory for Year Completion",
         "minPass": "Min. Passing Percentage (%)",
         "passMark": "Pass Mark (%)"
       },
       "internship": {
-        "title": "Clinical Practice Requirements",
+        "title": "Internship Requirements",
         "minCases": "Minimum Cases"
       }
     }

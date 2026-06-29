@@ -80,6 +80,13 @@ export const getExamResults = async (exam_id, planning_id, params) => {
   return response.data;
 };
 
+export const getStudentAnswerSheet = async (attempt_id) => {
+  const response = await axiosInstance.get(
+    `/exam/teacher/attempt/${attempt_id}/answers`,
+  );
+  return response.data;
+};
+
 export const getAdminExamResults = async (params) => {
   const response = await axiosInstance.get("/exam/admin/results", { params });
   return response.data;

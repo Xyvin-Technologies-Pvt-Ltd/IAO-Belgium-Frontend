@@ -1127,6 +1127,18 @@
       "createButton": "Créer un module de formation"
     }
   },
+  "examAnswerSheet": {
+    "title": "Feuille de réponses",
+    "result": "Résultat",
+    "score": "Score",
+    "percentage": "Pourcentage",
+    "submittedAt": "Soumis le",
+    "studentAnswer": "Réponse de l'étudiant",
+    "notAnswered": "Sans réponse",
+    "explanation": "Explication",
+    "loadFailed": "Échec du chargement de la feuille de réponses",
+    "notFound": "Feuille de réponses introuvable"
+  },
   "learningModule": {
     "search": "Rechercher des modules...",
     "filters": {
@@ -1423,9 +1435,12 @@
     "instructionVideoLabel": "Vidéo d'instruction (URL)",
     "instructionVideoPlaceholder": "Saisir l'URL de la vidéo",
     "submissionTypesLabel": "Types de soumission",
-    "caseStudies": "Études de cas",
-    "essays": "Essais",
-    "internships": "Stage clinique",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Introduction à la recherche scientifique",
+    "peerGroups": "Séance d'intervision",
+    "caseStudies": "Étude de cas",
+    "essays": "Essai",
+    "internships": "Stage",
     "activeStatus": "Statut actif",
     "uploadingFiles": "Téléversement des fichiers...",
     "types": {
@@ -1504,15 +1519,18 @@
       },
       "submission": {
         "title": "Exigences de soumission",
-        "caseStudies": "Études de cas",
-        "essays": "Essais",
-        "internships": "Stage clinique",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Introduction à la recherche scientifique",
+        "peerGroups": "Séance d'intervision",
+        "caseStudies": "Étude de cas",
+        "essays": "Essai",
+        "internships": "Stage",
         "mandatoryHint": "Obligatoire pour la clôture de l'année",
         "minPass": "Taux de réussite minimum (%)",
         "passMark": "Note de passage (%)"
       },
       "internship": {
-        "title": "Exigences de stage clinique",
+        "title": "Exigences de stage",
         "minCases": "Nombre minimum de cas"
       }
     }

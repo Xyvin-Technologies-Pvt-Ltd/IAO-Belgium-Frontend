@@ -224,12 +224,36 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.case_studies ? (
+                    {componentData.submissions.onboarding ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="text-sm">{t("componentManagement.caseStudies")}</span>
+                    <span className="text-sm">{t("componentManagement.onboarding")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {componentData.submissions.scientific_research_intro ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className="text-sm">{t("componentManagement.scientificResearchIntro")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {componentData.submissions.peer_groups ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className="text-sm">{t("componentManagement.peerGroups")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {componentData.submissions.internships ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-gray-400" />
+                    )}
+                    <span className="text-sm">{t("componentManagement.internships")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {componentData.submissions.essays ? (
@@ -240,12 +264,12 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.essays")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.internships ? (
+                    {componentData.submissions.case_studies ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="text-sm">{t("componentManagement.internships")}</span>
+                    <span className="text-sm">{t("componentManagement.caseStudies")}</span>
                   </div>
                 </div>
               </div>

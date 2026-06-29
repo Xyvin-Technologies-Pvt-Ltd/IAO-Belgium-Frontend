@@ -1126,6 +1126,18 @@
       "createButton": "Ausbildungsmodul erstellen"
     }
   },
+  "examAnswerSheet": {
+    "title": "Antwortbogen",
+    "result": "Ergebnis",
+    "score": "Punktzahl",
+    "percentage": "Prozentsatz",
+    "submittedAt": "Eingereicht am",
+    "studentAnswer": "Antwort des Studenten",
+    "notAnswered": "Nicht beantwortet",
+    "explanation": "Erläuterung",
+    "loadFailed": "Antwortbogen konnte nicht geladen werden",
+    "notFound": "Antwortbogen nicht gefunden"
+  },
   "learningModule": {
     "search": "Module suchen...",
     "filters": {
@@ -1422,8 +1434,11 @@
     "instructionVideoLabel": "Anleitungsvideo (URL)",
     "instructionVideoPlaceholder": "Video-URL eingeben",
     "submissionTypesLabel": "Einreichungsarten",
-    "caseStudies": "Fallstudien",
-    "essays": "Essays",
+    "onboarding": "Onboarding",
+    "scientificResearchIntro": "Einführung in die wissenschaftliche Forschung",
+    "peerGroups": "Gruppenbesprechungen",
+    "caseStudies": "Fallstudie",
+    "essays": "Essay",
     "internships": "Praktikum",
     "activeStatus": "Aktiver Status",
     "uploadingFiles": "Dateien werden hochgeladen...",
@@ -1503,8 +1518,11 @@
       },
       "submission": {
         "title": "Einreichungsanforderungen",
-        "caseStudies": "Fallstudien",
-        "essays": "Essays",
+        "onboarding": "Onboarding",
+        "scientificResearchIntro": "Einführung in die wissenschaftliche Forschung",
+        "peerGroups": "Gruppenbesprechungen",
+        "caseStudies": "Fallstudie",
+        "essays": "Essay",
         "internships": "Praktikum",
         "mandatoryHint": "Pflichtvoraussetzung für den Jahresabschluss",
         "minPass": "Mindest-Bestehensquote (%)",
