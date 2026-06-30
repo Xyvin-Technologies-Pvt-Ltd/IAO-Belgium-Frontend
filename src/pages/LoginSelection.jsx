@@ -33,13 +33,15 @@ const LoginSelection = () => {
       return;
     }
     
-    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    const studentPortalUrl = import.meta.env.VITE_STUDENT_PORTAL_URL || "https://student-iao.xyvin.com";
+    const studentLoginUrl = `${studentPortalUrl}/login?programId=${selectedProgram}`;
     window.open(studentLoginUrl, '_blank');
   };
 
   const handleCopyUrl = async () => {
     if (!selectedProgram) return;
-    const studentLoginUrl = `https://student-iao.xyvin.com/login?programId=${selectedProgram}`;
+    const studentPortalUrl = import.meta.env.VITE_STUDENT_PORTAL_URL || "https://student-iao.xyvin.com";
+    const studentLoginUrl = `${studentPortalUrl}/login?programId=${selectedProgram}`;
     try {
       await navigator.clipboard.writeText(studentLoginUrl);
       setCopied(true);
@@ -125,7 +127,13 @@ const LoginSelection = () => {
                     <SelectContent>
                       {programs.map((program) => (
                         <SelectItem key={program._id} value={program._id}>
-                          {program.name} - {program?.city?.name} - {program?.language?.name}
+                          {[
+                            program.name,
+                            program?.city?.name,
+                            program?.language?.name
+                          ]
+                            .filter(Boolean)
+                            .join(" - ")}
                         </SelectItem>
                       ))}
                     </SelectContent>
