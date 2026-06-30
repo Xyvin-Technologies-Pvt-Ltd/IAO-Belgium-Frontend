@@ -787,6 +787,27 @@
       "noLogs": "Geen jaarafsluitingslogs gevonden voor deze groep."
     }
   },
+  "studentImport": {
+    "title": "Studenten bulk uploaden",
+    "description": "Selecteer het programma en de batch en upload vervolgens een Excel-/CSV-bestand. Studenten worden aangemaakt met volledige toegang en zonder inschrijfgeld. Voer eerst een voorbeeld uit voordat u importeert.",
+    "selectProgram": "Programma",
+    "selectBatch": "Batch",
+    "selectProgramFirst": "Selecteer eerst een programma",
+    "selectBatchFirst": "Selecteer een programma en batch voordat u een bestand kiest.",
+    "downloadTemplate": "Sjabloon downloaden",
+    "selectFile": "Bestand selecteren",
+    "preview": "Voorbeeld",
+    "upload": "Uploaden",
+    "previewLabel": "Voorbeeld - nog niets opgeslagen",
+    "previewRequired": "Voer eerst een voorbeeld uit voordat u uploadt.",
+    "wouldImport": "Zou importeren",
+    "wouldSkip": "Zou overslaan",
+    "imported": "Geïmporteerd",
+    "skipped": "Overgeslagen",
+    "errors": "Fouten",
+    "invalidFile": "Ongeldig bestand. Upload een Excel- (.xlsx) of CSV-bestand.",
+    "templateFailed": "Sjabloon downloaden mislukt"
+  },
   "studentManagement": {
     "title": "Studentenbeheer",
     "search": "Studenten zoeken...",

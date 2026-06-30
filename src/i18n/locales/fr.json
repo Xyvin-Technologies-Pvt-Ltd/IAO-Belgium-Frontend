@@ -786,6 +786,27 @@
       "noLogs": "Aucun journal de clôture d'année trouvé pour ce groupe."
     }
   },
+  "studentImport": {
+    "title": "Importer des étudiants en masse",
+    "description": "Sélectionnez le programme et le groupe, puis importez un fichier Excel/CSV. Les étudiants sont créés avec un accès complet et sans frais d'inscription. Lancez un aperçu avant l'importation.",
+    "selectProgram": "Programme",
+    "selectBatch": "Groupe",
+    "selectProgramFirst": "Sélectionnez d'abord un programme",
+    "selectBatchFirst": "Sélectionnez un programme et un groupe avant de choisir un fichier.",
+    "downloadTemplate": "Télécharger le modèle",
+    "selectFile": "Sélectionner un fichier",
+    "preview": "Aperçu",
+    "upload": "Importer",
+    "previewLabel": "Aperçu - rien n'est encore enregistré",
+    "previewRequired": "Lancez d'abord un aperçu avant d'importer.",
+    "wouldImport": "À importer",
+    "wouldSkip": "À ignorer",
+    "imported": "Importés",
+    "skipped": "Ignorés",
+    "errors": "Erreurs",
+    "invalidFile": "Fichier non valide. Veuillez importer un fichier Excel (.xlsx) ou CSV.",
+    "templateFailed": "Échec du téléchargement du modèle"
+  },
   "studentManagement": {
     "title": "Gestion des étudiants",
     "search": "Rechercher des étudiants...",

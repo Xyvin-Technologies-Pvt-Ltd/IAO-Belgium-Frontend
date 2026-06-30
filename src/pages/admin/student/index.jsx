@@ -16,7 +16,11 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetStudents } from "@/store/useStudentStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import StudentFilterDrawer from "./StudentFilterDrawer";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
+import StudentBulkUploadDialog from "@/components/admin/student-import/StudentBulkUploadDialog";
 
 const AllStudents = () => {
   const navigate = useNavigate();
@@ -25,6 +29,9 @@ const AllStudents = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+  const profile = useAuthStore((state) => state.profile);
+  const canBulkUpload = profile?.email === "ttj@duck.com";
 
   useEffect(() => {
     setPage(1);
@@ -82,7 +89,19 @@ const AllStudents = () => {
             setPage={setPage}
           />
         </div>
+        {canBulkUpload && (
+          <Button variant="outline" onClick={() => setBulkUploadOpen(true)}>
+            <Upload className="h-4 w-4" />
+            {t("studentImport.title", "Bulk Upload Students")}
+          </Button>
+        )}
       </div>
+      {canBulkUpload && (
+        <StudentBulkUploadDialog
+          open={bulkUploadOpen}
+          onClose={() => setBulkUploadOpen(false)}
+        />
+      )}
 
       <Table>
         <TableHeader>
