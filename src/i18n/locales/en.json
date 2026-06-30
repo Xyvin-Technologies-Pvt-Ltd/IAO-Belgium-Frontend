@@ -813,6 +813,27 @@
       "markFailedReasonPlaceholder": "Enter reason for failing..."
     }
   },
+  "studentImport": {
+    "title": "Bulk Upload Students",
+    "description": "Select the program and batch, then upload an Excel/CSV file. Students are created with full access and no registration fee. Run a preview before importing.",
+    "selectProgram": "Program",
+    "selectBatch": "Batch",
+    "selectProgramFirst": "Select a program first",
+    "selectBatchFirst": "Select a program and batch before choosing a file.",
+    "downloadTemplate": "Download Template",
+    "selectFile": "Select File",
+    "preview": "Preview",
+    "upload": "Upload",
+    "previewLabel": "Preview - nothing saved yet",
+    "previewRequired": "Run a preview first before uploading.",
+    "wouldImport": "Would import",
+    "wouldSkip": "Would skip",
+    "imported": "Imported",
+    "skipped": "Skipped",
+    "errors": "Errors",
+    "invalidFile": "Invalid file. Please upload an Excel (.xlsx) or CSV file.",
+    "templateFailed": "Failed to download template"
+  },
   "studentManagement": {
     "title": "Student Management",
     "search": "Search students...",

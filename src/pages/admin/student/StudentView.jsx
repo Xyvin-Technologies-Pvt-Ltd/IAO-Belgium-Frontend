@@ -24,6 +24,14 @@ import {
   Tooltip,
 } from "recharts";
 
+const formatSubmissionType = (type) =>
+  type
+    ? type
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    : "-";
+
 const StudentView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -198,7 +206,9 @@ const StudentView = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>APP</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Scores</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Submitted Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -207,7 +217,11 @@ const StudentView = () => {
                 apps.map((app) => (
                   <TableRow key={app._id}>
                     <TableCell>{app.component_name}</TableCell>
-                    <TableCell>{app.score || "-"}</TableCell>
+                    <TableCell>{formatSubmissionType(app.submission_type)}</TableCell>
+                    <TableCell>{app.score ?? "-"}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={app.status} />
+                    </TableCell>
                     <TableCell>
                       {formatTZ(app.submitted_at, "DD MMM YYYY") || "-"}
                     </TableCell>
@@ -216,7 +230,7 @@ const StudentView = () => {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={3}
+                    colSpan={5}
                     className="text-center text-muted-foreground"
                   >
                     No APP submissions

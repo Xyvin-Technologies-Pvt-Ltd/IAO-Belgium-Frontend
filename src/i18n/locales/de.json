@@ -784,6 +784,27 @@
       "noLogs": "Keine Jahresabschlussprotokolle für diese Gruppe gefunden."
     }
   },
+  "studentImport": {
+    "title": "Studenten per Massenupload hinzufügen",
+    "description": "Wählen Sie das Programm und die Gruppe aus und laden Sie dann eine Excel-/CSV-Datei hoch. Studenten werden mit vollem Zugriff und ohne Anmeldegebühr angelegt. Führen Sie vor dem Import eine Vorschau aus.",
+    "selectProgram": "Programm",
+    "selectBatch": "Gruppe",
+    "selectProgramFirst": "Zuerst ein Programm auswählen",
+    "selectBatchFirst": "Wählen Sie ein Programm und eine Gruppe aus, bevor Sie eine Datei auswählen.",
+    "downloadTemplate": "Vorlage herunterladen",
+    "selectFile": "Datei auswählen",
+    "preview": "Vorschau",
+    "upload": "Hochladen",
+    "previewLabel": "Vorschau - noch nichts gespeichert",
+    "previewRequired": "Führen Sie zuerst eine Vorschau aus, bevor Sie hochladen.",
+    "wouldImport": "Würde importieren",
+    "wouldSkip": "Würde überspringen",
+    "imported": "Importiert",
+    "skipped": "Übersprungen",
+    "errors": "Fehler",
+    "invalidFile": "Ungültige Datei. Bitte laden Sie eine Excel- (.xlsx) oder CSV-Datei hoch.",
+    "templateFailed": "Vorlage konnte nicht heruntergeladen werden"
+  },
   "studentManagement": {
     "title": "Studentenverwaltung",
     "search": "Studierende suchen...",
