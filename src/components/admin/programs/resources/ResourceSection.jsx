@@ -26,6 +26,7 @@ const ResourceSection = ({
   errors,
   uploadProgress = {},
   onRetryUpload,
+  onRemoveResource,
 }) => {
   const { t } = useTranslation();
   const resources =
@@ -218,7 +219,11 @@ const ResourceSection = ({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-red-500 hover:text-red-600"
-                    onClick={() => remove(index)}
+                    onClick={() =>
+                      onRemoveResource
+                        ? onRemoveResource(index)
+                        : remove(index)
+                    }
                     disabled={isUploading || isProcessing}
                   >
                     <Trash className="h-4 w-4" />

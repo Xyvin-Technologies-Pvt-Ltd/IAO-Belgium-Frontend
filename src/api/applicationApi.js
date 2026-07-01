@@ -19,3 +19,23 @@ export const updateApplication = async (id, data) => {
     throw error.response.data;
   }
 };
+
+export const getModuleSelection = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/application/${id}/module-selection`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateModuleSelection = async (id, selectedModules) => {
+  try {
+    const response = await axiosInstance.patch(`/application/${id}/module-selection`, {
+      selected_modules: selectedModules
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

@@ -96,6 +96,8 @@
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
     "add": "Add",
     "uploading": "Uploading...",
     "yes": "Yes",
@@ -957,6 +959,7 @@
       "applicationId": "Application ID",
       "noDocuments": "No documents attached",
       "unknownApplicant": "Unknown Applicant",
+      "moduleSelection": "Module Selection",
       "requestAdditionalInfo": "Request additional information",
       "remarks": "Remarks",
       "remarksPlaceholder": "Enter any remarks to add before forwarding",
@@ -1913,6 +1916,29 @@
       "selectedStudents": "Selected Students",
       "selectedUsers": "Selected Users",
       "system": "System"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Manage Module Selection",
+        "desc": "Adjust the student's module enrollments. Already started or completed modules cannot be deselected."
+      },
+      "mode": {
+        "full": "Full Program",
+        "partial": "Individual Modules"
+      },
+      "modulesList": {
+        "label": "Training Modules:"
+      },
+      "lockedHelp": "This module has already started or been completed.",
+      "card": {
+        "title": "Module Selection",
+        "editBtn": "Manage Modules",
+        "modeLabel": "Enrollment Mode:",
+        "modulesLabel": "Selected Modules:",
+        "noModules": "No modules selected"
+      }
     }
   }
 }

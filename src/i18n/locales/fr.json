@@ -95,6 +95,8 @@
     "create": "Créer",
     "update": "Mettre à jour",
     "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
     "add": "Ajouter",
     "uploading": "Téléversement en cours...",
     "yes": "Oui",
@@ -929,13 +931,18 @@
       "applicationId": "ID de candidature",
       "noDocuments": "Aucun document joint",
       "unknownApplicant": "Candidat inconnu",
+      "moduleSelection": "Sélection des modules",
       "requestAdditionalInfo": "Demander des informations supplémentaires",
       "remarks": "Remarques",
       "remarksPlaceholder": "Saisir des remarques avant de transmettre",
       "processing": "Traitement en cours...",
       "reject": "Rejeter",
       "waitlist": "En cours",
-      "accept": "Accepter"
+      "accept": "Accepter",
+      "qualificationStatus": "Statut de qualification",
+      "stillCompletingQualification": "En cours de finalisation de la qualification",
+      "qualificationNotDeferred": "Non différé",
+      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
     },
     "status": {
       "pending": "En attente",
@@ -1866,7 +1873,31 @@
       "selectedTeachers": "Enseignants sélectionnés",
       "selectedStudents": "Étudiants sélectionnés",
       "selectedUsers": "Utilisateurs sélectionnés",
-      "system": "Système"
+      "system": "Système",
+      "moduleSelection": "Sélection des modules"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Gérer la sélection des modules",
+        "desc": "Ajustez les inscriptions aux modules de l'étudiant. Les modules déjà commencés ou terminés ne peuvent pas être désélectionnés."
+      },
+      "mode": {
+        "full": "Programme complet",
+        "partial": "Modules individuels"
+      },
+      "modulesList": {
+        "label": "Modules de formation:"
+      },
+      "lockedHelp": "Ce module a déjà commencé ou est terminé.",
+      "card": {
+        "title": "Sélection des modules",
+        "editBtn": "Modifier les modules",
+        "modeLabel": "Mode d'inscription:",
+        "modulesLabel": "Modules sélectionnés:",
+        "noModules": "Aucun module sélectionné"
+      }
     }
   }
 }

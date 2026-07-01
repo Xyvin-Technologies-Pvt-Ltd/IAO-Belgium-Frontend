@@ -168,6 +168,31 @@ const ViewApplication = ({ open, onClose, application }) => {
                 }
               />
             </div>
+            {(application.enrollment_mode || (application.selected_modules && application.selected_modules.length > 0)) && (
+              <div className="mt-4 p-4 border dark:border-white/20 rounded-lg bg-gray-50 dark:bg-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-dashboard-text dark:text-white">
+                    {t("applicationReview.modal.moduleSelection", "Module Selectie")}
+                  </h4>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                    application.enrollment_mode === "full" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                  }`}>
+                    {application.enrollment_mode === "full"
+                      ? t("admin.manualTherapy.mode.full", "Volledig Programma")
+                      : t("admin.manualTherapy.mode.partial", "Afzonderlijke Modules")}
+                  </span>
+                </div>
+                {application.enrollment_mode === "partial" && (
+                  <div className="flex flex-wrap gap-2">
+                    {(application.selected_modules || []).map((module, idx) => (
+                      <span key={module._id || idx} className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 px-2 py-1 rounded">
+                        M{module.module_number}: {module.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>

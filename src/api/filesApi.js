@@ -25,3 +25,23 @@ export const getPresignedUrls = async (keys, { download = false } = {}) => {
   });
   return response.data?.data?.urls || {};
 };
+export const deleteUploadedFile = async (keyOrUrl) => {
+  if (!keyOrUrl) return null;
+
+  const response = await axiosInstance.delete("/files", {
+    params: { key: keyOrUrl },
+  });
+  return response.data;
+
+};
+
+export const getFileMetadata = async (keyOrUrl) => {
+  if (!keyOrUrl) return null;
+
+  const response = await axiosInstance.get(`/files/metadata`, {
+    params: { key: keyOrUrl },
+  });
+  const size = response.data?.data?.size;
+  return typeof size === "number" && size > 0 ? size : null;
+};
+
