@@ -34,3 +34,14 @@ export const deleteUploadedFile = async (keyOrUrl) => {
   return response.data;
 
 };
+
+export const getFileMetadata = async (keyOrUrl) => {
+  if (!keyOrUrl) return null;
+
+  const response = await axiosInstance.get(`/files/metadata`, {
+    params: { key: keyOrUrl },
+  });
+  const size = response.data?.data?.size;
+  return typeof size === "number" && size > 0 ? size : null;
+};
+

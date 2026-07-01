@@ -61,12 +61,21 @@ export const openSecureFile = async (keyOrUrl) => {
 export const downloadSecureFile = async (keyOrUrl, filename) => {
   if (!keyOrUrl) return;
 
-  const url = await getPresignedUrl(keyOrUrl, { download: true, filename });
+  let resolvedFilename = filename;
+  if (resolvedFilename && !resolvedFilename.includes(".")) {
+    const urlPath = keyOrUrl.split("?")[0];
+    const extMatch = urlPath.match(/\.[a-zA-Z0-9]+$/);
+    if (extMatch) {
+      resolvedFilename = `${resolvedFilename}${extMatch[0]}`;
+    }
+  }
+
+  const url = await getPresignedUrl(keyOrUrl, { download: true, filename: resolvedFilename });
   if (!url) return;
 
   const link = document.createElement("a");
   link.href = url;
-  if (filename) link.download = filename;
+  if (resolvedFilename) link.download = resolvedFilename;
   document.body.appendChild(link);
   link.click();
   link.remove();

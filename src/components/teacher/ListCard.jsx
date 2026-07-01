@@ -2,24 +2,84 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { getFileMetadata } from "@/api/filesApi";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 import { toast } from "sonner";
+
+const formatSize = (bytes) => {
+  if (!bytes) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const resolveProvidedSize = (size) => {
+  if (typeof size === "number" && size > 0) return formatSize(size);
+  if (typeof size === "string" && size.trim()) return size;
+  return null;
+};
+
+const FileSize = ({ url, type, size: providedSize }) => {
+  const [displaySize, setDisplaySize] = useState(() =>
+    resolveProvidedSize(providedSize),
+  );
+
+  useEffect(() => {
+    const resolved = resolveProvidedSize(providedSize);
+    if (resolved) {
+      setDisplaySize(resolved);
+      return;
+    }
+
+    if (type === "link" || !url) {
+      setDisplaySize("—");
+      return;
+    }
+
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const bytes = await getFileMetadata(url);
+        if (!cancelled) {
+          setDisplaySize(bytes ? formatSize(bytes) : "—");
+        }
+      } catch {
+        if (!cancelled) setDisplaySize("—");
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [url, type, providedSize]);
+
+  return (
+    <span>
+      {displaySize ?? <Skeleton className="h-4 w-12 inline-block" />}
+    </span>
+  );
+};
 
 const ListCard = ({ columns = [], data = [], isLoading = false }) => {
   const { t } = useTranslation();
   const handleView = async (item) => {
     if (!item.url) return;
-    try {
-      await openSecureFile(item.url);
-    } catch {
-      toast.error("Failed to open file");
+    if (item.type === "link") {
+      window.open(item.url, "_blank", "noopener,noreferrer");
+    } else {
+      try {
+        await openSecureFile(item.url);
+      } catch {
+        toast.error("Failed to open file");
+      }
     }
   };
 
   const handleDownload = async (item) => {
     if (!item.url) return;
     try {
-      await downloadSecureFile(item.url, item.name);
+      await downloadSecureFile(item.url, item.name || "download");
     } catch {
       toast.error("Failed to download file");
     }
@@ -77,7 +137,7 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
             </div>
 
             <div className="text-base text-muted-foreground">
-              {item.size || "—"}
+              <FileSize url={item.url} type={item.type} size={item.size} />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2">
@@ -89,14 +149,16 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
                 <Eye className="w-4 h-4" />
                 {t("common.view")}
               </Button>
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => handleDownload(item)}
-              >
-                <Download className="w-4 h-4" />
-                {t("common.download")}
-              </Button>
+              {item?.type !== "link" && (
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => handleDownload(item)}
+                >
+                  <Download className="w-4 h-4" />
+                  {t("common.download")}
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -104,5 +166,5 @@ const ListCard = ({ columns = [], data = [], isLoading = false }) => {
     </div>
   );
 };
-
 export default ListCard;
+

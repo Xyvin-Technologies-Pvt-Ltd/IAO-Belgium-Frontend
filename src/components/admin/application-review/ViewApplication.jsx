@@ -168,7 +168,7 @@ const ViewApplication = ({ open, onClose, application }) => {
                 }
               />
             </div>
-            {(application.intake?.program?.program_type === "Manual Therapie" || application.batch?.intake?.program?.program_type === "Manual Therapie") && (
+            {(application.enrollment_mode || (application.selected_modules && application.selected_modules.length > 0)) && (
               <div className="mt-4 p-4 border dark:border-white/20 rounded-lg bg-gray-50 dark:bg-white/5">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-dashboard-text dark:text-white">

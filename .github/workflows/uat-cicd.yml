@@ -28,6 +28,7 @@ jobs:
         env:
           VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL_TEST }}
           VITE_APP_API_KEY: ${{ secrets.VITE_APP_API_KEY }}
+          VITE_STUDENT_PORTAL_URL: ${{ secrets.VITE_STUDENT_PORTAL_URL }}
         run: |
           npm ci
           npm run build
