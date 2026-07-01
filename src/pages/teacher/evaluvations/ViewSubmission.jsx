@@ -16,6 +16,11 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import StatusBadge from "@/components/StatusBadge";
+import {
+  buildSecureFileStreamUrl,
+  getSecureFileStreamHeaders,
+} from "@/utils/secureFile";
+import { useAuthStore } from "@/store/useAuthStore";
 import image from "../../../assets/images/no-academic.png";
 
 import { useForm } from "react-hook-form";
@@ -44,6 +49,16 @@ const ViewSubmission = () => {
   const submissionData = data?.data;
 
   const [selectedDocIndex, setSelectedDocIndex] = useState(0);
+
+  const token = useAuthStore((state) => state.token);
+
+  //* Stream via the API so pdf.js never calls S3 directly (no bucket CORS needed).
+  const rawDocUrl =
+    submissionData?.documents?.[selectedDocIndex]?.url ||
+    submissionData?.documents?.[0]?.url ||
+    null;
+  const pdfStreamUrl = buildSecureFileStreamUrl(rawDocUrl);
+  const pdfStreamHeaders = getSecureFileStreamHeaders();
 
   const { mutate: evaluate, isPending } = useEvaluateSubmission();
 
@@ -215,7 +230,7 @@ const ViewSubmission = () => {
   const isEvolvable = submissionData?.status === "submitted";
   const documents = submissionData?.documents || [];
   const documentFile = documents[selectedDocIndex] || documents[0];
-  const pdfUrl = documentFile?.url ? encodeURI(documentFile.url) : null;
+  const canViewPdf = Boolean(pdfStreamUrl && token);
 
   return (
     <div className="p-6 h-[calc(100vh-80px)] bg-white dark:bg-sidebar overflow-hidden">
@@ -264,13 +279,20 @@ const ViewSubmission = () => {
 
               {/* PDF Viewer */}
               <div className="flex-1 overflow-hidden bg-gray-100 dark:bg-gray-900">
-                <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                  <Viewer
-                    key={pdfUrl}
-                    fileUrl={pdfUrl}
-                    plugins={[defaultLayoutPluginInstance]}
-                  />
-                </Worker>
+                {canViewPdf ? (
+                  <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                    <Viewer
+                      key={`${pdfStreamUrl}-${selectedDocIndex}`}
+                      fileUrl={pdfStreamUrl}
+                      httpHeaders={pdfStreamHeaders}
+                      plugins={[defaultLayoutPluginInstance]}
+                    />
+                  </Worker>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-gray-500 px-4 text-center">
+                    Unable to load document. Please sign in again and refresh.
+                  </div>
+                )}
               </div>
             </>
           ) : (

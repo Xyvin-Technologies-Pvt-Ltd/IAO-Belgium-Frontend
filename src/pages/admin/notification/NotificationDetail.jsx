@@ -9,6 +9,8 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
+import { openSecureFile } from "@/utils/secureFile";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import {
   useGetNotificationById,
@@ -36,6 +38,8 @@ const NotificationDetail = () => {
 
   const { data: notifData, isLoading: notifLoading } = useGetNotificationById(id);
   const notification = notifData?.data;
+  //* Rewrite embedded private-file references to short-lived presigned URLs.
+  const secureMessage = useSecureHtml(notification?.message);
 
   useEffect(() => {
     if (notification) {
@@ -112,7 +116,7 @@ const NotificationDetail = () => {
                 {t("notification.view.message")}
               </p>
               <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5 [&_img]:max-w-[300px] [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2"
-              dangerouslySetInnerHTML={{ __html: notification.message?.replace(/src="([^"]+)"/g, (match, p1) => `src="${encodeURI(p1)}"`) }}
+              dangerouslySetInnerHTML={{ __html: secureMessage }}
             />
             </div>
 
@@ -169,12 +173,11 @@ const NotificationDetail = () => {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {notification.attachments.map((file, idx) => (
-                  <a
+                  <button
                     key={idx}
-                    href={file.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 border border-sidebar-border rounded-lg bg-sidebar-accent/10 hover:bg-sidebar-accent/30 transition-colors group"
+                    type="button"
+                    onClick={() => openSecureFile(file.file_url)}
+                    className="flex items-center gap-3 p-3 border border-sidebar-border rounded-lg bg-sidebar-accent/10 hover:bg-sidebar-accent/30 transition-colors group text-left w-full"
                   >
                     <div className="p-2 bg-sidebar-primary/10 rounded-md text-sidebar-primary shrink-0 group-hover:scale-105 transition-transform">
                       <File size={16} />
@@ -187,7 +190,7 @@ const NotificationDetail = () => {
                         {((file.size || 0) / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatTZ } from "@/utils/dateUtils";
+import { openSecureFile } from "@/utils/secureFile";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
 import moment from "moment";
 
 const ViewComponent = ({ open, onClose, componentData, program }) => {
@@ -15,6 +17,10 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
       moment.locale(i18n.language);
     }
   }, [i18n.language]);
+
+  //* Rewrite embedded private-file references in rich text to presigned URLs.
+  const secureAdditionalContext = useSecureHtml(componentData?.additional_context);
+  const secureInstruction = useSecureHtml(componentData?.instruction);
 
   if (!open || !componentData) return null;
 
@@ -29,9 +35,9 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
   };
 
   const handleView = (file) => {
-    // Open file in new tab
+    //* Open file via a short-lived presigned URL.
     if (file.url) {
-      window.open(file.url, "_blank");
+      openSecureFile(file.url);
     }
   };
 
@@ -164,7 +170,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                   <div
                     className="text-sm leading-relaxed instruction-content"
                     dangerouslySetInnerHTML={{
-                      __html: componentData.additional_context,
+                      __html: secureAdditionalContext,
                     }}
                   />
                 </div>
@@ -180,7 +186,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                   <div
                     className="text-sm leading-relaxed instruction-content"
                     dangerouslySetInnerHTML={{
-                      __html: componentData.instruction,
+                      __html: secureInstruction,
                     }}
                   />
                 </div>

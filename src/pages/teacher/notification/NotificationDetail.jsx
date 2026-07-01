@@ -9,6 +9,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import {
   useGetNotificationById,
@@ -36,6 +37,8 @@ const TeacherNotificationDetail = () => {
 
   const { data: notifData, isLoading: notifLoading } = useGetNotificationById(id);
   const notification = notifData?.data;
+  //* Rewrite embedded private-file references to short-lived presigned URLs.
+  const secureMessage = useSecureHtml(notification?.message);
 
   useEffect(() => {
     if (notification) {
@@ -106,7 +109,7 @@ const TeacherNotificationDetail = () => {
                 Message
               </p>
               <div className="text-sm text-sidebar-foreground leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5 [&_img]:max-w-[300px] [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2"
-                dangerouslySetInnerHTML={{ __html: notification.message }}
+                dangerouslySetInnerHTML={{ __html: secureMessage }}
               />
             </div>
 

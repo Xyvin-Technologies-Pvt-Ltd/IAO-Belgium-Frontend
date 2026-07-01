@@ -5,6 +5,7 @@ import { useAddTeacherAttachment, useDeleteTeacherAttachment } from "@/store/use
 import { FileText, Download, Trash2, UploadCloud, X, Loader2 } from "lucide-react";
 import moment from "moment";
 import axiosInstance from "@/api/axiosintercepter";
+import { downloadSecureFile } from "@/utils/secureFile";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -103,24 +104,12 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
   const handleDownload = async (url, filename) => {
     if (!url) return;
     try {
-      let downloadPath = url;
-      try {
-        const parsedUrl = new URL(url);
-        downloadPath = parsedUrl.pathname;
-      } catch {
-        // relative path
-      }
-      const response = await axiosInstance.get(downloadPath, { responseType: "blob" });
-      const blobUrl = window.URL.createObjectURL(response.data);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename || url.split("/").pop();
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    } catch {
-      window.open(url, "_blank");
+      //* Resolve a short-lived presigned URL with attachment disposition.
+      await downloadSecureFile(url, filename || url.split("/").pop());
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || error?.message || "Failed to download file"
+      );
     }
   };
 
