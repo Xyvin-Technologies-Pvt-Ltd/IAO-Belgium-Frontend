@@ -17,6 +17,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetContracts } from "@/store/useContractStore";
 import CreateContract from "@/components/admin/contract/CreateContract";
+import { openSecureFile } from "@/utils/secureFile";
 import { useTranslation } from "react-i18next";
 import {
   Select,
@@ -170,14 +171,16 @@ const AllContracts = () => {
                 </TableCell>
                 <TableCell>
                   {contract.file ? (
-                    <a
-                      href={contract.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openSecureFile(contract.file);
+                      }}
                       className="flex items-center gap-1 text-primary hover:underline text-sm"
                     >
                       {t("common.view")} <ExternalLink className="h-3 w-3" />
-                    </a>
+                    </button>
                   ) : (
                     <span className="text-gray-400 text-sm">—</span>
                   )}

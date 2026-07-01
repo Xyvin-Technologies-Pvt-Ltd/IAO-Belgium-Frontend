@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
-import { getMoment } from "@/utils/dateUtils";
+import { getMoment, formatInstant } from "@/utils/dateUtils";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 const OtherExamDetail = () => {
@@ -225,14 +225,13 @@ const OtherExamDetail = () => {
                             {t("exam.detail.notTaken", { defaultValue: "Not taken" })}
                           </span>
                         )}
-                      </TableCell>
-                      <TableCell className="text-center text-muted-foreground px-6 py-4">
+                      </TableCell>                      <TableCell className="text-center text-muted-foreground px-6 py-4">
                         {item.submitted_at
-                          ? getMoment(item.submitted_at).format("DD-MM-YYYY, HH:mm")
+                          ? formatInstant(item.submitted_at)
                           : "—"}
                       </TableCell>
                     </TableRow>
-
+ 
                     {/* Expanded attempts rows */}
                     {isExpanded && hasAttempts && item.attempts.map((attempt) => (
                       <TableRow
@@ -271,7 +270,7 @@ const OtherExamDetail = () => {
                         </TableCell>
                         <TableCell className="text-center text-muted-foreground px-6 py-2">
                           {attempt.submitted_at
-                            ? getMoment(attempt.submitted_at).format("DD-MM-YYYY, HH:mm")
+                            ? formatInstant(attempt.submitted_at)
                             : "—"}
                         </TableCell>
                       </TableRow>

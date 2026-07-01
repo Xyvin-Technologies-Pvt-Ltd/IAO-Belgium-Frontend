@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useCreateContract, useUpdateContract } from "@/store/useContractStore";
 import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { uploadFile } from "@/api/uploadApi";
+import { openSecureFile } from "@/utils/secureFile";
 import { toast } from "sonner";
 import {
   Select,
@@ -251,15 +252,16 @@ const CreateContract = ({ open, onClose, contractData }) => {
                       {fileName || t("contractManagement.modal.fileSelected")}
                     </p>
                     {isEdit && contractData?.file && !pendingFile && (
-                      <a
-                        href={contractData.file}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openSecureFile(contractData.file);
+                        }}
                         className="flex items-center gap-1 text-xs text-primary hover:underline"
                       >
                         {t("contractManagement.modal.viewCurrent")} <ExternalLink className="h-3 w-3" />
-                      </a>
+                      </button>
                     )}
                     <p className="text-xs text-gray-400">{t("contractManagement.modal.clickReplace")}</p>
                   </>

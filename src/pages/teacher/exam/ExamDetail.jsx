@@ -31,7 +31,7 @@ import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
-import { getMoment } from "@/utils/dateUtils";
+import { getMoment, formatInstant } from "@/utils/dateUtils";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -373,7 +373,7 @@ const ExamDetail = () => {
                       <StatusBadge status={result.result} />
                     </TableCell>
                     <TableCell className="text-center text-muted-foreground px-6 py-4">
-                      {result.submitted_at ? getMoment(result.submitted_at).format("DD-MM-YYYY, HH:mm") : "—"}
+                      {result.submitted_at ? formatInstant(result.submitted_at) : "—"}
                     </TableCell>
                   </TableRow>
                 ))

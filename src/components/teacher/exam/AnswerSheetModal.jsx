@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useGetStudentAnswerSheet } from "@/store/useExamStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import StatusBadge from "@/components/StatusBadge";
-import { getMoment } from "@/utils/dateUtils";
+import { getMoment, formatInstant } from "@/utils/dateUtils";
 
 const AnswerSheetModal = ({ open, attemptId, onClose }) => {
   const { t } = useTranslation();
@@ -93,7 +93,7 @@ const AnswerSheetModal = ({ open, attemptId, onClose }) => {
                   </p>
                   <p className="text-base">
                     {sheet.submitted_at
-                      ? getMoment(sheet.submitted_at).format("DD-MM-YYYY, HH:mm")
+                      ? formatInstant(sheet.submitted_at)
                       : "—"}
                   </p>
                 </div>

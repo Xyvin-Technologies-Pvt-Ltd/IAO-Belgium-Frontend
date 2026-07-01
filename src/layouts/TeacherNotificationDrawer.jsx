@@ -16,6 +16,16 @@ import {
 import moment from "moment";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
+
+//* Renders a notification's rich-text message with embedded private-file
+//* references rewritten to short-lived presigned URLs.
+const NotificationMessage = ({ html, className }) => {
+  const secureHtml = useSecureHtml(html);
+  return (
+    <p className={className} dangerouslySetInnerHTML={{ __html: secureHtml }} />
+  );
+};
 
 const TeacherNotificationDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,13 +173,13 @@ const TeacherNotificationDrawer = () => {
                         {notification.subject}
                       </p>
                     )}
-                    <p
+                    <NotificationMessage
+                      html={notification.message}
                       className={`text-sm ${
                         !notification.read
                           ? "font-medium text-sidebar-foreground"
                           : "text-dashboard-text-secondary"
                       } ${notification.subject ? "text-xs opacity-80 mt-0.5" : ""} prose prose-xs max-w-none`}
-                      dangerouslySetInnerHTML={{ __html: notification.message }}
                     />
                     <p className="text-xs text-dashboard-text-secondary mt-1 opacity-70">
                       {moment(notification.createdAt).fromNow()}

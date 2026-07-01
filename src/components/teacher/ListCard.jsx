@@ -2,15 +2,27 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
+import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
+import { toast } from "sonner";
 
 const ListCard = ({ columns = [], data = [], isLoading = false }) => {
   const { t } = useTranslation();
-  const handleView = (item) => {
-    if (item.url) window.open(item.url, "_blank");
+  const handleView = async (item) => {
+    if (!item.url) return;
+    try {
+      await openSecureFile(item.url);
+    } catch {
+      toast.error("Failed to open file");
+    }
   };
 
-  const handleDownload = (item) => {
-    if (item.url) console.log(`Downloading file from: ${item.url}`);
+  const handleDownload = async (item) => {
+    if (!item.url) return;
+    try {
+      await downloadSecureFile(item.url, item.name);
+    } catch {
+      toast.error("Failed to download file");
+    }
   };
 
   if (isLoading) {

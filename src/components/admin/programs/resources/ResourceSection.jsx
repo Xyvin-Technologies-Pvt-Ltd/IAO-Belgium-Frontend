@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { formatFileSize } from "@/utils/formatFileSize";
+import { openSecureFile } from "@/utils/secureFile";
 import { cn } from "@/lib/utils";
 
 const ResourceSection = ({
@@ -199,15 +200,17 @@ const ResourceSection = ({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-blue-500 hover:text-blue-600"
-                      asChild
+                      onClick={() => {
+                        //* External links open directly; uploaded files go
+                        //* through a short-lived presigned URL.
+                        if (resource.type === "link") {
+                          window.open(resource.url, "_blank", "noopener,noreferrer");
+                        } else {
+                          openSecureFile(resource.url);
+                        }
+                      }}
                     >
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
+                      <ExternalLink className="h-4 w-4" />
                     </Button>
                   )}
                   <Button

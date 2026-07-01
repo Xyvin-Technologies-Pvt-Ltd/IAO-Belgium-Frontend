@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import StatusBadge from "@/components/StatusBadge";
-import { getMoment } from "@/utils/dateUtils";
+import { getMoment, formatInstant } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -87,7 +87,7 @@ const BatchResult = () => {
                   <StatusBadge status={result.result} />
                 </TableCell>
                 <TableCell className="text-center text-muted-foreground px-6 py-4">
-                  {getMoment(result.submitted_at).format("DD-MM-YYYY, HH:mm")}
+                  {result.submitted_at ? formatInstant(result.submitted_at) : "—"}
                 </TableCell>
               </TableRow>
             ))
