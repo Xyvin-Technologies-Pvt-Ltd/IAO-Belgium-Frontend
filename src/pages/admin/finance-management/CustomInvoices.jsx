@@ -15,7 +15,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
-import { useGetPayments } from "@/store/usePaymentStore";
+import { useGetPayments, useGetTransactionLogs } from "@/store/usePaymentStore";
 import moment from "moment";
 import { Download, Plus } from "lucide-react";
 import { getInvoicePrintHtml } from "@/api/paymentApi";
@@ -34,7 +34,7 @@ const CustomInvoices = () => {
     setPage(1);
   }, [debouncedSearch]);
 
-  const { data, isLoading, error, refetch, isFetching } = useGetPayments({
+  const { data, isLoading, error, refetch, isFetching } = useGetTransactionLogs({
     page,
     limit: rowsPerPage,
     purpose: "custom-invoice",

@@ -96,6 +96,8 @@
     "create": "Aanmaken",
     "update": "Bijwerken",
     "cancel": "Annuleren",
+    "save": "Opslaan",
+    "saving": "Opslaan...",
     "add": "Toevoegen",
     "uploading": "Uploaden...",
     "yes": "Ja",
@@ -931,13 +933,18 @@
       "applicationId": "Candidatuur-ID",
       "noDocuments": "Geen documenten bijgevoegd",
       "unknownApplicant": "Onbekende kandidaat",
+      "moduleSelection": "Module Selectie",
       "requestAdditionalInfo": "Aanvullende informatie opvragen",
       "remarks": "Opmerkingen",
       "remarksPlaceholder": "Eventuele opmerkingen invoeren voor doorsturen",
       "processing": "Verwerken...",
       "reject": "Afwijzen",
       "waitlist": "In behandeling",
-      "accept": "Accepteren"
+      "accept": "Accepteren",
+      "qualificationStatus": "Status kwalificatie",
+      "stillCompletingQualification": "Nog bezig met afronden kwalificatie",
+      "qualificationNotDeferred": "Niet uitgesteld",
+      "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload."
     },
     "status": {
       "pending": "In behandeling",
@@ -1867,6 +1874,29 @@
       "selectedStudents": "Geselecteerde studenten",
       "selectedUsers": "Geselecteerde gebruikers",
       "system": "Systeem"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Module Selectie Beheren",
+        "desc": "Pas de module-inschrijvingen van de student aan. Reeds gestarte of voltooide modules kunnen niet worden gedeselecteerd."
+      },
+      "mode": {
+        "full": "Volledig Programma",
+        "partial": "Afzonderlijke Modules"
+      },
+      "modulesList": {
+        "label": "Opleidingsmodules:"
+      },
+      "lockedHelp": "Deze module is al gestart of voltooid.",
+      "card": {
+        "title": "Module Selectie",
+        "editBtn": "Modules Bewerken",
+        "modeLabel": "Inschrijvingsvorm:",
+        "modulesLabel": "Geselecteerde Modules:",
+        "noModules": "Geen modules geselecteerd"
+      }
     }
   }
 }
