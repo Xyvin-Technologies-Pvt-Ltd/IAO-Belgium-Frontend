@@ -17,6 +17,7 @@ import {
 import { formatTZ } from "@/utils/dateUtils";
 import moment from "moment";
 import { uploadFile } from "@/api/uploadApi";
+import { deleteUploadedFile } from "@/api/filesApi";
 
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -304,6 +305,35 @@ const CreateComponent = ({
         fileSize: file.size,
       },
     }));
+  };
+
+  const handleRemoveResource = async (index) => {
+    const resource = getValues(`resources.${index}`);
+    const fieldId = fields[index]?.id;
+
+    if (resource?.type === "file" && resource?.url) {
+      try {
+        await deleteUploadedFile(resource.url);
+      } catch (error) {
+        toast.error(
+          error?.message ||
+            t("resourceModule.resources.deleteFailed", {
+              defaultValue: "Failed to delete file from storage",
+            }),
+        );
+        return;
+      }
+    }
+
+    remove(index);
+
+    if (fieldId) {
+      setFileUploadProgress((prev) => {
+        const next = { ...prev };
+        delete next[fieldId];
+        return next;
+      });
+    }
   };
 
   const handleRetryUpload = async (fieldId, index) => {
@@ -965,6 +995,7 @@ const CreateComponent = ({
                 errors={errors}
                 uploadProgress={fileUploadProgress}
                 onRetryUpload={handleRetryUpload}
+                onRemoveResource={handleRemoveResource}
               />
             )}
 

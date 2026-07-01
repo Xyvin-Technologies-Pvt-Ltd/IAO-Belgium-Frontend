@@ -33,6 +33,7 @@ export const useGetUnreadTeacherNotificationsCount = (options = {}) => {
     queryKey: ["teacher-notifications-unread"],
     queryFn: () => getUnreadTeacherNotificationsCount(),
     staleTime: 30000,
+    refetchOnWindowFocus: false,
     ...options,
   });
 };

@@ -25,3 +25,12 @@ export const getPresignedUrls = async (keys, { download = false } = {}) => {
   });
   return response.data?.data?.urls || {};
 };
+export const deleteUploadedFile = async (keyOrUrl) => {
+  if (!keyOrUrl) return null;
+
+  const response = await axiosInstance.delete("/files", {
+    params: { key: keyOrUrl },
+  });
+  return response.data;
+
+};
