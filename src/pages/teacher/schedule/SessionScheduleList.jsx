@@ -104,18 +104,6 @@ const SessionScheduleList = () => {
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0">
                 <Button
-                  variant="secondary"
-                  className="w-full sm:w-auto text-sm"
-                >
-                  View
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full sm:w-auto text-sm whitespace-nowrap"
-                >
-                  Add to Calendar
-                </Button>
-                <Button
                   onClick={() =>
                     handleAttendence(session?._id, session?.planning_id)
                   }
