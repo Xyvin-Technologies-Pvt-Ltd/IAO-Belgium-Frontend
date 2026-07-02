@@ -26,6 +26,7 @@ const SearchableSelect = ({
   isLoading = false,
   renderItem = null, // optional: (item) => ReactNode
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -36,6 +37,7 @@ const SearchableSelect = ({
   }, [debouncedSearchTerm, onSearch]);
 
   const handleOpenChange = (open) => {
+    setIsOpen(open);
     if (!open) {
       setSearchTerm("");
       if (onSearch) {
@@ -43,6 +45,8 @@ const SearchableSelect = ({
       }
     }
   };
+
+  const showEmptyState = !isLoading && items.length === 0;
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -57,7 +61,7 @@ const SearchableSelect = ({
       )}
 
       <Select
-        key={`${items.length}-${value}`}
+        open={isOpen}
         value={value || ""}
         onValueChange={onChange}
         onOpenChange={handleOpenChange}
@@ -84,27 +88,33 @@ const SearchableSelect = ({
                 className="w-full pl-8 pr-3 py-1.5 text-sm bg-transparent border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
               />
             </div>
           </div>
 
           {/* Loading State */}
-          {isLoading && (
+          {isLoading && items.length === 0 && (
             <div className="p-2 text-sm text-muted-foreground text-center">
               Loading...
             </div>
           )}
 
           {/* No Results */}
-          {!isLoading && items.length === 0 && (
+          {showEmptyState && (
             <div className="p-2 text-sm text-muted-foreground text-center">
               No options found
             </div>
           )}
 
           {/* Options */}
-          {!isLoading && items.length > 0 && (
+          {items.length > 0 && (
             <div className="max-h-60 overflow-y-auto">
+              {isLoading && (
+                <div className="p-2 text-sm text-muted-foreground text-center border-b border-border">
+                  Loading...
+                </div>
+              )}
               {items.map((item) => (
                 <SelectItem key={item._id} value={item._id}>
                   {renderItem ? renderItem(item) : item.name}

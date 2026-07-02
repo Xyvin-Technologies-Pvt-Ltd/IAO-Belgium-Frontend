@@ -104,7 +104,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     { enabled: open && !!selectedProgram },
   );
 
-  const { data: componentsData, isLoading: componentsLoading } =
+  const { data: componentsData, isFetching: componentsFetching } =
     useGetComponents(
       {
         ...(componentSearchTerm && { search: componentSearchTerm }),
@@ -604,7 +604,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 if (value) setValue("component", value);
               }}
               onSearch={setComponentSearchTerm}
-              isLoading={componentsLoading}
+              isLoading={componentsFetching}
               error={errors.component?.message}
               disabled={!selectedProgram}
               required

@@ -16,7 +16,7 @@ const GraphHeader = ({ title }) => (
   </div>
 );
 
-const LineGraph = ({ data }) => {
+const LineGraph = ({ data, showComparison = true, primaryLabel = "Count", comparisonLabel = "Previous" }) => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -65,29 +65,44 @@ const LineGraph = ({ data }) => {
           <Line
             type="monotone"
             dataKey="a"
+            name={primaryLabel}
             stroke="#FB923C"
             strokeWidth={3}
             dot={{ r: 4, fill: "#fff", strokeWidth: 2 }}
           />
 
-          <Line
-            type="monotone"
-            dataKey="b"
-            stroke="#FDBA74"
-            strokeWidth={3}
-            dot={{ r: 4, fill: "#fff", strokeWidth: 2 }}
-          />
+          {showComparison && (
+            <Line
+              type="monotone"
+              dataKey="b"
+              name={comparisonLabel}
+              stroke="#FDBA74"
+              strokeWidth={3}
+              dot={{ r: 4, fill: "#fff", strokeWidth: 2 }}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
 };
 
-const DashboardGraph = ({ title, data }) => {
+const DashboardGraph = ({
+  title,
+  data,
+  showComparison = true,
+  primaryLabel = "Count",
+  comparisonLabel = "Previous",
+}) => {
   return (
     <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-6">
       <GraphHeader title={title} />
-      <LineGraph data={data} />
+      <LineGraph
+        data={data}
+        showComparison={showComparison}
+        primaryLabel={primaryLabel}
+        comparisonLabel={comparisonLabel}
+      />
     </div>
   );
 };
