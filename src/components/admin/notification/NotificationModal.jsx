@@ -29,6 +29,7 @@ import {
 } from "@/store/useNotificationStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import moment from "moment";
+import { tr } from "zod/v4/locales";
 
 
 
@@ -173,7 +174,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const { data: componentsData } = useGetComponents({
     program: activeProgram,
     type: "module",
-    status: "active"
+    status: true
   }, { enabled: open && step === 2 && !!activeProgram });
 
   const { register, trigger, getValues, reset, setValue, formState: { errors } } = useForm({

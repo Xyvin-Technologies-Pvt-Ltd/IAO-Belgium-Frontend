@@ -176,7 +176,7 @@ const NotificationDetail = () => {
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => openSecureFile(file.file_url)}
+                    onClick={() => openSecureFile(file.file_url || file.url, file.file_name)}
                     className="flex items-center gap-3 p-3 border border-sidebar-border rounded-lg bg-sidebar-accent/10 hover:bg-sidebar-accent/30 transition-colors group text-left w-full"
                   >
                     <div className="p-2 bg-sidebar-primary/10 rounded-md text-sidebar-primary shrink-0 group-hover:scale-105 transition-transform">

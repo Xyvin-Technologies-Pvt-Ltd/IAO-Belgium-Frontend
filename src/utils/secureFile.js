@@ -25,11 +25,44 @@ export const getSecureFileStreamHeaders = () => {
   };
 };
 
+const VIEWABLE_EXTENSIONS = [
+  "pdf",
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "svg",
+  "bmp",
+  "mp3",
+  "wav",
+  "ogg",
+  "mp4",
+  "webm",
+  "ogv",
+  "txt",
+  "html",
+  "xml",
+];
+
+export const isViewableFile = (keyOrUrl) => {
+  if (!keyOrUrl) return false;
+  const cleanPath = keyOrUrl.split("?")[0].split("#")[0];
+  const extension = cleanPath.split(".").pop().toLowerCase();
+  return VIEWABLE_EXTENSIONS.includes(extension);
+};
+
 //* Open a private file in a new tab via a short-lived presigned URL.
 //* A blank tab is opened synchronously first so the browser does not block the
-//* popup while we await the presigned URL.
-export const openSecureFile = async (keyOrUrl) => {
+//* popup while we await the presigned URL. If the file type is not natively viewable
+//* in the browser (e.g. .xlsx, .docx, .zip), it is downloaded directly instead.
+export const openSecureFile = async (keyOrUrl, filename) => {
   if (!keyOrUrl) return;
+
+  const viewable = isViewableFile(keyOrUrl);
+  if (!viewable) {
+    return downloadSecureFile(keyOrUrl, filename);
+  }
 
   //* Open a placeholder tab synchronously (inside the click handler) so the
   //* popup isn't blocked while we await the presigned URL. NOTE: passing
