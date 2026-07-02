@@ -376,17 +376,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         sessions: formattedSessions,
         exams: formattedExams,
       });
-
-      // Pre-set search terms so the SearchableSelect can show the labels even if items list is loading
-      if (planningData.component?.program?.name) {
-        setProgramSearchTerm(planningData.component.program.name);
-      }
-      if (planningData.batch?.name) {
-        setBatchSearchTerm(planningData.batch.name);
-      }
-      if (planningData.component?.name) {
-        setComponentSearchTerm(planningData.component.name);
-      }
     }
   }, [planningData, isEdit, reset, open]);
 
