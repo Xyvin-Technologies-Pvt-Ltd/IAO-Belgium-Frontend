@@ -126,7 +126,12 @@ const AdminDashboard = () => {
         ))}
       </div>
       <div>
-        <DashboardGraph title={t("dashboard.courseEnrollmentTrend")} data={graphData} />
+        <DashboardGraph
+          title={t("dashboard.courseEnrollmentTrend")}
+          data={graphData}
+          primaryLabel={t("dashboard.currentYear")}
+          comparisonLabel={t("dashboard.previousYear")}
+        />
       </div>
     </div>
   );

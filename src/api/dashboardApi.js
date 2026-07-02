@@ -8,3 +8,12 @@ export const getAdminDashboardStats = async () => {
     throw error.response?.data || error;
   }
 };
+
+export const getTeacherDashboardStats = async () => {
+  try {
+    const response = await axiosInstance.get(`/teacher/dashboard/stats`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

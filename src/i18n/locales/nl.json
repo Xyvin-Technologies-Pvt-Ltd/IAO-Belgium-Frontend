@@ -1373,7 +1373,31 @@
     "activeStudents": "Actieve studenten",
     "activeLecturers": "Actieve docenten",
     "courseEnrollmentTrend": "Inschrijvingstrend opleiding",
-    "comparedToLastMonth": "{{percent}} vergeleken met vorige maand"
+    "comparedToLastMonth": "{{percent}} vergeleken met vorige maand",
+    "currentYear": "Huidig jaar",
+    "previousYear": "Vorig jaar",
+    "teacher": {
+      "subtitle": "Hier is een overzicht van uw lesactiviteiten.",
+      "pendingInvites": "Openstaande uitnodigingen",
+      "pendingInvitesHint": "Planningssessies die op uw reactie wachten",
+      "acceptedModules": "Mijn modules",
+      "acceptedModulesHint": "Geaccepteerde moduleschema's",
+      "pendingEvaluations": "Openstaande evaluaties",
+      "pendingEvaluationsHint": "{{completed}} tot nu toe voltooid",
+      "assignedExams": "Toegewezen examens",
+      "assignedExamsHint": "{{other}} andere examens • {{unread}} ongelezen meldingen",
+      "upcomingSessions": "Aankomende sessies",
+      "recentSubmissions": "Inzendingen om te beoordelen",
+      "noUpcomingSessions": "Geen sessies gepland in de komende 7 dagen.",
+      "noRecentSubmissions": "Geen inzendingen die op beoordeling wachten.",
+      "viewAll": "Alles bekijken",
+      "unknownStudent": "Onbekende student",
+      "unreadNotifications": "{{count}} ongelezen meldingen",
+      "sessionsTrend": "Sessies dit jaar",
+      "evaluationsTrend": "Voltooide evaluaties dit jaar",
+      "sessionsCount": "Sessies",
+      "evaluationsCount": "Evaluaties"
+    }
   },
   "exam": {
     "title": "Examens",
@@ -1586,6 +1610,7 @@
   "questionBank": {
     "title": "Vragenbanken",
     "search": "Vragenbanken zoeken...",
+    "loading": "Vragenbank laden...",
     "createQuestionBank": "Vragenbank aanmaken",
     "editQuestionBank": "Vragenbank bewerken",
     "question": "Vraag",

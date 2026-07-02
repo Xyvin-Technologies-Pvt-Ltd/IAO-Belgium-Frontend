@@ -1413,7 +1413,31 @@
     "activeStudents": "Active students",
     "activeLecturers": "Active lecturers",
     "courseEnrollmentTrend": "Programme enrolment trend",
-    "comparedToLastMonth": "{{percent}} compared to last month"
+    "comparedToLastMonth": "{{percent}} compared to last month",
+    "currentYear": "Current year",
+    "previousYear": "Previous year",
+    "teacher": {
+      "subtitle": "Here is an overview of your teaching activity.",
+      "pendingInvites": "Pending invites",
+      "pendingInvitesHint": "Planning sessions awaiting your response",
+      "acceptedModules": "My modules",
+      "acceptedModulesHint": "Accepted module schedules",
+      "pendingEvaluations": "Pending evaluations",
+      "pendingEvaluationsHint": "{{completed}} completed so far",
+      "assignedExams": "Assigned exams",
+      "assignedExamsHint": "{{other}} other exams • {{unread}} unread notifications",
+      "upcomingSessions": "Upcoming sessions",
+      "recentSubmissions": "Submissions to review",
+      "noUpcomingSessions": "No sessions scheduled in the next 7 days.",
+      "noRecentSubmissions": "No submissions waiting for review.",
+      "viewAll": "View all",
+      "unknownStudent": "Unknown student",
+      "unreadNotifications": "{{count}} unread notifications",
+      "sessionsTrend": "Sessions this year",
+      "evaluationsTrend": "Evaluations completed this year",
+      "sessionsCount": "Sessions",
+      "evaluationsCount": "Evaluations"
+    }
   },
   "exam": {
     "title": "Exams",
@@ -1628,6 +1652,7 @@
   "questionBank": {
     "title": "Question Banks",
     "search": "Search question banks...",
+    "loading": "Loading question bank...",
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",

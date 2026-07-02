@@ -1371,7 +1371,31 @@
     "activeStudents": "Étudiants actifs",
     "activeLecturers": "Enseignants actifs",
     "courseEnrollmentTrend": "Tendance d'inscription aux formations",
-    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
+    "comparedToLastMonth": "{{percent}} par rapport au mois dernier",
+    "currentYear": "Année en cours",
+    "previousYear": "Année précédente",
+    "teacher": {
+      "subtitle": "Voici un aperçu de votre activité d'enseignement.",
+      "pendingInvites": "Invitations en attente",
+      "pendingInvitesHint": "Sessions de planning en attente de votre réponse",
+      "acceptedModules": "Mes modules",
+      "acceptedModulesHint": "Plannings de modules acceptés",
+      "pendingEvaluations": "Évaluations en attente",
+      "pendingEvaluationsHint": "{{completed}} terminées jusqu'à présent",
+      "assignedExams": "Examens assignés",
+      "assignedExamsHint": "{{other}} autres examens • {{unread}} notifications non lues",
+      "upcomingSessions": "Sessions à venir",
+      "recentSubmissions": "Soumissions à évaluer",
+      "noUpcomingSessions": "Aucune session prévue dans les 7 prochains jours.",
+      "noRecentSubmissions": "Aucune soumission en attente d'évaluation.",
+      "viewAll": "Voir tout",
+      "unknownStudent": "Étudiant inconnu",
+      "unreadNotifications": "{{count}} notifications non lues",
+      "sessionsTrend": "Sessions cette année",
+      "evaluationsTrend": "Évaluations terminées cette année",
+      "sessionsCount": "Sessions",
+      "evaluationsCount": "Évaluations"
+    }
   },
   "exam": {
     "title": "Examens",
@@ -1584,6 +1608,7 @@
   "questionBank": {
     "title": "Banques de questions",
     "search": "Rechercher des banques de questions...",
+    "loading": "Chargement de la banque de questions...",
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",

@@ -151,6 +151,7 @@ const ViewApplication = ({ open, onClose, application }) => {
               <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.programType", "Program Type")} value={application?.program_type || application?.intake?.program?.program_type || application?.batch?.intake?.program?.program_type || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
               <InfoItem
