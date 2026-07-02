@@ -45,11 +45,18 @@ const VIEWABLE_EXTENSIONS = [
   "xml",
 ];
 
+export const getFileExtension = (keyOrUrl) => {
+  if (!keyOrUrl) return "";
+  const cleanPath = keyOrUrl.split("?")[0].split("#")[0];
+  const lastSegment = cleanPath.split("/").pop() || "";
+  const dotIndex = lastSegment.lastIndexOf(".");
+  if (dotIndex === -1) return "";
+  return lastSegment.slice(dotIndex + 1).toLowerCase();
+};
+
 export const isViewableFile = (keyOrUrl) => {
   if (!keyOrUrl) return false;
-  const cleanPath = keyOrUrl.split("?")[0].split("#")[0];
-  const extension = cleanPath.split(".").pop().toLowerCase();
-  return VIEWABLE_EXTENSIONS.includes(extension);
+  return VIEWABLE_EXTENSIONS.includes(getFileExtension(keyOrUrl));
 };
 
 //* Open a private file in a new tab via a short-lived presigned URL.

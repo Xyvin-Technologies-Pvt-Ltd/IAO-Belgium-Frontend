@@ -18,8 +18,11 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import StatusBadge from "@/components/StatusBadge";
 import {
   buildSecureFileStreamUrl,
+  downloadSecureFile,
+  getFileExtension,
   getSecureFileStreamHeaders,
 } from "@/utils/secureFile";
+import DocxPreview from "@/components/common/DocxPreview";
 import { useAuthStore } from "@/store/useAuthStore";
 import image from "../../../assets/images/no-academic.png";
 
@@ -57,8 +60,12 @@ const ViewSubmission = () => {
     submissionData?.documents?.[selectedDocIndex]?.url ||
     submissionData?.documents?.[0]?.url ||
     null;
-  const pdfStreamUrl = buildSecureFileStreamUrl(rawDocUrl);
-  const pdfStreamHeaders = getSecureFileStreamHeaders();
+  const fileStreamUrl = buildSecureFileStreamUrl(rawDocUrl);
+  const fileStreamHeaders = getSecureFileStreamHeaders();
+  const fileExtension = getFileExtension(rawDocUrl);
+  const isPdfDocument = fileExtension === "pdf";
+  const isDocxDocument = fileExtension === "docx";
+  const isLegacyDocDocument = fileExtension === "doc";
 
   const { mutate: evaluate, isPending } = useEvaluateSubmission();
 
@@ -230,12 +237,12 @@ const ViewSubmission = () => {
   const isEvolvable = submissionData?.status === "submitted";
   const documents = submissionData?.documents || [];
   const documentFile = documents[selectedDocIndex] || documents[0];
-  const canViewPdf = Boolean(pdfStreamUrl && token);
+  const canViewDocument = Boolean(fileStreamUrl && token);
 
   return (
     <div className="p-6 h-[calc(100vh-80px)] bg-white dark:bg-sidebar overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-        {/* LEFT SIDE PDF VIEWER */}
+        {/* LEFT SIDE DOCUMENT VIEWER */}
         <div className="col-span-1 lg:col-span-7 bg-[#F9F9F9] dark:bg-sidebar border-none shadow-sm flex flex-col h-full overflow-hidden">
           {documentFile ? (
             <>
@@ -277,20 +284,61 @@ const ViewSubmission = () => {
                 </div>
               )}
 
-              {/* PDF Viewer */}
+              {/* Document Viewer */}
               <div className="flex-1 overflow-hidden bg-gray-100 dark:bg-gray-900">
-                {canViewPdf ? (
+                {!canViewDocument ? (
+                  <div className="flex h-full items-center justify-center text-gray-500 px-4 text-center">
+                    Unable to load document. Please sign in again and refresh.
+                  </div>
+                ) : isPdfDocument ? (
                   <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                     <Viewer
-                      key={`${pdfStreamUrl}-${selectedDocIndex}`}
-                      fileUrl={pdfStreamUrl}
-                      httpHeaders={pdfStreamHeaders}
+                      key={`${fileStreamUrl}-${selectedDocIndex}`}
+                      fileUrl={fileStreamUrl}
+                      httpHeaders={fileStreamHeaders}
                       plugins={[defaultLayoutPluginInstance]}
                     />
                   </Worker>
+                ) : isDocxDocument ? (
+                  <DocxPreview
+                    key={`${fileStreamUrl}-${selectedDocIndex}`}
+                    fileUrl={fileStreamUrl}
+                  />
+                ) : isLegacyDocDocument ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-4 text-gray-500 px-4 text-center">
+                    <p>
+                      Legacy Word (.doc) files cannot be previewed in the browser.
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        downloadSecureFile(
+                          rawDocUrl,
+                          decodeURIComponent(
+                            documentFile.url.split("/").pop() || "document.doc",
+                          ).replace(/^\d{10,13}_/, ""),
+                        )
+                      }
+                    >
+                      Download Document
+                    </Button>
+                  </div>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-gray-500 px-4 text-center">
-                    Unable to load document. Please sign in again and refresh.
+                  <div className="flex h-full flex-col items-center justify-center gap-4 text-gray-500 px-4 text-center">
+                    <p>This file type cannot be previewed in the browser.</p>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        downloadSecureFile(
+                          rawDocUrl,
+                          decodeURIComponent(
+                            documentFile.url.split("/").pop() || "document",
+                          ).replace(/^\d{10,13}_/, ""),
+                        )
+                      }
+                    >
+                      Download Document
+                    </Button>
                   </div>
                 )}
               </div>
@@ -316,16 +364,10 @@ const ViewSubmission = () => {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-600 dark:text-gray-300 text-[15px]">
               <div className="flex items-center gap-2">
                 <span>{submissionData?.program?.name || "MSc osteopathy"}</span>
-                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">
-                  IN-101
-                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span>
                   {submissionData?.batch?.name || "MSc 2025 Intake A"}
-                </span>
-                <span className="px-3 py-1 bg-gray-200/80 dark:bg-gray-700 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">
-                  IN-101
                 </span>
               </div>
             </div>
