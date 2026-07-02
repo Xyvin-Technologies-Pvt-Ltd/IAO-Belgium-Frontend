@@ -16,7 +16,7 @@ import {
   getAllRegions,
   getAllTeachingRegions,
 } from "@/api/dropDownApi";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 export const useGetAllCountries = (filter, options = {}) => {
   return useQuery({
@@ -117,7 +117,7 @@ export const useGetComponents= (filter, options = {}) => {
     queryKey: ["all-components", filter],
     queryFn: () => getComponents(filter),
     staleTime: 30000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: keepPreviousData,
     ...options,
   });
 };
