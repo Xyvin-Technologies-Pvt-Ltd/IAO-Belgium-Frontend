@@ -1608,6 +1608,7 @@
   "questionBank": {
     "title": "Banques de questions",
     "search": "Rechercher des banques de questions...",
+    "loading": "Chargement de la banque de questions...",
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",

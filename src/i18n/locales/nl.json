@@ -1610,6 +1610,7 @@
   "questionBank": {
     "title": "Vragenbanken",
     "search": "Vragenbanken zoeken...",
+    "loading": "Vragenbank laden...",
     "createQuestionBank": "Vragenbank aanmaken",
     "editQuestionBank": "Vragenbank bewerken",
     "question": "Vraag",

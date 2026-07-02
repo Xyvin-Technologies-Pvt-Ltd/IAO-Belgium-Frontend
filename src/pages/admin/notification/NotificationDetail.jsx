@@ -74,18 +74,7 @@ const NotificationDetail = () => {
   const recipients = recipientsData?.data || [];
   const totalRows = recipientsData?.total_count || 0;
 
-  useEffect(() => {
-    if (notification?.message) {
-      console.log("Debug - Raw Notification Message:", notification.message);
-      // Attempt to encode spaces in image URLs to see if it fixes the broken image
-      const processedMsg = notification.message.replace(/src="([^"]+)"/g, (match, p1) => {
-        console.log("Debug - Found image src:", p1);
-        console.log("Debug - Encoded image src:", encodeURI(p1));
-        return `src="${encodeURI(p1)}"`;
-      });
-      console.log("Debug - Processed Notification Message:", processedMsg);
-    }
-  }, [notification?.message]);
+
 
   return (
     <div className="space-y-6 mt-4">

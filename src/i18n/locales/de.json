@@ -1607,6 +1607,7 @@
   "questionBank": {
     "title": "Fragenbanken",
     "search": "Fragenbanken suchen...",
+    "loading": "Fragenbank wird geladen...",
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
     "question": "Frage",

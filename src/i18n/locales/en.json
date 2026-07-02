@@ -1652,6 +1652,7 @@
   "questionBank": {
     "title": "Question Banks",
     "search": "Search question banks...",
+    "loading": "Loading question bank...",
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
