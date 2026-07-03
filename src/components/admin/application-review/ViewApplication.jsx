@@ -305,7 +305,7 @@ const ViewApplication = ({ open, onClose, application }) => {
 export default ViewApplication;
 
 const InfoItem = ({ label, value }) => (
-  <div>
+  <div className="min-w-0 break-words">
     <p className="text-sm text-muted-foreground dark:text-white/70">{label}</p>
     <p className="text-base font-semibold text-dashboard-text dark:text-white">{value}</p>
   </div>
