@@ -568,6 +568,7 @@
     "delete": "Delete",
     "duplicate": "Duplicate",
     "createProgram": "Create Programme",
+    "programTypeSettings": "Program Type Defaults",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -1252,6 +1253,9 @@
     "previousEducation": {
       "trigger": "Previous Education",
       "title": "Previous Education Options",
+      "typeTitle": "Program Type Defaults",
+      "typeSubtitle": "Configure inherited options by program type",
+      "inherited": "Inherited",
       "subtitle": "Configure the education levels students can select when applying to this programme. Labels can be edited anytime; the key stays fixed after creation.",
       "empty": "No options configured yet.",
       "emptyHint": "Students will see these choices during application Step 1.",

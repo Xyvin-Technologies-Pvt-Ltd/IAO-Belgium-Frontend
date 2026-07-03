@@ -524,6 +524,7 @@
     "delete": "Löschen",
     "duplicate": "Duplizieren",
     "createProgram": "Ausbildung erstellen",
+    "programTypeSettings": "Ausbildungstyp Standardwerte",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -1175,6 +1176,9 @@
     "previousEducation": {
       "trigger": "Vorherige Ausbildung",
       "title": "Optionen für vorherige Ausbildung",
+      "typeTitle": "Ausbildungstyp Standardwerte",
+      "typeSubtitle": "Konfigurieren Sie geerbte Optionen nach Ausbildungstyp",
+      "inherited": "Geerbt",
       "subtitle": "Konfigurieren Sie die Ausbildungsniveaus, die Studierende auswählen können. Bezeichnungen können jederzeit bearbeitet werden; der Schlüssel bleibt nach der Erstellung fest.",
       "empty": "Noch keine Optionen konfiguriert.",
       "addOption": "Option hinzufügen",

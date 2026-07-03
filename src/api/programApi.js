@@ -61,3 +61,21 @@ export const getProgramsForLogin = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const getProgramTypeConfigs = async () => {
+  try {
+    const response = await axiosInstance.get(`/program/type-config`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateProgramTypeConfig = async (data) => {
+  try {
+    const response = await axiosInstance.put(`/program/type-config`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

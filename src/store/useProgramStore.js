@@ -6,6 +6,8 @@ import {
   getPrograms,
   getProgramsForLogin,
   updateProgram,
+  getProgramTypeConfigs,
+  updateProgramTypeConfig,
 } from "@/api/programApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -96,5 +98,31 @@ export const useGetProgramsList = (filter, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useGetProgramTypeConfigs = (options = {}) => {
+  return useQuery({
+    queryKey: ["program-type-configs"],
+    queryFn: getProgramTypeConfigs,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useUpdateProgramTypeConfig = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateProgramTypeConfig,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["program-type-configs"] });
+      queryClient.invalidateQueries({ queryKey: ["programs"] });
+      queryClient.invalidateQueries({ queryKey: ["program"] });
+      toast.success(response?.message || "Program type configuration updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update program type configuration");
+    },
   });
 };
