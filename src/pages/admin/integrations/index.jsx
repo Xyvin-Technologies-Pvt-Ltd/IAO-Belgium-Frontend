@@ -87,7 +87,7 @@ const IntegrationsPage = () => {
   }, [queryClient, refetch, refetchUnsynced, t]);
 
   const handleAuthorise = () => {
-    window.location.href = `${apiBase}exact/auth`;
+    window.location.href = `${apiBase}/exact/auth`;
   };
 
   const handleSync = () => {
