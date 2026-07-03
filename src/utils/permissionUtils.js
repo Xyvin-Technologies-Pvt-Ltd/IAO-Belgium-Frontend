@@ -12,6 +12,7 @@ const SIDEBAR_PERMISSIONS = {
   "/admin/notification-management": ["academic_management_view", "academic_management_modify"],
   "/admin/finance-reports": ["finance_management_view", "finance_management_modify"],
   "/admin/custom-invoices": ["finance_management_view", "finance_management_modify"],
+  "/admin/integrations": ["finance_management_view", "finance_management_modify"],
   "/admin/locations": ["master_data_management_view", "master_data_management_modify"],
   "/admin/languages": ["master_data_management_view", "master_data_management_modify"],
   "/admin/special-exceptions": ["master_data_management_view", "master_data_management_modify"],

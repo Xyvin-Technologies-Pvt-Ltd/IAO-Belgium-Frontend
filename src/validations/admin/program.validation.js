@@ -34,6 +34,11 @@ export const programSchema = z
     city: z.string().optional(),
     is_online: z.boolean().optional().default(false),
     document_required: z.boolean().optional().default(true),
+    exact_vat_code: z
+      .string()
+      .max(10, "Exact VAT code must be at most 10 characters")
+      .optional()
+      .or(z.literal("")),
   })
   .superRefine((data, ctx) => {
     if (!data.is_online) {
