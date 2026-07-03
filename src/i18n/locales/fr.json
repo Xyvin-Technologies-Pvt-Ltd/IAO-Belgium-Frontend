@@ -526,6 +526,7 @@
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
     "createProgram": "Créer une formation",
+    "programTypeSettings": "Valeurs par Défaut du Type de Programme",
     "table": {
       "uid": "UID",
       "name": "Nom",
@@ -1176,6 +1177,9 @@
     "previousEducation": {
       "trigger": "Formation antérieure",
       "title": "Options de formation antérieure",
+      "typeTitle": "Valeurs par Défaut du Type de Programme",
+      "typeSubtitle": "Configurer les options héritées par type de programme",
+      "inherited": "Hérité",
       "subtitle": "Configurez les niveaux de formation que les étudiants peuvent sélectionner. Les libellés peuvent être modifiés à tout moment ; la clé reste fixe après la création.",
       "empty": "Aucune option configurée.",
       "addOption": "Ajouter une option",

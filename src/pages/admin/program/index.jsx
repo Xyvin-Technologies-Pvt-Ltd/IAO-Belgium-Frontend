@@ -26,6 +26,7 @@ import {
   useDuplicateProgram,
 } from "@/store/useProgramStore";
 import CreateProgram from "@/components/admin/programs/CreateProgram";
+import ProgramTypeConfigDrawer from "@/components/admin/programs/ProgramTypeConfigDrawer";
 import { useNavigate } from "@tanstack/react-router";
 import ProgramsFilterDrawer from "./ProgramsFilterDrawer";
 
@@ -39,6 +40,7 @@ const Programs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [isTypeSettingsOpen, setIsTypeSettingsOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
     program_type: "all",
     language: "all",
@@ -190,9 +192,14 @@ const Programs = () => {
             setPage={setPage}
           />
         </div>
-        <Button onClick={handleOpenCreate}>
-          {t("programManagement.createProgram")}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsTypeSettingsOpen(true)}>
+            {t("programManagement.programTypeSettings", "Program Type Defaults")}
+          </Button>
+          <Button onClick={handleOpenCreate}>
+            {t("programManagement.createProgram")}
+          </Button>
+        </div>
       </div>
 
       <Table>
@@ -315,6 +322,11 @@ const Programs = () => {
         count={1}
         isLoading={isDeleting}
         data="Program"
+      />
+
+      <ProgramTypeConfigDrawer
+        isOpen={isTypeSettingsOpen}
+        onOpenChange={setIsTypeSettingsOpen}
       />
     </div>
   );

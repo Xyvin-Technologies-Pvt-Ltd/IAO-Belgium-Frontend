@@ -5,8 +5,14 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -25,14 +31,13 @@ import {
   Plus,
   Pencil,
   Trash2,
-  GripVertical,
 } from "lucide-react";
-import { useGetProgramById, useUpdateProgram } from "@/store/useProgramStore";
-import DeleteConfirm from "@/components/DeleteConfirm";
 import {
-  getAllPreviousEducationOptions,
-  slugifyPreviousEducationKey,
-} from "@/utils/previousEducation";
+  useGetProgramTypeConfigs,
+  useUpdateProgramTypeConfig,
+} from "@/store/useProgramStore";
+import DeleteConfirm from "@/components/DeleteConfirm";
+import { slugifyPreviousEducationKey } from "@/utils/previousEducation";
 
 const EMPTY_LABELS = { en: "", fr: "", nl: "", de: "" };
 
@@ -43,9 +48,17 @@ const LOCALE_FIELDS = [
   { code: "de", labelKey: "german", badge: "DE" },
 ];
 
-const PreviousEducationOptionsDrawer = ({ programId }) => {
+const PROGRAM_TYPES = [
+  "Master of Science",
+  "Lateral Entry Master of Science",
+  "Diploma",
+  "Manual Therapie",
+  "Post Academic Module",
+];
+
+const ProgramTypeConfigDrawer = ({ isOpen, onOpenChange }) => {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState(PROGRAM_TYPES[0]);
   const [options, setOptions] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -56,26 +69,19 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
     status: true,
   });
 
-  const { data: programRes, isLoading } = useGetProgramById(programId, {
-    enabled: isOpen && !!programId,
+  const { data: configsRes, isLoading } = useGetProgramTypeConfigs({
+    enabled: isOpen,
   });
-  const updateMutation = useUpdateProgram();
-  const program = programRes?.data;
+  const updateMutation = useUpdateProgramTypeConfig();
   const isSaving = updateMutation.isPending;
 
   useEffect(() => {
-    if (!isOpen || !program) return;
-    setOptions(getAllPreviousEducationOptions(program.previous_education_options));
-  }, [isOpen, program]);
-
-  const handleSheetOpenChange = (open) => {
-    setIsOpen(open);
-    if (!open) {
-      setFormOpen(false);
-      setEditingIndex(null);
-      setDeleteIndex(null);
-    }
-  };
+    if (!isOpen || !configsRes?.data) return;
+    const currentConfig = configsRes.data.find(
+      (c) => c.program_type === selectedType
+    );
+    setOptions(currentConfig?.previous_education_options || []);
+  }, [isOpen, configsRes, selectedType]);
 
   const resetForm = () => {
     setEditingIndex(null);
@@ -87,29 +93,20 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
   };
 
   const persistOptions = (nextOptions, onSuccess) => {
-    const cleanOptions = nextOptions
-      .filter((option) => !option.inherited)
-      .map((option, index) => {
-        const { inherited, ...rest } = option;
-        return {
-          ...rest,
-          sort_order: index,
-        };
-      });
-
     updateMutation.mutate(
       {
-        id: programId,
-        data: {
-          previous_education_options: cleanOptions,
-        },
+        program_type: selectedType,
+        previous_education_options: nextOptions.map((option, index) => ({
+          ...option,
+          sort_order: index,
+        })),
       },
       {
         onSuccess: () => {
           setOptions(nextOptions);
           onSuccess?.();
         },
-      },
+      }
     );
   };
 
@@ -165,7 +162,7 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
       nextOptions = [...options, payload];
     } else {
       nextOptions = options.map((option, index) =>
-        index === editingIndex ? payload : option,
+        index === editingIndex ? payload : option
       );
     }
 
@@ -187,14 +184,7 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
 
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
-        <SheetTrigger asChild>
-          <Button variant="outline" className="gap-2">
-            <GraduationCap className="h-4 w-4" />
-            {t("programDetail.previousEducation.trigger")}
-          </Button>
-        </SheetTrigger>
-
+      <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetContent
           side="right"
           className="w-[400px] sm:w-[540px] p-0 bg-sidebar flex flex-col h-full max-h-screen"
@@ -220,16 +210,47 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                  {t("programDetail.previousEducation.title")}
+                  {t("programDetail.previousEducation.typeTitle", "Program Type Defaults")}
                 </SheetTitle>
                 <p className="text-xs mt-0.5 line-clamp-2" style={{ color: "#94a3b8" }}>
-                  {t("programDetail.previousEducation.subtitle")}
+                  {t("programDetail.previousEducation.typeSubtitle", "Configure inherited options by program type")}
                 </p>
               </div>
             </div>
           </SheetHeader>
 
-          <div className="p-6 flex-1 overflow-y-auto space-y-4">
+          <div className="p-6 pb-2 shrink-0">
+            <Label className="text-xs font-semibold text-sidebar-foreground mb-1.5 block">
+              {t("programManagement.table.type", "Program Type")}
+            </Label>
+            <Select
+              value={selectedType}
+              onValueChange={setSelectedType}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("programManagement.modal.programTypePlaceholder", "Select program type")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Master of Science">
+                  {t("programManagement.modal.programTypes.masterOfScience", "Master of Science")}
+                </SelectItem>
+                <SelectItem value="Lateral Entry Master of Science">
+                  {t("programManagement.modal.programTypes.lateralEntry", "Lateral Entry Master of Science")}
+                </SelectItem>
+                <SelectItem value="Diploma">
+                  {t("programManagement.modal.programTypes.diploma", "Diploma")}
+                </SelectItem>
+                <SelectItem value="Manual Therapie">
+                  {t("programManagement.modal.programTypes.manualTherapie", "Manual Therapie")}
+                </SelectItem>
+                <SelectItem value="Post Academic Module">
+                  {t("programManagement.modal.programTypes.postAcademic", "Post Academic Module")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="p-6 flex-1 overflow-y-auto space-y-4 pt-2">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
@@ -267,21 +288,6 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
                     <p className="text-sm font-medium text-sidebar-foreground">
                       {t("programDetail.previousEducation.empty")}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                      {t(
-                        "programDetail.previousEducation.emptyHint",
-                        "Students will see these choices during application Step 1.",
-                      )}
-                    </p>
-                    <Button
-                      size="sm"
-                      className="mt-4 gap-1.5"
-                      onClick={() => handleOpenForm(null)}
-                      disabled={isSaving}
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      {t("programDetail.previousEducation.addOption")}
-                    </Button>
                   </div>
                 ) : (
                   <ul className="divide-y divide-sidebar-border">
@@ -290,10 +296,6 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
                         key={option.key}
                         className="group flex items-start gap-3 px-4 py-3.5 hover:bg-muted/20 transition-colors"
                       >
-                        <div className="pt-0.5 text-muted-foreground/40">
-                          <GripVertical className="h-4 w-4" />
-                        </div>
-
                         <div className="flex-1 min-w-0 space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm font-medium text-sidebar-foreground truncate">
@@ -310,11 +312,6 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
                                 ? t("programDetail.previousEducation.active")
                                 : t("programDetail.previousEducation.inactive")}
                             </span>
-                            {option.inherited && (
-                              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
-                                {t("programDetail.previousEducation.inherited", "Inherited")}
-                              </span>
-                            )}
                           </div>
 
                           <code className="inline-block text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
@@ -334,35 +331,33 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
                                     </span>
                                     <span className="truncate">{option.labels[code]}</span>
                                   </span>
-                                ) : null,
+                                ) : null
                             )}
                           </div>
                         </div>
 
-                        {!option.inherited && (
-                          <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleOpenForm(index)}
-                              disabled={isSaving}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                              onClick={() => setDeleteIndex(index)}
-                              disabled={isSaving}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        )}
+                        <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleOpenForm(index)}
+                            disabled={isSaving}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => setDeleteIndex(index)}
+                            disabled={isSaving}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -373,80 +368,54 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
         </SheetContent>
       </Sheet>
 
-      <Dialog
-        open={formOpen}
-        onOpenChange={(open) => !open && handleCloseForm()}
-      >
-        <DialogContent className="sm:max-w-lg bg-sidebar border-sidebar-border">
+      <Dialog open={formOpen} onOpenChange={handleCloseForm}>
+        <DialogContent className="max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
               {isNewOption
-                ? t("programDetail.previousEducation.addOption")
-                : t("programDetail.previousEducation.editOption")}
+                ? t("programDetail.previousEducation.addOption", "Add Option")
+                : t("programDetail.previousEducation.editOption", "Edit Option")}
             </DialogTitle>
-            <DialogDescription>
-              {t(
-                "programDetail.previousEducation.formHint",
-                "English label is required. The key is generated once and stays fixed.",
-              )}
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-4">
             {!isNewOption && (
-              <div className="rounded-lg border border-sidebar-border bg-muted/30 px-3 py-2.5 space-y-1">
-                <Label className="text-xs text-muted-foreground">
-                  {t("programDetail.previousEducation.keyLabel")}
-                </Label>
-                <code className="block text-sm font-mono text-sidebar-foreground">
-                  {formData.key}
-                </code>
-                <p className="text-[11px] text-muted-foreground">
-                  {t("programDetail.previousEducation.keyHint")}
-                </p>
+              <div className="space-y-1">
+                <Label className="text-xs">{t("programDetail.previousEducation.keyLabel")}</Label>
+                <Input value={formData.key} disabled className="bg-muted text-muted-foreground" />
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {LOCALE_FIELDS.map(({ code, labelKey, badge }) => (
-                <div key={code} className="space-y-1.5">
-                  <Label className="flex items-center gap-2 text-sm">
-                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded px-1 text-[10px] font-bold bg-[#ff8904]/10 text-[#ff8904]">
-                      {badge}
-                    </span>
-                    {t(`programDetail.previousEducation.locales.${labelKey}`)}
-                    {code === "en" && (
-                      <span className="text-destructive">*</span>
-                    )}
+            {LOCALE_FIELDS.map(({ code, labelKey, badge }) => (
+              <div key={code} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">
+                    {t(`programDetail.previousEducation.locales.${labelKey}`)}{" "}
+                    {code === "en" && <span className="text-destructive">*</span>}
                   </Label>
-                  <Input
-                    value={formData.labels[code] || ""}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        labels: { ...prev.labels, [code]: e.target.value },
-                      }))
-                    }
-                    placeholder={t(
-                      `programDetail.previousEducation.placeholders.${labelKey}`,
-                    )}
-                    className="bg-background border-sidebar-border"
-                    disabled={isSaving}
-                  />
+                  <span className="text-[10px] font-semibold text-muted-foreground px-1 bg-muted rounded">
+                    {badge}
+                  </span>
                 </div>
-              ))}
-            </div>
+                <Input
+                  value={formData.labels[code]}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      labels: { ...prev.labels, [code]: e.target.value },
+                    }))
+                  }
+                  placeholder={t(`programDetail.previousEducation.placeholders.${labelKey}`)}
+                  required={code === "en"}
+                />
+              </div>
+            ))}
 
-            <div className="flex items-center justify-between rounded-lg border border-sidebar-border px-3 py-3">
-              <div>
-                <Label className="font-medium">
-                  {t("programDetail.previousEducation.active")}
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {t(
-                    "programDetail.previousEducation.activeHint",
-                    "Inactive options are hidden from new applicants but remain visible for existing records.",
-                  )}
+            <div className="flex items-center justify-between border-t border-sidebar-border pt-4">
+              <div className="space-y-0.5">
+                <Label className="text-xs">{t("programDetail.previousEducation.active")}</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  {t("programDetail.previousEducation.activeHint")}
                 </p>
               </div>
               <Switch
@@ -454,33 +423,21 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
                 onCheckedChange={(checked) =>
                   setFormData((prev) => ({ ...prev, status: checked }))
                 }
-                disabled={isSaving}
               />
             </div>
           </div>
 
-          <DialogFooter className="gap-3 sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCloseForm}
-              disabled={isSaving}
-            >
+          <DialogFooter>
+            <Button variant="ghost" onClick={handleCloseForm} disabled={isSaving}>
               {t("common.cancel")}
             </Button>
             <Button
-              type="button"
               onClick={handleSaveOption}
               disabled={!formData.labels.en?.trim() || isSaving}
+              className="gap-1.5"
             >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("programDetail.previousEducation.saving")}
-                </>
-              ) : (
-                t("programDetail.previousEducation.saveOption")
-              )}
+              {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -488,13 +445,19 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
 
       <DeleteConfirm
         open={deleteIndex !== null}
-        onClose={() => !isSaving && setDeleteIndex(null)}
+        onOpenChange={(open) => !open && setDeleteIndex(null)}
+        title={t("programDetail.previousEducation.deleteOptionConfirm", "Delete Option")}
         onConfirm={handleConfirmDelete}
-        data={deleteTarget}
-        isLoading={isSaving}
-      />
+        loading={isSaving}
+      >
+        <DialogDescription>
+          {t("programDetail.previousEducation.deleteConfirmText", {
+            name: deleteTarget,
+          })}
+        </DialogDescription>
+      </DeleteConfirm>
     </>
   );
 };
 
-export default PreviousEducationOptionsDrawer;
+export default ProgramTypeConfigDrawer;
