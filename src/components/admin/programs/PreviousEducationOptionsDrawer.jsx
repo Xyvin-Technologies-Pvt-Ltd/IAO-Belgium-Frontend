@@ -445,7 +445,7 @@ const PreviousEducationOptionsDrawer = ({ programId }) => {
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-3 sm:justify-end">
             <Button
               type="button"
               variant="outline"
