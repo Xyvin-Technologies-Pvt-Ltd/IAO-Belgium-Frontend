@@ -8,6 +8,11 @@ export function slugifyPreviousEducationKey(text) {
     .replace(/^_+|_+$/g, "");
 }
 
+export function humanizePreviousEducationKey(key) {
+  const text = String(key || "").replace(/_/g, " ").trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
+}
+
 export function getActivePreviousEducationOptions(options = []) {
   return [...options]
     .filter((option) => option.status !== false)
@@ -43,7 +48,7 @@ export function resolvePreviousEducationLabel(
     return byLabel.labels?.[normalizedLocale] || byLabel.labels?.en || key;
   }
 
-  return key;
+  return humanizePreviousEducationKey(key);
 }
 
 export function getProgramPreviousEducationOptions(program) {
