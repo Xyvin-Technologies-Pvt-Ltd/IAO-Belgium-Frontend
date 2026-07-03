@@ -20,6 +20,7 @@ import StatusBadge from "@/components/StatusBadge";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import moment from "moment";
 import { toast } from "sonner";
+import { formatInstant } from "@/utils/dateUtils";
 
 const Results = () => {
   const { t } = useTranslation();
@@ -119,7 +120,7 @@ const Results = () => {
           const score = row.score !== undefined && row.score !== null ? row.score : "N/A";
           const percentage = row.percentage !== undefined && row.percentage !== null ? `${Math.round(row.percentage * 100) / 100}%` : "N/A";
           const status = row.result || row.status || "N/A";
-          const date = row.submitted_at ? moment(row.submitted_at).format("YYYY-MM-DD HH:mm:ss") : "N/A";
+          const date = row.submitted_at ? formatInstant(row.submitted_at, "YYYY-MM-DD HH:mm:ss") : "N/A";
 
           return [
             `"${studentName.replace(/"/g, '""')}"`,
@@ -245,7 +246,7 @@ const Results = () => {
                   <StatusBadge status={row.result || row.status || "N/A"} />
                 </TableCell>
                 <TableCell className="text-gray-500 dark:text-white/60">
-                  {row.submitted_at ? moment(row.submitted_at).format("DD-MM-YYYY HH:mm") : "N/A"}
+                  {row.submitted_at ? formatInstant(row.submitted_at, "DD-MM-YYYY HH:mm") : "N/A"}
                 </TableCell>
               </TableRow>
             ))

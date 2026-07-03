@@ -370,6 +370,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
               />
             </div>
             <SearchableSelect
+              label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}
               searchPlaceholder="Search languages..."
               items={languagesData?.data || []}

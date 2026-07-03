@@ -14,6 +14,7 @@ import {
   usePreviewNotificationCount,
 } from "@/store/useNotificationStore";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
 
 const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   const { t } = useTranslation();
@@ -26,6 +27,8 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
   const [moduleSearch, setModuleSearch] = useState("");
   const [previewCount, setPreviewCount] = useState(null);
   const [messageContent, setMessageContent] = useState("");
+  //* Rewrite embedded private-file references to presigned URLs for the preview.
+  const securePreview = useSecureHtml(messageContent);
 
   const debouncedModuleSearch = useDebounce(moduleSearch, 400);
 
@@ -290,7 +293,7 @@ const TeacherNotificationModal = ({ open, onClose, notification = null }) => {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-2">Message Body</p>
                   <div 
                     className="text-sm text-foreground/90 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: messageContent }}
+                    dangerouslySetInnerHTML={{ __html: securePreview }}
                   />
                 </div>
               </div>

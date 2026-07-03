@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import RichTextEditor from "@/components/ui/RichTextEditor";
+import { useSecureHtml } from "@/hooks/useSecureHtml";
 import {
   useGetAllCities,
   useGetAllCountries,
@@ -28,6 +29,7 @@ import {
 } from "@/store/useNotificationStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import moment from "moment";
+import { tr } from "zod/v4/locales";
 
 
 
@@ -125,6 +127,8 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const [isGlobal, setIsGlobal] = useState(false);
   const [messageContent, setMessageContent] = useState("");
   const [attachments, setAttachments] = useState([]);
+  //* Rewrite embedded private-file references to presigned URLs for the preview.
+  const securePreview = useSecureHtml(messageContent);
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [inlineImages, setInlineImages] = useState([]);
@@ -170,7 +174,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const { data: componentsData } = useGetComponents({
     program: activeProgram,
     type: "module",
-    status: "active"
+    status: true
   }, { enabled: open && step === 2 && !!activeProgram });
 
   const { register, trigger, getValues, reset, setValue, formState: { errors } } = useForm({
@@ -828,7 +832,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
                 </div>
                 <div className="border-t pt-3">
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">Message</p>
-                  <div className="text-sm text-foreground/80 prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5" dangerouslySetInnerHTML={{ __html: messageContent }} />
+                  <div className="text-sm text-foreground/80 prose prose-sm max-w-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-0.5" dangerouslySetInnerHTML={{ __html: securePreview }} />
                 </div>
                 {attachments.length > 0 && (
                   <div className="border-t pt-3">

@@ -95,6 +95,8 @@
     "create": "Erstellen",
     "update": "Aktualisieren",
     "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichern...",
     "add": "Hinzufügen",
     "uploading": "Wird hochgeladen...",
     "yes": "Ja",
@@ -928,13 +930,18 @@
       "applicationId": "Bewerbungs-ID",
       "noDocuments": "Keine Dokumente beigefügt",
       "unknownApplicant": "Unbekannte/r Bewerber/in",
+      "moduleSelection": "Modulauswahl",
       "requestAdditionalInfo": "Zusätzliche Informationen anfordern",
       "remarks": "Anmerkungen",
       "remarksPlaceholder": "Anmerkungen vor der Weiterleitung eingeben",
       "processing": "Wird verarbeitet...",
       "reject": "Ablehnen",
       "waitlist": "In Bearbeitung",
-      "accept": "Annehmen"
+      "accept": "Annehmen",
+      "qualificationStatus": "Status der Qualifikation",
+      "stillCompletingQualification": "Qualifikation wird noch abgeschlossen",
+      "qualificationNotDeferred": "Nicht aufgeschoben",
+      "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen."
     },
     "status": {
       "pending": "Ausstehend",
@@ -1363,7 +1370,31 @@
     "activeStudents": "Aktive Studierende",
     "activeLecturers": "Aktive Lehrkräfte",
     "courseEnrollmentTrend": "Einschreibungstrend Ausbildung",
-    "comparedToLastMonth": "{{percent}} im Vergleich zum Vormonat"
+    "comparedToLastMonth": "{{percent}} im Vergleich zum Vormonat",
+    "currentYear": "Aktuelles Jahr",
+    "previousYear": "Vorheriges Jahr",
+    "teacher": {
+      "subtitle": "Hier ist eine Übersicht über Ihre Lehraktivitäten.",
+      "pendingInvites": "Ausstehende Einladungen",
+      "pendingInvitesHint": "Planungssitzungen, die auf Ihre Antwort warten",
+      "acceptedModules": "Meine Module",
+      "acceptedModulesHint": "Akzeptierte Modulpläne",
+      "pendingEvaluations": "Ausstehende Bewertungen",
+      "pendingEvaluationsHint": "{{completed}} bisher abgeschlossen",
+      "assignedExams": "Zugewiesene Prüfungen",
+      "assignedExamsHint": "{{other}} weitere Prüfungen • {{unread}} ungelesene Benachrichtigungen",
+      "upcomingSessions": "Bevorstehende Sitzungen",
+      "recentSubmissions": "Einreichungen zur Bewertung",
+      "noUpcomingSessions": "Keine Sitzungen in den nächsten 7 Tagen geplant.",
+      "noRecentSubmissions": "Keine Einreichungen warten auf Bewertung.",
+      "viewAll": "Alle anzeigen",
+      "unknownStudent": "Unbekannter Student",
+      "unreadNotifications": "{{count}} ungelesene Benachrichtigungen",
+      "sessionsTrend": "Sitzungen dieses Jahr",
+      "evaluationsTrend": "Abgeschlossene Bewertungen dieses Jahr",
+      "sessionsCount": "Sitzungen",
+      "evaluationsCount": "Bewertungen"
+    }
   },
   "exam": {
     "title": "Prüfungen",
@@ -1576,6 +1607,7 @@
   "questionBank": {
     "title": "Fragenbanken",
     "search": "Fragenbanken suchen...",
+    "loading": "Fragenbank wird geladen...",
     "createQuestionBank": "Fragenbank erstellen",
     "editQuestionBank": "Fragenbank bearbeiten",
     "question": "Frage",
@@ -1864,6 +1896,29 @@
       "selectedStudents": "Ausgewählte Studierende",
       "selectedUsers": "Ausgewählte Nutzer",
       "system": "System"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Modulauswahl verwalten",
+        "desc": "Passen Sie die Modulanmeldungen des Schülers an. Bereits gestartete oder abgeschlossene Module können nicht abgewählt werden."
+      },
+      "mode": {
+        "full": "Vollständiges Programm",
+        "partial": "Einzelne Module"
+      },
+      "modulesList": {
+        "label": "Ausbildungsmodule:"
+      },
+      "lockedHelp": "Dieses Modul wurde bereits gestartet oder abgeschlossen.",
+      "card": {
+        "title": "Modulauswahl",
+        "editBtn": "Module bearbeiten",
+        "modeLabel": "Einschreibeform:",
+        "modulesLabel": "Ausgewählte Module:",
+        "noModules": "Keine Module ausgewählt"
+      }
     }
   }
 }

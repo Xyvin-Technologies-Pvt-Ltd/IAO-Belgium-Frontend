@@ -96,6 +96,8 @@
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
     "add": "Add",
     "uploading": "Uploading...",
     "yes": "Yes",
@@ -957,6 +959,7 @@
       "applicationId": "Application ID",
       "noDocuments": "No documents attached",
       "unknownApplicant": "Unknown Applicant",
+      "moduleSelection": "Module Selection",
       "requestAdditionalInfo": "Request additional information",
       "remarks": "Remarks",
       "remarksPlaceholder": "Enter any remarks to add before forwarding",
@@ -1410,7 +1413,31 @@
     "activeStudents": "Active students",
     "activeLecturers": "Active lecturers",
     "courseEnrollmentTrend": "Programme enrolment trend",
-    "comparedToLastMonth": "{{percent}} compared to last month"
+    "comparedToLastMonth": "{{percent}} compared to last month",
+    "currentYear": "Current year",
+    "previousYear": "Previous year",
+    "teacher": {
+      "subtitle": "Here is an overview of your teaching activity.",
+      "pendingInvites": "Pending invites",
+      "pendingInvitesHint": "Planning sessions awaiting your response",
+      "acceptedModules": "My modules",
+      "acceptedModulesHint": "Accepted module schedules",
+      "pendingEvaluations": "Pending evaluations",
+      "pendingEvaluationsHint": "{{completed}} completed so far",
+      "assignedExams": "Assigned exams",
+      "assignedExamsHint": "{{other}} other exams • {{unread}} unread notifications",
+      "upcomingSessions": "Upcoming sessions",
+      "recentSubmissions": "Submissions to review",
+      "noUpcomingSessions": "No sessions scheduled in the next 7 days.",
+      "noRecentSubmissions": "No submissions waiting for review.",
+      "viewAll": "View all",
+      "unknownStudent": "Unknown student",
+      "unreadNotifications": "{{count}} unread notifications",
+      "sessionsTrend": "Sessions this year",
+      "evaluationsTrend": "Evaluations completed this year",
+      "sessionsCount": "Sessions",
+      "evaluationsCount": "Evaluations"
+    }
   },
   "exam": {
     "title": "Exams",
@@ -1625,6 +1652,7 @@
   "questionBank": {
     "title": "Question Banks",
     "search": "Search question banks...",
+    "loading": "Loading question bank...",
     "createQuestionBank": "Create Question Bank",
     "editQuestionBank": "Edit Question Bank",
     "question": "Question",
@@ -1913,6 +1941,29 @@
       "selectedStudents": "Selected Students",
       "selectedUsers": "Selected Users",
       "system": "System"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Manage Module Selection",
+        "desc": "Adjust the student's module enrollments. Already started or completed modules cannot be deselected."
+      },
+      "mode": {
+        "full": "Full Program",
+        "partial": "Individual Modules"
+      },
+      "modulesList": {
+        "label": "Training Modules:"
+      },
+      "lockedHelp": "This module has already started or been completed.",
+      "card": {
+        "title": "Module Selection",
+        "editBtn": "Manage Modules",
+        "modeLabel": "Enrollment Mode:",
+        "modulesLabel": "Selected Modules:",
+        "noModules": "No modules selected"
+      }
     }
   }
 }

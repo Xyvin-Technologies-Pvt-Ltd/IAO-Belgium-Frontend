@@ -1,7 +1,7 @@
 import { Eye, Download, FileText } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/api/axiosintercepter";
+import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 
 const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
   const { t } = useTranslation();
@@ -280,37 +280,12 @@ const DocumentRow = ({ title, size, url }) => {
         <Action
           icon={Eye}
           label={t("applicationReview.documents.view")}
-          onClick={() => url && window.open(url, "_blank")}
+          onClick={() => url && openSecureFile(url)}
         />
         <Action
           icon={Download}
           label={t("applicationReview.documents.download", "Download")}
-          onClick={async () => {
-            if (!url) return;
-            try {
-              // Extract path from full URL so axios uses its configured baseURL
-              let downloadPath = url;
-              try {
-                const parsedUrl = new URL(url);
-                downloadPath = parsedUrl.pathname;
-              } catch {
-                // url is already a relative path
-              }
-              const response = await axiosInstance.get(downloadPath, {
-                responseType: "blob",
-              });
-              const blobUrl = window.URL.createObjectURL(response.data);
-              const link = document.createElement("a");
-              link.href = blobUrl;
-              link.download = url.split("/").pop() || "document";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              window.URL.revokeObjectURL(blobUrl);
-            } catch {
-              window.open(url, "_blank");
-            }
-          }}
+          onClick={() => url && downloadSecureFile(url, url.split("/").pop() || "document")}
         />
       </div>
     </div>

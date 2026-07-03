@@ -95,6 +95,8 @@
     "create": "Créer",
     "update": "Mettre à jour",
     "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
     "add": "Ajouter",
     "uploading": "Téléversement en cours...",
     "yes": "Oui",
@@ -929,13 +931,18 @@
       "applicationId": "ID de candidature",
       "noDocuments": "Aucun document joint",
       "unknownApplicant": "Candidat inconnu",
+      "moduleSelection": "Sélection des modules",
       "requestAdditionalInfo": "Demander des informations supplémentaires",
       "remarks": "Remarques",
       "remarksPlaceholder": "Saisir des remarques avant de transmettre",
       "processing": "Traitement en cours...",
       "reject": "Rejeter",
       "waitlist": "En cours",
-      "accept": "Accepter"
+      "accept": "Accepter",
+      "qualificationStatus": "Statut de qualification",
+      "stillCompletingQualification": "En cours de finalisation de la qualification",
+      "qualificationNotDeferred": "Non différé",
+      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
     },
     "status": {
       "pending": "En attente",
@@ -1364,7 +1371,31 @@
     "activeStudents": "Étudiants actifs",
     "activeLecturers": "Enseignants actifs",
     "courseEnrollmentTrend": "Tendance d'inscription aux formations",
-    "comparedToLastMonth": "{{percent}} par rapport au mois dernier"
+    "comparedToLastMonth": "{{percent}} par rapport au mois dernier",
+    "currentYear": "Année en cours",
+    "previousYear": "Année précédente",
+    "teacher": {
+      "subtitle": "Voici un aperçu de votre activité d'enseignement.",
+      "pendingInvites": "Invitations en attente",
+      "pendingInvitesHint": "Sessions de planning en attente de votre réponse",
+      "acceptedModules": "Mes modules",
+      "acceptedModulesHint": "Plannings de modules acceptés",
+      "pendingEvaluations": "Évaluations en attente",
+      "pendingEvaluationsHint": "{{completed}} terminées jusqu'à présent",
+      "assignedExams": "Examens assignés",
+      "assignedExamsHint": "{{other}} autres examens • {{unread}} notifications non lues",
+      "upcomingSessions": "Sessions à venir",
+      "recentSubmissions": "Soumissions à évaluer",
+      "noUpcomingSessions": "Aucune session prévue dans les 7 prochains jours.",
+      "noRecentSubmissions": "Aucune soumission en attente d'évaluation.",
+      "viewAll": "Voir tout",
+      "unknownStudent": "Étudiant inconnu",
+      "unreadNotifications": "{{count}} notifications non lues",
+      "sessionsTrend": "Sessions cette année",
+      "evaluationsTrend": "Évaluations terminées cette année",
+      "sessionsCount": "Sessions",
+      "evaluationsCount": "Évaluations"
+    }
   },
   "exam": {
     "title": "Examens",
@@ -1577,6 +1608,7 @@
   "questionBank": {
     "title": "Banques de questions",
     "search": "Rechercher des banques de questions...",
+    "loading": "Chargement de la banque de questions...",
     "createQuestionBank": "Créer une banque de questions",
     "editQuestionBank": "Modifier la banque de questions",
     "question": "Question",
@@ -1866,7 +1898,31 @@
       "selectedTeachers": "Enseignants sélectionnés",
       "selectedStudents": "Étudiants sélectionnés",
       "selectedUsers": "Utilisateurs sélectionnés",
-      "system": "Système"
+      "system": "Système",
+      "moduleSelection": "Sélection des modules"
+    }
+  },
+  "admin": {
+    "manualTherapy": {
+      "manageSelection": {
+        "title": "Gérer la sélection des modules",
+        "desc": "Ajustez les inscriptions aux modules de l'étudiant. Les modules déjà commencés ou terminés ne peuvent pas être désélectionnés."
+      },
+      "mode": {
+        "full": "Programme complet",
+        "partial": "Modules individuels"
+      },
+      "modulesList": {
+        "label": "Modules de formation:"
+      },
+      "lockedHelp": "Ce module a déjà commencé ou est terminé.",
+      "card": {
+        "title": "Sélection des modules",
+        "editBtn": "Modifier les modules",
+        "modeLabel": "Mode d'inscription:",
+        "modulesLabel": "Modules sélectionnés:",
+        "noModules": "Aucun module sélectionné"
+      }
     }
   }
 }

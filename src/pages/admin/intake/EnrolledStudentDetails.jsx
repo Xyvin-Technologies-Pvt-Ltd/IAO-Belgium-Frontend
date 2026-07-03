@@ -1,4 +1,5 @@
 import UserCard from "@/components/admin/UserCard";
+import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useIntakeStore";
@@ -77,6 +78,9 @@ const EnrolledStudentDetails = () => {
   return (
     <div className="space-y-6 mt-4">
       <UserCard student={studentData} />
+      {studentData.program_type === "Manual Therapie" && (
+        <ModuleSelectionCard applicationId={id} />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { getApplications, updateApplication } from "@/api/applicationApi";
+import { getApplications, updateApplication, getModuleSelection, updateModuleSelection } from "@/api/applicationApi";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -22,6 +22,33 @@ export const useUpdateApplication = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update application");
+    },
+  });
+};
+
+export const useGetModuleSelection = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["moduleSelection", id],
+    queryFn: () => getModuleSelection(id),
+    staleTime: 5000,
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const useUpdateModuleSelection = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, selectedModules }) => updateModuleSelection(id, selectedModules),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["moduleSelection", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+      queryClient.invalidateQueries({ queryKey: ["intake-enrollments"] });
+      toast.success(response?.message || "Module selection updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update module selection");
     },
   });
 };

@@ -391,7 +391,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   }, [selectedProgram, setValue, isEdit]);
 
   const onSubmit = (formData) => {
-    console.log("[Planning onSubmit] formData:", formData);
 
     const formattedSessions = formData.sessions.map((session) => {
       const sessionDate = moment(session.session_date).format("YYYY-MM-DD");
@@ -453,7 +452,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       })),
     };
 
-    console.log("[Planning onSubmit] payload:", payload);
 
     const mutation = isEdit ? updatePlanning : createPlanning;
     const mutationData = isEdit
@@ -462,7 +460,6 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
 
     mutation.mutate(mutationData, {
       onSuccess: () => {
-        console.log("[Planning onSubmit] SUCCESS");
         handleClose();
       },
       onError: (err) => {

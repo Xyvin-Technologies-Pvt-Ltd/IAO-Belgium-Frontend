@@ -6,7 +6,7 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import { useState, useEffect } from "react";
 import { useUpdateApplication } from "@/store/useApplication";
 import { useTranslation } from "react-i18next";
-import axiosInstance from "@/api/axiosintercepter";
+import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t } = useTranslation();
@@ -151,6 +151,7 @@ const ViewApplication = ({ open, onClose, application }) => {
               <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.programType", "Program Type")} value={application?.program_type || application?.intake?.program?.program_type || application?.batch?.intake?.program?.program_type || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
               <InfoItem
@@ -168,6 +169,31 @@ const ViewApplication = ({ open, onClose, application }) => {
                 }
               />
             </div>
+            {(application.enrollment_mode || (application.selected_modules && application.selected_modules.length > 0)) && (
+              <div className="mt-4 p-4 border dark:border-white/20 rounded-lg bg-gray-50 dark:bg-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-dashboard-text dark:text-white">
+                    {t("applicationReview.modal.moduleSelection", "Module Selectie")}
+                  </h4>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                    application.enrollment_mode === "full" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                  }`}>
+                    {application.enrollment_mode === "full"
+                      ? t("admin.manualTherapy.mode.full", "Volledig Programma")
+                      : t("admin.manualTherapy.mode.partial", "Afzonderlijke Modules")}
+                  </span>
+                </div>
+                {application.enrollment_mode === "partial" && (
+                  <div className="flex flex-wrap gap-2">
+                    {(application.selected_modules || []).map((module, idx) => (
+                      <span key={module._id || idx} className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800 px-2 py-1 rounded">
+                        M{module.module_number}: {module.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
@@ -279,7 +305,7 @@ const ViewApplication = ({ open, onClose, application }) => {
 export default ViewApplication;
 
 const InfoItem = ({ label, value }) => (
-  <div>
+  <div className="min-w-0 break-words">
     <p className="text-sm text-muted-foreground dark:text-white/70">{label}</p>
     <p className="text-base font-semibold text-dashboard-text dark:text-white">{value}</p>
   </div>
@@ -307,37 +333,12 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
         <Action 
           icon={Eye} 
           label={t("applicationReview.documents.view")} 
-          onClick={() => url && window.open(url, '_blank')}
+          onClick={() => url && openSecureFile(url)}
         />
         <Action 
           icon={Download} 
           label={t("applicationReview.documents.download")} 
-          onClick={async () => {
-            if (!url) return;
-            try {
-              // Extract path from full URL so axios uses its configured baseURL
-              let downloadPath = url;
-              try {
-                const parsedUrl = new URL(url);
-                downloadPath = parsedUrl.pathname;
-              } catch {
-                // url is already a relative path
-              }
-              const response = await axiosInstance.get(downloadPath, {
-                responseType: "blob",
-              });
-              const blobUrl = window.URL.createObjectURL(response.data);
-              const link = document.createElement("a");
-              link.href = blobUrl;
-              link.download = url.split("/").pop() || "document";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              window.URL.revokeObjectURL(blobUrl);
-            } catch {
-              window.open(url, "_blank");
-            }
-          }}
+          onClick={() => url && downloadSecureFile(url, url.split("/").pop() || "document")}
         />
         <Action 
           icon={Flag} 

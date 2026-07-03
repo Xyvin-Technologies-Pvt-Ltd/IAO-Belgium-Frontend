@@ -103,6 +103,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
     {
       type: "module",
       program: selectedProgram,
+      status: true,
     },
     { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
   );
