@@ -1207,6 +1207,37 @@
       "title": "No Programme Modules Added Yet",
       "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this programme effectively.",
       "createButton": "Create Programme Module"
+    },
+    "previousEducation": {
+      "trigger": "Previous Education",
+      "title": "Previous Education Options",
+      "subtitle": "Configure the education levels students can select when applying to this programme. Labels can be edited anytime; the key stays fixed after creation.",
+      "empty": "No options configured yet.",
+      "emptyHint": "Students will see these choices during application Step 1.",
+      "optionsList": "Options",
+      "formHint": "English label is required. The key is generated once and stays fixed.",
+      "activeHint": "Inactive options are hidden from new applicants but remain visible for existing records.",
+      "addOption": "Add option",
+      "editOption": "Edit option",
+      "saveOption": "Save option",
+      "saveAll": "Save all",
+      "saving": "Saving...",
+      "keyLabel": "Key",
+      "keyHint": "The key is generated when the option is created and cannot be changed.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "locales": {
+        "english": "English",
+        "french": "French",
+        "dutch": "Dutch",
+        "german": "German"
+      },
+      "placeholders": {
+        "english": "Enter English label",
+        "french": "Enter French label",
+        "dutch": "Enter Dutch label",
+        "german": "Enter German label"
+      }
     }
   },
   "examAnswerSheet": {

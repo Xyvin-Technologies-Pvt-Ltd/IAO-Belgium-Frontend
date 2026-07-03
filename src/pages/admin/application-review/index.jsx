@@ -18,9 +18,13 @@ import { useGetApplications } from "@/store/useApplication";
 import ViewApplication from "@/components/admin/application-review/ViewApplication";
 import StatusBadge from "@/components/StatusBadge";
 import { useTranslation } from "react-i18next";
+import {
+  getApplicationPreviousEducationOptions,
+  resolvePreviousEducationLabel,
+} from "@/utils/previousEducation";
 
 const ApplicationReview = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -110,7 +114,13 @@ const ApplicationReview = () => {
                 <TableCell className={"capitalize"}>{i?.user?.last_name}{" "}{i?.user?.first_name}</TableCell>
                 <TableCell>{i?.user?.email}</TableCell>
                 <TableCell>{i?.user?.phone}</TableCell>
-                <TableCell>{i?.user?.previous_education}</TableCell>
+                <TableCell>
+                  {resolvePreviousEducationLabel(
+                    i?.user?.previous_education,
+                    getApplicationPreviousEducationOptions(i),
+                    i18n.language,
+                  )}
+                </TableCell>
                 <TableCell>{i?.user?.address}</TableCell>
                 <TableCell>{i?.user?.postal_code}</TableCell>
                 <TableCell>{i?.user?.city}</TableCell>

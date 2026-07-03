@@ -1173,6 +1173,33 @@
       "title": "Nog geen opleidingsmodules toegevoegd",
       "subtitle": "Begin met het toevoegen van modules, APPs, onderzoek of examens om deze opleiding te beheren.",
       "createButton": "Opleidingsmodule aanmaken"
+    },
+    "previousEducation": {
+      "trigger": "Vooropleiding",
+      "title": "Vooropleidingsopties",
+      "subtitle": "Configureer de opleidingsniveaus die studenten kunnen selecteren. Labels kunnen altijd worden bewerkt; de sleutel blijft vast na aanmaak.",
+      "empty": "Nog geen opties geconfigureerd.",
+      "addOption": "Optie toevoegen",
+      "editOption": "Optie bewerken",
+      "saveOption": "Optie opslaan",
+      "saveAll": "Alles opslaan",
+      "saving": "Opslaan...",
+      "keyLabel": "Sleutel",
+      "keyHint": "De sleutel wordt gegenereerd bij aanmaak en kan niet worden gewijzigd.",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "locales": {
+        "english": "Engels",
+        "french": "Frans",
+        "dutch": "Nederlands",
+        "german": "Duits"
+      },
+      "placeholders": {
+        "english": "Voer Engels label in",
+        "french": "Voer Frans label in",
+        "dutch": "Voer Nederlands label in",
+        "german": "Voer Duits label in"
+      }
     }
   },
   "examAnswerSheet": {
