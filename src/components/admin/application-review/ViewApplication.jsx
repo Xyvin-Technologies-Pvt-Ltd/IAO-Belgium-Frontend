@@ -7,9 +7,13 @@ import { useState, useEffect } from "react";
 import { useUpdateApplication } from "@/store/useApplication";
 import { useTranslation } from "react-i18next";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
+import {
+  getApplicationPreviousEducationOptions,
+  resolvePreviousEducationLabel,
+} from "@/utils/previousEducation";
 
 const ViewApplication = ({ open, onClose, application }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [requestAdditionalInfo, setRequestAdditionalInfo] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [documentFlags, setDocumentFlags] = useState({
@@ -149,7 +153,15 @@ const ViewApplication = ({ open, onClose, application }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <InfoItem label={t("applicationReview.modal.phoneNumber")} value={application?.user?.phone || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.emailAddress")} value={application?.user?.email || t("common.notAvailable")} />
-              <InfoItem label={t("applicationReview.modal.previousEducation")} value={application?.user?.previous_education || t("common.notAvailable")} />
+              <InfoItem label={t("applicationReview.modal.previousEducation")} value={
+                application?.user?.previous_education_label ||
+                resolvePreviousEducationLabel(
+                  application?.user?.previous_education,
+                  getApplicationPreviousEducationOptions(application),
+                  i18n.language,
+                ) ||
+                t("common.notAvailable")
+              } />
               <InfoItem label={t("applicationReview.modal.program")} value={application?.program_name || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.programType", "Program Type")} value={application?.program_type || application?.intake?.program?.program_type || application?.batch?.intake?.program?.program_type || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />

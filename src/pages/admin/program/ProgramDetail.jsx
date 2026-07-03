@@ -11,6 +11,7 @@ import ExamModule from "@/components/admin/programs/ExamModule";
 import { Button } from "@/components/ui/button";
 import CreateComponent from "@/components/admin/programs/CreateComponent";
 import ProgramConfigDrawer from "@/components/admin/programs/ProgramConfigDrawer";
+import PreviousEducationOptionsDrawer from "@/components/admin/programs/PreviousEducationOptionsDrawer";
 import image from "../../../assets/images/no-component.png";
 import ResourceModule from "@/components/admin/programs/ResourceModule";
 import { useTranslation } from "react-i18next";
@@ -156,7 +157,10 @@ const ProgramDetail = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex-1" />
-        <ProgramConfigDrawer programId={id} />
+        <div className="flex items-center gap-2">
+          <PreviousEducationOptionsDrawer programId={id} />
+          <ProgramConfigDrawer programId={id} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
