@@ -40,6 +40,7 @@ import StudentContracts from "@/pages/admin/contract/StudentContracts";
 import Notifications from "@/pages/admin/notification";
 import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
+import IntegrationsPage from "@/pages/admin/integrations";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
 import Results from "@/pages/admin/results";
@@ -325,6 +326,10 @@ export const adminRoutes = [
   {
     path: "/admin/lti-management",
     component: withPermissionProtection(LtiManagement, "/admin/lti-management"),
+  },
+  {
+    path: "/admin/integrations",
+    component: withPermissionProtection(IntegrationsPage, "/admin/integrations"),
   },
   {
     path: "/admin/student-corner",

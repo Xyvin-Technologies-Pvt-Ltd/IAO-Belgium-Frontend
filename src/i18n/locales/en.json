@@ -58,6 +58,7 @@
       "customInvoices": "Custom Invoices",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
+      "integrations": "Integrations",
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
@@ -291,6 +292,43 @@
       "transactions": {
         "title": "Transaction Logs",
         "description": "Raw Mollie checkout transaction history"
+      }
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect third-party services used by the platform",
+    "exact": {
+      "title": "Exact Online (Belgium)",
+      "description": "Accounting integration for Mollie payments and sales entries.",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "division": "Division",
+      "tokenExpires": "Token expires",
+      "autoRefreshNote": "will auto-refresh on next sync",
+      "autoSyncNote": "Paid Mollie payments are synced to Exact Online automatically.",
+      "authorise": "Authorise Exact Online",
+      "authoriseHint": "Authorise the platform to access your Exact Online account. Once connected, payments will be posted as sales entries automatically.",
+      "disconnect": "Disconnect",
+      "disconnecting": "Disconnecting…",
+      "disconnectConfirm": "Disconnect Exact Online? Payments will no longer sync until you authorise again.",
+      "syncTitle": "Accounting sync",
+      "syncDescription": "Compare paid Mollie payments against entries posted to Exact Online.",
+      "allSynced": "All payments synced to Exact Online.",
+      "unsyncedBanner": "{{count}} payment(s) not yet synced — total {{total}} {{currency}}",
+      "syncNow": "Sync now",
+      "syncing": "Syncing…",
+      "authoriseFirst": "Authorise Exact Online first before syncing payments.",
+      "oauthConnected": "Exact Online connected successfully",
+      "oauthFailed": "Failed to connect Exact Online. Please try again.",
+      "loadFailed": "Failed to load Exact Online status",
+      "unsyncedLoadFailed": "Failed to load unsynced payments",
+      "table": {
+        "date": "Date",
+        "email": "Email",
+        "purpose": "Purpose",
+        "program": "Programme",
+        "amount": "Amount"
       }
     }
   },
@@ -555,6 +593,9 @@
       "namePlaceholder": "Enter programme name",
       "codeLabel": "Programme Code",
       "codePlaceholder": "Enter programme code",
+      "exactVatCodeLabel": "Exact VAT Code",
+      "exactVatCodePlaceholder": "e.g. VN, V21, 1I",
+      "exactVatCodeHint": "Exact Online VAT code used when posting payments for this programme.",
       "programTypeLabel": "Programme Type",
       "programTypePlaceholder": "Select programme type",
       "durationLabel": "Duration of the Programme",

@@ -16,6 +16,7 @@ import {
   Bell,
   Link2,
   Activity,
+  Plug,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -176,6 +177,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: "LTI Integrations",
             url: "/admin/lti-management",
             icon: Link2,
+          },
+          {
+            title: t("sidebar.admin.integrations"),
+            url: "/admin/integrations",
+            icon: Plug,
           },
           {
             title: "Student Corner",
