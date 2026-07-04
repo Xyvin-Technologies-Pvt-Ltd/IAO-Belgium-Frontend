@@ -178,11 +178,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/lti-management",
             icon: Link2,
           },
-          {
-            title: t("sidebar.admin.integrations"),
-            url: "/admin/integrations",
-            icon: Plug,
-          },
+          // {
+          //   title: t("sidebar.admin.integrations"),
+          //   url: "/admin/integrations",
+          //   icon: Plug,
+          // },
           {
             title: "Student Corner",
             url: "/admin/student-corner",
