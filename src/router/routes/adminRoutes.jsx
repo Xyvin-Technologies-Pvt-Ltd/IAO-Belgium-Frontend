@@ -132,10 +132,10 @@ export const adminRoutes = [
     path: "/admin/student-management",
     component: withPermissionProtection(AllStudents, "/admin/student-management"),
   },
-    {
+  {
     path: "/admin/student-management/$id",
     component: withPermissionProtection(
-      StudentView,
+      StudentDetails,
       "/admin/student-management",
     ),
   },

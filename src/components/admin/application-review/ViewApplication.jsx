@@ -256,59 +256,95 @@ const ViewApplication = ({ open, onClose, application }) => {
             )}
           </div>
 
-          <div>
-            <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
-              {t("applicationReview.modal.actions")}
-            </h3>
-
-            <div className="flex items-center gap-3 mb-4">
-              <Switch 
-                id="request-info" 
-                checked={requestAdditionalInfo}
-                onCheckedChange={setRequestAdditionalInfo}
-              />
-              <label htmlFor="request-info" className="text-sm cursor-pointer text-gray-700 dark:text-white/70">
-                {t("applicationReview.modal.requestAdditionalInfo")}
-              </label>
-            </div>
-
-            {requestAdditionalInfo && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-white/70">{t("applicationReview.modal.remarks")}</label>
-                <RichTextEditor
-                  value={remarks}
-                  onChange={setRemarks}
-                  placeholder={t("applicationReview.modal.remarksPlaceholder")}
-                  className="bg-white dark:bg-white/5"
-                />
+          {application?.admin_logs && application.admin_logs.length > 0 && (
+            <div>
+              <h3 className="text-base font-semibold mb-3 text-dashboard-text dark:text-white">
+                {t("applicationReview.modal.adminLog", "Admin Log / History")}
+              </h3>
+              <div className="space-y-3 max-h-48 overflow-y-auto border dark:border-white/20 rounded-lg p-4 bg-gray-50 dark:bg-white/5">
+                {application.admin_logs.map((log, index) => (
+                  <div key={log._id || index} className="text-sm border-b dark:border-white/10 pb-2 last:border-0 last:pb-0">
+                    <div className="flex justify-between items-center text-xs text-muted-foreground dark:text-white/60 mb-1">
+                      <span className="font-semibold text-dashboard-text dark:text-white">
+                        {log.admin 
+                          ? `${log.admin.first_name || ""} ${log.admin.last_name || ""}`.trim() || log.admin.email 
+                          : log.admin_name}
+                      </span>
+                      <span>{new Date(log.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p className="text-xs text-gray-700 dark:text-white/80">{log.action}</p>
+                    {log.remarks && (
+                      <div className="mt-1 text-xs bg-white dark:bg-black/25 p-2 rounded border dark:border-white/5 italic text-muted-foreground dark:text-white/60" dangerouslySetInnerHTML={{ __html: log.remarks }} />
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {application.status !== 'approved' && application.status !== 'rejected' && (
+            <div>
+              <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
+                {t("applicationReview.modal.actions")}
+              </h3>
+
+              <div className="flex items-center gap-3 mb-4">
+                <Switch 
+                  id="request-info" 
+                  checked={requestAdditionalInfo}
+                  onCheckedChange={setRequestAdditionalInfo}
+                />
+                <label htmlFor="request-info" className="text-sm cursor-pointer text-gray-700 dark:text-white/70">
+                  {t("applicationReview.modal.requestAdditionalInfo")}
+                </label>
+              </div>
+
+              {requestAdditionalInfo && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-white/70">{t("applicationReview.modal.remarks")}</label>
+                  <RichTextEditor
+                    value={remarks}
+                    onChange={setRemarks}
+                    placeholder={t("applicationReview.modal.remarksPlaceholder")}
+                    className="bg-white dark:bg-white/5"
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 p-6 border-t dark:border-white/20">
-          <Button 
-            variant="secondary"
-            onClick={() => handleStatusUpdate('rejected')}
-            disabled={updateApplicationMutation.isPending}
-          >
-            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.reject")}
-          </Button>
-          <Button 
-            variant="secondary"
-            onClick={() => handleStatusUpdate('waitlisted')}
-            disabled={updateApplicationMutation.isPending}
-          >
-            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.waitlist")}
-          </Button>
-          <Button 
-            disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
-            className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
-            onClick={() => handleStatusUpdate('approved')}
-          >
-            {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
-          </Button>
-        </div>
+        {application.status !== 'approved' && application.status !== 'rejected' ? (
+          <div className="flex items-center justify-end gap-3 p-6 border-t dark:border-white/20">
+            <Button 
+              variant="secondary"
+              onClick={() => handleStatusUpdate('rejected')}
+              disabled={updateApplicationMutation.isPending}
+            >
+              {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.reject")}
+            </Button>
+            <Button 
+              variant="secondary"
+              onClick={() => handleStatusUpdate('waitlisted')}
+              disabled={updateApplicationMutation.isPending}
+            >
+              {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.waitlist")}
+            </Button>
+            <Button 
+              disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
+              className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
+              onClick={() => handleStatusUpdate('approved')}
+            >
+              {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-end p-6 border-t dark:border-white/20">
+            <Button variant="secondary" onClick={onClose}>
+              {t("common.close", "Close")}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

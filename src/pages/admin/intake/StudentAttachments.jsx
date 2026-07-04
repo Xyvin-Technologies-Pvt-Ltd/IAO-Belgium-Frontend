@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDropzone } from "react-dropzone";
-import { useAddTeacherAttachment, useDeleteTeacherAttachment } from "@/store/useTeacherStore";
+import { useAddStudentAttachment, useDeleteStudentAttachment } from "@/store/useIntakeStore";
 import { FileText, Download, Trash2, UploadCloud, X, Loader2, StickyNote } from "lucide-react";
 import moment from "moment";
 import axiosInstance from "@/api/axiosintercepter";
@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const TeacherAttachments = ({ teacherId, attachments }) => {
+const StudentAttachments = ({ studentId, attachments }) => {
   const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [note, setNote] = useState("");
@@ -27,8 +27,8 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
 
-  const addAttachmentMutation = useAddTeacherAttachment();
-  const deleteAttachmentMutation = useDeleteTeacherAttachment();
+  const addAttachmentMutation = useAddStudentAttachment();
+  const deleteAttachmentMutation = useDeleteStudentAttachment();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -91,9 +91,9 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
         }
       }
 
-      // 2. Save note/attachment info to teacher profile
+      // 2. Save note/attachment info to student profile
       await addAttachmentMutation.mutateAsync({
-        teacherId,
+        studentId,
         data: attachmentData,
       });
 
@@ -102,8 +102,8 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
       setFileDescription("");
       toast.success(
         file 
-          ? t("teacherManagement.fileUploadedSuccess", "File uploaded successfully")
-          : t("teacherManagement.noteSavedSuccess", "Note saved successfully")
+          ? t("studentManagement.fileUploadedSuccess", "File uploaded successfully")
+          : t("studentManagement.noteSavedSuccess", "Note saved successfully")
       );
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message || "Failed to save note/attachment");
@@ -115,7 +115,7 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
   const handleDelete = () => {
     if (attachmentToDelete) {
       deleteAttachmentMutation.mutate(
-        { teacherId, attachmentId: attachmentToDelete },
+        { studentId, attachmentId: attachmentToDelete },
         { onSuccess: () => setAttachmentToDelete(null) }
       );
     }
@@ -137,19 +137,19 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
       {/* Upload/Note Form */}
       <div className="bg-sidebar rounded-xl border border-sidebar-border p-5 space-y-5">
         <h3 className="font-semibold text-sidebar-foreground">
-          {t("teacherManagement.addNoteOrAttachment", "Add Note & Attachment")}
+          {t("studentManagement.addNoteOrAttachment", "Add Note & Attachment")}
         </h3>
         
         <div className="grid grid-cols-1 gap-6">
           {/* Note Input (Rich Text Editor) */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-sidebar-foreground block">
-              {t("teacherManagement.note", "Note / General Comment")}
+              {t("studentManagement.note", "Note / General Comment")}
             </label>
             <RichTextEditor
               value={note}
               onChange={setNote}
-              placeholder={t("teacherManagement.notePlaceholder", "Write a rich text note here...")}
+              placeholder={t("studentManagement.notePlaceholder", "Write a rich text note here...")}
               className="bg-white dark:bg-white/5"
             />
           </div>
@@ -159,7 +159,7 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-sidebar-foreground block">
-                  {t("teacherManagement.attachmentFile", "Attachment File (Optional)")}
+                  {t("studentManagement.attachmentFile", "Attachment File (Optional)")}
                 </label>
                 {!file ? (
                   <div
@@ -205,12 +205,12 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
               {file && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-sidebar-foreground block">
-                    {t("teacherManagement.fileDescription", "File Description (Optional)")}
+                    {t("studentManagement.fileDescription", "File Description (Optional)")}
                   </label>
                   <Input
                     value={fileDescription}
                     onChange={(e) => setFileDescription(e.target.value)}
-                    placeholder={t("teacherManagement.fileDescriptionPlaceholder", "Add a short description for this file")}
+                    placeholder={t("studentManagement.fileDescriptionPlaceholder", "Add a short description for this file")}
                     className="w-full"
                   />
                 </div>
@@ -226,7 +226,7 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
                 {(isUploadingFile || addAttachmentMutation.isPending) && (
                   <Loader2 size={16} className="animate-spin mr-2" />
                 )}
-                {t("teacherManagement.saveNoteAttachment", "Save Note / Attachment")}
+                {t("studentManagement.saveNoteAttachment", "Save Note / Attachment")}
               </Button>
             </div>
           </div>
@@ -236,7 +236,7 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
       {/* List Area */}
       <div className="bg-sidebar rounded-xl border border-sidebar-border p-5 space-y-4">
         <h3 className="font-semibold text-sidebar-foreground">
-          {t("teacherManagement.notesAndAttachmentsList", "Notes & Attachments")}
+          {t("studentManagement.notesAndAttachmentsList", "Notes & Attachments")}
         </h3>
         
         {attachments?.length > 0 ? (
@@ -299,7 +299,7 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-sidebar-foreground/50 italic py-4">No notes or attachments found for this teacher.</p>
+          <p className="text-sm text-sidebar-foreground/50 italic py-4">No notes or attachments found for this student.</p>
         )}
       </div>
 
@@ -326,4 +326,4 @@ const TeacherAttachments = ({ teacherId, attachments }) => {
   );
 };
 
-export default TeacherAttachments;
+export default StudentAttachments;

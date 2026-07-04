@@ -14,6 +14,7 @@ import {
 } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import axiosInstance from "@/api/axiosintercepter";
 
 export const useGetIntakes = (academicId, filter, options = {}) => {
   return useQuery({
@@ -175,5 +176,39 @@ export const useGetBatchesByProgram = (programId, options = {}) => {
     enabled: !!programId,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useAddStudentAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ studentId, data }) => {
+      const response = await axiosInstance.post(`/user/student/${studentId}/attachments`, data);
+      return response.data;
+    },
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student"] });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || error?.message || "Failed to add attachment");
+    },
+  });
+};
+
+export const useDeleteStudentAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ studentId, attachmentId }) => {
+      const response = await axiosInstance.delete(`/user/student/${studentId}/attachments/${attachmentId}`);
+      return response.data;
+    },
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student"] });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || error?.message || "Failed to delete attachment");
+    },
   });
 };
