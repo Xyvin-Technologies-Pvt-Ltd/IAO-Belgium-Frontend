@@ -135,6 +135,7 @@
     "intakes": "Promotions",
     "intakeDetails": "Détails de la promotion",
     "batchDetails": "Détails du groupe",
+    "studentDetails": "Détails de l'étudiant",
     "mins": "min",
     "min": "min",
     "description": "Description :",
@@ -814,6 +815,11 @@
   "studentManagement": {
     "title": "Gestion des étudiants",
     "search": "Rechercher des étudiants...",
+    "tabs": {
+      "progress": "Progrès académique",
+      "general": "Sélection de module",
+      "notesAndAttachments": "Notes et pièces jointes"
+    },
     "table": {
       "studentId": "ID de candidature",
       "studentName": "Nom de l'étudiant",

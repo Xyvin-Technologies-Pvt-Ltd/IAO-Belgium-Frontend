@@ -136,6 +136,7 @@
     "intakes": "Instroom",
     "intakeDetails": "Instroomdetails",
     "batchDetails": "Groepsdetails",
+    "studentDetails": "Studentendetails",
     "mins": "min",
     "min": "min",
     "description": "Beschrijving:",
@@ -815,6 +816,11 @@
   "studentManagement": {
     "title": "Studentenbeheer",
     "search": "Studenten zoeken...",
+    "tabs": {
+      "progress": "Academische voortgang",
+      "general": "Module selectie",
+      "notesAndAttachments": "Notities & Bijlagen"
+    },
     "table": {
       "uid": "UID",
       "studentId": "Candidatuur-ID",

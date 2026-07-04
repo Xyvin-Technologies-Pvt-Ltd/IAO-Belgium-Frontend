@@ -136,6 +136,7 @@
     "intakes": "Intakes",
     "intakeDetails": "Intake Details",
     "batchDetails": "Group Details",
+    "studentDetails": "Student Details",
     "mins": "mins",
     "min": "min",
     "description": "Description:",
@@ -881,6 +882,11 @@
   "studentManagement": {
     "title": "Student Management",
     "search": "Search students...",
+    "tabs": {
+      "progress": "Academic Progress",
+      "general": "Module Selection",
+      "notesAndAttachments": "Notes & Attachments"
+    },
     "table": {
       "uid": "UID",
       "studentId": "Application ID",

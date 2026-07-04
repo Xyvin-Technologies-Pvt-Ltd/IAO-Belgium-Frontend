@@ -135,6 +135,7 @@
     "intakes": "Aufnahmen",
     "intakeDetails": "Aufnahmedetails",
     "batchDetails": "Gruppendetails",
+    "studentDetails": "Studentendetails",
     "mins": "Min.",
     "min": "Min.",
     "description": "Beschreibung:",
@@ -812,6 +813,11 @@
   "studentManagement": {
     "title": "Studentenverwaltung",
     "search": "Studierende suchen...",
+    "tabs": {
+      "progress": "Akademischer Fortschritt",
+      "general": "Modulauswahl",
+      "notesAndAttachments": "Notizen & Anhänge"
+    },
     "table": {
       "uid": "UID",
       "studentId": "Bewerbungs-ID",
