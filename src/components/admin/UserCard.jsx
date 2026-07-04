@@ -2,9 +2,10 @@ import { Eye, Download, FileText } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
+import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 
 const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = isTeacher ? teacher : student;
 
   return (
@@ -207,7 +208,13 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
               />
               <InfoItem
                 label={t("studentManagement.modal.previousEducation")}
-                value={user?.previous_education || t("common.notAvailable")}
+                value={
+                  resolvePreviousEducationLabel(
+                    user?.previous_education,
+                    user?.previous_education_options || [],
+                    i18n.language,
+                  ) || t("common.notAvailable")
+                }
               />
             </>
           )}

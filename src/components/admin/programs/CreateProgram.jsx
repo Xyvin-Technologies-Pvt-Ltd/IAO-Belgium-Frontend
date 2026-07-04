@@ -79,6 +79,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: "",
       is_online: false,
       document_required: true,
+      exact_vat_code: "",
     },
   });
 
@@ -136,6 +137,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       city: programData.city?._id || "",
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
+      exact_vat_code: programData.exact_vat_code || "",
     });
 
     if (programData.city?.country?._id) {
@@ -154,6 +156,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: formData.is_online || false,
       document_required: formData.document_required !== false,
     };
+
+    payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
 
     if (formData.is_online) {
       if (formData.city) {
@@ -329,6 +333,15 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
+            <FormField
+              label={t("programManagement.modal.exactVatCodeLabel")}
+              placeholder={t("programManagement.modal.exactVatCodePlaceholder")}
+              error={errors.exact_vat_code?.message}
+              {...register("exact_vat_code")}
+            />
+            <p className="text-xs text-muted-foreground -mt-2">
+              {t("programManagement.modal.exactVatCodeHint")}
+            </p>
 
             <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
               <div className="space-y-0.5">

@@ -58,6 +58,7 @@
       "customInvoices": "Factures personnalisées",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
+      "integrations": "Intégrations",
       "adminLogs": "Journaux administrateurs",
       "examination": "Examens",
       "questionBanks": "Banques de questions",
@@ -525,6 +526,7 @@
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
     "createProgram": "Créer une formation",
+    "programTypeSettings": "Valeurs par Défaut du Type de Programme",
     "table": {
       "uid": "UID",
       "name": "Nom",
@@ -1171,6 +1173,36 @@
       "title": "Aucun module de formation ajouté pour le moment",
       "subtitle": "Commencez par ajouter des modules, des APPs, des recherches ou des examens pour gérer cette formation.",
       "createButton": "Créer un module de formation"
+    },
+    "previousEducation": {
+      "trigger": "Formation antérieure",
+      "title": "Options de formation antérieure",
+      "typeTitle": "Valeurs par Défaut du Type de Programme",
+      "typeSubtitle": "Configurer les options héritées par type de programme",
+      "inherited": "Hérité",
+      "subtitle": "Configurez les niveaux de formation que les étudiants peuvent sélectionner. Les libellés peuvent être modifiés à tout moment ; la clé reste fixe après la création.",
+      "empty": "Aucune option configurée.",
+      "addOption": "Ajouter une option",
+      "editOption": "Modifier l'option",
+      "saveOption": "Enregistrer l'option",
+      "saveAll": "Tout enregistrer",
+      "saving": "Enregistrement...",
+      "keyLabel": "Clé",
+      "keyHint": "La clé est générée à la création et ne peut pas être modifiée.",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "locales": {
+        "english": "Anglais",
+        "french": "Français",
+        "dutch": "Néerlandais",
+        "german": "Allemand"
+      },
+      "placeholders": {
+        "english": "Saisir le libellé en anglais",
+        "french": "Saisir le libellé en français",
+        "dutch": "Saisir le libellé en néerlandais",
+        "german": "Saisir le libellé en allemand"
+      }
     }
   },
   "examAnswerSheet": {

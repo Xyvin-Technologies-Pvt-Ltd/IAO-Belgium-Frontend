@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetStudents } from "@/store/useStudentStore";
+import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { useAuthStore } from "@/store/useAuthStore";
 import StudentFilterDrawer from "./StudentFilterDrawer";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ import StudentBulkUploadDialog from "@/components/admin/student-import/StudentBu
 
 const AllStudents = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -152,7 +153,13 @@ const AllStudents = () => {
                 <TableCell>{i?.phone}</TableCell>
                 <TableCell>{i?.country}</TableCell>
                 <TableCell>{i?.city}</TableCell>
-                <TableCell>{i?.previous_education}</TableCell>
+                <TableCell>
+                  {resolvePreviousEducationLabel(
+                    i?.previous_education,
+                    i?.previous_education_options || [],
+                    i18n.language,
+                  )}
+                </TableCell>
                 <TableCell>{i?.program_name}</TableCell>
                 <TableCell>{i?.batch_name}</TableCell>
                 <TableCell>

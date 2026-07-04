@@ -58,6 +58,7 @@
       "customInvoices": "Custom Invoices",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
+      "integrations": "Integrations",
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
@@ -291,6 +292,43 @@
       "transactions": {
         "title": "Transaction Logs",
         "description": "Raw Mollie checkout transaction history"
+      }
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Connect third-party services used by the platform",
+    "exact": {
+      "title": "Exact Online (Belgium)",
+      "description": "Accounting integration for Mollie payments and sales entries.",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "division": "Division",
+      "tokenExpires": "Token expires",
+      "autoRefreshNote": "will auto-refresh on next sync",
+      "autoSyncNote": "Paid Mollie payments are synced to Exact Online automatically.",
+      "authorise": "Authorise Exact Online",
+      "authoriseHint": "Authorise the platform to access your Exact Online account. Once connected, payments will be posted as sales entries automatically.",
+      "disconnect": "Disconnect",
+      "disconnecting": "Disconnecting…",
+      "disconnectConfirm": "Disconnect Exact Online? Payments will no longer sync until you authorise again.",
+      "syncTitle": "Accounting sync",
+      "syncDescription": "Compare paid Mollie payments against entries posted to Exact Online.",
+      "allSynced": "All payments synced to Exact Online.",
+      "unsyncedBanner": "{{count}} payment(s) not yet synced — total {{total}} {{currency}}",
+      "syncNow": "Sync now",
+      "syncing": "Syncing…",
+      "authoriseFirst": "Authorise Exact Online first before syncing payments.",
+      "oauthConnected": "Exact Online connected successfully",
+      "oauthFailed": "Failed to connect Exact Online. Please try again.",
+      "loadFailed": "Failed to load Exact Online status",
+      "unsyncedLoadFailed": "Failed to load unsynced payments",
+      "table": {
+        "date": "Date",
+        "email": "Email",
+        "purpose": "Purpose",
+        "program": "Programme",
+        "amount": "Amount"
       }
     }
   },
@@ -530,6 +568,7 @@
     "delete": "Delete",
     "duplicate": "Duplicate",
     "createProgram": "Create Programme",
+    "programTypeSettings": "Program Type Defaults",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -555,6 +594,9 @@
       "namePlaceholder": "Enter programme name",
       "codeLabel": "Programme Code",
       "codePlaceholder": "Enter programme code",
+      "exactVatCodeLabel": "Exact VAT Code",
+      "exactVatCodePlaceholder": "e.g. VN, V21, 1I",
+      "exactVatCodeHint": "Exact Online VAT code used when posting payments for this programme.",
       "programTypeLabel": "Programme Type",
       "programTypePlaceholder": "Select programme type",
       "durationLabel": "Duration of the Programme",
@@ -1207,6 +1249,40 @@
       "title": "No Programme Modules Added Yet",
       "subtitle": "Start by adding modules, apps, resources, or exams to build and manage this programme effectively.",
       "createButton": "Create Programme Module"
+    },
+    "previousEducation": {
+      "trigger": "Previous Education",
+      "title": "Previous Education Options",
+      "typeTitle": "Program Type Defaults",
+      "typeSubtitle": "Configure inherited options by program type",
+      "inherited": "Inherited",
+      "subtitle": "Configure the education levels students can select when applying to this programme. Labels can be edited anytime; the key stays fixed after creation.",
+      "empty": "No options configured yet.",
+      "emptyHint": "Students will see these choices during application Step 1.",
+      "optionsList": "Options",
+      "formHint": "English label is required. The key is generated once and stays fixed.",
+      "activeHint": "Inactive options are hidden from new applicants but remain visible for existing records.",
+      "addOption": "Add option",
+      "editOption": "Edit option",
+      "saveOption": "Save option",
+      "saveAll": "Save all",
+      "saving": "Saving...",
+      "keyLabel": "Key",
+      "keyHint": "The key is generated when the option is created and cannot be changed.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "locales": {
+        "english": "English",
+        "french": "French",
+        "dutch": "Dutch",
+        "german": "German"
+      },
+      "placeholders": {
+        "english": "Enter English label",
+        "french": "Enter French label",
+        "dutch": "Enter Dutch label",
+        "german": "Enter German label"
+      }
     }
   },
   "examAnswerSheet": {

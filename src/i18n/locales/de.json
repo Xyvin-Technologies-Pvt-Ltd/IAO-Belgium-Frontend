@@ -58,6 +58,7 @@
       "customInvoices": "Benutzerdefinierte Rechnungen",
       "adminManagement": "Administratorenverwaltung",
       "roleManagement": "Rollenverwaltung",
+      "integrations": "Integrationen",
       "adminLogs": "Administratorenprotokolle",
       "examination": "Prüfungen",
       "questionBanks": "Fragenbanken",
@@ -523,6 +524,7 @@
     "delete": "Löschen",
     "duplicate": "Duplizieren",
     "createProgram": "Ausbildung erstellen",
+    "programTypeSettings": "Ausbildungstyp Standardwerte",
     "table": {
       "uid": "UID",
       "name": "Name",
@@ -1170,6 +1172,36 @@
       "title": "Noch keine Ausbildungsmodule hinzugefügt",
       "subtitle": "Fügen Sie zunächst Module, APPs, Forschungseinheiten oder Prüfungen hinzu, um diese Ausbildung zu verwalten.",
       "createButton": "Ausbildungsmodul erstellen"
+    },
+    "previousEducation": {
+      "trigger": "Vorherige Ausbildung",
+      "title": "Optionen für vorherige Ausbildung",
+      "typeTitle": "Ausbildungstyp Standardwerte",
+      "typeSubtitle": "Konfigurieren Sie geerbte Optionen nach Ausbildungstyp",
+      "inherited": "Geerbt",
+      "subtitle": "Konfigurieren Sie die Ausbildungsniveaus, die Studierende auswählen können. Bezeichnungen können jederzeit bearbeitet werden; der Schlüssel bleibt nach der Erstellung fest.",
+      "empty": "Noch keine Optionen konfiguriert.",
+      "addOption": "Option hinzufügen",
+      "editOption": "Option bearbeiten",
+      "saveOption": "Option speichern",
+      "saveAll": "Alles speichern",
+      "saving": "Wird gespeichert...",
+      "keyLabel": "Schlüssel",
+      "keyHint": "Der Schlüssel wird bei der Erstellung generiert und kann nicht geändert werden.",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "locales": {
+        "english": "Englisch",
+        "french": "Französisch",
+        "dutch": "Niederländisch",
+        "german": "Deutsch"
+      },
+      "placeholders": {
+        "english": "Englische Bezeichnung eingeben",
+        "french": "Französische Bezeichnung eingeben",
+        "dutch": "Niederländische Bezeichnung eingeben",
+        "german": "Deutsche Bezeichnung eingeben"
+      }
     }
   },
   "examAnswerSheet": {
