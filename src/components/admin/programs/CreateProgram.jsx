@@ -80,6 +80,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: false,
       document_required: true,
       exact_vat_code: "",
+      exact_gl_revenue: "",
+      exact_gl_deferred_revenue: "",
     },
   });
 
@@ -138,6 +140,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
       exact_vat_code: programData.exact_vat_code || "",
+      exact_gl_revenue: programData.exact_gl_revenue || "",
+      exact_gl_deferred_revenue: programData.exact_gl_deferred_revenue || "",
     });
 
     if (programData.city?.country?._id) {
@@ -158,6 +162,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
     };
 
     payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
+    payload.exact_gl_revenue = formData.exact_gl_revenue?.trim() || "";
+    payload.exact_gl_deferred_revenue = formData.exact_gl_deferred_revenue?.trim() || "";
 
     if (formData.is_online) {
       if (formData.city) {
@@ -333,15 +339,26 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
-            <FormField
-              label={t("programManagement.modal.exactVatCodeLabel")}
-              placeholder={t("programManagement.modal.exactVatCodePlaceholder")}
-              error={errors.exact_vat_code?.message}
-              {...register("exact_vat_code")}
-            />
-            <p className="text-xs text-muted-foreground -mt-2">
-              {t("programManagement.modal.exactVatCodeHint")}
-            </p>
+            <div className="rounded-lg border border-sidebar-border bg-sidebar/50 p-4 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t("programManagement.modal.exactSectionTitle")}
+              </h3>
+              <FormField
+                label={t("programManagement.modal.exactGlRevenueLabel")}
+                error={errors.exact_gl_revenue?.message}
+                {...register("exact_gl_revenue")}
+              />
+              <FormField
+                label={t("programManagement.modal.exactGlDeferredRevenueLabel")}
+                error={errors.exact_gl_deferred_revenue?.message}
+                {...register("exact_gl_deferred_revenue")}
+              />
+              <FormField
+                label={t("programManagement.modal.exactVatCodeLabel")}
+                error={errors.exact_vat_code?.message}
+                {...register("exact_vat_code")}
+              />
+            </div>
 
             <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
               <div className="space-y-0.5">

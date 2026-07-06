@@ -9,9 +9,9 @@ export const getExactStatus = async () => {
   }
 };
 
-export const getExactUnsynced = async () => {
+export const getExactUnsynced = async (params = {}) => {
   try {
-    const response = await axiosInstance.get("/exact/unsynced");
+    const response = await axiosInstance.get("/exact/unsynced", { params });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
