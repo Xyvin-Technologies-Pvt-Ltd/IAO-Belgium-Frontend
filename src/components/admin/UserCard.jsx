@@ -207,6 +207,14 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
                 }
               />
               <InfoItem
+                label={t("studentManagement.modal.lastLogin", "Last Login")}
+                value={
+                  user?.last_login
+                    ? moment(user.last_login).format("DD MMM YYYY, HH:mm")
+                    : t("common.notAvailable")
+                }
+              />
+              <InfoItem
                 label={t("studentManagement.modal.previousEducation")}
                 value={
                   resolvePreviousEducationLabel(

@@ -180,6 +180,7 @@
     "convenienceFee": "Servicegebühr",
     "paid": "Bezahlt",
     "failed": "Fehlgeschlagen",
+    "overdue": "Überfällig",
     "canceled": "Storniert",
     "allReports": "Alle Berichte",
     "cityReports": "Stadtberichte",
@@ -816,7 +817,45 @@
     "tabs": {
       "progress": "Akademischer Fortschritt",
       "general": "Modulauswahl",
+      "payments": "Zahlungen",
       "notesAndAttachments": "Notizen & Anhänge"
+    },
+    "details": {
+      "assignedModules": "Zugewiesene Module",
+      "assignedApps": "Zugewiesene APPs",
+      "completedExams": "Abgeschlossene Prüfungen",
+      "payments": "Zahlungen",
+      "attendance": "Anwesenheit",
+      "seeMore": "Mehr anzeigen",
+      "noAssignedModules": "Keine Module zugewiesen",
+      "noAssignedApps": "Keine APPs zugewiesen",
+      "noExamsCompleted": "Keine Prüfungen abgeschlossen",
+      "noPayments": "Keine Zahlungen gefunden",
+      "moduleId": "Modul-ID",
+      "moduleName": "Modulname",
+      "app": "APP",
+      "type": "Typ",
+      "scores": "Punkte",
+      "submittedDate": "Einreichungsdatum",
+      "sessions": "Sitzungen",
+      "attended": "Anwesend",
+      "missed": "Abwesend",
+      "unmarked": "Nicht markiert",
+      "billingMethod": "Abrechnung",
+      "viewInvoice": "Rechnung anzeigen",
+      "downloadInvoice": "Rechnung herunterladen",
+      "specialExceptions": "Besondere Ausnahmen",
+      "configureExceptions": "Konfigurieren",
+      "noExceptions": "Keine Ausnahmen konfiguriert. Standard-Prüfungseinstellungen gelten.",
+      "noSessionsPlanned": "Keine Sitzungen geplant",
+      "noAttendanceRecords": "Keine Anwesenheitsdaten für dieses Jahr gefunden.",
+      "attendanceLoadFailed": "Anwesenheit konnte nicht geladen werden",
+      "configureExceptionsTitle": "Besondere Ausnahmen konfigurieren",
+      "configureExceptionsHint": "Wählen Sie alle medizinischen Bedingungen oder Lernschwierigkeiten aus, die auf diesen Studierenden zutreffen. Das System wendet automatisch die maximale zusätzliche Zeit für Prüfungen an."
+    },
+    "billing": {
+      "personal": "Privat",
+      "company": "Unternehmen"
     },
     "table": {
       "uid": "UID",
@@ -855,7 +894,8 @@
       "teacherRole": "Dozentenrolle",
       "employmentStartDate": "Startdatum",
       "languages": "Sprachen",
-      "locations": "Standorte"
+      "locations": "Standorte",
+      "lastLogin": "Letzte Anmeldung"
     }
   },
   "locationManagement": {
