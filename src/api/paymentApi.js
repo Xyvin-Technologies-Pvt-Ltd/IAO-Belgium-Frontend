@@ -33,9 +33,31 @@ export const getAnalyticsByCity = async (filter) => {
   }
 };
 
+export const getAnalyticsByCityList = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/payment/analytics/city/list`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getAnalyticsByProgram = async (filter) => {
   try {
     const response = await axiosInstance.get(`/payment/analytics/program`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAnalyticsByProgramList = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/payment/analytics/program/list`, {
       params: filter,
     });
     return response.data;
