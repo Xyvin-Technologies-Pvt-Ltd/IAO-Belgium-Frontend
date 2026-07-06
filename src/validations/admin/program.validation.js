@@ -39,6 +39,16 @@ export const programSchema = z
       .max(10, "Exact VAT code must be at most 10 characters")
       .optional()
       .or(z.literal("")),
+    exact_gl_revenue: z
+      .string()
+      .max(20, "GL revenue code must be at most 20 characters")
+      .optional()
+      .or(z.literal("")),
+    exact_gl_deferred_revenue: z
+      .string()
+      .max(20, "GL deferred revenue code must be at most 20 characters")
+      .optional()
+      .or(z.literal("")),
   })
   .superRefine((data, ctx) => {
     if (!data.is_online) {
