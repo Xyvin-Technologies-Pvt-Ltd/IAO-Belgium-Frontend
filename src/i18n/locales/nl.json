@@ -181,6 +181,7 @@
     "convenienceFee": "Servicekosten",
     "paid": "Betaald",
     "failed": "Mislukt",
+    "overdue": "Achterstallig",
     "canceled": "Geannuleerd",
     "allReports": "Alle rapporten",
     "cityReports": "Stadsrapporten",
@@ -819,7 +820,45 @@
     "tabs": {
       "progress": "Academische voortgang",
       "general": "Module selectie",
+      "payments": "Betalingen",
       "notesAndAttachments": "Notities & Bijlagen"
+    },
+    "details": {
+      "assignedModules": "Toegewezen modules",
+      "assignedApps": "Toegewezen APP's",
+      "completedExams": "Voltooide examens",
+      "payments": "Betalingen",
+      "attendance": "Aanwezigheid",
+      "seeMore": "Meer bekijken",
+      "noAssignedModules": "Geen modules toegewezen",
+      "noAssignedApps": "Geen APP's toegewezen",
+      "noExamsCompleted": "Geen examens voltooid",
+      "noPayments": "Geen betalingen gevonden",
+      "moduleId": "Module-ID",
+      "moduleName": "Modulenaam",
+      "app": "APP",
+      "type": "Type",
+      "scores": "Scores",
+      "submittedDate": "Inleverdatum",
+      "sessions": "Sessies",
+      "attended": "Aanwezig",
+      "missed": "Afwezig",
+      "unmarked": "Niet gemarkeerd",
+      "billingMethod": "Facturering",
+      "viewInvoice": "Factuur bekijken",
+      "downloadInvoice": "Factuur downloaden",
+      "specialExceptions": "Speciale uitzonderingen",
+      "configureExceptions": "Configureren",
+      "noExceptions": "Geen uitzonderingen geconfigureerd. Standaard exameninstellingen zijn van toepassing.",
+      "noSessionsPlanned": "Geen sessies gepland",
+      "noAttendanceRecords": "Geen aanwezigheidsgegevens gevonden voor dit jaar.",
+      "attendanceLoadFailed": "Laden van aanwezigheid mislukt",
+      "configureExceptionsTitle": "Speciale uitzonderingen configureren",
+      "configureExceptionsHint": "Selecteer alle medische aandoeningen of leerproblemen die op deze student van toepassing zijn. Het systeem past automatisch het maximum aan extra minuten toe op hun examens."
+    },
+    "billing": {
+      "personal": "Persoonlijk",
+      "company": "Bedrijf"
     },
     "table": {
       "uid": "UID",
@@ -858,7 +897,8 @@
       "teacherRole": "Docentrol",
       "employmentStartDate": "Startdatum",
       "languages": "Talen",
-      "locations": "Locaties"
+      "locations": "Locaties",
+      "lastLogin": "Laatste login"
     }
   },
   "locationManagement": {

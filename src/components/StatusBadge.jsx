@@ -54,6 +54,13 @@ const statusVariants = {
 
   // Payment statuses
   paid: "text-green-600",
+  overdue: "text-red-600",
+
+  // Module availability
+  locked: "text-gray-500",
+  "in-progress": "text-blue-600",
+  ongoing: "text-amber-600",
+  "not submitted": "text-red-600",
 
   // Ride statuses
   requested: "text-amber-600",
@@ -121,6 +128,12 @@ const StatusBadge = ({ status }) => {
     displayText = "Course Completed";
   } else if (status === "re_enrolled") {
     displayText = "Re-enrolled";
+  } else if (status === "in-progress") {
+    displayText = "In Progress";
+  } else if (status === "not submitted") {
+    displayText = "Not Submitted";
+  } else if (status === "overdue") {
+    displayText = "Overdue";
   } else {
     displayText = status;
   }

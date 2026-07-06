@@ -1,10 +1,16 @@
 import UserCard from "@/components/admin/UserCard";
+import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useIntakeStore";
-import { useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
-import { useParams, useNavigate } from "@tanstack/react-router";
+import {
+  useGetSpecialExceptions,
+  useGetStudentAttendance,
+  useUpdateStudentSpecialExceptions,
+} from "@/store/useStudentStore";
+import { getInvoiceHtml } from "@/api/paymentApi";
+import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
@@ -17,12 +23,8 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import StatusBadge from "@/components/StatusBadge";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-} from "recharts";
+import { Download } from "lucide-react";
+import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
 
 const formatSubmissionType = (type) =>
@@ -37,17 +39,17 @@ const EnrolledStudentDetails = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
-  const navigate = useNavigate();
   const { updateBreadcrumbs } = useBreadcrumb();
-  
+
   const [activeTab, setActiveTab] = useState("progress");
   const [filter, setFilter] = useState({ year: 1 });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedExceptions, setSelectedExceptions] = useState([]);
 
-  const { data: allExceptionsData, isLoading: isExceptionsLoading } = useGetSpecialExceptions({
-    enabled: isEditModalOpen,
-  });
+  const { data: allExceptionsData, isLoading: isExceptionsLoading } =
+    useGetSpecialExceptions({
+      enabled: isEditModalOpen,
+    });
   const allExceptions = allExceptionsData?.data || [];
   const updateExceptionsMutation = useUpdateStudentSpecialExceptions();
 
@@ -56,12 +58,28 @@ const EnrolledStudentDetails = () => {
     isLoading,
     error,
     refetch,
-  } = useGetStudentByApplication(id);
+  } = useGetStudentByApplication(
+    id,
+    activeTab === "progress" ? { year: filter.year } : {},
+  );
+
+  const studentUserId = student?.data?._id;
+  const {
+    data: attendanceResponse,
+    isLoading: attendanceLoading,
+    error: attendanceError,
+    refetch: refetchAttendance,
+    isFetching: attendanceFetching,
+  } = useGetStudentAttendance(studentUserId, filter, {
+    enabled: !!studentUserId && !student?.data?.is_online,
+  });
 
   useEffect(() => {
     if (student?.data) {
-      const isStudentManagement = window.location.pathname.startsWith("/admin/student-management");
-      
+      const isStudentManagement = window.location.pathname.startsWith(
+        "/admin/student-management",
+      );
+
       if (isStudentManagement) {
         updateBreadcrumbs([
           {
@@ -99,7 +117,7 @@ const EnrolledStudentDetails = () => {
           },
           {
             label: t("common.studentDetails"),
-            path: `/admin/admission-administration/academics/intakes/batch/student/${id}`,
+            path: `/admin/admission-administration/academics/intakes/student/${id}`,
             navigable: false,
           },
         ]);
@@ -109,6 +127,45 @@ const EnrolledStudentDetails = () => {
       updateBreadcrumbs([]);
     };
   }, [student?.data, id]);
+
+  const formatPurpose = (purpose) => {
+    if (!purpose) return t("common.notAvailable");
+    switch (purpose) {
+      case "admission-fee":
+        return t("finance.purposes.admissionFee");
+      case "module-purchase":
+        return t("finance.purposes.modulePurchase");
+      case "custom-invoice":
+        return t("finance.purposes.customInvoice");
+      default:
+        return purpose
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+    }
+  };
+
+  const handleDownloadInvoice = async (payment) => {
+    try {
+      const html = await getInvoiceHtml(payment._id);
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
+      iframe.contentWindow.focus();
+      iframe.contentWindow.onafterprint = () => document.body.removeChild(iframe);
+      setTimeout(() => iframe.contentWindow.print(), 500);
+    } catch (err) {
+      console.error("Failed to download invoice:", err);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -134,21 +191,18 @@ const EnrolledStudentDetails = () => {
   const totalYears = studentData?.year || 1;
   const years = Array.from({ length: totalYears }, (_, i) => i + 1);
 
-  const modules = studentData?.completed_modules || [];
+  const modules = studentData?.assigned_modules || [];
   const exams = studentData?.completed_exams || [];
-  const apps = studentData?.completed_submissions || [];
-  const attendance = studentData?.attendance_percentage || 0;
+  const apps = studentData?.assigned_apps || [];
+  const payments = studentData?.payments || [];
+  const attendanceModules = attendanceResponse?.data || [];
 
-  const attendanceData = [
-    { name: "Present", value: attendance, color: "#FFCD71" },
-    { name: "Absent", value: 100 - attendance, color: "#FFF7E8" },
-  ].filter((item) => item.value > 0);
+  const getAppStatus = (app) => app.review_status || app.status;
 
   return (
     <div className="space-y-6 mt-4 bg-sidebar rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} />
 
-      {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
           <button
@@ -174,6 +228,16 @@ const EnrolledStudentDetails = () => {
             </button>
           )}
           <button
+            onClick={() => setActiveTab("payments")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "payments"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.payments", "Payments")}
+          </button>
+          <button
             onClick={() => setActiveTab("attachments")}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
               activeTab === "attachments"
@@ -181,14 +245,16 @@ const EnrolledStudentDetails = () => {
                 : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
             }`}
           >
-            {t("studentManagement.tabs.notesAndAttachments", "Notes & Attachments")}
+            {t(
+              "studentManagement.tabs.notesAndAttachments",
+              "Notes & Attachments",
+            )}
           </button>
         </nav>
       </div>
 
       {activeTab === "progress" && (
         <div className="space-y-6">
-          {/* Year level filter inside Progress tab */}
           <div className="border-b border-gray-150 dark:border-white/10 pb-2">
             <nav className="flex space-x-6">
               {years.map((y) => (
@@ -201,7 +267,8 @@ const EnrolledStudentDetails = () => {
                       : "border-transparent text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:border-gray-200"
                   }`}
                 >
-                  {studentData?.duration_unit && studentData.duration_unit !== "years"
+                  {studentData?.duration_unit &&
+                  studentData.duration_unit !== "years"
                     ? `${t("common.level", "Level")} ${y}`
                     : `${t("common.year", "Year")} ${y}`}
                 </button>
@@ -211,12 +278,21 @@ const EnrolledStudentDetails = () => {
 
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-6">
-              <h3 className="font-semibold mb-4">Completed Modules</h3>
+              <h3 className="font-semibold mb-4">
+                {t("studentManagement.details.assignedModules", "Assigned Modules")}
+              </h3>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Module ID</TableHead>
-                    <TableHead>Module Name</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.moduleId", "Module ID")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.moduleName", "Module Name")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -225,15 +301,21 @@ const EnrolledStudentDetails = () => {
                       <TableRow key={m._id}>
                         <TableCell>{m.uid}</TableCell>
                         <TableCell>{m.name}</TableCell>
+                        <TableCell>
+                          <StatusBadge status={m.status} />
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={2}
+                        colSpan={3}
                         className="text-center text-muted-foreground"
                       >
-                        No modules completed
+                        {t(
+                          "studentManagement.details.noAssignedModules",
+                          "No modules assigned",
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
@@ -242,13 +324,22 @@ const EnrolledStudentDetails = () => {
             </div>
 
             <div className="col-span-12 lg:col-span-6">
-              <h3 className="font-semibold mb-4">Completed Exams</h3>
+              <h3 className="font-semibold mb-4">
+                {t(
+                  "studentManagement.details.completedExams",
+                  "Completed Exams",
+                )}
+              </h3>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Exam</TableHead>
-                    <TableHead>Scores</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t("common.exam", "Exam")}</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.scores", "Scores")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -256,7 +347,9 @@ const EnrolledStudentDetails = () => {
                     exams.map((exam) => (
                       <TableRow key={exam._id}>
                         <TableCell>{exam.exam_name}</TableCell>
-                        <TableCell>{exam.percentage?.toFixed(2)}/100</TableCell>
+                        <TableCell>
+                          {exam.percentage?.toFixed(2)}/100
+                        </TableCell>
                         <TableCell>
                           <StatusBadge status={exam.result} />
                         </TableCell>
@@ -268,7 +361,10 @@ const EnrolledStudentDetails = () => {
                         colSpan={3}
                         className="text-center text-muted-foreground"
                       >
-                        No exams completed
+                        {t(
+                          "studentManagement.details.noExamsCompleted",
+                          "No exams completed",
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
@@ -276,27 +372,44 @@ const EnrolledStudentDetails = () => {
               </Table>
             </div>
 
-            <div className="col-span-12 lg:col-span-8">
-              <h3 className="font-semibold mb-4">Completed APPs</h3>
+            <div className="col-span-12">
+              <h3 className="font-semibold mb-4">
+                {t("studentManagement.details.assignedApps", "Assigned APPs")}
+              </h3>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>APP</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Scores</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Submitted Date</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.app", "APP")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.type", "Type")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.scores", "Scores")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
+                    <TableHead>
+                      {t(
+                        "studentManagement.details.submittedDate",
+                        "Submitted Date",
+                      )}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {apps.length > 0 ? (
                     apps.map((app) => (
                       <TableRow key={app._id}>
-                        <TableCell>{app.component_name}</TableCell>
-                        <TableCell>{formatSubmissionType(app.submission_type)}</TableCell>
+                        <TableCell>{app.name}</TableCell>
+                        <TableCell>
+                          {formatSubmissionType(app.submission_type)}
+                        </TableCell>
                         <TableCell>{app.score ?? "-"}</TableCell>
                         <TableCell>
-                          <StatusBadge status={app.status} />
+                          <StatusBadge status={getAppStatus(app)} />
                         </TableCell>
                         <TableCell>
                           {formatTZ(app.submitted_at, "DD MMM YYYY") || "-"}
@@ -309,7 +422,10 @@ const EnrolledStudentDetails = () => {
                         colSpan={5}
                         className="text-center text-muted-foreground"
                       >
-                        No APP submissions
+                        {t(
+                          "studentManagement.details.noAssignedApps",
+                          "No APPs assigned",
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
@@ -317,58 +433,44 @@ const EnrolledStudentDetails = () => {
               </Table>
             </div>
 
-            <div className="col-span-12 lg:col-span-4">
-              {!studentData?.is_online && (
-                <>
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-semibold">Attendance</h3>
-                    <button 
-                      onClick={() => navigate({ to: `/admin/student-management/${studentData._id}/attendence` })}
-                      className="text-blue-500 hover:text-blue-700 font-medium text-sm transition-colors cursor-pointer"
-                    >
-                      See more
-                    </button>
-                  </div>
-                  <div className="border border-sidebar-border rounded-lg p-6 flex items-center justify-center relative">
-                    <ResponsiveContainer width="100%" height={220}>
-                      <PieChart>
-                        <Pie
-                          data={attendanceData}
-                          dataKey="value"
-                          startAngle={180}
-                          endAngle={0}
-                          cx="50%"
-                          cy="90%"
-                          innerRadius={80}
-                          outerRadius={100}
-                          stroke="none"
-                        >
-                          {attendanceData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute text-3xl font-semibold text-black">
-                      {attendance}%
-                    </div>
-                  </div>
-                </>
-              )}
+            {!studentData?.is_online && (
+              <div className="col-span-12">
+                <h3 className="font-semibold mb-4">
+                  {t("studentManagement.details.attendance", "Attendance")}
+                </h3>
+                <div className="border border-sidebar-border rounded-lg overflow-hidden">
+                  <StudentAttendanceTable
+                    modules={attendanceModules}
+                    isLoading={attendanceLoading}
+                    error={attendanceError}
+                    refetch={refetchAttendance}
+                    isFetching={attendanceFetching}
+                  />
+                </div>
+              </div>
+            )}
 
-              {/* Medical / Special Exceptions Section */}
-              <div className="mt-6">
+            <div className="col-span-12">
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Special Exceptions</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {t(
+                      "studentManagement.details.specialExceptions",
+                      "Special Exceptions",
+                    )}
+                  </h3>
                   <button
                     onClick={() => setIsEditModalOpen(true)}
                     className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
                   >
-                    Configure
+                    {t(
+                      "studentManagement.details.configureExceptions",
+                      "Configure",
+                    )}
                   </button>
                 </div>
                 <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
-                  {studentData.special_exceptions && studentData.special_exceptions.length > 0 ? (
+                  {studentData.special_exceptions &&
+                  studentData.special_exceptions.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {studentData.special_exceptions.map((ex) => (
                         <span
@@ -381,38 +483,132 @@ const EnrolledStudentDetails = () => {
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground py-2">
-                      No exceptions configured. Default exam settings apply.
+                      {t(
+                        "studentManagement.details.noExceptions",
+                        "No exceptions configured. Default exam settings apply.",
+                      )}
                     </p>
                   )}
                 </div>
-              </div>
             </div>
           </div>
         </div>
       )}
 
-      {activeTab === "general" && studentData.program_type === "Manual Therapie" && (
-        <ModuleSelectionCard applicationId={studentData.application_id} />
+      {activeTab === "payments" && (
+        <div className="space-y-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("common.paymentId", "Payment ID")}</TableHead>
+                <TableHead>{t("common.purpose", "Purpose")}</TableHead>
+                <TableHead>{t("common.component", "Component")}</TableHead>
+                <TableHead>{t("common.amount", "Amount")}</TableHead>
+                <TableHead>
+                  {t("studentManagement.details.billingMethod", "Billing")}
+                </TableHead>
+                <TableHead>
+                  {t("studentManagement.table.status", "Status")}
+                </TableHead>
+                <TableHead>{t("common.date", "Date")}</TableHead>
+                <TableHead>{t("common.actions", "Actions")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payments.length > 0 ? (
+                payments.map((payment) => (
+                  <TableRow key={payment._id}>
+                    <TableCell>{payment.uid || "-"}</TableCell>
+                    <TableCell>{formatPurpose(payment.purpose)}</TableCell>
+                    <TableCell>
+                      {payment.component_name || t("common.notAvailable")}
+                    </TableCell>
+                    <TableCell>
+                      {payment.currency || "EUR"} {payment.amount?.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      {payment.billing_method === "company"
+                        ? t("studentManagement.billing.company", "Company")
+                        : t("studentManagement.billing.personal", "Personal")}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={payment.display_status} />
+                    </TableCell>
+                    <TableCell>
+                      {payment.paid_at
+                        ? moment(payment.paid_at).format("DD-MM-YYYY")
+                        : moment(payment.createdAt).format("DD-MM-YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      {payment.status === "paid" ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadInvoice(payment)}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                          title={t(
+                            "studentManagement.details.downloadInvoice",
+                            "Download invoice",
+                          )}
+                        >
+                          <Download size={14} />
+                          {t(
+                            "studentManagement.details.viewInvoice",
+                            "View invoice",
+                          )}
+                        </button>
+                      ) : null}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-muted-foreground"
+                  >
+                    {t(
+                      "studentManagement.details.noPayments",
+                      "No payments found",
+                    )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
+
+      {activeTab === "general" &&
+        studentData.program_type === "Manual Therapie" && (
+          <ModuleSelectionCard applicationId={studentData.application_id} />
+        )}
 
       {activeTab === "attachments" && (
-        <StudentAttachments studentId={studentData._id} attachments={studentData.attachments || []} />
+        <StudentAttachments
+          studentId={studentData._id}
+          attachments={studentData.attachments || []}
+        />
       )}
 
-      {/* Edit Special Exceptions Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
           <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl shadow-lg w-full max-w-md flex flex-col p-6 space-y-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              Configure Special Exceptions
+              {t(
+                "studentManagement.details.configureExceptionsTitle",
+                "Configure Special Exceptions",
+              )}
             </h3>
-            
+
             <p className="text-xs text-gray-500 dark:text-white/60">
-              Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams.
+              {t(
+                "studentManagement.details.configureExceptionsHint",
+                "Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams.",
+              )}
             </p>
 
             {isExceptionsLoading ? (
-              <p className="text-sm">Loading conditions...</p>
+              <p className="text-sm">{t("common.loading", "Loading...")}</p>
             ) : (
               <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                 {allExceptions.map((ex) => {
@@ -427,9 +623,16 @@ const EnrolledStudentDetails = () => {
                         checked={isChecked}
                         onChange={() => {
                           if (isChecked) {
-                            setSelectedExceptions(selectedExceptions.filter(exid => exid !== ex._id));
+                            setSelectedExceptions(
+                              selectedExceptions.filter(
+                                (exid) => exid !== ex._id,
+                              ),
+                            );
                           } else {
-                            setSelectedExceptions([...selectedExceptions, ex._id]);
+                            setSelectedExceptions([
+                              ...selectedExceptions,
+                              ex._id,
+                            ]);
                           }
                         }}
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -439,7 +642,8 @@ const EnrolledStudentDetails = () => {
                           {ex.name}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-white/60">
-                          +{ex.extra_time_min} min extra time
+                          +{ex.extra_time_min} {t("common.mins", "mins")}{" "}
+                          {t("common.extraTime", "extra time")}
                         </p>
                       </div>
                     </label>
@@ -447,7 +651,10 @@ const EnrolledStudentDetails = () => {
                 })}
                 {allExceptions.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    No exceptions configured in system yet.
+                    {t(
+                      "studentManagement.details.noExceptions",
+                      "No exceptions configured. Default exam settings apply.",
+                    )}
                   </p>
                 )}
               </div>
@@ -459,35 +666,45 @@ const EnrolledStudentDetails = () => {
                 onClick={() => setIsEditModalOpen(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="button"
                 onClick={() => {
                   updateExceptionsMutation.mutate(
-                    { id: studentData._id, specialExceptions: selectedExceptions },
+                    {
+                      id: studentData._id,
+                      specialExceptions: selectedExceptions,
+                    },
                     {
                       onSuccess: () => {
                         setIsEditModalOpen(false);
                         refetch();
                       },
-                    }
+                    },
                   );
                 }}
                 disabled={updateExceptionsMutation.isPending}
                 className="px-4 py-2 text-sm font-medium text-white bg-[#ff8904] rounded-lg hover:bg-[#e07b03] disabled:opacity-50 cursor-pointer"
               >
-                {updateExceptionsMutation.isPending ? "Saving..." : "Save Changes"}
+                {updateExceptionsMutation.isPending
+                  ? t("common.saving", "Saving...")
+                  : t("common.saveChanges", "Save Changes")}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Initialize state when modal is opened */}
       {(() => {
-        if (isEditModalOpen && selectedExceptions.length === 0 && studentData.special_exceptions?.length > 0) {
-          setSelectedExceptions(studentData.special_exceptions.map(ex => ex._id || ex));
+        if (
+          isEditModalOpen &&
+          selectedExceptions.length === 0 &&
+          studentData.special_exceptions?.length > 0
+        ) {
+          setSelectedExceptions(
+            studentData.special_exceptions.map((ex) => ex._id || ex),
+          );
         }
       })()}
     </div>

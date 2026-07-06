@@ -102,10 +102,10 @@ export const useDeleteIntake = () => {
     },
   });
 };
-export const useGetStudentByApplication = (applicationId, options = {}) => {
+export const useGetStudentByApplication = (applicationId, filter = {}, options = {}) => {
   return useQuery({
-    queryKey: ["student", applicationId],
-    queryFn: () => getStudentByApplication(applicationId),
+    queryKey: ["student", applicationId, filter],
+    queryFn: () => getStudentByApplication(applicationId, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,

@@ -181,6 +181,7 @@
     "convenienceFee": "Convenience Fee",
     "paid": "Paid",
     "failed": "Failed",
+    "overdue": "Overdue",
     "canceled": "Canceled",
     "allReports": "All Reports",
     "cityReports": "City Reports",
@@ -886,7 +887,45 @@
     "tabs": {
       "progress": "Academic Progress",
       "general": "Module Selection",
+      "payments": "Payments",
       "notesAndAttachments": "Notes & Attachments"
+    },
+    "details": {
+      "assignedModules": "Assigned Modules",
+      "assignedApps": "Assigned APPs",
+      "completedExams": "Completed Exams",
+      "payments": "Payments",
+      "attendance": "Attendance",
+      "seeMore": "See more",
+      "noAssignedModules": "No modules assigned",
+      "noAssignedApps": "No APPs assigned",
+      "noExamsCompleted": "No exams completed",
+      "noPayments": "No payments found",
+      "moduleId": "Module ID",
+      "moduleName": "Module Name",
+      "app": "APP",
+      "type": "Type",
+      "scores": "Scores",
+      "submittedDate": "Submitted Date",
+      "sessions": "Sessions",
+      "attended": "Attended",
+      "missed": "Missed",
+      "unmarked": "Unmarked",
+      "billingMethod": "Billing",
+      "viewInvoice": "View invoice",
+      "downloadInvoice": "Download invoice",
+      "specialExceptions": "Special Exceptions",
+      "configureExceptions": "Configure",
+      "noExceptions": "No exceptions configured. Default exam settings apply.",
+      "noSessionsPlanned": "No sessions planned",
+      "noAttendanceRecords": "No attendance records found for this year.",
+      "attendanceLoadFailed": "Failed to load attendance",
+      "configureExceptionsTitle": "Configure Special Exceptions",
+      "configureExceptionsHint": "Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams."
+    },
+    "billing": {
+      "personal": "Personal",
+      "company": "Company"
     },
     "table": {
       "uid": "UID",
@@ -925,7 +964,8 @@
       "teacherRole": "Lecturer Role",
       "employmentStartDate": "Start Date",
       "languages": "Languages",
-      "locations": "Locations"
+      "locations": "Locations",
+      "lastLogin": "Last Login"
     }
   },
   "locationManagement": {

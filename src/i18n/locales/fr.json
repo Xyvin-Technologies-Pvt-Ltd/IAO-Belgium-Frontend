@@ -180,6 +180,7 @@
     "convenienceFee": "Frais de service",
     "paid": "Payé",
     "failed": "Échoué",
+    "overdue": "En retard",
     "canceled": "Annulé",
     "allReports": "Tous les rapports",
     "cityReports": "Rapports par ville",
@@ -818,7 +819,45 @@
     "tabs": {
       "progress": "Progrès académique",
       "general": "Sélection de module",
+      "payments": "Paiements",
       "notesAndAttachments": "Notes et pièces jointes"
+    },
+    "details": {
+      "assignedModules": "Modules assignés",
+      "assignedApps": "APP assignées",
+      "completedExams": "Examens terminés",
+      "payments": "Paiements",
+      "attendance": "Présence",
+      "seeMore": "Voir plus",
+      "noAssignedModules": "Aucun module assigné",
+      "noAssignedApps": "Aucune APP assignée",
+      "noExamsCompleted": "Aucun examen terminé",
+      "noPayments": "Aucun paiement trouvé",
+      "moduleId": "ID du module",
+      "moduleName": "Nom du module",
+      "app": "APP",
+      "type": "Type",
+      "scores": "Scores",
+      "submittedDate": "Date de soumission",
+      "sessions": "Sessions",
+      "attended": "Présent",
+      "missed": "Absent",
+      "unmarked": "Non marqué",
+      "billingMethod": "Facturation",
+      "viewInvoice": "Voir la facture",
+      "downloadInvoice": "Télécharger la facture",
+      "specialExceptions": "Exceptions spéciales",
+      "configureExceptions": "Configurer",
+      "noExceptions": "Aucune exception configurée. Les paramètres d'examen par défaut s'appliquent.",
+      "noSessionsPlanned": "Aucune session planifiée",
+      "noAttendanceRecords": "Aucun enregistrement de présence pour cette année.",
+      "attendanceLoadFailed": "Échec du chargement de la présence",
+      "configureExceptionsTitle": "Configurer les exceptions spéciales",
+      "configureExceptionsHint": "Sélectionnez toutes les conditions médicales ou difficultés d'apprentissage qui s'appliquent à cet étudiant. Le système appliquera automatiquement le maximum de minutes supplémentaires à ses examens."
+    },
+    "billing": {
+      "personal": "Personnel",
+      "company": "Entreprise"
     },
     "table": {
       "studentId": "ID de candidature",
@@ -856,7 +895,8 @@
       "teacherRole": "Rôle de l'enseignant",
       "employmentStartDate": "Date de début",
       "languages": "Langues",
-      "locations": "Lieux"
+      "locations": "Lieux",
+      "lastLogin": "Dernière connexion"
     }
   },
   "locationManagement": {
