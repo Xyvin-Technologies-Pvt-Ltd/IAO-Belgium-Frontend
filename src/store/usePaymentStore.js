@@ -1,7 +1,9 @@
 import {
   getPayments,
   getAnalyticsByCity,
+  getAnalyticsByCityList,
   getAnalyticsByProgram,
+  getAnalyticsByProgramList,
   getAnalyticsByBatch,
   getAnalyticsByBatchList,
   getAnalyticsByStudent,
@@ -40,11 +42,33 @@ export const useGetAnalyticsByCity = (filter, options = {}) => {
   });
 };
 
+export const useGetAnalyticsByCityList = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["payment-analytics-city-list", filter],
+    queryFn: () => getAnalyticsByCityList(filter),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    retry: false,
+    ...options,
+  });
+};
+
 export const useGetAnalyticsByProgram = (filter, options = {}) => {
   return useQuery({
     queryKey: ["payment-analytics-program", filter],
     queryFn: () => getAnalyticsByProgram(filter),
     staleTime: 60000,
+    ...options,
+  });
+};
+
+export const useGetAnalyticsByProgramList = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["payment-analytics-program-list", filter],
+    queryFn: () => getAnalyticsByProgramList(filter),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    retry: false,
     ...options,
   });
 };

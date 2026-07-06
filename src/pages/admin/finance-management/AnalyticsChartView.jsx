@@ -149,23 +149,32 @@ const AnalyticsChartView = ({
   onPageChange,
   setLimit,
   isLoading,
+  isChartLoading,
+  isTableLoading,
   error,
+  chartError,
+  tableError,
   labelKey,
   labelFn,
   title,
 }) => {
   const { t } = useTranslation();
 
-  if (isLoading) {
+  const chartLoading = isChartLoading ?? isLoading;
+  const tableLoading = isTableLoading ?? isLoading;
+  const chartErr = chartError ?? error;
+  const tableErr = tableError ?? error;
+
+  if (chartLoading && !data?.length) {
     return (
       <LoadingState text={t("finance.messages.loadingAnalytics")} size="lg" />
     );
   }
 
-  if (error) {
+  if (chartErr && !data?.length) {
     return (
       <ErrorMessage 
-        message={error?.message || t("finance.messages.loadAnalyticsFailed")} 
+        message={chartErr?.message || t("finance.messages.loadAnalyticsFailed")} 
         variant="card" 
         showRetry={false} 
       />
@@ -350,13 +359,13 @@ const AnalyticsChartView = ({
               <TableHead>{t("common.paid")}</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className={isLoading ? "opacity-50 pointer-events-none" : ""}>
-            {isLoading && displayTableData.length === 0 ? (
+          <TableBody className={tableLoading ? "opacity-50 pointer-events-none" : ""}>
+            {tableLoading && displayTableData.length === 0 ? (
               <TableSkeleton rows={limit || 10} columns={6} />
-            ) : error ? (
+            ) : tableErr ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center p-8">
-                  <ErrorMessage message={error?.message || t("finance.messages.loadAnalyticsFailed")} variant="inline" />
+                  <ErrorMessage message={tableErr?.message || t("finance.messages.loadAnalyticsFailed")} variant="inline" />
                 </TableCell>
               </TableRow>
             ) : displayTableData?.length > 0 ? (

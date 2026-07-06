@@ -56,6 +56,8 @@ const ViewApplication = ({ open, onClose, application }) => {
     (Array.isArray(documentFlags.qualification_certificate) && 
      documentFlags.qualification_certificate.some(flag => flag));
 
+  const isPaymentPaid = application?.payment_status === "paid";
+
   if (!open || !application) return null;
 
   const handleStatusUpdate = (status) => {
@@ -330,13 +332,15 @@ const ViewApplication = ({ open, onClose, application }) => {
             >
               {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.waitlist")}
             </Button>
-            <Button 
-              disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
-              className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
-              onClick={() => handleStatusUpdate('approved')}
-            >
-              {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
-            </Button>
+            {isPaymentPaid && (
+              <Button 
+                disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
+                className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => handleStatusUpdate('approved')}
+              >
+                {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
+              </Button>
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-end p-6 border-t dark:border-white/20">
