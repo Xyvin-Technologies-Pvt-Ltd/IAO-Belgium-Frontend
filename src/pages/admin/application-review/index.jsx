@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetAllLanguages } from "@/store/useDropdownStore";
+import { useGetAllLanguages, useGetAllPrograms } from "@/store/useDropdownStore";
 import axiosInstance from "@/api/axiosintercepter";
 
 const ApplicationReview = () => {
@@ -72,6 +72,10 @@ const ApplicationReview = () => {
   // Fetch languages dropdown list
   const { data: languagesData } = useGetAllLanguages({ limit: 1000 });
   const languagesList = languagesData?.data || [];
+
+  // Fetch programs dropdown list
+  const { data: programsData } = useGetAllPrograms({ limit: 1000 });
+  const programsList = programsData?.data || [];
 
   // Save filters and sorting in session storage
   useEffect(() => {
@@ -276,11 +280,31 @@ const ApplicationReview = () => {
 
           <div className="space-y-1">
             <label className="text-xs font-semibold text-gray-600 dark:text-white/70">{t("applicationReview.filters.programName", "Program Name")}</label>
-            <Input
-              placeholder={t("applicationReview.searchPlaceholder.programName", "Search program name")}
-              value={filters.program_name === "all" ? "" : filters.program_name}
-              onChange={(e) => setFilters(prev => ({ ...prev, program_name: e.target.value || "all" }))}
-            />
+            <Select
+              value={filters.program_name}
+              onValueChange={(val) => setFilters(prev => ({ ...prev, program_name: val }))}
+            >
+              <SelectTrigger className="w-full bg-background dark:border-white/20 dark:bg-black/10 text-dashboard-text dark:text-white h-10">
+                <SelectValue placeholder="All Programs" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Programs</SelectItem>
+                {programsList.map((program) => {
+                  const parts = [program.name];
+                  if (program.language?.name) {
+                    parts.push(program.language.name);
+                  }
+                  if (program.city?.name) {
+                    parts.push(program.city.name);
+                  }
+                  return (
+                    <SelectItem key={program._id} value={program._id}>
+                      {parts.join(" - ")}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1">
@@ -323,21 +347,11 @@ const ApplicationReview = () => {
 
           <div className="space-y-1">
             <label className="text-xs font-semibold text-gray-600 dark:text-white/70">{t("applicationReview.filters.previousEducation", "Previous Education")}</label>
-            <Select
-              value={filters.previous_education}
-              onValueChange={(val) => setFilters(prev => ({ ...prev, previous_education: val }))}
-            >
-              <SelectTrigger className="w-full bg-background dark:border-white/20 dark:bg-black/10 text-dashboard-text dark:text-white h-10">
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="physiotherapy">Physiotherapy</SelectItem>
-                <SelectItem value="manual_therapy">Manual Therapy</SelectItem>
-                <SelectItem value="medicine">Medicine</SelectItem>
-                <SelectItem value="osteopathy">Osteopathy</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              placeholder={t("applicationReview.searchPlaceholder.previousEducation", "Search previous education")}
+              value={filters.previous_education === "all" ? "" : filters.previous_education}
+              onChange={(e) => setFilters(prev => ({ ...prev, previous_education: e.target.value || "all" }))}
+            />
           </div>
 
           <div className="space-y-1">
