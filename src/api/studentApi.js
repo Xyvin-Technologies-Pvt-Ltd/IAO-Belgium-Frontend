@@ -10,6 +10,18 @@ export const getStudents = async (filter) => {
     throw error.response.data;
   }
 };
+
+export const exportStudents = async (params) => {
+  try {
+    const response = await axiosInstance.get(`/user/student/export`, {
+      params,
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 export const getStudentById = async (id, filter) => {
   try {
     const response = await axiosInstance.get(`/user/student/${id}`, {
@@ -77,4 +89,4 @@ export const deleteSpecialException = async (id) => {
   } catch (error) {
     throw error.response?.data || error;
   }
-};
+};
