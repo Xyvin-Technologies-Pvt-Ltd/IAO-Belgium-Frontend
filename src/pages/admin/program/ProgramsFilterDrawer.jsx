@@ -23,6 +23,7 @@ import {
   useGetAllCountries,
 } from "@/store/useDropdownStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import { PROGRAM_TYPES } from "@/constants/programTypes";
 
 const FilterSection = ({ label, children }) => (
   <div className="space-y-2">
@@ -98,13 +99,7 @@ const ProgramsFilterDrawer = ({
     setIsOpen(false);
   };
 
-  const programTypes = [
-    "Master of Science",
-    "Lateral Entry Master of Science",
-    "Diploma",
-    "Manual Therapie",
-    "Post Academic Module",
-  ];
+  const programTypes = PROGRAM_TYPES;
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>

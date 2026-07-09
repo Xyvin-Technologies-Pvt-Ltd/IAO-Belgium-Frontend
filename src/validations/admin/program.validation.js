@@ -1,4 +1,11 @@
 import { z } from "zod";
+import { PROGRAM_TYPES } from "@/constants/programTypes";
+
+const glCodeField = z
+  .string()
+  .max(20, "GL code must be at most 20 characters")
+  .optional()
+  .or(z.literal(""));
 
 export const programSchema = z
   .object({
@@ -7,18 +14,9 @@ export const programSchema = z
       .string()
       .min(1, "Program code is required")
       .max(10, "Program code must be at most 10 characters"),
-    program_type: z.enum(
-      [
-        "Master of Science",
-        "Lateral Entry Master of Science",
-        "Diploma",
-        "Manual Therapie",
-        "Post Academic Module",
-      ],
-      {
-        errorMap: () => ({ message: "Please select a valid program type" }),
-      },
-    ),
+    program_type: z.enum(PROGRAM_TYPES, {
+      errorMap: () => ({ message: "Please select a valid program type" }),
+    }),
     year: z.coerce
       .number({ invalid_type_error: "Duration must be a number" })
       .min(1, "Duration must be at least 1")
@@ -39,16 +37,11 @@ export const programSchema = z
       .max(10, "Exact VAT code must be at most 10 characters")
       .optional()
       .or(z.literal("")),
-    exact_gl_revenue: z
-      .string()
-      .max(20, "GL revenue code must be at most 20 characters")
-      .optional()
-      .or(z.literal("")),
-    exact_gl_deferred_revenue: z
-      .string()
-      .max(20, "GL deferred revenue code must be at most 20 characters")
-      .optional()
-      .or(z.literal("")),
+    exact_gl_revenue: glCodeField,
+    gl_revenue_module: glCodeField,
+    gl_revenue_research: glCodeField,
+    gl_revenue_admission_fee: glCodeField,
+    gl_revenue_convenience_fee: glCodeField,
   })
   .superRefine((data, ctx) => {
     if (!data.is_online) {
