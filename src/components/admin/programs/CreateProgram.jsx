@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -23,6 +24,25 @@ import { useTranslation } from "react-i18next";
 import { useCreateProgram, useUpdateProgram } from "@/store/useProgramStore";
 import { programSchema } from "@/validations/admin";
 import { useNavigate } from "@tanstack/react-router";
+import {
+  PROGRAM_TYPE_I18N_KEYS,
+  PROGRAM_TYPES,
+} from "@/constants/programTypes";
+import {
+  getGlobalVatConfig,
+  resolveAccountingMapping,
+} from "@/api/accountingMappingApi";
+import { getProgramTypes } from "@/api/programApi";
+
+const emptyAccountingDefaults = {
+  program_code: "",
+  exact_vat_code: "",
+  exact_gl_revenue: "",
+  gl_revenue_module: "",
+  gl_revenue_research: "",
+  gl_revenue_admission_fee: "",
+  gl_revenue_convenience_fee: "",
+};
 
 const CreateProgram = ({ open, onClose, programData }) => {
   const navigate = useNavigate();
@@ -33,7 +53,14 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const [citySearchTerm, setCitySearchTerm] = useState("");
   const [languageSearchTerm, setLanguageSearchTerm] = useState("");
 
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const { data: programTypesResponse } = useQuery({
+    queryKey: ["program-types"],
+    queryFn: getProgramTypes,
+    enabled: open,
+    staleTime: 60000,
+  });
+
+  const programTypes = programTypesResponse?.data || PROGRAM_TYPES;
 
   const { data: countriesData, isLoading: countriesLoading } =
     useGetAllCountries(
@@ -42,6 +69,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
       },
       { enabled: open },
     );
+
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
     {
@@ -65,6 +94,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
     reset,
     setValue,
     watch,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(programSchema),
@@ -81,7 +111,10 @@ const CreateProgram = ({ open, onClose, programData }) => {
       document_required: true,
       exact_vat_code: "",
       exact_gl_revenue: "",
-      exact_gl_deferred_revenue: "",
+      gl_revenue_module: "",
+      gl_revenue_research: "",
+      gl_revenue_admission_fee: "",
+      gl_revenue_convenience_fee: "",
     },
   });
 
@@ -117,6 +150,7 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: "",
       is_online: false,
       document_required: true,
+      ...emptyAccountingDefaults,
     });
     setCountrySearchTerm("");
     setCitySearchTerm("");
@@ -141,13 +175,104 @@ const CreateProgram = ({ open, onClose, programData }) => {
       document_required: programData.document_required !== false,
       exact_vat_code: programData.exact_vat_code || "",
       exact_gl_revenue: programData.exact_gl_revenue || "",
-      exact_gl_deferred_revenue: programData.exact_gl_deferred_revenue || "",
+      gl_revenue_module: programData.gl_revenue_module || "",
+      gl_revenue_research: programData.gl_revenue_research || "",
+      gl_revenue_admission_fee: programData.gl_revenue_admission_fee || "",
+      gl_revenue_convenience_fee: programData.gl_revenue_convenience_fee || "",
     });
 
     if (programData.city?.country?._id) {
       setSelectedCountry(programData.city.country._id);
     }
   }, [open, programData, reset]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const languageId =
+      selectedLanguage || (isEdit ? programData?.language?._id : "") || "";
+    const programType =
+      selectedProgramType || (isEdit ? programData?.program_type : "") || "";
+
+    if (!languageId || !programType) {
+      return;
+    }
+
+    if (!isOnlineValue) {
+      const countryId =
+        watchedCountry || (isEdit ? programData?.city?.country?._id : "") || "";
+      if (!countryId) {
+        return;
+      }
+    }
+
+    let cancelled = false;
+
+    const loadAccountingDefaults = async () => {
+      try {
+        const countryId = isOnlineValue
+          ? undefined
+          : watchedCountry || (isEdit ? programData?.city?.country?._id : "") || "";
+
+        const [mappingResponse, vatResponse] = await Promise.all([
+          resolveAccountingMapping({
+            language: languageId,
+            ...(countryId ? { country: countryId } : {}),
+            program_type: programType,
+          }),
+          getGlobalVatConfig(),
+        ]);
+
+        if (cancelled) return;
+
+        const mapping = mappingResponse?.data || {};
+        const globalVat = vatResponse?.data?.vat_code || "";
+
+        const applyField = (field, value) => {
+          if (isEdit) {
+            const current = getValues(field);
+            if (String(current || "").trim()) {
+              return;
+            }
+          }
+          setValue(field, value, { shouldValidate: true });
+        };
+
+        applyField("exact_vat_code", globalVat);
+        applyField("exact_gl_revenue", mapping.exact_gl_revenue || "");
+        applyField("gl_revenue_module", mapping.gl_revenue_module || "");
+        applyField("gl_revenue_research", mapping.gl_revenue_research || "");
+        applyField(
+          "gl_revenue_admission_fee",
+          mapping.gl_revenue_admission_fee || "",
+        );
+        applyField(
+          "gl_revenue_convenience_fee",
+          mapping.gl_revenue_convenience_fee || "",
+        );
+      } catch {
+        // mapping lookup failed; leave fields for manual entry
+      }
+    };
+
+    loadAccountingDefaults();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    open,
+    isEdit,
+    programData,
+    selectedLanguage,
+    watchedCountry,
+    selectedProgramType,
+    isOnlineValue,
+    setValue,
+    getValues,
+  ]);
 
   const onSubmit = (formData) => {
     const payload = {
@@ -163,7 +288,12 @@ const CreateProgram = ({ open, onClose, programData }) => {
 
     payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
     payload.exact_gl_revenue = formData.exact_gl_revenue?.trim() || "";
-    payload.exact_gl_deferred_revenue = formData.exact_gl_deferred_revenue?.trim() || "";
+    payload.gl_revenue_module = formData.gl_revenue_module?.trim() || "";
+    payload.gl_revenue_research = formData.gl_revenue_research?.trim() || "";
+    payload.gl_revenue_admission_fee =
+      formData.gl_revenue_admission_fee?.trim() || "";
+    payload.gl_revenue_convenience_fee =
+      formData.gl_revenue_convenience_fee?.trim() || "";
 
     if (formData.is_online) {
       if (formData.city) {
@@ -309,21 +439,11 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Master of Science">
-                    {t("programManagement.modal.programTypes.masterOfScience")}
-                  </SelectItem>
-                  <SelectItem value="Lateral Entry Master of Science">
-                    {t("programManagement.modal.programTypes.lateralEntry")}
-                  </SelectItem>
-                  <SelectItem value="Diploma">
-                    {t("programManagement.modal.programTypes.diploma")}
-                  </SelectItem>
-                  <SelectItem value="Manual Therapie">
-                    {t("programManagement.modal.programTypes.manualTherapie")}
-                  </SelectItem>
-                  <SelectItem value="Post Academic Module">
-                    {t("programManagement.modal.programTypes.postAcademic")}
-                  </SelectItem>
+                  {programTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(PROGRAM_TYPE_I18N_KEYS[type] || type, type)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {errors.program_type && (
@@ -339,26 +459,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
-            <div className="rounded-lg border border-sidebar-border bg-sidebar/50 p-4 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t("programManagement.modal.exactSectionTitle")}
-              </h3>
-              <FormField
-                label={t("programManagement.modal.exactGlRevenueLabel")}
-                error={errors.exact_gl_revenue?.message}
-                {...register("exact_gl_revenue")}
-              />
-              <FormField
-                label={t("programManagement.modal.exactGlDeferredRevenueLabel")}
-                error={errors.exact_gl_deferred_revenue?.message}
-                {...register("exact_gl_deferred_revenue")}
-              />
-              <FormField
-                label={t("programManagement.modal.exactVatCodeLabel")}
-                error={errors.exact_vat_code?.message}
-                {...register("exact_vat_code")}
-              />
-            </div>
 
             <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
               <div className="space-y-0.5">
@@ -452,6 +552,46 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 />
               </>
             )}
+
+            <div className="rounded-lg border border-sidebar-border bg-sidebar/50 p-4 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t("programManagement.modal.exactSectionTitle")}
+              </h3>
+              <FormField
+                label={t("programManagement.modal.exactGlRevenueModuleLabel")}
+                error={errors.gl_revenue_module?.message}
+                {...register("gl_revenue_module")}
+              />
+              <FormField
+                label={t("programManagement.modal.exactGlRevenueResearchLabel")}
+                error={errors.gl_revenue_research?.message}
+                {...register("gl_revenue_research")}
+              />
+              <FormField
+                label={t(
+                  "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
+                )}
+                error={errors.gl_revenue_admission_fee?.message}
+                {...register("gl_revenue_admission_fee")}
+              />
+              <FormField
+                label={t(
+                  "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
+                )}
+                error={errors.gl_revenue_convenience_fee?.message}
+                {...register("gl_revenue_convenience_fee")}
+              />
+              <FormField
+                label={t("programManagement.modal.exactGlRevenueLabel")}
+                error={errors.exact_gl_revenue?.message}
+                {...register("exact_gl_revenue")}
+              />
+              <FormField
+                label={t("programManagement.modal.exactVatCodeLabel")}
+                error={errors.exact_vat_code?.message}
+                {...register("exact_vat_code")}
+              />
+            </div>
 
             <FormActions
               onCancel={handleClose}

@@ -48,6 +48,7 @@ import ContractTypes from "@/pages/admin/contract-type";
 import Departments from "@/pages/admin/department";
 import Regions from "@/pages/admin/region";
 import TeachingRegions from "@/pages/admin/teaching-region";
+import AccountingMappings from "@/pages/admin/accounting-mapping";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -102,6 +103,13 @@ export const adminRoutes = [
   {
     path: "/admin/teaching-regions",
     component: withPermissionProtection(TeachingRegions, "/admin/teaching-regions"),
+  },
+  {
+    path: "/admin/accounting-mappings",
+    component: withPermissionProtection(
+      AccountingMappings,
+      "/admin/accounting-mappings",
+    ),
   },
   {
     path: "/admin/special-exceptions",
