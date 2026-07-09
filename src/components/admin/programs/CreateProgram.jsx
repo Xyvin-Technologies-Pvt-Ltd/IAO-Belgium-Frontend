@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
+import { Input } from "@/components/ui/input";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import {
   Select,
@@ -37,7 +38,6 @@ import { getProgramTypes } from "@/api/programApi";
 const emptyAccountingDefaults = {
   program_code: "",
   exact_vat_code: "",
-  exact_gl_revenue: "",
   gl_revenue_module: "",
   gl_revenue_research: "",
   gl_revenue_admission_fee: "",
@@ -110,7 +110,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: false,
       document_required: true,
       exact_vat_code: "",
-      exact_gl_revenue: "",
       gl_revenue_module: "",
       gl_revenue_research: "",
       gl_revenue_admission_fee: "",
@@ -174,7 +173,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
       exact_vat_code: programData.exact_vat_code || "",
-      exact_gl_revenue: programData.exact_gl_revenue || "",
       gl_revenue_module: programData.gl_revenue_module || "",
       gl_revenue_research: programData.gl_revenue_research || "",
       gl_revenue_admission_fee: programData.gl_revenue_admission_fee || "",
@@ -241,7 +239,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
         };
 
         applyField("exact_vat_code", globalVat);
-        applyField("exact_gl_revenue", mapping.exact_gl_revenue || "");
         applyField("gl_revenue_module", mapping.gl_revenue_module || "");
         applyField("gl_revenue_research", mapping.gl_revenue_research || "");
         applyField(
@@ -287,7 +284,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
     };
 
     payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
-    payload.exact_gl_revenue = formData.exact_gl_revenue?.trim() || "";
     payload.gl_revenue_module = formData.gl_revenue_module?.trim() || "";
     payload.gl_revenue_research = formData.gl_revenue_research?.trim() || "";
     payload.gl_revenue_admission_fee =
@@ -560,37 +556,37 @@ const CreateProgram = ({ open, onClose, programData }) => {
               <FormField
                 label={t("programManagement.modal.exactGlRevenueModuleLabel")}
                 error={errors.gl_revenue_module?.message}
-                {...register("gl_revenue_module")}
-              />
+              >
+                <Input readOnly {...register("gl_revenue_module")} />
+              </FormField>
               <FormField
                 label={t("programManagement.modal.exactGlRevenueResearchLabel")}
                 error={errors.gl_revenue_research?.message}
-                {...register("gl_revenue_research")}
-              />
+              >
+                <Input readOnly {...register("gl_revenue_research")} />
+              </FormField>
               <FormField
                 label={t(
                   "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
                 )}
                 error={errors.gl_revenue_admission_fee?.message}
-                {...register("gl_revenue_admission_fee")}
-              />
+              >
+                <Input readOnly {...register("gl_revenue_admission_fee")} />
+              </FormField>
               <FormField
                 label={t(
                   "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
                 )}
                 error={errors.gl_revenue_convenience_fee?.message}
-                {...register("gl_revenue_convenience_fee")}
-              />
-              <FormField
-                label={t("programManagement.modal.exactGlRevenueLabel")}
-                error={errors.exact_gl_revenue?.message}
-                {...register("exact_gl_revenue")}
-              />
+              >
+                <Input readOnly {...register("gl_revenue_convenience_fee")} />
+              </FormField>
               <FormField
                 label={t("programManagement.modal.exactVatCodeLabel")}
                 error={errors.exact_vat_code?.message}
-                {...register("exact_vat_code")}
-              />
+              >
+                <Input readOnly {...register("exact_vat_code")} />
+              </FormField>
             </div>
 
             <FormActions

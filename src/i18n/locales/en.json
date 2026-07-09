@@ -598,7 +598,6 @@
       "codePlaceholder": "Enter programme code",
       "exactVatCodeLabel": "Exact VAT Code",
       "exactSectionTitle": "Exact Online Accounting",
-      "exactGlRevenueLabel": "Default Revenue GL Account",
       "exactGlRevenueModuleLabel": "Module Revenue GL Account",
       "exactGlRevenueResearchLabel": "Research Revenue GL Account",
       "exactGlRevenueAdmissionFeeLabel": "Admission Fee Revenue GL Account",
