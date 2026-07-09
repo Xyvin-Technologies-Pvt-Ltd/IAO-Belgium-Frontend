@@ -37,7 +37,6 @@ export const programSchema = z
       .max(10, "Exact VAT code must be at most 10 characters")
       .optional()
       .or(z.literal("")),
-    exact_gl_revenue: glCodeField,
     gl_revenue_module: glCodeField,
     gl_revenue_research: glCodeField,
     gl_revenue_admission_fee: glCodeField,
