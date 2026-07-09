@@ -100,6 +100,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     selectedProgram,
     {
       ...(batchSearchTerm && { search: batchSearchTerm }),
+      include_closed: true,
     },
     { enabled: open && !!selectedProgram },
   );
