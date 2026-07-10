@@ -558,9 +558,10 @@
       "exactVatCodeLabel": "Exact BTW-code",
       "exactSectionTitle": "Exact Online boekhouding",
       "exactGlRevenueModuleLabel": "Module omzet GL-rekening",
-      "exactGlRevenueResearchLabel": "Onderzoek omzet GL-rekening",
-      "exactGlRevenueAdmissionFeeLabel": "Inschrijvingsgeld omzet GL-rekening",
-      "exactGlRevenueConvenienceFeeLabel": "Servicekosten omzet GL-rekening",
+      "exactGlRevenueResearchLabel": "Thesis omzet GL-rekening",
+      "exactGlRevenueAdmissionFeeLabel": "Registratiekosten omzet GL-rekening",
+      "exactGlRevenueConvenienceFeeLabel": "Administratiekosten omzet GL-rekening",
+      "exactGlRevenueFceExamLabel": "FCE-vergoeding omzet GL-rekening",
       "exactGlDeferredRevenueLabel": "Uitgestelde omzet GL-rekening",
       "accountingMappingFound": "Boekhoudcodes geladen uit masterdata",
       "accountingMappingNotFound": "Geen masterdata-koppeling gevonden. U kunt codes handmatig invoeren.",
@@ -1260,11 +1261,22 @@
     "loadFailed": "Laden van opleidingsdetails mislukt",
     "cards": {
       "programName": "Naam opleiding",
+      "programType": "Type opleiding",
+      "country": "Land",
       "duration": "Duur",
       "noOfModules": "Aantal modules",
       "registrationFee": "Inschrijvingsgeld",
       "years": "jaar",
       "free": "Gratis"
+    },
+    "accounting": {
+      "title": "Exact Online boekhoudcodes",
+      "subtitle": "Opgehaald uit accounting mapping op basis van taal, land en type van deze opleiding.",
+      "loading": "Boekhoudcodes laden...",
+      "loadFailed": "Laden van boekhoudcodes mislukt.",
+      "noMapping": "Geen accounting mapping gevonden voor deze opleiding. Configureer er een bij Accounting Mappings.",
+      "incompleteProgram": "Vul taal en locatie van de opleiding in om boekhoudcodes te tonen.",
+      "notConfigured": "Niet geconfigureerd"
     },
     "tabs": {
       "learningModules": "Leermodule",

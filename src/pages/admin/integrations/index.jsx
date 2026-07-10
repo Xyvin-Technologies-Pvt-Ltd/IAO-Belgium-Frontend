@@ -223,7 +223,7 @@ const IntegrationsPage = () => {
         </div>
 
         {isUnsyncedLoading ? (
-          <TableSkeleton rows={3} columns={5} />
+          <TableSkeleton rows={3} columns={6} />
         ) : unsyncedError ? (
           <ErrorMessage
             message={unsyncedError?.message || t("integrations.exact.unsyncedLoadFailed")}
@@ -250,6 +250,7 @@ const IntegrationsPage = () => {
                     <TableHead>{t("integrations.exact.table.email")}</TableHead>
                     <TableHead>{t("integrations.exact.table.purpose")}</TableHead>
                     <TableHead>{t("integrations.exact.table.program")}</TableHead>
+                    <TableHead>{t("integrations.exact.table.glAccount")}</TableHead>
                     <TableHead className="text-right">
                       {t("integrations.exact.table.amount")}
                     </TableHead>
@@ -264,6 +265,9 @@ const IntegrationsPage = () => {
                       </TableCell>
                       <TableCell>{row.purpose || "—"}</TableCell>
                       <TableCell>{row.program_name || "—"}</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {row.gl_account || "—"}
+                      </TableCell>
                       <TableCell className="text-right whitespace-nowrap">
                         {row.amount} {row.currency}
                       </TableCell>

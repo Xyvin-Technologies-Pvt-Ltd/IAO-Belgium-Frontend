@@ -51,6 +51,7 @@ const DEFAULT_FORM = {
   gl_revenue_research: "",
   gl_revenue_admission_fee: "",
   gl_revenue_convenience_fee: "",
+  gl_revenue_fce_exam: "",
 };
 
 const AccountingMappings = () => {
@@ -214,18 +215,19 @@ const AccountingMappings = () => {
             <TableHead>{t("common.country", "Country")}</TableHead>
             <TableHead>{t("programManagement.modal.programTypeLabel", "Program Type")}</TableHead>
             <TableHead>{t("accountingMappingManagement.table.module", "Module GL")}</TableHead>
-            <TableHead>{t("accountingMappingManagement.table.research", "Research GL")}</TableHead>
-            <TableHead>{t("accountingMappingManagement.table.admission", "Admission GL")}</TableHead>
-            <TableHead>{t("accountingMappingManagement.table.convenience", "Convenience GL")}</TableHead>
+            <TableHead>{t("accountingMappingManagement.table.thesis", "Thesis GL")}</TableHead>
+            <TableHead>{t("accountingMappingManagement.table.registration", "Registration GL")}</TableHead>
+            <TableHead>{t("accountingMappingManagement.table.administration", "Administration GL")}</TableHead>
+            <TableHead>{t("accountingMappingManagement.table.fceFee", "FCE Fee GL")}</TableHead>
             <TableHead>{t("common.action", "Action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={mappingQuery.isFetching ? "opacity-50 pointer-events-none" : ""}>
           {mappingQuery.isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : mappingQuery.error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     mappingQuery.error?.message ||
@@ -250,6 +252,7 @@ const AccountingMappings = () => {
                 <TableCell>{item.gl_revenue_research || "-"}</TableCell>
                 <TableCell>{item.gl_revenue_admission_fee || "-"}</TableCell>
                 <TableCell>{item.gl_revenue_convenience_fee || "-"}</TableCell>
+                <TableCell>{item.gl_revenue_fce_exam || "-"}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
@@ -270,7 +273,7 @@ const AccountingMappings = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("accountingMappingManagement.table.noItems", "No mappings found")}
               </TableCell>
             </TableRow>
@@ -398,6 +401,7 @@ const AccountingMappingModal = ({
       gl_revenue_research: item.gl_revenue_research || "",
       gl_revenue_admission_fee: item.gl_revenue_admission_fee || "",
       gl_revenue_convenience_fee: item.gl_revenue_convenience_fee || "",
+      gl_revenue_fce_exam: item.gl_revenue_fce_exam || "",
     });
   }, [open, item, reset]);
 
@@ -415,6 +419,7 @@ const AccountingMappingModal = ({
       gl_revenue_research: formData.gl_revenue_research?.trim() || "",
       gl_revenue_admission_fee: formData.gl_revenue_admission_fee?.trim() || "",
       gl_revenue_convenience_fee: formData.gl_revenue_convenience_fee?.trim() || "",
+      gl_revenue_fce_exam: formData.gl_revenue_fce_exam?.trim() || "",
     };
 
     const mutation = isEdit ? updateMutation : createMutation;
@@ -507,26 +512,33 @@ const AccountingMappingModal = ({
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label={t("programManagement.modal.exactGlRevenueModuleLabel", "Module Revenue GL")}
+              label={t("programManagement.modal.exactGlRevenueModuleLabel", "Module Revenue GL Account")}
               {...register("gl_revenue_module")}
             />
             <FormField
-              label={t("programManagement.modal.exactGlRevenueResearchLabel", "Research Revenue GL")}
+              label={t("programManagement.modal.exactGlRevenueResearchLabel", "Thesis Revenue GL Account")}
               {...register("gl_revenue_research")}
             />
             <FormField
               label={t(
                 "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
-                "Admission Fee Revenue GL",
+                "Registration Fee Revenue GL Account",
               )}
               {...register("gl_revenue_admission_fee")}
             />
             <FormField
               label={t(
                 "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
-                "Convenience Fee Revenue GL",
+                "Administration Fee Revenue GL Account",
               )}
               {...register("gl_revenue_convenience_fee")}
+            />
+            <FormField
+              label={t(
+                "programManagement.modal.exactGlRevenueFceExamLabel",
+                "FCE Fee Revenue GL Account",
+              )}
+              {...register("gl_revenue_fce_exam")}
             />
           </div>
 

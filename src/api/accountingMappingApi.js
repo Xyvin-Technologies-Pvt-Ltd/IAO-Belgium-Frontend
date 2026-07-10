@@ -11,7 +11,12 @@ export const getAccountingMappings = async (filter) => {
   }
 };
 
-export const resolveAccountingMapping = async ({ language, country, program_type }) => {
+export const resolveAccountingMapping = async ({
+  language,
+  country,
+  program_type,
+  is_online,
+}) => {
   try {
     const response = await axiosInstance.get(
       `/master-data/accounting-mapping/resolve`,
@@ -20,6 +25,7 @@ export const resolveAccountingMapping = async ({ language, country, program_type
           language,
           program_type,
           ...(country ? { country } : {}),
+          ...(is_online ? { is_online: true } : {}),
         },
       },
     );
