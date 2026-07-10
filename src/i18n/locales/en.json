@@ -330,6 +330,7 @@
         "email": "Email",
         "purpose": "Purpose",
         "program": "Programme",
+        "glAccount": "GL account",
         "amount": "Amount"
       }
     }
@@ -599,9 +600,10 @@
       "exactVatCodeLabel": "Exact VAT Code",
       "exactSectionTitle": "Exact Online Accounting",
       "exactGlRevenueModuleLabel": "Module Revenue GL Account",
-      "exactGlRevenueResearchLabel": "Research Revenue GL Account",
-      "exactGlRevenueAdmissionFeeLabel": "Admission Fee Revenue GL Account",
-      "exactGlRevenueConvenienceFeeLabel": "Convenience Fee Revenue GL Account",
+      "exactGlRevenueResearchLabel": "Thesis Revenue GL Account",
+      "exactGlRevenueAdmissionFeeLabel": "Registration Fee Revenue GL Account",
+      "exactGlRevenueConvenienceFeeLabel": "Administration Fee Revenue GL Account",
+      "exactGlRevenueFceExamLabel": "FCE Fee Revenue GL Account",
       "exactGlDeferredRevenueLabel": "Deferred Revenue GL Account",
       "accountingMappingFound": "Accounting codes loaded from master data",
       "accountingMappingNotFound": "No master-data mapping found. You can enter codes manually.",
@@ -1331,11 +1333,22 @@
     "loadFailed": "Failed to load programme details",
     "cards": {
       "programName": "Programme Name",
+      "programType": "Programme Type",
+      "country": "Country",
       "duration": "Duration",
       "noOfModules": "No of Modules",
       "registrationFee": "Registration Fee",
       "years": "years",
       "free": "Free"
+    },
+    "accounting": {
+      "title": "Exact Online Accounting Codes",
+      "subtitle": "Resolved from accounting mapping based on this programme's language, country, and type.",
+      "loading": "Loading accounting codes...",
+      "loadFailed": "Failed to load accounting codes.",
+      "noMapping": "No accounting mapping found for this programme. Configure one in Accounting Mappings.",
+      "incompleteProgram": "Complete programme language and location details to view accounting codes.",
+      "notConfigured": "Not configured"
     },
     "tabs": {
       "learningModules": "Learning Module",

@@ -1,12 +1,6 @@
 import { z } from "zod";
 import { PROGRAM_TYPES } from "@/constants/programTypes";
 
-const glCodeField = z
-  .string()
-  .max(20, "GL code must be at most 20 characters")
-  .optional()
-  .or(z.literal(""));
-
 export const programSchema = z
   .object({
     name: z.string().min(1, "Program name is required"),
@@ -32,15 +26,6 @@ export const programSchema = z
     city: z.string().optional(),
     is_online: z.boolean().optional().default(false),
     document_required: z.boolean().optional().default(true),
-    exact_vat_code: z
-      .string()
-      .max(10, "Exact VAT code must be at most 10 characters")
-      .optional()
-      .or(z.literal("")),
-    gl_revenue_module: glCodeField,
-    gl_revenue_research: glCodeField,
-    gl_revenue_admission_fee: glCodeField,
-    gl_revenue_convenience_fee: glCodeField,
   })
   .superRefine((data, ctx) => {
     if (!data.is_online) {

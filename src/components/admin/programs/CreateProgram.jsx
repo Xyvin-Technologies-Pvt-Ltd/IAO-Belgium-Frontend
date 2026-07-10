@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
-import { Input } from "@/components/ui/input";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import {
   Select,
@@ -29,20 +28,7 @@ import {
   PROGRAM_TYPE_I18N_KEYS,
   PROGRAM_TYPES,
 } from "@/constants/programTypes";
-import {
-  getGlobalVatConfig,
-  resolveAccountingMapping,
-} from "@/api/accountingMappingApi";
 import { getProgramTypes } from "@/api/programApi";
-
-const emptyAccountingDefaults = {
-  program_code: "",
-  exact_vat_code: "",
-  gl_revenue_module: "",
-  gl_revenue_research: "",
-  gl_revenue_admission_fee: "",
-  gl_revenue_convenience_fee: "",
-};
 
 const CreateProgram = ({ open, onClose, programData }) => {
   const navigate = useNavigate();
@@ -94,7 +80,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
     reset,
     setValue,
     watch,
-    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(programSchema),
@@ -109,11 +94,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: "",
       is_online: false,
       document_required: true,
-      exact_vat_code: "",
-      gl_revenue_module: "",
-      gl_revenue_research: "",
-      gl_revenue_admission_fee: "",
-      gl_revenue_convenience_fee: "",
     },
   });
 
@@ -149,7 +129,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: "",
       is_online: false,
       document_required: true,
-      ...emptyAccountingDefaults,
     });
     setCountrySearchTerm("");
     setCitySearchTerm("");
@@ -172,104 +151,12 @@ const CreateProgram = ({ open, onClose, programData }) => {
       city: programData.city?._id || "",
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
-      exact_vat_code: programData.exact_vat_code || "",
-      gl_revenue_module: programData.gl_revenue_module || "",
-      gl_revenue_research: programData.gl_revenue_research || "",
-      gl_revenue_admission_fee: programData.gl_revenue_admission_fee || "",
-      gl_revenue_convenience_fee: programData.gl_revenue_convenience_fee || "",
     });
 
     if (programData.city?.country?._id) {
       setSelectedCountry(programData.city.country._id);
     }
   }, [open, programData, reset]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const languageId =
-      selectedLanguage || (isEdit ? programData?.language?._id : "") || "";
-    const programType =
-      selectedProgramType || (isEdit ? programData?.program_type : "") || "";
-
-    if (!languageId || !programType) {
-      return;
-    }
-
-    if (!isOnlineValue) {
-      const countryId =
-        watchedCountry || (isEdit ? programData?.city?.country?._id : "") || "";
-      if (!countryId) {
-        return;
-      }
-    }
-
-    let cancelled = false;
-
-    const loadAccountingDefaults = async () => {
-      try {
-        const countryId = isOnlineValue
-          ? undefined
-          : watchedCountry || (isEdit ? programData?.city?.country?._id : "") || "";
-
-        const [mappingResponse, vatResponse] = await Promise.all([
-          resolveAccountingMapping({
-            language: languageId,
-            ...(countryId ? { country: countryId } : {}),
-            program_type: programType,
-          }),
-          getGlobalVatConfig(),
-        ]);
-
-        if (cancelled) return;
-
-        const mapping = mappingResponse?.data || {};
-        const globalVat = vatResponse?.data?.vat_code || "";
-
-        const applyField = (field, value) => {
-          if (isEdit) {
-            const current = getValues(field);
-            if (String(current || "").trim()) {
-              return;
-            }
-          }
-          setValue(field, value, { shouldValidate: true });
-        };
-
-        applyField("exact_vat_code", globalVat);
-        applyField("gl_revenue_module", mapping.gl_revenue_module || "");
-        applyField("gl_revenue_research", mapping.gl_revenue_research || "");
-        applyField(
-          "gl_revenue_admission_fee",
-          mapping.gl_revenue_admission_fee || "",
-        );
-        applyField(
-          "gl_revenue_convenience_fee",
-          mapping.gl_revenue_convenience_fee || "",
-        );
-      } catch {
-        // mapping lookup failed; leave fields for manual entry
-      }
-    };
-
-    loadAccountingDefaults();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    open,
-    isEdit,
-    programData,
-    selectedLanguage,
-    watchedCountry,
-    selectedProgramType,
-    isOnlineValue,
-    setValue,
-    getValues,
-  ]);
 
   const onSubmit = (formData) => {
     const payload = {
@@ -282,14 +169,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: formData.is_online || false,
       document_required: formData.document_required !== false,
     };
-
-    payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
-    payload.gl_revenue_module = formData.gl_revenue_module?.trim() || "";
-    payload.gl_revenue_research = formData.gl_revenue_research?.trim() || "";
-    payload.gl_revenue_admission_fee =
-      formData.gl_revenue_admission_fee?.trim() || "";
-    payload.gl_revenue_convenience_fee =
-      formData.gl_revenue_convenience_fee?.trim() || "";
 
     if (formData.is_online) {
       if (formData.city) {
@@ -548,46 +427,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 />
               </>
             )}
-
-            <div className="rounded-lg border border-sidebar-border bg-sidebar/50 p-4 space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t("programManagement.modal.exactSectionTitle")}
-              </h3>
-              <FormField
-                label={t("programManagement.modal.exactGlRevenueModuleLabel")}
-                error={errors.gl_revenue_module?.message}
-              >
-                <Input readOnly {...register("gl_revenue_module")} />
-              </FormField>
-              <FormField
-                label={t("programManagement.modal.exactGlRevenueResearchLabel")}
-                error={errors.gl_revenue_research?.message}
-              >
-                <Input readOnly {...register("gl_revenue_research")} />
-              </FormField>
-              <FormField
-                label={t(
-                  "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
-                )}
-                error={errors.gl_revenue_admission_fee?.message}
-              >
-                <Input readOnly {...register("gl_revenue_admission_fee")} />
-              </FormField>
-              <FormField
-                label={t(
-                  "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
-                )}
-                error={errors.gl_revenue_convenience_fee?.message}
-              >
-                <Input readOnly {...register("gl_revenue_convenience_fee")} />
-              </FormField>
-              <FormField
-                label={t("programManagement.modal.exactVatCodeLabel")}
-                error={errors.exact_vat_code?.message}
-              >
-                <Input readOnly {...register("exact_vat_code")} />
-              </FormField>
-            </div>
 
             <FormActions
               onCancel={handleClose}
