@@ -17,6 +17,7 @@ import {
   Link2,
   Activity,
   Plug,
+  WalletCards,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -145,6 +146,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: Award,
           },
           {
+            title: t("sidebar.admin.accountingMappings", "Accounting Mappings"),
+            url: "/admin/accounting-mappings",
+            icon: WalletCards,
+          },
+          {
             title: "Contracts",
             icon: ScrollText,
             items: [
@@ -178,11 +184,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/lti-management",
             icon: Link2,
           },
-          // {
-          //   title: t("sidebar.admin.integrations"),
-          //   url: "/admin/integrations",
-          //   icon: Plug,
-          // },
+          {
+            title: t("sidebar.admin.integrations"),
+            url: "/admin/integrations",
+            icon: Plug,
+          },
           {
             title: "Student Corner",
             url: "/admin/student-corner",

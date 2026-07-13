@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
@@ -23,6 +24,11 @@ import { useTranslation } from "react-i18next";
 import { useCreateProgram, useUpdateProgram } from "@/store/useProgramStore";
 import { programSchema } from "@/validations/admin";
 import { useNavigate } from "@tanstack/react-router";
+import {
+  PROGRAM_TYPE_I18N_KEYS,
+  PROGRAM_TYPES,
+} from "@/constants/programTypes";
+import { getProgramTypes } from "@/api/programApi";
 
 const CreateProgram = ({ open, onClose, programData }) => {
   const navigate = useNavigate();
@@ -33,7 +39,14 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const [citySearchTerm, setCitySearchTerm] = useState("");
   const [languageSearchTerm, setLanguageSearchTerm] = useState("");
 
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const { data: programTypesResponse } = useQuery({
+    queryKey: ["program-types"],
+    queryFn: getProgramTypes,
+    enabled: open,
+    staleTime: 60000,
+  });
+
+  const programTypes = programTypesResponse?.data || PROGRAM_TYPES;
 
   const { data: countriesData, isLoading: countriesLoading } =
     useGetAllCountries(
@@ -42,6 +55,8 @@ const CreateProgram = ({ open, onClose, programData }) => {
       },
       { enabled: open },
     );
+
+  const [selectedCountry, setSelectedCountry] = useState("");
 
   const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
     {
@@ -79,7 +94,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       country: "",
       is_online: false,
       document_required: true,
-      exact_vat_code: "",
     },
   });
 
@@ -137,7 +151,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       city: programData.city?._id || "",
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
-      exact_vat_code: programData.exact_vat_code || "",
     });
 
     if (programData.city?.country?._id) {
@@ -156,8 +169,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       is_online: formData.is_online || false,
       document_required: formData.document_required !== false,
     };
-
-    payload.exact_vat_code = formData.exact_vat_code?.trim().toUpperCase() || "";
 
     if (formData.is_online) {
       if (formData.city) {
@@ -303,21 +314,11 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Master of Science">
-                    {t("programManagement.modal.programTypes.masterOfScience")}
-                  </SelectItem>
-                  <SelectItem value="Lateral Entry Master of Science">
-                    {t("programManagement.modal.programTypes.lateralEntry")}
-                  </SelectItem>
-                  <SelectItem value="Diploma">
-                    {t("programManagement.modal.programTypes.diploma")}
-                  </SelectItem>
-                  <SelectItem value="Manual Therapie">
-                    {t("programManagement.modal.programTypes.manualTherapie")}
-                  </SelectItem>
-                  <SelectItem value="Post Academic Module">
-                    {t("programManagement.modal.programTypes.postAcademic")}
-                  </SelectItem>
+                  {programTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(PROGRAM_TYPE_I18N_KEYS[type] || type, type)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {errors.program_type && (
@@ -333,15 +334,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
               required
               {...register("program_code")}
             />
-            <FormField
-              label={t("programManagement.modal.exactVatCodeLabel")}
-              placeholder={t("programManagement.modal.exactVatCodePlaceholder")}
-              error={errors.exact_vat_code?.message}
-              {...register("exact_vat_code")}
-            />
-            <p className="text-xs text-muted-foreground -mt-2">
-              {t("programManagement.modal.exactVatCodeHint")}
-            </p>
 
             <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-lg border border-sidebar-border">
               <div className="space-y-0.5">

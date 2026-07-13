@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
-import { useGetAnalyticsByCity } from "@/store/usePaymentStore";
+import { useState, useEffect } from "react";
+import {
+  useGetAnalyticsByCity,
+  useGetAnalyticsByCityList,
+} from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
@@ -19,10 +22,10 @@ const buildQueryFilters = (filters) => {
 const CityReports = () => {
   const { t } = useTranslation();
   const { updateBreadcrumbs } = useBreadcrumb();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
-
-  const { data, isLoading, error } = useGetAnalyticsByCity(buildQueryFilters(appliedFilters));
 
   useEffect(() => {
     updateBreadcrumbs([
@@ -31,6 +34,27 @@ const CityReports = () => {
     ]);
     return () => updateBreadcrumbs([]);
   }, [t]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [appliedFilters]);
+
+  const queryFilters = buildQueryFilters(appliedFilters);
+
+  const { data: chartDataFull, isLoading: isLoadingChart, error: errorChart } =
+    useGetAnalyticsByCity(queryFilters);
+
+  const { data: tableDataFull, isLoading: isLoadingTable, error: errorTable } =
+    useGetAnalyticsByCityList({ ...queryFilters, page, limit });
+
+  const chartData = chartDataFull?.data;
+  const listAvailable = !errorTable && Array.isArray(tableDataFull?.data);
+  const tableRows = listAvailable
+    ? tableDataFull.data
+    : chartData?.slice((page - 1) * limit, page * limit);
+  const tableTotal = listAvailable
+    ? tableDataFull.total_count
+    : chartData?.length ?? 0;
 
   return (
     <div className="space-y-6 mt-4">
@@ -46,10 +70,20 @@ const CityReports = () => {
         />
       </div>
       <AnalyticsChartView
-        data={data?.data}
-        totalCount={data?.total_count}
-        isLoading={isLoading}
-        error={error}
+        data={chartData}
+        tableData={tableRows}
+        totalCount={{
+          ...chartDataFull?.total_count,
+          total: tableTotal,
+        }}
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
+        setLimit={setLimit}
+        isChartLoading={isLoadingChart}
+        isTableLoading={listAvailable && isLoadingTable}
+        chartError={errorChart}
+        tableError={listAvailable ? errorTable : null}
         labelKey="city_name"
         title={t("common.city")}
       />

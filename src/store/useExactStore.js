@@ -15,10 +15,10 @@ export const useGetExactStatus = (options = {}) =>
     ...options,
   });
 
-export const useGetExactUnsynced = (options = {}) =>
+export const useGetExactUnsynced = (params = {}, options = {}) =>
   useQuery({
-    queryKey: ["exact-unsynced"],
-    queryFn: getExactUnsynced,
+    queryKey: ["exact-unsynced", params],
+    queryFn: () => getExactUnsynced(params),
     staleTime: 30000,
     ...options,
   });

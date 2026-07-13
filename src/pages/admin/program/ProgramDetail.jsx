@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { LoadingState, ErrorMessage } from "@/components/common";
-import { DollarSign, Layers, Clock } from "lucide-react";
+import { Layers, Clock, Tag } from "lucide-react";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetProgramById } from "@/store/useProgramStore";
@@ -14,6 +14,8 @@ import ProgramConfigDrawer from "@/components/admin/programs/ProgramConfigDrawer
 import PreviousEducationOptionsDrawer from "@/components/admin/programs/PreviousEducationOptionsDrawer";
 import image from "../../../assets/images/no-component.png";
 import ResourceModule from "@/components/admin/programs/ResourceModule";
+import ProgramAccountingCodes from "@/components/admin/programs/ProgramAccountingCodes";
+import { PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
 import { useTranslation } from "react-i18next";
 const ProgramDetail = () => {
   const { t } = useTranslation();
@@ -153,6 +155,19 @@ const ProgramDetail = () => {
 
   const programData = program?.data;
   if (!programData) return null;
+
+  const programTypeLabel = programData.program_type
+    ? t(
+        PROGRAM_TYPE_I18N_KEYS[programData.program_type] || programData.program_type,
+        programData.program_type,
+      )
+    : t("common.notAvailable");
+
+  const locationLabel =
+    [programData?.city?.name, programData?.city?.country?.name]
+      .filter(Boolean)
+      .join(", ") || t("common.notAvailable");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -163,12 +178,18 @@ const ProgramDetail = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <DashboardCard
           title={t("programDetail.cards.programName")}
           value={programData?.name}
-          subtitle={`${programData?.language?.name || 'N/A'} • ${programData?.city?.name || 'N/A'}${programData?.is_online ? ` • ${t("common.online", "Online")}` : ""}`}
+          subtitle={`${programData?.language?.name || t("common.notAvailable")} • ${locationLabel}${programData?.is_online ? ` • ${t("common.online", "Online")}` : ""}`}
           icon={Layers}
+        />
+
+        <DashboardCard
+          title={t("programDetail.cards.programType")}
+          value={programTypeLabel}
+          icon={Tag}
         />
 
         <DashboardCard
@@ -197,6 +218,8 @@ const ProgramDetail = () => {
           icon={DollarSign}
         /> */}
       </div>
+
+      <ProgramAccountingCodes program={programData} />
 
       {tabs.length > 0 && (
         <>

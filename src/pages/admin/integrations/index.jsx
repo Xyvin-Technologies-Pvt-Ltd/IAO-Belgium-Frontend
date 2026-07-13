@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink, Plug, RefreshCw, Unplug } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
+import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import {
   useGetExactStatus,
@@ -41,6 +42,8 @@ function formatPaymentDate(value) {
 const IntegrationsPage = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const {
     data: statusResponse,
@@ -54,16 +57,15 @@ const IntegrationsPage = () => {
     isLoading: isUnsyncedLoading,
     error: unsyncedError,
     refetch: refetchUnsynced,
-  } = useGetExactUnsynced();
+  } = useGetExactUnsynced({ page, limit: rowsPerPage });
 
   const { mutate: reconcile, isPending: isReconciling } = useReconcileExact();
   const { mutate: disconnect, isPending: isDisconnecting } = useDisconnectExact();
 
   const status = statusResponse?.data;
   const isConnected = Boolean(status?.connected);
-  const unsynced = unsyncedResponse?.data;
-  const unsyncedCount = unsynced?.count ?? 0;
-  const unsyncedRows = unsynced?.rows ?? [];
+  const unsyncedRows = unsyncedResponse?.data ?? [];
+  const unsyncedCount = unsyncedResponse?.total_count ?? 0;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -221,7 +223,7 @@ const IntegrationsPage = () => {
         </div>
 
         {isUnsyncedLoading ? (
-          <TableSkeleton rows={3} columns={5} />
+          <TableSkeleton rows={3} columns={6} />
         ) : unsyncedError ? (
           <ErrorMessage
             message={unsyncedError?.message || t("integrations.exact.unsyncedLoadFailed")}
@@ -237,8 +239,6 @@ const IntegrationsPage = () => {
             <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
               {t("integrations.exact.unsyncedBanner", {
                 count: unsyncedCount,
-                total: unsynced.total,
-                currency: unsynced.currency || "EUR",
               })}
             </div>
 
@@ -250,6 +250,7 @@ const IntegrationsPage = () => {
                     <TableHead>{t("integrations.exact.table.email")}</TableHead>
                     <TableHead>{t("integrations.exact.table.purpose")}</TableHead>
                     <TableHead>{t("integrations.exact.table.program")}</TableHead>
+                    <TableHead>{t("integrations.exact.table.glAccount")}</TableHead>
                     <TableHead className="text-right">
                       {t("integrations.exact.table.amount")}
                     </TableHead>
@@ -264,6 +265,9 @@ const IntegrationsPage = () => {
                       </TableCell>
                       <TableCell>{row.purpose || "—"}</TableCell>
                       <TableCell>{row.program_name || "—"}</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {row.gl_account || "—"}
+                      </TableCell>
                       <TableCell className="text-right whitespace-nowrap">
                         {row.amount} {row.currency}
                       </TableCell>
@@ -272,6 +276,14 @@ const IntegrationsPage = () => {
                 </TableBody>
               </Table>
             </div>
+
+            <Pagination
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              totalRows={unsyncedCount}
+            />
           </div>
         )}
 

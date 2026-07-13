@@ -38,6 +38,7 @@ import {
 } from "@/store/useProgramStore";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import { slugifyPreviousEducationKey } from "@/utils/previousEducation";
+import { PROGRAM_TYPES, PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
 
 const EMPTY_LABELS = { en: "", fr: "", nl: "", de: "" };
 
@@ -48,13 +49,6 @@ const LOCALE_FIELDS = [
   { code: "de", labelKey: "german", badge: "DE" },
 ];
 
-const PROGRAM_TYPES = [
-  "Master of Science",
-  "Lateral Entry Master of Science",
-  "Diploma",
-  "Manual Therapie",
-  "Post Academic Module",
-];
 
 const ProgramTypeConfigDrawer = ({ isOpen, onOpenChange }) => {
   const { t } = useTranslation();
@@ -231,21 +225,11 @@ const ProgramTypeConfigDrawer = ({ isOpen, onOpenChange }) => {
                 <SelectValue placeholder={t("programManagement.modal.programTypePlaceholder", "Select program type")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Master of Science">
-                  {t("programManagement.modal.programTypes.masterOfScience", "Master of Science")}
-                </SelectItem>
-                <SelectItem value="Lateral Entry Master of Science">
-                  {t("programManagement.modal.programTypes.lateralEntry", "Lateral Entry Master of Science")}
-                </SelectItem>
-                <SelectItem value="Diploma">
-                  {t("programManagement.modal.programTypes.diploma", "Diploma")}
-                </SelectItem>
-                <SelectItem value="Manual Therapie">
-                  {t("programManagement.modal.programTypes.manualTherapie", "Manual Therapie")}
-                </SelectItem>
-                <SelectItem value="Post Academic Module">
-                  {t("programManagement.modal.programTypes.postAcademic", "Post Academic Module")}
-                </SelectItem>
+                {PROGRAM_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {t(PROGRAM_TYPE_I18N_KEYS[type] || type, type)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
