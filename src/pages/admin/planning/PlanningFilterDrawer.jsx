@@ -55,10 +55,12 @@ const PlanningFilterDrawer = ({
   const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
     selectedProgramId,
     {
+      include_closed: true,
       ...(batchSearchTerm && { search: batchSearchTerm }),
     },
     { enabled: isOpen && !!selectedProgramId }
   );
+
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(([key, val]) => {
     if (key === "status" && val === "active") return false;
