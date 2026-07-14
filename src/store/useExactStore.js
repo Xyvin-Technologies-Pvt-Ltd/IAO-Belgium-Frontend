@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   getExactStatus,
   getExactUnsynced,
+  getExactSent,
   reconcileExact,
   disconnectExact,
 } from "@/api/exactApi";
@@ -23,6 +24,14 @@ export const useGetExactUnsynced = (params = {}, options = {}) =>
     ...options,
   });
 
+export const useGetExactSent = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-sent", params],
+    queryFn: () => getExactSent(params),
+    staleTime: 30000,
+    ...options,
+  });
+
 export const useReconcileExact = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -39,6 +48,7 @@ export const useReconcileExact = () => {
           : "All payments are already synced",
       );
       queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
       queryClient.invalidateQueries({ queryKey: ["exact-status"] });
     },
     onError: (err) =>
@@ -53,6 +63,7 @@ export const useDisconnectExact = () => {
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["exact-status"] });
       queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
       toast.success(res?.message || "Exact Online disconnected");
     },
     onError: (err) =>
