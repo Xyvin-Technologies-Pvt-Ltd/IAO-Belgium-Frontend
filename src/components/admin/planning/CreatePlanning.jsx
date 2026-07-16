@@ -185,12 +185,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         setValue("exams", filteredNewExams);
       }
     } else if (open) {
-      // Only clear if NOT in edit mode, OR if the component has actually changed
-      if (!isEdit || isComponentChanged) {
-        const currentExams = watch("exams") || [];
-        if (currentExams.length > 0) {
-          setValue("exams", []);
-        }
+      const currentExams = watch("exams") || [];
+      if (currentExams.length > 0) {
+        setValue("exams", []);
       }
     }
   }, [examsList, examsLoading, open, setValue, isEdit, isComponentChanged, planningData]);
