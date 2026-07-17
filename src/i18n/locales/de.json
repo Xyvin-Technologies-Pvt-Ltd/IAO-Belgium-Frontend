@@ -245,6 +245,7 @@
     "purposes": {
       "admissionFee": "Zulassungsgebühr",
       "modulePurchase": "Modulkauf",
+      "locationSwitch": "Standortwechsel",
       "customInvoice": "Benutzerdefinierte Rechnung"
     },
     "messages": {

@@ -19,6 +19,10 @@ import moment from "moment";
 import { Download } from "lucide-react";
 import { getInvoiceHtml } from "@/api/paymentApi";
 import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
+import {
+  getPaymentConvenienceFeeAmount,
+  getPaymentModuleAmount,
+} from "@/utils/financePaymentUtils";
 
 const TransactionLogs = () => {
   const { t } = useTranslation();
@@ -83,12 +87,7 @@ const TransactionLogs = () => {
     }
   };
 
-  const getActualAmount = (payment) => {
-    if (payment.purpose === "module-purchase" && payment.convenience_fee) {
-      return payment.amount - payment.convenience_fee;
-    }
-    return payment.amount;
-  };
+  const getActualAmount = (payment) => getPaymentModuleAmount(payment);
 
   const getPurposeColor = (purpose) => {
     switch (purpose) {
@@ -96,6 +95,8 @@ const TransactionLogs = () => {
         return "text-blue-600 dark:text-blue-400";
       case "module-purchase":
         return "text-green-600 dark:text-green-400";
+      case "location-switch":
+        return "text-amber-600 dark:text-amber-400";
       case "custom-invoice":
         return "text-purple-600 dark:text-purple-400";
       default:
@@ -110,6 +111,8 @@ const TransactionLogs = () => {
         return t("finance.purposes.admissionFee");
       case "module-purchase":
         return t("finance.purposes.modulePurchase");
+      case "location-switch":
+        return t("finance.purposes.locationSwitch");
       case "custom-invoice":
         return t("finance.purposes.customInvoice");
       default:
@@ -203,10 +206,12 @@ const TransactionLogs = () => {
                     {getActualAmount(payment).toFixed(2)}
                   </TableCell>
                   <TableCell>
-                    {payment.purpose === "module-purchase" &&
-                    payment.convenience_fee
-                      ? `${payment?.currency || "EUR"} ${payment.convenience_fee.toFixed(2)}`
-                      : "-"}
+                    {(() => {
+                      const fee = getPaymentConvenienceFeeAmount(payment);
+                      return fee != null
+                        ? `${payment?.currency || "EUR"} ${fee.toFixed(2)}`
+                        : "-";
+                    })()}
                   </TableCell>
                   <TableCell>{payment?.invoice_ref || "-"}</TableCell>
                   <TableCell>{payment?.receipt_ref || "-"}</TableCell>

@@ -248,6 +248,7 @@
     "purposes": {
       "admissionFee": "Admission Fee",
       "modulePurchase": "Module Purchase",
+      "locationSwitch": "Location Switch",
       "customInvoice": "Custom Invoice"
     },
     "messages": {

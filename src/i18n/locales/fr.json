@@ -247,6 +247,7 @@
     "purposes": {
       "admissionFee": "Frais d'inscription",
       "modulePurchase": "Achat de module",
+      "locationSwitch": "Changement de lieu",
       "customInvoice": "Facture personnalisée"
     },
     "messages": {
