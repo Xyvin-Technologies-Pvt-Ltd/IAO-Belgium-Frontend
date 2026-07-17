@@ -248,6 +248,7 @@
     "purposes": {
       "admissionFee": "Inschrijvingsgeld",
       "modulePurchase": "Module-aankoop",
+      "locationSwitch": "Locatiewissel",
       "customInvoice": "Aangepaste factuur"
     },
     "messages": {
