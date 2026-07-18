@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
-import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import { useGetAllPrograms, useGetIntakes } from "@/store/useDropdownStore";
 import { useBulkUploadStudents } from "@/store/useStudentImport";
 import { downloadStudentTemplate } from "@/api/studentImportApi";
 
@@ -20,7 +20,7 @@ const ACCEPTED_EXT = [".xlsx", ".xls", ".csv"];
 const StudentBulkUploadDialog = ({ open, onClose }) => {
   const { t } = useTranslation();
   const [program, setProgram] = useState("");
-  const [batch, setBatch] = useState("");
+  const [intake, setIntake] = useState("");
   const [programSearch, setProgramSearch] = useState("");
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
@@ -44,21 +44,21 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
     [programsData],
   );
 
-  const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
+  const { data: intakesData, isLoading: intakesLoading } = useGetIntakes(
     program,
     {},
     { enabled: open && !!program },
   );
-  const batches = batchesData?.data || [];
+  const intakes = intakesData?.data || [];
 
   const isPreviewing = bulkUpload.isPending && bulkUpload.variables?.dryRun;
   const isImporting = bulkUpload.isPending && !bulkUpload.variables?.dryRun;
   const isPreviewResult = result?.dry_run === true;
   const isImported = result && !result.dry_run && result.imported > 0;
 
-  //* Identifies the current file+batch combination. The real Upload is only
+  //* Identifies the current file+intake combination. The real Upload is only
   //* allowed once a successful preview has run for this exact combination.
-  const currentKey = file && batch ? `${batch}::${file.name}::${file.size}` : null;
+  const currentKey = file && intake ? `${intake}::${file.name}::${file.size}` : null;
   const canUpload = !!currentKey && previewedKey === currentKey && !isImported;
 
   const resetFileState = () => {
@@ -71,19 +71,19 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
   const handleClose = () => {
     resetFileState();
     setProgram("");
-    setBatch("");
+    setIntake("");
     onClose();
   };
 
   const handleProgramChange = (value) => {
     setProgram(value);
-    setBatch("");
+    setIntake("");
     setResult(null);
     setPreviewedKey(null);
   };
 
-  const handleBatchChange = (value) => {
-    setBatch(value);
+  const handleIntakeChange = (value) => {
+    setIntake(value);
     setResult(null);
     setPreviewedKey(null);
   };
@@ -110,12 +110,12 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
   };
 
   const runUpload = async (dryRun) => {
-    if (!file || !batch) return;
+    if (!file || !intake) return;
     try {
       const response = await bulkUpload.mutateAsync({
         file,
         dryRun,
-        batchId: batch,
+        intakeId: intake,
       });
       setResult(response?.data || null);
       if (dryRun && response?.data) setPreviewedKey(currentKey);
@@ -155,7 +155,7 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
           <p className="text-sm text-muted-foreground">
             {t(
               "studentImport.description",
-              "Select the program and batch, then upload an Excel/CSV file. Students are created with full access and no registration fee. Run a preview before importing.",
+              "Select the program and intake, then upload an Excel/CSV file. Students are created with full access and no registration fee. Run a preview before importing.",
             )}
           </p>
 
@@ -171,18 +171,18 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
               isLoading={programsLoading}
             />
             <SearchableSelect
-              label={t("studentImport.selectBatch", "Batch")}
+              label={t("studentImport.selectIntake", "Intake")}
               placeholder={
                 program
-                  ? t("studentImport.selectBatch", "Batch")
+                  ? t("studentImport.selectIntake", "Intake")
                   : t("studentImport.selectProgramFirst", "Select a program first")
               }
               required
-              items={batches}
-              value={batch}
-              onChange={handleBatchChange}
+              items={intakes}
+              value={intake}
+              onChange={handleIntakeChange}
               disabled={!program}
-              isLoading={batchesLoading}
+              isLoading={intakesLoading}
             />
           </div>
 
@@ -208,15 +208,15 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
             <Button
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              disabled={!batch}
+              disabled={!intake}
             >
               {t("studentImport.selectFile", "Select File")}
             </Button>
-            {!batch && (
+            {!intake && (
               <p className="text-xs text-muted-foreground">
                 {t(
-                  "studentImport.selectBatchFirst",
-                  "Select a program and batch before choosing a file.",
+                  "studentImport.selectIntakeFirst",
+                  "Select a program and intake before choosing a file.",
                 )}
               </p>
             )}
@@ -278,7 +278,7 @@ const StudentBulkUploadDialog = ({ open, onClose }) => {
             <Button
               variant="outline"
               onClick={() => runUpload(true)}
-              disabled={!file || !batch || bulkUpload.isPending}
+              disabled={!file || !intake || bulkUpload.isPending}
             >
               {isPreviewing
                 ? t("common.loading", "Loading...")
