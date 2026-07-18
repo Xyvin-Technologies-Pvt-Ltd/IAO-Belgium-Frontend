@@ -7,8 +7,8 @@ export const useBulkUploadStudents = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ file, dryRun = false, batchId }) =>
-      bulkUploadStudents(file, { dryRun, batchId }),
+    mutationFn: ({ file, dryRun = false, intakeId }) =>
+      bulkUploadStudents(file, { dryRun, intakeId }),
     onSuccess: (response, variables) => {
       //* Preview (dry-run) must not change data or fire a success toast.
       if (variables?.dryRun) return;

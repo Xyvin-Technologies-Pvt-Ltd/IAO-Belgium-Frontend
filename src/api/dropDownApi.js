@@ -83,6 +83,16 @@ export const getBatches= async (id,filter) => {
     throw error.response.data;
   }
 }
+export const getIntakes = async (id, filter) => {
+  try {
+    const response = await axiosInstance.get(`/intake/program/${id}`, {
+      params: filter
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
 export const getComponents= async (filter) => {
   try {
     const response = await axiosInstance.get(`/components/dropdown`,{

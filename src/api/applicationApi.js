@@ -20,6 +20,15 @@ export const updateApplication = async (id, data) => {
   }
 };
 
+export const putApplication = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/application/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getModuleSelection = async (id) => {
   try {
     const response = await axiosInstance.get(`/application/${id}/module-selection`);

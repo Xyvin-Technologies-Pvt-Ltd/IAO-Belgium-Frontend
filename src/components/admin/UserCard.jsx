@@ -1,12 +1,60 @@
-import { Eye, Download, FileText } from "lucide-react";
+import { useState } from "react";
+import { Eye, Download, FileText, Upload, Plus, Loader2 } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
+import { uploadFile } from "@/api/uploadApi";
+import { usePutApplication } from "@/store/useApplication";
 
 const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
   const { t, i18n } = useTranslation();
   const user = isTeacher ? teacher : student;
+  const [uploadingIdCard, setUploadingIdCard] = useState(false);
+  const [uploadingCert, setUploadingCert] = useState(false);
+  const putApplicationMutation = usePutApplication();
+
+  const handleIdCardUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingIdCard(true);
+      const res = await uploadFile(file);
+      await putApplicationMutation.mutateAsync({
+        id: user.application_id || user._id, // Application ID
+        data: {
+          id_card: { url: res.data.file_url }
+        }
+      });
+      toast.success(t("studentManagement.modal.idCardUploaded", "ID Card uploaded successfully"));
+    } catch (err) {
+      toast.error(err?.message || t("studentManagement.modal.uploadFailed", "Upload failed"));
+    } finally {
+      setUploadingIdCard(false);
+    }
+  };
+
+  const handleCertUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingCert(true);
+      const res = await uploadFile(file);
+      const currentCerts = Array.isArray(user?.qualification_certificate) ? user.qualification_certificate : [];
+      await putApplicationMutation.mutateAsync({
+        id: user.application_id || user._id, // Application ID
+        data: {
+          qualification_certificate: [...currentCerts, { url: res.data.file_url }]
+        }
+      });
+      toast.success(t("studentManagement.modal.certUploaded", "Qualification Certificate uploaded successfully"));
+    } catch (err) {
+      toast.error(err?.message || t("studentManagement.modal.uploadFailed", "Upload failed"));
+    } finally {
+      setUploadingCert(false);
+    }
+  };
 
   const programLocation = [user?.program_city, user?.program_country]
     .filter(Boolean)
@@ -244,37 +292,93 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
       </div>
 
       {!isTeacher && (
-        <div>
-          <h3 className="text-base font-semibold mb-4 text-sidebar-foreground">
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-sidebar-foreground">
             {t("studentManagement.modal.documents")}
           </h3>
 
-          {user?.id_card?.url && (
-            <DocumentRow
-              title={t("applicationReview.documents.idCard")}
-              size={t("applicationReview.documents.pdfDocument")}
-              url={user.id_card.url}
-            />
-          )}
-
-          {Array.isArray(user?.qualification_certificate) &&
-            user.qualification_certificate.length > 0 &&
-            user.qualification_certificate.map((cert, index) => (
-              <DocumentRow
-                key={index}
-                title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`}
-                size={t("applicationReview.documents.pdfDocument")}
-                url={cert.url}
-              />
-            ))}
-
-          {!user?.id_card?.url &&
-            (!Array.isArray(user?.qualification_certificate) ||
-              user.qualification_certificate.length === 0) && (
-              <p className="text-sm text-sidebar-foreground/70">
-                {t("studentManagement.modal.noDocuments")}
+          <div className="space-y-3">
+            {/* ID Card */}
+            <div>
+              <p className="text-xs font-semibold text-sidebar-foreground/70 mb-1">
+                {t("applicationReview.documents.idCard")}
               </p>
-            )}
+              {user?.id_card?.url ? (
+                <DocumentRow
+                  title={t("applicationReview.documents.idCard")}
+                  size={t("applicationReview.documents.pdfDocument")}
+                  url={user.id_card.url}
+                />
+              ) : (
+                <div className="flex items-center justify-between border border-dashed border-sidebar-border rounded-lg px-4 py-3 bg-sidebar-accent/5">
+                  <span className="text-sm text-sidebar-foreground/50">
+                    {t("studentManagement.modal.idCardMissing", "ID Card not uploaded")}
+                  </span>
+                  {user?.application_status === "drafted" && (
+                    <label className="flex items-center gap-1.5 px-3 py-1.5 bg-[#ff8904] text-white rounded-[6px] text-xs font-semibold cursor-pointer hover:bg-[#ff8904]/90 transition-colors">
+                      {uploadingIdCard ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Upload size={14} />
+                      )}
+                      {t("studentManagement.modal.upload", "Upload")}
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        onChange={handleIdCardUpload}
+                        disabled={uploadingIdCard}
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Qualification Certificates */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-semibold text-sidebar-foreground/70">
+                  {t("applicationReview.documents.qualificationCertificate")}
+                </p>
+                {user?.application_status === "drafted" && (
+                  <label className="flex items-center gap-1 px-2 py-1 bg-sidebar-accent/20 text-sidebar-foreground hover:bg-sidebar-accent/40 rounded-[4px] text-xs font-medium cursor-pointer transition-colors">
+                    {uploadingCert ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Plus size={12} />
+                    )}
+                    {t("studentManagement.modal.addCert", "Add Certificate")}
+                    <input
+                      type="file"
+                      accept="application/pdf,image/*"
+                      className="hidden"
+                      onChange={handleCertUpload}
+                      disabled={uploadingCert}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {Array.isArray(user?.qualification_certificate) &&
+              user.qualification_certificate.length > 0 ? (
+                user.qualification_certificate.map((cert, index) => (
+                  <DocumentRow
+                    key={index}
+                    title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`}
+                    size={t("applicationReview.documents.pdfDocument")}
+                    url={cert.url}
+                  />
+                ))
+              ) : (
+                <div className="border border-dashed border-sidebar-border rounded-lg px-4 py-3 bg-sidebar-accent/5">
+                  <span className="text-sm text-sidebar-foreground/50">
+                    {t("studentManagement.modal.certsMissing", "Qualification certificates not uploaded")}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
