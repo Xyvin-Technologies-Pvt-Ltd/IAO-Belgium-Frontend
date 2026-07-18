@@ -125,3 +125,21 @@ export const createPayment = async (data) => {
     throw error.response?.data || error;
   }
 };
+
+export const getKmoApplications = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/kmo/applications`, { params: filter });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateKmoStatus = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/kmo/applications/${id}/status`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

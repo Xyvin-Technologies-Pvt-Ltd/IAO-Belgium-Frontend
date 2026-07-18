@@ -295,6 +295,10 @@
       "transactions": {
         "title": "Transaction Logs",
         "description": "Raw Mollie checkout transaction history"
+      },
+      "kmo": {
+        "title": "KMO-Portefeuille",
+        "description": "Manage KMO-Portefeuille student applications"
       }
     }
   },
