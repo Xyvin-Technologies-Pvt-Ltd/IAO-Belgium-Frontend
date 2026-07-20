@@ -3,12 +3,12 @@ import axiosInstance from "./axiosintercepter";
 
 export const bulkUploadStudents = async (
   file,
-  { dryRun = false, batchId } = {},
+  { dryRun = false, intakeId } = {},
 ) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
-    if (batchId) formData.append("batch_id", batchId);
+    if (intakeId) formData.append("intake_id", intakeId);
     if (dryRun) formData.append("dry_run", "true");
     const response = await axiosInstance.post(`/student-import/upload`, formData, {
       headers: { "Content-Type": "multipart/form-data" },

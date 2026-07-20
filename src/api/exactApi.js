@@ -18,6 +18,15 @@ export const getExactUnsynced = async (params = {}) => {
   }
 };
 
+export const getExactSent = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/sent", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const reconcileExact = async () => {
   try {
     const response = await axiosInstance.post("/exact/reconcile");

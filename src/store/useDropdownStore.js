@@ -7,6 +7,7 @@ import {
   getAllTeacherRoles,
   getAllTeacherTitles,
   getBatches,
+  getIntakes,
   getComponents,
   getUsers,
   getTeacherModules,
@@ -106,6 +107,16 @@ export const useGetBatches= (id, filter, options = {}) => {
   return useQuery({
     queryKey: ["all-batches", id, filter],
     queryFn: () => getBatches(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id, // Only run query when id is provided
+    ...options,
+  });
+};
+export const useGetIntakes = (id, filter, options = {}) => {
+  return useQuery({
+    queryKey: ["all-intakes", id, filter],
+    queryFn: () => getIntakes(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     enabled: !!id, // Only run query when id is provided

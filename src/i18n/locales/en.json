@@ -248,6 +248,7 @@
     "purposes": {
       "admissionFee": "Admission Fee",
       "modulePurchase": "Module Purchase",
+      "locationSwitch": "Location Switch",
       "customInvoice": "Custom Invoice"
     },
     "messages": {
@@ -315,9 +316,13 @@
       "disconnecting": "Disconnecting…",
       "disconnectConfirm": "Disconnect Exact Online? Payments will no longer sync until you authorise again.",
       "syncTitle": "Accounting sync",
-      "syncDescription": "Compare paid Mollie payments against entries posted to Exact Online.",
+      "syncDescription": "Review pending payments and everything already posted to Exact Online.",
+      "tabPending": "Pending",
+      "tabSent": "Sent to Exact",
       "allSynced": "All payments synced to Exact Online.",
+      "noSentEntries": "No Exact sales entries recorded yet.",
       "unsyncedBanner": "{{count}} payment(s) not yet synced",
+      "sentBanner": "{{count}} line(s) posted to Exact Online",
       "syncNow": "Sync now",
       "syncing": "Syncing…",
       "authoriseFirst": "Authorise Exact Online first before syncing payments.",
@@ -325,13 +330,35 @@
       "oauthFailed": "Failed to connect Exact Online. Please try again.",
       "loadFailed": "Failed to load Exact Online status",
       "unsyncedLoadFailed": "Failed to load unsynced payments",
+      "sentLoadFailed": "Failed to load Exact sent history",
       "table": {
         "date": "Date",
         "email": "Email",
         "purpose": "Purpose",
+        "type": "Type",
+        "source": "Source",
+        "document": "Document",
         "program": "Programme",
         "glAccount": "GL account",
-        "amount": "Amount"
+        "amount": "Amount",
+        "currency": "Currency",
+        "description": "Description",
+        "exactEntry": "Exact entry #",
+        "exactEntryId": "Exact entry ID"
+      },
+      "sources": {
+        "payment": "Payment",
+        "credit_note": "Credit note",
+        "invoice": "Invoice"
+      },
+      "types": {
+        "module_purchase": "Module purchase",
+        "admission_fee": "Admission fee",
+        "credit_note": "Credit note",
+        "switch_invoice": "Switch invoice",
+        "switch_invoice_fee": "Switch fee",
+        "invoice": "Invoice",
+        "revenue_recognition": "Revenue recognition"
       }
     }
   },

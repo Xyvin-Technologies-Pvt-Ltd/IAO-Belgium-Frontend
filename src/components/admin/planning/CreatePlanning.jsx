@@ -223,7 +223,14 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   );
 
 
-  const batches = (open && selectedProgram) ? (batchesData?.data || []) : [];
+  const batches = (open && selectedProgram)
+    ? (batchesData?.data || []).map((batch) => ({
+        ...batch,
+        name: batch.intake?.academic?.name
+          ? `${batch.name} (${batch.intake.academic.name})`
+          : batch.name,
+      }))
+    : [];
   const componentsRaw = (open && selectedProgram) ? (componentsData?.data || []) : [];
   const components = componentsRaw.map((comp) => {
     const linkedExams = (comp.linked_exams || []).filter((e) => e.name);
