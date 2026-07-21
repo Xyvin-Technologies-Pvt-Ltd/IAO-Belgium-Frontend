@@ -5,6 +5,7 @@ import {
   Users,
   UserCircle,
   History,
+  Briefcase,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -69,6 +70,16 @@ const REPORT_CARDS = [
     bgColor: "rgba(6,182,212,0.08)",
     accentColor: "#06b6d4",
     path: "/admin/finance-reports/transactions",
+  },
+  {
+    key: "kmo",
+    titleKey: "finance.reports.kmo.title",
+    descriptionKey: "finance.reports.kmo.description",
+    icon: Briefcase,
+    iconColor: "#d97706",
+    bgColor: "rgba(217,119,6,0.08)",
+    accentColor: "#d97706",
+    path: "/admin/kmo-applications",
   },
 ];
 

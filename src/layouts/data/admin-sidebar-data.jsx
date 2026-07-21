@@ -116,6 +116,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: FileText,
           },
           {
+            title: "KMO-Portefeuille",
+            url: "/admin/kmo-applications",
+            icon: WalletCards,
+          },
+          {
             title: t("sidebar.admin.customInvoices"),
             url: "/admin/custom-invoices",
             icon: NotebookText,
