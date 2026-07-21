@@ -16,7 +16,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetKmoApplications, useUpdateKmoStatus } from "@/store/usePaymentStore";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Edit2, Eye, Building2 } from "lucide-react";
+import { Edit2, Eye, Building2, CheckCircle2, XCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -279,6 +279,61 @@ const KmoManagement = () => {
                 <p><span className="font-semibold text-gray-500 dark:text-gray-400">Name:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.company_name}</span></p>
                 <p><span className="font-semibold text-gray-500 dark:text-gray-400">Registration #:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.registration_number}</span></p>
                 <p><span className="font-semibold text-gray-500 dark:text-gray-400">VAT #:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.vat_number}</span></p>
+              </div>
+
+              {/* Student Confirmations Section */}
+              <div className="space-y-2 border-b border-sidebar-border pb-3">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Student Confirmations
+                  </p>
+                  {selectedApp.confirmations?.confirmed_at && (
+                    <span className="text-xs text-muted-foreground font-medium">
+                      {moment(selectedApp.confirmations.confirmed_at).format("DD MMM YYYY HH:mm")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-1 text-xs">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-zinc-800/40 border border-gray-100 dark:border-zinc-800">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Submitted KMO Application</span>
+                    {selectedApp.confirmations?.submitted_kmo_app ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Confirmed
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-gray-400 font-medium">
+                        <XCircle className="w-3.5 h-3.5" /> Pending
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-zinc-800/40 border border-gray-100 dark:border-zinc-800">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Deposited Contribution</span>
+                    {selectedApp.confirmations?.deposited_contribution ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Confirmed
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-gray-400 font-medium">
+                        <XCircle className="w-3.5 h-3.5" /> Pending
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-zinc-800/40 border border-gray-100 dark:border-zinc-800">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Granted Transfer Permission</span>
+                    {selectedApp.confirmations?.granted_permission ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Confirmed
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-gray-400 font-medium">
+                        <XCircle className="w-3.5 h-3.5" /> Pending
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 border-b border-sidebar-border pb-3">
