@@ -69,6 +69,7 @@ export const getEnrolledStudentsByIntake = async (id,filter) => {
   }
 };
 
+
 export const getStudentByApplication = async (applicationId, filter = {}) => {
   try {
     const response = await axiosInstance.get(

@@ -107,7 +107,8 @@ const KmoManagement = () => {
       setIsUpdateOpen(false);
       refetch();
     } catch (err) {
-      toast.error(err?.message || "Failed to update status");
+      // Error toast is already handled by useUpdateKmoStatus onError callback
+      console.error("Failed to update status:", err);
     }
   };
 
@@ -192,25 +193,25 @@ const KmoManagement = () => {
                 applications.map((app) => (
                   <TableRow key={app._id}>
                     <TableCell>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {app.student_id?.first_name} {app.student_id?.last_name}
                       </p>
                       <p className="text-xs text-muted-foreground">{app.student_id?.email}</p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-semibold text-gray-900">{app.module_id?.name}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {app.module_id?.currency || "EUR"} {app.module_id?.amount}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-semibold text-gray-900">{app.company_id?.company_name}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{app.company_id?.company_name}</p>
                       <p className="text-xs text-muted-foreground">VAT: {app.company_id?.vat_number}</p>
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={getDisplayStatusColor(app.status)} label={app.status} />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">
                       {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
@@ -255,50 +256,50 @@ const KmoManagement = () => {
       {/* Details Dialog */}
       {selectedApp && (
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent className="max-w-md rounded-xl">
+          <DialogContent className="max-w-md rounded-xl bg-white dark:bg-sidebar border border-sidebar-border">
             <DialogHeader>
-              <DialogTitle>KMO Application Details</DialogTitle>
+              <DialogTitle className="text-gray-900 dark:text-white">KMO Application Details</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4 text-sm">
               <div className="grid grid-cols-2 gap-2 border-b border-sidebar-border pb-3">
-                <p className="font-bold text-gray-500">Student:</p>
-                <p className="font-semibold text-gray-900">{selectedApp.student_id?.first_name} {selectedApp.student_id?.last_name}</p>
+                <p className="font-bold text-gray-500 dark:text-gray-400">Student:</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.student_id?.first_name} {selectedApp.student_id?.last_name}</p>
                 
-                <p className="font-bold text-gray-500">Module:</p>
-                <p className="font-semibold text-gray-900">{selectedApp.module_id?.name}</p>
+                <p className="font-bold text-gray-500 dark:text-gray-400">Module:</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.module_id?.name}</p>
 
-                <p className="font-bold text-gray-500">Amount:</p>
-                <p className="font-semibold text-gray-900">{selectedApp.module_id?.currency || "EUR"} {selectedApp.module_id?.amount}</p>
+                <p className="font-bold text-gray-500 dark:text-gray-400">Amount:</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.module_id?.currency || "EUR"} {selectedApp.module_id?.amount}</p>
               </div>
 
               <div className="space-y-2 border-b border-sidebar-border pb-3">
-                <p className="font-bold text-gray-700 flex items-center gap-1">
-                  <Building2 className="w-4 h-4" /> Company Details
+                <p className="font-bold text-gray-700 dark:text-gray-200 flex items-center gap-1">
+                  <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" /> Company Details
                 </p>
-                <p><span className="font-semibold text-gray-500">Name:</span> {selectedApp.company_id?.company_name}</p>
-                <p><span className="font-semibold text-gray-500">Registration #:</span> {selectedApp.company_id?.registration_number}</p>
-                <p><span className="font-semibold text-gray-500">VAT #:</span> {selectedApp.company_id?.vat_number}</p>
+                <p><span className="font-semibold text-gray-500 dark:text-gray-400">Name:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.company_name}</span></p>
+                <p><span className="font-semibold text-gray-500 dark:text-gray-400">Registration #:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.registration_number}</span></p>
+                <p><span className="font-semibold text-gray-500 dark:text-gray-400">VAT #:</span> <span className="text-gray-900 dark:text-white font-medium">{selectedApp.company_id?.vat_number}</span></p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 border-b border-sidebar-border pb-3">
-                <p className="font-bold text-gray-500">Project Number:</p>
-                <p className="font-semibold text-gray-900">{selectedApp.project_number || "N/A"}</p>
+                <p className="font-bold text-gray-500 dark:text-gray-400">Project Number:</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
 
-                <p className="font-bold text-gray-500">Current Status:</p>
-                <p className="font-bold text-amber-600 capitalize">{selectedApp.status}</p>
+                <p className="font-bold text-gray-500 dark:text-gray-400">Current Status:</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400 capitalize">{selectedApp.status}</p>
               </div>
 
               {selectedApp.reason && (
-                <div className="bg-red-50 text-red-800 p-3 rounded-lg border border-red-200">
+                <div className="bg-red-50 dark:bg-red-950/40 text-red-800 dark:text-red-300 p-3 rounded-lg border border-red-200 dark:border-red-900/50">
                   <p className="font-bold">Rejection Reason:</p>
                   <p>{selectedApp.reason}</p>
                 </div>
               )}
 
               {selectedApp.notes && (
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                  <p className="font-semibold text-gray-800">Admin Notes:</p>
-                  <p className="text-xs text-gray-600 mt-1">{selectedApp.notes}</p>
+                <div className="bg-gray-50 dark:bg-zinc-800/60 p-3 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <p className="font-semibold text-gray-800 dark:text-gray-200">Admin Notes:</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{selectedApp.notes}</p>
                 </div>
               )}
             </div>
@@ -314,13 +315,13 @@ const KmoManagement = () => {
       {/* Update Dialog */}
       {selectedApp && (
         <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-          <DialogContent className="max-w-md rounded-xl">
+          <DialogContent className="max-w-md rounded-xl bg-white dark:bg-sidebar border border-sidebar-border">
             <DialogHeader>
-              <DialogTitle>Update KMO Application Status</DialogTitle>
+              <DialogTitle className="text-gray-900 dark:text-white">Update KMO Application Status</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-600 uppercase">New Status</label>
+                <label className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">New Status</label>
                 <Select value={newStatus} onValueChange={setNewStatus}>
                   <SelectTrigger className="rounded-[6px] h-10">
                     <SelectValue placeholder="Select Status" />
@@ -337,7 +338,7 @@ const KmoManagement = () => {
 
               {newStatus === "submitted" && (
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-600 uppercase">Project Number (Required)</label>
+                  <label className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">Project Number (Required)</label>
                   <Input
                     value={projectNumber}
                     onChange={(e) => setProjectNumber(e.target.value)}
@@ -349,7 +350,7 @@ const KmoManagement = () => {
 
               {newStatus === "rejected" && (
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-gray-600 uppercase">Rejection Reason (Required)</label>
+                  <label className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">Rejection Reason (Required)</label>
                   <Textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
@@ -360,7 +361,7 @@ const KmoManagement = () => {
               )}
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-600 uppercase">Internal Notes (Optional)</label>
+                <label className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">Internal Notes (Optional)</label>
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

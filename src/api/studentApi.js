@@ -44,6 +44,39 @@ export const getStudentAttendance = async (id, filter) => {
   }
 };
 
+export const getStudentPayments = async (id, filter = {}) => {
+  try {
+    const response = await axiosInstance.get(`/user/student/${id}/payments`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getStudentInvoices = async (id, filter = {}) => {
+  try {
+    const response = await axiosInstance.get(`/user/student/${id}/invoices`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getStudentReceipts = async (id, filter = {}) => {
+  try {
+    const response = await axiosInstance.get(`/user/student/${id}/receipts`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getSpecialExceptions = async () => {
   try {
     const response = await axiosInstance.get("/special-exceptions");
