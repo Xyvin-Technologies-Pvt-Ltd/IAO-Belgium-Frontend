@@ -177,9 +177,13 @@ const EnrolledStudentDetails = () => {
     };
   }, [student?.data, id]);
 
-  const formatPurpose = (purpose) => {
+  const formatPurpose = (item) => {
+    const purpose = typeof item === "string" ? item : (item?.purpose || item?.payment?.purpose);
+    if (item?.is_kmo || purpose === "kmo") return "KMO-Portefeuille";
     if (!purpose) return t("common.notAvailable");
     switch (purpose) {
+      case "kmo":
+        return "KMO-Portefeuille";
       case "admission-fee":
         return t("finance.purposes.admissionFee");
       case "module-purchase":
@@ -672,7 +676,7 @@ const EnrolledStudentDetails = () => {
                           </span>
                         </TableCell>
                         <TableCell>{item.uid || "-"}</TableCell>
-                        <TableCell>{formatPurpose(item.purpose)}</TableCell>
+                        <TableCell>{formatPurpose(item)}</TableCell>
                         <TableCell>
                           {item.component_name || t("common.notAvailable")}
                         </TableCell>
