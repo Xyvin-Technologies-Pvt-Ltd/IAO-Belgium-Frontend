@@ -9,7 +9,7 @@ import FormActions from "@/components/ui/forms/FormActions";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 import { Label } from "@/components/ui/label";
-import { GetCountries } from "react-country-state-city";
+import { getCountriesCached } from "@/utils/countriesCache";
 import {
   Select,
   SelectContent,
@@ -49,10 +49,15 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   const [teachingRegionSearchTerm, setTeachingRegionSearchTerm] = useState("");
 
   useEffect(() => {
-    GetCountries().then((result) => {
-      setCountries(result);
+    if (!open) return;
+    let cancelled = false;
+    getCountriesCached().then((result) => {
+      if (!cancelled) setCountries(result);
     });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const { data: languagesData, isLoading: languagesLoading } =
     useGetAllLanguages(
