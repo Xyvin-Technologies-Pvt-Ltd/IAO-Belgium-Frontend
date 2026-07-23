@@ -18,6 +18,7 @@ import {
   Activity,
   Plug,
   WalletCards,
+  CreditCard,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -119,6 +120,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: "KMO-Portefeuille",
             url: "/admin/kmo-applications",
             icon: WalletCards,
+          },
+          {
+            title: "Third-Party Payments",
+            url: "/admin/third-party-payments",
+            icon: CreditCard,
           },
           {
             title: t("sidebar.admin.customInvoices"),

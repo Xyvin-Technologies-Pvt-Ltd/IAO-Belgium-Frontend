@@ -143,3 +143,21 @@ export const updateKmoStatus = async (id, data) => {
     throw error.response?.data || error;
   }
 };
+
+export const getThirdPartyApplications = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/third-party-payment/applications`, { params: filter });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const adminCancelThirdParty = async (id) => {
+  try {
+    const response = await axiosInstance.put(`/third-party-payment/${id}/admin-cancel`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

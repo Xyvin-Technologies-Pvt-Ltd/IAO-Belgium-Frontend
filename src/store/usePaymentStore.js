@@ -143,3 +143,28 @@ export const useUpdateKmoStatus = () => {
     },
   });
 };
+
+export const useGetThirdPartyApplications = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["third-party-applications", filter],
+    queryFn: () => import("@/api/paymentApi").then(m => m.getThirdPartyApplications(filter)),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useAdminCancelThirdParty = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => import("@/api/paymentApi").then(m => m.adminCancelThirdParty(id)),
+    onSuccess: () => {
+      toast.success("Third-party payment application cancelled successfully.");
+      queryClient.invalidateQueries({ queryKey: ["third-party-applications"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to cancel third-party payment application");
+    },
+  });
+};
