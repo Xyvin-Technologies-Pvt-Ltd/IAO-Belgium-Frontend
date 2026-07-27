@@ -5,6 +5,8 @@ import {
   Users,
   UserCircle,
   History,
+  Briefcase,
+  CreditCard,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -69,6 +71,26 @@ const REPORT_CARDS = [
     bgColor: "rgba(6,182,212,0.08)",
     accentColor: "#06b6d4",
     path: "/admin/finance-reports/transactions",
+  },
+  {
+    key: "kmo",
+    titleKey: "finance.reports.kmo.title",
+    descriptionKey: "finance.reports.kmo.description",
+    icon: Briefcase,
+    iconColor: "#d97706",
+    bgColor: "rgba(217,119,6,0.08)",
+    accentColor: "#d97706",
+    path: "/admin/kmo-applications",
+  },
+  {
+    key: "third_party",
+    titleKey: "Third-Party Payments",
+    descriptionKey: "Manage student pay-via-third-party invoice arrangements",
+    icon: CreditCard,
+    iconColor: "#4f46e5",
+    bgColor: "rgba(79,70,229,0.08)",
+    accentColor: "#4f46e5",
+    path: "/admin/third-party-payments",
   },
 ];
 

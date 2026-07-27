@@ -7,9 +7,12 @@ import { useGetStudentByApplication } from "@/store/useIntakeStore";
 import {
   useGetSpecialExceptions,
   useGetStudentAttendance,
+  useGetStudentPayments,
+  useGetStudentInvoices,
+  useGetStudentReceipts,
   useUpdateStudentSpecialExceptions,
 } from "@/store/useStudentStore";
-import { getInvoiceHtml } from "@/api/paymentApi";
+import { getInvoiceHtml, getInvoicePrintHtml } from "@/api/paymentApi";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import { Pagination } from "@/components/ui/table/Pagination";
 import StatusBadge from "@/components/StatusBadge";
 import { Download } from "lucide-react";
 import moment from "moment";
@@ -43,6 +47,12 @@ const StudentDetails = () => {
 
   const [activeTab, setActiveTab] = useState("progress");
   const [filter, setFilter] = useState({ year: 1 });
+  const [paymentsPage, setPaymentsPage] = useState(1);
+  const [paymentsRowsPerPage, setPaymentsRowsPerPage] = useState(10);
+  const [transactionsPage, setTransactionsPage] = useState(1);
+  const [transactionsRowsPerPage, setTransactionsRowsPerPage] = useState(10);
+  const [receiptsPage, setReceiptsPage] = useState(1);
+  const [receiptsRowsPerPage, setReceiptsRowsPerPage] = useState(10);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedExceptions, setSelectedExceptions] = useState([]);
 
@@ -73,6 +83,45 @@ const StudentDetails = () => {
   } = useGetStudentAttendance(studentUserId, filter, {
     enabled: !!studentUserId && !student?.data?.is_online,
   });
+
+  const {
+    data: invoicesResponse,
+    isLoading: invoicesLoading,
+    error: invoicesError,
+    refetch: refetchInvoices,
+  } = useGetStudentInvoices(
+    studentUserId,
+    { page: paymentsPage, limit: paymentsRowsPerPage },
+    {
+      enabled: !!studentUserId && activeTab === "payments",
+    },
+  );
+
+  const {
+    data: transactionsResponse,
+    isLoading: transactionsLoading,
+    error: transactionsError,
+    refetch: refetchTransactions,
+  } = useGetStudentPayments(
+    studentUserId,
+    { page: transactionsPage, limit: transactionsRowsPerPage },
+    {
+      enabled: !!studentUserId && activeTab === "transactions",
+    },
+  );
+
+  const {
+    data: receiptsResponse,
+    isLoading: receiptsLoading,
+    error: receiptsError,
+    refetch: refetchReceipts,
+  } = useGetStudentReceipts(
+    studentUserId,
+    { page: receiptsPage, limit: receiptsRowsPerPage },
+    {
+      enabled: !!studentUserId && activeTab === "receipts",
+    },
+  );
 
   useEffect(() => {
     if (student?.data) {
@@ -133,15 +182,21 @@ const StudentDetails = () => {
     };
   }, [student?.data, id]);
 
-  const formatPurpose = (purpose) => {
+  const formatPurpose = (item) => {
+    const purpose = typeof item === "string" ? item : (item?.purpose || item?.payment?.purpose);
+    if (item?.is_kmo || purpose === "kmo") return "KMO-Portefeuille";
     if (!purpose) return t("common.notAvailable");
     switch (purpose) {
+      case "kmo":
+        return "KMO-Portefeuille";
       case "admission-fee":
         return t("finance.purposes.admissionFee");
       case "module-purchase":
         return t("finance.purposes.modulePurchase");
       case "custom-invoice":
         return t("finance.purposes.customInvoice");
+      case "location-switch":
+        return t("finance.purposes.locationSwitch", "Location Switch");
       default:
         return purpose
           .split("-")
@@ -150,9 +205,65 @@ const StudentDetails = () => {
     }
   };
 
-  const handleDownloadInvoice = async (payment) => {
+  const formatDocType = (docType) => {
+    switch (docType) {
+      case "invoice":
+        return t("common.invoice", "Invoice");
+      case "credit_note":
+        return t("common.creditNote", "Credit Note");
+      case "refund":
+        return t("common.refund", "Refund");
+      case "payment":
+      default:
+        return t("common.payment", "Payment");
+    }
+  };
+
+  const getDocTypeBadgeClass = (docType) => {
+    switch (docType) {
+      case "invoice":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200 dark:border-blue-900/50";
+      case "credit_note":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200 dark:border-amber-900/50";
+      case "refund":
+        return "bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border-red-200 dark:border-red-900/50";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700";
+    }
+  };
+
+  const getAmountClass = (item) => {
+    if (item.doc_type === "refund") {
+      return "text-red-600 dark:text-red-400 font-medium";
+    }
+    if (item.doc_type === "credit_note" || item.amount < 0) {
+      return "text-amber-700 dark:text-amber-400 font-medium";
+    }
+    if (item.doc_type === "invoice") {
+      return "text-blue-700 dark:text-blue-400";
+    }
+    return undefined;
+  };
+
+  const canViewDocument = (item) => {
+    if (item.doc_type === "credit_note") return true;
+    if (item.doc_type === "refund") return false;
+    if (item.doc_type === "invoice") {
+      return ["issued", "paid", "credited"].includes(item.status);
+    }
+    return item.status === "paid";
+  };
+
+  const handleDownloadDocument = async (item) => {
     try {
-      const html = await getInvoiceHtml(payment._id);
+      const html =
+        item.doc_type === "invoice" ||
+        item.doc_type === "credit_note" ||
+        item.doc_type === "refund"
+          ? await getInvoicePrintHtml(
+              item.doc_type === "refund" ? item.invoice_id : item._id,
+            )
+          : await getInvoiceHtml(item._id);
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
       iframe.style.right = "0";
@@ -168,7 +279,7 @@ const StudentDetails = () => {
       iframe.contentWindow.onafterprint = () => document.body.removeChild(iframe);
       setTimeout(() => iframe.contentWindow.print(), 500);
     } catch (err) {
-      console.error("Failed to download invoice:", err);
+      console.error("Failed to download document:", err);
     }
   };
 
@@ -199,7 +310,12 @@ const StudentDetails = () => {
   const modules = studentData?.assigned_modules || [];
   const exams = studentData?.completed_exams || [];
   const apps = studentData?.assigned_apps || [];
-  const payments = studentData?.payments || [];
+  const invoices = invoicesResponse?.data || [];
+  const invoicesTotal = invoicesResponse?.total_count || 0;
+  const transactions = transactionsResponse?.data || [];
+  const transactionsTotal = transactionsResponse?.total_count || 0;
+  const receipts = receiptsResponse?.data || [];
+  const receiptsTotal = receiptsResponse?.total_count || 0;
   const attendanceModules = attendanceResponse?.data || [];
 
   const getAppStatus = (app) => app.review_status || app.status;
@@ -241,6 +357,26 @@ const StudentDetails = () => {
             }`}
           >
             {t("studentManagement.tabs.payments", "Payments")}
+          </button>
+          <button
+            onClick={() => setActiveTab("transactions")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "transactions"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.transactions", "Transactions")}
+          </button>
+          <button
+            onClick={() => setActiveTab("receipts")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "receipts"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.receipts", "Receipts")}
           </button>
           <button
             onClick={() => setActiveTab("attachments")}
@@ -502,84 +638,352 @@ const StudentDetails = () => {
 
       {activeTab === "payments" && (
         <div className="space-y-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("common.paymentId", "Payment ID")}</TableHead>
-                <TableHead>{t("common.purpose", "Purpose")}</TableHead>
-                <TableHead>{t("common.component", "Component")}</TableHead>
-                <TableHead>{t("common.amount", "Amount")}</TableHead>
-                <TableHead>
-                  {t("studentManagement.details.billingMethod", "Billing")}
-                </TableHead>
-                <TableHead>
-                  {t("studentManagement.table.status", "Status")}
-                </TableHead>
-                <TableHead>{t("common.date", "Date")}</TableHead>
-                <TableHead>{t("common.actions", "Actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.length > 0 ? (
-                payments.map((payment) => (
-                  <TableRow key={payment._id}>
-                    <TableCell>{payment.uid || "-"}</TableCell>
-                    <TableCell>{formatPurpose(payment.purpose)}</TableCell>
-                    <TableCell>
-                      {payment.component_name || t("common.notAvailable")}
-                    </TableCell>
-                    <TableCell>
-                      {payment.currency || "EUR"} {payment.amount?.toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      {payment.billing_method === "company"
-                        ? t("studentManagement.billing.company", "Company")
-                        : t("studentManagement.billing.personal", "Personal")}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={payment.display_status} />
-                    </TableCell>
-                    <TableCell>
-                      {payment.paid_at
-                        ? moment(payment.paid_at).format("DD-MM-YYYY")
-                        : moment(payment.createdAt).format("DD-MM-YYYY")}
-                    </TableCell>
-                    <TableCell>
-                      {payment.status === "paid" ? (
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadInvoice(payment)}
-                          className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                          title={t(
-                            "studentManagement.details.downloadInvoice",
-                            "Download invoice",
-                          )}
-                        >
-                          <Download size={14} />
-                          {t(
-                            "studentManagement.details.viewInvoice",
-                            "View invoice",
-                          )}
-                        </button>
-                      ) : null}
-                    </TableCell>
+          {invoicesLoading ? (
+            <LoadingState text={t("common.loading", "Loading...")} />
+          ) : invoicesError ? (
+            <ErrorMessage
+              message={
+                invoicesError?.message ||
+                t("intakeManagement.details.loadFailed")
+              }
+              onRetry={refetchInvoices}
+              variant="card"
+            />
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("common.type", "Type")}</TableHead>
+                    <TableHead>{t("common.id", "ID")}</TableHead>
+                    <TableHead>{t("common.purpose", "Purpose")}</TableHead>
+                    <TableHead>{t("common.component", "Component")}</TableHead>
+                    <TableHead>{t("common.amount", "Amount")}</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.billingMethod", "Billing")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
+                    <TableHead>{t("common.date", "Date")}</TableHead>
+                    <TableHead>{t("common.actions", "Actions")}</TableHead>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-muted-foreground"
-                  >
-                    {t(
-                      "studentManagement.details.noPayments",
-                      "No payments found",
-                    )}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                  {invoices.length > 0 ? (
+                    invoices.map((item) => (
+                      <TableRow key={`${item.doc_type}-${item._id}`}>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${getDocTypeBadgeClass(item.doc_type)}`}
+                          >
+                            {formatDocType(item.doc_type)}
+                          </span>
+                        </TableCell>
+                        <TableCell>{item.uid || "-"}</TableCell>
+                        <TableCell>{formatPurpose(item)}</TableCell>
+                        <TableCell>
+                          {item.component_name || t("common.notAvailable")}
+                        </TableCell>
+                        <TableCell className={getAmountClass(item)}>
+                          {item.currency || "EUR"}{" "}
+                          {Number(item.amount || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          {item.billing_method === "company"
+                            ? t("studentManagement.billing.company", "Company")
+                            : t(
+                                "studentManagement.billing.personal",
+                                "Personal",
+                              )}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={item.display_status} />
+                        </TableCell>
+                        <TableCell>
+                          {moment(item.sort_date || item.createdAt).format(
+                            "DD-MM-YYYY",
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {canViewDocument(item) ? (
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadDocument(item)}
+                              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                              title={t(
+                                "studentManagement.details.downloadInvoice",
+                                "Download invoice",
+                              )}
+                            >
+                              <Download size={14} />
+                              {item.doc_type === "credit_note"
+                                ? t(
+                                    "studentManagement.details.viewCreditNote",
+                                    "View credit note",
+                                  )
+                                : t(
+                                    "studentManagement.details.viewInvoice",
+                                    "View invoice",
+                                  )}
+                            </button>
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center text-muted-foreground"
+                      >
+                        {t(
+                          "studentManagement.details.noInvoices",
+                          "No invoices found",
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <Pagination
+                page={paymentsPage}
+                setPage={setPaymentsPage}
+                rowsPerPage={paymentsRowsPerPage}
+                setRowsPerPage={setPaymentsRowsPerPage}
+                totalRows={invoicesTotal}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {activeTab === "transactions" && (
+        <div className="space-y-4">
+          {transactionsLoading ? (
+            <LoadingState text={t("common.loading", "Loading...")} />
+          ) : transactionsError ? (
+            <ErrorMessage
+              message={
+                transactionsError?.message ||
+                t("intakeManagement.details.loadFailed")
+              }
+              onRetry={refetchTransactions}
+              variant="card"
+            />
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("common.paymentId", "Payment ID")}</TableHead>
+                    <TableHead>{t("common.purpose", "Purpose")}</TableHead>
+                    <TableHead>{t("common.component", "Component")}</TableHead>
+                    <TableHead>{t("common.amount", "Amount")}</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.billingMethod", "Billing")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
+                    <TableHead>{t("common.date", "Date")}</TableHead>
+                    <TableHead>{t("common.actions", "Actions")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {transactions.length > 0 ? (
+                    transactions.map((payment) => (
+                      <TableRow key={payment._id}>
+                        <TableCell>{payment.uid || "-"}</TableCell>
+                        <TableCell>{formatPurpose(payment.purpose)}</TableCell>
+                        <TableCell>
+                          {payment.component_name || t("common.notAvailable")}
+                        </TableCell>
+                        <TableCell>
+                          {payment.currency || "EUR"}{" "}
+                          {Number(payment.amount || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          {payment.billing_method === "company"
+                            ? t("studentManagement.billing.company", "Company")
+                            : t(
+                                "studentManagement.billing.personal",
+                                "Personal",
+                              )}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={payment.display_status} />
+                        </TableCell>
+                        <TableCell>
+                          {payment.paid_at
+                            ? moment(payment.paid_at).format("DD-MM-YYYY")
+                            : moment(payment.createdAt).format("DD-MM-YYYY")}
+                        </TableCell>
+                        <TableCell>
+                          {payment.status === "paid" ? (
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadDocument(payment)}
+                              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                              title={t(
+                                "studentManagement.details.downloadInvoice",
+                                "Download invoice",
+                              )}
+                            >
+                              <Download size={14} />
+                              {t(
+                                "studentManagement.details.viewInvoice",
+                                "View invoice",
+                              )}
+                            </button>
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-muted-foreground"
+                      >
+                        {t(
+                          "studentManagement.details.noPayments",
+                          "No payments found",
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <Pagination
+                page={transactionsPage}
+                setPage={setTransactionsPage}
+                rowsPerPage={transactionsRowsPerPage}
+                setRowsPerPage={setTransactionsRowsPerPage}
+                totalRows={transactionsTotal}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {activeTab === "receipts" && (
+        <div className="space-y-4">
+          {receiptsLoading ? (
+            <LoadingState text={t("common.loading", "Loading...")} />
+          ) : receiptsError ? (
+            <ErrorMessage
+              message={
+                receiptsError?.message ||
+                t("intakeManagement.details.loadFailed")
+              }
+              onRetry={refetchReceipts}
+              variant="card"
+            />
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("common.receiptId", "Receipt ID")}</TableHead>
+                    <TableHead>{t("common.purpose", "Purpose")}</TableHead>
+                    <TableHead>{t("common.component", "Component")}</TableHead>
+                    <TableHead>{t("common.amount", "Amount")}</TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.billingMethod", "Billing")}
+                    </TableHead>
+                    <TableHead>
+                      {t("studentManagement.table.status", "Status")}
+                    </TableHead>
+                    <TableHead>{t("common.date", "Date")}</TableHead>
+                    <TableHead>{t("common.actions", "Actions")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {receipts.length > 0 ? (
+                    receipts.map((receipt) => (
+                      <TableRow key={receipt._id}>
+                        <TableCell>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50">
+                            {receipt.uid || "-"}
+                          </span>
+                        </TableCell>
+                        <TableCell>{formatPurpose(receipt.purpose)}</TableCell>
+                        <TableCell>
+                          {receipt.component_name || t("common.notAvailable")}
+                        </TableCell>
+                        <TableCell className="text-emerald-700 dark:text-emerald-400">
+                          {receipt.currency || "EUR"}{" "}
+                          {Number(receipt.amount || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          {receipt.billing_method === "company"
+                            ? t("studentManagement.billing.company", "Company")
+                            : t(
+                                "studentManagement.billing.personal",
+                                "Personal",
+                              )}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={receipt.display_status} />
+                        </TableCell>
+                        <TableCell>
+                          {moment(receipt.sort_date || receipt.createdAt).format(
+                            "DD-MM-YYYY",
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {receipt.payment_id ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleDownloadDocument({
+                                  ...receipt,
+                                  _id: receipt.payment_id,
+                                  doc_type: "payment",
+                                  status: "paid",
+                                })
+                              }
+                              className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors cursor-pointer"
+                              title={t(
+                                "studentManagement.details.viewReceipt",
+                                "View receipt",
+                              )}
+                            >
+                              <Download size={14} />
+                              {t(
+                                "studentManagement.details.viewReceipt",
+                                "View receipt",
+                              )}
+                            </button>
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-muted-foreground"
+                      >
+                        {t(
+                          "studentManagement.details.noReceipts",
+                          "No receipts found",
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <Pagination
+                page={receiptsPage}
+                setPage={setReceiptsPage}
+                rowsPerPage={receiptsRowsPerPage}
+                setRowsPerPage={setReceiptsRowsPerPage}
+                totalRows={receiptsTotal}
+              />
+            </>
+          )}
         </div>
       )}
 

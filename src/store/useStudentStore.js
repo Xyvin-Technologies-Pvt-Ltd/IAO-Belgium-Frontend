@@ -1,5 +1,8 @@
 import {
   getStudentAttendance,
+  getStudentPayments,
+  getStudentInvoices,
+  getStudentReceipts,
   getStudentById,
   getStudents,
   getSpecialExceptions,
@@ -33,6 +36,36 @@ export const useGetStudentAttendance = (id, filter, options = {}) => {
   return useQuery({
     queryKey: ["student-attendance", id, filter],
     queryFn: () => getStudentAttendance(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentPayments = (id, filter = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["student-payments", id, filter],
+    queryFn: () => getStudentPayments(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentInvoices = (id, filter = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["student-invoices", id, filter],
+    queryFn: () => getStudentInvoices(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentReceipts = (id, filter = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["student-receipts", id, filter],
+    queryFn: () => getStudentReceipts(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
@@ -86,4 +119,4 @@ export const useDeleteSpecialException = () => {
       queryClient.invalidateQueries({ queryKey: ["special-exceptions"] });
     },
   });
-};
+};

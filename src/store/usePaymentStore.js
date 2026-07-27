@@ -9,6 +9,8 @@ import {
   getAnalyticsByStudent,
   createPayment,
   getTransactionLogs,
+  getKmoApplications,
+  updateKmoStatus,
 } from "@/api/paymentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -113,6 +115,56 @@ export const useCreatePayment = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to create invoice");
+    },
+  });
+};
+
+export const useGetKmoApplications = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["kmo-applications", filter],
+    queryFn: () => getKmoApplications(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useUpdateKmoStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => updateKmoStatus(id, data),
+    onSuccess: () => {
+      toast.success("KMO application status updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["kmo-applications"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update KMO status");
+    },
+  });
+};
+
+export const useGetThirdPartyApplications = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["third-party-applications", filter],
+    queryFn: () => import("@/api/paymentApi").then(m => m.getThirdPartyApplications(filter)),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useAdminCancelThirdParty = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => import("@/api/paymentApi").then(m => m.adminCancelThirdParty(id)),
+    onSuccess: () => {
+      toast.success("Third-party payment application cancelled successfully.");
+      queryClient.invalidateQueries({ queryKey: ["third-party-applications"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to cancel third-party payment application");
     },
   });
 };

@@ -53,8 +53,15 @@ const statusVariants = {
   ended: "text-green-600",
 
   // Payment statuses
-  paid: "text-green-600",
-  overdue: "text-red-600",
+  paid: "text-green-600 dark:text-green-400",
+  overdue: "text-red-600 dark:text-red-400",
+  credited: "text-amber-700 dark:text-amber-300",
+  refunded: "text-red-700 dark:text-red-300",
+  issued: "text-blue-600 dark:text-blue-400",
+  pending: "text-amber-600 dark:text-amber-400",
+  failed: "text-red-600 dark:text-red-400",
+  canceled: "text-red-600 dark:text-red-400",
+  cancelled: "text-red-600 dark:text-red-400",
 
   // Module availability
   locked: "text-gray-500",
@@ -68,7 +75,7 @@ const statusVariants = {
   arrived: "text-purple-600",
   in_progress: "text-indigo-600",
   completed: "text-green-600",
-  cancelled: "text-red-600",
+  cancelled: "text-red-600 dark:text-red-400",
 
   // Boolean
   true: "text-green-600",
@@ -138,7 +145,7 @@ const StatusBadge = ({ status }) => {
     displayText = status;
   }
 
-  const colorClass = statusVariants[status] || "text-gray-800";
+  const colorClass = statusVariants[status] || "text-gray-800 dark:text-gray-200";
 
   return (
     <span className={`font-medium capitalize ${colorClass}`}>
