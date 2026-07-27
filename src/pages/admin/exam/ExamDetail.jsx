@@ -17,9 +17,11 @@ import ExamForm from "@/components/admin/exam/ExamForm";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const ExamDetail = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const params = useParams({ strict: false });
   const id = params.id;
   const navigate = useNavigate();
@@ -130,7 +132,7 @@ const ExamDetail = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          {exam.status === "draft" && (
+          {canModify && exam.status === "draft" && (
             <>
               <Button variant="outline" onClick={handleEdit}>
                 <Edit className="h-4 w-4 mr-2" />
@@ -146,7 +148,7 @@ const ExamDetail = () => {
               </Button>
             </>
           )}
-          {exam.status === "published" && (
+          {canModify && exam.status === "published" && (
             <Button variant="outline" onClick={handleArchive}>
               <Archive className="h-4 w-4 mr-2" />
               {t("exam.archive")}

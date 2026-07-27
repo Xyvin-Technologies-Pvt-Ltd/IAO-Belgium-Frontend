@@ -5,7 +5,7 @@ const statusVariants = {
   inactive: "text-red-500",
   pending_verification: "text-amber-600",
   waitlisted: "text-blue-600",
-  pending: "text-amber-600",
+  pending: "text-amber-600 dark:text-amber-400",
   approved: "text-green-600",
   suspended: "text-gray-500",
   rejected: "text-red-600",
@@ -47,7 +47,7 @@ const statusVariants = {
   passed: "text-green-600",
   pass: "text-green-600",
   fail: "text-red-600",
-  failed: "text-red-600",
+  failed: "text-red-600 dark:text-red-400",
   started: "text-indigo-600",
   not_started: "text-gray-500",
   ended: "text-green-600",
@@ -58,8 +58,6 @@ const statusVariants = {
   credited: "text-amber-700 dark:text-amber-300",
   refunded: "text-red-700 dark:text-red-300",
   issued: "text-blue-600 dark:text-blue-400",
-  pending: "text-amber-600 dark:text-amber-400",
-  failed: "text-red-600 dark:text-red-400",
   canceled: "text-red-600 dark:text-red-400",
   cancelled: "text-red-600 dark:text-red-400",
 
@@ -75,7 +73,6 @@ const statusVariants = {
   arrived: "text-purple-600",
   in_progress: "text-indigo-600",
   completed: "text-green-600",
-  cancelled: "text-red-600 dark:text-red-400",
 
   // Boolean
   true: "text-green-600",

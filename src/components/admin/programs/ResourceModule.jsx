@@ -21,9 +21,11 @@ import ViewComponent from "./ViewComponent";
 import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetProgramById } from "@/store/useProgramStore";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -69,14 +71,16 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button
-          onClick={() => {
-            setSelectedModule(null);
-            setIsModalOpen(true);
-          }}
-        >
-          {t("programDetail.emptyState.createButton")}
-        </Button>
+        {canModify && (
+          <Button
+            onClick={() => {
+              setSelectedModule(null);
+              setIsModalOpen(true);
+            }}
+          >
+            {t("programDetail.emptyState.createButton")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -126,15 +130,17 @@ const ResourceModule = ({ programId, onComponentCreated ,languageId}) => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("resourceModule.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("resourceModule.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

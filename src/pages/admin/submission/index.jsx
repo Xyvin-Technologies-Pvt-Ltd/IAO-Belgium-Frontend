@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Submissions = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -189,47 +191,49 @@ const Submissions = () => {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          {!selectedSubmissions.some(id => {
-            const sub = submissionsData.find(s => s._id === id);
-            return sub && sub.status === "failed";
-          }) && (
-            <>
-              <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                <SelectTrigger className="w-50 bg-white dark:bg-sidebar">
-                  <SelectValue placeholder="Select Teacher to Assign" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teachers.map((teacher) => (
-                    <SelectItem key={teacher._id} value={teacher._id}>
-                      {teacher.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {canModify && (
+          <div className="flex items-center gap-2">
+            {!selectedSubmissions.some(id => {
+              const sub = submissionsData.find(s => s._id === id);
+              return sub && sub.status === "failed";
+            }) && (
+              <>
+                <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                  <SelectTrigger className="w-50 bg-white dark:bg-sidebar">
+                    <SelectValue placeholder="Select Teacher to Assign" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachers.map((teacher) => (
+                      <SelectItem key={teacher._id} value={teacher._id}>
+                        {teacher.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleBulkAssign}
+                  disabled={
+                    isBulkAssigning || selectedSubmissions.length === 0 || !selectedTeacher
+                  }
+                >
+                  {isBulkAssigning ? "Assigning..." : "Assign Checked"}
+                </Button>
+              </>
+            )}
+            {selectedSubmissions.length > 0 && selectedSubmissions.every(id => {
+              const sub = submissionsData.find(s => s._id === id);
+              return sub && sub.status === "failed";
+            }) && (
               <Button
-                onClick={handleBulkAssign}
-                disabled={
-                  isBulkAssigning || selectedSubmissions.length === 0 || !selectedTeacher
-                }
+                onClick={handleEnableResubmission}
+                disabled={isEnablingResubmission}
+                className="bg-red-600 hover:bg-red-700 text-white"
               >
-                {isBulkAssigning ? "Assigning..." : "Assign Checked"}
+                {isEnablingResubmission ? "Enabling..." : "Enable Resubmission"}
               </Button>
-            </>
-          )}
-          {selectedSubmissions.length > 0 && selectedSubmissions.every(id => {
-            const sub = submissionsData.find(s => s._id === id);
-            return sub && sub.status === "failed";
-          }) && (
-            <Button
-              onClick={handleEnableResubmission}
-              disabled={isEnablingResubmission}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {isEnablingResubmission ? "Enabling..." : "Enable Resubmission"}
-            </Button>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="w-full">

@@ -24,9 +24,11 @@ import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import StatusBadge from "@/components/StatusBadge";
 import { getMoment } from "@/utils/dateUtils";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const PlanningTable = ({ activeCity }) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -251,9 +253,11 @@ const PlanningTable = ({ activeCity }) => {
             setPage={setPage}
           />
         </div>
-        <Button onClick={handleOpenCreate}>
-          {t("planningManagement.createPlanning")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("planningManagement.createPlanning")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -347,20 +351,22 @@ const PlanningTable = ({ activeCity }) => {
                 </TableCell>
 
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("planningManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("planningManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("planningManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("planningManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

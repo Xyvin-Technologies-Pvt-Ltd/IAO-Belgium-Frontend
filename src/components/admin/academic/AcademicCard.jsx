@@ -8,9 +8,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const AcademicCard = ({ academic, onEdit, onDuplicate }) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const navigate = useNavigate();
   const { name, programs_count, batches_count } = academic;
 
@@ -40,23 +42,25 @@ const AcademicCard = ({ academic, onEdit, onDuplicate }) => {
         <p className="text-sm text-sidebar-foreground/70">
           {t("academicManagement.card.academicYear")}
         </p>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleEdit}>
-              <Edit className="w-4 h-4 mr-2" />
-              {t("academicManagement.card.edit")}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDuplicate}>
-              <Copy className="w-4 h-4 mr-2" />
-              {t("academicManagement.card.duplicate")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {canModify && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleEdit}>
+                <Edit className="w-4 h-4 mr-2" />
+                {t("academicManagement.card.edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDuplicate}>
+                <Copy className="w-4 h-4 mr-2" />
+                {t("academicManagement.card.duplicate")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <h3 className="text-2xl font-bold mt-1 text-sidebar-foreground">{name}</h3>

@@ -27,9 +27,11 @@ import TeacherFilterDrawer, {
   MULTI_FILTER_KEYS,
   createEmptyFilters,
 } from "./TeacherFilterDrawer";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Teachers = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("academic");
   const navigate=useNavigate()
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -119,14 +121,16 @@ const Teachers = () => {
             setPage={setPage}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
-            {t("teacherManagement.bulkUpload.button", "Bulk Upload")}
-          </Button>
-          <Button onClick={handleOpenCreate}>
-            {t("teacherManagement.createTeacher")}
-          </Button>
-        </div>
+        {canModify && (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
+              {t("teacherManagement.bulkUpload.button", "Bulk Upload")}
+            </Button>
+            <Button onClick={handleOpenCreate}>
+              {t("teacherManagement.createTeacher")}
+            </Button>
+          </div>
+        )}
       </div>
 
       <Table>
@@ -216,20 +220,22 @@ const Teachers = () => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("teacherManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("teacherManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("teacherManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("teacherManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

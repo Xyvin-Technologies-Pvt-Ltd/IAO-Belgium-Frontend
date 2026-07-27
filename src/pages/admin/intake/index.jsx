@@ -24,12 +24,14 @@ import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import IntakesFilterDrawer from "./IntakesFilterDrawer";
+import { useCanModify } from "@/hooks/useCanModify";
 
 
 const DEFAULT_FILTERS = { status: "all", city: "all", language: "all", country: "all" };
 
 const Intakes = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params.id;
@@ -138,9 +140,11 @@ const Intakes = () => {
             setPage={setPage}
           />
         </div>
-        <Button onClick={handleOpenCreate}>
-          {t("intakeManagement.createIntake")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("intakeManagement.createIntake")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -217,20 +221,22 @@ const Intakes = () => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("intakeManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("intakeManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("intakeManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("intakeManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

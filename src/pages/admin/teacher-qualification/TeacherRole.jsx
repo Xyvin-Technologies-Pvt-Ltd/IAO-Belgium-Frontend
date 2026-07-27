@@ -20,9 +20,11 @@ import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
 import { useDeleteTeacherRole, useGetTeacherRole, useUpdateTeacherRole } from "@/store/useTeacherRoleStore";
 import CreateTeacherRole from "@/components/admin/teacher-qualification/CreateTeacherRole";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const TeacherRole = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -86,9 +88,11 @@ const TeacherRole = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("teacherRoleManagement.createRole")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("teacherRoleManagement.createRole")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -132,23 +136,26 @@ const TeacherRole = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("teacherRoleManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("teacherRoleManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("teacherRoleManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("teacherRoleManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

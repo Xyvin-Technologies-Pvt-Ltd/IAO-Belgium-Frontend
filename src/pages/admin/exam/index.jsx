@@ -34,10 +34,12 @@ import {
 import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Exams = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -165,7 +167,9 @@ const Exams = () => {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleOpenCreate}>{t("exam.createExam")}</Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>{t("exam.createExam")}</Button>
+        )}
       </div>
 
       <Table>
@@ -217,34 +221,36 @@ const Exams = () => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      ...(i?.status === "draft"
-                        ? [
-                            {
-                              label: t("exam.table.edit"),
-                              icon: Edit,
-                              onClick: () => handleOpenEdit(i),
-                            },
-                            {
-                              label: t("exam.table.publish"),
-                              onClick: () => handlePublish(i),
-                            },
-                            {
-                              label: t("exam.table.archive"),
-                              onClick: () => handleArchive(i),
-                            },
-                          ]
-                        : i?.status === "published"
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        ...(i?.status === "draft"
                           ? [
+                              {
+                                label: t("exam.table.edit"),
+                                icon: Edit,
+                                onClick: () => handleOpenEdit(i),
+                              },
+                              {
+                                label: t("exam.table.publish"),
+                                onClick: () => handlePublish(i),
+                              },
                               {
                                 label: t("exam.table.archive"),
                                 onClick: () => handleArchive(i),
                               },
                             ]
-                          : []),
-                    ]}
-                  />
+                          : i?.status === "published"
+                            ? [
+                                {
+                                  label: t("exam.table.archive"),
+                                  onClick: () => handleArchive(i),
+                                },
+                              ]
+                            : []),
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

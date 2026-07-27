@@ -11,9 +11,11 @@ import {
   getApplicationPreviousEducationOptions,
   resolvePreviousEducationLabel,
 } from "@/utils/previousEducation";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t, i18n } = useTranslation();
+  const canModify = useCanModify("operations");
   const [requestAdditionalInfo, setRequestAdditionalInfo] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [documentFlags, setDocumentFlags] = useState({
@@ -316,7 +318,7 @@ const ViewApplication = ({ open, onClose, application }) => {
           )}
         </div>
 
-        {application.status !== 'approved' && application.status !== 'rejected' ? (
+        {canModify && application.status !== 'approved' && application.status !== 'rejected' ? (
           <div className="flex items-center justify-end gap-3 p-6 border-t dark:border-white/20">
             <Button 
               variant="secondary"

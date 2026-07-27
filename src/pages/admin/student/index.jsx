@@ -32,6 +32,7 @@ import {
 import { exportStudents } from "@/api/studentApi";
 import moment from "moment";
 import { formatPaymentMethod } from "@/utils/paymentMethod";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const BoolBadge = ({ value, t }) => (
   <span
@@ -48,6 +49,7 @@ const BoolBadge = ({ value, t }) => (
 const AllStudents = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const canModify = useCanModify("academic");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState(loadStoredStudentSearch);
@@ -55,7 +57,7 @@ const AllStudents = () => {
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [exportPending, setExportPending] = useState(false);
   const profile = useAuthStore((state) => state.profile);
-  const canBulkUpload = profile?.email === "ttj@duck.com";
+  const canBulkUpload = canModify && profile?.email === "ttj@duck.com";
 
   const [appliedFilters, setAppliedFilters] = useState(loadStoredStudentFilters);
   const [draftFilters, setDraftFilters] = useState(loadStoredStudentFilters);

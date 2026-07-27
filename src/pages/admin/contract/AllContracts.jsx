@@ -26,9 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const AllContracts = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -119,9 +121,11 @@ const AllContracts = () => {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex justify-end shrink-0">
-          <Button onClick={handleOpenCreate}>{t("common.createContract")}</Button>
-        </div>
+        {canModify && (
+          <div className="flex justify-end shrink-0">
+            <Button onClick={handleOpenCreate}>{t("common.createContract")}</Button>
+          </div>
+        )}
       </div>
 
       <Table>
@@ -186,15 +190,17 @@ const AllContracts = () => {
                   )}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("common.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(contract),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("common.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(contract),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))
