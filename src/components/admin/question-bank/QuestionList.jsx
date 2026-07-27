@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const DIFFICULTY_LABELS = {
   remember: "Remember",
@@ -42,6 +43,7 @@ const DIFFICULTY_LABELS = {
 
 const QuestionList = ({ questionBankId }) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [difficulty, setDifficulty] = useState("all");
@@ -110,14 +112,16 @@ const QuestionList = ({ questionBankId }) => {
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex gap-2">
-          <Button onClick={handleOpenAdd}>
-            {t("questionBank.questionList.addQuestion")}
-          </Button>
-          <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
-            {t("questionBank.questionList.bulkUpload")}
-          </Button>
-        </div>
+        {canModify && (
+          <div className="flex gap-2">
+            <Button onClick={handleOpenAdd}>
+              {t("questionBank.questionList.addQuestion")}
+            </Button>
+            <Button variant="outline" onClick={() => setIsBulkOpen(true)}>
+              {t("questionBank.questionList.bulkUpload")}
+            </Button>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <Select
             value={difficulty}
@@ -198,20 +202,22 @@ const QuestionList = ({ questionBankId }) => {
                   {i?.createdAt ? moment(i.createdAt).format("DD-MM-YYYY") : "-"}
                 </TableCell>
                 <TableCell>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("questionBank.questionList.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("questionBank.questionList.delete"),
-                        icon: Trash2,
-                        onClick: () => handleDeleteClick(i),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("questionBank.questionList.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("questionBank.questionList.delete"),
+                          icon: Trash2,
+                          onClick: () => handleDeleteClick(i),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

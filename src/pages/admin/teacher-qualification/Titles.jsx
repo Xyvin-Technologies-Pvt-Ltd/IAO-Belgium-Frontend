@@ -20,9 +20,11 @@ import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
 import { useDeleteTitle, useGetTitles, useUpdateTitle } from "@/store/useTitleStore";
 import CreateTitle from "@/components/admin/teacher-qualification/CreateTitle";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Titles = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -86,9 +88,11 @@ const Titles = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("teacherTitleManagement.createTitle")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("teacherTitleManagement.createTitle")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -126,23 +130,26 @@ const Titles = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("teacherTitleManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("teacherTitleManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("teacherTitleManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("teacherTitleManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

@@ -22,6 +22,7 @@ import {
   useDisconnectExact,
 } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
@@ -50,6 +51,7 @@ function formatDateTime(value) {
 
 const IntegrationsPage = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("finance");
   const queryClient = useQueryClient();
   const [syncTab, setSyncTab] = useState("pending");
   const [page, setPage] = useState(1);
@@ -253,26 +255,30 @@ const IntegrationsPage = () => {
                 {t("integrations.exact.autoSyncNote")}
               </p>
             </div>
-            <Button
-              variant="destructive"
-              onClick={handleDisconnect}
-              disabled={isDisconnecting}
-            >
-              <Unplug className="w-4 h-4 mr-2" />
-              {isDisconnecting
-                ? t("integrations.exact.disconnecting")
-                : t("integrations.exact.disconnect")}
-            </Button>
+            {canModify && (
+              <Button
+                variant="destructive"
+                onClick={handleDisconnect}
+                disabled={isDisconnecting}
+              >
+                <Unplug className="w-4 h-4 mr-2" />
+                {isDisconnecting
+                  ? t("integrations.exact.disconnecting")
+                  : t("integrations.exact.disconnect")}
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
               {t("integrations.exact.authoriseHint")}
             </p>
-            <Button onClick={handleAuthorise}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              {t("integrations.exact.authorise")}
-            </Button>
+            {canModify && (
+              <Button onClick={handleAuthorise}>
+                <ExternalLink className="w-4 h-4 mr-2" />
+                {t("integrations.exact.authorise")}
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -385,17 +391,19 @@ const IntegrationsPage = () => {
             )}
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              <Button
-                onClick={handleSync}
-                disabled={!isConnected || isReconciling || unsyncedCount === 0}
-              >
-                <RefreshCw
-                  className={`w-4 h-4 mr-2 ${isReconciling ? "animate-spin" : ""}`}
-                />
-                {isReconciling
-                  ? t("integrations.exact.syncing")
-                  : t("integrations.exact.syncNow")}
-              </Button>
+              {canModify && (
+                <Button
+                  onClick={handleSync}
+                  disabled={!isConnected || isReconciling || unsyncedCount === 0}
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 mr-2 ${isReconciling ? "animate-spin" : ""}`}
+                  />
+                  {isReconciling
+                    ? t("integrations.exact.syncing")
+                    : t("integrations.exact.syncNow")}
+                </Button>
+              )}
               {!isConnected && (
                 <p className="text-sm text-muted-foreground">
                   {t("integrations.exact.authoriseFirst")}

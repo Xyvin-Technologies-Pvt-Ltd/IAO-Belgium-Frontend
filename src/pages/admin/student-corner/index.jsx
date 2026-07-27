@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 
-const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
+const DocumentField = ({ index, register, setValue, watch, removeDoc, canModify }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const fileUrl = watch(`documents.${index}.file_url`);
@@ -62,15 +63,18 @@ const DocumentField = ({ index, register, setValue, watch, removeDoc }) => {
           </div>
         </div>
       </div>
-      <button type="button" onClick={() => removeDoc(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
-        <Trash2 className="h-5 w-5" />
-      </button>
+      {canModify && (
+        <button type="button" onClick={() => removeDoc(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
+          <Trash2 className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 };
 
 const StudentCornerCMS = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("admin");
   const { data: responseData, isLoading: loading } = useGetStudentCornerConfig();
   const updateConfigMutation = useUpdateStudentCornerConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -167,14 +171,16 @@ const StudentCornerCMS = () => {
           </h2>
           <p className="text-sm text-gray-500 dark:text-white/70 mt-1">{t("studentCornerCMS.subtitle", "Manage content for the Student Corner page.")}</p>
         </div>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting || updateConfigMutation.isPending}
-          className="flex items-center gap-2"
-        >
-          {(isSubmitting || updateConfigMutation.isPending) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {t("studentCornerCMS.saveChanges", "Save Changes")}
-        </Button>
+        {canModify && (
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting || updateConfigMutation.isPending}
+            className="flex items-center gap-2"
+          >
+            {(isSubmitting || updateConfigMutation.isPending) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {t("studentCornerCMS.saveChanges", "Save Changes")}
+          </Button>
+        )}
       </div>
 
       <div className="space-y-8">
@@ -227,9 +233,11 @@ const StudentCornerCMS = () => {
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.documentsSection", "Documents")}</h3>
-            <button type="button" onClick={() => appendDoc({ title: "", file_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addDocument", "Add Document")}
-            </button>
+            {canModify && (
+              <button type="button" onClick={() => appendDoc({ title: "", file_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
+                <Plus className="h-4 w-4" /> {t("studentCornerCMS.addDocument", "Add Document")}
+              </button>
+            )}
           </div>
           <div className="space-y-4">
             {docFields.map((field, index) => (
@@ -240,6 +248,7 @@ const StudentCornerCMS = () => {
                 setValue={setValue}
                 watch={watch}
                 removeDoc={removeDoc}
+                canModify={canModify}
               />
             ))}
             {docFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noDocuments", "No documents added.")}</p>}
@@ -250,9 +259,11 @@ const StudentCornerCMS = () => {
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.quickLinksSection", "Quick Links")}</h3>
-            <button type="button" onClick={() => appendLink({ title: "", url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addLink", "Add Link")}
-            </button>
+            {canModify && (
+              <button type="button" onClick={() => appendLink({ title: "", url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
+                <Plus className="h-4 w-4" /> {t("studentCornerCMS.addLink", "Add Link")}
+              </button>
+            )}
           </div>
           <div className="space-y-4">
             {linkFields.map((field, index) => (
@@ -261,9 +272,11 @@ const StudentCornerCMS = () => {
                   <Input {...register(`quick_links.${index}.title`)} placeholder={t("studentCornerCMS.placeholderTitle", "Title")} />
                   <Input {...register(`quick_links.${index}.url`)} placeholder={t("studentCornerCMS.placeholderUrl", "URL")} />
                 </div>
-                <button type="button" onClick={() => removeLink(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
-                  <Trash2 className="h-5 w-5" />
-                </button>
+                {canModify && (
+                  <button type="button" onClick={() => removeLink(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                )}
               </div>
             ))}
             {linkFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noQuickLinks", "No quick links added.")}</p>}
@@ -274,9 +287,11 @@ const StudentCornerCMS = () => {
         <section className="bg-card border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">{t("studentCornerCMS.videosSection", "Videos")}</h3>
-            <button type="button" onClick={() => appendVideo({ title: "", video_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
-              <Plus className="h-4 w-4" /> {t("studentCornerCMS.addVideo", "Add Video")}
-            </button>
+            {canModify && (
+              <button type="button" onClick={() => appendVideo({ title: "", video_url: "" })} className="text-primary flex items-center gap-1 text-sm font-medium">
+                <Plus className="h-4 w-4" /> {t("studentCornerCMS.addVideo", "Add Video")}
+              </button>
+            )}
           </div>
           <div className="space-y-4">
             {videoFields.map((field, index) => (
@@ -285,9 +300,11 @@ const StudentCornerCMS = () => {
                   <Input {...register(`videos.${index}.title`)} placeholder={t("studentCornerCMS.placeholderTitle", "Title")} />
                   <Input {...register(`videos.${index}.video_url`)} placeholder={t("studentCornerCMS.placeholderVideoUrl", "Video URL")} />
                 </div>
-                <button type="button" onClick={() => removeVideo(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
-                  <Trash2 className="h-5 w-5" />
-                </button>
+                {canModify && (
+                  <button type="button" onClick={() => removeVideo(index)} className="text-destructive p-2 hover:bg-destructive/10 rounded-md">
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                )}
               </div>
             ))}
             {videoFields.length === 0 && <p className="text-muted-foreground text-sm">{t("studentCornerCMS.noVideos", "No videos added.")}</p>}

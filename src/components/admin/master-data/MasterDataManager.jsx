@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import FormField from "@/components/ui/forms/FormField";
 import FormActions from "@/components/ui/forms/FormActions";
 import axiosInstance from "@/api/axiosintercepter";
+import { useCanModify } from "@/hooks/useCanModify";
 
 /**
  * Generic CRUD manager for simple "name + status" master data lists.
@@ -31,6 +32,7 @@ import axiosInstance from "@/api/axiosintercepter";
  */
 const MasterDataManager = ({ endpoint, queryKey, i18nPrefix }) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -145,7 +147,9 @@ const MasterDataManager = ({ endpoint, queryKey, i18nPrefix }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>{tk("create", "Create")}</Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>{tk("create", "Create")}</Button>
+        )}
       </div>
 
       <Table>
@@ -178,23 +182,26 @@ const MasterDataManager = ({ endpoint, queryKey, i18nPrefix }) => {
                     checked={i?.status}
                     onCheckedChange={() => handleStatusToggle(i._id, i?.status)}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("common.edit", "Edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("common.delete", "Delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("common.edit", "Edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("common.delete", "Delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

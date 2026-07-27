@@ -29,9 +29,11 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { toast } from "sonner";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const KmoManagement = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("finance");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
@@ -346,7 +348,7 @@ const KmoManagement = () => {
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      {app.status !== "paid" && app.status !== "rejected" && (
+                      {canModify && app.status !== "paid" && app.status !== "rejected" && (
                         <Button
                           variant="ghost"
                           size="icon"

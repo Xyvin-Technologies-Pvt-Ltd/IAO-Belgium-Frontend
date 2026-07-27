@@ -20,9 +20,11 @@ import moment from "moment";
 import { Download, Plus } from "lucide-react";
 import { getInvoicePrintHtml } from "@/api/paymentApi";
 import CreateInvoice from "./CreateInvoice";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const CustomInvoices = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("finance");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -72,10 +74,12 @@ const CustomInvoices = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("finance.reports.customInvoices.title")}
         </h2>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
-          <Plus size={16} />
-          {t("sidebar.admin.createInvoice")}
-        </Button>
+        {canModify && (
+          <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
+            <Plus size={16} />
+            {t("sidebar.admin.createInvoice")}
+          </Button>
+        )}
       </div>
 
       <div className="space-y-4">

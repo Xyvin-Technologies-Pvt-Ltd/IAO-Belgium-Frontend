@@ -42,6 +42,7 @@ import { Edit, Plus, Trash2, X } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useGetAllCountries, useGetAllLanguages } from "@/store/useDropdownStore";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const DEFAULT_FORM = {
   language: "",
@@ -56,6 +57,7 @@ const DEFAULT_FORM = {
 
 const AccountingMappings = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -192,6 +194,7 @@ const AccountingMappings = () => {
         isLoading={vatQuery.isLoading}
         isUpdating={globalVatMutation.isPending}
         onSave={(vat_code) => globalVatMutation.mutate({ vat_code })}
+        canModify={canModify}
       />
 
       <div className="flex items-center justify-between gap-2">
@@ -201,10 +204,12 @@ const AccountingMappings = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("accountingMappingManagement.create", "Create")}
-        </Button>
+        {canModify && (
+          <Button onClick={openCreate}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("accountingMappingManagement.create", "Create")}
+          </Button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -254,20 +259,22 @@ const AccountingMappings = () => {
                 <TableCell>{item.gl_revenue_convenience_fee || "-"}</TableCell>
                 <TableCell>{item.gl_revenue_fce_exam || "-"}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("common.edit", "Edit"),
-                        icon: Edit,
-                        onClick: () => openEdit(item),
-                      },
-                      {
-                        label: t("common.delete", "Delete"),
-                        icon: Trash2,
-                        onClick: () => handleDelete(item._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("common.edit", "Edit"),
+                          icon: Edit,
+                          onClick: () => openEdit(item),
+                        },
+                        {
+                          label: t("common.delete", "Delete"),
+                          icon: Trash2,
+                          onClick: () => handleDelete(item._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))
@@ -311,7 +318,7 @@ const AccountingMappings = () => {
   );
 };
 
-const GlobalVatCard = ({ value, source, isLoading, isUpdating, onSave }) => {
+const GlobalVatCard = ({ value, source, isLoading, isUpdating, onSave, canModify = true }) => {
   const { register, handleSubmit, reset } = useForm({
     defaultValues: { vat_code: value || "" },
   });
@@ -333,10 +340,13 @@ const GlobalVatCard = ({ value, source, isLoading, isUpdating, onSave }) => {
           label={t("programManagement.modal.exactVatCodeLabel", "Exact VAT Code")}
           placeholder="VH"
           {...register("vat_code", { required: true })}
+          disabled={!canModify}
         />
-        <Button type="submit" disabled={isLoading || isUpdating}>
-          {t("common.save", "Save")}
-        </Button>
+        {canModify && (
+          <Button type="submit" disabled={isLoading || isUpdating}>
+            {t("common.save", "Save")}
+          </Button>
+        )}
       </form>
     </div>
   );

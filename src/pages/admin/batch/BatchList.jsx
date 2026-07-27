@@ -29,12 +29,14 @@ import {
 } from "@/components/ui/dialog";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const BatchList = () => {
   const params = useParams({ strict: false });
   const id = params.id;
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -92,14 +94,18 @@ const BatchList = () => {
       icon: Eye,
       onClick: () => handleRowClick(batch._id),
     },
-    {
-      label: t("batchManagement.actions.delete"),
-      icon: Trash2,
-      onClick: () => {
-        setSelectedBatch(batch);
-        setIsDeleteDialogOpen(true);
-      },
-    },
+    ...(canModify
+      ? [
+          {
+            label: t("batchManagement.actions.delete"),
+            icon: Trash2,
+            onClick: () => {
+              setSelectedBatch(batch);
+              setIsDeleteDialogOpen(true);
+            },
+          },
+        ]
+      : []),
   ];
   return (
     <div className="space-y-6 mt-4">
@@ -110,13 +116,15 @@ const BatchList = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          {t("batchManagement.createBatch")}
-        </Button>
+        {canModify && (
+          <Button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            {t("batchManagement.createBatch")}
+          </Button>
+        )}
       </div>
 
       <Table>

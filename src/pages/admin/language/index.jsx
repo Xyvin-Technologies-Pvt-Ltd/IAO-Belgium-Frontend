@@ -24,9 +24,11 @@ import {
   useUpdateLanguage,
 } from "@/store/useLanguageStore";
 import CreateLanguage from "@/components/admin/language/CreateLanguage";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Language = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -92,9 +94,11 @@ const Language = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("languageManagement.createLanguage")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("languageManagement.createLanguage")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -132,23 +136,26 @@ const Language = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("languageManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("languageManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("languageManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("languageManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

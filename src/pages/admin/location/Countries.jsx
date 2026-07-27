@@ -24,9 +24,11 @@ import {
   useUpdateCountry,
 } from "@/store/useCountryStore";
 import CreateCountry from "@/components/admin/location/CreateCountry";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Countries = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -89,9 +91,11 @@ const Countries = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("countryManagement.createCountry")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("countryManagement.createCountry")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -132,23 +136,26 @@ const Countries = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("countryManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("countryManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("countryManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("countryManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))
