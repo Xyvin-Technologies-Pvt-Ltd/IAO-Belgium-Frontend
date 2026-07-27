@@ -26,10 +26,12 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const QuestionBanks = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -99,9 +101,11 @@ const QuestionBanks = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("questionBank.createQuestionBank")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("questionBank.createQuestionBank")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -168,20 +172,22 @@ const QuestionBanks = () => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("questionBank.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("questionBank.table.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("questionBank.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("questionBank.table.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

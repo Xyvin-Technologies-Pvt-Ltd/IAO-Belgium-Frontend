@@ -17,8 +17,10 @@ import ResourceModule from "@/components/admin/programs/ResourceModule";
 import ProgramAccountingCodes from "@/components/admin/programs/ProgramAccountingCodes";
 import { PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 const ProgramDetail = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [preselectedType, setPreselectedType] = useState(null);
   const params = useParams({ strict: false });
@@ -258,9 +260,11 @@ const ProgramDetail = () => {
           <p className="text-sm text-sidebar-foreground/70 max-w-md mt-1">
             {t("programDetail.emptyState.subtitle")}
           </p>
-          <Button className="mt-4" onClick={() => handleOpenCreate()}>
-            {t("programDetail.emptyState.createButton")}
-          </Button>
+          {canModify && (
+            <Button className="mt-4" onClick={() => handleOpenCreate()}>
+              {t("programDetail.emptyState.createButton")}
+            </Button>
+          )}
         </div>
       )}
       <CreateComponent

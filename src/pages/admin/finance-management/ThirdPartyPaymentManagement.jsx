@@ -27,9 +27,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const ThirdPartyPaymentManagement = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("finance");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -206,7 +208,7 @@ const ThirdPartyPaymentManagement = () => {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        {app.status === "invoice_issued" && (
+                        {canModify && app.status === "invoice_issued" && (
                           <Button
                             size="icon"
                             variant="ghost"

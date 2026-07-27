@@ -25,9 +25,11 @@ import CreateRole from "@/components/admin/role-management/CreateRole";
 import ViewRole from "@/components/admin/role-management/ViewRole";
 import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const RoleManagement = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("roles");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -99,9 +101,11 @@ const RoleManagement = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("roleManagement.createRole")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("roleManagement.createRole")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -175,6 +179,7 @@ const RoleManagement = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
@@ -185,16 +190,20 @@ const RoleManagement = () => {
                         icon: Eye,
                         onClick: () => handleOpenView(i),
                       },
-                      {
-                        label: t("roleManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("roleManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
+                      ...(canModify
+                        ? [
+                            {
+                              label: t("roleManagement.table.edit"),
+                              icon: Edit,
+                              onClick: () => handleOpenEdit(i),
+                            },
+                            {
+                              label: t("roleManagement.delete"),
+                              icon: Trash2,
+                              onClick: () => handleRowDeleteClick(i._id),
+                            },
+                          ]
+                        : []),
                     ]}
                   />
                 </TableCell>

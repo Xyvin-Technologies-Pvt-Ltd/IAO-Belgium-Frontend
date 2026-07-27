@@ -29,10 +29,12 @@ import CreateProgram from "@/components/admin/programs/CreateProgram";
 import ProgramTypeConfigDrawer from "@/components/admin/programs/ProgramTypeConfigDrawer";
 import { useNavigate } from "@tanstack/react-router";
 import ProgramsFilterDrawer from "./ProgramsFilterDrawer";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Programs = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -193,12 +195,16 @@ const Programs = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsTypeSettingsOpen(true)}>
-            {t("programManagement.programTypeSettings", "Program Type Defaults")}
-          </Button>
-          <Button onClick={handleOpenCreate}>
-            {t("programManagement.createProgram")}
-          </Button>
+          {canModify && (
+            <Button variant="outline" onClick={() => setIsTypeSettingsOpen(true)}>
+              {t("programManagement.programTypeSettings", "Program Type Defaults")}
+            </Button>
+          )}
+          {canModify && (
+            <Button onClick={handleOpenCreate}>
+              {t("programManagement.createProgram")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -267,28 +273,31 @@ const Programs = () => {
                       handleStatusToggle(i._id, i?.status);
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("programManagement.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                      {
-                        label: t("programManagement.duplicate"),
-                        icon: Copy,
-                        onClick: () => handleDuplicate(i._id),
-                      },
-                      {
-                        label: t("programManagement.delete"),
-                        icon: Trash2,
-                        onClick: () => handleRowDeleteClick(i._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("programManagement.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                        {
+                          label: t("programManagement.duplicate"),
+                          icon: Copy,
+                          onClick: () => handleDuplicate(i._id),
+                        },
+                        {
+                          label: t("programManagement.delete"),
+                          icon: Trash2,
+                          onClick: () => handleRowDeleteClick(i._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

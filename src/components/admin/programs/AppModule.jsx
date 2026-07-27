@@ -22,9 +22,11 @@ import { useGetComponents } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { useGetProgramById } from "@/store/useProgramStore";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const AppModule = ({ programId, onComponentCreated,languageId }) => {
   const { t, i18n } = useTranslation();
+  const canModify = useCanModify("operations");
 
   // Sync moment locale with app language
   useMemo(() => {
@@ -75,14 +77,16 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button
-          onClick={() => {
-            setSelectedModule(null);
-            setIsModalOpen(true);
-          }}
-        >
-          {t("programDetail.emptyState.createButton")}
-        </Button>
+        {canModify && (
+          <Button
+            onClick={() => {
+              setSelectedModule(null);
+              setIsModalOpen(true);
+            }}
+          >
+            {t("programDetail.emptyState.createButton")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -134,15 +138,17 @@ const AppModule = ({ programId, onComponentCreated,languageId }) => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("appModule.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("appModule.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

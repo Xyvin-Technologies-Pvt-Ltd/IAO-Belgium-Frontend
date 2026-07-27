@@ -18,9 +18,11 @@ import RegisterLtiTool from "@/components/admin/lti/RegisterLtiTool";
 import PlatformConfigModal from "@/components/admin/lti/PlatformConfigModal";
 import { useGetLtiTools, useDeactivateLtiTool, useUpdateLtiTool } from "@/store/useLtiStore";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const LtiManagement = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("admin");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isPlatformConfigOpen, setIsPlatformConfigOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState(null);
@@ -78,12 +80,14 @@ const LtiManagement = () => {
             {t("ltiManagement.subtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={handleOpenCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            {t("ltiManagement.registerTool")}
-          </Button>
-        </div>
+        {canModify && (
+          <div className="flex items-center gap-2">
+            <Button onClick={handleOpenCreate}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("ltiManagement.registerTool")}
+            </Button>
+          </div>
+        )}
       </div>
 
       <Table>
@@ -125,26 +129,35 @@ const LtiManagement = () => {
                   <Switch
                     checked={tool.is_active}
                     onCheckedChange={() => handleToggleActive(tool)}
+                    disabled={!canModify}
                   />
                 </TableCell>
                 <TableCell>
                   <RowActionMenu
                     actions={[
-                      {
-                        label: t("ltiManagement.actions.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(tool),
-                      },
+                      ...(canModify
+                        ? [
+                            {
+                              label: t("ltiManagement.actions.edit"),
+                              icon: Edit,
+                              onClick: () => handleOpenEdit(tool),
+                            },
+                          ]
+                        : []),
                       {
                         label: t("ltiManagement.actions.platformConfig"),
                         icon: Settings,
                         onClick: () => handleOpenPlatformConfig(tool._id),
                       },
-                      {
-                        label: t("ltiManagement.actions.deactivate"),
-                        icon: Trash2,
-                        onClick: () => handleDeleteClick(tool._id),
-                      },
+                      ...(canModify
+                        ? [
+                            {
+                              label: t("ltiManagement.actions.deactivate"),
+                              icon: Trash2,
+                              onClick: () => handleDeleteClick(tool._id),
+                            },
+                          ]
+                        : []),
                     ]}
                   />
                 </TableCell>

@@ -33,6 +33,7 @@ import DeleteConfirm from "@/components/DeleteConfirm";
 import SendConfirm from "@/components/SendConfirm";
 import { Pencil, Trash2, Send, Eye } from "lucide-react";
 import moment from "moment";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const getRecipientsLabel = (n) => {
   if (n.meta?.batch_id)
@@ -43,6 +44,7 @@ const getRecipientsLabel = (n) => {
 
 const Notifications = () => {
   const navigate = useNavigate();
+  const canModify = useCanModify("academic");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -149,7 +151,9 @@ const Notifications = () => {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleCreate}>Create Notification</Button>
+        {canModify && (
+          <Button onClick={handleCreate}>Create Notification</Button>
+        )}
       </div>
 
       <Table>
@@ -233,7 +237,7 @@ const Notifications = () => {
                     >
                       <Eye size={15} />
                     </button>
-                    {n.status !== "sent" && n.status !== "deleted" && (
+                    {canModify && n.status !== "sent" && n.status !== "deleted" && (
                       <>
                         <button
                           onClick={() => handleEdit(n)}
@@ -252,7 +256,7 @@ const Notifications = () => {
                         </button>
                       </>
                     )}
-                    {n.status !== "deleted" && (n.status !== "sent" || n.type === "student_corner") && (
+                    {canModify && n.status !== "deleted" && (n.status !== "sent" || n.type === "student_corner") && (
                         <button
                           onClick={() => setDeleteTarget(n._id)}
                           disabled={deleteMutation.isPending}

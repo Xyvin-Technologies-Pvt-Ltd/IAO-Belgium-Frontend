@@ -33,6 +33,7 @@ import {
 } from "@/store/useComponentStore";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetProgramById } from "@/store/useProgramStore";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const SORT_MAP = {
   uid: { sort_by: "uid", sort_order: "asc" },
@@ -44,6 +45,7 @@ const SORT_MAP = {
 
 const LearningModule = ({ programId, onComponentCreated,languageId }) => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -127,12 +129,14 @@ const LearningModule = ({ programId, onComponentCreated,languageId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={() => {
-          setSelectedModule(null);
-          setIsModalOpen(true);
-        }}>
-          {t("programDetail.emptyState.createButton")}
-        </Button>
+        {canModify && (
+          <Button onClick={() => {
+            setSelectedModule(null);
+            setIsModalOpen(true);
+          }}>
+            {t("programDetail.emptyState.createButton")}
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -251,15 +255,17 @@ const LearningModule = ({ programId, onComponentCreated,languageId }) => {
                   <StatusBadge status={i?.status} />
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("learningModule.table.edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(i),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("learningModule.table.edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(i),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

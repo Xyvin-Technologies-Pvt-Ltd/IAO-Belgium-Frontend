@@ -10,9 +10,11 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import image from "../../../assets/images/no-academic.png";
 import CreateAcademic from "@/components/admin/academic/CreateAcademic";
 import AcademicCard from "@/components/admin/academic/AcademicCard";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const Academics = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -110,9 +112,11 @@ const Academics = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <Button onClick={handleOpenCreate}>
-          {t("academicManagement.createAcademic")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("academicManagement.createAcademic")}
+          </Button>
+        )}
       </div>
 
       {!isLoading && academics.length === 0 && (

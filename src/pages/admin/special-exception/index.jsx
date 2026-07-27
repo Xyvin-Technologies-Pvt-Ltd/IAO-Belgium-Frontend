@@ -22,9 +22,11 @@ import {
   useUpdateSpecialException,
   useDeleteSpecialException,
 } from "@/store/useStudentStore";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const SpecialExceptions = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("master_data");
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedException, setSelectedException] = useState(null);
@@ -143,10 +145,12 @@ const SpecialExceptions = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          {t("specialExceptions.addExceptionBtn", "Add Exception")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            {t("specialExceptions.addExceptionBtn", "Add Exception")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -180,20 +184,22 @@ const SpecialExceptions = () => {
                   {t("specialExceptions.extraTimeMinShort", { minutes: ex.extra_time_min }, "+{{minutes}} min")}
                 </TableCell>
                 <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                  <RowActionMenu
-                    actions={[
-                      {
-                        label: t("specialExceptions.edit", "Edit"),
-                        icon: Edit,
-                        onClick: () => handleOpenEdit(ex),
-                      },
-                      {
-                        label: t("specialExceptions.delete", "Delete"),
-                        icon: Trash2,
-                        onClick: () => handleOpenDelete(ex._id),
-                      },
-                    ]}
-                  />
+                  {canModify && (
+                    <RowActionMenu
+                      actions={[
+                        {
+                          label: t("specialExceptions.edit", "Edit"),
+                          icon: Edit,
+                          onClick: () => handleOpenEdit(ex),
+                        },
+                        {
+                          label: t("specialExceptions.delete", "Delete"),
+                          icon: Trash2,
+                          onClick: () => handleOpenDelete(ex._id),
+                        },
+                      ]}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

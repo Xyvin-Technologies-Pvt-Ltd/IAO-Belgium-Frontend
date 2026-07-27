@@ -17,9 +17,11 @@ import CreateAdmin from "@/components/admin/admin-management/CreateAdmin";
 import { useGetAdmins, useUpdateAdminStatus } from "@/store/useAdminStore";
 import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "react-i18next";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const AdminManagement = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("admin");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -62,9 +64,11 @@ const AdminManagement = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button onClick={handleOpenCreate}>
-          {t("adminManagement.createAdmin")}
-        </Button>
+        {canModify && (
+          <Button onClick={handleOpenCreate}>
+            {t("adminManagement.createAdmin")}
+          </Button>
+        )}
       </div>
 
       <Table>
@@ -103,6 +107,7 @@ const AdminManagement = () => {
                   <Switch
                     checked={i?.status === "active"}
                     onCheckedChange={() => handleStatusToggle(i._id, i?.status)}
+                    disabled={!canModify}
                   />
                 </TableCell>
               </TableRow>
