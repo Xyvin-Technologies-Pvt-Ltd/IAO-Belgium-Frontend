@@ -69,7 +69,7 @@ const KmoManagement = () => {
   const batchesList = batchesData?.data || [];
 
   // Queries
-  const { data, isLoading, error, refetch } = useGetKmoApplications({
+  const { data, isLoading, error, refetch, isFetching } = useGetKmoApplications({
     page,
     limit: rowsPerPage,
     ...(filters.status !== "all" ? { status: filters.status } : {}),
@@ -97,18 +97,14 @@ const KmoManagement = () => {
   const [notes, setNotes] = useState("");
 
   const STATUS_OPTIONS = [
-    { value: "submitted", label: "Submitted" },
     { value: "contribution_received", label: "Contribution Received" },
     { value: "payment_released", label: "Payment Released" },
     { value: "paid", label: "Paid" },
     { value: "rejected", label: "Rejected" },
   ];
 
-  // Submitted is only for waiting → submitted (project number step). Hide once already past waiting.
+  // Admin never sets submitted — that is student-only after "I had applied".
   const availableStatusOptions = STATUS_OPTIONS.filter((opt) => {
-    if (opt.value === "submitted" && selectedApp?.status !== "waiting") {
-      return false;
-    }
     // Don't offer the current status again
     if (selectedApp?.status && opt.value === selectedApp.status) {
       return false;
@@ -233,14 +229,14 @@ const KmoManagement = () => {
           </Select>
 
           <Select value={filters.program} onValueChange={handleProgramChange}>
-            <SelectTrigger className="w-[220px] h-10 rounded-[6px]">
+            <SelectTrigger className="w-[320px] h-10 rounded-[6px]">
               <SelectValue placeholder="All Programs" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Programs</SelectItem>
               {programsList.map((prog) => (
                 <SelectItem key={prog._id} value={prog._id}>
-                  {prog.name}
+                  {`${prog.name} - ${prog.city?.name || "N/A"} - ${prog.language?.name || "N/A"}`}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -282,101 +278,110 @@ const KmoManagement = () => {
       </div>
 
       {/* Main Table */}
-      {error ? (
-        <ErrorMessage message={error.message || "Failed to load KMO applications"} />
-      ) : isLoading ? (
-        <TableSkeleton rows={5} columns={8} />
-      ) : (
-        <div className="bg-sidebar rounded-xl border border-sidebar-border overflow-hidden">
-          <Table>
-            <TableHeader>
+      <div className="bg-sidebar rounded-xl border border-sidebar-border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Student</TableHead>
+              <TableHead>Program</TableHead>
+              <TableHead>Batch</TableHead>
+              <TableHead>Learning Module</TableHead>
+              <TableHead>Company</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date Applied</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody
+            className={isFetching ? "opacity-50 pointer-events-none" : ""}
+          >
+            {isLoading ? (
+              <TableSkeleton rows={rowsPerPage} columns={8} />
+            ) : error ? (
               <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Program</TableHead>
-                <TableHead>Batch</TableHead>
-                <TableHead>Learning Module</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date Applied</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableCell colSpan={8} className="text-center p-8">
+                  <ErrorMessage
+                    message={error.message || "Failed to load KMO applications"}
+                    onRetry={refetch}
+                    variant="inline"
+                  />
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {applications.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
-                    No KMO applications found.
+            ) : applications.length > 0 ? (
+              applications.map((app) => (
+                <TableRow key={app._id}>
+                  <TableCell>
+                    <p className="font-semibold text-gray-900 dark:text-white">
+                      {app.student_id?.first_name} {app.student_id?.last_name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{app.student_id?.email}</p>
                   </TableCell>
-                </TableRow>
-              ) : (
-                applications.map((app) => (
-                  <TableRow key={app._id}>
-                    <TableCell>
-                      <p className="font-semibold text-gray-900 dark:text-white">
-                        {app.student_id?.first_name} {app.student_id?.last_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{app.student_id?.email}</p>
-                    </TableCell>
-                    <TableCell className="max-w-[180px] truncate text-gray-700 dark:text-gray-300">
-                      {app.program?.name || "-"}
-                    </TableCell>
-                    <TableCell className="text-gray-700 dark:text-gray-300">
-                      {app.batch?.name || "-"}
-                    </TableCell>
-                    <TableCell>
-                      <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {app.module_id?.currency || "EUR"} {app.module_id?.amount}
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <p className="font-semibold text-gray-900 dark:text-white">{app.company_id?.company_name}</p>
-                      <p className="text-xs text-muted-foreground">VAT: {app.company_id?.vat_number}</p>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={getDisplayStatusColor(app.status)} label={app.status} />
-                    </TableCell>
-                    <TableCell className="text-gray-700 dark:text-gray-300">
-                      {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
+                  <TableCell className="max-w-[180px] truncate text-gray-700 dark:text-gray-300">
+                    {app.program?.name || "-"}
+                  </TableCell>
+                  <TableCell className="text-gray-700 dark:text-gray-300">
+                    {app.batch?.name || "-"}
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {app.module_id?.currency || "EUR"} {app.module_id?.amount}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-semibold text-gray-900 dark:text-white">{app.company_id?.company_name}</p>
+                    <p className="text-xs text-muted-foreground">VAT: {app.company_id?.vat_number}</p>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={getDisplayStatusColor(app.status)} label={app.status} />
+                  </TableCell>
+                  <TableCell className="text-gray-700 dark:text-gray-300">
+                    {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenDetails(app)}
+                      className="rounded-[6px]"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {canModify &&
+                      !["waiting", "paid", "rejected"].includes(app.status) && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleOpenDetails(app)}
+                        onClick={() => handleOpenUpdate(app)}
                         className="rounded-[6px]"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Edit2 className="h-4 w-4" />
                       </Button>
-                      {canModify && app.status !== "paid" && app.status !== "rejected" && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenUpdate(app)}
-                          className="rounded-[6px]"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                  No KMO applications found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
 
-          {totalRows > rowsPerPage && (
-            <div className="p-4 border-t border-sidebar-border">
-              <Pagination
-                currentPage={page}
-                totalCount={totalRows}
-                pageSize={rowsPerPage}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
-        </div>
-      )}
+        {totalRows > rowsPerPage && (
+          <div className="p-4 border-t border-sidebar-border">
+            <Pagination
+              currentPage={page}
+              totalCount={totalRows}
+              pageSize={rowsPerPage}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Details Dialog */}
       {selectedApp && (
@@ -534,7 +539,8 @@ const KmoManagement = () => {
                 </Select>
               </div>
 
-              {(newStatus === "submitted" || selectedApp.status === "submitted") && (
+              {(newStatus === "contribution_received" ||
+                selectedApp.status === "submitted") && (
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
                     Project Number (Required)

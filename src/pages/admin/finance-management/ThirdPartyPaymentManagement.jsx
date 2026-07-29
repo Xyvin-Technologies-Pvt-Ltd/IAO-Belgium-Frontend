@@ -134,108 +134,114 @@ const ThirdPartyPaymentManagement = () => {
         </div>
       )}
 
-      {error ? (
-        <ErrorMessage message={error?.message || t("Failed to load applications")} />
-      ) : isLoading ? (
-        <TableSkeleton rows={rowsPerPage} columns={7} />
-      ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("Student")}</TableHead>
-                <TableHead>{t("Learning Module")}</TableHead>
-                <TableHead>{t("Invoice")}</TableHead>
-                <TableHead>{t("Amount")}</TableHead>
-                <TableHead>{t("Status")}</TableHead>
-                <TableHead>{t("Created")}</TableHead>
-                <TableHead className="text-right">{t("Actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
-              {applications.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
-                    {t("No applications found.")}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                applications.map((app) => (
-                  <TableRow 
-                    key={app._id} 
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => handleOpenDetails(app)}
-                  >
-                    <TableCell>
-                      <div className="font-bold text-gray-900 dark:text-gray-100">
-                        {app.student_id?.first_name} {app.student_id?.last_name}
-                      </div>
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100">{app.module_id?.name || "-"}</div>
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.module_id?.code || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
-                        {app.invoice_id?.uid || t("Draft")}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t("Student")}</TableHead>
+            <TableHead>{t("Learning Module")}</TableHead>
+            <TableHead>{t("Invoice")}</TableHead>
+            <TableHead>{t("Amount")}</TableHead>
+            <TableHead>{t("Status")}</TableHead>
+            <TableHead>{t("Created")}</TableHead>
+            <TableHead className="text-right">{t("Actions")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
+          {isLoading ? (
+            <TableSkeleton rows={rowsPerPage} columns={7} />
+          ) : error ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center p-8">
+                <ErrorMessage
+                  message={error?.message || t("Failed to load applications")}
+                  onRetry={refetch}
+                  variant="inline"
+                />
+              </TableCell>
+            </TableRow>
+          ) : applications.length > 0 ? (
+            applications.map((app) => (
+              <TableRow
+                key={app._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleOpenDetails(app)}
+              >
+                <TableCell>
+                  <div className="font-bold text-gray-900 dark:text-gray-100">
+                    {app.student_id?.first_name} {app.student_id?.last_name}
+                  </div>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">{app.module_id?.name || "-"}</div>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.module_id?.code || "-"}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
+                    {app.invoice_id?.uid || t("Draft")}
+                  </span>
+                </TableCell>
+                <TableCell className="font-bold text-gray-900 dark:text-gray-100">
+                  &euro; {Number(app.invoice_id?.total_amount || 0).toFixed(2)}
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <div className="flex flex-col gap-1 items-start">
+                    <StatusBadge status={app.status} />
+                    {app.conflict_flags?.includes("PAYMENT_RECEIVED_AFTER_CANCELLATION") && (
+                      <span className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border border-red-100 dark:border-red-900/50 flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-3 w-3 shrink-0" />
+                        {t("Late Paid Conflict")}
                       </span>
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-900 dark:text-gray-100">
-                      &euro; {Number(app.invoice_id?.total_amount || 0).toFixed(2)}
-                    </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex flex-col gap-1 items-start">
-                        <StatusBadge status={app.status} />
-                        {app.conflict_flags?.includes("PAYMENT_RECEIVED_AFTER_CANCELLATION") && (
-                          <span className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border border-red-100 dark:border-red-900/50 flex items-center gap-1 mt-1">
-                            <AlertTriangle className="h-3 w-3 shrink-0" />
-                            {t("Late Paid Conflict")}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-gray-500 dark:text-gray-400">
-                      {moment(app.createdAt).format("DD/MM/YYYY HH:mm")}
-                    </TableCell>
-                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                          onClick={() => handleOpenDetails(app)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {canModify && app.status === "invoice_issued" && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
-                            onClick={() => handleCancelClick(app)}
-                            disabled={cancelMutation.isPending}
-                          >
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-xs text-gray-500 dark:text-gray-400">
+                  {moment(app.createdAt).format("DD/MM/YYYY HH:mm")}
+                </TableCell>
+                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      onClick={() => handleOpenDetails(app)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {canModify && app.status === "invoice_issued" && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                        onClick={() => handleCancelClick(app)}
+                        disabled={cancelMutation.isPending}
+                      >
+                        <Ban className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
+                {t("No applications found.")}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
-          <Pagination
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            totalRows={totalRows}
-          />
-        </>
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={totalRows}
+      />
 
       {/* Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
