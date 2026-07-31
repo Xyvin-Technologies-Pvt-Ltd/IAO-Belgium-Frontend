@@ -36,6 +36,7 @@ const ThirdPartyPaymentManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [purposeFilter, setPurposeFilter] = useState("all");
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -44,6 +45,7 @@ const ThirdPartyPaymentManagement = () => {
     page,
     limit: rowsPerPage,
     ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(purposeFilter !== "all" ? { purpose: purposeFilter } : {}),
     ...(debouncedSearch ? { student_id: debouncedSearch } : {}),
   });
 
@@ -62,7 +64,41 @@ const ThirdPartyPaymentManagement = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, purposeFilter]);
+
+  const formatPurpose = (purpose) => {
+    switch (purpose) {
+      case "admission-fee":
+        return t("Admission Fee");
+      case "location-switch":
+        return t("Location Switch");
+      case "module-purchase":
+        return t("Module Purchase");
+      default:
+        return purpose || t("Module Purchase");
+    }
+  };
+
+  const getSubjectLabel = (app) => {
+    if (app.purpose === "admission-fee") {
+      return {
+        title: app.program_name || t("Admission Fee"),
+        subtitle: app.application_id?.uid
+          ? `App ${app.application_id.uid}`
+          : t("Enrollment"),
+      };
+    }
+    if (app.purpose === "location-switch") {
+      return {
+        title: app.module_id?.name || t("Location Switch"),
+        subtitle: app.module_id?.code || t("Location switch"),
+      };
+    }
+    return {
+      title: app.module_id?.name || "-",
+      subtitle: app.module_id?.code || "-",
+    };
+  };
 
   const handleOpenDetails = (app) => {
     setSelectedApp(app);
@@ -118,6 +154,18 @@ const ThirdPartyPaymentManagement = () => {
               <SelectItem value="conflicts">Conflicts</SelectItem>
             </SelectContent>
           </Select>
+
+          <Select value={purposeFilter} onValueChange={setPurposeFilter}>
+            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
+              <SelectValue placeholder="All Purposes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Purposes</SelectItem>
+              <SelectItem value="admission-fee">Admission Fee</SelectItem>
+              <SelectItem value="module-purchase">Module Purchase</SelectItem>
+              <SelectItem value="location-switch">Location Switch</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -138,7 +186,8 @@ const ThirdPartyPaymentManagement = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("Student")}</TableHead>
-            <TableHead>{t("Learning Module")}</TableHead>
+            <TableHead>{t("Purpose")}</TableHead>
+            <TableHead>{t("Subject")}</TableHead>
             <TableHead>{t("Invoice")}</TableHead>
             <TableHead>{t("Amount")}</TableHead>
             <TableHead>{t("Status")}</TableHead>
@@ -150,10 +199,10 @@ const ThirdPartyPaymentManagement = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={8} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={8} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("Failed to load applications")}
                   onRetry={refetch}
@@ -162,7 +211,9 @@ const ThirdPartyPaymentManagement = () => {
               </TableCell>
             </TableRow>
           ) : applications.length > 0 ? (
-            applications.map((app) => (
+            applications.map((app) => {
+              const subject = getSubjectLabel(app);
+              return (
               <TableRow
                 key={app._id}
                 className="cursor-pointer hover:bg-muted/50"
@@ -175,8 +226,13 @@ const ThirdPartyPaymentManagement = () => {
                   <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
                 </TableCell>
                 <TableCell>
-                  <div className="font-semibold text-gray-900 dark:text-gray-100">{app.module_id?.name || "-"}</div>
-                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.module_id?.code || "-"}</span>
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                    {formatPurpose(app.purpose)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">{subject.title}</div>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{subject.subtitle}</span>
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
@@ -224,10 +280,11 @@ const ThirdPartyPaymentManagement = () => {
                   </div>
                 </TableCell>
               </TableRow>
-            ))
+            );
+            })
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
+              <TableCell colSpan={8} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
                 {t("No applications found.")}
               </TableCell>
             </TableRow>
@@ -260,8 +317,18 @@ const ThirdPartyPaymentManagement = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Module")}</span>
-                  <span className="font-bold">{selectedApp.module_id?.name}</span>
+                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Purpose")}</span>
+                  <span className="font-bold">{formatPurpose(selectedApp.purpose)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium">
+                    {selectedApp.purpose === "admission-fee" ? t("Enrollment") : t("Module")}
+                  </span>
+                  <span className="font-bold text-right">
+                    {selectedApp.purpose === "admission-fee"
+                      ? selectedApp.application_id?.uid || "-"
+                      : selectedApp.module_id?.name || "-"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Status")}</span>

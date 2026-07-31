@@ -56,14 +56,14 @@ const KmoManagement = () => {
   const debouncedSearch = useDebounce(filters.search, 500);
 
   // Fetch programs dropdown list
-  const { data: programsData } = useGetAllPrograms({ limit: 1000 });
+  const { data: programsData } = useGetAllPrograms();
   const programsList = programsData?.data || [];
 
   // Fetch batches dropdown list
   const selectedProgramId = filters.program !== "all" ? filters.program : null;
   const { data: batchesData } = useGetBatches(
     selectedProgramId,
-    { limit: 1000 },
+    {},
     { enabled: !!selectedProgramId }
   );
   const batchesList = batchesData?.data || [];
@@ -370,18 +370,15 @@ const KmoManagement = () => {
             )}
           </TableBody>
         </Table>
-
-        {totalRows > rowsPerPage && (
-          <div className="p-4 border-t border-sidebar-border">
-            <Pagination
-              currentPage={page}
-              totalCount={totalRows}
-              pageSize={rowsPerPage}
-              onPageChange={setPage}
-            />
-          </div>
-        )}
       </div>
+
+      <Pagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={totalRows}
+      />
 
       {/* Details Dialog */}
       {selectedApp && (
