@@ -205,6 +205,16 @@ const StudentDetails = () => {
     }
   };
 
+  const formatBillingMethod = (item) => {
+    if (item?.billing_method === "third_party" || item?.is_third_party) {
+      return t("studentManagement.billing.thirdParty", "Third Party");
+    }
+    if (item?.billing_method === "company") {
+      return t("studentManagement.billing.company", "Company");
+    }
+    return t("studentManagement.billing.personal", "Personal");
+  };
+
   const formatDocType = (docType) => {
     switch (docType) {
       case "invoice":
@@ -690,12 +700,7 @@ const StudentDetails = () => {
                           {Number(item.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {item.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(item)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={item.display_status} />
@@ -804,12 +809,7 @@ const StudentDetails = () => {
                           {Number(payment.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {payment.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(payment)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={payment.display_status} />
@@ -917,12 +917,7 @@ const StudentDetails = () => {
                           {Number(receipt.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {receipt.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(receipt)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={receipt.display_status} />
