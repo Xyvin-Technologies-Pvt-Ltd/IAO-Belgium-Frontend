@@ -87,6 +87,7 @@ const StudentFilterDrawer = ({
           "has_outstanding_invoices",
           "has_missed_modules",
           "has_unpurchased_modules",
+          "fachkursfoerderung",
         ].includes(key)
       ) {
         return val === true;
@@ -496,6 +497,21 @@ const StudentFilterDrawer = ({
                 }
               />
               {t("studentManagement.filters.unpurchasedModules", "Unpurchased modules only")}
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={draftFilters.fachkursfoerderung}
+                onCheckedChange={(checked) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    fachkursfoerderung: checked === true,
+                  }))
+                }
+              />
+              {t(
+                "studentManagement.filters.fachkursfoerderung",
+                "Eligible for Fachkursförderung",
+              )}
             </label>
           </div>
         </div>

@@ -92,6 +92,16 @@ const REPORT_CARDS = [
     accentColor: "#4f46e5",
     path: "/admin/third-party-payments",
   },
+  {
+    key: "fkf",
+    titleKey: "finance.reports.fkf.title",
+    descriptionKey: "finance.reports.fkf.description",
+    icon: GraduationCap,
+    iconColor: "#0d9488",
+    bgColor: "rgba(13,148,136,0.08)",
+    accentColor: "#0d9488",
+    path: "/admin/fkf",
+  },
 ];
 
 const FinanceManagement = () => {

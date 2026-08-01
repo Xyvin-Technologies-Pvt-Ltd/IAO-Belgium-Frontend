@@ -39,6 +39,10 @@ const SIDEBAR_PERMISSIONS = {
     "finance_management_view",
     "finance_management_modify",
   ],
+  "/admin/fkf": [
+    "finance_management_view",
+    "finance_management_modify",
+  ],
   "/admin/custom-invoices": [
     "finance_management_view",
     "finance_management_modify",

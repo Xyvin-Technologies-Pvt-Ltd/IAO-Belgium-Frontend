@@ -56,6 +56,7 @@
       "studentManagement": "Studentenverwaltung",
       "financeReports": "Finanzberichte",
       "customInvoices": "Benutzerdefinierte Rechnungen",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Administratorenverwaltung",
       "roleManagement": "Rollenverwaltung",
       "integrations": "Integrationen",
@@ -288,7 +289,36 @@
       },
       "customInvoices": {
         "title": "Benutzerdefinierte Rechnungen"
+      },
+      "fkf": {
+        "title": "Fachkursförderung",
+        "description": "Subventionierte Modulrechnungen für berechtigte Studierende erstellen"
       }
+    },
+    "fkf": {
+      "title": "Fachkursförderung",
+      "subtitle": "Berechtigte Studierende, subventionierte Rechnungen und PLZ-Konfiguration.",
+      "createTab": "Rechnung erstellen",
+      "studentsTab": "Berechtigte Studierende",
+      "configTab": "Konfiguration",
+      "student": "Student/in",
+      "searchStudent": "Student/in suchen…",
+      "program": "Programm",
+      "batch": "Gruppe",
+      "academicYear": "Studienjahr",
+      "postalCode": "Postleitzahl",
+      "selectProgramFirst": "Zuerst Programm auswählen",
+      "module": "Modul / Prüfung",
+      "selectModule": "Modul auswählen…",
+      "selectStudentFirst": "Zuerst Student/in auswählen",
+      "catalogFee": "Katalogpreis",
+      "pendingHint": "Für dieses Modul existiert bereits eine ausstehende FKF-Zahlung.",
+      "subsidizedAmount": "Subventionierter Betrag",
+      "createButton": "FKF-Rechnung erstellen",
+      "sendInvoice": "FKF-Rechnung senden",
+      "noEligibleStudents": "Keine berechtigten Studierenden gefunden.",
+      "postalCodes": "Berechtigte Postleitzahlen (kommagetrennt)",
+      "programActive": "Programm aktiv (jährliche L-Bank-Auswahl)"
     }
   },
   "ltiManagement": {
@@ -906,6 +936,7 @@
       "outstandingInvoices": "Offene Rechnungen",
       "missedModules": "Verpasste Module (abwesend oder nicht gekauft)",
       "unpurchasedModules": "Nur nicht gekaufte Module",
+      "fachkursfoerderung": "Berechtigt für Fachkursförderung",
       "inactiveIncludesNotStarted": "Inaktiv umfasst Studierende, die noch keine Bewerbung begonnen haben.",
       "clearAll": "Alle löschen",
       "apply": "Filter anwenden"

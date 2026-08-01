@@ -32,6 +32,7 @@ import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseRepor
 import TransactionLogs from "@/pages/admin/finance-management/TransactionLogs";
 import KmoManagement from "@/pages/admin/finance-management/KmoManagement";
 import ThirdPartyPaymentManagement from "@/pages/admin/finance-management/ThirdPartyPaymentManagement";
+import FkfManagement from "@/pages/admin/finance-management/FkfManagement";
 import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
@@ -231,6 +232,10 @@ export const adminRoutes = [
       ThirdPartyPaymentManagement,
       "/admin/finance-reports",
     ),
+  },
+  {
+    path: "/admin/fkf",
+    component: withPermissionProtection(FkfManagement, "/admin/fkf"),
   },
   {
     path: "/admin/admission-administration/application-review",

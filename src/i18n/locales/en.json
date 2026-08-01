@@ -56,6 +56,7 @@
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
       "customInvoices": "Custom Invoices",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "integrations": "Integrations",
@@ -299,7 +300,36 @@
       "kmo": {
         "title": "KMO-Portefeuille",
         "description": "Manage KMO-Portefeuille student applications"
+      },
+      "fkf": {
+        "title": "Fachkursförderung",
+        "description": "Create subsidized module invoices for eligible students"
       }
+    },
+    "fkf": {
+      "title": "Fachkursförderung",
+      "subtitle": "Eligible students, subsidized invoices, and postal eligibility config.",
+      "createTab": "Create Invoice",
+      "studentsTab": "Eligible Students",
+      "configTab": "Config",
+      "student": "Student",
+      "searchStudent": "Search student…",
+      "program": "Program",
+      "batch": "Batch",
+      "academicYear": "Academic year",
+      "postalCode": "Postal code",
+      "selectProgramFirst": "Select program first",
+      "module": "Module / Exam",
+      "selectModule": "Select module…",
+      "selectStudentFirst": "Select a student first",
+      "catalogFee": "Catalog fee",
+      "pendingHint": "A pending FKF payment already exists for this module.",
+      "subsidizedAmount": "Subsidized amount",
+      "createButton": "Create FKF Invoice",
+      "sendInvoice": "Send FKF Invoice",
+      "noEligibleStudents": "No eligible students found.",
+      "postalCodes": "Eligible postal codes (comma-separated)",
+      "programActive": "Program active (annual L-Bank selection)"
     }
   },
   "integrations": {
@@ -1013,6 +1043,7 @@
       "outstandingInvoices": "Outstanding invoices",
       "missedModules": "Missed modules (absent or unpurchased)",
       "unpurchasedModules": "Unpurchased modules only",
+      "fachkursfoerderung": "Eligible for Fachkursförderung",
       "inactiveIncludesNotStarted": "Inactive includes students who have not started an application.",
       "clearAll": "Clear All",
       "apply": "Apply Filters"

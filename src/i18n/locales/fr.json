@@ -56,6 +56,7 @@
       "studentManagement": "Gestion des étudiants",
       "financeReports": "Rapports financiers",
       "customInvoices": "Factures personnalisées",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
       "integrations": "Intégrations",
@@ -907,6 +908,7 @@
       "outstandingInvoices": "Factures impayées",
       "missedModules": "Modules manqués (absent ou non acheté)",
       "unpurchasedModules": "Modules non achetés uniquement",
+      "fachkursfoerderung": "Éligible à la Fachkursförderung",
       "inactiveIncludesNotStarted": "Inactif inclut les étudiants qui n'ont pas encore commencé de candidature.",
       "clearAll": "Tout effacer",
       "apply": "Appliquer les filtres"
