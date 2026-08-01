@@ -19,6 +19,7 @@ import {
   Plug,
   WalletCards,
   CreditCard,
+  Landmark,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -125,6 +126,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: "Third-Party Payments",
             url: "/admin/third-party-payments",
             icon: CreditCard,
+          },
+          {
+            title: t("sidebar.admin.fkf", "Fachkursförderung"),
+            url: "/admin/fkf",
+            icon: Landmark,
           },
           {
             title: t("sidebar.admin.customInvoices"),

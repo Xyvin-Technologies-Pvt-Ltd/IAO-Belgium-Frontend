@@ -14,6 +14,7 @@ export const DEFAULT_STUDENT_FILTERS = {
   has_outstanding_invoices: false,
   has_missed_modules: false,
   has_unpurchased_modules: false,
+  fachkursfoerderung: false,
 };
 
 export const STUDENT_MANAGEMENT_FILTERS_KEY = "student_management_filters";
@@ -56,6 +57,7 @@ export const buildStudentQueryFilters = (filters, { search, studentId } = {}) =>
   if (filters.has_outstanding_invoices) query.has_outstanding_invoices = true;
   if (filters.has_missed_modules) query.has_missed_modules = true;
   if (filters.has_unpurchased_modules) query.has_unpurchased_modules = true;
+  if (filters.fachkursfoerderung) query.fachkursfoerderung = true;
 
   return query;
 };
