@@ -43,6 +43,16 @@ import LtiManagement from "@/pages/admin/lti";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
 import Results from "@/pages/admin/results";
+import ArchiveStudents from "@/pages/admin/archive/students";
+import ArchiveStudentView from "@/pages/admin/archive/students/ArchiveStudentView";
+import ArchiveProgrammes from "@/pages/admin/archive/programmes";
+import ArchiveProgrammeDetail from "@/pages/admin/archive/programmes/ProgrammeDetail";
+import ArchiveCohorts from "@/pages/admin/archive/cohorts";
+import ArchiveCohortDetail from "@/pages/admin/archive/cohorts/CohortDetail";
+import ArchiveInvoices from "@/pages/admin/archive/invoices";
+import ArchiveInvoiceDetail from "@/pages/admin/archive/invoices/InvoiceDetail";
+import ArchiveEntities from "@/pages/admin/archive/entities";
+import ArchiveEntityBrowser from "@/pages/admin/archive/entities/EntityBrowser";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -309,5 +319,51 @@ export const adminRoutes = [
   {
     path: "/admin/student-corner",
     component: withPermissionProtection(StudentCornerCMS, "/admin/student-corner"),
+  },
+  // CoachView Archive — read-only historical data portal (see backend
+  // docs/COACHVIEW_MIGRATION.md). Every page here is read-only by construction.
+  {
+    path: "/admin/archive",
+    component: () => <Navigate to="/admin/archive/students" replace />,
+  },
+  {
+    path: "/admin/archive/students",
+    component: withPermissionProtection(ArchiveStudents, "/admin/archive/students"),
+  },
+  {
+    path: "/admin/archive/students/$id",
+    component: withPermissionProtection(ArchiveStudentView, "/admin/archive/students"),
+  },
+  {
+    path: "/admin/archive/programmes",
+    component: withPermissionProtection(ArchiveProgrammes, "/admin/archive/programmes"),
+  },
+  {
+    path: "/admin/archive/programmes/$id",
+    component: withPermissionProtection(ArchiveProgrammeDetail, "/admin/archive/programmes"),
+  },
+  {
+    path: "/admin/archive/cohorts",
+    component: withPermissionProtection(ArchiveCohorts, "/admin/archive/cohorts"),
+  },
+  {
+    path: "/admin/archive/cohorts/$id",
+    component: withPermissionProtection(ArchiveCohortDetail, "/admin/archive/cohorts"),
+  },
+  {
+    path: "/admin/archive/invoices",
+    component: withPermissionProtection(ArchiveInvoices, "/admin/archive/invoices"),
+  },
+  {
+    path: "/admin/archive/invoices/$id",
+    component: withPermissionProtection(ArchiveInvoiceDetail, "/admin/archive/invoices"),
+  },
+  {
+    path: "/admin/archive/entities",
+    component: withPermissionProtection(ArchiveEntities, "/admin/archive/entities"),
+  },
+  {
+    path: "/admin/archive/entities/$entity",
+    component: withPermissionProtection(ArchiveEntityBrowser, "/admin/archive/entities"),
   },
 ];
