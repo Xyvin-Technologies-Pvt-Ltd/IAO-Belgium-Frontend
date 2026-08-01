@@ -26,7 +26,7 @@ jobs:
       # 3️⃣ Install dependencies & build
       - name: Install Dependencies and Build
         env:
-          VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL_TEST }}
+          VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL_ARCHIVE }}
           VITE_APP_API_KEY: ${{ secrets.VITE_APP_API_KEY }}
           VITE_STUDENT_PORTAL_URL: ${{ secrets.VITE_STUDENT_PORTAL_URL }}
         run: |
