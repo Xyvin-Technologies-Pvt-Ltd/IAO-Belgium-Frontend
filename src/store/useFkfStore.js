@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFkfInvoice,
   getFkfConfig,
+  getFkfInvoices,
   getFkfStudentModules,
   updateFkfConfig,
 } from "@/api/fkfApi";
@@ -36,6 +37,13 @@ export const useGetFkfStudentModules = (studentId, options = {}) =>
     ...options,
   });
 
+export const useGetFkfInvoices = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["fkf-invoices", params],
+    queryFn: () => getFkfInvoices(params),
+    ...options,
+  });
+
 export const useCreateFkfInvoice = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -45,6 +53,7 @@ export const useCreateFkfInvoice = () => {
         data?.message || "FKF invoice created and payment link sent",
       );
       queryClient.invalidateQueries({ queryKey: ["fkf-student-modules"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-invoices"] });
       queryClient.invalidateQueries({ queryKey: ["students"] });
     },
     onError: (error) => {

@@ -18,6 +18,11 @@ export const getFkfStudentModules = async (studentId) => {
   return response.data;
 };
 
+export const getFkfInvoices = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/invoices", { params });
+  return response.data;
+};
+
 export const createFkfInvoice = async (data) => {
   const response = await axiosInstance.post("/fkf/invoices", data);
   return response.data;

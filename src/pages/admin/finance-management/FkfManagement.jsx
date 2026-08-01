@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MoreVertical } from "lucide-react";
+import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import StatusBadge from "@/components/StatusBadge";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetStudents } from "@/store/useStudentStore";
 import {
@@ -46,6 +49,7 @@ import {
 import {
   useCreateFkfInvoice,
   useGetFkfConfig,
+  useGetFkfInvoices,
   useGetFkfStudentModules,
   useUpdateFkfConfig,
 } from "@/store/useFkfStore";
@@ -61,14 +65,20 @@ const FkfManagement = () => {
   const [program, setProgram] = useState("all");
   const [batch, setBatch] = useState("all");
   const [academic, setAcademic] = useState("all");
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyRowsPerPage, setHistoryRowsPerPage] = useState(10);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatus, setHistoryStatus] = useState("all");
+  const [historyProgram, setHistoryProgram] = useState("all");
+  const [historyBatch, setHistoryBatch] = useState("all");
   const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [componentId, setComponentId] = useState("");
   const [subsidizedAmount, setSubsidizedAmount] = useState("");
   const [postalText, setPostalText] = useState("");
-  const [programActive, setProgramActive] = useState(true);
 
   const debouncedSearch = useDebounce(search, 400);
+  const debouncedHistorySearch = useDebounce(historySearch, 400);
 
   const { data: programsData } = useGetAllPrograms();
   const { data: academicData } = useGetAllAcademicYears();
@@ -77,6 +87,12 @@ const FkfManagement = () => {
     selectedProgramId,
     {},
     { enabled: Boolean(selectedProgramId) },
+  );
+  const historyProgramId = historyProgram !== "all" ? historyProgram : null;
+  const { data: historyBatchesData } = useGetBatches(
+    historyProgramId,
+    {},
+    { enabled: Boolean(historyProgramId) },
   );
 
   const { data, isLoading, error, refetch, isFetching } = useGetStudents({
@@ -89,6 +105,24 @@ const FkfManagement = () => {
     ...(batch !== "all" ? { batch } : {}),
     ...(academic !== "all" ? { academic } : {}),
   });
+
+  const {
+    data: historyRes,
+    isLoading: historyLoading,
+    error: historyError,
+    refetch: refetchHistory,
+    isFetching: historyFetching,
+  } = useGetFkfInvoices(
+    {
+      page: historyPage,
+      limit: historyRowsPerPage,
+      ...(historyStatus !== "all" ? { status: historyStatus } : {}),
+      ...(debouncedHistorySearch ? { search: debouncedHistorySearch } : {}),
+      ...(historyProgram !== "all" ? { program: historyProgram } : {}),
+      ...(historyBatch !== "all" ? { batch: historyBatch } : {}),
+    },
+    { enabled: activeTab === "history" },
+  );
 
   const studentId = selectedStudent?._id || "";
   const { data: modulesRes, isLoading: modulesLoading } =
@@ -103,8 +137,11 @@ const FkfManagement = () => {
 
   const students = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const historyRows = historyRes?.data?.rows || [];
+  const historyTotal = historyRes?.data?.total || 0;
   const programsList = programsData?.data || [];
   const batchesList = batchesData?.data || [];
+  const historyBatchesList = historyBatchesData?.data || [];
   const academicList = academicData?.data || [];
 
   const modulePayload = modulesRes?.data;
@@ -127,7 +164,6 @@ const FkfManagement = () => {
     const cfg = configRes?.data;
     if (!cfg) return;
     setPostalText((cfg.postal_codes || []).join(", "));
-    setProgramActive(Boolean(cfg.program_active));
   }, [configRes]);
 
   useEffect(() => {
@@ -135,8 +171,16 @@ const FkfManagement = () => {
   }, [debouncedSearch, program, batch, academic]);
 
   useEffect(() => {
+    setHistoryPage(1);
+  }, [debouncedHistorySearch, historyStatus, historyProgram, historyBatch]);
+
+  useEffect(() => {
     setBatch("all");
   }, [program]);
+
+  useEffect(() => {
+    setHistoryBatch("all");
+  }, [historyProgram]);
 
   useEffect(() => {
     setComponentId("");
@@ -175,6 +219,8 @@ const FkfManagement = () => {
         onSuccess: () => {
           closeSendInvoice();
           refetch();
+          setActiveTab("history");
+          setHistoryPage(1);
         },
       },
     );
@@ -188,12 +234,18 @@ const FkfManagement = () => {
       .filter(Boolean);
     updateConfig.mutate({
       postal_codes,
-      program_active: programActive,
+      program_active: true,
     });
   };
 
   const studentName = (s) =>
     `${s.first_name || ""} ${s.last_name || ""}`.trim() || s.email || "-";
+
+  const formatMoney = (currency, amount) => {
+    if (amount == null || amount === "") return "-";
+    const symbol = currency === "EUR" ? "€" : currency || "EUR";
+    return `${symbol} ${Number(amount).toFixed(2)}`;
+  };
 
   return (
     <div className="space-y-6 mt-4">
@@ -209,13 +261,20 @@ const FkfManagement = () => {
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           variant={activeTab === "students" ? "default" : "outline"}
           onClick={() => setActiveTab("students")}
         >
           {t("finance.fkf.studentsTab", "Eligible Students")}
+        </Button>
+        <Button
+          type="button"
+          variant={activeTab === "history" ? "default" : "outline"}
+          onClick={() => setActiveTab("history")}
+        >
+          {t("finance.fkf.historyTab", "Subsidy History")}
         </Button>
         <Button
           type="button"
@@ -439,36 +498,270 @@ const FkfManagement = () => {
         </div>
       )}
 
+      {activeTab === "history" && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("common.search", "Search")}
+              </Label>
+              <Input
+                className="w-56"
+                placeholder={t(
+                  "finance.fkf.searchHistory",
+                  "Search student name, email, UID…",
+                )}
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("common.status", "Status")}
+              </Label>
+              <Select
+                value={historyStatus}
+                onValueChange={(v) => {
+                  setHistoryStatus(v);
+                  setHistoryPage(1);
+                }}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t("common.all", "All")}
+                  </SelectItem>
+                  <SelectItem value="pending">
+                    {t("common.pending", "Pending")}
+                  </SelectItem>
+                  <SelectItem value="paid">
+                    {t("common.paid", "Paid")}
+                  </SelectItem>
+                  <SelectItem value="failed">
+                    {t("common.failed", "Failed")}
+                  </SelectItem>
+                  <SelectItem value="canceled">
+                    {t("common.canceled", "Canceled")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("finance.fkf.program", "Program")}
+              </Label>
+              <Select
+                value={historyProgram}
+                onValueChange={(v) => {
+                  setHistoryProgram(v);
+                  setHistoryPage(1);
+                }}
+              >
+                <SelectTrigger className="w-52">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t("common.all", "All")}
+                  </SelectItem>
+                  {programsList.map((p) => (
+                    <SelectItem key={p._id} value={p._id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("finance.fkf.batch", "Batch")}
+              </Label>
+              <Select
+                value={historyBatch}
+                onValueChange={(v) => {
+                  setHistoryBatch(v);
+                  setHistoryPage(1);
+                }}
+                disabled={historyProgram === "all"}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue
+                    placeholder={
+                      historyProgram === "all"
+                        ? t(
+                            "finance.fkf.selectProgramFirst",
+                            "Select program first",
+                          )
+                        : t("common.all", "All")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t("common.all", "All")}
+                  </SelectItem>
+                  {historyBatchesList.map((b) => (
+                    <SelectItem key={b._id} value={b._id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="bg-sidebar border border-sidebar-border rounded-xl overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    {t("finance.fkf.student", "Student")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.module", "Module / Exam")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.subsidizedAmount", "Subsidized amount")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.catalogFee", "Catalog fee")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.invoiceNumber", "Invoice #")}
+                  </TableHead>
+                  <TableHead>
+                    {t("common.status", "Status")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.sentDate", "Sent")}
+                  </TableHead>
+                  <TableHead>
+                    {t("finance.fkf.paidDate", "Paid")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody
+                className={
+                  historyFetching ? "opacity-50 pointer-events-none" : ""
+                }
+              >
+                {historyLoading ? (
+                  <TableSkeleton rows={historyRowsPerPage} columns={8} />
+                ) : historyError ? (
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <ErrorMessage
+                        message={
+                          historyError.message ||
+                          "Failed to load FKF history"
+                        }
+                        onRetry={refetchHistory}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : historyRows.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground py-10"
+                    >
+                      {t(
+                        "finance.fkf.noHistory",
+                        "No FKF invoices sent yet.",
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  historyRows.map((row) => (
+                    <TableRow key={row._id}>
+                      <TableCell>
+                        <div className="font-medium">
+                          {row.student?.name ||
+                            studentName(row.student || {})}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {row.student?.uid || row.student?.email || "-"}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {row.module?.name || "-"}
+                        {row.module?.uid ? (
+                          <div className="text-xs text-muted-foreground">
+                            {row.module.uid}
+                          </div>
+                        ) : null}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatMoney(row.currency, row.subsidized_amount)}
+                      </TableCell>
+                      <TableCell>
+                        {formatMoney(row.currency, row.catalog_amount)}
+                      </TableCell>
+                      <TableCell>
+                        {row.invoice?.uid || row.payment_uid || "-"}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={row.payment_status} />
+                      </TableCell>
+                      <TableCell>
+                        {row.created_at
+                          ? moment(row.created_at).format("DD MMM YYYY")
+                          : "-"}
+                      </TableCell>
+                      <TableCell>
+                        {row.paid_at
+                          ? moment(row.paid_at).format("DD MMM YYYY")
+                          : "-"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <Pagination
+            page={historyPage}
+            setPage={setHistoryPage}
+            rowsPerPage={historyRowsPerPage}
+            setRowsPerPage={setHistoryRowsPerPage}
+            totalRows={historyTotal}
+          />
+        </div>
+      )}
+
       {activeTab === "config" && (
         <form
           onSubmit={handleSaveConfig}
-          className="bg-sidebar border border-sidebar-border rounded-xl p-6 space-y-5 max-w-2xl"
+          className="bg-sidebar border border-sidebar-border rounded-xl p-6 space-y-6 max-w-2xl"
         >
           <div className="space-y-2">
-            <Label>
-              {t(
-                "finance.fkf.postalCodes",
-                "Eligible postal codes (comma-separated)",
-              )}
+            <Label htmlFor="fkf-postal-codes">
+              {t("finance.fkf.postalCodes", "Eligible postal codes")}
             </Label>
-            <textarea
-              className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+            <Textarea
+              id="fkf-postal-codes"
+              className="min-h-[120px]"
               value={postalText}
               onChange={(e) => setPostalText(e.target.value)}
+              placeholder={t(
+                "finance.fkf.postalCodesPlaceholder",
+                "e.g. 70173, 76133, 89073",
+              )}
+              disabled={!canModify}
             />
+            <p className="text-xs text-muted-foreground">
+              {t(
+                "finance.fkf.postalCodesHint",
+                "Separate codes with commas or new lines. Students with a matching postal code are eligible for Fachkursförderung.",
+              )}
+            </p>
           </div>
-
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={programActive}
-              onChange={(e) => setProgramActive(e.target.checked)}
-            />
-            {t(
-              "finance.fkf.programActive",
-              "Program active (annual L-Bank selection)",
-            )}
-          </label>
 
           <Button type="submit" disabled={updateConfig.isPending || !canModify}>
             {updateConfig.isPending
