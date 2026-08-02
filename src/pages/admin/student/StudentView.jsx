@@ -1,5 +1,6 @@
 import UserCard from "@/components/admin/UserCard";
 import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentById, useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
@@ -55,6 +56,13 @@ const StudentView = () => {
     error,
     refetch,
   } = useGetStudentById(id, filter);
+  //* Must run before the isLoading/error early returns below (Rules of
+  //* Hooks) — safe with undefined values via optional chaining.
+  const yearHistory = useMigratedYearHistory(
+    student?.data?.application_id,
+    student?.data?.migration_ref,
+    filter.year,
+  );
 
   useEffect(() => {
     if (student?.data) {
@@ -136,6 +144,18 @@ const StudentView = () => {
       </div>
 
       <div className="grid grid-cols-12 gap-6">
+        {yearHistory.hasHistory && (
+          <div className="col-span-12">
+            <PreMigrationHistory
+              cvId={yearHistory.cvId}
+              yearBucket={yearHistory.yearBucket}
+              year={filter.year}
+            />
+          </div>
+        )}
+
+        {!yearHistory.hasHistory && (
+        <>
         <div className="col-span-12 lg:col-span-6">
           <h3 className="font-semibold mb-4">Completed Modules</h3>
           <Table>
@@ -242,16 +262,11 @@ const StudentView = () => {
           </Table>
         </div>
 
-        <div className="col-span-12">
-          <PreMigrationHistory
-            applicationId={studentData?.application_id}
-            migrationRef={studentData?.migration_ref}
-            year={filter.year}
-          />
-        </div>
+        </>
+        )}
 
         <div className="col-span-12 lg:col-span-4">
-          {!studentData?.is_online && (
+          {!yearHistory.hasHistory && !studentData?.is_online && (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold">Attendance</h3>

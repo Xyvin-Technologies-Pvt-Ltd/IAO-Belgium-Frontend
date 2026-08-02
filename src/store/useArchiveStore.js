@@ -38,6 +38,32 @@ export const useLmsStudentArchiveSummary = (applicationId, options = {}) =>
     ...options,
   });
 
+//* Single source of truth for "does this specific year have CoachView
+//* history" — student detail pages use this to decide whether to render the
+//* native (native-LMS) year content or the PreMigrationHistory panel, never
+//* both. Showing an empty "No modules assigned" table right above a panel
+//* that has the real legacy data for that same year reads as broken, so the
+//* two must be mutually exclusive per year, not stacked.
+export const useMigratedYearHistory = (applicationId, migrationRef, year) => {
+  const isMigrated = migrationRef?.source === "coachview" && !!migrationRef?.cv_id;
+
+  const query = useLmsStudentArchiveSummary(applicationId, {
+    enabled: isMigrated && !!applicationId,
+  });
+
+  const summary = query.data?.data;
+  const yearBucket = summary?.years?.find((y) => y.year === year) || null;
+
+  return {
+    isMigrated,
+    cvId: migrationRef?.cv_id || null,
+    isLoading: isMigrated ? query.isLoading : false,
+    hasHistory: isMigrated && !!yearBucket,
+    yearBucket,
+    refetch: query.refetch,
+  };
+};
+
 // -- Persons -----------------------------------------------------------
 
 export const useArchivePersons = (params, options = {}) =>

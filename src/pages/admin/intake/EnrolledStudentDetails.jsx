@@ -2,6 +2,7 @@ import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useIntakeStore";
@@ -72,6 +73,13 @@ const EnrolledStudentDetails = () => {
   } = useGetStudentByApplication(
     id,
     activeTab === "progress" ? { year: filter.year } : {},
+  );
+  //* Must run before the isLoading/error early returns below (Rules of
+  //* Hooks) — safe with undefined values via optional chaining.
+  const yearHistory = useMigratedYearHistory(
+    student?.data?.application_id,
+    student?.data?.migration_ref,
+    filter.year,
   );
 
   const studentUserId = student?.data?._id;
@@ -424,6 +432,16 @@ const EnrolledStudentDetails = () => {
           </div>
 
           <div className="grid grid-cols-12 gap-6">
+            {yearHistory.hasHistory ? (
+              <div className="col-span-12">
+                <PreMigrationHistory
+                  cvId={yearHistory.cvId}
+                  yearBucket={yearHistory.yearBucket}
+                  year={filter.year}
+                />
+              </div>
+            ) : (
+              <>
             <div className="col-span-12 lg:col-span-6">
               <h3 className="font-semibold mb-4">
                 {t("studentManagement.details.assignedModules", "Assigned Modules")}
@@ -580,14 +598,6 @@ const EnrolledStudentDetails = () => {
               </Table>
             </div>
 
-            <div className="col-span-12">
-              <PreMigrationHistory
-                applicationId={studentData?.application_id}
-                migrationRef={studentData?.migration_ref}
-                year={filter.year}
-              />
-            </div>
-
             {!studentData?.is_online && (
               <div className="col-span-12">
                 <h3 className="font-semibold mb-4">
@@ -603,6 +613,8 @@ const EnrolledStudentDetails = () => {
                   />
                 </div>
               </div>
+            )}
+              </>
             )}
 
             <div className="col-span-12">

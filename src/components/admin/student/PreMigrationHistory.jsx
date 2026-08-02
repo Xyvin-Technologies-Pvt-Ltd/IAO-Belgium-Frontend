@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { LoadingSpinner, ErrorMessage } from "@/components/common";
-import { useLmsStudentArchiveSummary, useArchivePersonResults } from "@/store/useArchiveStore";
+import { useArchivePersonResults } from "@/store/useArchiveStore";
 import ArchiveStatusBadge from "@/pages/admin/archive/components/ArchiveStatusBadge";
 import BilingualLabel from "@/pages/admin/archive/components/BilingualLabel";
 import AttendanceTab from "@/pages/admin/archive/students/tabs/AttendanceTab";
@@ -85,95 +85,69 @@ const ResultsPanel = ({ cvId, year }) => {
   );
 };
 
-//* Provenance for a migrated student's empty year tab — everything they did
-//* in CoachView for that specific programme year, queried live from the
-//* archive Postgres (nothing is copied into Mongo). Renders nothing when
-//* the student wasn't migrated, so it never appears for native students.
-const PreMigrationHistory = ({ applicationId, migrationRef, year }) => {
+//* Replaces the native (empty) year content for a year the student studied
+//* in CoachView before migrating — everything they did that year, queried
+//* live from the archive Postgres (nothing is copied into Mongo).
+//*
+//* Purely presentational: the caller (via useMigratedYearHistory) already
+//* decided this year has archive history before mounting this component, so
+//* there's no loading/empty/not-migrated branch here — showing this
+//* alongside the native "No modules assigned" empty state would be the
+//* exact redundancy this component exists to avoid.
+const PreMigrationHistory = ({ cvId, yearBucket, year }) => {
   const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState("enrolments");
 
-  const isMigrated = migrationRef?.source === "coachview" && !!migrationRef?.cv_id;
-  const cvId = migrationRef?.cv_id;
-
-  const { data, isLoading, error, refetch } = useLmsStudentArchiveSummary(applicationId, {
-    enabled: isMigrated && !!applicationId,
-  });
-
-  if (!isMigrated) return null;
-
-  const summary = data?.data;
-  const yearBucket = summary?.years?.find((y) => y.year === year);
-
   return (
-    <div className="mt-6 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-900/10 p-4 space-y-3">
+    <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-900/10 p-4 space-y-3">
       <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 dark:text-blue-300">
         <Archive className="h-4 w-4" />
         {t("coachviewImport.preMigrationHistory", "Pre-migration history (CoachView Archive)")}
       </div>
 
-      {isLoading && <LoadingSpinner size="sm" />}
-      {error && (
-        <ErrorMessage
-          message={error?.message || "Failed to load pre-migration history"}
-          onRetry={refetch}
-          variant="inline"
-        />
-      )}
+      <div className="flex gap-4 border-b border-blue-200 dark:border-blue-800">
+        {SUB_TABS.map((tabKey) => (
+          <button
+            key={tabKey}
+            type="button"
+            onClick={() => setActiveSubTab(tabKey)}
+            className={`pb-2 text-xs font-medium border-b-2 capitalize transition-colors ${
+              activeSubTab === tabKey
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t(`coachviewImport.subTabs.${tabKey}`, tabKey)}
+          </button>
+        ))}
+      </div>
 
-      {!isLoading && !error && !yearBucket && (
-        <p className="text-xs text-muted-foreground">
-          {t("coachviewImport.noHistoryForYear", "No CoachView history recorded for this year.")}
-        </p>
-      )}
+      {activeSubTab === "enrolments" && <EnrolmentsPanel enrolments={yearBucket.enrolments} />}
+      {activeSubTab === "results" && <ResultsPanel cvId={cvId} year={year} />}
 
-      {!isLoading && !error && yearBucket && (
+      {activeSubTab === "attendance" && (
         <>
-          <div className="flex gap-4 border-b border-blue-200 dark:border-blue-800">
-            {SUB_TABS.map((tabKey) => (
-              <button
-                key={tabKey}
-                type="button"
-                onClick={() => setActiveSubTab(tabKey)}
-                className={`pb-2 text-xs font-medium border-b-2 capitalize transition-colors ${
-                  activeSubTab === tabKey
-                    ? "border-[#ff8904] text-[#ff8904]"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t(`coachviewImport.subTabs.${tabKey}`, tabKey)}
-              </button>
-            ))}
-          </div>
+          <p className="flex items-center gap-1.5 text-xs text-amber-600">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            {t(
+              "coachviewImport.attendanceAllYears",
+              "Showing this student's complete CoachView attendance history, not limited to this year.",
+            )}
+          </p>
+          <AttendanceTab personId={cvId} />
+        </>
+      )}
 
-          {activeSubTab === "enrolments" && <EnrolmentsPanel enrolments={yearBucket.enrolments} />}
-          {activeSubTab === "results" && <ResultsPanel cvId={cvId} year={year} />}
-
-          {activeSubTab === "attendance" && (
-            <>
-              <p className="flex items-center gap-1.5 text-xs text-amber-600">
-                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                {t(
-                  "coachviewImport.attendanceAllYears",
-                  "Showing this student's complete CoachView attendance history, not limited to this year.",
-                )}
-              </p>
-              <AttendanceTab personId={cvId} />
-            </>
-          )}
-
-          {activeSubTab === "invoices" && (
-            <>
-              <p className="flex items-center gap-1.5 text-xs text-amber-600">
-                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                {t(
-                  "coachviewImport.invoicesAllYears",
-                  "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
-                )}
-              </p>
-              <InvoicesTab personId={cvId} />
-            </>
-          )}
+      {activeSubTab === "invoices" && (
+        <>
+          <p className="flex items-center gap-1.5 text-xs text-amber-600">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            {t(
+              "coachviewImport.invoicesAllYears",
+              "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
+            )}
+          </p>
+          <InvoicesTab personId={cvId} />
         </>
       )}
     </div>
