@@ -42,6 +42,25 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
   const [selectedCohortId, setSelectedCohortId] = useState(
     batch?.coachview_cohort?.opleiding_id || "",
   );
+  //* The full row for the selected cohort, captured at selection time.
+  //* Radix's <SelectValue> can only show a label for a value if a matching
+  //* <SelectItem> is currently mounted — once the admin clears the search
+  //* box (or the debounced query changes), the fetched list no longer
+  //* contains the previously-picked cohort and the trigger goes blank even
+  //* though selectedCohortId is still correct. Keeping this around and
+  //* merging it back into cohortOptions below keeps that item mounted.
+  const [selectedCohort, setSelectedCohort] = useState(
+    batch?.coachview_cohort
+      ? {
+          opleiding_id: batch.coachview_cohort.opleiding_id,
+          code: batch.coachview_cohort.code,
+          target_year: batch.coachview_cohort.target_year,
+          academic_year: batch.coachview_cohort.academic_year,
+          location_name: null,
+          student_count: batch.coachview_cohort.migrated_count,
+        }
+      : null,
+  );
   const [preview, setPreview] = useState(null);
   const [previewedCohortId, setPreviewedCohortId] = useState(null);
   const [result, setResult] = useState(null);
@@ -52,15 +71,17 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
     { enabled: open },
   );
 
-  const cohortOptions = useMemo(
-    () =>
-      (cohortsData?.data || []).map((c) => ({
-        _id: c.opleiding_id,
-        name: c.code,
-        raw: c,
-      })),
-    [cohortsData],
-  );
+  const cohortOptions = useMemo(() => {
+    const base = (cohortsData?.data || []).map((c) => ({
+      _id: c.opleiding_id,
+      name: c.code,
+      raw: c,
+    }));
+    if (selectedCohort && !base.some((o) => o._id === selectedCohort.opleiding_id)) {
+      base.unshift({ _id: selectedCohort.opleiding_id, name: selectedCohort.code, raw: selectedCohort });
+    }
+    return base;
+  }, [cohortsData, selectedCohort]);
 
   const previewMutation = usePreviewCoachviewCohort();
   const migrateMutation = useMigrateCoachviewCohort();
@@ -71,6 +92,7 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
 
   const handleClose = () => {
     setCohortSearch("");
+    setSelectedCohort(null);
     setPreview(null);
     setPreviewedCohortId(null);
     setResult(null);
@@ -80,6 +102,8 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
 
   const handleCohortChange = (value) => {
     setSelectedCohortId(value);
+    const picked = cohortOptions.find((o) => o._id === value);
+    if (picked) setSelectedCohort(picked.raw);
     setPreview(null);
     setPreviewedCohortId(null);
     setResult(null);
@@ -93,9 +117,21 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
         opleidingId: selectedCohortId,
         batchId: batch._id,
       });
-      setPreview(response?.data || null);
+      const data = response?.data || null;
+      setPreview(data);
       setPreviewedCohortId(selectedCohortId);
       setResult(null);
+      //* Preload every importable student one year ahead of the cohort's own
+      //* year — by the time an admin runs this, the academic year the cohort
+      //* describes has typically already elapsed, so continuity means
+      //* landing them in the *next* year, not re-running the one they were
+      //* enrolled in. Stored in state (not just the input's visual default)
+      //* so it's submitted even if the admin never touches the field.
+      const defaults = {};
+      (data?.students || []).forEach((s) => {
+        if (s.importable) defaults[s.cv_id] = s.assigned_year + 1;
+      });
+      setYearOverrides(defaults);
     } catch {
       setPreview(null);
     }
@@ -128,7 +164,7 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isReMigrate
@@ -227,7 +263,7 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
                 )}
               </div>
 
-              <div className="border rounded-md max-h-80 overflow-y-auto">
+              <div className="border rounded-md max-h-80 overflow-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -259,7 +295,7 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
                                 type="number"
                                 min={1}
                                 className="w-16 h-8"
-                                defaultValue={s.assigned_year}
+                                value={yearOverrides[s.cv_id] ?? s.assigned_year + 1}
                                 onChange={(e) => handleYearChange(s.cv_id, e.target.value)}
                               />
                             ) : (
