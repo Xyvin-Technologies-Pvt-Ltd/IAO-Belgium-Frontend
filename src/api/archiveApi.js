@@ -14,6 +14,8 @@ const unwrap = async (promise) => {
 
 export const getArchiveStatus = () => unwrap(axiosInstance.get("/archive/status"));
 
+export const getArchiveFacets = () => unwrap(axiosInstance.get("/archive/facets"));
+
 // -- Persons ---------------------------------------------------------------
 
 export const getArchivePersons = (params) =>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,16 +12,18 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableSort } from "@/hooks/useTableSort";
 import { useArchiveCohorts } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
+import CohortsFilterDrawer, { COHORTS_FILTER_DEFAULTS } from "./CohortsFilterDrawer";
 
 const ArchiveCohorts = () => {
   const navigate = useNavigate();
@@ -31,18 +33,36 @@ const ArchiveCohorts = () => {
   const [isCohort, setIsCohort] = useState("1");
   const debouncedSearch = useDebounce(search, 500);
 
+  const [appliedFilters, setAppliedFilters] = useState(COHORTS_FILTER_DEFAULTS);
+  const [draftFilters, setDraftFilters] = useState(COHORTS_FILTER_DEFAULTS);
+
+  const { sortBy, sortOrder, handleSort, sortParams } = useTableSort("academic_year", "desc", { setPage });
+
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, isCohort]);
+  }, [debouncedSearch, isCohort, appliedFilters]);
 
-  const params = {
+  const filterParams = useMemo(
+    () => ({
+      is_cohort: isCohort,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(appliedFilters.family !== "all" ? { family: appliedFilters.family } : {}),
+      ...(appliedFilters.academic_year !== "all" ? { academic_year: appliedFilters.academic_year } : {}),
+      ...(appliedFilters.target_year !== "all" ? { target_year: appliedFilters.target_year } : {}),
+      ...(appliedFilters.location !== "all" ? { location: appliedFilters.location } : {}),
+      ...(appliedFilters.is_online !== "all" ? { is_online: appliedFilters.is_online === "true" } : {}),
+      ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
+      ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
+      ...sortParams,
+    }),
+    [isCohort, debouncedSearch, appliedFilters, sortParams],
+  );
+
+  const { data, isLoading, isFetching, error, refetch } = useArchiveCohorts({
     page,
     limit: rowsPerPage,
-    is_cohort: isCohort,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  };
-
-  const { data, isLoading, isFetching, error, refetch } = useArchiveCohorts(params);
+    ...filterParams,
+  });
   const cohorts = data?.data || [];
   const totalRows = data?.total_count || 0;
 
@@ -74,17 +94,34 @@ const ArchiveCohorts = () => {
               <SelectItem value="0">Module deliveries</SelectItem>
             </SelectContent>
           </Select>
+          <CohortsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Group</TableHead>
-              <TableHead>Academic year</TableHead>
-              <TableHead>Sessions</TableHead>
-              <TableHead>Students</TableHead>
+              <SortableTableHead sortKey="code" activeKey={sortBy} order={sortOrder} onSort={handleSort}>Code</SortableTableHead>
+              <SortableTableHead sortKey="city" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Plaats <span className="opacity-60">(City)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="group" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Groep <span className="opacity-60">(Group)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="academic_year" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Studiejaar <span className="opacity-60">(Academic year)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="sessions" activeKey={sortBy} order={sortOrder} onSort={handleSort} align="right">
+                Sessies <span className="opacity-60">(Sessions)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="students" activeKey={sortBy} order={sortOrder} onSort={handleSort} align="right">
+                Studenten <span className="opacity-60">(Students)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -107,8 +144,8 @@ const ArchiveCohorts = () => {
                   <TableCell>{c.location_name || c.location_code || "—"}</TableCell>
                   <TableCell>{c.cohort_group || "—"}</TableCell>
                   <TableCell>{c.academic_year || "—"}</TableCell>
-                  <TableCell>{c.session_count ?? 0}</TableCell>
-                  <TableCell>{c.enrollment_count ?? 0}</TableCell>
+                  <TableCell className="text-right">{c.session_count ?? 0}</TableCell>
+                  <TableCell className="text-right">{c.enrollment_count ?? 0}</TableCell>
                 </TableRow>
               ))
             ) : (

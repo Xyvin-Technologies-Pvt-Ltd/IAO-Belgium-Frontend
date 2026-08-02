@@ -14,6 +14,17 @@ export const useArchiveStatus = (options = {}) =>
     ...options,
   });
 
+//* Backend caches this for 6h server-side; the frontend caches it forever
+//* per session on top of that — one fetch for the whole archive portal.
+export const useArchiveFacets = (options = {}) =>
+  useQuery({
+    queryKey: ["archive-facets"],
+    queryFn: archiveApi.getArchiveFacets,
+    staleTime: ARCHIVE_STALE_TIME,
+    gcTime: ARCHIVE_STALE_TIME,
+    ...options,
+  });
+
 // -- Persons -----------------------------------------------------------
 
 export const useArchivePersons = (params, options = {}) =>

@@ -1,33 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableSort } from "@/hooks/useTableSort";
 import { useArchiveProgrammes } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
+import ProgrammesFilterDrawer, { PROGRAMMES_FILTER_DEFAULTS } from "./ProgrammesFilterDrawer";
 
 const LEVEL_LABELS = {
-  programme_year: "Programme year",
+  programme_year: "Opleidingsjaar (Programme year)",
   module: "Module",
-  programme: "Programme",
-  other: "Other",
+  programme: "Opleiding (Programme)",
+  other: "Overig (Other)",
 };
 
 const ArchiveProgrammes = () => {
@@ -35,21 +30,35 @@ const ArchiveProgrammes = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [level, setLevel] = useState("all");
   const debouncedSearch = useDebounce(search, 500);
+
+  const [appliedFilters, setAppliedFilters] = useState(PROGRAMMES_FILTER_DEFAULTS);
+  const [draftFilters, setDraftFilters] = useState(PROGRAMMES_FILTER_DEFAULTS);
+
+  const { sortBy, sortOrder, handleSort, sortParams } = useTableSort("code", "asc", { setPage });
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, level]);
+  }, [debouncedSearch, appliedFilters]);
 
-  const params = {
+  const filterParams = useMemo(
+    () => ({
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(appliedFilters.level !== "all" ? { level: appliedFilters.level } : {}),
+      ...(appliedFilters.family !== "all" ? { family: appliedFilters.family } : {}),
+      ...(appliedFilters.target_year !== "all" ? { target_year: appliedFilters.target_year } : {}),
+      ...(appliedFilters.inactief !== "all" ? { inactief: appliedFilters.inactief === "true" } : {}),
+      ...(appliedFilters.retake !== "all" ? { retake: appliedFilters.retake === "true" } : {}),
+      ...sortParams,
+    }),
+    [debouncedSearch, appliedFilters, sortParams],
+  );
+
+  const { data, isLoading, isFetching, error, refetch } = useArchiveProgrammes({
     page,
     limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(level !== "all" ? { level } : {}),
-  };
-
-  const { data, isLoading, isFetching, error, refetch } = useArchiveProgrammes(params);
+    ...filterParams,
+  });
   const programmes = data?.data || [];
   const totalRows = data?.total_count || 0;
 
@@ -70,30 +79,32 @@ const ArchiveProgrammes = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Select value={level} onValueChange={setLevel}>
-            <SelectTrigger className="w-56">
-              <SelectValue placeholder="All levels" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All levels</SelectItem>
-              {Object.entries(LEVEL_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ProgrammesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Level</TableHead>
-              <TableHead>Family</TableHead>
-              <TableHead>Year</TableHead>
-              <TableHead>Status</TableHead>
+              <SortableTableHead sortKey="code" activeKey={sortBy} order={sortOrder} onSort={handleSort}>Code</SortableTableHead>
+              <SortableTableHead sortKey="name" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Naam <span className="opacity-60">(Name)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="level" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Niveau <span className="opacity-60">(Level)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="family" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Familie <span className="opacity-60">(Family)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="year" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Jaar <span className="opacity-60">(Year)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="status" activeKey={sortBy} order={sortOrder} onSort={handleSort}>Status</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -121,7 +132,7 @@ const ArchiveProgrammes = () => {
                   <TableCell>{p.target_year ?? "—"}</TableCell>
                   <TableCell>
                     <span className={p.inactief ? "text-red-500 font-medium" : "text-green-600 font-medium"}>
-                      {p.inactief ? "Inactive" : "Active"}
+                      {p.inactief ? "Inactief (Inactive)" : "Actief (Active)"}
                     </span>
                   </TableCell>
                 </TableRow>

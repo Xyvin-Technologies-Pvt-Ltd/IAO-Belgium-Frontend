@@ -7,10 +7,11 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
+import { useClientTableSort } from "@/hooks/useClientTableSort";
 import { useArchiveCohort } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
 
@@ -47,8 +48,24 @@ const CohortDetail = () => {
   );
 };
 
+const SESSION_ACCESSORS = {
+  date: (s) => s.datum,
+  name: (s) => s.naam || s.code,
+  location: (s) => s.locatie_naam,
+  exam: (s) => s.examen,
+};
+
+const STUDENT_ACCESSORS = {
+  name: (p) => p.full_name,
+  email: (p) => p.email1,
+};
+
 const Content = ({ data, navigate }) => {
   const { cohort, sessions, persons } = data;
+
+  const sessionSort = useClientTableSort(sessions, { defaultKey: "date", accessors: SESSION_ACCESSORS });
+  const studentSort = useClientTableSort(persons, { defaultKey: "name", accessors: STUDENT_ACCESSORS });
+
   return (
     <div className="space-y-6 mt-4">
       <div className="rounded-xl border border-sidebar-border bg-sidebar p-5">
@@ -62,29 +79,37 @@ const Content = ({ data, navigate }) => {
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-dashboard-text dark:text-white">
-          Sessions <span className="font-normal text-gray-400">({sessions.length})</span>
+          Opleidingsonderdelen <span className="font-normal text-gray-400">(Sessions — {sessions.length})</span>
         </h3>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Exam</TableHead>
+              <SortableTableHead sortKey="date" activeKey={sessionSort.sortBy} order={sessionSort.sortOrder} onSort={sessionSort.handleSort}>
+                Datum <span className="opacity-60">(Date)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="name" activeKey={sessionSort.sortBy} order={sessionSort.sortOrder} onSort={sessionSort.handleSort}>
+                Naam <span className="opacity-60">(Name)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="location" activeKey={sessionSort.sortBy} order={sessionSort.sortOrder} onSort={sessionSort.handleSort}>
+                Locatie <span className="opacity-60">(Location)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="exam" activeKey={sessionSort.sortBy} order={sessionSort.sortOrder} onSort={sessionSort.handleSort}>
+                Examen <span className="opacity-60">(Exam)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sessions.length > 0 ? (
-              sessions.map((s) => (
+            {sessionSort.sorted.length > 0 ? (
+              sessionSort.sorted.map((s) => (
                 <TableRow key={s.cv_id}>
                   <TableCell className="text-gray-500 dark:text-white/60">
                     {s.datum ? new Date(s.datum).toLocaleDateString() : "—"}
                   </TableCell>
-                  <TableCell className="max-w-[280px] truncate" title={s.naam}>
+                  <TableCell className="max-w-70 truncate" title={s.naam}>
                     {s.naam || s.code}
                   </TableCell>
                   <TableCell>{s.locatie_naam || "—"}</TableCell>
-                  <TableCell>{s.examen ? "Yes" : "—"}</TableCell>
+                  <TableCell>{s.examen ? "Ja (Yes)" : "—"}</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -100,18 +125,22 @@ const Content = ({ data, navigate }) => {
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-dashboard-text dark:text-white">
-          Students <span className="font-normal text-gray-400">({persons.length})</span>
+          Personen <span className="font-normal text-gray-400">(Students — {persons.length})</span>
         </h3>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
+              <SortableTableHead sortKey="name" activeKey={studentSort.sortBy} order={studentSort.sortOrder} onSort={studentSort.handleSort}>
+                Naam <span className="opacity-60">(Name)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="email" activeKey={studentSort.sortBy} order={studentSort.sortOrder} onSort={studentSort.handleSort}>
+                E-mail <span className="opacity-60">(Email)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {persons.length > 0 ? (
-              persons.map((p) => (
+            {studentSort.sorted.length > 0 ? (
+              studentSort.sorted.map((p) => (
                 <TableRow
                   key={p.cv_id}
                   className="cursor-pointer hover:bg-muted/50"

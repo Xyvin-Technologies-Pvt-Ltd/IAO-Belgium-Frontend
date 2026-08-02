@@ -1,15 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,36 +11,56 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableSort } from "@/hooks/useTableSort";
 import { toast } from "sonner";
 import { useArchivePersons } from "@/store/useArchiveStore";
 import { getArchivePersons } from "@/api/archiveApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import { buildCsvHeaders } from "../labels/archiveLabels";
 import ArchiveGate from "../components/ArchiveGate";
+import StudentsFilterDrawer, { STUDENTS_FILTER_DEFAULTS } from "./StudentsFilterDrawer";
 
 const ArchiveStudents = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [inactief, setInactief] = useState("all");
   const debouncedSearch = useDebounce(search, 500);
+
+  const [appliedFilters, setAppliedFilters] = useState(STUDENTS_FILTER_DEFAULTS);
+  const [draftFilters, setDraftFilters] = useState(STUDENTS_FILTER_DEFAULTS);
+
+  const { sortBy, sortOrder, handleSort, sortParams } = useTableSort("name", "asc", { setPage });
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, inactief]);
+  }, [debouncedSearch, appliedFilters]);
 
-  const params = {
+  //* Single source for both the list query and the CSV export — the two used
+  //* to be built separately and could drift.
+  const filterParams = useMemo(
+    () => ({
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(appliedFilters.category !== "all" ? { category: appliedFilters.category } : {}),
+      ...(appliedFilters.land_code !== "all" ? { land_code: appliedFilters.land_code } : {}),
+      ...(appliedFilters.plaats ? { plaats: appliedFilters.plaats } : {}),
+      ...(appliedFilters.inactief !== "all" ? { inactief: appliedFilters.inactief === "true" } : {}),
+      ...(appliedFilters.verwijderd !== "all" ? { verwijderd: appliedFilters.verwijderd === "true" } : {}),
+      ...sortParams,
+    }),
+    [debouncedSearch, appliedFilters, sortParams],
+  );
+
+  const { data, isLoading, isFetching, error, refetch } = useArchivePersons({
     page,
     limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(inactief !== "all" ? { inactief: inactief === "true" } : {}),
-  };
-
-  const { data, isLoading, isFetching, error, refetch } = useArchivePersons(params);
+    ...filterParams,
+  });
   const persons = data?.data || [];
   const totalRows = data?.total_count || 0;
 
@@ -58,18 +71,14 @@ const ArchiveStudents = () => {
   const handleExport = async () => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
-      const response = await getArchivePersons({
-        ...(debouncedSearch ? { search: debouncedSearch } : {}),
-        ...(inactief !== "all" ? { inactief: inactief === "true" } : {}),
-        export: true,
-      });
+      const response = await getArchivePersons({ ...filterParams, export: true });
       const rows = response?.data || [];
       if (rows.length === 0) {
         toast.error("No students to export matching applied filters.", { id: toastId });
         return;
       }
       const csv = buildCsv(
-        ["Name", "Email", "Phone", "City", "Country", "Status", "Last changed (CoachView)"],
+        buildCsvHeaders("students", ["name", "email", "phone", "city", "country", "status", "changed"]),
         rows,
         (r) => [
           r.full_name,
@@ -113,28 +122,39 @@ const ArchiveStudents = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Select value={inactief} onValueChange={setInactief}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="false">Active</SelectItem>
-              <SelectItem value="true">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <StudentsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Country</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last changed (CoachView)</TableHead>
+              <SortableTableHead sortKey="name" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Naam <span className="opacity-60">(Name)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="email" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                E-mail <span className="opacity-60">(Email)</span>
+              </SortableTableHead>
+              <TableHead>
+                Telefoon <span className="opacity-60">(Phone)</span>
+              </TableHead>
+              <SortableTableHead sortKey="city" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Plaats <span className="opacity-60">(City)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="country" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Land <span className="opacity-60">(Country)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="status" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Status
+              </SortableTableHead>
+              <SortableTableHead sortKey="changed" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Gewijzigd <span className="opacity-60">(Last changed)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -156,7 +176,7 @@ const ArchiveStudents = () => {
                   <TableCell>{p.land_code || "—"}</TableCell>
                   <TableCell>
                     <span className={p.inactief ? "text-red-500 font-medium" : "text-green-600 font-medium"}>
-                      {p.inactief ? "Inactive" : "Active"}
+                      {p.inactief ? "Inactief (Inactive)" : "Actief (Active)"}
                     </span>
                   </TableCell>
                   <TableCell className="text-gray-500 dark:text-white/60">

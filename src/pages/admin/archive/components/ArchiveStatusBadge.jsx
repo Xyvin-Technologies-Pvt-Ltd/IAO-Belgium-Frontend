@@ -1,3 +1,5 @@
+import BilingualLabel from "./BilingualLabel";
+
 //* CoachView status ids, shown verbatim (Dutch, primary) with an English
 //* gloss underneath — display only, never used to derive pass/fail. See the
 //* backend's archive.constants.js STATUS_LABELS for the source of truth.
@@ -17,19 +19,9 @@ const STATUS_COLORS = {
 
 const ArchiveStatusBadge = ({ status }) => {
   if (!status) return <span className="text-gray-400">—</span>;
-  const gloss = STATUS_LABELS[status];
   const color = STATUS_COLORS[status] || "text-gray-800";
 
-  return (
-    <span className={`font-medium ${color}`}>
-      {status}
-      {gloss && (
-        <span className="ml-1 text-xs font-normal text-gray-400 dark:text-white/40">
-          ({gloss})
-        </span>
-      )}
-    </span>
-  );
+  return <BilingualLabel nl={status} en={STATUS_LABELS[status]} className={`font-medium ${color}`} />;
 };
 
 export default ArchiveStatusBadge;

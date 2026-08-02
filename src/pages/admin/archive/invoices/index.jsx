@@ -1,15 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -18,56 +11,70 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableSort } from "@/hooks/useTableSort";
 import { toast } from "sonner";
 import { useArchiveInvoices } from "@/store/useArchiveStore";
 import { getArchiveInvoices } from "@/api/archiveApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import { buildCsvHeaders } from "../labels/archiveLabels";
 import ArchiveGate from "../components/ArchiveGate";
+import InvoicesFilterDrawer, { INVOICES_FILTER_DEFAULTS } from "./InvoicesFilterDrawer";
 
 const ArchiveInvoices = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [betaald, setBetaald] = useState("all");
   const debouncedSearch = useDebounce(search, 500);
+
+  const [appliedFilters, setAppliedFilters] = useState(INVOICES_FILTER_DEFAULTS);
+  const [draftFilters, setDraftFilters] = useState(INVOICES_FILTER_DEFAULTS);
+
+  const { sortBy, sortOrder, handleSort, sortParams } = useTableSort("date", "desc", { setPage });
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, betaald]);
+  }, [debouncedSearch, appliedFilters]);
 
-  const params = {
+  const filterParams = useMemo(
+    () => ({
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(appliedFilters.betaald !== "all" ? { betaald: appliedFilters.betaald === "true" } : {}),
+      ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
+      ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
+      ...(appliedFilters.amount_min !== "" ? { amount_min: appliedFilters.amount_min } : {}),
+      ...(appliedFilters.amount_max !== "" ? { amount_max: appliedFilters.amount_max } : {}),
+      ...sortParams,
+    }),
+    [debouncedSearch, appliedFilters, sortParams],
+  );
+
+  const { data, isLoading, isFetching, error, refetch } = useArchiveInvoices({
     page,
     limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(betaald !== "all" ? { betaald: betaald === "true" } : {}),
-  };
-
-  const { data, isLoading, isFetching, error, refetch } = useArchiveInvoices(params);
+    ...filterParams,
+  });
   const invoices = data?.data || [];
   const totalRows = data?.total_count || 0;
 
   const handleExport = async () => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
-      const response = await getArchiveInvoices({
-        ...(debouncedSearch ? { search: debouncedSearch } : {}),
-        ...(betaald !== "all" ? { betaald: betaald === "true" } : {}),
-        export: true,
-      });
+      const response = await getArchiveInvoices({ ...filterParams, export: true });
       const rows = response?.data || [];
       if (rows.length === 0) {
         toast.error("No invoices to export matching applied filters.", { id: toastId });
         return;
       }
       const csv = buildCsv(
-        ["Number", "Person", "Date", "Amount", "Status", "Paid on", "Description"],
+        buildCsvHeaders("invoices", ["number", "student", "date", "amount", "status", "description"]),
         rows,
-        (r) => [r.nummer, r.person_name, r.datum, r.line_total, r.betaald ? "Paid" : "Open", r.datum_betaald, r.omschrijving],
+        (r) => [r.nummer, r.person_name, r.datum, r.line_total, r.betaald ? "Paid" : "Open", r.omschrijving],
       );
       downloadCsv(csv, "coachview_archive_invoices");
       toast.success("Invoices exported successfully!", { id: toastId });
@@ -101,27 +108,32 @@ const ArchiveInvoices = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Select value={betaald} onValueChange={setBetaald}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="true">Paid</SelectItem>
-              <SelectItem value="false">Open</SelectItem>
-            </SelectContent>
-          </Select>
+          <InvoicesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Number</TableHead>
-              <TableHead>Student</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Description</TableHead>
+              <SortableTableHead sortKey="number" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Nummer <span className="opacity-60">(Number)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="student" activeKey={sortBy} order={sortOrder} onSort={handleSort}>Student</SortableTableHead>
+              <SortableTableHead sortKey="date" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Datum <span className="opacity-60">(Date)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="amount" activeKey={sortBy} order={sortOrder} onSort={handleSort} align="right">
+                Bedrag <span className="opacity-60">(Amount)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="status" activeKey={sortBy} order={sortOrder} onSort={handleSort}>Status</SortableTableHead>
+              <TableHead>
+                Omschrijving <span className="opacity-60">(Description)</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
@@ -145,10 +157,12 @@ const ArchiveInvoices = () => {
                   <TableCell className="text-gray-500 dark:text-white/60">
                     {inv.datum ? new Date(inv.datum).toLocaleDateString() : "—"}
                   </TableCell>
-                  <TableCell className="font-medium">{inv.line_total != null ? `€${inv.line_total.toFixed(2)}` : "—"}</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {inv.line_total != null ? `€${inv.line_total.toFixed(2)}` : "—"}
+                  </TableCell>
                   <TableCell>
                     <span className={inv.betaald ? "text-green-600 font-medium" : "text-amber-600 font-medium"}>
-                      {inv.betaald ? "Paid" : "Open"}
+                      {inv.betaald ? "Betaald (Paid)" : "Openstaand (Open)"}
                     </span>
                   </TableCell>
                   <TableCell className="max-w-[240px] truncate" title={inv.omschrijving}>

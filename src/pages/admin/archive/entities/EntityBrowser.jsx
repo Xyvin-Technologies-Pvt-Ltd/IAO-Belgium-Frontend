@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useParams } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -10,12 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useArchiveEntityRows } from "@/store/useArchiveStore";
+import { useTableSort } from "@/hooks/useTableSort";
+import { useArchiveEntities, useArchiveEntityRows } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
 
 const EntityBrowser = () => {
@@ -27,6 +29,13 @@ const EntityBrowser = () => {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
+
+  const { sortBy, sortOrder, handleSort, sortParams } = useTableSort("changed", "desc", { setPage });
+
+  //* label_en for the title — the entities list is already cached, so this
+  //* doesn't add a real network call.
+  const { data: entitiesData } = useArchiveEntities();
+  const meta = entitiesData?.data?.find((e) => e.entity === entity);
 
   useEffect(() => {
     setPage(1);
@@ -41,10 +50,13 @@ const EntityBrowser = () => {
     return () => updateBreadcrumbs([]);
   }, [entity]);
 
+  const search_disabled = meta?.search_disabled;
+
   const { data, isLoading, isFetching, error, refetch } = useArchiveEntityRows(entity, {
     page,
     limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(debouncedSearch && !search_disabled ? { search: debouncedSearch } : {}),
+    ...sortParams,
   });
   const rows = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -53,18 +65,34 @@ const EntityBrowser = () => {
     <ArchiveGate>
       <div className="space-y-6 mt-4">
         <div>
-          <h2 className="text-xl font-semibold text-dashboard-text dark:text-white capitalize">{entity}</h2>
-          <p className="text-sm text-gray-500 dark:text-white/60">Raw CoachView JSON, captured verbatim. Click a row to expand it.</p>
+          <h2 className="text-xl font-semibold text-dashboard-text dark:text-white capitalize">
+            {entity} {meta?.label_en && <span className="text-sm font-normal text-gray-400">({meta.label_en})</span>}
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-white/60">
+            {meta?.description_en || "Raw CoachView JSON, captured verbatim."} Click a row to expand it.
+          </p>
         </div>
 
-        <Input placeholder="Search raw JSON..." className="max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} />
+        {search_disabled ? (
+          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            Search is disabled on this table — {totalRows.toLocaleString()} rows makes a full-text scan too slow. Use the
+            dedicated Students / Cohorts pages instead, or page through manually.
+          </div>
+        ) : (
+          <Input placeholder="Search raw JSON..." className="max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} />
+        )}
 
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead />
-              <TableHead>Key</TableHead>
-              <TableHead>Last changed (CoachView)</TableHead>
+              <TableHead className="w-8" />
+              <SortableTableHead sortKey="key" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Sleutel <span className="opacity-60">(Key)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="changed" activeKey={sortBy} order={sortOrder} onSort={handleSort}>
+                Gewijzigd <span className="opacity-60">(Last changed)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>

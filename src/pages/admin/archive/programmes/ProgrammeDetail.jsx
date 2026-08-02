@@ -7,10 +7,11 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
+import { useClientTableSort } from "@/hooks/useClientTableSort";
 import { useArchiveProgramme } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
 
@@ -47,8 +48,27 @@ const ProgrammeDetail = () => {
   );
 };
 
+const MODULE_ACCESSORS = {
+  order: (m) => m.volgnummer,
+  code: (m) => m.code,
+  name: (m) => m.naam,
+  exam: (m) => m.examen,
+  status: (m) => m.inactief,
+};
+
+const COHORT_ACCESSORS = {
+  code: (c) => c.code,
+  city: (c) => c.location_name || c.location_code,
+  group: (c) => c.cohort_group,
+  academic_year: (c) => c.academic_year,
+};
+
 const Content = ({ data, navigate }) => {
   const { programme, modules, cohorts, enrolment_count } = data;
+
+  const moduleSort = useClientTableSort(modules, { defaultKey: "order", accessors: MODULE_ACCESSORS });
+  const cohortSort = useClientTableSort(cohorts, { defaultKey: "academic_year", defaultOrder: "desc", accessors: COHORT_ACCESSORS });
+
   return (
     <div className="space-y-6 mt-4">
       <div className="rounded-xl border border-sidebar-border bg-sidebar p-5">
@@ -61,30 +81,36 @@ const Content = ({ data, navigate }) => {
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-dashboard-text dark:text-white">
-          Modules <span className="font-normal text-gray-400">({modules.length})</span>
+          Opleidingssoortonderdelen <span className="font-normal text-gray-400">(Modules — {modules.length})</span>
         </h3>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Code</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Exam</TableHead>
-              <TableHead>Status</TableHead>
+              <SortableTableHead sortKey="order" activeKey={moduleSort.sortBy} order={moduleSort.sortOrder} onSort={moduleSort.handleSort}>#</SortableTableHead>
+              <SortableTableHead sortKey="code" activeKey={moduleSort.sortBy} order={moduleSort.sortOrder} onSort={moduleSort.handleSort}>Code</SortableTableHead>
+              <SortableTableHead sortKey="name" activeKey={moduleSort.sortBy} order={moduleSort.sortOrder} onSort={moduleSort.handleSort}>
+                Naam <span className="opacity-60">(Name)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="exam" activeKey={moduleSort.sortBy} order={moduleSort.sortOrder} onSort={moduleSort.handleSort}>
+                Examen <span className="opacity-60">(Exam)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="status" activeKey={moduleSort.sortBy} order={moduleSort.sortOrder} onSort={moduleSort.handleSort}>Status</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {modules.length > 0 ? (
-              modules.map((m) => (
+            {moduleSort.sorted.length > 0 ? (
+              moduleSort.sorted.map((m) => (
                 <TableRow key={`${m.cv_id}-${m.volgnummer}`}>
                   <TableCell>{m.volgnummer ?? "—"}</TableCell>
                   <TableCell className="font-medium">{m.code}</TableCell>
-                  <TableCell className="max-w-[320px] truncate" title={m.naam}>
+                  <TableCell className="max-w-80 truncate" title={m.naam}>
                     {m.naam}
                   </TableCell>
-                  <TableCell>{m.examen ? "Yes" : "—"}</TableCell>
+                  <TableCell>{m.examen ? "Ja (Yes)" : "—"}</TableCell>
                   <TableCell>
-                    <span className={m.inactief ? "text-red-500" : "text-green-600"}>{m.inactief ? "Inactive" : "Active"}</span>
+                    <span className={m.inactief ? "text-red-500" : "text-green-600"}>
+                      {m.inactief ? "Inactief (Inactive)" : "Actief (Active)"}
+                    </span>
                   </TableCell>
                 </TableRow>
               ))
@@ -101,20 +127,26 @@ const Content = ({ data, navigate }) => {
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-dashboard-text dark:text-white">
-          Cohorts <span className="font-normal text-gray-400">({cohorts.length})</span>
+          Opleidingen <span className="font-normal text-gray-400">(Cohorts — {cohorts.length})</span>
         </h3>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Group</TableHead>
-              <TableHead>Academic year</TableHead>
+              <SortableTableHead sortKey="code" activeKey={cohortSort.sortBy} order={cohortSort.sortOrder} onSort={cohortSort.handleSort}>Code</SortableTableHead>
+              <SortableTableHead sortKey="city" activeKey={cohortSort.sortBy} order={cohortSort.sortOrder} onSort={cohortSort.handleSort}>
+                Plaats <span className="opacity-60">(City)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="group" activeKey={cohortSort.sortBy} order={cohortSort.sortOrder} onSort={cohortSort.handleSort}>
+                Groep <span className="opacity-60">(Group)</span>
+              </SortableTableHead>
+              <SortableTableHead sortKey="academic_year" activeKey={cohortSort.sortBy} order={cohortSort.sortOrder} onSort={cohortSort.handleSort}>
+                Studiejaar <span className="opacity-60">(Academic year)</span>
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cohorts.length > 0 ? (
-              cohorts.map((c) => (
+            {cohortSort.sorted.length > 0 ? (
+              cohortSort.sorted.map((c) => (
                 <TableRow
                   key={c.opleiding_id}
                   className="cursor-pointer hover:bg-muted/50"
