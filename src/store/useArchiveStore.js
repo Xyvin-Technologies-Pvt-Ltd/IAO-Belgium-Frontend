@@ -25,6 +25,19 @@ export const useArchiveFacets = (options = {}) =>
     ...options,
   });
 
+// -- LMS student pre-migration history ----------------------------------
+
+//* enabled defaults to false: callers pass enabled only once they know the
+//* student has a migration_ref, so non-migrated students never fire this.
+export const useLmsStudentArchiveSummary = (applicationId, options = {}) =>
+  useQuery({
+    queryKey: ["archive-lms-student-summary", applicationId],
+    queryFn: () => archiveApi.getLmsStudentArchiveSummary(applicationId),
+    staleTime: ARCHIVE_STALE_TIME,
+    enabled: false,
+    ...options,
+  });
+
 // -- Persons -----------------------------------------------------------
 
 export const useArchivePersons = (params, options = {}) =>

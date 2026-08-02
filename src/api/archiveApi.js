@@ -16,6 +16,11 @@ export const getArchiveStatus = () => unwrap(axiosInstance.get("/archive/status"
 
 export const getArchiveFacets = () => unwrap(axiosInstance.get("/archive/facets"));
 
+// -- LMS student pre-migration history (admin view of a migrated student) ---
+
+export const getLmsStudentArchiveSummary = (applicationId) =>
+  unwrap(axiosInstance.get(`/archive/lms-student/${applicationId}/summary`));
+
 // -- Persons ---------------------------------------------------------------
 
 export const getArchivePersons = (params) =>

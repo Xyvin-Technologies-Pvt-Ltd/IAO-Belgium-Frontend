@@ -1,6 +1,7 @@
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
+import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useIntakeStore";
@@ -582,6 +583,14 @@ const StudentDetails = () => {
                   )}
                 </TableBody>
               </Table>
+            </div>
+
+            <div className="col-span-12">
+              <PreMigrationHistory
+                applicationId={studentData?.application_id}
+                migrationRef={studentData?.migration_ref}
+                year={filter.year}
+              />
             </div>
 
             {!studentData?.is_online && (

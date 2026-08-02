@@ -1,4 +1,5 @@
 import UserCard from "@/components/admin/UserCard";
+import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentById, useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
@@ -240,6 +241,15 @@ const StudentView = () => {
             </TableBody>
           </Table>
         </div>
+
+        <div className="col-span-12">
+          <PreMigrationHistory
+            applicationId={studentData?.application_id}
+            migrationRef={studentData?.migration_ref}
+            year={filter.year}
+          />
+        </div>
+
         <div className="col-span-12 lg:col-span-4">
           {!studentData?.is_online && (
             <>
