@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   getCoachviewImportStatus,
@@ -6,6 +6,8 @@ import {
   previewCoachviewCohort,
   migrateCoachviewCohort,
 } from "@/api/coachviewImportApi";
+
+const COHORT_PAGE_SIZE = 100;
 
 export const useCoachviewImportStatus = (options = {}) =>
   useQuery({
@@ -21,6 +23,27 @@ export const useCoachviewCohorts = (filter = {}, options = {}) =>
     queryFn: () => getCoachviewCohorts(filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+//* Server-paged cohort picker: search runs against the full archive, not the
+//* already-loaded page. Each page asks for up to COHORT_PAGE_SIZE rows.
+export const useInfiniteCoachviewCohorts = (filter = {}, options = {}) =>
+  useInfiniteQuery({
+    queryKey: ["coachview-cohorts-infinite", filter.search || "", filter.limit || COHORT_PAGE_SIZE],
+    queryFn: ({ pageParam = 1 }) =>
+      getCoachviewCohorts({
+        search: filter.search || "",
+        limit: filter.limit || COHORT_PAGE_SIZE,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const loaded = allPages.reduce((acc, page) => acc + (page?.data?.length || 0), 0);
+      const total = lastPage?.total_count ?? 0;
+      return loaded < total ? allPages.length + 1 : undefined;
+    },
+    staleTime: 30000,
     ...options,
   });
 

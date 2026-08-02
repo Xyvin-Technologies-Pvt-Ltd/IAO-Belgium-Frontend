@@ -7,15 +7,13 @@ import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetBatchesById } from "@/store/useBatchStore";
-import { useParams } from "@tanstack/react-router";
-import { CalendarCheck, BookOpen, Users, BarChart3, RefreshCw, ExternalLink } from "lucide-react";
+import { Link, useParams } from "@tanstack/react-router";
+import { CalendarCheck, BookOpen, Users, BarChart3, RefreshCw, Archive } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCanModify } from "@/hooks/useCanModify";
 import MigrateFromCoachViewDialog from "@/components/admin/batch/MigrateFromCoachViewDialog";
-
-const ARCHIVE_URL = import.meta.env.VITE_APP_ARCHIVE_URL || "https://archive.osteopathie.eu/";
 
 const BatchDetails = () => {
   const { t } = useTranslation();
@@ -122,15 +120,22 @@ const BatchDetails = () => {
               </span>
             </div>
 
-            <a
-              href={ARCHIVE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to={
+                batchData.coachview_cohort?.opleiding_id
+                  ? "/admin/archive/cohorts/$id"
+                  : "/admin/archive/cohorts"
+              }
+              params={
+                batchData.coachview_cohort?.opleiding_id
+                  ? { id: batchData.coachview_cohort.opleiding_id }
+                  : undefined
+              }
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <Archive className="h-3.5 w-3.5" />
               {t("coachviewImport.viewArchive", "View previous years in the CoachView Archive")}
-            </a>
+            </Link>
           </div>
 
           {canModify && (

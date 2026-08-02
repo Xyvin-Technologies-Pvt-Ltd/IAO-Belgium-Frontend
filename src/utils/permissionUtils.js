@@ -129,6 +129,13 @@ const SIDEBAR_PERMISSIONS = {
     "master_data_management_view",
     "master_data_management_modify",
   ],
+  // CoachView Archive — read-only historical portal. Gated behind the same
+  // bucket as other operational reporting pages (results, programs).
+  "/admin/archive/students": ["operations_management_view", "operations_management_modify"],
+  "/admin/archive/programmes": ["operations_management_view", "operations_management_modify"],
+  "/admin/archive/cohorts": ["operations_management_view", "operations_management_modify"],
+  "/admin/archive/invoices": ["operations_management_view", "operations_management_modify"],
+  "/admin/archive/entities": ["operations_management_view", "operations_management_modify"],
 };
 
 /** Module key → modify permission string */

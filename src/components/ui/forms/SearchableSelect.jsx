@@ -19,6 +19,9 @@ const SearchableSelect = ({
   value,
   onChange,
   onSearch,
+  onLoadMore,
+  hasMore = false,
+  isFetchingMore = false,
   error,
   required = false,
   className,
@@ -46,6 +49,14 @@ const SearchableSelect = ({
     }
   };
 
+  const handleScroll = (e) => {
+    if (!onLoadMore || !hasMore || isFetchingMore) return;
+    const el = e.currentTarget;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 48) {
+      onLoadMore();
+    }
+  };
+
   const showEmptyState = !isLoading && items.length === 0;
 
   return (
@@ -62,7 +73,6 @@ const SearchableSelect = ({
 
       <Select
         open={isOpen}
-        key={`${items.length}-${value}`}
         value={value || ""}
         onValueChange={onChange}
         onOpenChange={handleOpenChange}
@@ -110,17 +120,22 @@ const SearchableSelect = ({
 
           {/* Options */}
           {items.length > 0 && (
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-60 overflow-y-auto" onScroll={handleScroll}>
               {isLoading && (
                 <div className="p-2 text-sm text-muted-foreground text-center border-b border-border">
                   Loading...
                 </div>
               )}
               {items.map((item) => (
-                <SelectItem key={item._id} value={item._id}>
+                <SelectItem key={item._id} value={String(item._id)}>
                   {renderItem ? renderItem(item) : item.name}
                 </SelectItem>
               ))}
+              {(hasMore || isFetchingMore) && (
+                <div className="p-2 text-xs text-muted-foreground text-center">
+                  {isFetchingMore ? "Loading more..." : "Scroll for more"}
+                </div>
+              )}
             </div>
           )}
         </SelectContent>

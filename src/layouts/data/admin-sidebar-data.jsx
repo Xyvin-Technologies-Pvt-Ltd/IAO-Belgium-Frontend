@@ -20,6 +20,7 @@ import {
   WalletCards,
   CreditCard,
   Landmark,
+  Archive,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -210,6 +211,36 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: "Student Corner",
             url: "/admin/student-corner",
             icon: LayoutDashboard,
+          },
+        ],
+      },
+      {
+        title: t("sidebar.admin.coachviewArchive", { defaultValue: "CoachView Archive" }),
+        items: [
+          {
+            title: t("sidebar.admin.archiveStudents", { defaultValue: "Students" }),
+            url: "/admin/archive/students",
+            icon: Archive,
+          },
+          {
+            title: t("sidebar.admin.archiveProgrammes", { defaultValue: "Programmes" }),
+            url: "/admin/archive/programmes",
+            icon: Archive,
+          },
+          {
+            title: t("sidebar.admin.archiveCohorts", { defaultValue: "Cohorts" }),
+            url: "/admin/archive/cohorts",
+            icon: Archive,
+          },
+          {
+            title: t("sidebar.admin.archiveInvoices", { defaultValue: "Invoices" }),
+            url: "/admin/archive/invoices",
+            icon: Archive,
+          },
+          {
+            title: t("sidebar.admin.archiveEntities", { defaultValue: "All entities" }),
+            url: "/admin/archive/entities",
+            icon: Archive,
           },
         ],
       },

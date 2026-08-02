@@ -957,6 +957,16 @@
       "coachview": "CoachView",
       "year": "Year to assign",
       "status": "Status"
+    },
+    "preMigrationHistory": "Pre-migration history (CoachView Archive)",
+    "noHistoryForYear": "No CoachView history recorded for this year.",
+    "attendanceAllYears": "Showing this student's complete CoachView attendance history, not limited to this year.",
+    "invoicesAllYears": "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
+    "subTabs": {
+      "enrolments": "Enrolments",
+      "results": "Results",
+      "attendance": "Attendance",
+      "invoices": "Invoices"
     }
   },
   "studentImport": {

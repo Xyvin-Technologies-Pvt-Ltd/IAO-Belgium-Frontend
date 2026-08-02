@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, CheckCircle2, Eye, ExternalLink } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { AlertTriangle, CheckCircle2, Eye, Archive } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,12 +22,10 @@ import {
 } from "@/components/ui/table/table";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import {
-  useCoachviewCohorts,
+  useInfiniteCoachviewCohorts,
   usePreviewCoachviewCohort,
   useMigrateCoachviewCohort,
 } from "@/store/useCoachviewImport";
-
-const ARCHIVE_URL = import.meta.env.VITE_APP_ARCHIVE_URL || "https://archive.osteopathie.eu/";
 
 const STATUS_LABELS = {
   new: { label: "Will import", className: "text-green-600" },
@@ -40,7 +39,9 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
   const { t } = useTranslation();
   const [cohortSearch, setCohortSearch] = useState("");
   const [selectedCohortId, setSelectedCohortId] = useState(
-    batch?.coachview_cohort?.opleiding_id || "",
+    batch?.coachview_cohort?.opleiding_id
+      ? String(batch.coachview_cohort.opleiding_id)
+      : "",
   );
   //* The full row for the selected cohort, captured at selection time.
   //* Radix's <SelectValue> can only show a label for a value if a matching
@@ -66,22 +67,44 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
   const [result, setResult] = useState(null);
   const [yearOverrides, setYearOverrides] = useState({});
 
-  const { data: cohortsData, isLoading: cohortsLoading } = useCoachviewCohorts(
-    { search: cohortSearch, limit: 30 },
+  const {
+    data: cohortsPages,
+    isLoading: cohortsLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteCoachviewCohorts(
+    { search: cohortSearch, limit: 100 },
     { enabled: open },
   );
 
   const cohortOptions = useMemo(() => {
-    const base = (cohortsData?.data || []).map((c) => ({
-      _id: c.opleiding_id,
-      name: c.code,
-      raw: c,
-    }));
-    if (selectedCohort && !base.some((o) => o._id === selectedCohort.opleiding_id)) {
-      base.unshift({ _id: selectedCohort.opleiding_id, name: selectedCohort.code, raw: selectedCohort });
+    const seen = new Set();
+    const base = [];
+    for (const page of cohortsPages?.pages || []) {
+      for (const c of page?.data || []) {
+        const id = String(c.opleiding_id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        base.push({
+          _id: id,
+          name: c.code,
+          raw: c,
+        });
+      }
+    }
+    if (selectedCohort) {
+      const selectedId = String(selectedCohort.opleiding_id);
+      if (!seen.has(selectedId)) {
+        base.unshift({
+          _id: selectedId,
+          name: selectedCohort.code,
+          raw: selectedCohort,
+        });
+      }
     }
     return base;
-  }, [cohortsData, selectedCohort]);
+  }, [cohortsPages, selectedCohort]);
 
   const previewMutation = usePreviewCoachviewCohort();
   const migrateMutation = useMigrateCoachviewCohort();
@@ -184,9 +207,14 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
             label={t("coachviewImport.selectCohort", "CoachView cohort")}
             placeholder={t("coachviewImport.selectCohort", "CoachView cohort")}
             items={cohortOptions}
-            value={selectedCohortId}
+            value={selectedCohortId ? String(selectedCohortId) : ""}
             onChange={handleCohortChange}
             onSearch={setCohortSearch}
+            onLoadMore={() => {
+              if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+            }}
+            hasMore={!!hasNextPage}
+            isFetchingMore={isFetchingNextPage}
             isLoading={cohortsLoading}
             renderItem={(item) => (
               <span>
@@ -339,15 +367,14 @@ const MigrateFromCoachViewDialog = ({ open, onClose, batch }) => {
             </div>
           )}
 
-          <a
-            href={ARCHIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to={selectedCohortId ? "/admin/archive/cohorts/$id" : "/admin/archive/cohorts"}
+            params={selectedCohortId ? { id: selectedCohortId } : undefined}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <Archive className="h-3.5 w-3.5" />
             {t("coachviewImport.viewArchive", "View previous years in the CoachView Archive")}
-          </a>
+          </Link>
         </div>
 
         <DialogFooter>
