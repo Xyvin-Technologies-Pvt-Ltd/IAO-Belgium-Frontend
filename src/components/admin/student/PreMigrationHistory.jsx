@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Archive, AlertTriangle } from "lucide-react";
+import { Archive, AlertTriangle, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,6 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { LoadingSpinner, ErrorMessage } from "@/components/common";
 import { useArchivePersonResults } from "@/store/useArchiveStore";
 import ArchiveStatusBadge from "@/pages/admin/archive/components/ArchiveStatusBadge";
@@ -18,70 +26,191 @@ import InvoicesTab from "@/pages/admin/archive/students/tabs/InvoicesTab";
 
 const SUB_TABS = ["enrolments", "results", "attendance", "invoices"];
 
+const LEVEL_OPTIONS = ["programme_year", "module", "programme", "other"];
+
 //* Enrolments sub-tab: rendered straight from the year bucket the summary
 //* call already grouped — accurate to this specific year, zero extra query.
-const EnrolmentsPanel = ({ enrolments }) => (
-  <Table>
-    <TableHeader>
-      <TableRow>
-        <TableHead>Programme</TableHead>
-        <TableHead>Level</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Cohort</TableHead>
-        <TableHead>Avg. result</TableHead>
-      </TableRow>
-    </TableHeader>
-    <TableBody>
-      {enrolments.map((e) => (
-        <TableRow key={e.cv_id}>
-          <TableCell>
-            <BilingualLabel nl={e.soort_code} en={e.soort_naam} />
-          </TableCell>
-          <TableCell className="capitalize">{(e.level || "—").replace("_", " ")}</TableCell>
-          <TableCell><ArchiveStatusBadge status={e.status} /></TableCell>
-          <TableCell>{e.cohort?.location_name || "—"}</TableCell>
-          <TableCell>{e.gemiddeld_resultaat || "—"}</TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-);
+const EnrolmentsPanel = ({ enrolments }) => {
+  const { t } = useTranslation();
+  const [level, setLevel] = useState("all");
+  const [status, setStatus] = useState("all");
+
+  const statusOptions = useMemo(() => {
+    const values = [...new Set((enrolments || []).map((e) => e.status).filter(Boolean))];
+    return values.sort();
+  }, [enrolments]);
+
+  const filtered = useMemo(() => {
+    return (enrolments || []).filter((e) => {
+      if (level !== "all" && e.level !== level) return false;
+      if (status !== "all" && e.status !== status) return false;
+      return true;
+    });
+  }, [enrolments, level, status]);
+
+  const hasFilters = level !== "all" || status !== "all";
+
+  const clearFilters = () => {
+    setLevel("all");
+    setStatus("all");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={level} onValueChange={setLevel}>
+          <SelectTrigger className="w-48 h-8 text-xs">
+            <SelectValue placeholder={t("coachviewImport.filters.allLevels", "All levels")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("coachviewImport.filters.allLevels", "All levels")}</SelectItem>
+            {LEVEL_OPTIONS.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt.replace("_", " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="w-48 h-8 text-xs">
+            <SelectValue placeholder={t("coachviewImport.filters.allStatuses", "All statuses")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("coachviewImport.filters.allStatuses", "All statuses")}</SelectItem>
+            {statusOptions.map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+            {t("coachviewImport.filters.clear", "Clear filters")}
+          </button>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-xs text-muted-foreground py-4">
+          {t("coachviewImport.filters.noEnrolments", "No enrolments match these filters.")}
+        </p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Programme</TableHead>
+              <TableHead>Level</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Cohort</TableHead>
+              <TableHead>Avg. result</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((e) => (
+              <TableRow key={e.cv_id}>
+                <TableCell>
+                  <BilingualLabel nl={e.soort_code} en={e.soort_naam} />
+                </TableCell>
+                <TableCell className="capitalize">{(e.level || "—").replace("_", " ")}</TableCell>
+                <TableCell><ArchiveStatusBadge status={e.status} /></TableCell>
+                <TableCell>{e.cohort?.location_name || "—"}</TableCell>
+                <TableCell>{e.gemiddeld_resultaat || "—"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+};
 
 //* Results sub-tab: the same person-results call the standalone archive
 //* portal uses, filtered client-side to this year via target_year (added to
 //* the backend query specifically so this filter is possible — see
 //* archive.service.js list_person_results).
 const ResultsPanel = ({ cvId, year }) => {
-  const { data, isLoading, error, refetch } = useArchivePersonResults(cvId, { limit: 100 });
-  if (isLoading) return <LoadingSpinner size="sm" />;
-  if (error) return <ErrorMessage message={error?.message} onRetry={refetch} variant="inline" />;
+  const { t } = useTranslation();
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
-  const rows = (data?.data || []).filter((r) => r.target_year === year);
-  if (rows.length === 0) {
-    return <p className="text-xs text-muted-foreground py-4">No results recorded for this year.</p>;
-  }
+  const { data, isLoading, error, refetch } = useArchivePersonResults(cvId, {
+    limit: 100,
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+  });
+
+  const hasFilters = !!from || !!to;
+
+  const rows = (data?.data || []).filter((r) => Number(r.target_year) === Number(year));
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Programme</TableHead>
-          <TableHead>Score</TableHead>
-          <TableHead>Code</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((r, i) => (
-          <TableRow key={`${r.opleidingsvraag_id}-${i}`}>
-            <TableCell>{r.datum ? new Date(r.datum).toLocaleDateString() : "—"}</TableCell>
-            <TableCell><BilingualLabel nl={r.soort_code} en={r.soort_naam} /></TableCell>
-            <TableCell>{r.score_absoluut ?? "—"}</TableCell>
-            <TableCell>{r.score_code || "—"}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          type="date"
+          className="w-40 h-8 text-xs"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          aria-label={t("coachviewImport.filters.from", "From")}
+        />
+        <Input
+          type="date"
+          className="w-40 h-8 text-xs"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          aria-label={t("coachviewImport.filters.to", "To")}
+        />
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={() => {
+              setFrom("");
+              setTo("");
+            }}
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+            {t("coachviewImport.filters.clear", "Clear filters")}
+          </button>
+        )}
+      </div>
+
+      {isLoading && <LoadingSpinner size="sm" />}
+      {error && <ErrorMessage message={error?.message} onRetry={refetch} variant="inline" />}
+      {!isLoading && !error && rows.length === 0 && (
+        <p className="text-xs text-muted-foreground py-4">
+          {t("coachviewImport.filters.noResults", "No results recorded for this year.")}
+        </p>
+      )}
+      {!isLoading && !error && rows.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Programme</TableHead>
+              <TableHead>Score</TableHead>
+              <TableHead>Code</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((r, i) => (
+              <TableRow key={`${r.opleidingsvraag_id}-${i}`}>
+                <TableCell>{r.datum ? new Date(r.datum).toLocaleDateString() : "—"}</TableCell>
+                <TableCell><BilingualLabel nl={r.soort_code} en={r.soort_naam} /></TableCell>
+                <TableCell>{r.score_absoluut ?? "—"}</TableCell>
+                <TableCell>{r.score_code || "—"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 };
 

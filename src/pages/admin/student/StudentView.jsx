@@ -144,7 +144,17 @@ const StudentView = () => {
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        {yearHistory.hasHistory && (
+        {yearHistory.isLoading ? (
+          <div className="col-span-12 py-10">
+            <LoadingState
+              size="sm"
+              text={t(
+                "coachviewImport.loadingHistory",
+                "Loading pre-migration history...",
+              )}
+            />
+          </div>
+        ) : yearHistory.hasHistory ? (
           <div className="col-span-12">
             <PreMigrationHistory
               cvId={yearHistory.cvId}
@@ -152,9 +162,7 @@ const StudentView = () => {
               year={filter.year}
             />
           </div>
-        )}
-
-        {!yearHistory.hasHistory && (
+        ) : (
         <>
         <div className="col-span-12 lg:col-span-6">
           <h3 className="font-semibold mb-4">Completed Modules</h3>
@@ -266,7 +274,7 @@ const StudentView = () => {
         )}
 
         <div className="col-span-12 lg:col-span-4">
-          {!yearHistory.hasHistory && !studentData?.is_online && (
+          {!yearHistory.isLoading && !yearHistory.hasHistory && !studentData?.is_online && (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold">Attendance</h3>

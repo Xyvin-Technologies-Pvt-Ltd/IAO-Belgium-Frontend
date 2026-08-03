@@ -273,7 +273,8 @@ const EnrolledStudentDetails = () => {
       const html =
         item.doc_type === "invoice" ||
         item.doc_type === "credit_note" ||
-        item.doc_type === "refund"
+        item.doc_type === "refund" ||
+        item.doc_type === "receipt"
           ? await getInvoicePrintHtml(
               item.doc_type === "refund" ? item.invoice_id : item._id,
             )
@@ -432,7 +433,17 @@ const EnrolledStudentDetails = () => {
           </div>
 
           <div className="grid grid-cols-12 gap-6">
-            {yearHistory.hasHistory ? (
+            {yearHistory.isLoading ? (
+              <div className="col-span-12 py-10">
+                <LoadingState
+                  size="sm"
+                  text={t(
+                    "coachviewImport.loadingHistory",
+                    "Loading pre-migration history...",
+                  )}
+                />
+              </div>
+            ) : yearHistory.hasHistory ? (
               <div className="col-span-12">
                 <PreMigrationHistory
                   cvId={yearHistory.cvId}
@@ -944,15 +955,13 @@ const EnrolledStudentDetails = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {receipt.payment_id ? (
+                          {receipt._id ? (
                             <button
                               type="button"
                               onClick={() =>
                                 handleDownloadDocument({
                                   ...receipt,
-                                  _id: receipt.payment_id,
-                                  doc_type: "payment",
-                                  status: "paid",
+                                  doc_type: "receipt",
                                 })
                               }
                               className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors cursor-pointer"
