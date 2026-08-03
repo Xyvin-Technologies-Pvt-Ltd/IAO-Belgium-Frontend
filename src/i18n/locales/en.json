@@ -250,7 +250,8 @@
       "admissionFee": "Admission Fee",
       "modulePurchase": "Module Purchase",
       "locationSwitch": "Location Switch",
-      "customInvoice": "Custom Invoice"
+      "customInvoice": "Custom Invoice",
+      "other": "Other"
     },
     "messages": {
       "noPaymentsFound": "No payments found",

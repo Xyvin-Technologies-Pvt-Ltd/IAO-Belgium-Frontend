@@ -250,7 +250,8 @@
       "admissionFee": "Inschrijvingsgeld",
       "modulePurchase": "Module-aankoop",
       "locationSwitch": "Locatiewissel",
-      "customInvoice": "Aangepaste factuur"
+      "customInvoice": "Aangepaste factuur",
+      "other": "Overig"
     },
     "messages": {
       "noPaymentsFound": "Geen betalingen gevonden",

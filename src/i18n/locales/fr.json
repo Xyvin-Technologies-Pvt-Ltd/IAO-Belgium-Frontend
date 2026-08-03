@@ -249,7 +249,8 @@
       "admissionFee": "Frais d'inscription",
       "modulePurchase": "Achat de module",
       "locationSwitch": "Changement de lieu",
-      "customInvoice": "Facture personnalisée"
+      "customInvoice": "Facture personnalisée",
+      "other": "Autre"
     },
     "messages": {
       "noPaymentsFound": "Aucun paiement trouvé",
