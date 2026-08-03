@@ -17,7 +17,8 @@ export const adminSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Invalid email address")
-    .max(100, "Email must be at most 100 characters"),
+    .max(100, "Email must be at most 100 characters")
+    .transform((email) => email.trim().toLowerCase()),
   phone: z
     .string()
     .min(1, "Phone is required")

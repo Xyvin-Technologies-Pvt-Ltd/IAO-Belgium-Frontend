@@ -64,11 +64,12 @@ const Login = () => {
       return;
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
     setSendingOtp(true);
     clearError();
 
     try {
-      await sendOtp({ email });
+      await sendOtp({ email: normalizedEmail });
       setOtpSent(true);
       toast.success(t("login.toast.otpSentSuccess"));
     } catch (err) {
@@ -85,10 +86,11 @@ const Login = () => {
       return;
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
     clearError();
 
     try {
-      const response = await verifyOtp(email, otp);
+      const response = await verifyOtp(normalizedEmail, otp);
       const userRole = response?.data?.user?.role;
       toast.success(t("login.toast.loginSuccess"));
 
