@@ -247,7 +247,8 @@
       "admissionFee": "Zulassungsgebühr",
       "modulePurchase": "Modulkauf",
       "locationSwitch": "Standortwechsel",
-      "customInvoice": "Benutzerdefinierte Rechnung"
+      "customInvoice": "Benutzerdefinierte Rechnung",
+      "other": "Sonstiges"
     },
     "messages": {
       "noPaymentsFound": "Keine Zahlungen gefunden",

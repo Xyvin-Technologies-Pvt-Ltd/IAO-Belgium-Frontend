@@ -102,16 +102,17 @@ const StudentwiseReport = () => {
               <TableHead>{t("common.paid")}</TableHead>
               <TableHead>{t("finance.purposes.admissionFee")}</TableHead>
               <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
+              <TableHead>{t("finance.purposes.other")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={7} />
+              <TableSkeleton rows={rowsPerPage} columns={8} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center p-8">
+                <TableCell colSpan={8} className="text-center p-8">
                   <ErrorMessage
                     message={
                       error?.message ||
@@ -142,11 +143,14 @@ const StudentwiseReport = () => {
                   <TableCell>
                     EUR {(student.module_purchase_amount || 0).toFixed(2)}
                   </TableCell>
+                  <TableCell>
+                    EUR {(student.other_amount || 0).toFixed(2)}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={8} className="text-center">
                   {t("finance.messages.noPaymentAnalyticsFound")}
                 </TableCell>
               </TableRow>
