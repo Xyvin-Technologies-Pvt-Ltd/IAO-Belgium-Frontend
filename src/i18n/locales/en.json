@@ -959,6 +959,7 @@
       "status": "Status"
     },
     "preMigrationHistory": "Pre-migration history (CoachView Archive)",
+    "loadingHistory": "Loading pre-migration history...",
     "noHistoryForYear": "No CoachView history recorded for this year.",
     "attendanceAllYears": "Showing this student's complete CoachView attendance history, not limited to this year.",
     "invoicesAllYears": "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
@@ -967,6 +968,15 @@
       "results": "Results",
       "attendance": "Attendance",
       "invoices": "Invoices"
+    },
+    "filters": {
+      "allLevels": "All levels",
+      "allStatuses": "All statuses",
+      "clear": "Clear filters",
+      "from": "From",
+      "to": "To",
+      "noEnrolments": "No enrolments match these filters.",
+      "noResults": "No results recorded for this year."
     }
   },
   "studentImport": {
