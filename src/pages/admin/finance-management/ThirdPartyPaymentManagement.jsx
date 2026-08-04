@@ -15,6 +15,8 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetThirdPartyApplications, useAdminCancelThirdParty } from "@/store/usePaymentStore";
+import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Ban, Eye, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -37,8 +39,57 @@ const ThirdPartyPaymentManagement = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [purposeFilter, setPurposeFilter] = useState("all");
+  const [programFilter, setProgramFilter] = useState("all");
+  const [batchFilter, setBatchFilter] = useState("all");
+  const [programSearchTerm, setProgramSearchTerm] = useState("");
+  const [batchSearchTerm, setBatchSearchTerm] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
+  const selectedProgramId = programFilter !== "all" ? programFilter : null;
+
+  const hasActiveFilters =
+    !!debouncedSearch ||
+    statusFilter !== "all" ||
+    purposeFilter !== "all" ||
+    programFilter !== "all" ||
+    batchFilter !== "all";
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+    setPurposeFilter("all");
+    setProgramFilter("all");
+    setBatchFilter("all");
+    setProgramSearchTerm("");
+    setBatchSearchTerm("");
+    setPage(1);
+  };
+
+  const { data: programsData, isLoading: programsLoading } = useGetAllPrograms({
+    ...(programSearchTerm && { search: programSearchTerm }),
+  });
+
+  const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
+    selectedProgramId,
+    {
+      include_closed: true,
+      ...(batchSearchTerm && { search: batchSearchTerm }),
+    },
+    { enabled: !!selectedProgramId }
+  );
+
+  const programItems = [
+    { _id: "all", name: t("All Programs") },
+    ...(programsData?.data?.map((p) => ({
+      ...p,
+      name: `${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`,
+    })) || []),
+  ];
+
+  const batchItems = [
+    { _id: "all", name: t("All Batches") },
+    ...(batchesData?.data || []),
+  ];
 
   // Queries
   const { data, isLoading, error, refetch, isFetching } = useGetThirdPartyApplications({
@@ -46,6 +97,8 @@ const ThirdPartyPaymentManagement = () => {
     limit: rowsPerPage,
     ...(statusFilter !== "all" ? { status: statusFilter } : {}),
     ...(purposeFilter !== "all" ? { purpose: purposeFilter } : {}),
+    ...(programFilter !== "all" ? { program: programFilter } : {}),
+    ...(batchFilter !== "all" ? { batch: batchFilter } : {}),
     ...(debouncedSearch ? { student_id: debouncedSearch } : {}),
   });
 
@@ -64,7 +117,7 @@ const ThirdPartyPaymentManagement = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter, purposeFilter]);
+  }, [debouncedSearch, statusFilter, purposeFilter, programFilter, batchFilter]);
 
   const formatPurpose = (purpose) => {
     switch (purpose) {
@@ -133,7 +186,7 @@ const ThirdPartyPaymentManagement = () => {
 
       {/* Filters bar */}
       <div className="bg-sidebar rounded-xl border border-sidebar-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-1 items-center gap-3">
+        <div className="flex flex-1 flex-wrap items-center gap-3">
           <Input
             placeholder={t("Search by student ID...")}
             value={search}
@@ -166,6 +219,49 @@ const ThirdPartyPaymentManagement = () => {
               <SelectItem value="location-switch">Location Switch</SelectItem>
             </SelectContent>
           </Select>
+
+          <div className="w-[260px]">
+            <SearchableSelect
+              placeholder={t("All Programs")}
+              searchPlaceholder={t("Search programs...")}
+              items={programItems}
+              value={programFilter === "all" ? "all" : programFilter}
+              onChange={(val) => {
+                setProgramFilter(val || "all");
+                setBatchFilter("all");
+              }}
+              onSearch={setProgramSearchTerm}
+              isLoading={programsLoading}
+            />
+          </div>
+
+          <div className="w-[220px]">
+            <SearchableSelect
+              placeholder={
+                selectedProgramId
+                  ? t("All Batches")
+                  : t("Select a Program First")
+              }
+              searchPlaceholder={t("Search batches...")}
+              items={batchItems}
+              value={batchFilter === "all" ? "all" : batchFilter}
+              onChange={(val) => setBatchFilter(val || "all")}
+              onSearch={setBatchSearchTerm}
+              isLoading={batchesLoading}
+              disabled={!selectedProgramId}
+            />
+          </div>
+
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 rounded-[6px] shrink-0"
+              onClick={handleClearFilters}
+            >
+              {t("Clear Filters")}
+            </Button>
+          )}
         </div>
       </div>
 
