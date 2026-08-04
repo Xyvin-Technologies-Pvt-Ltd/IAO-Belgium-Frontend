@@ -350,7 +350,7 @@ const FkfManagement = () => {
                   </SelectItem>
                   {programsList.map((p) => (
                     <SelectItem key={p._id} value={p._id}>
-                      {p.name}
+                      {`${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -570,7 +570,7 @@ const FkfManagement = () => {
                   </SelectItem>
                   {programsList.map((p) => (
                     <SelectItem key={p._id} value={p._id}>
-                      {p.name}
+                      {`${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
