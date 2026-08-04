@@ -1835,7 +1835,7 @@
     "freeComponentLabel": "Free Module",
     "freeComponentDescription": "Enable if this module does not require any additional payment",
     "linkedModuleLabel": "Linked Module",
-    "linkedModuleHint": "Exam scheduled before this module",
+    "linkedModuleHint": "Exam scheduled with this module",
     "linkedModulePlaceholder": "Select module",
     "noModulesFound": "No modules found",
     "linkedExamLabel": "Linked Exam",

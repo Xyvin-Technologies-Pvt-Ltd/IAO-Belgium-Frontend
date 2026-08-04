@@ -20,6 +20,28 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  if (!durationUnit) return t("common.year", "Year");
+  const unit = durationUnit.toLowerCase();
+  if (unit.startsWith("year")) {
+    const trans = t("common.durationUnits.year", "Year");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("month")) {
+    const trans = t("common.durationUnits.month", "Month");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("week")) {
+    const trans = t("common.durationUnits.week", "Week");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("day")) {
+    const trans = t("common.durationUnits.day", "Day");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  return t("common.year", "Year");
+};
+
 const AttendenceView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -111,9 +133,7 @@ const AttendenceView = () => {
                 )}
                 {studentInfo.year && (
                   <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-muted text-muted-foreground">
-                    {studentInfo.duration_unit && studentInfo.duration_unit !== "years"
-                      ? `${t("common.level", "Level")} ${filter.year}`
-                      : `${t("common.year", "Year")} ${filter.year}`}
+                    {`${getDurationUnitLabel(studentInfo?.duration_unit, t)} ${filter.year}`}
                   </span>
                 )}
               </div>
@@ -146,9 +166,7 @@ const AttendenceView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              {studentInfo?.duration_unit && studentInfo?.duration_unit !== "years"
-                ? `${t("common.level", "Level")} ${y}`
-                : `${t("common.year", "Year")} ${y}`}
+              {`${getDurationUnitLabel(studentInfo?.duration_unit, t)} ${y}`}
             </button>
           ))}
         </nav>

@@ -1620,7 +1620,7 @@
     "freeComponentLabel": "Module gratuit",
     "freeComponentDescription": "Activer si ce module ne nécessite pas de paiement supplémentaire",
     "linkedModuleLabel": "Module associé",
-    "linkedModuleHint": "Examen planifié avant ce module",
+    "linkedModuleHint": "Examen planifié avec ce module",
     "linkedModulePlaceholder": "Sélectionner un module",
     "noModulesFound": "Aucun module trouvé",
     "linkedExamLabel": "Examen associé",
