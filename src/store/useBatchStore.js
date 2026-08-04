@@ -1,4 +1,4 @@
-import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults, getBatchYearLog, recalculateYearCompletion } from "@/api/batchApi";
+import { getBatchById, getStudentByBatch, createBatch, deleteBatch, getBatchAttendance, getBatchExamResults, getBatchYearLog, recalculateYearCompletion, getBatchRemovalImpact, removeStudentFromBatch } from "@/api/batchApi";
 import { markStudentAsFailed } from "@/api/intakeApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -101,6 +101,34 @@ export const useRecalculateYearCompletion = () => {
     onError: (error) => {
       queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
       toast.error(error?.message || "Failed to recalculate year completion");
+    },
+  });
+};
+
+export const useRemovalImpact = (batchId, applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["batch-removal-impact", batchId, applicationId],
+    queryFn: () => getBatchRemovalImpact(batchId, applicationId),
+    enabled: !!batchId && !!applicationId,
+    ...options,
+  });
+};
+
+export const useRemoveStudentFromBatch = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ batchId, applicationId, ...payload }) =>
+      removeStudentFromBatch(batchId, applicationId, payload),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      queryClient.invalidateQueries({ queryKey: ["batch", variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ["students", "batch", variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ["student-list"] });
+      toast.success(response?.message || "Student removed from group successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to remove student from group");
     },
   });
 };

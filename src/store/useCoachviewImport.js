@@ -5,6 +5,9 @@ import {
   getCoachviewCohorts,
   previewCoachviewCohort,
   migrateCoachviewCohort,
+  getCoachviewPersons,
+  previewCoachviewStudents,
+  addCoachviewStudents,
 } from "@/api/coachviewImportApi";
 
 const COHORT_PAGE_SIZE = 100;
@@ -74,6 +77,65 @@ export const useMigrateCoachviewCohort = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to migrate cohort");
+    },
+  });
+};
+
+//* Manual "add students" flow — see AddStudentsFromCoachViewDialog.
+const PERSON_PAGE_SIZE = 20;
+
+export const useInfiniteCoachviewPersons = (filter = {}, options = {}) =>
+  useInfiniteQuery({
+    queryKey: [
+      "coachview-persons-infinite",
+      filter.search || "",
+      filter.batch_id || "",
+      filter.limit || PERSON_PAGE_SIZE,
+    ],
+    queryFn: ({ pageParam = 1 }) =>
+      getCoachviewPersons({
+        search: filter.search || "",
+        batch_id: filter.batch_id,
+        limit: filter.limit || PERSON_PAGE_SIZE,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const loaded = allPages.reduce((acc, page) => acc + (page?.data?.length || 0), 0);
+      const total = lastPage?.total_count ?? 0;
+      return loaded < total ? allPages.length + 1 : undefined;
+    },
+    staleTime: 30000,
+    ...options,
+  });
+
+export const usePreviewCoachviewStudents = () =>
+  useMutation({
+    mutationFn: ({ batchId, cvIds }) => previewCoachviewStudents(batchId, cvIds),
+    onError: (error) => {
+      toast.error(error?.message || "Failed to preview students");
+    },
+  });
+
+export const useAddCoachviewStudents = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ batchId, ...payload }) => addCoachviewStudents(batchId, payload),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
+      queryClient.invalidateQueries({ queryKey: ["batch", variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ["students", "batch", variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ["student-list"] });
+      const imported = response?.data?.imported ?? 0;
+      if (imported > 0) {
+        toast.success(response?.message || `${imported} student(s) added successfully!`);
+      } else {
+        toast.info(response?.message || "No students were added.");
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add students");
     },
   });
 };

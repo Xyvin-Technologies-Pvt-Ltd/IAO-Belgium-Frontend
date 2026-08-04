@@ -71,3 +71,26 @@ export const recalculateYearCompletion = async (application_id) => {
     throw error.response.data;
   }
 };
+
+export const getBatchRemovalImpact = async (batchId, applicationId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/batch/${batchId}/students/${applicationId}/removal-impact`,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const removeStudentFromBatch = async (batchId, applicationId, payload) => {
+  try {
+    const response = await axiosInstance.post(
+      `/batch/${batchId}/students/${applicationId}/remove`,
+      payload,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

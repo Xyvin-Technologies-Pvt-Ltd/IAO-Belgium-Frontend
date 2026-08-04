@@ -218,7 +218,12 @@
       "send": "Send",
       "sending": "Sending...",
       "cancel": "Cancel"
-    }
+    },
+    "na": "n/a",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "loadMore": "Load more"
   },
   "finance": {
     "title": "Finance Management",
@@ -980,6 +985,44 @@
       "noResults": "No results recorded for this year."
     }
   },
+  "addStudents": {
+    "button": "Add students",
+    "title": "Add students from CoachView",
+    "description": "For students who reached CoachView through a route the API doesn't expose as a cohort. Search for the person directly and add them to this group.",
+    "searchPlaceholder": "Search by name or email...",
+    "noResults": "No matches.",
+    "alreadyInGroup": "Already in this group",
+    "alreadyInLms": "Already in LMS",
+    "inactive": "Inactive in CoachView",
+    "selectedCount": "{{count}} selected",
+    "review": "Review selection",
+    "noFindings": "No issues",
+    "blockingWarning": "One or more selected students has a blocking issue. Go back and deselect them before continuing.",
+    "confirmAdd": "Add students",
+    "ackTitle": "Confirm before adding",
+    "ackDescription": "Review and acknowledge every finding, then confirm.",
+    "table": {
+      "placement": "Placement",
+      "findings": "Findings"
+    }
+  },
+  "removeStudent": {
+    "button": "Remove from group",
+    "title": "Remove student from group",
+    "description": "The student's account and history are kept — this only detaches them from this group.",
+    "studentLabel": "Student",
+    "noImpact": "No attendance, module progress or invoices are tied to this enrolment.",
+    "confirm": "Remove student",
+    "ackTitle": "Confirm removal",
+    "ackDescription": "Acknowledge what's tied to this enrolment, then confirm the removal."
+  },
+  "discrepancy": {
+    "nothingToAcknowledge": "Nothing to acknowledge — you're good to go.",
+    "mustDeselect": "— this student must be deselected.",
+    "reasonLabel": "Reason for this manual change",
+    "reasonPlaceholder": "Explain why this manual change is being made — recorded in the audit log.",
+    "blockingPresent": "One or more students have a blocking issue and cannot be confirmed. Go back and deselect them first."
+  },
   "studentImport": {
     "title": "Bulk Upload Students",
     "description": "Select the program and batch, then upload an Excel/CSV file. Students are created with full access and no registration fee. Run a preview before importing.",
@@ -1004,6 +1047,11 @@
   "studentManagement": {
     "title": "Student Management",
     "search": "Search students...",
+    "exportCsv": "Export CSV",
+    "exporting": "Preparing CSV export...",
+    "exportEmpty": "No students to export.",
+    "exportSuccess": "Students exported successfully!",
+    "exportFailed": "Failed to export students.",
     "tabs": {
       "progress": "Academic Progress",
       "general": "Module Selection",
