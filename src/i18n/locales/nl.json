@@ -1643,7 +1643,7 @@
     "freeComponentLabel": "Gratis module",
     "freeComponentDescription": "Activeer als voor deze module geen aanvullende betaling vereist is",
     "linkedModuleLabel": "Gekoppelde module",
-    "linkedModuleHint": "Examen gepland vóór deze module",
+    "linkedModuleHint": "Examen gepland met deze module",
     "linkedModulePlaceholder": "Module selecteren",
     "noModulesFound": "Geen modules gevonden",
     "linkedExamLabel": "Gekoppeld examen",

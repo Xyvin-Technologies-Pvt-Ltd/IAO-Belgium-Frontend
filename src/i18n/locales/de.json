@@ -1648,7 +1648,7 @@
     "freeComponentLabel": "Kostenloses Modul",
     "freeComponentDescription": "Aktivieren, wenn für dieses Modul keine zusätzliche Zahlung erforderlich ist",
     "linkedModuleLabel": "Verknüpftes Modul",
-    "linkedModuleHint": "Prüfung vor diesem Modul geplant",
+    "linkedModuleHint": "Prüfung mit diesem Modul geplant",
     "linkedModulePlaceholder": "Modul auswählen",
     "noModulesFound": "Keine Module gefunden",
     "linkedExamLabel": "Verknüpfte Prüfung",

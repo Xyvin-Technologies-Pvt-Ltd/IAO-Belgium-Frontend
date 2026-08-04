@@ -34,6 +34,28 @@ const formatSubmissionType = (type) =>
         .join(" ")
     : "-";
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  if (!durationUnit) return t("common.year", "Year");
+  const unit = durationUnit.toLowerCase();
+  if (unit.startsWith("year")) {
+    const trans = t("common.durationUnits.year", "Year");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("month")) {
+    const trans = t("common.durationUnits.month", "Month");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("week")) {
+    const trans = t("common.durationUnits.week", "Week");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("day")) {
+    const trans = t("common.durationUnits.day", "Day");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  return t("common.year", "Year");
+};
+
 const StudentView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -135,9 +157,7 @@ const StudentView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              {studentData?.duration_unit && studentData.duration_unit !== "years"
-                ? `${t("common.level", "Level")} ${y}`
-                : `${t("common.year", "Year")} ${y}`}
+              {`${getDurationUnitLabel(studentData?.duration_unit, t)} ${y}`}
             </button>
           ))}
         </nav>
