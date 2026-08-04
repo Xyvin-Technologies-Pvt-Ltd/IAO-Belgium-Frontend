@@ -282,6 +282,8 @@ const ThirdPartyPaymentManagement = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("Student")}</TableHead>
+            <TableHead>{t("Program")}</TableHead>
+            <TableHead>{t("Batch")}</TableHead>
             <TableHead>{t("Purpose")}</TableHead>
             <TableHead>{t("Subject")}</TableHead>
             <TableHead>{t("Invoice")}</TableHead>
@@ -295,10 +297,10 @@ const ThirdPartyPaymentManagement = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("Failed to load applications")}
                   onRetry={refetch}
@@ -320,6 +322,19 @@ const ThirdPartyPaymentManagement = () => {
                     {app.student_id?.first_name} {app.student_id?.last_name}
                   </div>
                   <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                    {app.program_name || "-"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className="text-xs text-gray-700 dark:text-gray-300 block max-w-[160px] truncate"
+                    title={app.batch_name || ""}
+                  >
+                    {app.batch_name || "-"}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
@@ -380,7 +395,7 @@ const ThirdPartyPaymentManagement = () => {
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
+              <TableCell colSpan={10} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
                 {t("No applications found.")}
               </TableCell>
             </TableRow>
@@ -406,18 +421,30 @@ const ThirdPartyPaymentManagement = () => {
           {selectedApp && (
             <div className="space-y-4 mt-4 text-sm text-gray-900 dark:text-white">
               <div className="bg-gray-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Student")}</span>
-                  <span className="font-bold">
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Student")}</span>
+                  <span className="font-bold text-right">
                     {selectedApp.student_id?.first_name} {selectedApp.student_id?.last_name}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Purpose")}</span>
-                  <span className="font-bold">{formatPurpose(selectedApp.purpose)}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Purpose")}</span>
+                  <span className="font-bold text-right">{formatPurpose(selectedApp.purpose)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Program")}</span>
+                  <span className="font-bold text-right">
+                    {selectedApp.program_name || "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Batch")}</span>
+                  <span className="font-bold text-right break-words max-w-[60%]">
+                    {selectedApp.batch_name || "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">
                     {selectedApp.purpose === "admission-fee" ? t("Enrollment") : t("Module")}
                   </span>
                   <span className="font-bold text-right">
@@ -426,25 +453,52 @@ const ThirdPartyPaymentManagement = () => {
                       : selectedApp.module_id?.name || "-"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Status")}</span>
-                  <span className="font-bold uppercase">{selectedApp.status.replace("_", " ")}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Status")}</span>
+                  <span className="font-bold uppercase text-right">{selectedApp.status.replace("_", " ")}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Invoice Reference")}</span>
-                  <span className="font-mono font-bold">{selectedApp.invoice_id?.uid || "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Exact Sales Entry")}</span>
-                  <span className="font-mono text-xs">
-                    {selectedApp.invoice_id?.meta?.exact?.entry_id ? (
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t("Pushed")}</span>
-                    ) : (
-                      <span className="text-gray-400">{t("Pending")}</span>
-                    )}
-                  </span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Invoice Reference")}</span>
+                  <span className="font-mono font-bold text-right">{selectedApp.invoice_id?.uid || "-"}</span>
                 </div>
               </div>
+
+              {(selectedApp.payment_id?.company?.company_name ||
+                selectedApp.payment_id?.company?.address_line_1) && (
+                <div className="bg-gray-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 space-y-3">
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider block">
+                    {t("Bill to (third party)", "Bill to (third party)")}
+                  </span>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Name", "Name")}</span>
+                    <span className="font-bold text-right">
+                      {selectedApp.payment_id?.company?.company_name || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Address", "Address")}</span>
+                    <span className="font-bold text-right break-words max-w-[60%]">
+                      {selectedApp.payment_id?.company?.address_line_1 || "-"}
+                    </span>
+                  </div>
+                  {selectedApp.payment_id?.company?.vat_number && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("VAT number", "VAT number")}</span>
+                      <span className="font-bold text-right">
+                        {selectedApp.payment_id.company.vat_number}
+                      </span>
+                    </div>
+                  )}
+                  {selectedApp.payment_id?.company?.contact_person && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Contact person", "Contact person")}</span>
+                      <span className="font-bold text-right">
+                        {selectedApp.payment_id.company.contact_person}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {selectedApp.mollie_payment_link_url && (
                 <div className="space-y-1">
