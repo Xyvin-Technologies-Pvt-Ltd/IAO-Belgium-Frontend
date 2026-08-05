@@ -755,6 +755,12 @@ const FkfManagement = () => {
                   <SelectItem value="used_via_kmo">
                     {t("finance.fkf.usedViaKmo", "Used via KMO")}
                   </SelectItem>
+                  <SelectItem value="used_via_location_switch">
+                    {t(
+                      "finance.fkf.usedViaLocationSwitch",
+                      "Used via location switch",
+                    )}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

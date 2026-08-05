@@ -62,6 +62,8 @@ const statusVariants = {
   cancelled: "text-red-600 dark:text-red-400",
   used_via_kmo: "text-green-600 dark:text-green-400",
   "used via kmo": "text-green-600 dark:text-green-400",
+  used_via_location_switch: "text-green-600 dark:text-green-400",
+  "used via location switch": "text-green-600 dark:text-green-400",
 
   // Module availability
   locked: "text-gray-500",
@@ -142,6 +144,8 @@ const StatusBadge = ({ status }) => {
     displayText = "Overdue";
   } else if (status === "used_via_kmo") {
     displayText = "Used via KMO";
+  } else if (status === "used_via_location_switch") {
+    displayText = "Used via location switch";
   } else {
     displayText = status;
   }
