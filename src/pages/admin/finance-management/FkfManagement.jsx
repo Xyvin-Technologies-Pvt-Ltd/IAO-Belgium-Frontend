@@ -752,6 +752,9 @@ const FkfManagement = () => {
                   <SelectItem value="canceled">
                     {t("common.canceled", "Canceled")}
                   </SelectItem>
+                  <SelectItem value="used_via_kmo">
+                    {t("finance.fkf.usedViaKmo", "Used via KMO")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
