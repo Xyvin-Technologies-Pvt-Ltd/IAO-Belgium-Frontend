@@ -5,6 +5,7 @@ import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import {
   Table,
@@ -40,16 +41,17 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useGetStudents } from "@/store/useStudentStore";
 import {
-  useGetAllAcademicYears,
   useGetAllPrograms,
   useGetBatches,
 } from "@/store/useDropdownStore";
 import {
+  useCreateFkfBulkInvoices,
   useCreateFkfInvoice,
+  useGetFkfBulkPreview,
   useGetFkfConfig,
   useGetFkfInvoices,
+  useGetFkfModules,
   useGetFkfStudentModules,
   useUpdateFkfConfig,
 } from "@/store/useFkfStore";
@@ -59,12 +61,11 @@ const FkfManagement = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
   const [activeTab, setActiveTab] = useState("students");
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [program, setProgram] = useState("all");
-  const [batch, setBatch] = useState("all");
-  const [academic, setAcademic] = useState("all");
+  const [program, setProgram] = useState("");
+  const [batch, setBatch] = useState("");
+  const [catalogueModuleId, setCatalogueModuleId] = useState("");
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
   const [historyPage, setHistoryPage] = useState(1);
   const [historyRowsPerPage, setHistoryRowsPerPage] = useState(10);
   const [historySearch, setHistorySearch] = useState("");
@@ -72,17 +73,18 @@ const FkfManagement = () => {
   const [historyProgram, setHistoryProgram] = useState("all");
   const [historyBatch, setHistoryBatch] = useState("all");
   const [invoiceOpen, setInvoiceOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [componentId, setComponentId] = useState("");
   const [subsidizedAmount, setSubsidizedAmount] = useState("");
+  const [bulkAmount, setBulkAmount] = useState("");
   const [postalText, setPostalText] = useState("");
 
   const debouncedSearch = useDebounce(search, 400);
   const debouncedHistorySearch = useDebounce(historySearch, 400);
 
   const { data: programsData } = useGetAllPrograms();
-  const { data: academicData } = useGetAllAcademicYears();
-  const selectedProgramId = program !== "all" ? program : null;
+  const selectedProgramId = program || null;
   const { data: batchesData } = useGetBatches(
     selectedProgramId,
     {},
@@ -95,16 +97,33 @@ const FkfManagement = () => {
     { enabled: Boolean(historyProgramId) },
   );
 
-  const { data, isLoading, error, refetch, isFetching } = useGetStudents({
-    page,
-    limit: rowsPerPage,
-    fachkursfoerderung: true,
-    status: "active",
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(program !== "all" ? { program } : {}),
-    ...(batch !== "all" ? { batch } : {}),
-    ...(academic !== "all" ? { academic } : {}),
-  });
+  const {
+    data: catalogueModulesRes,
+    isLoading: catalogueModulesLoading,
+  } = useGetFkfModules(
+    {
+      program: program || undefined,
+      batch: batch || undefined,
+    },
+    { enabled: Boolean(program && batch) },
+  );
+
+  const {
+    data: previewRes,
+    isLoading: previewLoading,
+    error: previewError,
+    refetch: refetchPreview,
+    isFetching: previewFetching,
+  } = useGetFkfBulkPreview(
+    {
+      batch: batch || undefined,
+      component: catalogueModuleId || undefined,
+    },
+    {
+      enabled: Boolean(program && batch && catalogueModuleId),
+      retry: false,
+    },
+  );
 
   const {
     data: historyRes,
@@ -134,15 +153,52 @@ const FkfManagement = () => {
   const { data: configRes } = useGetFkfConfig();
   const updateConfig = useUpdateFkfConfig();
   const createInvoice = useCreateFkfInvoice();
+  const createBulk = useCreateFkfBulkInvoices();
 
-  const students = data?.data || [];
-  const totalRows = data?.total_count || 0;
   const historyRows = historyRes?.data?.rows || [];
   const historyTotal = historyRes?.data?.total || 0;
   const programsList = programsData?.data || [];
   const batchesList = batchesData?.data || [];
   const historyBatchesList = historyBatchesData?.data || [];
-  const academicList = academicData?.data || [];
+
+  const catalogueModules = (catalogueModulesRes?.data || []).map((m) => ({
+    _id: m._id,
+    name: `${m.name} (${m.type}) — ${m.currency || "EUR"} ${m.catalog_amount}`,
+    catalog_amount: m.catalog_amount,
+    currency: m.currency,
+  }));
+
+  const selectedCatalogueModule = useMemo(
+    () =>
+      catalogueModules.find(
+        (m) => String(m._id) === String(catalogueModuleId),
+      ),
+    [catalogueModules, catalogueModuleId],
+  );
+
+  const previewStudents = previewRes?.data?.students || [];
+  const filteredStudents = useMemo(() => {
+    const q = String(debouncedSearch || "").trim().toLowerCase();
+    if (!q) return previewStudents;
+    return previewStudents.filter((s) => {
+      const hay = [
+        s.first_name,
+        s.last_name,
+        s.email,
+        s.uid,
+        s.postal_code,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [previewStudents, debouncedSearch]);
+
+  const selectableStudents = useMemo(
+    () => filteredStudents.filter((s) => s.can_send),
+    [filteredStudents],
+  );
 
   const modulePayload = modulesRes?.data;
   const modules = (modulePayload?.modules || []).map((m) => ({
@@ -167,16 +223,23 @@ const FkfManagement = () => {
   }, [configRes]);
 
   useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, program, batch, academic]);
-
-  useEffect(() => {
     setHistoryPage(1);
   }, [debouncedHistorySearch, historyStatus, historyProgram, historyBatch]);
 
   useEffect(() => {
-    setBatch("all");
+    setBatch("");
+    setCatalogueModuleId("");
+    setSelectedStudentIds([]);
   }, [program]);
+
+  useEffect(() => {
+    setCatalogueModuleId("");
+    setSelectedStudentIds([]);
+  }, [batch]);
+
+  useEffect(() => {
+    setSelectedStudentIds([]);
+  }, [catalogueModuleId, debouncedSearch]);
 
   useEffect(() => {
     setHistoryBatch("all");
@@ -190,12 +253,22 @@ const FkfManagement = () => {
   useEffect(() => {
     if (selectedModule?.pending_fkf?.amount != null) {
       setSubsidizedAmount(String(selectedModule.pending_fkf.amount));
+    } else if (
+      invoiceOpen &&
+      selectedCatalogueModule &&
+      !subsidizedAmount &&
+      String(componentId) === String(catalogueModuleId)
+    ) {
+      // leave empty for admin to enter
     }
   }, [selectedModule]);
 
   const openSendInvoice = (student) => {
     setSelectedStudent(student);
     setInvoiceOpen(true);
+    if (catalogueModuleId) {
+      setComponentId(catalogueModuleId);
+    }
   };
 
   const closeSendInvoice = () => {
@@ -204,6 +277,40 @@ const FkfManagement = () => {
     setComponentId("");
     setSubsidizedAmount("");
   };
+
+  const openBulkSend = () => {
+    setBulkAmount("");
+    setBulkOpen(true);
+  };
+
+  const closeBulkSend = () => {
+    setBulkOpen(false);
+    setBulkAmount("");
+  };
+
+  const toggleStudent = (id, checked) => {
+    setSelectedStudentIds((prev) => {
+      const sid = String(id);
+      if (checked) {
+        return prev.includes(sid) ? prev : [...prev, sid];
+      }
+      return prev.filter((x) => x !== sid);
+    });
+  };
+
+  const toggleSelectAll = (checked) => {
+    if (!checked) {
+      setSelectedStudentIds([]);
+      return;
+    }
+    setSelectedStudentIds(selectableStudents.map((s) => String(s._id)));
+  };
+
+  const allSelectableChecked =
+    selectableStudents.length > 0 &&
+    selectableStudents.every((s) =>
+      selectedStudentIds.includes(String(s._id)),
+    );
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -218,7 +325,30 @@ const FkfManagement = () => {
       {
         onSuccess: () => {
           closeSendInvoice();
-          refetch();
+          refetchPreview();
+          setActiveTab("history");
+          setHistoryPage(1);
+        },
+      },
+    );
+  };
+
+  const handleBulkCreate = (e) => {
+    e.preventDefault();
+    if (!catalogueModuleId || !bulkAmount || selectedStudentIds.length === 0)
+      return;
+    createBulk.mutate(
+      {
+        student_ids: selectedStudentIds,
+        component_id: catalogueModuleId,
+        subsidized_amount: Number(bulkAmount),
+        currency: selectedCatalogueModule?.currency || "EUR",
+      },
+      {
+        onSuccess: () => {
+          closeBulkSend();
+          setSelectedStudentIds([]);
+          refetchPreview();
           setActiveTab("history");
           setHistoryPage(1);
         },
@@ -246,6 +376,9 @@ const FkfManagement = () => {
     const symbol = currency === "EUR" ? "€" : currency || "EUR";
     return `${symbol} ${Number(amount).toFixed(2)}`;
   };
+
+  const filtersReady = Boolean(program && batch);
+  const previewReady = Boolean(filtersReady && catalogueModuleId);
 
   return (
     <div className="space-y-6 mt-4">
@@ -290,64 +423,22 @@ const FkfManagement = () => {
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">
-                {t("common.search", "Search")}
-              </Label>
-              <Input
-                className="w-56"
-                placeholder={t(
-                  "finance.fkf.searchStudent",
-                  "Search student…",
-                )}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.academicYear", "Academic year")}
+                {t("finance.fkf.program", "Program")}{" "}
+                <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={academic}
-                onValueChange={(v) => {
-                  setAcademic(v);
-                  setPage(1);
-                }}
+                value={program || undefined}
+                onValueChange={(v) => setProgram(v)}
               >
-                <SelectTrigger className="w-48">
-                  <SelectValue />
+                <SelectTrigger className="w-56">
+                  <SelectValue
+                    placeholder={t(
+                      "finance.fkf.selectProgram",
+                      "Select program…",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    {t("common.all", "All")}
-                  </SelectItem>
-                  {academicList.map((a) => (
-                    <SelectItem key={a._id} value={a._id}>
-                      {a.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.program", "Program")}
-              </Label>
-              <Select
-                value={program}
-                onValueChange={(v) => {
-                  setProgram(v);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-52">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("common.all", "All")}
-                  </SelectItem>
                   {programsList.map((p) => (
                     <SelectItem key={p._id} value={p._id}>
                       {`${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`}
@@ -359,32 +450,27 @@ const FkfManagement = () => {
 
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.batch", "Batch")}
+                {t("finance.fkf.batch", "Batch")}{" "}
+                <span className="text-red-500">*</span>
               </Label>
               <Select
-                value={batch}
-                onValueChange={(v) => {
-                  setBatch(v);
-                  setPage(1);
-                }}
-                disabled={program === "all"}
+                value={batch || undefined}
+                onValueChange={(v) => setBatch(v)}
+                disabled={!program}
               >
                 <SelectTrigger className="w-48">
                   <SelectValue
                     placeholder={
-                      program === "all"
+                      !program
                         ? t(
                             "finance.fkf.selectProgramFirst",
                             "Select program first",
                           )
-                        : t("common.all", "All")
+                        : t("finance.fkf.selectBatch", "Select batch…")
                     }
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    {t("common.all", "All")}
-                  </SelectItem>
                   {batchesList.map((b) => (
                     <SelectItem key={b._id} value={b._id}>
                       {b.name}
@@ -393,12 +479,88 @@ const FkfManagement = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-1 min-w-[260px]">
+              <Label className="text-xs text-muted-foreground">
+                {t("finance.fkf.module", "Module / Exam")}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
+              <SearchableSelect
+                placeholder={
+                  !filtersReady
+                    ? t(
+                        "finance.fkf.selectProgramBatchFirst",
+                        "Select program and batch first",
+                      )
+                    : t("finance.fkf.selectModule", "Select module…")
+                }
+                searchPlaceholder={t("common.search", "Search")}
+                items={catalogueModules}
+                value={catalogueModuleId}
+                onChange={setCatalogueModuleId}
+                isLoading={catalogueModulesLoading}
+                disabled={!filtersReady}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("common.search", "Search")}
+              </Label>
+              <Input
+                className="w-56"
+                placeholder={t(
+                  "finance.fkf.searchStudent",
+                  "Search student…",
+                )}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                disabled={!previewReady}
+              />
+            </div>
+
+            <Button
+              type="button"
+              disabled={
+                !canModify ||
+                !previewReady ||
+                selectedStudentIds.length === 0
+              }
+              onClick={openBulkSend}
+            >
+              {t("finance.fkf.bulkSend", "Bulk Send Invoice")}
+              {selectedStudentIds.length > 0
+                ? ` (${selectedStudentIds.length})`
+                : ""}
+            </Button>
           </div>
+
+          {selectedCatalogueModule && previewReady && (
+            <p className="text-sm text-muted-foreground">
+              {t("finance.fkf.catalogFee", "Catalog fee")}:{" "}
+              <strong>
+                {formatMoney(
+                  selectedCatalogueModule.currency,
+                  selectedCatalogueModule.catalog_amount,
+                )}
+              </strong>
+            </p>
+          )}
 
           <div className="bg-sidebar border border-sidebar-border rounded-xl overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allSelectableChecked}
+                      onCheckedChange={(v) => toggleSelectAll(Boolean(v))}
+                      disabled={
+                        !previewReady || selectableStudents.length === 0
+                      }
+                      aria-label={t("common.selectAll", "Select all")}
+                    />
+                  </TableHead>
                   <TableHead>
                     {t("finance.fkf.student", "Student")}
                   </TableHead>
@@ -407,13 +569,7 @@ const FkfManagement = () => {
                     {t("finance.fkf.postalCode", "Postal code")}
                   </TableHead>
                   <TableHead>
-                    {t("finance.fkf.program", "Program")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.batch", "Batch")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.academicYear", "Academic year")}
+                    {t("common.status", "Status")}
                   </TableHead>
                   <TableHead className="w-12 text-right">
                     {t("common.actions", "Actions")}
@@ -421,23 +577,40 @@ const FkfManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody
-                className={isFetching ? "opacity-50 pointer-events-none" : ""}
+                className={
+                  previewFetching ? "opacity-50 pointer-events-none" : ""
+                }
               >
-                {isLoading ? (
-                  <TableSkeleton rows={rowsPerPage} columns={7} />
-                ) : error ? (
+                {!previewReady ? (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-muted-foreground py-10"
+                    >
+                      {t(
+                        "finance.fkf.selectProgramBatchModule",
+                        "Select program, batch, and module to load eligible students.",
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : previewLoading ? (
+                  <TableSkeleton rows={8} columns={6} />
+                ) : previewError ? (
+                  <TableRow>
+                    <TableCell colSpan={6}>
                       <ErrorMessage
-                        message={error.message || "Failed to load students"}
-                        onRetry={refetch}
+                        message={
+                          previewError.message ||
+                          "Failed to load students for this module"
+                        }
+                        onRetry={refetchPreview}
                       />
                     </TableCell>
                   </TableRow>
-                ) : students.length === 0 ? (
+                ) : filteredStudents.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={6}
                       className="text-center text-muted-foreground py-10"
                     >
                       {t(
@@ -447,54 +620,87 @@ const FkfManagement = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  students.map((student) => (
-                    <TableRow key={student._id}>
-                      <TableCell className="font-medium">
-                        {studentName(student)}
-                      </TableCell>
-                      <TableCell>{student.uid || "-"}</TableCell>
-                      <TableCell>{student.postal_code || "-"}</TableCell>
-                      <TableCell>{student.program_name || "-"}</TableCell>
-                      <TableCell>{student.batch_name || "-"}</TableCell>
-                      <TableCell>{student.academic_name || "-"}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              disabled={!canModify}
-                              onClick={() => openSendInvoice(student)}
-                            >
-                              {t(
-                                "finance.fkf.sendInvoice",
-                                "Send FKF Invoice",
-                              )}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  filteredStudents.map((student) => {
+                    const checked = selectedStudentIds.includes(
+                      String(student._id),
+                    );
+                    let statusLabel = t(
+                      "finance.fkf.readyToSend",
+                      "Ready to send",
+                    );
+                    if (student.already_paid) {
+                      statusLabel = t("common.paid", "Paid");
+                    } else if (!student.eligible) {
+                      statusLabel = t(
+                        "finance.fkf.notEligible",
+                        "Not eligible",
+                      );
+                    } else if (student.pending_fkf) {
+                      statusLabel = t(
+                        "finance.fkf.pendingOffer",
+                        "Pending FKF offer",
+                      );
+                    }
+
+                    return (
+                      <TableRow key={student._id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={checked}
+                            disabled={!student.can_send || !canModify}
+                            onCheckedChange={(v) =>
+                              toggleStudent(student._id, Boolean(v))
+                            }
+                            aria-label={studentName(student)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {studentName(student)}
+                        </TableCell>
+                        <TableCell>{student.uid || "-"}</TableCell>
+                        <TableCell>{student.postal_code || "-"}</TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {statusLabel}
+                            {student.pending_fkf?.amount != null
+                              ? ` · ${formatMoney(
+                                  selectedCatalogueModule?.currency,
+                                  student.pending_fkf.amount,
+                                )}`
+                              : ""}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                disabled={!canModify || !student.can_send}
+                                onClick={() => openSendInvoice(student)}
+                              >
+                                {t(
+                                  "finance.fkf.sendInvoice",
+                                  "Send FKF Invoice",
+                                )}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
           </div>
-
-          <Pagination
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            totalRows={totalRows}
-          />
         </div>
       )}
 
@@ -792,8 +998,8 @@ const FkfManagement = () => {
               </p>
               <p className="text-muted-foreground">
                 {[
-                  selectedStudent?.program_name,
-                  selectedStudent?.batch_name,
+                  previewRes?.data?.program?.name,
+                  previewRes?.data?.batch?.name,
                   selectedStudent?.postal_code
                     ? `PLZ ${selectedStudent.postal_code}`
                     : null,
@@ -870,6 +1076,87 @@ const FkfManagement = () => {
                 {createInvoice.isPending
                   ? t("common.processing", "Processing…")
                   : t("finance.fkf.createButton", "Create FKF Invoice")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={bulkOpen}
+        onOpenChange={(open) => {
+          if (!open) closeBulkSend();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {t("finance.fkf.bulkSend", "Bulk Send Invoice")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleBulkCreate} className="space-y-4">
+            <div className="rounded-lg bg-muted/40 p-3 text-sm space-y-1">
+              <p className="font-medium">
+                {selectedCatalogueModule?.name ||
+                  previewRes?.data?.module?.name ||
+                  "-"}
+              </p>
+              <p className="text-muted-foreground">
+                {t("finance.fkf.bulkSelectedCount", {
+                  count: selectedStudentIds.length,
+                  defaultValue: `${selectedStudentIds.length} students selected`,
+                })}
+              </p>
+              {selectedCatalogueModule && (
+                <p className="text-muted-foreground">
+                  {t("finance.fkf.catalogFee", "Catalog fee")}:{" "}
+                  {formatMoney(
+                    selectedCatalogueModule.currency,
+                    selectedCatalogueModule.catalog_amount,
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>
+                {t("finance.fkf.subsidizedAmount", "Subsidized amount")}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={bulkAmount}
+                onChange={(e) => setBulkAmount(e.target.value)}
+                placeholder="e.g. 600"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "finance.fkf.bulkAmountHint",
+                  "This subsidized amount will be applied to every selected student.",
+                )}
+              </p>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={closeBulkSend}>
+                {t("common.cancel", "Cancel")}
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  createBulk.isPending ||
+                  !bulkAmount ||
+                  selectedStudentIds.length === 0 ||
+                  !canModify
+                }
+              >
+                {createBulk.isPending
+                  ? t("common.processing", "Processing…")
+                  : t("finance.fkf.bulkSendConfirm", "Send invoices")}
               </Button>
             </DialogFooter>
           </form>

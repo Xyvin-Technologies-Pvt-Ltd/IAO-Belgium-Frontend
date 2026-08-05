@@ -18,6 +18,18 @@ export const getFkfStudentModules = async (studentId) => {
   return response.data;
 };
 
+export const getFkfModules = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/modules", { params });
+  return response.data;
+};
+
+export const getFkfBulkPreview = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/invoices/bulk-preview", {
+    params,
+  });
+  return response.data;
+};
+
 export const getFkfInvoices = async (params = {}) => {
   const response = await axiosInstance.get("/fkf/invoices", { params });
   return response.data;
@@ -25,5 +37,10 @@ export const getFkfInvoices = async (params = {}) => {
 
 export const createFkfInvoice = async (data) => {
   const response = await axiosInstance.post("/fkf/invoices", data);
+  return response.data;
+};
+
+export const createFkfBulkInvoices = async (data) => {
+  const response = await axiosInstance.post("/fkf/invoices/bulk", data);
   return response.data;
 };
