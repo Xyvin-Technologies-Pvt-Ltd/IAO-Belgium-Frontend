@@ -31,6 +31,33 @@ import moment from "moment";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
 
+const formatKmoAmount = (app) => {
+  const currency =
+    app?.invoice_id?.currency || app?.module_id?.currency || "EUR";
+  const invoiceAmount =
+    app?.invoice_id?.total_amount ?? app?.invoice_id?.amount;
+  const catalogAmount = app?.module_id?.amount;
+  const amount =
+    invoiceAmount != null && invoiceAmount !== ""
+      ? Number(invoiceAmount)
+      : Number(catalogAmount || 0);
+  const isFkf = Boolean(
+    app?.invoice_id?.meta?.is_fkf || app?.meta?.is_fkf,
+  );
+  return {
+    currency,
+    amount,
+    catalogAmount:
+      catalogAmount != null && catalogAmount !== ""
+        ? Number(catalogAmount)
+        : null,
+    isFkf,
+    label: `${currency} ${Number(amount).toFixed(2)}${
+      isFkf ? " (FKF)" : ""
+    }`,
+  };
+};
+
 const KmoManagement = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
@@ -325,7 +352,7 @@ const KmoManagement = () => {
                   <TableCell>
                     <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {app.module_id?.currency || "EUR"} {app.module_id?.amount}
+                      {formatKmoAmount(app).label}
                     </p>
                   </TableCell>
                   <TableCell>
@@ -381,7 +408,9 @@ const KmoManagement = () => {
       />
 
       {/* Details Dialog */}
-      {selectedApp && (
+      {selectedApp && (() => {
+        const kmoAmount = formatKmoAmount(selectedApp);
+        return (
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
           <DialogContent className="max-w-md rounded-xl bg-white dark:bg-sidebar border border-sidebar-border">
             <DialogHeader>
@@ -411,7 +440,14 @@ const KmoManagement = () => {
                 <p className="font-bold text-gray-500 dark:text-gray-400">Module:</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
                   {selectedApp.module_id?.name}
-                  <span className="block text-xs font-normal text-muted-foreground">{selectedApp.module_id?.currency || "EUR"} {selectedApp.module_id?.amount}</span>
+                  <span className="block text-xs font-normal text-muted-foreground">
+                    {kmoAmount.label}
+                    {kmoAmount.isFkf &&
+                    kmoAmount.catalogAmount != null &&
+                    kmoAmount.catalogAmount !== kmoAmount.amount
+                      ? ` · catalog ${kmoAmount.currency} ${kmoAmount.catalogAmount.toFixed(2)}`
+                      : ""}
+                  </span>
                 </p>
               </div>
 
@@ -510,7 +546,8 @@ const KmoManagement = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      )}
+        );
+      })()}
 
       {/* Update Dialog */}
       {selectedApp && (
