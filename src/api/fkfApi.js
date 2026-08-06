@@ -1,6 +1,5 @@
 import axiosInstance from "./axiosintercepter";
 
-
 export const getFkfConfig = async () => {
   const response = await axiosInstance.get("/fkf/config");
   return response.data;
@@ -23,9 +22,35 @@ export const getFkfModules = async (params = {}) => {
   return response.data;
 };
 
-export const getFkfBulkPreview = async (params = {}) => {
-  const response = await axiosInstance.get("/fkf/invoices/bulk-preview", {
+export const getFkfStudents = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/students", { params });
+  return response.data;
+};
+
+export const getFkfEligibleStudents = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/students/eligible", {
     params,
+  });
+  return response.data;
+};
+
+export const markFkfEligible = async (data) => {
+  const response = await axiosInstance.post("/fkf/students/mark-eligible", data);
+  return response.data;
+};
+
+export const unmarkFkfEligible = async (data) => {
+  const response = await axiosInstance.post(
+    "/fkf/students/unmark-eligible",
+    data,
+  );
+  return response.data;
+};
+
+export const exportFkfStudents = async (params = {}) => {
+  const response = await axiosInstance.get("/fkf/students/export", {
+    params,
+    responseType: "blob",
   });
   return response.data;
 };
@@ -37,6 +62,11 @@ export const getFkfInvoices = async (params = {}) => {
 
 export const createFkfInvoice = async (data) => {
   const response = await axiosInstance.post("/fkf/invoices", data);
+  return response.data;
+};
+
+export const previewFkfBulkInvoices = async (data) => {
+  const response = await axiosInstance.post("/fkf/invoices/bulk/preview", data);
   return response.data;
 };
 

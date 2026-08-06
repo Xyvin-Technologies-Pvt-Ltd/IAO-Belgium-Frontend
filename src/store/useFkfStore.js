@@ -2,11 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFkfBulkInvoices,
   createFkfInvoice,
-  getFkfBulkPreview,
+  exportFkfStudents,
   getFkfConfig,
+  getFkfEligibleStudents,
   getFkfInvoices,
   getFkfModules,
   getFkfStudentModules,
+  getFkfStudents,
+  markFkfEligible,
+  previewFkfBulkInvoices,
+  unmarkFkfEligible,
   updateFkfConfig,
 } from "@/api/fkfApi";
 import { toast } from "sonner";
@@ -32,6 +37,69 @@ export const useUpdateFkfConfig = () => {
   });
 };
 
+export const useGetFkfStudents = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["fkf-students", params],
+    queryFn: () => getFkfStudents(params),
+    ...options,
+  });
+
+export const useGetFkfEligibleStudents = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["fkf-eligible-students", params],
+    queryFn: () => getFkfEligibleStudents(params),
+    ...options,
+  });
+
+export const useMarkFkfEligible = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markFkfEligible,
+    onSuccess: (data) => {
+      toast.success(data?.message || "Students marked eligible");
+      queryClient.invalidateQueries({ queryKey: ["fkf-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark students eligible");
+    },
+  });
+};
+
+export const useUnmarkFkfEligible = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: unmarkFkfEligible,
+    onSuccess: (data) => {
+      toast.success(data?.message || "Students unmarked");
+      queryClient.invalidateQueries({ queryKey: ["fkf-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to unmark students");
+    },
+  });
+};
+
+export const useExportFkfStudents = () =>
+  useMutation({
+    mutationFn: exportFkfStudents,
+    onSuccess: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "fkf-students.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("CSV exported");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to export students");
+    },
+  });
+
 export const useGetFkfStudentModules = (studentId, options = {}) =>
   useQuery({
     queryKey: ["fkf-student-modules", studentId],
@@ -45,14 +113,6 @@ export const useGetFkfModules = (params = {}, options = {}) =>
     queryKey: ["fkf-modules", params],
     queryFn: () => getFkfModules(params),
     enabled: Boolean(params?.program),
-    ...options,
-  });
-
-export const useGetFkfBulkPreview = (params = {}, options = {}) =>
-  useQuery({
-    queryKey: ["fkf-bulk-preview", params],
-    queryFn: () => getFkfBulkPreview(params),
-    enabled: Boolean(params?.batch && params?.component),
     ...options,
   });
 
@@ -72,7 +132,7 @@ export const useCreateFkfInvoice = () => {
         data?.message || "FKF invoice created and email sent",
       );
       queryClient.invalidateQueries({ queryKey: ["fkf-student-modules"] });
-      queryClient.invalidateQueries({ queryKey: ["fkf-bulk-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
       queryClient.invalidateQueries({ queryKey: ["fkf-invoices"] });
       queryClient.invalidateQueries({ queryKey: ["students"] });
     },
@@ -81,6 +141,14 @@ export const useCreateFkfInvoice = () => {
     },
   });
 };
+
+export const usePreviewFkfBulkInvoices = () =>
+  useMutation({
+    mutationFn: previewFkfBulkInvoices,
+    onError: (error) => {
+      toast.error(error?.message || "Failed to preview FKF invoices");
+    },
+  });
 
 export const useCreateFkfBulkInvoices = () => {
   const queryClient = useQueryClient();
@@ -97,7 +165,7 @@ export const useCreateFkfBulkInvoices = () => {
           `${payload.failed_count} of ${payload.total} invoices failed`,
         );
       }
-      queryClient.invalidateQueries({ queryKey: ["fkf-bulk-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
       queryClient.invalidateQueries({ queryKey: ["fkf-student-modules"] });
       queryClient.invalidateQueries({ queryKey: ["fkf-invoices"] });
       queryClient.invalidateQueries({ queryKey: ["students"] });
