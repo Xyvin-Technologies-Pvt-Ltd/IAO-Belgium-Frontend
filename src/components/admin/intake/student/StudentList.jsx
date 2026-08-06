@@ -174,7 +174,6 @@ const StudentList = () => {
         open={moveDialogOpen}
         onOpenChange={setMoveDialogOpen}
         student={selectedStudent}
-        intakeId={id}
       />
 
       <ReEnrollStudentDialog
