@@ -46,6 +46,7 @@ import {
   useGetBatches,
 } from "@/store/useDropdownStore";
 import {
+  useCancelFkfInvoice,
   useCreateFkfBulkInvoices,
   useCreateFkfInvoice,
   useExportFkfStudents,
@@ -121,6 +122,7 @@ const FkfManagement = () => {
   const [eligibleProgramSearch, setEligibleProgramSearch] = useState("");
   const [historyProgramSearch, setHistoryProgramSearch] = useState("");
   const [postalText, setPostalText] = useState("");
+  const [cancelTarget, setCancelTarget] = useState(null);
 
   const debouncedStudentsSearch = useDebounce(studentsSearch, 400);
   const debouncedEligibleSearch = useDebounce(eligibleSearch, 400);
@@ -234,6 +236,7 @@ const FkfManagement = () => {
   const { data: configRes } = useGetFkfConfig();
   const updateConfig = useUpdateFkfConfig();
   const createInvoice = useCreateFkfInvoice();
+  const cancelInvoice = useCancelFkfInvoice();
   const createBulk = useCreateFkfBulkInvoices();
   const previewBulk = usePreviewFkfBulkInvoices();
   const markEligible = useMarkFkfEligible();
@@ -1172,6 +1175,11 @@ const FkfManagement = () => {
                   <TableHead>
                     {t("finance.fkf.paidAt", "Paid")}
                   </TableHead>
+                  {canModify ? (
+                    <TableHead className="w-12 text-right">
+                      {t("common.actions", "Actions")}
+                    </TableHead>
+                  ) : null}
                 </TableRow>
               </TableHeader>
               <TableBody
@@ -1180,10 +1188,13 @@ const FkfManagement = () => {
                 }
               >
                 {historyLoading ? (
-                  <TableSkeleton rows={historyRowsPerPage} columns={8} />
+                  <TableSkeleton
+                    rows={historyRowsPerPage}
+                    columns={canModify ? 9 : 8}
+                  />
                 ) : historyError ? (
                   <TableRow>
-                    <TableCell colSpan={8}>
+                    <TableCell colSpan={canModify ? 9 : 8}>
                       <ErrorMessage
                         message={
                           historyError.message || "Failed to load FKF history"
@@ -1195,7 +1206,7 @@ const FkfManagement = () => {
                 ) : historyRows.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={canModify ? 9 : 8}
                       className="text-center text-muted-foreground py-10"
                     >
                       {t(
@@ -1246,6 +1257,35 @@ const FkfManagement = () => {
                           ? moment(row.paid_at).format("DD MMM YYYY")
                           : "-"}
                       </TableCell>
+                      {canModify ? (
+                        <TableCell className="text-right">
+                          {row.payment_status === "pending" ? (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  aria-label={t("common.actions", "Actions")}
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => setCancelTarget(row)}
+                                >
+                                  {t(
+                                    "finance.fkf.cancelSubsidy",
+                                    "Cancel subsidy",
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : null}
+                        </TableCell>
+                      ) : null}
                     </TableRow>
                   ))
                 )}
@@ -1298,6 +1338,82 @@ const FkfManagement = () => {
           </Button>
         </form>
       )}
+
+      <Dialog
+        open={Boolean(cancelTarget)}
+        onOpenChange={(open) => {
+          if (!open && !cancelInvoice.isPending) setCancelTarget(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {t("finance.fkf.cancelSubsidyTitle", "Cancel FKF subsidy?")}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {t(
+              "finance.fkf.cancelSubsidyConfirm",
+              "This voids the unpaid subsidy invoice. The student will no longer see this offer. Paid subsidies cannot be cancelled.",
+            )}
+          </p>
+          {cancelTarget ? (
+            <div className="rounded-lg bg-muted/40 p-3 text-sm space-y-1">
+              <p>
+                <span className="text-muted-foreground">
+                  {t("finance.fkf.student", "Student")}:{" "}
+                </span>
+                <strong>
+                  {cancelTarget.student?.name ||
+                    studentName(cancelTarget.student || {})}
+                </strong>
+              </p>
+              <p>
+                <span className="text-muted-foreground">
+                  {t("finance.fkf.module", "Module")}:{" "}
+                </span>
+                <strong>{cancelTarget.module?.name || "-"}</strong>
+              </p>
+              <p>
+                <span className="text-muted-foreground">
+                  {t("finance.fkf.invoice", "Invoice")}:{" "}
+                </span>
+                <strong>
+                  {cancelTarget.invoice?.uid ||
+                    cancelTarget.payment_uid ||
+                    "-"}
+                </strong>
+              </p>
+            </div>
+          ) : null}
+          <DialogFooter className="gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setCancelTarget(null)}
+              disabled={cancelInvoice.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={cancelInvoice.isPending || !cancelTarget?._id}
+              onClick={async () => {
+                if (!cancelTarget?._id) return;
+                try {
+                  await cancelInvoice.mutateAsync(cancelTarget._id);
+                  setCancelTarget(null);
+                } catch {
+                  // toast handled by mutation
+                }
+              }}
+            >
+              {cancelInvoice.isPending
+                ? t("finance.fkf.cancelling", "Cancelling…")
+                : t("finance.fkf.cancelSubsidy", "Cancel subsidy")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={invoiceOpen}

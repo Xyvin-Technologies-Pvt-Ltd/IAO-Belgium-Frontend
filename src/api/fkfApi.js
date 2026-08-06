@@ -65,6 +65,13 @@ export const createFkfInvoice = async (data) => {
   return response.data;
 };
 
+export const cancelFkfInvoice = async (paymentId) => {
+  const response = await axiosInstance.post(
+    `/fkf/invoices/${paymentId}/cancel`,
+  );
+  return response.data;
+};
+
 export const previewFkfBulkInvoices = async (data) => {
   const response = await axiosInstance.post("/fkf/invoices/bulk/preview", data);
   return response.data;

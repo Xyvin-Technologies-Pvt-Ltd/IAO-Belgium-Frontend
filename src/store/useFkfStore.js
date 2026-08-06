@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFkfBulkInvoices,
   createFkfInvoice,
+  cancelFkfInvoice,
   exportFkfStudents,
   getFkfConfig,
   getFkfEligibleStudents,
@@ -138,6 +139,22 @@ export const useCreateFkfInvoice = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to create FKF invoice");
+    },
+  });
+};
+
+export const useCancelFkfInvoice = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (paymentId) => cancelFkfInvoice(paymentId),
+    onSuccess: (data) => {
+      toast.success(data?.message || "FKF subsidy cancelled");
+      queryClient.invalidateQueries({ queryKey: ["fkf-invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
+      queryClient.invalidateQueries({ queryKey: ["fkf-student-modules"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to cancel FKF subsidy");
     },
   });
 };
