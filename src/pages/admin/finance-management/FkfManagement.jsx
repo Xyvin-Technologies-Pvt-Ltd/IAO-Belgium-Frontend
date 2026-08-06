@@ -48,82 +48,163 @@ import {
 import {
   useCreateFkfBulkInvoices,
   useCreateFkfInvoice,
-  useGetFkfBulkPreview,
+  useExportFkfStudents,
   useGetFkfConfig,
+  useGetFkfEligibleStudents,
   useGetFkfInvoices,
   useGetFkfModules,
   useGetFkfStudentModules,
+  useGetFkfStudents,
+  useMarkFkfEligible,
+  usePreviewFkfBulkInvoices,
+  useUnmarkFkfEligible,
   useUpdateFkfConfig,
 } from "@/store/useFkfStore";
 import { useCanModify } from "@/hooks/useCanModify";
+
+const studentName = (s) =>
+  `${s?.first_name || ""} ${s?.last_name || ""}`.trim() || s?.email || "-";
+
+const formatMoney = (currency, amount) => {
+  if (amount == null || amount === "") return "-";
+  const symbol = currency === "EUR" ? "€" : currency || "EUR";
+  return `${symbol} ${Number(amount).toFixed(2)}`;
+};
+
+const programLabel = (p) =>
+  [p?.name, p?.language?.name, p?.city?.name].filter(Boolean).join(" · ");
+
 
 const FkfManagement = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
   const [activeTab, setActiveTab] = useState("students");
-  const [search, setSearch] = useState("");
-  const [program, setProgram] = useState("");
-  const [batch, setBatch] = useState("");
-  const [catalogueModuleId, setCatalogueModuleId] = useState("");
-  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+
+  // Students tab
+  const [studentsSearch, setStudentsSearch] = useState("");
+  const [studentsProgram, setStudentsProgram] = useState("");
+  const [studentsBatch, setStudentsBatch] = useState("");
+  const [studentsPage, setStudentsPage] = useState(1);
+  const [studentsRowsPerPage, setStudentsRowsPerPage] = useState(20);
+  const [studentsSelectedIds, setStudentsSelectedIds] = useState([]);
+
+  // Eligible tab
+  const [eligibleSearch, setEligibleSearch] = useState("");
+  const [eligibleProgram, setEligibleProgram] = useState("");
+  const [eligibleBatch, setEligibleBatch] = useState("");
+  const [eligiblePage, setEligiblePage] = useState(1);
+  const [eligibleRowsPerPage, setEligibleRowsPerPage] = useState(20);
+  const [eligibleSelectedIds, setEligibleSelectedIds] = useState([]);
+
+  // History
   const [historyPage, setHistoryPage] = useState(1);
   const [historyRowsPerPage, setHistoryRowsPerPage] = useState(10);
   const [historySearch, setHistorySearch] = useState("");
   const [historyStatus, setHistoryStatus] = useState("all");
   const [historyProgram, setHistoryProgram] = useState("all");
   const [historyBatch, setHistoryBatch] = useState("all");
+
+  // Dialogs
   const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [componentId, setComponentId] = useState("");
   const [subsidizedAmount, setSubsidizedAmount] = useState("");
+  const [bulkModuleId, setBulkModuleId] = useState("");
   const [bulkAmount, setBulkAmount] = useState("");
+  const [bulkProgram, setBulkProgram] = useState("");
+  const [bulkBatch, setBulkBatch] = useState("");
+  const [bulkStep, setBulkStep] = useState("form"); // form | preview
+  const [bulkPreview, setBulkPreview] = useState(null);
+  const [bulkProgramSearch, setBulkProgramSearch] = useState("");
+  const [studentsProgramSearch, setStudentsProgramSearch] = useState("");
+  const [eligibleProgramSearch, setEligibleProgramSearch] = useState("");
+  const [historyProgramSearch, setHistoryProgramSearch] = useState("");
   const [postalText, setPostalText] = useState("");
 
-  const debouncedSearch = useDebounce(search, 400);
+  const debouncedStudentsSearch = useDebounce(studentsSearch, 400);
+  const debouncedEligibleSearch = useDebounce(eligibleSearch, 400);
   const debouncedHistorySearch = useDebounce(historySearch, 400);
 
   const { data: programsData } = useGetAllPrograms();
-  const selectedProgramId = program || null;
-  const { data: batchesData } = useGetBatches(
-    selectedProgramId,
+  const programsList = programsData?.data || [];
+
+  const { data: studentsBatchesData } = useGetBatches(
+    studentsProgram || null,
     {},
-    { enabled: Boolean(selectedProgramId) },
+    { enabled: Boolean(studentsProgram) },
   );
+  const studentsBatchesList = studentsBatchesData?.data || [];
+
+  const { data: eligibleBatchesData } = useGetBatches(
+    eligibleProgram || null,
+    {},
+    { enabled: Boolean(eligibleProgram) },
+  );
+  const eligibleBatchesList = eligibleBatchesData?.data || [];
+
   const historyProgramId = historyProgram !== "all" ? historyProgram : null;
   const { data: historyBatchesData } = useGetBatches(
     historyProgramId,
     {},
     { enabled: Boolean(historyProgramId) },
   );
+  const historyBatchesList = historyBatchesData?.data || [];
+
+  const { data: bulkBatchesData } = useGetBatches(
+    bulkProgram || null,
+    {},
+    { enabled: Boolean(bulkProgram) && bulkOpen },
+  );
+  const bulkBatchesList = bulkBatchesData?.data || [];
+
+  const studentsParams = {
+    page: studentsPage,
+    limit: studentsRowsPerPage,
+    apply_postal_filter: "true",
+    ...(debouncedStudentsSearch ? { search: debouncedStudentsSearch } : {}),
+    ...(studentsProgram ? { program: studentsProgram } : {}),
+    ...(studentsBatch ? { batch: studentsBatch } : {}),
+  };
 
   const {
-    data: catalogueModulesRes,
-    isLoading: catalogueModulesLoading,
-  } = useGetFkfModules(
-    {
-      program: program || undefined,
-      batch: batch || undefined,
-    },
-    { enabled: Boolean(program && batch) },
-  );
+    data: studentsRes,
+    isLoading: studentsLoading,
+    error: studentsError,
+    refetch: refetchStudents,
+    isFetching: studentsFetching,
+  } = useGetFkfStudents(studentsParams, {
+    enabled: activeTab === "students",
+  });
+
+  const eligibleParams = {
+    page: eligiblePage,
+    limit: eligibleRowsPerPage,
+    ...(debouncedEligibleSearch ? { search: debouncedEligibleSearch } : {}),
+    ...(eligibleProgram ? { program: eligibleProgram } : {}),
+    ...(eligibleBatch ? { batch: eligibleBatch } : {}),
+  };
 
   const {
-    data: previewRes,
-    isLoading: previewLoading,
-    error: previewError,
-    refetch: refetchPreview,
-    isFetching: previewFetching,
-  } = useGetFkfBulkPreview(
-    {
-      batch: batch || undefined,
-      component: catalogueModuleId || undefined,
-    },
-    {
-      enabled: Boolean(program && batch && catalogueModuleId),
-      retry: false,
-    },
-  );
+    data: eligibleRes,
+    isLoading: eligibleLoading,
+    error: eligibleError,
+    refetch: refetchEligible,
+    isFetching: eligibleFetching,
+  } = useGetFkfEligibleStudents(eligibleParams, {
+    enabled: activeTab === "eligible",
+  });
+
+  const { data: catalogueModulesRes, isLoading: catalogueModulesLoading } =
+    useGetFkfModules(
+      {
+        program: bulkProgram || undefined,
+        batch: bulkBatch || undefined,
+      },
+      {
+        enabled: Boolean(bulkProgram) && (bulkOpen || invoiceOpen),
+      },
+    );
 
   const {
     data: historyRes,
@@ -154,12 +235,17 @@ const FkfManagement = () => {
   const updateConfig = useUpdateFkfConfig();
   const createInvoice = useCreateFkfInvoice();
   const createBulk = useCreateFkfBulkInvoices();
+  const previewBulk = usePreviewFkfBulkInvoices();
+  const markEligible = useMarkFkfEligible();
+  const unmarkEligible = useUnmarkFkfEligible();
+  const exportStudents = useExportFkfStudents();
 
+  const studentsRows = studentsRes?.data?.rows || [];
+  const studentsTotal = studentsRes?.data?.total || 0;
+  const eligibleRows = eligibleRes?.data?.rows || [];
+  const eligibleTotal = eligibleRes?.data?.total || 0;
   const historyRows = historyRes?.data?.rows || [];
   const historyTotal = historyRes?.data?.total || 0;
-  const programsList = programsData?.data || [];
-  const batchesList = batchesData?.data || [];
-  const historyBatchesList = historyBatchesData?.data || [];
 
   const catalogueModules = (catalogueModulesRes?.data || []).map((m) => ({
     _id: m._id,
@@ -168,40 +254,77 @@ const FkfManagement = () => {
     currency: m.currency,
   }));
 
-  const selectedCatalogueModule = useMemo(
+  const programSelectItems = useMemo(() => {
+    const q = String(bulkProgramSearch || "").trim().toLowerCase();
+    const mapped = programsList.map((p) => ({
+      _id: p._id,
+      name: programLabel(p),
+    }));
+    let list = q
+      ? mapped.filter((p) => p.name.toLowerCase().includes(q))
+      : mapped;
+    if (bulkProgram) {
+      const selected = mapped.find(
+        (p) => String(p._id) === String(bulkProgram),
+      );
+      if (
+        selected &&
+        !list.some((p) => String(p._id) === String(bulkProgram))
+      ) {
+        list = [selected, ...list];
+      }
+    }
+    return list;
+  }, [programsList, bulkProgramSearch, bulkProgram]);
+
+  const filterProgramItems = useMemo(() => {
+    const allLabel = t("common.all", "All");
+    const build = (search, selectedId) => {
+      const q = String(search || "").trim().toLowerCase();
+      const mapped = programsList.map((p) => ({
+        _id: p._id,
+        name: programLabel(p),
+      }));
+      let list = q
+        ? mapped.filter((p) => p.name.toLowerCase().includes(q))
+        : mapped;
+      if (selectedId && selectedId !== "all") {
+        const selected = mapped.find(
+          (p) => String(p._id) === String(selectedId),
+        );
+        if (
+          selected &&
+          !list.some((p) => String(p._id) === String(selectedId))
+        ) {
+          list = [selected, ...list];
+        }
+      }
+      return [{ _id: "all", name: allLabel }, ...list];
+    };
+    return {
+      students: build(studentsProgramSearch, studentsProgram || "all"),
+      eligible: build(eligibleProgramSearch, eligibleProgram || "all"),
+      history: build(historyProgramSearch, historyProgram),
+    };
+  }, [
+    t,
+    programsList,
+    studentsProgramSearch,
+    studentsProgram,
+    eligibleProgramSearch,
+    eligibleProgram,
+    historyProgramSearch,
+    historyProgram,
+  ]);
+
+  const selectedBulkModule = useMemo(
     () =>
-      catalogueModules.find(
-        (m) => String(m._id) === String(catalogueModuleId),
-      ),
-    [catalogueModules, catalogueModuleId],
-  );
-
-  const previewStudents = previewRes?.data?.students || [];
-  const filteredStudents = useMemo(() => {
-    const q = String(debouncedSearch || "").trim().toLowerCase();
-    if (!q) return previewStudents;
-    return previewStudents.filter((s) => {
-      const hay = [
-        s.first_name,
-        s.last_name,
-        s.email,
-        s.uid,
-        s.postal_code,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    });
-  }, [previewStudents, debouncedSearch]);
-
-  const selectableStudents = useMemo(
-    () => filteredStudents.filter((s) => s.can_send),
-    [filteredStudents],
+      catalogueModules.find((m) => String(m._id) === String(bulkModuleId)),
+    [catalogueModules, bulkModuleId],
   );
 
   const modulePayload = modulesRes?.data;
-  const modules = (modulePayload?.modules || []).map((m) => ({
+  const studentModules = (modulePayload?.modules || []).map((m) => ({
     _id: m._id,
     name: `${m.name} (${m.type}) — ${m.currency || "EUR"} ${m.catalog_amount}${
       m.pending_fkf ? " · pending FKF" : ""
@@ -212,8 +335,8 @@ const FkfManagement = () => {
   }));
 
   const selectedModule = useMemo(
-    () => modules.find((m) => String(m._id) === String(componentId)),
-    [modules, componentId],
+    () => studentModules.find((m) => String(m._id) === String(componentId)),
+    [studentModules, componentId],
   );
 
   useEffect(() => {
@@ -227,19 +350,22 @@ const FkfManagement = () => {
   }, [debouncedHistorySearch, historyStatus, historyProgram, historyBatch]);
 
   useEffect(() => {
-    setBatch("");
-    setCatalogueModuleId("");
-    setSelectedStudentIds([]);
-  }, [program]);
+    setStudentsPage(1);
+    setStudentsSelectedIds([]);
+  }, [debouncedStudentsSearch, studentsProgram, studentsBatch]);
 
   useEffect(() => {
-    setCatalogueModuleId("");
-    setSelectedStudentIds([]);
-  }, [batch]);
+    setStudentsBatch("");
+  }, [studentsProgram]);
 
   useEffect(() => {
-    setSelectedStudentIds([]);
-  }, [catalogueModuleId, debouncedSearch]);
+    setEligiblePage(1);
+    setEligibleSelectedIds([]);
+  }, [debouncedEligibleSearch, eligibleProgram, eligibleBatch]);
+
+  useEffect(() => {
+    setEligibleBatch("");
+  }, [eligibleProgram]);
 
   useEffect(() => {
     setHistoryBatch("all");
@@ -253,22 +379,40 @@ const FkfManagement = () => {
   useEffect(() => {
     if (selectedModule?.pending_fkf?.amount != null) {
       setSubsidizedAmount(String(selectedModule.pending_fkf.amount));
-    } else if (
-      invoiceOpen &&
-      selectedCatalogueModule &&
-      !subsidizedAmount &&
-      String(componentId) === String(catalogueModuleId)
-    ) {
-      // leave empty for admin to enter
     }
   }, [selectedModule]);
+
+  useEffect(() => {
+    setBulkBatch("");
+    setBulkModuleId("");
+    setBulkStep("form");
+    setBulkPreview(null);
+  }, [bulkProgram]);
+
+  useEffect(() => {
+    setBulkStep("form");
+    setBulkPreview(null);
+  }, [bulkModuleId, bulkAmount, bulkBatch]);
+
+  const toggleId = (setter) => (id, checked) => {
+    setter((prev) => {
+      const sid = String(id);
+      if (checked) return prev.includes(sid) ? prev : [...prev, sid];
+      return prev.filter((x) => x !== sid);
+    });
+  };
+
+  const toggleSelectAll = (rows, setter) => (checked) => {
+    if (!checked) {
+      setter([]);
+      return;
+    }
+    setter(rows.map((s) => String(s._id)));
+  };
 
   const openSendInvoice = (student) => {
     setSelectedStudent(student);
     setInvoiceOpen(true);
-    if (catalogueModuleId) {
-      setComponentId(catalogueModuleId);
-    }
   };
 
   const closeSendInvoice = () => {
@@ -279,38 +423,61 @@ const FkfManagement = () => {
   };
 
   const openBulkSend = () => {
+    const selected = eligibleRows.filter((s) =>
+      eligibleSelectedIds.includes(String(s._id)),
+    );
+    const first = selected[0];
+    setBulkProgram(first?.program_id || eligibleProgram || "");
+    setBulkBatch(first?.batch_id || eligibleBatch || "");
+    setBulkModuleId("");
     setBulkAmount("");
+    setBulkStep("form");
+    setBulkPreview(null);
     setBulkOpen(true);
   };
 
   const closeBulkSend = () => {
     setBulkOpen(false);
     setBulkAmount("");
+    setBulkModuleId("");
+    setBulkStep("form");
+    setBulkPreview(null);
   };
 
-  const toggleStudent = (id, checked) => {
-    setSelectedStudentIds((prev) => {
-      const sid = String(id);
-      if (checked) {
-        return prev.includes(sid) ? prev : [...prev, sid];
-      }
-      return prev.filter((x) => x !== sid);
+  const handleMarkEligible = () => {
+    if (!studentsSelectedIds.length) return;
+    markEligible.mutate(
+      { user_ids: studentsSelectedIds },
+      {
+        onSuccess: () => {
+          setStudentsSelectedIds([]);
+          refetchStudents();
+        },
+      },
+    );
+  };
+
+  const handleUnmarkEligible = () => {
+    if (!eligibleSelectedIds.length) return;
+    unmarkEligible.mutate(
+      { user_ids: eligibleSelectedIds },
+      {
+        onSuccess: () => {
+          setEligibleSelectedIds([]);
+          refetchEligible();
+        },
+      },
+    );
+  };
+
+  const handleExport = () => {
+    exportStudents.mutate({
+      apply_postal_filter: "true",
+      ...(debouncedStudentsSearch ? { search: debouncedStudentsSearch } : {}),
+      ...(studentsProgram ? { program: studentsProgram } : {}),
+      ...(studentsBatch ? { batch: studentsBatch } : {}),
     });
   };
-
-  const toggleSelectAll = (checked) => {
-    if (!checked) {
-      setSelectedStudentIds([]);
-      return;
-    }
-    setSelectedStudentIds(selectableStudents.map((s) => String(s._id)));
-  };
-
-  const allSelectableChecked =
-    selectableStudents.length > 0 &&
-    selectableStudents.every((s) =>
-      selectedStudentIds.includes(String(s._id)),
-    );
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -325,7 +492,7 @@ const FkfManagement = () => {
       {
         onSuccess: () => {
           closeSendInvoice();
-          refetchPreview();
+          refetchEligible();
           setActiveTab("history");
           setHistoryPage(1);
         },
@@ -333,22 +500,59 @@ const FkfManagement = () => {
     );
   };
 
+  const handleBulkPreview = (e) => {
+    e.preventDefault();
+    if (
+      !bulkProgram ||
+      !bulkModuleId ||
+      !bulkAmount ||
+      eligibleSelectedIds.length === 0
+    )
+      return;
+    previewBulk.mutate(
+      {
+        student_ids: eligibleSelectedIds,
+        program_id: bulkProgram,
+        component_id: bulkModuleId,
+        subsidized_amount: Number(bulkAmount),
+        currency: selectedBulkModule?.currency || "EUR",
+      },
+      {
+        onSuccess: (res) => {
+          setBulkPreview(res?.data || null);
+          setBulkStep("preview");
+        },
+      },
+    );
+  };
+
   const handleBulkCreate = (e) => {
     e.preventDefault();
-    if (!catalogueModuleId || !bulkAmount || selectedStudentIds.length === 0)
+    if (
+      !bulkProgram ||
+      !bulkModuleId ||
+      !bulkAmount ||
+      eligibleSelectedIds.length === 0
+    )
       return;
+    const readyIds = (bulkPreview?.rows || [])
+      .filter((r) => r.can_send)
+      .map((r) => r.student_id);
+    if (!readyIds.length) return;
+
     createBulk.mutate(
       {
-        student_ids: selectedStudentIds,
-        component_id: catalogueModuleId,
+        student_ids: readyIds,
+        program_id: bulkProgram,
+        component_id: bulkModuleId,
         subsidized_amount: Number(bulkAmount),
-        currency: selectedCatalogueModule?.currency || "EUR",
+        currency: selectedBulkModule?.currency || "EUR",
       },
       {
         onSuccess: () => {
           closeBulkSend();
-          setSelectedStudentIds([]);
-          refetchPreview();
+          setEligibleSelectedIds([]);
+          refetchEligible();
           setActiveTab("history");
           setHistoryPage(1);
         },
@@ -368,17 +572,13 @@ const FkfManagement = () => {
     });
   };
 
-  const studentName = (s) =>
-    `${s.first_name || ""} ${s.last_name || ""}`.trim() || s.email || "-";
+  const allStudentsChecked =
+    studentsRows.length > 0 &&
+    studentsRows.every((s) => studentsSelectedIds.includes(String(s._id)));
 
-  const formatMoney = (currency, amount) => {
-    if (amount == null || amount === "") return "-";
-    const symbol = currency === "EUR" ? "€" : currency || "EUR";
-    return `${symbol} ${Number(amount).toFixed(2)}`;
-  };
-
-  const filtersReady = Boolean(program && batch);
-  const previewReady = Boolean(filtersReady && catalogueModuleId);
+  const allEligibleChecked =
+    eligibleRows.length > 0 &&
+    eligibleRows.every((s) => eligibleSelectedIds.includes(String(s._id)));
 
   return (
     <div className="space-y-6 mt-4">
@@ -389,7 +589,7 @@ const FkfManagement = () => {
         <p className="text-sm text-muted-foreground mt-1">
           {t(
             "finance.fkf.subtitle",
-            "Eligible students, subsidized invoices, and postal eligibility config.",
+            "Postal students, mark eligible, send subsidized invoices, and manage config.",
           )}
         </p>
       </div>
@@ -400,7 +600,14 @@ const FkfManagement = () => {
           variant={activeTab === "students" ? "default" : "outline"}
           onClick={() => setActiveTab("students")}
         >
-          {t("finance.fkf.studentsTab", "Eligible Students")}
+          {t("finance.fkf.studentsListTab", "Students")}
+        </Button>
+        <Button
+          type="button"
+          variant={activeTab === "eligible" ? "default" : "outline"}
+          onClick={() => setActiveTab("eligible")}
+        >
+          {t("finance.fkf.eligibleTab", "Eligible students")}
         </Button>
         <Button
           type="button"
@@ -423,55 +630,49 @@ const FkfManagement = () => {
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.program", "Program")}{" "}
-                <span className="text-red-500">*</span>
+                {t("common.search", "Search")}
               </Label>
-              <Select
-                value={program || undefined}
-                onValueChange={(v) => setProgram(v)}
-              >
-                <SelectTrigger className="w-56">
-                  <SelectValue
-                    placeholder={t(
-                      "finance.fkf.selectProgram",
-                      "Select program…",
-                    )}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {programsList.map((p) => (
-                    <SelectItem key={p._id} value={p._id}>
-                      {`${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                className="w-56"
+                placeholder={t(
+                  "finance.fkf.searchStudents",
+                  "Name, email, UID, postal…",
+                )}
+                value={studentsSearch}
+                onChange={(e) => setStudentsSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="w-64">
+              <SearchableSelect
+                label={t("finance.fkf.program", "Program")}
+                placeholder={t("common.all", "All")}
+                searchPlaceholder={t(
+                  "finance.fkf.searchProgram",
+                  "Search programs…",
+                )}
+                items={filterProgramItems.students}
+                value={studentsProgram || "all"}
+                onChange={(v) => setStudentsProgram(v === "all" ? "" : v)}
+                onSearch={setStudentsProgramSearch}
+              />
             </div>
 
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.batch", "Batch")}{" "}
-                <span className="text-red-500">*</span>
+                {t("finance.fkf.batch", "Batch")}
               </Label>
               <Select
-                value={batch || undefined}
-                onValueChange={(v) => setBatch(v)}
-                disabled={!program}
+                value={studentsBatch || "all"}
+                onValueChange={(v) => setStudentsBatch(v === "all" ? "" : v)}
+                disabled={!studentsProgram}
               >
-                <SelectTrigger className="w-48">
-                  <SelectValue
-                    placeholder={
-                      !program
-                        ? t(
-                            "finance.fkf.selectProgramFirst",
-                            "Select program first",
-                          )
-                        : t("finance.fkf.selectBatch", "Select batch…")
-                    }
-                  />
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder={t("common.all", "All")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {batchesList.map((b) => (
+                  <SelectItem value="all">{t("common.all", "All")}</SelectItem>
+                  {studentsBatchesList.map((b) => (
                     <SelectItem key={b._id} value={b._id}>
                       {b.name}
                     </SelectItem>
@@ -480,72 +681,33 @@ const FkfManagement = () => {
               </Select>
             </div>
 
-            <div className="space-y-1 min-w-[260px]">
-              <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.module", "Module / Exam")}{" "}
-                <span className="text-red-500">*</span>
-              </Label>
-              <SearchableSelect
-                placeholder={
-                  !filtersReady
-                    ? t(
-                        "finance.fkf.selectProgramBatchFirst",
-                        "Select program and batch first",
-                      )
-                    : t("finance.fkf.selectModule", "Select module…")
+            <div className="flex flex-wrap gap-2 ml-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleExport}
+                disabled={exportStudents.isPending}
+              >
+                {exportStudents.isPending
+                  ? t("common.exporting", "Exporting…")
+                  : t("common.exportCsv", "Export CSV")}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleMarkEligible}
+                disabled={
+                  !canModify ||
+                  studentsSelectedIds.length === 0 ||
+                  markEligible.isPending
                 }
-                searchPlaceholder={t("common.search", "Search")}
-                items={catalogueModules}
-                value={catalogueModuleId}
-                onChange={setCatalogueModuleId}
-                isLoading={catalogueModulesLoading}
-                disabled={!filtersReady}
-              />
+              >
+                {t("finance.fkf.markEligible", "Mark as eligible")}
+                {studentsSelectedIds.length > 0
+                  ? ` (${studentsSelectedIds.length})`
+                  : ""}
+              </Button>
             </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">
-                {t("common.search", "Search")}
-              </Label>
-              <Input
-                className="w-56"
-                placeholder={t(
-                  "finance.fkf.searchStudent",
-                  "Search student…",
-                )}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                disabled={!previewReady}
-              />
-            </div>
-
-            <Button
-              type="button"
-              disabled={
-                !canModify ||
-                !previewReady ||
-                selectedStudentIds.length === 0
-              }
-              onClick={openBulkSend}
-            >
-              {t("finance.fkf.bulkSend", "Bulk Send Invoice")}
-              {selectedStudentIds.length > 0
-                ? ` (${selectedStudentIds.length})`
-                : ""}
-            </Button>
           </div>
-
-          {selectedCatalogueModule && previewReady && (
-            <p className="text-sm text-muted-foreground">
-              {t("finance.fkf.catalogFee", "Catalog fee")}:{" "}
-              <strong>
-                {formatMoney(
-                  selectedCatalogueModule.currency,
-                  selectedCatalogueModule.catalog_amount,
-                )}
-              </strong>
-            </p>
-          )}
 
           <div className="bg-sidebar border border-sidebar-border rounded-xl overflow-hidden">
             <Table>
@@ -553,103 +715,74 @@ const FkfManagement = () => {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                      checked={allSelectableChecked}
-                      onCheckedChange={(v) => toggleSelectAll(Boolean(v))}
-                      disabled={
-                        !previewReady || selectableStudents.length === 0
+                      checked={allStudentsChecked}
+                      onCheckedChange={(v) =>
+                        toggleSelectAll(
+                          studentsRows,
+                          setStudentsSelectedIds,
+                        )(Boolean(v))
                       }
+                      disabled={studentsRows.length === 0}
                       aria-label={t("common.selectAll", "Select all")}
                     />
                   </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.student", "Student")}
-                  </TableHead>
+                  <TableHead>{t("finance.fkf.student", "Student")}</TableHead>
                   <TableHead>UID</TableHead>
+                  <TableHead>{t("common.email", "Email")}</TableHead>
+                  <TableHead>{t("finance.fkf.program", "Program")}</TableHead>
+                  <TableHead>{t("finance.fkf.batch", "Batch")}</TableHead>
                   <TableHead>
                     {t("finance.fkf.postalCode", "Postal code")}
                   </TableHead>
-                  <TableHead>
-                    {t("common.status", "Status")}
-                  </TableHead>
-                  <TableHead className="w-12 text-right">
-                    {t("common.actions", "Actions")}
-                  </TableHead>
+                  <TableHead>{t("common.status", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody
                 className={
-                  previewFetching ? "opacity-50 pointer-events-none" : ""
+                  studentsFetching ? "opacity-50 pointer-events-none" : ""
                 }
               >
-                {!previewReady ? (
+                {studentsLoading ? (
+                  <TableSkeleton rows={8} columns={8} />
+                ) : studentsError ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center text-muted-foreground py-10"
-                    >
-                      {t(
-                        "finance.fkf.selectProgramBatchModule",
-                        "Select program, batch, and module to load eligible students.",
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ) : previewLoading ? (
-                  <TableSkeleton rows={8} columns={6} />
-                ) : previewError ? (
-                  <TableRow>
-                    <TableCell colSpan={6}>
+                    <TableCell colSpan={8}>
                       <ErrorMessage
                         message={
-                          previewError.message ||
-                          "Failed to load students for this module"
+                          studentsError.message || "Failed to load students"
                         }
-                        onRetry={refetchPreview}
+                        onRetry={refetchStudents}
                       />
                     </TableCell>
                   </TableRow>
-                ) : filteredStudents.length === 0 ? (
+                ) : studentsRows.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={8}
                       className="text-center text-muted-foreground py-10"
                     >
                       {t(
-                        "finance.fkf.noEligibleStudents",
-                        "No eligible students found.",
+                        "finance.fkf.noPostalStudents",
+                        "No students with a matching postal code found.",
                       )}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredStudents.map((student) => {
-                    const checked = selectedStudentIds.includes(
+                  studentsRows.map((student) => {
+                    const checked = studentsSelectedIds.includes(
                       String(student._id),
                     );
-                    let statusLabel = t(
-                      "finance.fkf.readyToSend",
-                      "Ready to send",
-                    );
-                    if (student.already_paid) {
-                      statusLabel = t("common.paid", "Paid");
-                    } else if (!student.eligible) {
-                      statusLabel = t(
-                        "finance.fkf.notEligible",
-                        "Not eligible",
-                      );
-                    } else if (student.pending_fkf) {
-                      statusLabel = t(
-                        "finance.fkf.pendingOffer",
-                        "Pending FKF offer",
-                      );
-                    }
-
                     return (
                       <TableRow key={student._id}>
                         <TableCell>
                           <Checkbox
                             checked={checked}
-                            disabled={!student.can_send || !canModify}
+                            disabled={!canModify}
                             onCheckedChange={(v) =>
-                              toggleStudent(student._id, Boolean(v))
+                              toggleId(setStudentsSelectedIds)(
+                                student._id,
+                                Boolean(v),
+                              )
                             }
                             aria-label={studentName(student)}
                           />
@@ -658,18 +791,215 @@ const FkfManagement = () => {
                           {studentName(student)}
                         </TableCell>
                         <TableCell>{student.uid || "-"}</TableCell>
+                        <TableCell>{student.email || "-"}</TableCell>
+                        <TableCell>{student.program || "-"}</TableCell>
+                        <TableCell>{student.batch || "-"}</TableCell>
                         <TableCell>{student.postal_code || "-"}</TableCell>
                         <TableCell>
-                          <span className="text-sm text-muted-foreground">
-                            {statusLabel}
-                            {student.pending_fkf?.amount != null
-                              ? ` · ${formatMoney(
-                                  selectedCatalogueModule?.currency,
-                                  student.pending_fkf.amount,
-                                )}`
-                              : ""}
-                          </span>
+                          {student.fkf_admin_eligible ? (
+                            <span className="text-sm text-emerald-700 dark:text-emerald-400">
+                              {t("finance.fkf.markedEligible", "Eligible")}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              {t("finance.fkf.notMarked", "Not marked")}
+                            </span>
+                          )}
                         </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <Pagination
+            page={studentsPage}
+            setPage={setStudentsPage}
+            rowsPerPage={studentsRowsPerPage}
+            setRowsPerPage={setStudentsRowsPerPage}
+            totalRows={studentsTotal}
+          />
+        </div>
+      )}
+
+      {activeTab === "eligible" && (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("common.search", "Search")}
+              </Label>
+              <Input
+                className="w-56"
+                placeholder={t(
+                  "finance.fkf.searchStudents",
+                  "Name, email, UID, postal…",
+                )}
+                value={eligibleSearch}
+                onChange={(e) => setEligibleSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="w-64">
+              <SearchableSelect
+                label={t("finance.fkf.program", "Program")}
+                placeholder={t("common.all", "All")}
+                searchPlaceholder={t(
+                  "finance.fkf.searchProgram",
+                  "Search programs…",
+                )}
+                items={filterProgramItems.eligible}
+                value={eligibleProgram || "all"}
+                onChange={(v) => setEligibleProgram(v === "all" ? "" : v)}
+                onSearch={setEligibleProgramSearch}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">
+                {t("finance.fkf.batch", "Batch")}
+              </Label>
+              <Select
+                value={eligibleBatch || "all"}
+                onValueChange={(v) => setEligibleBatch(v === "all" ? "" : v)}
+                disabled={!eligibleProgram}
+              >
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder={t("common.all", "All")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("common.all", "All")}</SelectItem>
+                  {eligibleBatchesList.map((b) => (
+                    <SelectItem key={b._id} value={b._id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-wrap gap-2 ml-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleUnmarkEligible}
+                disabled={
+                  !canModify ||
+                  eligibleSelectedIds.length === 0 ||
+                  unmarkEligible.isPending
+                }
+              >
+                {t("finance.fkf.unmarkEligible", "Unmark")}
+                {eligibleSelectedIds.length > 0
+                  ? ` (${eligibleSelectedIds.length})`
+                  : ""}
+              </Button>
+              <Button
+                type="button"
+                onClick={openBulkSend}
+                disabled={
+                  !canModify || eligibleSelectedIds.length === 0
+                }
+              >
+                {t("finance.fkf.addModule", "Add module")}
+                {eligibleSelectedIds.length > 0
+                  ? ` (${eligibleSelectedIds.length})`
+                  : ""}
+              </Button>
+            </div>
+          </div>
+
+          <div className="bg-sidebar border border-sidebar-border rounded-xl overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={allEligibleChecked}
+                      onCheckedChange={(v) =>
+                        toggleSelectAll(
+                          eligibleRows,
+                          setEligibleSelectedIds,
+                        )(Boolean(v))
+                      }
+                      disabled={eligibleRows.length === 0}
+                      aria-label={t("common.selectAll", "Select all")}
+                    />
+                  </TableHead>
+                  <TableHead>{t("finance.fkf.student", "Student")}</TableHead>
+                  <TableHead>UID</TableHead>
+                  <TableHead>{t("common.email", "Email")}</TableHead>
+                  <TableHead>{t("finance.fkf.program", "Program")}</TableHead>
+                  <TableHead>{t("finance.fkf.batch", "Batch")}</TableHead>
+                  <TableHead>
+                    {t("finance.fkf.postalCode", "Postal code")}
+                  </TableHead>
+                  <TableHead className="w-12 text-right">
+                    {t("common.actions", "Actions")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody
+                className={
+                  eligibleFetching ? "opacity-50 pointer-events-none" : ""
+                }
+              >
+                {eligibleLoading ? (
+                  <TableSkeleton rows={8} columns={8} />
+                ) : eligibleError ? (
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <ErrorMessage
+                        message={
+                          eligibleError.message ||
+                          "Failed to load eligible students"
+                        }
+                        onRetry={refetchEligible}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : eligibleRows.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground py-10"
+                    >
+                      {t(
+                        "finance.fkf.noAdminEligible",
+                        "No admin-marked eligible students yet. Mark students on the Students tab.",
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  eligibleRows.map((student) => {
+                    const checked = eligibleSelectedIds.includes(
+                      String(student._id),
+                    );
+                    return (
+                      <TableRow key={student._id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={checked}
+                            disabled={!canModify}
+                            onCheckedChange={(v) =>
+                              toggleId(setEligibleSelectedIds)(
+                                student._id,
+                                Boolean(v),
+                              )
+                            }
+                            aria-label={studentName(student)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {studentName(student)}
+                        </TableCell>
+                        <TableCell>{student.uid || "-"}</TableCell>
+                        <TableCell>{student.email || "-"}</TableCell>
+                        <TableCell>{student.program || "-"}</TableCell>
+                        <TableCell>{student.batch || "-"}</TableCell>
+                        <TableCell>{student.postal_code || "-"}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -683,7 +1013,7 @@ const FkfManagement = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                disabled={!canModify || !student.can_send}
+                                disabled={!canModify}
                                 onClick={() => openSendInvoice(student)}
                               >
                                 {t(
@@ -701,6 +1031,14 @@ const FkfManagement = () => {
               </TableBody>
             </Table>
           </div>
+
+          <Pagination
+            page={eligiblePage}
+            setPage={setEligiblePage}
+            rowsPerPage={eligibleRowsPerPage}
+            setRowsPerPage={setEligibleRowsPerPage}
+            totalRows={eligibleTotal}
+          />
         </div>
       )}
 
@@ -765,31 +1103,22 @@ const FkfManagement = () => {
               </Select>
             </div>
 
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">
-                {t("finance.fkf.program", "Program")}
-              </Label>
-              <Select
+            <div className="w-64">
+              <SearchableSelect
+                label={t("finance.fkf.program", "Program")}
+                placeholder={t("common.all", "All")}
+                searchPlaceholder={t(
+                  "finance.fkf.searchProgram",
+                  "Search programs…",
+                )}
+                items={filterProgramItems.history}
                 value={historyProgram}
-                onValueChange={(v) => {
-                  setHistoryProgram(v);
+                onChange={(v) => {
+                  setHistoryProgram(v || "all");
                   setHistoryPage(1);
                 }}
-              >
-                <SelectTrigger className="w-52">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("common.all", "All")}
-                  </SelectItem>
-                  {programsList.map((p) => (
-                    <SelectItem key={p._id} value={p._id}>
-                      {`${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onSearch={setHistoryProgramSearch}
+              />
             </div>
 
             <div className="space-y-1">
@@ -804,17 +1133,8 @@ const FkfManagement = () => {
                 }}
                 disabled={historyProgram === "all"}
               >
-                <SelectTrigger className="w-48">
-                  <SelectValue
-                    placeholder={
-                      historyProgram === "all"
-                        ? t(
-                            "finance.fkf.selectProgramFirst",
-                            "Select program first",
-                          )
-                        : t("common.all", "All")
-                    }
-                  />
+                <SelectTrigger className="w-44">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
@@ -834,29 +1154,23 @@ const FkfManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>{t("finance.fkf.student", "Student")}</TableHead>
+                  <TableHead>{t("finance.fkf.module", "Module")}</TableHead>
                   <TableHead>
-                    {t("finance.fkf.student", "Student")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.module", "Module / Exam")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.subsidizedAmount", "Subsidized amount")}
+                    {t("finance.fkf.subsidizedAmount", "Subsidized")}
                   </TableHead>
                   <TableHead>
                     {t("finance.fkf.catalogFee", "Catalog fee")}
                   </TableHead>
                   <TableHead>
-                    {t("finance.fkf.invoiceNumber", "Invoice #")}
+                    {t("finance.fkf.invoice", "Invoice")}
+                  </TableHead>
+                  <TableHead>{t("common.status", "Status")}</TableHead>
+                  <TableHead>
+                    {t("finance.fkf.sentAt", "Sent")}
                   </TableHead>
                   <TableHead>
-                    {t("common.status", "Status")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.sentDate", "Sent")}
-                  </TableHead>
-                  <TableHead>
-                    {t("finance.fkf.paidDate", "Paid")}
+                    {t("finance.fkf.paidAt", "Paid")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -872,8 +1186,7 @@ const FkfManagement = () => {
                     <TableCell colSpan={8}>
                       <ErrorMessage
                         message={
-                          historyError.message ||
-                          "Failed to load FKF history"
+                          historyError.message || "Failed to load FKF history"
                         }
                         onRetry={refetchHistory}
                       />
@@ -973,7 +1286,7 @@ const FkfManagement = () => {
             <p className="text-xs text-muted-foreground">
               {t(
                 "finance.fkf.postalCodesHint",
-                "Separate codes with commas or new lines. Students with a matching postal code are eligible for Fachkursförderung.",
+                "Separate codes with commas or new lines. Students with these postal codes appear on the Students tab.",
               )}
             </p>
           </div>
@@ -1006,15 +1319,9 @@ const FkfManagement = () => {
                 {selectedStudent?.uid ? ` (${selectedStudent.uid})` : ""}
               </p>
               <p className="text-muted-foreground">
-                {[
-                  previewRes?.data?.program?.name,
-                  previewRes?.data?.batch?.name,
-                  selectedStudent?.postal_code
-                    ? `PLZ ${selectedStudent.postal_code}`
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
+                {selectedStudent?.postal_code
+                  ? `PLZ ${selectedStudent.postal_code}`
+                  : ""}
               </p>
             </div>
 
@@ -1022,7 +1329,7 @@ const FkfManagement = () => {
               label={t("finance.fkf.module", "Module / Exam")}
               placeholder={t("finance.fkf.selectModule", "Select module…")}
               searchPlaceholder={t("common.search", "Search")}
-              items={modules}
+              items={studentModules}
               value={componentId}
               onChange={setComponentId}
               isLoading={modulesLoading}
@@ -1097,78 +1404,287 @@ const FkfManagement = () => {
           if (!open) closeBulkSend();
         }}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {t("finance.fkf.bulkSend", "Bulk Send Invoice")}
+              {bulkStep === "preview"
+                ? t("finance.fkf.previewInvoices", "Preview invoices")
+                : t("finance.fkf.addModule", "Add module")}
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleBulkCreate} className="space-y-4">
-            <div className="rounded-lg bg-muted/40 p-3 text-sm space-y-1">
-              <p className="font-medium">
-                {selectedCatalogueModule?.name ||
-                  previewRes?.data?.module?.name ||
-                  "-"}
-              </p>
-              <p className="text-muted-foreground">
-                {t("finance.fkf.bulkSelectedCount", {
-                  count: selectedStudentIds.length,
-                  defaultValue: `${selectedStudentIds.length} students selected`,
-                })}
-              </p>
-              {selectedCatalogueModule && (
-                <p className="text-muted-foreground">
-                  {t("finance.fkf.catalogFee", "Catalog fee")}:{" "}
-                  {formatMoney(
-                    selectedCatalogueModule.currency,
-                    selectedCatalogueModule.catalog_amount,
+          {bulkStep === "form" ? (
+            <form onSubmit={handleBulkPreview} className="space-y-4">
+              <div className="rounded-lg bg-muted/40 p-3 text-sm">
+                <p className="font-medium">
+                  {t("finance.fkf.bulkSelectedCount", {
+                    count: eligibleSelectedIds.length,
+                    defaultValue: `${eligibleSelectedIds.length} students selected`,
+                  })}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t(
+                    "finance.fkf.bulkPreviewHint",
+                    "Choose programme and module, then preview before sending.",
                   )}
                 </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <SearchableSelect
+                    label={t("finance.fkf.program", "Program")}
+                    placeholder={t(
+                      "finance.fkf.selectProgram",
+                      "Select program…",
+                    )}
+                    searchPlaceholder={t(
+                      "finance.fkf.searchProgram",
+                      "Search programs…",
+                    )}
+                    items={programSelectItems}
+                    value={bulkProgram}
+                    onChange={setBulkProgram}
+                    onSearch={setBulkProgramSearch}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("finance.fkf.batch", "Batch")}
+                  </Label>
+                  <Select
+                    value={bulkBatch || "all"}
+                    onValueChange={(v) => setBulkBatch(v === "all" ? "" : v)}
+                    disabled={!bulkProgram}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t("common.all", "All")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        {t("common.all", "All")}
+                      </SelectItem>
+                      {bulkBatchesList.map((b) => (
+                        <SelectItem key={b._id} value={b._id} title={b.name}>
+                          <span className="block truncate">{b.name}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    {t("finance.fkf.subsidizedAmount", "Subsidized amount")}{" "}
+                    <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={bulkAmount}
+                    onChange={(e) => setBulkAmount(e.target.value)}
+                    placeholder="e.g. 600"
+                    required
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <SearchableSelect
+                    label={t("finance.fkf.module", "Module / Exam")}
+                    placeholder={t(
+                      "finance.fkf.selectModule",
+                      "Select module…",
+                    )}
+                    searchPlaceholder={t("common.search", "Search")}
+                    items={catalogueModules}
+                    value={bulkModuleId}
+                    onChange={setBulkModuleId}
+                    isLoading={catalogueModulesLoading}
+                    disabled={!bulkProgram}
+                    required
+                  />
+                </div>
+              </div>
+
+              {selectedBulkModule && (
+                <p className="text-sm text-muted-foreground">
+                  {t("finance.fkf.catalogFee", "Catalog fee")}:{" "}
+                  <strong>
+                    {formatMoney(
+                      selectedBulkModule.currency,
+                      selectedBulkModule.catalog_amount,
+                    )}
+                  </strong>
+                  <span className="block text-xs mt-1">
+                    {t(
+                      "finance.fkf.bulkAmountHint",
+                      "Subsidized amount is applied to every student. Catalog may differ after location change.",
+                    )}
+                  </span>
+                </p>
               )}
-            </div>
 
-            <div className="space-y-2">
-              <Label>
-                {t("finance.fkf.subsidizedAmount", "Subsidized amount")}{" "}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={bulkAmount}
-                onChange={(e) => setBulkAmount(e.target.value)}
-                placeholder="e.g. 600"
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                {t(
-                  "finance.fkf.bulkAmountHint",
-                  "This subsidized amount will be applied to every selected student.",
-                )}
-              </p>
-            </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={closeBulkSend}>
+                  {t("common.cancel", "Cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    previewBulk.isPending ||
+                    !bulkProgram ||
+                    !bulkModuleId ||
+                    !bulkAmount ||
+                    eligibleSelectedIds.length === 0 ||
+                    !canModify
+                  }
+                >
+                  {previewBulk.isPending
+                    ? t("common.processing", "Processing…")
+                    : t("finance.fkf.previewButton", "Preview")}
+                </Button>
+              </DialogFooter>
+            </form>
+          ) : (
+            <form onSubmit={handleBulkCreate} className="space-y-4">
+              <div className="rounded-lg bg-muted/40 p-3 text-sm flex flex-wrap gap-x-4 gap-y-1">
+                <span>
+                  {t("finance.fkf.readyCount", "Ready")}:{" "}
+                  <strong>{bulkPreview?.ready_count ?? 0}</strong>
+                </span>
+                <span>
+                  {t("finance.fkf.blockedCount", "Blocked")}:{" "}
+                  <strong>{bulkPreview?.blocked_count ?? 0}</strong>
+                </span>
+                <span>
+                  {t("finance.fkf.subsidizedAmount", "Subsidized")}:{" "}
+                  <strong>
+                    {formatMoney(
+                      bulkPreview?.currency,
+                      bulkPreview?.subsidized_amount,
+                    )}
+                  </strong>
+                </span>
+              </div>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={closeBulkSend}>
-                {t("common.cancel", "Cancel")}
-              </Button>
-              <Button
-                type="submit"
-                disabled={
-                  createBulk.isPending ||
-                  !bulkAmount ||
-                  selectedStudentIds.length === 0 ||
-                  !canModify
-                }
-              >
-                {createBulk.isPending
-                  ? t("common.processing", "Processing…")
-                  : t("finance.fkf.bulkSendConfirm", "Send invoices")}
-              </Button>
-            </DialogFooter>
-          </form>
+              <div className="border border-sidebar-border rounded-xl overflow-hidden max-h-[50vh] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                        {t("finance.fkf.student", "Student")}
+                      </TableHead>
+                      <TableHead>
+                        {t("finance.fkf.module", "Module")}
+                      </TableHead>
+                      <TableHead>
+                        {t("finance.fkf.catalogFee", "Catalog")}
+                      </TableHead>
+                      <TableHead>
+                        {t("finance.fkf.subsidizedAmount", "Subsidy")}
+                      </TableHead>
+                      <TableHead>{t("common.status", "Status")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(bulkPreview?.rows || []).map((row) => (
+                      <TableRow key={row.student_id}>
+                        <TableCell>
+                          <div className="font-medium">
+                            {studentName(row)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {row.uid || row.email || "-"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {row.can_send ? (
+                            <div>
+                              <div className="text-sm">
+                                {row.component_name || "-"}
+                              </div>
+                              {row.location_changed ? (
+                                <div className="text-xs text-amber-700 dark:text-amber-400">
+                                  {t(
+                                    "finance.fkf.locationChanged",
+                                    "Location changed",
+                                  )}
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {row.can_send
+                            ? formatMoney(row.currency, row.catalog_amount)
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {formatMoney(row.currency, row.subsidized_amount)}
+                        </TableCell>
+                        <TableCell>
+                          {row.can_send ? (
+                            <span className="text-sm text-emerald-700 dark:text-emerald-400">
+                              {t("finance.fkf.readyToSend", "Ready")}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-destructive">
+                              {row.error || t("common.error", "Error")}
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <DialogFooter className="flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    setBulkStep("form");
+                    setBulkPreview(null);
+                  }}
+                >
+                  {t("common.back", "Back")}
+                </Button>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={closeBulkSend}
+                  >
+                    {t("common.cancel", "Cancel")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="w-full sm:w-auto"
+                    disabled={
+                      createBulk.isPending ||
+                      !bulkPreview?.ready_count ||
+                      !canModify
+                    }
+                  >
+                    {createBulk.isPending
+                      ? t("common.processing", "Processing…")
+                      : t("finance.fkf.bulkSendConfirm", {
+                          count: bulkPreview?.ready_count || 0,
+                          defaultValue: `Send ${bulkPreview?.ready_count || 0} invoices`,
+                        })}
+                  </Button>
+                </div>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>
