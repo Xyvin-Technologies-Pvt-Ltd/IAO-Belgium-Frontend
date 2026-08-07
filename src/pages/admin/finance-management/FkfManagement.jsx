@@ -118,6 +118,7 @@ const FkfManagement = () => {
   const [bulkStep, setBulkStep] = useState("form"); // form | preview
   const [bulkPreview, setBulkPreview] = useState(null);
   const [bulkProgramSearch, setBulkProgramSearch] = useState("");
+  const [bulkModuleSearch, setBulkModuleSearch] = useState("");
   const [studentsProgramSearch, setStudentsProgramSearch] = useState("");
   const [eligibleProgramSearch, setEligibleProgramSearch] = useState("");
   const [historyProgramSearch, setHistoryProgramSearch] = useState("");
@@ -127,6 +128,7 @@ const FkfManagement = () => {
   const debouncedStudentsSearch = useDebounce(studentsSearch, 400);
   const debouncedEligibleSearch = useDebounce(eligibleSearch, 400);
   const debouncedHistorySearch = useDebounce(historySearch, 400);
+  const debouncedBulkModuleSearch = useDebounce(bulkModuleSearch, 400);
 
   const { data: programsData } = useGetAllPrograms();
   const programsList = programsData?.data || [];
@@ -202,6 +204,7 @@ const FkfManagement = () => {
       {
         program: bulkProgram || undefined,
         batch: bulkBatch || undefined,
+        search: debouncedBulkModuleSearch || undefined,
       },
       {
         enabled: Boolean(bulkProgram) && (bulkOpen || invoiceOpen),
@@ -433,6 +436,7 @@ const FkfManagement = () => {
     setBulkProgram(first?.program_id || eligibleProgram || "");
     setBulkBatch(first?.batch_id || eligibleBatch || "");
     setBulkModuleId("");
+    setBulkModuleSearch("");
     setBulkAmount("");
     setBulkStep("form");
     setBulkPreview(null);
@@ -443,6 +447,7 @@ const FkfManagement = () => {
     setBulkOpen(false);
     setBulkAmount("");
     setBulkModuleId("");
+    setBulkModuleSearch("");
     setBulkStep("form");
     setBulkPreview(null);
   };
@@ -1442,7 +1447,7 @@ const FkfManagement = () => {
             </div>
 
             <SearchableSelect
-              label={t("finance.fkf.module", "Module / Exam")}
+              label={t("finance.fkf.module", "Module")}
               placeholder={t("finance.fkf.selectModule", "Select module…")}
               searchPlaceholder={t("common.search", "Search")}
               items={studentModules}
@@ -1609,7 +1614,7 @@ const FkfManagement = () => {
 
                 <div className="sm:col-span-2">
                   <SearchableSelect
-                    label={t("finance.fkf.module", "Module / Exam")}
+                    label={t("finance.fkf.module", "Module")}
                     placeholder={t(
                       "finance.fkf.selectModule",
                       "Select module…",
@@ -1618,6 +1623,7 @@ const FkfManagement = () => {
                     items={catalogueModules}
                     value={bulkModuleId}
                     onChange={setBulkModuleId}
+                    onSearch={setBulkModuleSearch}
                     isLoading={catalogueModulesLoading}
                     disabled={!bulkProgram}
                     required

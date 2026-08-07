@@ -105,6 +105,8 @@
     "yes": "Ja",
     "no": "Nee",
     "none": "Geen",
+    "open": "Open",
+    "closed": "Gesloten",
     "active": "Actief",
     "inactive": "Inactief",
     "deleted": "Verwijderd",
@@ -984,7 +986,8 @@
       "noAcademics": "Geen academische jaren gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van academische jaren mislukt"
+      "loadFailed": "Laden van academische jaren mislukt",
+      "loading": "Academische jaren laden..."
     },
     "modal": {
       "createTitle": "Nieuw academisch jaar aanmaken",
