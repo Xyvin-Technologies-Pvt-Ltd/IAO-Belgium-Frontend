@@ -138,6 +138,7 @@ const IntakesFilterDrawer = ({
                   <SelectItem value="all">{t("intakeManagement.filters.allStatuses")}</SelectItem>
                   <SelectItem value="open">{t("common.open")}</SelectItem>
                   <SelectItem value="closed">{t("common.closed")}</SelectItem>
+                  <SelectItem value="deleted">{t("common.deleted")}</SelectItem>
                 </SelectContent>
               </Select>
             </FilterSection>

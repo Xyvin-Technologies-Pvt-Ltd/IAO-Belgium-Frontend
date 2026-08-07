@@ -80,7 +80,7 @@ const Academics = () => {
   };
 
   if (isLoading) {
-    return <LoadingState text={t("academicManagement.messages.loadFailed")} fullHeight />;
+    return <LoadingState text={t("academicManagement.messages.loading", "Loading academic years...")} fullHeight />;
   }
 
   if (error) {

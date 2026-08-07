@@ -105,6 +105,8 @@
     "yes": "Yes",
     "no": "No",
     "none": "None",
+    "open": "Open",
+    "closed": "Closed",
     "active": "Active",
     "inactive": "Inactive",
     "deleted": "Deleted",
@@ -1206,7 +1208,8 @@
       "noAcademics": "No academic years found"
     },
     "messages": {
-      "loadFailed": "Failed to load academic years"
+      "loadFailed": "Failed to load academic years",
+      "loading": "Loading academic years..."
     },
     "modal": {
       "createTitle": "Create a new academic year",

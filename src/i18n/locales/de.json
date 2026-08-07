@@ -104,6 +104,8 @@
     "yes": "Ja",
     "no": "Nein",
     "none": "Keine",
+    "open": "Offen",
+    "closed": "Geschlossen",
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "deleted": "Gelöscht",
@@ -1000,7 +1002,8 @@
       "noAcademics": "Keine akademischen Jahre gefunden"
     },
     "messages": {
-      "loadFailed": "Akademische Jahre konnten nicht geladen werden"
+      "loadFailed": "Akademische Jahre konnten nicht geladen werden",
+      "loading": "Akademische Jahre werden geladen..."
     },
     "modal": {
       "createTitle": "Neues akademisches Jahr erstellen",
