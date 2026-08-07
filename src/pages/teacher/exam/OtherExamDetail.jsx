@@ -110,7 +110,7 @@ const OtherExamDetail = () => {
     return null;
   };
 
-  const totalColumns = 6;
+  const totalColumns = 7;
 
   return (
     <div className="space-y-6 mt-4">
@@ -159,6 +159,9 @@ const OtherExamDetail = () => {
               </TableHead>
               <TableHead className="text-center">
                 {t("exam.detail.result", { defaultValue: "Result" })}
+              </TableHead>
+              <TableHead className="text-center">
+                {t("exam.detail.warnings", { defaultValue: "Warnings" })}
               </TableHead>
               <TableHead className="text-center px-6">
                 {t("exam.detail.lastSubmitted", { defaultValue: "Last Submitted" })}
@@ -225,13 +228,23 @@ const OtherExamDetail = () => {
                             {t("exam.detail.notTaken", { defaultValue: "Not taken" })}
                           </span>
                         )}
-                      </TableCell>                      <TableCell className="text-center text-muted-foreground px-6 py-4">
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {(item.integrity_violation_count || 0) > 0 ? (
+                          <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-orange-100 text-orange-700 text-sm font-semibold">
+                            {item.integrity_violation_count}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-center text-muted-foreground px-6 py-4">
                         {item.submitted_at
                           ? formatInstant(item.submitted_at)
                           : "—"}
                       </TableCell>
                     </TableRow>
- 
+
                     {/* Expanded attempts rows */}
                     {isExpanded && hasAttempts && item.attempts.map((attempt) => (
                       <TableRow
@@ -266,6 +279,15 @@ const OtherExamDetail = () => {
                             <StatusBadge status={attempt.result} />
                           ) : (
                             <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center py-2">
+                          {(attempt.integrity_violation_count || 0) > 0 ? (
+                            <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-orange-100 text-orange-700 text-sm font-semibold">
+                              {attempt.integrity_violation_count}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">0</span>
                           )}
                         </TableCell>
                         <TableCell className="text-center text-muted-foreground px-6 py-2">

@@ -97,7 +97,39 @@ const AnswerSheetModal = ({ open, attemptId, onClose }) => {
                       : "—"}
                   </p>
                 </div>
+                <div>
+                  <p className="text-muted-foreground">
+                    {t("examAnswerSheet.warnings", "Integrity warnings")}
+                  </p>
+                  <p
+                    className={`text-base ${
+                      (sheet.integrity_violation_count || 0) > 0
+                        ? "text-orange-600"
+                        : ""
+                    }`}
+                  >
+                    {sheet.integrity_violation_count || 0}
+                  </p>
+                </div>
               </div>
+
+              {(sheet.integrity_violations?.length || 0) > 0 && (
+                <div className="rounded-[6px] border border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-900 p-4 space-y-2">
+                  <p className="text-sm font-semibold text-orange-800 dark:text-orange-300">
+                    {t("examAnswerSheet.warningLog", "Warning log")}
+                  </p>
+                  <ul className="space-y-1 text-sm text-orange-900 dark:text-orange-200">
+                    {sheet.integrity_violations.map((v, idx) => (
+                      <li key={`${v.type}-${v.at}-${idx}`}>
+                        <span className="font-medium">
+                          {t(`examAnswerSheet.violation.${v.type}`, v.type)}
+                        </span>
+                        {v.at ? ` · ${formatInstant(v.at)}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="space-y-6">
                 {(sheet.questions || []).map((q, index) => (
