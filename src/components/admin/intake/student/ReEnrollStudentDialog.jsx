@@ -25,8 +25,15 @@ const ReEnrollStudentDialog = ({ open, onOpenChange, student }) => {
   const [reason, setReason] = useState("");
 
   const { data, isLoading, error, refetch } = useGetBatchesByProgram(
-    student?.program_id,
-    { enabled: Boolean(open && student?.program_id) },
+    student?.program_id
+      ? String(student.program_id?._id || student.program_id)
+      : "",
+    {
+      enabled: Boolean(
+        open &&
+          (student?.program_id?._id || student?.program_id),
+      ),
+    },
   );
   const reEnrollMutation = useReEnrollStudent();
 

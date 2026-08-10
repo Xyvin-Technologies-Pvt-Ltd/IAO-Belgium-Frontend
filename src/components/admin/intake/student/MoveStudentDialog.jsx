@@ -23,9 +23,13 @@ const MoveStudentDialog = ({ open, onOpenChange, student }) => {
   const [selectedBatchId, setSelectedBatchId] = useState("");
   const [batchSearch, setBatchSearch] = useState("");
 
+  const programId = student?.program_id
+    ? String(student.program_id?._id || student.program_id)
+    : "";
+
   const { data, isLoading, error, refetch } = useGetBatchesByProgram(
-    student?.program_id,
-    { enabled: Boolean(open && student?.program_id) },
+    programId,
+    { enabled: Boolean(open && programId) },
   );
   const moveStudentMutation = useMoveStudentToAnotherBatch();
 
@@ -48,17 +52,13 @@ const MoveStudentDialog = ({ open, onOpenChange, student }) => {
   const batchSelectItems = useMemo(() => {
     const q = String(batchSearch || "").trim().toLowerCase();
     let list = allBatches
-      .filter(
-        (b) =>
-          !b.is_full_filled &&
-          String(b._id) !== String(student?.batch_id),
-      )
+      .filter((b) => String(b._id) !== String(student?.batch_id))
       .map((b) => ({
         _id: b._id,
         name: `${b.label} (${b.student_count ?? 0} ${t(
           "batchManagement.modal.moveStudent.studentsCount",
           "students",
-        )})`,
+        )}${b.is_full_filled ? ` · ${t("common.full", "Full")}` : ""})`,
       }));
 
     if (q) {
@@ -152,7 +152,15 @@ const MoveStudentDialog = ({ open, onOpenChange, student }) => {
           </div>
 
           <div className="min-w-0">
-            {isLoading ? (
+            {!programId ? (
+              <ErrorMessage
+                message={t(
+                  "batchManagement.modal.moveStudent.missingProgram",
+                  "Could not determine this student's programme. Refresh and try again.",
+                )}
+                variant="inline"
+              />
+            ) : isLoading ? (
               <div className="flex items-center justify-center py-4">
                 <LoadingSpinner size="sm" />
               </div>
@@ -165,6 +173,13 @@ const MoveStudentDialog = ({ open, onOpenChange, student }) => {
                 onRetry={refetch}
                 variant="inline"
               />
+            ) : batchSelectItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  "batchManagement.modal.moveStudent.noBatches",
+                  "No other groups available for this programme.",
+                )}
+              </p>
             ) : (
               <SearchableSelect
                 className="min-w-0"
