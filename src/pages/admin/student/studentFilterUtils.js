@@ -1,4 +1,7 @@
 export const DEFAULT_STUDENT_FILTERS = {
+  country: "all",
+  city: "all",
+  language: "all",
   program: "all",
   batch: "all",
   status: "active",

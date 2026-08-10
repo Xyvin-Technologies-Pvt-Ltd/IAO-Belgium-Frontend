@@ -19,7 +19,11 @@ import { Input } from "@/components/ui/input";
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import {
+  useGetAllCountries,
+  useGetAllCities,
+  useGetAllLanguages,
   useGetAllPrograms,
+  useGetProgramsByCitiesAndLanguages,
   useGetBatches,
   useGetComponents,
 } from "@/store/useDropdownStore";
@@ -59,10 +63,58 @@ const StudentFilterDrawer = ({
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [moduleSearchTerm, setModuleSearchTerm] = useState("");
+  const [countrySearchTerm, setCountrySearchTerm] = useState("");
+  const [citySearchTerm, setCitySearchTerm] = useState("");
+  const [languageSearchTerm, setLanguageSearchTerm] = useState("");
 
-  const { data: programsData } = useGetAllPrograms({}, { enabled: isOpen });
+  const selectedCountry =
+    draftFilters.country && draftFilters.country !== "all"
+      ? draftFilters.country
+      : null;
+  const selectedCity =
+    draftFilters.city && draftFilters.city !== "all" ? draftFilters.city : "";
+  const selectedLanguage =
+    draftFilters.language && draftFilters.language !== "all"
+      ? draftFilters.language
+      : "";
   const selectedProgramId =
     draftFilters.program !== "all" ? draftFilters.program : null;
+  const hasProgramScope = Boolean(selectedCity || selectedLanguage);
+
+  const { data: countriesData, isLoading: countriesLoading } =
+    useGetAllCountries(
+      {
+        ...(countrySearchTerm && { search: countrySearchTerm }),
+      },
+      { enabled: isOpen },
+    );
+
+  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
+    {
+      ...(citySearchTerm && { search: citySearchTerm }),
+      ...(selectedCountry && { country: selectedCountry }),
+    },
+    { enabled: isOpen && !!selectedCountry },
+  );
+
+  const { data: languagesData, isLoading: languagesLoading } =
+    useGetAllLanguages(
+      {
+        ...(languageSearchTerm && { search: languageSearchTerm }),
+      },
+      { enabled: isOpen },
+    );
+
+  const { data: allProgramsData } = useGetAllPrograms(
+    {},
+    { enabled: isOpen && !hasProgramScope },
+  );
+  const { data: scopedProgramsData } = useGetProgramsByCitiesAndLanguages(
+    selectedCity,
+    selectedLanguage,
+    { enabled: isOpen && hasProgramScope },
+  );
+  const programsData = hasProgramScope ? scopedProgramsData : allProgramsData;
 
   const { data: batchesData } = useGetBatches(
     selectedProgramId,
@@ -81,7 +133,11 @@ const StudentFilterDrawer = ({
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(
     ([key, val]) => {
-      if (key === "program") return val !== "all";
+      // Country only scopes city options; city/language/program drive the list
+      if (key === "country") return false;
+      if (key === "program" || key === "city" || key === "language") {
+        return val !== "all";
+      }
       if (
         [
           "has_outstanding_invoices",
@@ -198,7 +254,10 @@ const StudentFilterDrawer = ({
                 {t("studentManagement.filters.title", "Filter Students")}
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                {t("studentManagement.filters.subtitle", "Narrow down the students list")}
+                {t(
+                  "studentManagement.filters.subtitle",
+                  "Narrow down the students list",
+                )}
               </p>
             </div>
           </div>
@@ -206,7 +265,105 @@ const StudentFilterDrawer = ({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("studentManagement.table.program", "Programme")}>
+            <p
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: "#94a3b8" }}
+            >
+              {t("studentManagement.filters.programScope", "Programme")}
+            </p>
+
+            <FilterSection
+              label={t("studentManagement.filters.country", "Country")}
+            >
+              <SearchableSelect
+                placeholder={t(
+                  "studentManagement.filters.allCountries",
+                  "All Countries",
+                )}
+                searchPlaceholder={t(
+                  "studentManagement.filters.searchCountries",
+                  "Search countries...",
+                )}
+                items={countriesData?.data || []}
+                value={
+                  draftFilters.country === "all" ? "" : draftFilters.country
+                }
+                onChange={(val) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    country: val || "all",
+                    city: "all",
+                    program: "all",
+                    batch: "all",
+                  }))
+                }
+                onSearch={setCountrySearchTerm}
+                isLoading={countriesLoading}
+              />
+            </FilterSection>
+
+            <FilterSection label={t("studentManagement.filters.city", "City")}>
+              <SearchableSelect
+                placeholder={
+                  selectedCountry
+                    ? t("studentManagement.filters.allCities", "All Cities")
+                    : t(
+                        "studentManagement.filters.selectCountryFirst",
+                        "Select country first",
+                      )
+                }
+                searchPlaceholder={t(
+                  "studentManagement.filters.searchCities",
+                  "Search cities...",
+                )}
+                items={citiesData?.data || []}
+                value={draftFilters.city === "all" ? "" : draftFilters.city}
+                onChange={(val) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    city: val || "all",
+                    program: "all",
+                    batch: "all",
+                  }))
+                }
+                onSearch={setCitySearchTerm}
+                isLoading={citiesLoading}
+                disabled={!selectedCountry}
+              />
+            </FilterSection>
+
+            <FilterSection
+              label={t("studentManagement.filters.language", "Language")}
+            >
+              <SearchableSelect
+                placeholder={t(
+                  "studentManagement.filters.allLanguages",
+                  "All Languages",
+                )}
+                searchPlaceholder={t(
+                  "studentManagement.filters.searchLanguages",
+                  "Search languages...",
+                )}
+                items={languagesData?.data || []}
+                value={
+                  draftFilters.language === "all" ? "" : draftFilters.language
+                }
+                onChange={(val) =>
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    language: val || "all",
+                    program: "all",
+                    batch: "all",
+                  }))
+                }
+                onSearch={setLanguageSearchTerm}
+                isLoading={languagesLoading}
+              />
+            </FilterSection>
+
+            <FilterSection
+              label={t("studentManagement.table.program", "Programme")}
+            >
               <Select
                 value={draftFilters.program}
                 onValueChange={(val) =>
@@ -218,10 +375,20 @@ const StudentFilterDrawer = ({
                 }
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder={t("studentManagement.filters.allPrograms", "All Programs")} />
+                  <SelectValue
+                    placeholder={t(
+                      "studentManagement.filters.allPrograms",
+                      "All Programs",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("studentManagement.filters.allPrograms", "All Programs")}</SelectItem>
+                  <SelectItem value="all">
+                    {t(
+                      "studentManagement.filters.allPrograms",
+                      "All Programs",
+                    )}
+                  </SelectItem>
                   {programsData?.data?.map((program) => (
                     <SelectItem key={program._id} value={program._id}>
                       {program.name} - {program.city?.name || "N/A"} -{" "}
@@ -241,10 +408,17 @@ const StudentFilterDrawer = ({
                 disabled={!selectedProgramId}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder={t("studentManagement.filters.allBatches", "All Groups")} />
+                  <SelectValue
+                    placeholder={t(
+                      "studentManagement.filters.allBatches",
+                      "All Groups",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("studentManagement.filters.allBatches", "All Groups")}</SelectItem>
+                  <SelectItem value="all">
+                    {t("studentManagement.filters.allBatches", "All Groups")}
+                  </SelectItem>
                   {batchesData?.data?.map((batch) => (
                     <SelectItem key={batch._id} value={batch._id}>
                       {batch.name}
@@ -254,7 +428,9 @@ const StudentFilterDrawer = ({
               </Select>
             </FilterSection>
 
-            <FilterSection label={t("studentManagement.table.status", "Status")}>
+            <FilterSection
+              label={t("studentManagement.table.status", "Status")}
+            >
               <Select
                 value={draftFilters.status}
                 onValueChange={(val) =>
@@ -262,10 +438,20 @@ const StudentFilterDrawer = ({
                 }
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder={t("studentManagement.filters.allStatuses", "All Statuses")} />
+                  <SelectValue
+                    placeholder={t(
+                      "studentManagement.filters.allStatuses",
+                      "All Statuses",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("studentManagement.filters.allStatuses", "All Statuses")}</SelectItem>
+                  <SelectItem value="all">
+                    {t(
+                      "studentManagement.filters.allStatuses",
+                      "All Statuses",
+                    )}
+                  </SelectItem>
                   {statuses.map((status) => (
                     <SelectItem key={status.value} value={status.value}>
                       {status.label}
@@ -283,7 +469,12 @@ const StudentFilterDrawer = ({
           </div>
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("studentManagement.filters.paymentStatus", "Payment Status")}>
+            <FilterSection
+              label={t(
+                "studentManagement.filters.paymentStatus",
+                "Payment Status",
+              )}
+            >
               <Select
                 value={draftFilters.payment_status}
                 onValueChange={(val) =>
@@ -294,7 +485,9 @@ const StudentFilterDrawer = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("studentManagement.filters.all", "All")}</SelectItem>
+                  <SelectItem value="all">
+                    {t("studentManagement.filters.all", "All")}
+                  </SelectItem>
                   {paymentStatuses.map((item) => (
                     <SelectItem key={item.value} value={item.value}>
                       {item.label}
@@ -304,7 +497,12 @@ const StudentFilterDrawer = ({
               </Select>
             </FilterSection>
 
-            <FilterSection label={t("studentManagement.filters.paymentMethod", "Payment Method")}>
+            <FilterSection
+              label={t(
+                "studentManagement.filters.paymentMethod",
+                "Payment Method",
+              )}
+            >
               <Select
                 value={draftFilters.payment_method}
                 onValueChange={(val) =>
@@ -315,7 +513,9 @@ const StudentFilterDrawer = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("studentManagement.filters.all", "All")}</SelectItem>
+                  <SelectItem value="all">
+                    {t("studentManagement.filters.all", "All")}
+                  </SelectItem>
                   {paymentMethods.map((item) => (
                     <SelectItem key={item.value} value={item.value}>
                       {item.label}
@@ -327,10 +527,18 @@ const StudentFilterDrawer = ({
           </div>
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("studentManagement.filters.module", "Module")}>
+            <FilterSection
+              label={t("studentManagement.filters.module", "Module")}
+            >
               <SearchableSelect
-                placeholder={t("studentManagement.filters.allModules", "All Modules")}
-                searchPlaceholder={t("studentManagement.filters.searchModules", "Search modules")}
+                placeholder={t(
+                  "studentManagement.filters.allModules",
+                  "All Modules",
+                )}
+                searchPlaceholder={t(
+                  "studentManagement.filters.searchModules",
+                  "Search modules",
+                )}
                 items={modulesData?.data || []}
                 value={draftFilters.module === "all" ? "" : draftFilters.module}
                 onChange={(val) =>
@@ -343,51 +551,58 @@ const StudentFilterDrawer = ({
                 }
                 onSearch={setModuleSearchTerm}
                 isLoading={modulesLoading}
-                renderItem={(item) => `${item.uid || ""} ${item.name || ""}`.trim()}
+                renderItem={(item) =>
+                  `${item.uid || ""} ${item.name || ""}`.trim()
+                }
               />
             </FilterSection>
 
             {moduleSelected && (
-              <>
-                <FilterSection label={t("studentManagement.filters.moduleStartDate", "Module Start Date")}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      type="date"
-                      value={draftFilters.module_start_from}
-                      onChange={(e) =>
-                        setDraftFilters((prev) => ({
-                          ...prev,
-                          module_start_from: e.target.value,
-                        }))
-                      }
-                    />
-                    <Input
-                      type="date"
-                      value={draftFilters.module_start_to}
-                      onChange={(e) =>
-                        setDraftFilters((prev) => ({
-                          ...prev,
-                          module_start_to: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-2"
-                    onClick={handleThisWeek}
-                  >
-                    {t("studentManagement.filters.thisWeek", "This week")}
-                  </Button>
-                </FilterSection>
-              </>
+              <FilterSection
+                label={t(
+                  "studentManagement.filters.moduleStartDate",
+                  "Module Start Date",
+                )}
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={draftFilters.module_start_from}
+                    onChange={(e) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        module_start_from: e.target.value,
+                      }))
+                    }
+                  />
+                  <Input
+                    type="date"
+                    value={draftFilters.module_start_to}
+                    onChange={(e) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        module_start_to: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={handleThisWeek}
+                >
+                  {t("studentManagement.filters.thisWeek", "This week")}
+                </Button>
+              </FilterSection>
             )}
           </div>
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("studentManagement.filters.loginDate", "Login Date")}>
+            <FilterSection
+              label={t("studentManagement.filters.loginDate", "Login Date")}
+            >
               <div className="grid grid-cols-2 gap-2">
                 <Input
                   type="date"
@@ -414,7 +629,9 @@ const StudentFilterDrawer = ({
           </div>
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("studentManagement.filters.idCard", "ID Card Uploaded")}>
+            <FilterSection
+              label={t("studentManagement.filters.idCard", "ID Card Uploaded")}
+            >
               <Select
                 value={draftFilters.has_id_card}
                 onValueChange={(val) =>
@@ -434,7 +651,12 @@ const StudentFilterDrawer = ({
               </Select>
             </FilterSection>
 
-            <FilterSection label={t("studentManagement.filters.qualificationCert", "Qualification Certificate")}>
+            <FilterSection
+              label={t(
+                "studentManagement.filters.qualificationCert",
+                "Qualification Certificate",
+              )}
+            >
               <Select
                 value={draftFilters.has_qualification_certificate}
                 onValueChange={(val) =>
@@ -459,7 +681,10 @@ const StudentFilterDrawer = ({
           </div>
 
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+            <p
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: "#94a3b8" }}
+            >
               {t("studentManagement.filters.flags", "Flags")}
             </p>
             <label className="flex items-center gap-2 text-sm">
@@ -472,7 +697,10 @@ const StudentFilterDrawer = ({
                   }))
                 }
               />
-              {t("studentManagement.filters.outstandingInvoices", "Outstanding invoices")}
+              {t(
+                "studentManagement.filters.outstandingInvoices",
+                "Outstanding invoices",
+              )}
             </label>
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
@@ -484,7 +712,10 @@ const StudentFilterDrawer = ({
                   }))
                 }
               />
-              {t("studentManagement.filters.missedModules", "Missed modules (absent or unpurchased)")}
+              {t(
+                "studentManagement.filters.missedModules",
+                "Missed modules (absent or unpurchased)",
+              )}
             </label>
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
@@ -496,7 +727,10 @@ const StudentFilterDrawer = ({
                   }))
                 }
               />
-              {t("studentManagement.filters.unpurchasedModules", "Unpurchased modules only")}
+              {t(
+                "studentManagement.filters.unpurchasedModules",
+                "Unpurchased modules only",
+              )}
             </label>
             <label className="flex items-center gap-2 text-sm">
               <Checkbox

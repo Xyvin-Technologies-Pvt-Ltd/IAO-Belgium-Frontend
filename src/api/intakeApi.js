@@ -118,6 +118,42 @@ export const reEnrollStudent = async (applicationId, data) => {
   }
 };
 
+export const pauseEnrollment = async (applicationId, data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/application/${applicationId}/pause`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const stopEnrollment = async (applicationId, data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/application/${applicationId}/stop`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const resumeEnrollment = async (applicationId, data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/application/${applicationId}/resume`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getBatchesByProgram = async (programId) => {
   try {
     const response = await axiosInstance.get(`/batch/by-program/${programId}`);

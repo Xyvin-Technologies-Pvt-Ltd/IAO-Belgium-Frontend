@@ -24,6 +24,9 @@ const statusVariants = {
   closed: "text-red-500",
   open: "text-green-600",
   re_enrolled: "text-blue-600",
+  paused: "text-amber-600",
+  stopped: "text-red-600",
+  removed: "text-gray-500",
 
   // Bloom levels (Difficulty)
   remember: "text-green-600",
@@ -136,6 +139,12 @@ const StatusBadge = ({ status }) => {
     displayText = "Course Completed";
   } else if (status === "re_enrolled") {
     displayText = "Re-enrolled";
+  } else if (status === "paused") {
+    displayText = "Paused";
+  } else if (status === "stopped") {
+    displayText = "Stopped";
+  } else if (status === "removed") {
+    displayText = "Removed";
   } else if (status === "in-progress") {
     displayText = "In Progress";
   } else if (status === "not submitted") {
