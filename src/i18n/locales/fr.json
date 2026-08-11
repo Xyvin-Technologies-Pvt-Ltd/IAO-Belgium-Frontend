@@ -474,6 +474,7 @@
     "createLanguage": "Créer une langue",
     "table": {
       "name": "Nom",
+      "emailCode": "Code e-mail",
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
@@ -488,7 +489,18 @@
       "createSubtitle": "Créer une nouvelle langue",
       "editSubtitle": "Mettre à jour les données de la langue",
       "nameLabel": "Nom de la langue",
-      "namePlaceholder": "Saisir le nom de la langue"
+      "namePlaceholder": "Saisir le nom de la langue",
+      "nameRequired": "Le nom de la langue est obligatoire",
+      "codeLabel": "Code langue e-mail",
+      "codePlaceholder": "Sélectionner la langue e-mail",
+      "codeRequired": "Le code langue e-mail est obligatoire",
+      "codeHelp": "Utilisé pour les e-mails étudiants. Doit correspondre aux modèles de langue du programme (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Anglais",
+        "nl": "NL — Néerlandais",
+        "fr": "FR — Français",
+        "de": "DE — Allemand"
+      }
     }
   },
   "contractTypeManagement": {

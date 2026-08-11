@@ -501,6 +501,7 @@
     "createLanguage": "Sprache erstellen",
     "table": {
       "name": "Name",
+      "emailCode": "E-Mail-Code",
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
@@ -515,7 +516,18 @@
       "createSubtitle": "Neue Sprache erstellen",
       "editSubtitle": "Sprachdaten aktualisieren",
       "nameLabel": "Sprachname",
-      "namePlaceholder": "Sprachname eingeben"
+      "namePlaceholder": "Sprachname eingeben",
+      "nameRequired": "Sprachname ist erforderlich",
+      "codeLabel": "E-Mail-Sprachcode",
+      "codePlaceholder": "E-Mail-Sprache auswählen",
+      "codeRequired": "E-Mail-Sprachcode ist erforderlich",
+      "codeHelp": "Wird für Studenten-E-Mails verwendet. Muss zu den Programmsprache-Vorlagen passen (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Englisch",
+        "nl": "NL — Niederländisch",
+        "fr": "FR — Französisch",
+        "de": "DE — Deutsch"
+      }
     }
   },
   "contractTypeManagement": {
