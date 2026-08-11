@@ -581,6 +581,7 @@
     "createLanguage": "Create Language",
     "table": {
       "name": "Name",
+      "emailCode": "Email code",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
@@ -595,7 +596,18 @@
       "createSubtitle": "Let's create a new language",
       "editSubtitle": "Update the language details",
       "nameLabel": "Language Name",
-      "namePlaceholder": "Enter language name"
+      "namePlaceholder": "Enter language name",
+      "nameRequired": "Language name is required",
+      "codeLabel": "Email language code",
+      "codePlaceholder": "Select email language",
+      "codeRequired": "Email language code is required",
+      "codeHelp": "Used for student emails. Must match the programme language templates (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — English",
+        "nl": "NL — Dutch",
+        "fr": "FR — French",
+        "de": "DE — German"
+      }
     }
   },
   "contractTypeManagement": {

@@ -475,6 +475,7 @@
     "createLanguage": "Taal aanmaken",
     "table": {
       "name": "Naam",
+      "emailCode": "E-mailcode",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
@@ -489,7 +490,18 @@
       "createSubtitle": "Maak een nieuwe taal aan",
       "editSubtitle": "Taalgegevens bijwerken",
       "nameLabel": "Taalnaam",
-      "namePlaceholder": "Taalnaam invoeren"
+      "namePlaceholder": "Taalnaam invoeren",
+      "nameRequired": "Taalnaam is verplicht",
+      "codeLabel": "E-mailtaalcode",
+      "codePlaceholder": "Selecteer e-mailtaal",
+      "codeRequired": "E-mailtaalcode is verplicht",
+      "codeHelp": "Gebruikt voor studentene-mails. Moet overeenkomen met de programmataalsjablonen (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Engels",
+        "nl": "NL — Nederlands",
+        "fr": "FR — Frans",
+        "de": "DE — Duits"
+      }
     }
   },
   "contractTypeManagement": {
