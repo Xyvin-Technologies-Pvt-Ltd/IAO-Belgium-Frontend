@@ -118,7 +118,7 @@ const StudentFilterDrawer = ({
 
   const { data: batchesData } = useGetBatches(
     selectedProgramId,
-    {},
+    { include_closed: true },
     { enabled: isOpen && !!selectedProgramId },
   );
 
