@@ -1289,6 +1289,7 @@
       "qualificationStatus": "Qualification status",
       "stillCompletingQualification": "Still completing qualification",
       "qualificationNotDeferred": "Not deferred",
+      "completingQualificationCheckbox": "I'm still completing my qualification. I will submit my diploma later.",
       "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet."
     },
     "status": {
@@ -1307,7 +1308,8 @@
       "download": "Download",
       "flagDocument": "Flag document",
       "unflagDocument": "Unflag document",
-      "documentFlagged": "Document flagged"
+      "documentFlagged": "Document flagged",
+      "notUploadedYet": "Not uploaded yet"
     }
   },
   "contractManagement": {

@@ -1067,6 +1067,7 @@
       "qualificationStatus": "Status kwalificatie",
       "stillCompletingQualification": "Nog bezig met afronden kwalificatie",
       "qualificationNotDeferred": "Niet uitgesteld",
+      "completingQualificationCheckbox": "Ik ben nog bezig met mijn kwalificatie. Ik zal mijn diploma later indienen.",
       "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload."
     },
     "status": {
@@ -1085,7 +1086,8 @@
       "download": "Downloaden",
       "flagDocument": "Document markeren",
       "unflagDocument": "Markering verwijderen",
-      "documentFlagged": "Document gemarkeerd"
+      "documentFlagged": "Document gemarkeerd",
+      "notUploadedYet": "Nog niet geüpload"
     }
   },
   "contractManagement": {

@@ -1083,6 +1083,7 @@
       "qualificationStatus": "Status der Qualifikation",
       "stillCompletingQualification": "Qualifikation wird noch abgeschlossen",
       "qualificationNotDeferred": "Nicht aufgeschoben",
+      "completingQualificationCheckbox": "Ich schließe noch meine Qualifikation ab. Ich werde mein Diplom zu einem späteren Zeitpunkt einreichen.",
       "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen."
     },
     "status": {
@@ -1101,7 +1102,8 @@
       "download": "Herunterladen",
       "flagDocument": "Dokument markieren",
       "unflagDocument": "Markierung entfernen",
-      "documentFlagged": "Dokument markiert"
+      "documentFlagged": "Dokument markiert",
+      "notUploadedYet": "Noch nicht hochgeladen"
     }
   },
   "contractManagement": {
