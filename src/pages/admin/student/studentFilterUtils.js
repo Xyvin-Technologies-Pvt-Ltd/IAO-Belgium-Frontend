@@ -5,6 +5,7 @@ export const DEFAULT_STUDENT_FILTERS = {
   program: "all",
   batch: "all",
   status: "active",
+  year_status: "all",
   payment_status: "all",
   payment_method: "all",
   module: "all",
@@ -46,6 +47,7 @@ export const buildStudentQueryFilters = (filters, { search, studentId } = {}) =>
   if (filters.program !== "all") query.program = filters.program;
   if (filters.batch !== "all") query.batch = filters.batch;
   if (filters.status !== "all") query.status = filters.status;
+  if (filters.year_status !== "all") query.year_status = filters.year_status;
   if (filters.payment_status !== "all") query.payment_status = filters.payment_status;
   if (filters.payment_method !== "all") query.payment_method = filters.payment_method;
   if (filters.module !== "all") query.module = filters.module;

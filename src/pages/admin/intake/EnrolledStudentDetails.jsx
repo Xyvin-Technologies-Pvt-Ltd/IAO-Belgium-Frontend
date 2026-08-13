@@ -90,6 +90,8 @@ const EnrolledStudentDetails = () => {
   const {
     data: student,
     isLoading,
+    isFetching,
+    isPlaceholderData,
     error,
     refetch,
   } = useGetStudentByApplication(
@@ -102,6 +104,7 @@ const EnrolledStudentDetails = () => {
     student?.data?.application_id,
     student?.data?.migration_ref,
     filter.year,
+    student?.data?.current_year,
   );
 
   const studentUserId = student?.data?._id;
@@ -452,14 +455,11 @@ const EnrolledStudentDetails = () => {
           </div>
 
           <div className="grid grid-cols-12 gap-6">
-            {yearHistory.isLoading ? (
+            {yearHistory.isLoading || (isFetching && isPlaceholderData) ? (
               <div className="col-span-12 py-10">
                 <LoadingState
                   size="sm"
-                  text={t(
-                    "coachviewImport.loadingHistory",
-                    "Loading pre-migration history...",
-                  )}
+                  text={t("common.loading", "Loading...")}
                 />
               </div>
             ) : yearHistory.hasHistory ? (

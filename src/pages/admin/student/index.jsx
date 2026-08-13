@@ -119,7 +119,7 @@ const AllStudents = () => {
     }
   };
 
-  const columnCount = 15;
+  const columnCount = 16;
 
   return (
     <div className="space-y-6 mt-4">
@@ -187,6 +187,9 @@ const AllStudents = () => {
               <TableHead>{t("studentManagement.table.batch")}</TableHead>
               <TableHead>{t("studentManagement.table.status")}</TableHead>
               <TableHead>
+                {t("studentManagement.table.yearStatus", "Year Status")}
+              </TableHead>
+              <TableHead>
                 {t("studentManagement.table.paymentStatus", "Payment Status")}
               </TableHead>
               <TableHead>
@@ -246,7 +249,14 @@ const AllStudents = () => {
                   <TableCell>{i?.program_name || t("common.dash", "-")}</TableCell>
                   <TableCell>{i?.batch_name || t("common.dash", "-")}</TableCell>
                   <TableCell>
-                    <StatusBadge status={i?.application_status} />
+                    <StatusBadge status={i?.status} />
+                  </TableCell>
+                  <TableCell>
+                    {i?.year_status ? (
+                      <StatusBadge status={i.year_status} />
+                    ) : (
+                      t("common.dash", "-")
+                    )}
                   </TableCell>
                   <TableCell>
                     {i?.payment_status ? (
