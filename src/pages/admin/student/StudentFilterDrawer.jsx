@@ -179,6 +179,16 @@ const StudentFilterDrawer = ({
     { label: t("common.inactive", "Inactive"), value: "inactive" },
   ];
 
+  const yearStatuses = [
+    { label: t("common.active", "Active"), value: "active" },
+    { label: t("common.paused", "Paused"), value: "paused" },
+    { label: t("common.stopped", "Stopped"), value: "stopped" },
+    { label: t("common.removed", "Removed"), value: "removed" },
+    { label: t("common.failed", "Failed"), value: "failed" },
+    { label: t("common.re_enrolled", "Re-enrolled"), value: "re_enrolled" },
+    { label: t("common.completed", "Completed"), value: "completed" },
+  ];
+
   const paymentStatuses = [
     { label: t("common.pending", "Pending"), value: "pending" },
     { label: t("common.paid", "Paid"), value: "paid" },
@@ -462,9 +472,42 @@ const StudentFilterDrawer = ({
               <p className="text-xs mt-1" style={{ color: "#94a3b8" }}>
                 {t(
                   "studentManagement.filters.inactiveIncludesNotStarted",
-                  "Inactive includes students who have not started an application.",
+                  "Active is enrolled students with an active account. Inactive includes paused, stopped, removed, and students who have not started an application.",
                 )}
               </p>
+            </FilterSection>
+
+            <FilterSection
+              label={t("studentManagement.table.yearStatus", "Year Status")}
+            >
+              <Select
+                value={draftFilters.year_status}
+                onValueChange={(val) =>
+                  setDraftFilters((prev) => ({ ...prev, year_status: val }))
+                }
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue
+                    placeholder={t(
+                      "studentManagement.filters.allYearStatuses",
+                      "All Year Statuses",
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t(
+                      "studentManagement.filters.allYearStatuses",
+                      "All Year Statuses",
+                    )}
+                  </SelectItem>
+                  {yearStatuses.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FilterSection>
           </div>
 
