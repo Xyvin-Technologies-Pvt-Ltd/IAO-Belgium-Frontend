@@ -56,6 +56,7 @@
       "studentManagement": "Studentenverwaltung",
       "financeReports": "Finanzberichte",
       "customInvoices": "Benutzerdefinierte Rechnungen",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Administratorenverwaltung",
       "roleManagement": "Rollenverwaltung",
       "integrations": "Integrationen",
@@ -103,6 +104,8 @@
     "yes": "Ja",
     "no": "Nein",
     "none": "Keine",
+    "open": "Offen",
+    "closed": "Geschlossen",
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "deleted": "Gelöscht",
@@ -246,7 +249,8 @@
       "admissionFee": "Zulassungsgebühr",
       "modulePurchase": "Modulkauf",
       "locationSwitch": "Standortwechsel",
-      "customInvoice": "Benutzerdefinierte Rechnung"
+      "customInvoice": "Benutzerdefinierte Rechnung",
+      "other": "Sonstiges"
     },
     "messages": {
       "noPaymentsFound": "Keine Zahlungen gefunden",
@@ -288,7 +292,36 @@
       },
       "customInvoices": {
         "title": "Benutzerdefinierte Rechnungen"
+      },
+      "fkf": {
+        "title": "Fachkursförderung",
+        "description": "Subventionierte Modulrechnungen für berechtigte Studierende erstellen"
       }
+    },
+    "fkf": {
+      "title": "Fachkursförderung",
+      "subtitle": "Berechtigte Studierende, subventionierte Rechnungen und PLZ-Konfiguration.",
+      "createTab": "Rechnung erstellen",
+      "studentsTab": "Berechtigte Studierende",
+      "configTab": "Konfiguration",
+      "student": "Student/in",
+      "searchStudent": "Student/in suchen…",
+      "program": "Programm",
+      "batch": "Gruppe",
+      "academicYear": "Studienjahr",
+      "postalCode": "Postleitzahl",
+      "selectProgramFirst": "Zuerst Programm auswählen",
+      "module": "Modul / Prüfung",
+      "selectModule": "Modul auswählen…",
+      "selectStudentFirst": "Zuerst Student/in auswählen",
+      "catalogFee": "Katalogpreis",
+      "pendingHint": "Für dieses Modul existiert bereits eine ausstehende FKF-Zahlung.",
+      "subsidizedAmount": "Subventionierter Betrag",
+      "createButton": "FKF-Rechnung erstellen",
+      "sendInvoice": "FKF-Rechnung senden",
+      "noEligibleStudents": "Keine berechtigten Studierenden gefunden.",
+      "postalCodes": "Berechtigte Postleitzahlen (kommagetrennt)",
+      "programActive": "Programm aktiv (jährliche L-Bank-Auswahl)"
     }
   },
   "ltiManagement": {
@@ -468,6 +501,7 @@
     "createLanguage": "Sprache erstellen",
     "table": {
       "name": "Name",
+      "emailCode": "E-Mail-Code",
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
@@ -482,7 +516,18 @@
       "createSubtitle": "Neue Sprache erstellen",
       "editSubtitle": "Sprachdaten aktualisieren",
       "nameLabel": "Sprachname",
-      "namePlaceholder": "Sprachname eingeben"
+      "namePlaceholder": "Sprachname eingeben",
+      "nameRequired": "Sprachname ist erforderlich",
+      "codeLabel": "E-Mail-Sprachcode",
+      "codePlaceholder": "E-Mail-Sprache auswählen",
+      "codeRequired": "E-Mail-Sprachcode ist erforderlich",
+      "codeHelp": "Wird für Studenten-E-Mails verwendet. Muss zu den Programmsprache-Vorlagen passen (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Englisch",
+        "nl": "NL — Niederländisch",
+        "fr": "FR — Französisch",
+        "de": "DE — Deutsch"
+      }
     }
   },
   "contractTypeManagement": {
@@ -906,6 +951,7 @@
       "outstandingInvoices": "Offene Rechnungen",
       "missedModules": "Verpasste Module (abwesend oder nicht gekauft)",
       "unpurchasedModules": "Nur nicht gekaufte Module",
+      "fachkursfoerderung": "Berechtigt für Fachkursförderung",
       "inactiveIncludesNotStarted": "Inaktiv umfasst Studierende, die noch keine Bewerbung begonnen haben.",
       "clearAll": "Alle löschen",
       "apply": "Filter anwenden"
@@ -968,7 +1014,8 @@
       "noAcademics": "Keine akademischen Jahre gefunden"
     },
     "messages": {
-      "loadFailed": "Akademische Jahre konnten nicht geladen werden"
+      "loadFailed": "Akademische Jahre konnten nicht geladen werden",
+      "loading": "Akademische Jahre werden geladen..."
     },
     "modal": {
       "createTitle": "Neues akademisches Jahr erstellen",
@@ -1036,6 +1083,7 @@
       "qualificationStatus": "Status der Qualifikation",
       "stillCompletingQualification": "Qualifikation wird noch abgeschlossen",
       "qualificationNotDeferred": "Nicht aufgeschoben",
+      "completingQualificationCheckbox": "Ich schließe noch meine Qualifikation ab. Ich werde mein Diplom zu einem späteren Zeitpunkt einreichen.",
       "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen."
     },
     "status": {
@@ -1054,7 +1102,8 @@
       "download": "Herunterladen",
       "flagDocument": "Dokument markieren",
       "unflagDocument": "Markierung entfernen",
-      "documentFlagged": "Dokument markiert"
+      "documentFlagged": "Dokument markiert",
+      "notUploadedYet": "Noch nicht hochgeladen"
     }
   },
   "contractManagement": {
@@ -1616,7 +1665,7 @@
     "freeComponentLabel": "Kostenloses Modul",
     "freeComponentDescription": "Aktivieren, wenn für dieses Modul keine zusätzliche Zahlung erforderlich ist",
     "linkedModuleLabel": "Verknüpftes Modul",
-    "linkedModuleHint": "Prüfung vor diesem Modul geplant",
+    "linkedModuleHint": "Prüfung mit diesem Modul geplant",
     "linkedModulePlaceholder": "Modul auswählen",
     "noModulesFound": "Keine Module gefunden",
     "linkedExamLabel": "Verknüpfte Prüfung",

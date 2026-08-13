@@ -203,6 +203,7 @@ const AnalyticsChartView = ({
     name: getLabel(item),
     admission_fee: item.admission_fee_amount || 0,
     module_purchase: item.module_purchase_amount || 0,
+    other: item.other_amount || 0,
     paid: item.paid_count,
     pending: item.pending_count,
     failed: item.failed_count,
@@ -307,9 +308,14 @@ const AnalyticsChartView = ({
               <Tooltip content={<CustomTooltipRevenue />} cursor={{ fill: "rgba(241,245,249,0.55)", radius: 8 }} />
               <Bar dataKey="admission_fee" name={t("finance.purposes.admissionFee")} fill="#3b82f6" radius={[6, 6, 0, 0]} maxBarSize={40} />
               <Bar dataKey="module_purchase" name={t("finance.purposes.modulePurchase")} fill="#ff8904" radius={[6, 6, 0, 0]} maxBarSize={40} />
+              <Bar dataKey="other" name={t("finance.purposes.other")} fill="#22c55e" radius={[6, 6, 0, 0]} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
-          <InlineLegend items={[{ color: "#3b82f6", label: t("finance.purposes.admissionFee") }, { color: "#ff8904", label: t("finance.purposes.modulePurchase") }]} />
+          <InlineLegend items={[
+            { color: "#3b82f6", label: t("finance.purposes.admissionFee") },
+            { color: "#ff8904", label: t("finance.purposes.modulePurchase") },
+            { color: "#22c55e", label: t("finance.purposes.other") },
+          ]} />
         </CardContent>
       </Card>
 
@@ -355,16 +361,17 @@ const AnalyticsChartView = ({
               <TableHead>{t("finance.fields.totalAmount")}</TableHead>
               <TableHead>{t("finance.purposes.admissionFee")}</TableHead>
               <TableHead>{t("finance.purposes.modulePurchase")}</TableHead>
+              <TableHead>{t("finance.purposes.other")}</TableHead>
               <TableHead>{t("common.trxCount")}</TableHead>
               <TableHead>{t("common.paid")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={tableLoading ? "opacity-50 pointer-events-none" : ""}>
             {tableLoading && displayTableData.length === 0 ? (
-              <TableSkeleton rows={limit || 10} columns={6} />
+              <TableSkeleton rows={limit || 10} columns={7} />
             ) : tableErr ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center p-8">
+                <TableCell colSpan={7} className="text-center p-8">
                   <ErrorMessage message={tableErr?.message || t("finance.messages.loadAnalyticsFailed")} variant="inline" />
                 </TableCell>
               </TableRow>
@@ -375,13 +382,14 @@ const AnalyticsChartView = ({
                   <TableCell>EUR {item.total_amount?.toFixed(2)}</TableCell>
                   <TableCell>EUR {(item.admission_fee_amount || 0).toFixed(2)}</TableCell>
                   <TableCell>EUR {(item.module_purchase_amount || 0).toFixed(2)}</TableCell>
+                  <TableCell>EUR {(item.other_amount || 0).toFixed(2)}</TableCell>
                   <TableCell>{item.total_count}</TableCell>
                   <TableCell className="text-green-600">{item.paid_count}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">{t("finance.messages.noAnalyticsFound")}</TableCell>
+                <TableCell colSpan={7} className="text-center">{t("finance.messages.noAnalyticsFound")}</TableCell>
               </TableRow>
             )}
           </TableBody>

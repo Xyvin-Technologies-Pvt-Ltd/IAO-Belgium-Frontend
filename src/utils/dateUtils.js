@@ -12,6 +12,11 @@ export const getMoment = (date) => {
   return moment.utc(date);
 };
 
+// Current clock in school timezone (NL/BE). Use for "today" checks, not stored dates.
+export const getNow = (date) => {
+  return moment(date).tz(DISPLAY_TZ);
+};
+
 // Real UTC instants (e.g. createdAt, paid_at) — show in app timezone.
 export const formatInstant = (date, format = "DD-MM-YYYY, HH:mm") => {
   if (!date) return "";

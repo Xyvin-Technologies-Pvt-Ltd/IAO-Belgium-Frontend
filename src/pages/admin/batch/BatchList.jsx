@@ -30,6 +30,8 @@ import {
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import { useCanModify } from "@/hooks/useCanModify";
+import MigrateFromCoachViewDialog from "@/components/admin/batch/MigrateFromCoachViewDialog";
+import { RefreshCw } from "lucide-react";
 
 const BatchList = () => {
   const params = useParams({ strict: false });
@@ -43,6 +45,7 @@ const BatchList = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
+  const [migrateBatch, setMigrateBatch] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
@@ -96,6 +99,13 @@ const BatchList = () => {
     },
     ...(canModify
       ? [
+          {
+            label: batch.coachview_cohort?.code
+              ? t("coachviewImport.resync", "Re-sync from CoachView")
+              : t("coachviewImport.migrate", "Migrate from CoachView"),
+            icon: RefreshCw,
+            onClick: () => setMigrateBatch(batch),
+          },
           {
             label: t("batchManagement.actions.delete"),
             icon: Trash2,
@@ -233,6 +243,13 @@ const BatchList = () => {
         count={1}
         data={selectedBatch?.name || t("common.batch")}
         isLoading={deleteBatchMutation.isPending}
+      />
+
+      {/* Migrate from CoachView Dialog */}
+      <MigrateFromCoachViewDialog
+        open={!!migrateBatch}
+        batch={migrateBatch}
+        onClose={() => setMigrateBatch(null)}
       />
     </div>
   );

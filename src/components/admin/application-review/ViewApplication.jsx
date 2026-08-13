@@ -20,21 +20,39 @@ const ViewApplication = ({ open, onClose, application }) => {
   const [remarks, setRemarks] = useState("");
   const [documentFlags, setDocumentFlags] = useState({
     id_card: false,
-    qualification_certificate: []
+    qualification_certificate: [],
+    qualification_missing: false,
   });
   
   const updateApplicationMutation = useUpdateApplication();
+
+  const getUploadedCertificates = (app) =>
+    Array.isArray(app?.qualification_certificate)
+      ? app.qualification_certificate.filter((cert) => cert?.url)
+      : [];
+
+  const getInitialDocumentFlags = (app) => {
+    const uploadedCerts = getUploadedCertificates(app);
+    const hasUploadedCerts = uploadedCerts.length > 0;
+    const hasMissingCertFlag =
+      !hasUploadedCerts &&
+      Array.isArray(app?.qualification_certificate) &&
+      app.qualification_certificate.some((cert) => cert?.flag === true && !cert?.url);
+
+    return {
+      id_card: app?.id_card?.flag || false,
+      qualification_certificate: hasUploadedCerts
+        ? uploadedCerts.map((cert) => cert?.flag || false)
+        : [],
+      qualification_missing: hasMissingCertFlag,
+    };
+  };
+
   useEffect(() => {
     if (open && application) {
       setRequestAdditionalInfo(false);
       setRemarks(application.remarks || "");
-      
-      setDocumentFlags({
-        id_card: application.id_card?.flag || false,
-        qualification_certificate: Array.isArray(application.qualification_certificate)
-          ? application.qualification_certificate.map(cert => cert?.flag || false)
-          : []
-      });
+      setDocumentFlags(getInitialDocumentFlags(application));
     }
   }, [open, application?._id]);
 
@@ -54,7 +72,8 @@ const ViewApplication = ({ open, onClose, application }) => {
     }
   };
 
-  const hasAnyFlaggedDocument = documentFlags.id_card || 
+  const hasAnyFlaggedDocument = documentFlags.id_card ||
+    documentFlags.qualification_missing ||
     (Array.isArray(documentFlags.qualification_certificate) && 
      documentFlags.qualification_certificate.some(flag => flag));
 
@@ -71,19 +90,20 @@ const ViewApplication = ({ open, onClose, application }) => {
       updateData.remarks = remarks.trim();
     }
 
-    if (application.id_card && documentFlags.id_card) {
+    if (documentFlags.id_card) {
       updateData.id_card = { flag: true };
     }
-    
-    // Only send flags for qualification certificates, not the full objects
-    if (Array.isArray(documentFlags.qualification_certificate) && 
-        documentFlags.qualification_certificate.length > 0) {
-      const hasFlaggedCerts = documentFlags.qualification_certificate.some(flag => flag);
+
+    const uploadedCerts = getUploadedCertificates(application);
+    if (uploadedCerts.length > 0) {
+      const hasFlaggedCerts = documentFlags.qualification_certificate.some((flag) => flag);
       if (hasFlaggedCerts) {
-        updateData.qualification_certificate = documentFlags.qualification_certificate.map(flag => ({
-          flag: flag
+        updateData.qualification_certificate = documentFlags.qualification_certificate.map((flag) => ({
+          flag,
         }));
       }
+    } else if (documentFlags.qualification_missing) {
+      updateData.qualification_certificate = [{ flag: true }];
     }
 
     updateApplicationMutation.mutate({
@@ -137,12 +157,7 @@ const ViewApplication = ({ open, onClose, application }) => {
             setRequestAdditionalInfo(false);
             setRemarks("");
             // Reset flags to original values from application data
-            setDocumentFlags({
-              id_card: application?.id_card?.flag || false,
-              qualification_certificate: Array.isArray(application?.qualification_certificate)
-                ? application.qualification_certificate.map(cert => cert?.flag || false)
-                : []
-            });
+            setDocumentFlags(getInitialDocumentFlags(application));
             onClose();
           }}>
             <X className="text-muted-foreground dark:text-white/70 hover:text-gray-700 dark:hover:text-white" />
@@ -170,20 +185,25 @@ const ViewApplication = ({ open, onClose, application }) => {
               <InfoItem label={t("applicationReview.modal.programType", "Program Type")} value={application?.program_type || application?.intake?.program?.program_type || application?.batch?.intake?.program?.program_type || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
-              <InfoItem
-                label={t("applicationReview.modal.qualificationStatus", "Qualification status")}
-                value={
-                  application?.completing_qualification
-                    ? t(
-                        "applicationReview.modal.stillCompletingQualification",
-                        "Still completing qualification",
-                      )
-                    : t(
-                        "applicationReview.modal.qualificationNotDeferred",
-                        "Not deferred",
-                      )
-                }
+            </div>
+            <div className="mt-4 flex items-start gap-3 p-3 rounded-lg border dark:border-white/20 bg-gray-50 dark:bg-white/5">
+              <input
+                type="checkbox"
+                id="completing-qualification-status"
+                className="mt-1"
+                checked={application?.completing_qualification === true}
+                disabled
+                readOnly
               />
+              <label
+                htmlFor="completing-qualification-status"
+                className="text-sm font-semibold text-dashboard-text dark:text-white"
+              >
+                {t(
+                  "applicationReview.modal.completingQualificationCheckbox",
+                  "I'm still completing my qualification. I will submit my diploma later.",
+                )}
+              </label>
             </div>
             {(application.enrollment_mode || (application.selected_modules && application.selected_modules.length > 0)) && (
               <div className="mt-4 p-4 border dark:border-white/20 rounded-lg bg-gray-50 dark:bg-white/5">
@@ -217,47 +237,37 @@ const ViewApplication = ({ open, onClose, application }) => {
               {t("applicationReview.modal.attachedDocuments")}
             </h3>
 
-            {application?.completing_qualification && (
-              <div className="flex items-start gap-2 p-3 mb-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-100">
-                <FileText size={18} className="shrink-0 mt-0.5" />
-                <p className="text-sm">
-                  {t(
-                    "applicationReview.modal.completingQualificationNotice",
-                    "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet.",
-                  )}
-                </p>
-              </div>
-            )}
+            <DocumentRow
+              title={t("applicationReview.documents.idCard")}
+              size={
+                application?.id_card?.url
+                  ? t("applicationReview.documents.pdfDocument")
+                  : t("applicationReview.documents.notUploadedYet", "Not uploaded yet")
+              }
+              url={application?.id_card?.url}
+              flagged={documentFlags.id_card}
+              onToggleFlag={() => toggleDocumentFlag('id_card')}
+            />
 
-            {application?.id_card?.url && (
-              <DocumentRow 
-                title={t("applicationReview.documents.idCard")} 
-                size={t("applicationReview.documents.pdfDocument")} 
-                url={application.id_card.url}
-                flagged={documentFlags.id_card}
-                onToggleFlag={() => toggleDocumentFlag('id_card')}
-              />
-            )}
-            
-            {Array.isArray(application?.qualification_certificate) && 
-             application.qualification_certificate.length > 0 && 
-             application.qualification_certificate.map((cert, index) => (
-              <DocumentRow 
-                key={index}
-                title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`} 
-                size={t("applicationReview.documents.pdfDocument")} 
-                url={cert.url}
-                flagged={documentFlags.qualification_certificate[index] || false}
-                onToggleFlag={() => toggleDocumentFlag('qualification_certificate', index)}
-              />
-            ))}
-
-            {!application?.id_card?.url && 
-             (!Array.isArray(application?.qualification_certificate) || 
-              application.qualification_certificate.length === 0) &&
-             !application?.completing_qualification && (
-              <p className="text-sm text-muted-foreground dark:text-white/70">{t("applicationReview.modal.noDocuments")}</p>
-            )}
+            {getUploadedCertificates(application).length > 0
+              ? getUploadedCertificates(application).map((cert, index) => (
+                  <DocumentRow
+                    key={index}
+                    title={`${t("applicationReview.documents.qualificationCertificate")} ${index + 1}`}
+                    size={t("applicationReview.documents.pdfDocument")}
+                    url={cert.url}
+                    flagged={documentFlags.qualification_certificate[index] || false}
+                    onToggleFlag={() => toggleDocumentFlag('qualification_certificate', index)}
+                  />
+                ))
+              : (
+                  <DocumentRow
+                    title={t("applicationReview.documents.qualificationCertificate")}
+                    size={t("applicationReview.documents.notUploadedYet", "Not uploaded yet")}
+                    flagged={documentFlags.qualification_missing}
+                    onToggleFlag={() => toggleDocumentFlag('qualification_missing')}
+                  />
+                )}
           </div>
 
           {application?.admin_logs && application.admin_logs.length > 0 && (
@@ -383,24 +393,32 @@ const DocumentRow = ({ title, size, url, flagged, onToggleFlag }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Action 
-          icon={Eye} 
-          label={t("applicationReview.documents.view")} 
-          onClick={() => url && openSecureFile(url)}
-        />
-        <Action 
-          icon={Download} 
-          label={t("applicationReview.documents.download")} 
-          onClick={() => url && downloadSecureFile(url, url.split("/").pop() || "document")}
-        />
-        <Action 
-          icon={Flag} 
-          label={flagged ? t("applicationReview.documents.unflagDocument") : t("applicationReview.documents.flagDocument")}
-          onClick={onToggleFlag}
-          className={flagged ? "text-red-500 hover:text-red-700 dark:hover:text-red-400" : ""}
-        />
-      </div>
+      {(url || onToggleFlag) && (
+        <div className="flex items-center gap-4">
+          {url && (
+            <>
+              <Action
+                icon={Eye}
+                label={t("applicationReview.documents.view")}
+                onClick={() => openSecureFile(url)}
+              />
+              <Action
+                icon={Download}
+                label={t("applicationReview.documents.download")}
+                onClick={() => downloadSecureFile(url, url.split("/").pop() || "document")}
+              />
+            </>
+          )}
+          {onToggleFlag && (
+            <Action
+              icon={Flag}
+              label={flagged ? t("applicationReview.documents.unflagDocument") : t("applicationReview.documents.flagDocument")}
+              onClick={onToggleFlag}
+              className={flagged ? "text-red-500 hover:text-red-700 dark:hover:text-red-400" : ""}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

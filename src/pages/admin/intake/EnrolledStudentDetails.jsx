@@ -1,6 +1,8 @@
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
+import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentByApplication } from "@/store/useIntakeStore";
@@ -39,6 +41,28 @@ const formatSubmissionType = (type) =>
         .join(" ")
     : "-";
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  if (!durationUnit) return t("common.year", "Year");
+  const unit = durationUnit.toLowerCase();
+  if (unit.startsWith("year")) {
+    const trans = t("common.durationUnits.year", "Year");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("month")) {
+    const trans = t("common.durationUnits.month", "Month");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("week")) {
+    const trans = t("common.durationUnits.week", "Week");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("day")) {
+    const trans = t("common.durationUnits.day", "Day");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  return t("common.year", "Year");
+};
+
 const EnrolledStudentDetails = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -71,6 +95,13 @@ const EnrolledStudentDetails = () => {
   } = useGetStudentByApplication(
     id,
     activeTab === "progress" ? { year: filter.year } : {},
+  );
+  //* Must run before the isLoading/error early returns below (Rules of
+  //* Hooks) — safe with undefined values via optional chaining.
+  const yearHistory = useMigratedYearHistory(
+    student?.data?.application_id,
+    student?.data?.migration_ref,
+    filter.year,
   );
 
   const studentUserId = student?.data?._id;
@@ -200,6 +231,16 @@ const EnrolledStudentDetails = () => {
     }
   };
 
+  const formatBillingMethod = (item) => {
+    if (item?.billing_method === "third_party" || item?.is_third_party) {
+      return t("studentManagement.billing.thirdParty", "Third Party");
+    }
+    if (item?.billing_method === "company") {
+      return t("studentManagement.billing.company", "Company");
+    }
+    return t("studentManagement.billing.personal", "Personal");
+  };
+
   const formatDocType = (docType) => {
     switch (docType) {
       case "invoice":
@@ -254,7 +295,8 @@ const EnrolledStudentDetails = () => {
       const html =
         item.doc_type === "invoice" ||
         item.doc_type === "credit_note" ||
-        item.doc_type === "refund"
+        item.doc_type === "refund" ||
+        item.doc_type === "receipt"
           ? await getInvoicePrintHtml(
               item.doc_type === "refund" ? item.invoice_id : item._id,
             )
@@ -403,16 +445,33 @@ const EnrolledStudentDetails = () => {
                       : "border-transparent text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:border-gray-200"
                   }`}
                 >
-                  {studentData?.duration_unit &&
-                  studentData.duration_unit !== "years"
-                    ? `${t("common.level", "Level")} ${y}`
-                    : `${t("common.year", "Year")} ${y}`}
+                  {`${getDurationUnitLabel(studentData?.duration_unit, t)} ${y}`}
                 </button>
               ))}
             </nav>
           </div>
 
           <div className="grid grid-cols-12 gap-6">
+            {yearHistory.isLoading ? (
+              <div className="col-span-12 py-10">
+                <LoadingState
+                  size="sm"
+                  text={t(
+                    "coachviewImport.loadingHistory",
+                    "Loading pre-migration history...",
+                  )}
+                />
+              </div>
+            ) : yearHistory.hasHistory ? (
+              <div className="col-span-12">
+                <PreMigrationHistory
+                  cvId={yearHistory.cvId}
+                  yearBucket={yearHistory.yearBucket}
+                  year={filter.year}
+                />
+              </div>
+            ) : (
+              <>
             <div className="col-span-12 lg:col-span-6">
               <h3 className="font-semibold mb-4">
                 {t("studentManagement.details.assignedModules", "Assigned Modules")}
@@ -585,6 +644,8 @@ const EnrolledStudentDetails = () => {
                 </div>
               </div>
             )}
+              </>
+            )}
 
             <div className="col-span-12">
                 <div className="mb-4 flex items-center justify-between">
@@ -685,12 +746,7 @@ const EnrolledStudentDetails = () => {
                           {Number(item.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {item.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(item)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={item.display_status} />
@@ -799,12 +855,7 @@ const EnrolledStudentDetails = () => {
                           {Number(payment.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {payment.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(payment)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={payment.display_status} />
@@ -912,12 +963,7 @@ const EnrolledStudentDetails = () => {
                           {Number(receipt.amount || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          {receipt.billing_method === "company"
-                            ? t("studentManagement.billing.company", "Company")
-                            : t(
-                                "studentManagement.billing.personal",
-                                "Personal",
-                              )}
+                          {formatBillingMethod(receipt)}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={receipt.display_status} />
@@ -928,15 +974,13 @@ const EnrolledStudentDetails = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {receipt.payment_id ? (
+                          {receipt._id ? (
                             <button
                               type="button"
                               onClick={() =>
                                 handleDownloadDocument({
                                   ...receipt,
-                                  _id: receipt.payment_id,
-                                  doc_type: "payment",
-                                  status: "paid",
+                                  doc_type: "receipt",
                                 })
                               }
                               className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors cursor-pointer"

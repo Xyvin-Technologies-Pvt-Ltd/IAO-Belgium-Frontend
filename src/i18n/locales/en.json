@@ -56,6 +56,7 @@
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
       "customInvoices": "Custom Invoices",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "integrations": "Integrations",
@@ -104,6 +105,8 @@
     "yes": "Yes",
     "no": "No",
     "none": "None",
+    "open": "Open",
+    "closed": "Closed",
     "active": "Active",
     "inactive": "Inactive",
     "deleted": "Deleted",
@@ -217,7 +220,12 @@
       "send": "Send",
       "sending": "Sending...",
       "cancel": "Cancel"
-    }
+    },
+    "na": "n/a",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "loadMore": "Load more"
   },
   "finance": {
     "title": "Finance Management",
@@ -249,7 +257,8 @@
       "admissionFee": "Admission Fee",
       "modulePurchase": "Module Purchase",
       "locationSwitch": "Location Switch",
-      "customInvoice": "Custom Invoice"
+      "customInvoice": "Custom Invoice",
+      "other": "Other"
     },
     "messages": {
       "noPaymentsFound": "No payments found",
@@ -299,7 +308,36 @@
       "kmo": {
         "title": "KMO-Portefeuille",
         "description": "Manage KMO-Portefeuille student applications"
+      },
+      "fkf": {
+        "title": "Fachkursförderung",
+        "description": "Create subsidized module invoices for eligible students"
       }
+    },
+    "fkf": {
+      "title": "Fachkursförderung",
+      "subtitle": "Eligible students, subsidized invoices, and postal eligibility config.",
+      "createTab": "Create Invoice",
+      "studentsTab": "Eligible Students",
+      "configTab": "Config",
+      "student": "Student",
+      "searchStudent": "Search student…",
+      "program": "Program",
+      "batch": "Batch",
+      "academicYear": "Academic year",
+      "postalCode": "Postal code",
+      "selectProgramFirst": "Select program first",
+      "module": "Module / Exam",
+      "selectModule": "Select module…",
+      "selectStudentFirst": "Select a student first",
+      "catalogFee": "Catalog fee",
+      "pendingHint": "A pending FKF payment already exists for this module.",
+      "subsidizedAmount": "Subsidized amount",
+      "createButton": "Create FKF Invoice",
+      "sendInvoice": "Send FKF Invoice",
+      "noEligibleStudents": "No eligible students found.",
+      "postalCodes": "Eligible postal codes (comma-separated)",
+      "programActive": "Program active (annual L-Bank selection)"
     }
   },
   "integrations": {
@@ -543,6 +581,7 @@
     "createLanguage": "Create Language",
     "table": {
       "name": "Name",
+      "emailCode": "Email code",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
@@ -557,7 +596,18 @@
       "createSubtitle": "Let's create a new language",
       "editSubtitle": "Update the language details",
       "nameLabel": "Language Name",
-      "namePlaceholder": "Enter language name"
+      "namePlaceholder": "Enter language name",
+      "nameRequired": "Language name is required",
+      "codeLabel": "Email language code",
+      "codePlaceholder": "Select email language",
+      "codeRequired": "Email language code is required",
+      "codeHelp": "Used for student emails. Must match the programme language templates (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — English",
+        "nl": "NL — Dutch",
+        "fr": "FR — French",
+        "de": "DE — German"
+      }
     }
   },
   "contractTypeManagement": {
@@ -898,6 +948,95 @@
       "markFailedReasonPlaceholder": "Enter reason for failing..."
     }
   },
+  "coachviewImport": {
+    "migrate": "Migrate from CoachView",
+    "resync": "Re-sync from CoachView",
+    "retitle": "Re-sync from CoachView",
+    "title": "Migrate from CoachView",
+    "description": "Pick the CoachView cohort this group corresponds to. Every student in that cohort will be enrolled here at the appropriate programme year.",
+    "selectCohort": "CoachView cohort",
+    "preview": "Preview",
+    "confirmMigrate": "Migrate",
+    "previewRequired": "Run a preview first.",
+    "year": "Year",
+    "students": "students",
+    "willImport": "Will import",
+    "alreadyMigrated": "Already migrated",
+    "emailConflict": "Email conflicts",
+    "noEmail": "No email",
+    "yearDiffers": "Year differs from CoachView",
+    "graduateWarning": "This cohort's year exceeds the program's duration — these students have graduated and will not be imported.",
+    "nothingToImport": "Nothing to import — this cohort has no importable students. Double-check you picked the right code.",
+    "imported": "Imported",
+    "skipped": "Skipped",
+    "cohortBadge": "CoachView",
+    "viewArchive": "View previous years in the CoachView Archive",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "coachview": "CoachView",
+      "year": "Year to assign",
+      "status": "Status"
+    },
+    "preMigrationHistory": "Pre-migration history (CoachView Archive)",
+    "loadingHistory": "Loading pre-migration history...",
+    "noHistoryForYear": "No CoachView history recorded for this year.",
+    "attendanceAllYears": "Showing this student's complete CoachView attendance history, not limited to this year.",
+    "invoicesAllYears": "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
+    "subTabs": {
+      "enrolments": "Enrolments",
+      "results": "Results",
+      "attendance": "Attendance",
+      "invoices": "Invoices"
+    },
+    "filters": {
+      "allLevels": "All levels",
+      "allStatuses": "All statuses",
+      "clear": "Clear filters",
+      "from": "From",
+      "to": "To",
+      "noEnrolments": "No enrolments match these filters.",
+      "noResults": "No results recorded for this year."
+    }
+  },
+  "addStudents": {
+    "button": "Add students",
+    "title": "Add students from CoachView",
+    "description": "For students who reached CoachView through a route the API doesn't expose as a cohort. Search for the person directly and add them to this group.",
+    "searchPlaceholder": "Search by name or email...",
+    "noResults": "No matches.",
+    "alreadyInGroup": "Already in this group",
+    "alreadyInLms": "Already in LMS",
+    "inactive": "Inactive in CoachView",
+    "selectedCount": "{{count}} selected",
+    "review": "Review selection",
+    "noFindings": "No issues",
+    "blockingWarning": "One or more selected students has a blocking issue. Go back and deselect them before continuing.",
+    "confirmAdd": "Add students",
+    "ackTitle": "Confirm before adding",
+    "ackDescription": "Review and acknowledge every finding, then confirm.",
+    "table": {
+      "placement": "Placement",
+      "findings": "Findings"
+    }
+  },
+  "removeStudent": {
+    "button": "Remove from group",
+    "title": "Remove student from group",
+    "description": "The student's account and history are kept — this only detaches them from this group.",
+    "studentLabel": "Student",
+    "noImpact": "No attendance, module progress or invoices are tied to this enrolment.",
+    "confirm": "Remove student",
+    "ackTitle": "Confirm removal",
+    "ackDescription": "Acknowledge what's tied to this enrolment, then confirm the removal."
+  },
+  "discrepancy": {
+    "nothingToAcknowledge": "Nothing to acknowledge — you're good to go.",
+    "mustDeselect": "— this student must be deselected.",
+    "reasonLabel": "Reason for this manual change",
+    "reasonPlaceholder": "Explain why this manual change is being made — recorded in the audit log.",
+    "blockingPresent": "One or more students have a blocking issue and cannot be confirmed. Go back and deselect them first."
+  },
   "studentImport": {
     "title": "Bulk Upload Students",
     "description": "Select the program and batch, then upload an Excel/CSV file. Students are created with full access and no registration fee. Run a preview before importing.",
@@ -922,6 +1061,11 @@
   "studentManagement": {
     "title": "Student Management",
     "search": "Search students...",
+    "exportCsv": "Export CSV",
+    "exporting": "Preparing CSV export...",
+    "exportEmpty": "No students to export.",
+    "exportSuccess": "Students exported successfully!",
+    "exportFailed": "Failed to export students.",
     "tabs": {
       "progress": "Academic Progress",
       "general": "Module Selection",
@@ -1013,6 +1157,7 @@
       "outstandingInvoices": "Outstanding invoices",
       "missedModules": "Missed modules (absent or unpurchased)",
       "unpurchasedModules": "Unpurchased modules only",
+      "fachkursfoerderung": "Eligible for Fachkursförderung",
       "inactiveIncludesNotStarted": "Inactive includes students who have not started an application.",
       "clearAll": "Clear All",
       "apply": "Apply Filters"
@@ -1075,7 +1220,8 @@
       "noAcademics": "No academic years found"
     },
     "messages": {
-      "loadFailed": "Failed to load academic years"
+      "loadFailed": "Failed to load academic years",
+      "loading": "Loading academic years..."
     },
     "modal": {
       "createTitle": "Create a new academic year",
@@ -1143,6 +1289,7 @@
       "qualificationStatus": "Qualification status",
       "stillCompletingQualification": "Still completing qualification",
       "qualificationNotDeferred": "Not deferred",
+      "completingQualificationCheckbox": "I'm still completing my qualification. I will submit my diploma later.",
       "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet."
     },
     "status": {
@@ -1161,7 +1308,8 @@
       "download": "Download",
       "flagDocument": "Flag document",
       "unflagDocument": "Unflag document",
-      "documentFlagged": "Document flagged"
+      "documentFlagged": "Document flagged",
+      "notUploadedYet": "Not uploaded yet"
     }
   },
   "contractManagement": {
@@ -1752,7 +1900,7 @@
     "freeComponentLabel": "Free Module",
     "freeComponentDescription": "Enable if this module does not require any additional payment",
     "linkedModuleLabel": "Linked Module",
-    "linkedModuleHint": "Exam scheduled before this module",
+    "linkedModuleHint": "Exam scheduled with this module",
     "linkedModulePlaceholder": "Select module",
     "noModulesFound": "No modules found",
     "linkedExamLabel": "Linked Exam",

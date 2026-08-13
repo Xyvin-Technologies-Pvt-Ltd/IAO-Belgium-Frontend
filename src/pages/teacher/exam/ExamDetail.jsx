@@ -31,7 +31,7 @@ import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
-import { getMoment, formatInstant } from "@/utils/dateUtils";
+import { getMoment, getNow, formatInstant } from "@/utils/dateUtils";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -122,12 +122,12 @@ const ExamDetail = () => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      const now = getMoment().startOf("day");
+      const today = getNow().format("YYYY-MM-DD");
       const sessionDate = getMoment(
         examData.data.first_session.session_date,
-      ).startOf("day");
+      ).format("YYYY-MM-DD");
       setCanStart(
-        now.isSame(sessionDate) &&
+        today === sessionDate &&
           examData.data.exam_session_status !== "started",
       );
     };
@@ -332,6 +332,9 @@ const ExamDetail = () => {
                 <TableHead className="text-center">Score</TableHead>
                 <TableHead className="text-center">Percentage</TableHead>
                 <TableHead className="text-center">Result</TableHead>
+                <TableHead className="text-center">
+                  {t("exam.detail.warnings", { defaultValue: "Warnings" })}
+                </TableHead>
                 <TableHead className="text-center px-6">Submitted At</TableHead>
               </TableRow>
             </TableHeader>
@@ -339,7 +342,7 @@ const ExamDetail = () => {
               {resultsLoading ? (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
                     {t("common.loading") || "Loading results..."}
@@ -372,6 +375,15 @@ const ExamDetail = () => {
                     <TableCell className="text-center">
                       <StatusBadge status={result.result} />
                     </TableCell>
+                    <TableCell className="text-center">
+                      {(result.integrity_violation_count || 0) > 0 ? (
+                        <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-orange-100 text-orange-700 text-sm font-semibold">
+                          {result.integrity_violation_count}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-center text-muted-foreground px-6 py-4">
                       {result.submitted_at ? formatInstant(result.submitted_at) : "—"}
                     </TableCell>
@@ -380,7 +392,7 @@ const ExamDetail = () => {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
                     {t("common.noResultsFound") ||

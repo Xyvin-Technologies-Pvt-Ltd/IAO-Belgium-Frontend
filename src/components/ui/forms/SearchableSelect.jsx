@@ -19,6 +19,9 @@ const SearchableSelect = ({
   value,
   onChange,
   onSearch,
+  onLoadMore,
+  hasMore = false,
+  isFetchingMore = false,
   error,
   required = false,
   className,
@@ -46,10 +49,18 @@ const SearchableSelect = ({
     }
   };
 
+  const handleScroll = (e) => {
+    if (!onLoadMore || !hasMore || isFetchingMore) return;
+    const el = e.currentTarget;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 48) {
+      onLoadMore();
+    }
+  };
+
   const showEmptyState = !isLoading && items.length === 0;
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("min-w-0 space-y-2", className)}>
       {label && (
         <Label
           className={
@@ -62,7 +73,6 @@ const SearchableSelect = ({
 
       <Select
         open={isOpen}
-        key={`${items.length}-${value}`}
         value={value || ""}
         onValueChange={onChange}
         onOpenChange={handleOpenChange}
@@ -70,13 +80,18 @@ const SearchableSelect = ({
       >
         <SelectTrigger
           className={cn(
+            "w-full min-w-0 overflow-hidden [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
             error && "border-destructive aria-invalid:ring-destructive/20",
           )}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
-        <SelectContent className="max-h-80" position="popper" sideOffset={4}>
+        <SelectContent
+          className="max-h-80 w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)]"
+          position="popper"
+          sideOffset={4}
+        >
           {/* Search Input */}
           <div className="p-2 border-b border-border sticky top-0 bg-popover z-10">
             <div className="relative">
@@ -86,7 +101,7 @@ const SearchableSelect = ({
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-sm bg-transparent border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full min-w-0 pl-8 pr-3 py-1.5 text-sm bg-transparent border border-input rounded focus:outline-none focus:ring-2 focus:ring-ring"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
@@ -110,17 +125,27 @@ const SearchableSelect = ({
 
           {/* Options */}
           {items.length > 0 && (
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-60 overflow-y-auto" onScroll={handleScroll}>
               {isLoading && (
                 <div className="p-2 text-sm text-muted-foreground text-center border-b border-border">
                   Loading...
                 </div>
               )}
               {items.map((item) => (
-                <SelectItem key={item._id} value={item._id}>
+                <SelectItem
+                  key={item._id}
+                  value={String(item._id)}
+                  className="whitespace-normal break-words py-2"
+                  title={typeof item.name === "string" ? item.name : undefined}
+                >
                   {renderItem ? renderItem(item) : item.name}
                 </SelectItem>
               ))}
+              {(hasMore || isFetchingMore) && (
+                <div className="p-2 text-xs text-muted-foreground text-center">
+                  {isFetchingMore ? "Loading more..." : "Scroll for more"}
+                </div>
+              )}
             </div>
           )}
         </SelectContent>

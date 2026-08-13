@@ -7,10 +7,13 @@ import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetBatchesById } from "@/store/useBatchStore";
-import { useParams } from "@tanstack/react-router";
-import { CalendarCheck, BookOpen, Users, BarChart3 } from "lucide-react";
+import { Link, useParams } from "@tanstack/react-router";
+import { CalendarCheck, BookOpen, Users, BarChart3, RefreshCw, Archive } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { useCanModify } from "@/hooks/useCanModify";
+import MigrateFromCoachViewDialog from "@/components/admin/batch/MigrateFromCoachViewDialog";
 
 const BatchDetails = () => {
   const { t } = useTranslation();
@@ -19,6 +22,8 @@ const BatchDetails = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
 
   const { data: batch, isLoading, error, refetch } = useGetBatchesById(id);
+  const canModify = useCanModify("operations");
+  const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState(false);
   const getInitialTab = () => {
     const savedTab = localStorage.getItem(`batchDetailsTab_${id}`);
     return savedTab || t("batchManagement.details.tabs.overview");
@@ -100,6 +105,12 @@ const BatchDetails = () => {
                 {t("batchManagement.details.badges.batchId")}:{" "}
                 {batchData.uid || batchData._id}
               </span>
+
+              {batchData.coachview_cohort?.code && (
+                <span className="text-xs px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  {t("coachviewImport.cohortBadge", "CoachView")}: {batchData.coachview_cohort.code}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2 text-sm">
@@ -108,7 +119,37 @@ const BatchDetails = () => {
                 {batchData.program_name}
               </span>
             </div>
+
+            <Link
+              to={
+                batchData.coachview_cohort?.opleiding_id
+                  ? "/admin/archive/cohorts/$id"
+                  : "/admin/archive/cohorts"
+              }
+              params={
+                batchData.coachview_cohort?.opleiding_id
+                  ? { id: batchData.coachview_cohort.opleiding_id }
+                  : undefined
+              }
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <Archive className="h-3.5 w-3.5" />
+              {t("coachviewImport.viewArchive", "View previous years in the CoachView Archive")}
+            </Link>
           </div>
+
+          {canModify && (
+            <Button
+              variant="outline"
+              onClick={() => setIsMigrateDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {batchData.coachview_cohort?.code
+                ? t("coachviewImport.resync", "Re-sync from CoachView")
+                : t("coachviewImport.migrate", "Migrate from CoachView")}
+            </Button>
+          )}
         </div>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -189,6 +230,12 @@ const BatchDetails = () => {
         {activeTab==="Results" && <BatchResult />}
         {activeTab==="Year" && <BatchYearLog />}
       </div>
+
+      <MigrateFromCoachViewDialog
+        open={isMigrateDialogOpen}
+        batch={batchData}
+        onClose={() => setIsMigrateDialogOpen(false)}
+      />
     </div>
   );
 };

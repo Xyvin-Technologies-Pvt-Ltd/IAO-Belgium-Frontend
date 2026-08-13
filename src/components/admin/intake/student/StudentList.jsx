@@ -7,6 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -20,6 +27,8 @@ import { formatTZ } from "@/utils/dateUtils";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import MoveStudentDialog from "./MoveStudentDialog";
 import ReEnrollStudentDialog from "./ReEnrollStudentDialog";
+import PauseStopEnrollmentDialog from "@/components/admin/batch/PauseStopEnrollmentDialog";
+import ResumeEnrollmentDialog from "@/components/admin/batch/ResumeEnrollmentDialog";
 
 const StudentList = () => {
   const params = useParams({ strict: false });
@@ -29,19 +38,23 @@ const StudentList = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [reEnrollDialogOpen, setReEnrollDialogOpen] = useState(false);
+  const [holdDialog, setHoldDialog] = useState({ open: false, mode: "pause", student: null });
+  const [resumeDialogOpen, setResumeDialogOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, statusFilter]);
 
   const { data, isLoading, error, refetch, isFetching } =
     useGetEnrolledStudentsByIntake(id, {
       page: page,
       limit: rowsPerPage,
+      year_status: statusFilter,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
     });
 
@@ -64,15 +77,42 @@ const StudentList = () => {
     setSelectedStudent(student);
     setReEnrollDialogOpen(true);
   };
+
+  const handleResumeStudent = (student) => {
+    setSelectedStudent(student);
+    setResumeDialogOpen(true);
+  };
+
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           placeholder={t("studentManagement.search")}
           className="max-w-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue
+              placeholder={t("enrollmentHold.statusFilter", "Status")}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">
+              {t("enrollmentHold.filterAll", "All")}
+            </SelectItem>
+            <SelectItem value="active">
+              {t("enrollmentHold.filterActive", "Active (in group)")}
+            </SelectItem>
+            <SelectItem value="paused">
+              {t("enrollmentHold.filterPaused", "Paused")}
+            </SelectItem>
+            <SelectItem value="stopped">
+              {t("enrollmentHold.filterStopped", "Stopped")}
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Table>
@@ -116,7 +156,7 @@ const StudentList = () => {
                   {i?.last_name} {i?.first_name}
                 </TableCell>
                 <TableCell>{i?.email}</TableCell>
-                <TableCell>{i?.batch_name}</TableCell>
+                <TableCell>{i?.batch_name || "—"}</TableCell>
                 <TableCell>
                   {formatTZ(i?.enrolled_date, "DD-MM-YYYY") || t("common.notAvailable")}
                 </TableCell>
@@ -126,7 +166,7 @@ const StudentList = () => {
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
-                      ...(i.year_status !== "failed"
+                      ...(i.year_status === "active"
                         ? [
                             {
                               label: t("batchManagement.actions.moveToAnotherBatch"),
@@ -135,17 +175,60 @@ const StudentList = () => {
                                 handleMoveStudent(i);
                               },
                             },
+                            {
+                              label: t("enrollmentHold.confirmPause", "Pause"),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                setHoldDialog({ open: true, mode: "pause", student: i });
+                              },
+                            },
+                            {
+                              label: t("enrollmentHold.confirmStop", "Stop"),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                setHoldDialog({ open: true, mode: "stop", student: i });
+                              },
+                            },
                           ]
                         : []),
                       ...(i.year_status === "failed"
                         ? [
                             {
-                              label: t("batchManagement.actions.reEnrollStudent", "Re-enroll for Failed Year"),
+                              label: t(
+                                "batchManagement.actions.reEnrollStudent",
+                                "Re-enroll for Failed Year",
+                              ),
                               onClick: (e) => {
                                 e.stopPropagation();
                                 handleReEnrollStudent(i);
                               },
                             },
+                          ]
+                        : []),
+                      ...(i.year_status === "paused" || i.year_status === "stopped"
+                        ? [
+                            {
+                              label: t("enrollmentHold.confirmResume", "Resume"),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                handleResumeStudent(i);
+                              },
+                            },
+                            ...(i.year_status === "paused"
+                              ? [
+                                  {
+                                    label: t("enrollmentHold.confirmStop", "Stop"),
+                                    onClick: (e) => {
+                                      e.stopPropagation();
+                                      setHoldDialog({
+                                        open: true,
+                                        mode: "stop",
+                                        student: i,
+                                      });
+                                    },
+                                  },
+                                ]
+                              : []),
                           ]
                         : []),
                     ]}
@@ -174,13 +257,27 @@ const StudentList = () => {
         open={moveDialogOpen}
         onOpenChange={setMoveDialogOpen}
         student={selectedStudent}
-        intakeId={id}
       />
 
       <ReEnrollStudentDialog
         open={reEnrollDialogOpen}
         onOpenChange={setReEnrollDialogOpen}
         student={selectedStudent}
+      />
+
+      <PauseStopEnrollmentDialog
+        open={holdDialog.open}
+        mode={holdDialog.mode}
+        application={holdDialog.student}
+        batchId={holdDialog.student?.batch_id}
+        onClose={() => setHoldDialog({ open: false, mode: "pause", student: null })}
+      />
+
+      <ResumeEnrollmentDialog
+        open={resumeDialogOpen}
+        onOpenChange={setResumeDialogOpen}
+        student={selectedStudent}
+        batchId={selectedStudent?.batch_id || selectedStudent?.previous_batch}
       />
     </div>
   );

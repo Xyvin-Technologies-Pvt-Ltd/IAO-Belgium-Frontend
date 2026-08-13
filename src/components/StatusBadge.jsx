@@ -24,6 +24,9 @@ const statusVariants = {
   closed: "text-red-500",
   open: "text-green-600",
   re_enrolled: "text-blue-600",
+  paused: "text-amber-600",
+  stopped: "text-red-600",
+  removed: "text-gray-500",
 
   // Bloom levels (Difficulty)
   remember: "text-green-600",
@@ -60,6 +63,10 @@ const statusVariants = {
   issued: "text-blue-600 dark:text-blue-400",
   canceled: "text-red-600 dark:text-red-400",
   cancelled: "text-red-600 dark:text-red-400",
+  used_via_kmo: "text-green-600 dark:text-green-400",
+  "used via kmo": "text-green-600 dark:text-green-400",
+  used_via_location_switch: "text-green-600 dark:text-green-400",
+  "used via location switch": "text-green-600 dark:text-green-400",
 
   // Module availability
   locked: "text-gray-500",
@@ -132,12 +139,22 @@ const StatusBadge = ({ status }) => {
     displayText = "Course Completed";
   } else if (status === "re_enrolled") {
     displayText = "Re-enrolled";
+  } else if (status === "paused") {
+    displayText = "Paused";
+  } else if (status === "stopped") {
+    displayText = "Stopped";
+  } else if (status === "removed") {
+    displayText = "Removed";
   } else if (status === "in-progress") {
     displayText = "In Progress";
   } else if (status === "not submitted") {
     displayText = "Not Submitted";
   } else if (status === "overdue") {
     displayText = "Overdue";
+  } else if (status === "used_via_kmo") {
+    displayText = "Used via KMO";
+  } else if (status === "used_via_location_switch") {
+    displayText = "Used via location switch";
   } else {
     displayText = status;
   }

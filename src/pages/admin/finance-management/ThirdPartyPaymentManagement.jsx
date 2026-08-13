@@ -15,6 +15,8 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
 import { useGetThirdPartyApplications, useAdminCancelThirdParty } from "@/store/usePaymentStore";
+import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Ban, Eye, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -36,14 +38,67 @@ const ThirdPartyPaymentManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [purposeFilter, setPurposeFilter] = useState("all");
+  const [programFilter, setProgramFilter] = useState("all");
+  const [batchFilter, setBatchFilter] = useState("all");
+  const [programSearchTerm, setProgramSearchTerm] = useState("");
+  const [batchSearchTerm, setBatchSearchTerm] = useState("");
 
   const debouncedSearch = useDebounce(search, 500);
+  const selectedProgramId = programFilter !== "all" ? programFilter : null;
+
+  const hasActiveFilters =
+    !!debouncedSearch ||
+    statusFilter !== "all" ||
+    purposeFilter !== "all" ||
+    programFilter !== "all" ||
+    batchFilter !== "all";
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setStatusFilter("all");
+    setPurposeFilter("all");
+    setProgramFilter("all");
+    setBatchFilter("all");
+    setProgramSearchTerm("");
+    setBatchSearchTerm("");
+    setPage(1);
+  };
+
+  const { data: programsData, isLoading: programsLoading } = useGetAllPrograms({
+    ...(programSearchTerm && { search: programSearchTerm }),
+  });
+
+  const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
+    selectedProgramId,
+    {
+      include_closed: true,
+      ...(batchSearchTerm && { search: batchSearchTerm }),
+    },
+    { enabled: !!selectedProgramId }
+  );
+
+  const programItems = [
+    { _id: "all", name: t("All Programs") },
+    ...(programsData?.data?.map((p) => ({
+      ...p,
+      name: `${p.name} - ${p.language?.name || ""} - ${p.city?.name || ""}`,
+    })) || []),
+  ];
+
+  const batchItems = [
+    { _id: "all", name: t("All Batches") },
+    ...(batchesData?.data || []),
+  ];
 
   // Queries
   const { data, isLoading, error, refetch, isFetching } = useGetThirdPartyApplications({
     page,
     limit: rowsPerPage,
     ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(purposeFilter !== "all" ? { purpose: purposeFilter } : {}),
+    ...(programFilter !== "all" ? { program: programFilter } : {}),
+    ...(batchFilter !== "all" ? { batch: batchFilter } : {}),
     ...(debouncedSearch ? { student_id: debouncedSearch } : {}),
   });
 
@@ -62,7 +117,41 @@ const ThirdPartyPaymentManagement = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, purposeFilter, programFilter, batchFilter]);
+
+  const formatPurpose = (purpose) => {
+    switch (purpose) {
+      case "admission-fee":
+        return t("Admission Fee");
+      case "location-switch":
+        return t("Location Switch");
+      case "module-purchase":
+        return t("Module Purchase");
+      default:
+        return purpose || t("Module Purchase");
+    }
+  };
+
+  const getSubjectLabel = (app) => {
+    if (app.purpose === "admission-fee") {
+      return {
+        title: app.program_name || t("Admission Fee"),
+        subtitle: app.application_id?.uid
+          ? `App ${app.application_id.uid}`
+          : t("Enrollment"),
+      };
+    }
+    if (app.purpose === "location-switch") {
+      return {
+        title: app.module_id?.name || t("Location Switch"),
+        subtitle: app.module_id?.code || t("Location switch"),
+      };
+    }
+    return {
+      title: app.module_id?.name || "-",
+      subtitle: app.module_id?.code || "-",
+    };
+  };
 
   const handleOpenDetails = (app) => {
     setSelectedApp(app);
@@ -97,7 +186,7 @@ const ThirdPartyPaymentManagement = () => {
 
       {/* Filters bar */}
       <div className="bg-sidebar rounded-xl border border-sidebar-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-1 items-center gap-3">
+        <div className="flex flex-1 flex-wrap items-center gap-3">
           <Input
             placeholder={t("Search by student ID...")}
             value={search}
@@ -118,6 +207,61 @@ const ThirdPartyPaymentManagement = () => {
               <SelectItem value="conflicts">Conflicts</SelectItem>
             </SelectContent>
           </Select>
+
+          <Select value={purposeFilter} onValueChange={setPurposeFilter}>
+            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
+              <SelectValue placeholder="All Purposes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Purposes</SelectItem>
+              <SelectItem value="admission-fee">Admission Fee</SelectItem>
+              <SelectItem value="module-purchase">Module Purchase</SelectItem>
+              <SelectItem value="location-switch">Location Switch</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div className="w-[260px]">
+            <SearchableSelect
+              placeholder={t("All Programs")}
+              searchPlaceholder={t("Search programs...")}
+              items={programItems}
+              value={programFilter === "all" ? "all" : programFilter}
+              onChange={(val) => {
+                setProgramFilter(val || "all");
+                setBatchFilter("all");
+              }}
+              onSearch={setProgramSearchTerm}
+              isLoading={programsLoading}
+            />
+          </div>
+
+          <div className="w-[220px]">
+            <SearchableSelect
+              placeholder={
+                selectedProgramId
+                  ? t("All Batches")
+                  : t("Select a Program First")
+              }
+              searchPlaceholder={t("Search batches...")}
+              items={batchItems}
+              value={batchFilter === "all" ? "all" : batchFilter}
+              onChange={(val) => setBatchFilter(val || "all")}
+              onSearch={setBatchSearchTerm}
+              isLoading={batchesLoading}
+              disabled={!selectedProgramId}
+            />
+          </div>
+
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 rounded-[6px] shrink-0"
+              onClick={handleClearFilters}
+            >
+              {t("Clear Filters")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -134,108 +278,138 @@ const ThirdPartyPaymentManagement = () => {
         </div>
       )}
 
-      {error ? (
-        <ErrorMessage message={error?.message || t("Failed to load applications")} />
-      ) : isLoading ? (
-        <TableSkeleton rows={rowsPerPage} columns={7} />
-      ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("Student")}</TableHead>
-                <TableHead>{t("Learning Module")}</TableHead>
-                <TableHead>{t("Invoice")}</TableHead>
-                <TableHead>{t("Amount")}</TableHead>
-                <TableHead>{t("Status")}</TableHead>
-                <TableHead>{t("Created")}</TableHead>
-                <TableHead className="text-right">{t("Actions")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
-              {applications.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
-                    {t("No applications found.")}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                applications.map((app) => (
-                  <TableRow 
-                    key={app._id} 
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => handleOpenDetails(app)}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t("Student")}</TableHead>
+            <TableHead>{t("Program")}</TableHead>
+            <TableHead>{t("Batch")}</TableHead>
+            <TableHead>{t("Purpose")}</TableHead>
+            <TableHead>{t("Subject")}</TableHead>
+            <TableHead>{t("Invoice")}</TableHead>
+            <TableHead>{t("Amount")}</TableHead>
+            <TableHead>{t("Status")}</TableHead>
+            <TableHead>{t("Created")}</TableHead>
+            <TableHead className="text-right">{t("Actions")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody
+          className={isFetching ? "opacity-50 pointer-events-none" : ""}
+        >
+          {isLoading ? (
+            <TableSkeleton rows={rowsPerPage} columns={10} />
+          ) : error ? (
+            <TableRow>
+              <TableCell colSpan={10} className="text-center p-8">
+                <ErrorMessage
+                  message={error?.message || t("Failed to load applications")}
+                  onRetry={refetch}
+                  variant="inline"
+                />
+              </TableCell>
+            </TableRow>
+          ) : applications.length > 0 ? (
+            applications.map((app) => {
+              const subject = getSubjectLabel(app);
+              return (
+              <TableRow
+                key={app._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleOpenDetails(app)}
+              >
+                <TableCell>
+                  <div className="font-bold text-gray-900 dark:text-gray-100">
+                    {app.student_id?.first_name} {app.student_id?.last_name}
+                  </div>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                    {app.program_name || "-"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className="text-xs text-gray-700 dark:text-gray-300 block max-w-[160px] truncate"
+                    title={app.batch_name || ""}
                   >
-                    <TableCell>
-                      <div className="font-bold text-gray-900 dark:text-gray-100">
-                        {app.student_id?.first_name} {app.student_id?.last_name}
-                      </div>
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.student_id?.email}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-gray-900 dark:text-gray-100">{app.module_id?.name || "-"}</div>
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{app.module_id?.code || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
-                        {app.invoice_id?.uid || t("Draft")}
+                    {app.batch_name || "-"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                    {formatPurpose(app.purpose)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">{subject.title}</div>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-mono block mt-0.5">{subject.subtitle}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
+                    {app.invoice_id?.uid || t("Draft")}
+                  </span>
+                </TableCell>
+                <TableCell className="font-bold text-gray-900 dark:text-gray-100">
+                  &euro; {Number(app.invoice_id?.total_amount || 0).toFixed(2)}
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <div className="flex flex-col gap-1 items-start">
+                    <StatusBadge status={app.status} />
+                    {app.conflict_flags?.includes("PAYMENT_RECEIVED_AFTER_CANCELLATION") && (
+                      <span className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border border-red-100 dark:border-red-900/50 flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-3 w-3 shrink-0" />
+                        {t("Late Paid Conflict")}
                       </span>
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-900 dark:text-gray-100">
-                      &euro; {Number(app.invoice_id?.total_amount || 0).toFixed(2)}
-                    </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex flex-col gap-1 items-start">
-                        <StatusBadge status={app.status} />
-                        {app.conflict_flags?.includes("PAYMENT_RECEIVED_AFTER_CANCELLATION") && (
-                          <span className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[9px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border border-red-100 dark:border-red-900/50 flex items-center gap-1 mt-1">
-                            <AlertTriangle className="h-3 w-3 shrink-0" />
-                            {t("Late Paid Conflict")}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-gray-500 dark:text-gray-400">
-                      {moment(app.createdAt).format("DD/MM/YYYY HH:mm")}
-                    </TableCell>
-                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                          onClick={() => handleOpenDetails(app)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {canModify && app.status === "invoice_issued" && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
-                            onClick={() => handleCancelClick(app)}
-                            disabled={cancelMutation.isPending}
-                          >
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-xs text-gray-500 dark:text-gray-400">
+                  {moment(app.createdAt).format("DD/MM/YYYY HH:mm")}
+                </TableCell>
+                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      onClick={() => handleOpenDetails(app)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {canModify && app.status === "invoice_issued" && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                        onClick={() => handleCancelClick(app)}
+                        disabled={cancelMutation.isPending}
+                      >
+                        <Ban className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan={10} className="text-center py-10 text-gray-500 dark:text-gray-400 font-medium">
+                {t("No applications found.")}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
-          <Pagination
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            totalRows={totalRows}
-          />
-        </>
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={totalRows}
+      />
 
       {/* Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
@@ -247,35 +421,84 @@ const ThirdPartyPaymentManagement = () => {
           {selectedApp && (
             <div className="space-y-4 mt-4 text-sm text-gray-900 dark:text-white">
               <div className="bg-gray-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Student")}</span>
-                  <span className="font-bold">
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Student")}</span>
+                  <span className="font-bold text-right">
                     {selectedApp.student_id?.first_name} {selectedApp.student_id?.last_name}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Module")}</span>
-                  <span className="font-bold">{selectedApp.module_id?.name}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Purpose")}</span>
+                  <span className="font-bold text-right">{formatPurpose(selectedApp.purpose)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Status")}</span>
-                  <span className="font-bold uppercase">{selectedApp.status.replace("_", " ")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Invoice Reference")}</span>
-                  <span className="font-mono font-bold">{selectedApp.invoice_id?.uid || "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium">{t("Exact Sales Entry")}</span>
-                  <span className="font-mono text-xs">
-                    {selectedApp.invoice_id?.meta?.exact?.entry_id ? (
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t("Pushed")}</span>
-                    ) : (
-                      <span className="text-gray-400">{t("Pending")}</span>
-                    )}
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Program")}</span>
+                  <span className="font-bold text-right">
+                    {selectedApp.program_name || "-"}
                   </span>
                 </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Batch")}</span>
+                  <span className="font-bold text-right break-words max-w-[60%]">
+                    {selectedApp.batch_name || "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">
+                    {selectedApp.purpose === "admission-fee" ? t("Enrollment") : t("Module")}
+                  </span>
+                  <span className="font-bold text-right">
+                    {selectedApp.purpose === "admission-fee"
+                      ? selectedApp.application_id?.uid || "-"
+                      : selectedApp.module_id?.name || "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Status")}</span>
+                  <span className="font-bold uppercase text-right">{selectedApp.status.replace("_", " ")}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Invoice Reference")}</span>
+                  <span className="font-mono font-bold text-right">{selectedApp.invoice_id?.uid || "-"}</span>
+                </div>
               </div>
+
+              {(selectedApp.payment_id?.company?.company_name ||
+                selectedApp.payment_id?.company?.address_line_1) && (
+                <div className="bg-gray-50 dark:bg-zinc-800/40 p-4 rounded-xl border border-gray-200 dark:border-zinc-700 space-y-3">
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider block">
+                    {t("Bill to (third party)", "Bill to (third party)")}
+                  </span>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Name", "Name")}</span>
+                    <span className="font-bold text-right">
+                      {selectedApp.payment_id?.company?.company_name || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Address", "Address")}</span>
+                    <span className="font-bold text-right break-words max-w-[60%]">
+                      {selectedApp.payment_id?.company?.address_line_1 || "-"}
+                    </span>
+                  </div>
+                  {selectedApp.payment_id?.company?.vat_number && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("VAT number", "VAT number")}</span>
+                      <span className="font-bold text-right">
+                        {selectedApp.payment_id.company.vat_number}
+                      </span>
+                    </div>
+                  )}
+                  {selectedApp.payment_id?.company?.contact_person && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Contact person", "Contact person")}</span>
+                      <span className="font-bold text-right">
+                        {selectedApp.payment_id.company.contact_person}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {selectedApp.mollie_payment_link_url && (
                 <div className="space-y-1">

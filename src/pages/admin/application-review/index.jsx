@@ -70,11 +70,11 @@ const ApplicationReview = () => {
   });
 
   // Fetch languages dropdown list
-  const { data: languagesData } = useGetAllLanguages({ limit: 1000 });
+  const { data: languagesData } = useGetAllLanguages();
   const languagesList = languagesData?.data || [];
 
   // Fetch programs dropdown list
-  const { data: programsData } = useGetAllPrograms({ limit: 1000 });
+  const { data: programsData } = useGetAllPrograms();
   const programsList = programsData?.data || [];
 
   // Save filters and sorting in session storage

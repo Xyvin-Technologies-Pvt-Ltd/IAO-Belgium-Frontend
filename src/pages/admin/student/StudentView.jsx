@@ -1,4 +1,6 @@
 import UserCard from "@/components/admin/UserCard";
+import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useGetStudentById, useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
@@ -32,6 +34,28 @@ const formatSubmissionType = (type) =>
         .join(" ")
     : "-";
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  if (!durationUnit) return t("common.year", "Year");
+  const unit = durationUnit.toLowerCase();
+  if (unit.startsWith("year")) {
+    const trans = t("common.durationUnits.year", "Year");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("month")) {
+    const trans = t("common.durationUnits.month", "Month");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("week")) {
+    const trans = t("common.durationUnits.week", "Week");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  if (unit.startsWith("day")) {
+    const trans = t("common.durationUnits.day", "Day");
+    return trans.charAt(0).toUpperCase() + trans.slice(1);
+  }
+  return t("common.year", "Year");
+};
+
 const StudentView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
@@ -54,6 +78,13 @@ const StudentView = () => {
     error,
     refetch,
   } = useGetStudentById(id, filter);
+  //* Must run before the isLoading/error early returns below (Rules of
+  //* Hooks) — safe with undefined values via optional chaining.
+  const yearHistory = useMigratedYearHistory(
+    student?.data?.application_id,
+    student?.data?.migration_ref,
+    filter.year,
+  );
 
   useEffect(() => {
     if (student?.data) {
@@ -126,15 +157,33 @@ const StudentView = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              {studentData?.duration_unit && studentData.duration_unit !== "years"
-                ? `${t("common.level", "Level")} ${y}`
-                : `${t("common.year", "Year")} ${y}`}
+              {`${getDurationUnitLabel(studentData?.duration_unit, t)} ${y}`}
             </button>
           ))}
         </nav>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
+        {yearHistory.isLoading ? (
+          <div className="col-span-12 py-10">
+            <LoadingState
+              size="sm"
+              text={t(
+                "coachviewImport.loadingHistory",
+                "Loading pre-migration history...",
+              )}
+            />
+          </div>
+        ) : yearHistory.hasHistory ? (
+          <div className="col-span-12">
+            <PreMigrationHistory
+              cvId={yearHistory.cvId}
+              yearBucket={yearHistory.yearBucket}
+              year={filter.year}
+            />
+          </div>
+        ) : (
+        <>
         <div className="col-span-12 lg:col-span-6">
           <h3 className="font-semibold mb-4">Completed Modules</h3>
           <Table>
@@ -240,8 +289,12 @@ const StudentView = () => {
             </TableBody>
           </Table>
         </div>
+
+        </>
+        )}
+
         <div className="col-span-12 lg:col-span-4">
-          {!studentData?.is_online && (
+          {!yearHistory.isLoading && !yearHistory.hasHistory && !studentData?.is_online && (
             <>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold">Attendance</h3>

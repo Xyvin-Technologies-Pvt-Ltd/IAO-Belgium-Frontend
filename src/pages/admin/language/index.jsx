@@ -105,16 +105,17 @@ const Language = () => {
         <TableHeader>
           <TableRow>
             <TableHead>{t("languageManagement.table.name")}</TableHead>
+            <TableHead>{t("languageManagement.table.emailCode")}</TableHead>
             <TableHead>{t("languageManagement.table.status")}</TableHead>
             <TableHead>{t("languageManagement.table.action")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={3} />
+            <TableSkeleton rows={rowsPerPage} columns={4} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center p-8">
+              <TableCell colSpan={4} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -129,6 +130,9 @@ const Language = () => {
             languages?.map((i) => (
               <TableRow key={i._id}>
                 <TableCell>{i?.name}</TableCell>
+                <TableCell className="uppercase text-muted-foreground">
+                  {i?.code || "—"}
+                </TableCell>
                 <TableCell>
                   <Switch
                     checked={i?.status}
@@ -161,7 +165,7 @@ const Language = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={3} className="text-center">
+              <TableCell colSpan={4} className="text-center">
                 {t("languageManagement.table.noLanguages")}
               </TableCell>
             </TableRow>

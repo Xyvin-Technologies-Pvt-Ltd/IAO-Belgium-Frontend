@@ -56,6 +56,7 @@
       "studentManagement": "Studentenbeheer",
       "financeReports": "Financiële rapporten",
       "customInvoices": "Aangepaste facturen",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Beheerdersbeheer",
       "roleManagement": "Rolbeheer",
       "integrations": "Integraties",
@@ -104,6 +105,8 @@
     "yes": "Ja",
     "no": "Nee",
     "none": "Geen",
+    "open": "Open",
+    "closed": "Gesloten",
     "active": "Actief",
     "inactive": "Inactief",
     "deleted": "Verwijderd",
@@ -249,7 +252,8 @@
       "admissionFee": "Inschrijvingsgeld",
       "modulePurchase": "Module-aankoop",
       "locationSwitch": "Locatiewissel",
-      "customInvoice": "Aangepaste factuur"
+      "customInvoice": "Aangepaste factuur",
+      "other": "Overig"
     },
     "messages": {
       "noPaymentsFound": "Geen betalingen gevonden",
@@ -471,6 +475,7 @@
     "createLanguage": "Taal aanmaken",
     "table": {
       "name": "Naam",
+      "emailCode": "E-mailcode",
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
@@ -485,7 +490,18 @@
       "createSubtitle": "Maak een nieuwe taal aan",
       "editSubtitle": "Taalgegevens bijwerken",
       "nameLabel": "Taalnaam",
-      "namePlaceholder": "Taalnaam invoeren"
+      "namePlaceholder": "Taalnaam invoeren",
+      "nameRequired": "Taalnaam is verplicht",
+      "codeLabel": "E-mailtaalcode",
+      "codePlaceholder": "Selecteer e-mailtaal",
+      "codeRequired": "E-mailtaalcode is verplicht",
+      "codeHelp": "Gebruikt voor studentene-mails. Moet overeenkomen met de programmataalsjablonen (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Engels",
+        "nl": "NL — Nederlands",
+        "fr": "FR — Frans",
+        "de": "DE — Duits"
+      }
     }
   },
   "contractTypeManagement": {
@@ -919,6 +935,7 @@
       "outstandingInvoices": "Openstaande facturen",
       "missedModules": "Gemiste modules (afwezig of niet gekocht)",
       "unpurchasedModules": "Alleen niet gekochte modules",
+      "fachkursfoerderung": "In aanmerking voor Fachkursförderung",
       "inactiveIncludesNotStarted": "Inactief omvat studenten die nog geen aanvraag zijn gestart.",
       "clearAll": "Alles wissen",
       "apply": "Filters toepassen"
@@ -981,7 +998,8 @@
       "noAcademics": "Geen academische jaren gevonden"
     },
     "messages": {
-      "loadFailed": "Laden van academische jaren mislukt"
+      "loadFailed": "Laden van academische jaren mislukt",
+      "loading": "Academische jaren laden..."
     },
     "modal": {
       "createTitle": "Nieuw academisch jaar aanmaken",
@@ -1049,6 +1067,7 @@
       "qualificationStatus": "Status kwalificatie",
       "stillCompletingQualification": "Nog bezig met afronden kwalificatie",
       "qualificationNotDeferred": "Niet uitgesteld",
+      "completingQualificationCheckbox": "Ik ben nog bezig met mijn kwalificatie. Ik zal mijn diploma later indienen.",
       "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload."
     },
     "status": {
@@ -1067,7 +1086,8 @@
       "download": "Downloaden",
       "flagDocument": "Document markeren",
       "unflagDocument": "Markering verwijderen",
-      "documentFlagged": "Document gemarkeerd"
+      "documentFlagged": "Document gemarkeerd",
+      "notUploadedYet": "Nog niet geüpload"
     }
   },
   "contractManagement": {
@@ -1640,7 +1660,7 @@
     "freeComponentLabel": "Gratis module",
     "freeComponentDescription": "Activeer als voor deze module geen aanvullende betaling vereist is",
     "linkedModuleLabel": "Gekoppelde module",
-    "linkedModuleHint": "Examen gepland vóór deze module",
+    "linkedModuleHint": "Examen gepland met deze module",
     "linkedModulePlaceholder": "Module selecteren",
     "noModulesFound": "Geen modules gevonden",
     "linkedExamLabel": "Gekoppeld examen",

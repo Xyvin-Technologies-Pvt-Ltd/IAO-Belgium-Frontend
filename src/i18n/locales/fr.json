@@ -56,6 +56,7 @@
       "studentManagement": "Gestion des étudiants",
       "financeReports": "Rapports financiers",
       "customInvoices": "Factures personnalisées",
+      "fkf": "Fachkursförderung",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
       "integrations": "Intégrations",
@@ -103,6 +104,8 @@
     "yes": "Oui",
     "no": "Non",
     "none": "Aucun",
+    "open": "Ouvert",
+    "closed": "Fermé",
     "active": "Actif",
     "inactive": "Inactif",
     "deleted": "Supprimé",
@@ -248,7 +251,8 @@
       "admissionFee": "Frais d'inscription",
       "modulePurchase": "Achat de module",
       "locationSwitch": "Changement de lieu",
-      "customInvoice": "Facture personnalisée"
+      "customInvoice": "Facture personnalisée",
+      "other": "Autre"
     },
     "messages": {
       "noPaymentsFound": "Aucun paiement trouvé",
@@ -470,6 +474,7 @@
     "createLanguage": "Créer une langue",
     "table": {
       "name": "Nom",
+      "emailCode": "Code e-mail",
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
@@ -484,7 +489,18 @@
       "createSubtitle": "Créer une nouvelle langue",
       "editSubtitle": "Mettre à jour les données de la langue",
       "nameLabel": "Nom de la langue",
-      "namePlaceholder": "Saisir le nom de la langue"
+      "namePlaceholder": "Saisir le nom de la langue",
+      "nameRequired": "Le nom de la langue est obligatoire",
+      "codeLabel": "Code langue e-mail",
+      "codePlaceholder": "Sélectionner la langue e-mail",
+      "codeRequired": "Le code langue e-mail est obligatoire",
+      "codeHelp": "Utilisé pour les e-mails étudiants. Doit correspondre aux modèles de langue du programme (EN/NL/FR/DE).",
+      "codeOptions": {
+        "en": "EN — Anglais",
+        "nl": "NL — Néerlandais",
+        "fr": "FR — Français",
+        "de": "DE — Allemand"
+      }
     }
   },
   "contractTypeManagement": {
@@ -907,6 +923,7 @@
       "outstandingInvoices": "Factures impayées",
       "missedModules": "Modules manqués (absent ou non acheté)",
       "unpurchasedModules": "Modules non achetés uniquement",
+      "fachkursfoerderung": "Éligible à la Fachkursförderung",
       "inactiveIncludesNotStarted": "Inactif inclut les étudiants qui n'ont pas encore commencé de candidature.",
       "clearAll": "Tout effacer",
       "apply": "Appliquer les filtres"
@@ -969,7 +986,8 @@
       "noAcademics": "Aucune année académique trouvée"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des années académiques"
+      "loadFailed": "Échec du chargement des années académiques",
+      "loading": "Chargement des années académiques..."
     },
     "modal": {
       "createTitle": "Créer une nouvelle année académique",
@@ -1037,6 +1055,7 @@
       "qualificationStatus": "Statut de qualification",
       "stillCompletingQualification": "En cours de finalisation de la qualification",
       "qualificationNotDeferred": "Non différé",
+      "completingQualificationCheckbox": "Je suis encore en train de finaliser ma qualification. Je soumettrai mon diplôme ultérieurement.",
       "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
     },
     "status": {
@@ -1055,7 +1074,8 @@
       "download": "Télécharger",
       "flagDocument": "Signaler le document",
       "unflagDocument": "Retirer le signalement",
-      "documentFlagged": "Document signalé"
+      "documentFlagged": "Document signalé",
+      "notUploadedYet": "Pas encore téléversé"
     }
   },
   "contractManagement": {
@@ -1617,7 +1637,7 @@
     "freeComponentLabel": "Module gratuit",
     "freeComponentDescription": "Activer si ce module ne nécessite pas de paiement supplémentaire",
     "linkedModuleLabel": "Module associé",
-    "linkedModuleHint": "Examen planifié avant ce module",
+    "linkedModuleHint": "Examen planifié avec ce module",
     "linkedModulePlaceholder": "Sélectionner un module",
     "noModulesFound": "Aucun module trouvé",
     "linkedExamLabel": "Examen associé",

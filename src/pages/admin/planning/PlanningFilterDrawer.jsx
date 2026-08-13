@@ -16,7 +16,12 @@ import {
 } from "@/components/ui/select";
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
-import { useGetBatches, useGetAllPrograms } from "@/store/useDropdownStore";
+import {
+  useGetBatches,
+  useGetAllPrograms,
+  useGetAllAcademicYears,
+} from "@/store/useDropdownStore";
+import { useGetComponentFilterOptions } from "@/store/useComponentStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 
 const FilterSection = ({ label, children }) => (
@@ -31,12 +36,31 @@ const FilterSection = ({ label, children }) => (
   </div>
 );
 
+const moduleOrdinalLabel = (n) => {
+  const num = Number(n);
+  const j = num % 10;
+  const k = num % 100;
+  if (j === 1 && k !== 11) return `${num}st Module`;
+  if (j === 2 && k !== 12) return `${num}nd Module`;
+  if (j === 3 && k !== 13) return `${num}rd Module`;
+  return `${num}th Module`;
+};
+
+const DEFAULT_FILTERS = {
+  module_number: "all",
+  status: "active",
+  program: "all",
+  batch: "all",
+  academic: "all",
+};
+
 const PlanningFilterDrawer = ({
   draftFilters,
   setDraftFilters,
   appliedFilters,
   setAppliedFilters,
   setPage,
+  activeCity,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,6 +70,7 @@ const PlanningFilterDrawer = ({
   const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
     {
       ...(programSearchTerm && { search: programSearchTerm }),
+      ...(activeCity && activeCity !== "all" && { city: activeCity }),
     },
     { enabled: isOpen }
   );
@@ -61,6 +86,15 @@ const PlanningFilterDrawer = ({
     { enabled: isOpen && !!selectedProgramId }
   );
 
+  const { data: filterOptionsRes, isLoading: moduleOptionsLoading } =
+    useGetComponentFilterOptions(
+      { program: selectedProgramId, type: "module" },
+      { enabled: isOpen && !!selectedProgramId }
+    );
+
+  const moduleNumbers = filterOptionsRes?.data?.module_numbers || [];
+
+  const { data: academicYearsData } = useGetAllAcademicYears({}, { enabled: isOpen });
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(([key, val]) => {
     if (key === "status" && val === "active") return false;
@@ -68,12 +102,7 @@ const PlanningFilterDrawer = ({
   }).length;
 
   const handleClearAll = () => {
-    const resetObj = {
-      module_number: "all",
-      status: "active",
-      program: "all",
-      batch: "all",
-    };
+    const resetObj = { ...DEFAULT_FILTERS };
     setDraftFilters(resetObj);
     setAppliedFilters(resetObj);
     setPage(1);
@@ -167,7 +196,12 @@ const PlanningFilterDrawer = ({
                 }
                 value={draftFilters.program === "all" ? "" : draftFilters.program || ""}
                 onChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, program: val || "all", batch: "all" }))
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    program: val || "all",
+                    batch: "all",
+                    module_number: "all",
+                  }))
                 }
                 onSearch={setProgramSearchTerm}
                 isLoading={programsLoading}
@@ -189,24 +223,51 @@ const PlanningFilterDrawer = ({
               />
             </FilterSection>
 
+            <FilterSection label="Academic Year">
+              <Select
+                value={draftFilters.academic || "all"}
+                onValueChange={(val) =>
+                  setDraftFilters((prev) => ({ ...prev, academic: val }))
+                }
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue placeholder="All Academic Years" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Academic Years</SelectItem>
+                  {(academicYearsData?.data || []).map((ay) => (
+                    <SelectItem key={ay._id} value={ay._id}>
+                      {ay.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterSection>
+
             <FilterSection label="Module Sequence">
               <Select
                 value={draftFilters.module_number}
                 onValueChange={(val) =>
                   setDraftFilters((prev) => ({ ...prev, module_number: val }))
                 }
+                disabled={!selectedProgramId}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All Modules" />
+                  <SelectValue
+                    placeholder={
+                      selectedProgramId ? "All Modules" : "Select a Program First"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Modules</SelectItem>
-                  <SelectItem value="1">1st Module</SelectItem>
-                  <SelectItem value="2">2nd Module</SelectItem>
-                  <SelectItem value="3">3rd Module</SelectItem>
-                  <SelectItem value="4">4th Module</SelectItem>
-                  <SelectItem value="5">5th Module</SelectItem>
-                  <SelectItem value="6">6th Module</SelectItem>
+                  {moduleOptionsLoading
+                    ? null
+                    : moduleNumbers.map((n) => (
+                        <SelectItem key={String(n)} value={String(n)}>
+                          {moduleOrdinalLabel(n)}
+                        </SelectItem>
+                      ))}
                 </SelectContent>
               </Select>
             </FilterSection>
@@ -259,3 +320,4 @@ const PlanningFilterDrawer = ({
 };
 
 export default PlanningFilterDrawer;
+export { DEFAULT_FILTERS };

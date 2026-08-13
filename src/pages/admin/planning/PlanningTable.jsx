@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Users } from "lucide-react";
-import { useState, useEffect } from "react";
-import PlanningFilterDrawer from "./PlanningFilterDrawer";
+import { useState, useEffect, useRef } from "react";
+import PlanningFilterDrawer, { DEFAULT_FILTERS } from "./PlanningFilterDrawer";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
@@ -26,36 +26,69 @@ import StatusBadge from "@/components/StatusBadge";
 import { getMoment } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
 
+const PLANNING_FILTERS_KEY = "planning_filters";
+const PLANNING_SEARCH_KEY = "planning_search";
+
+const loadSavedFilters = () => {
+  try {
+    const saved = sessionStorage.getItem(PLANNING_FILTERS_KEY);
+    if (saved) {
+      return { ...DEFAULT_FILTERS, ...JSON.parse(saved) };
+    }
+  } catch {
+    // ignore invalid session data
+  }
+  return { ...DEFAULT_FILTERS };
+};
+
 const PlanningTable = ({ activeCity }) => {
   const { t } = useTranslation();
   const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [search, setSearch] = useState("");
-  const [draftFilters, setDraftFilters] = useState({
-    module_number: "all",
-    status: "active",
-    program: "all",
-    batch: "all",
+  const [search, setSearch] = useState(() => {
+    return sessionStorage.getItem(PLANNING_SEARCH_KEY) || "";
   });
-  const [appliedFilters, setAppliedFilters] = useState({
-    module_number: "all",
-    status: "active",
-    program: "all",
-    batch: "all",
-  });
+  const [draftFilters, setDraftFilters] = useState(loadSavedFilters);
+  const [appliedFilters, setAppliedFilters] = useState(loadSavedFilters);
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedPlanning, setSelectedPlanning] = useState(null);
   const [viewPlanning, setViewPlanning] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const prevCityRef = useRef(activeCity);
 
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
   }, [activeCity, debouncedSearch, appliedFilters]);
+
+  useEffect(() => {
+    sessionStorage.setItem(PLANNING_FILTERS_KEY, JSON.stringify(appliedFilters));
+  }, [appliedFilters]);
+
+  useEffect(() => {
+    sessionStorage.setItem(PLANNING_SEARCH_KEY, search);
+  }, [search]);
+
+  useEffect(() => {
+    if (prevCityRef.current === activeCity) return;
+    prevCityRef.current = activeCity;
+    setDraftFilters((prev) => ({
+      ...prev,
+      program: "all",
+      batch: "all",
+      module_number: "all",
+    }));
+    setAppliedFilters((prev) => ({
+      ...prev,
+      program: "all",
+      batch: "all",
+      module_number: "all",
+    }));
+  }, [activeCity]);
 
   const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
     page: page,
@@ -65,6 +98,7 @@ const PlanningTable = ({ activeCity }) => {
     ...(appliedFilters.module_number !== "all" ? { module_number: appliedFilters.module_number } : {}),
     ...(appliedFilters.program !== "all" ? { program: appliedFilters.program } : {}),
     ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
+    ...(appliedFilters.academic !== "all" ? { academic: appliedFilters.academic } : {}),
     ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
   });
   const { mutateAsync: deletePlanning, isPending: isDeleting } =
@@ -251,6 +285,7 @@ const PlanningTable = ({ activeCity }) => {
             appliedFilters={appliedFilters}
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
+            activeCity={activeCity}
           />
         </div>
         {canModify && (
