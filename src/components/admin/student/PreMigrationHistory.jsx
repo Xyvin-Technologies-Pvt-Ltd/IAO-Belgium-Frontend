@@ -134,7 +134,7 @@ const EnrolmentsPanel = ({ enrolments }) => {
 //* portal uses, filtered client-side to this year via target_year (added to
 //* the backend query specifically so this filter is possible — see
 //* archive.service.js list_person_results).
-const ResultsPanel = ({ cvId, year }) => {
+const ResultsPanel = ({ cvId, year, bucketYear }) => {
   const { t } = useTranslation();
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -147,7 +147,10 @@ const ResultsPanel = ({ cvId, year }) => {
 
   const hasFilters = !!from || !!to;
 
-  const rows = (data?.data || []).filter((r) => Number(r.target_year) === Number(year));
+  const rows = (data?.data || []).filter((r) => {
+    if (bucketYear == null) return r.target_year == null;
+    return Number(r.target_year) === Number(year);
+  });
 
   return (
     <div className="space-y-3">
@@ -251,8 +254,12 @@ const PreMigrationHistory = ({ cvId, yearBucket, year }) => {
         ))}
       </div>
 
-      {activeSubTab === "enrolments" && <EnrolmentsPanel enrolments={yearBucket.enrolments} />}
-      {activeSubTab === "results" && <ResultsPanel cvId={cvId} year={year} />}
+      {activeSubTab === "enrolments" && (
+        <EnrolmentsPanel enrolments={yearBucket?.enrolments} />
+      )}
+      {activeSubTab === "results" && (
+        <ResultsPanel cvId={cvId} year={year} bucketYear={yearBucket?.year} />
+      )}
 
       {activeSubTab === "attendance" && (
         <>

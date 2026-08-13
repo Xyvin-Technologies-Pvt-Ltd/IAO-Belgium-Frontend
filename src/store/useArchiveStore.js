@@ -44,7 +44,14 @@ export const useLmsStudentArchiveSummary = (applicationId, options = {}) =>
 //* both. Showing an empty "No modules assigned" table right above a panel
 //* that has the real legacy data for that same year reads as broken, so the
 //* two must be mutually exclusive per year, not stacked.
-export const useMigratedYearHistory = (applicationId, migrationRef, year) => {
+//* Current placement year (and later) always use LMS progress, even when
+//* the archive also has a bucket for that year.
+export const useMigratedYearHistory = (
+  applicationId,
+  migrationRef,
+  year,
+  currentYear,
+) => {
   const isMigrated = migrationRef?.source === "coachview" && !!migrationRef?.cv_id;
 
   const query = useLmsStudentArchiveSummary(applicationId, {
@@ -52,13 +59,25 @@ export const useMigratedYearHistory = (applicationId, migrationRef, year) => {
   });
 
   const summary = query.data?.data;
-  const yearBucket = summary?.years?.find((y) => y.year === year) || null;
+  const isPriorYear = Number(year) < Number(currentYear);
+  const exactBucket =
+    summary?.years?.find((y) => Number(y.year) === Number(year)) || null;
+  const unmappedBucket =
+    summary?.years?.find((y) => y.year == null) || null;
+  const emptyBucket = {
+    year,
+    enrolments: [],
+    counts: { total: 0, completed: 0 },
+  };
+  const yearBucket = isPriorYear
+    ? exactBucket || unmappedBucket || emptyBucket
+    : exactBucket;
 
   return {
     isMigrated,
     cvId: migrationRef?.cv_id || null,
     isLoading: isMigrated ? query.isLoading : false,
-    hasHistory: isMigrated && !!yearBucket,
+    hasHistory: isMigrated && isPriorYear,
     yearBucket,
     refetch: query.refetch,
   };
