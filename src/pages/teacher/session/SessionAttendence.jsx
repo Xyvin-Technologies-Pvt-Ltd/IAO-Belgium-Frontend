@@ -21,7 +21,7 @@ import {
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { getMoment } from "@/utils/dateUtils";
+import { getMoment, getNow } from "@/utils/dateUtils";
 
 
 const SessionAttendence = () => {
@@ -56,11 +56,13 @@ const SessionAttendence = () => {
   const totalRows = data?.total_count || 0;
   const component = data?.data?.component_name;
 
-  const sessionDay = sessionDate ? getMoment(sessionDate).startOf("day") : null;
-  const today = getMoment().startOf("day");
-  const isSessionFuture = sessionDay ? sessionDay.isAfter(today) : false;
-  const isSessionPast = sessionDay ? sessionDay.isBefore(today) : false;
-  const canMarkAttendance = sessionDay ? sessionDay.isSame(today) : false;
+  const sessionDay = sessionDate
+    ? getMoment(sessionDate).format("YYYY-MM-DD")
+    : null;
+  const today = getNow().format("YYYY-MM-DD");
+  const isSessionFuture = sessionDay ? sessionDay > today : false;
+  const isSessionPast = sessionDay ? sessionDay < today : false;
+  const canMarkAttendance = sessionDay ? sessionDay === today : false;
   const isAttendanceLocked = !canMarkAttendance;
 
   useEffect(() => {

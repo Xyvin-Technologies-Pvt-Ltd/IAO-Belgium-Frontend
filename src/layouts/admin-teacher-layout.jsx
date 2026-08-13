@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Languages } from "lucide-react";
-import { getMoment } from "@/utils/dateUtils";
+import { getNow } from "@/utils/dateUtils";
 import TeacherNotificationDrawer from "./TeacherNotificationDrawer";
 
 export default function AdminTeacherLayoutComponent() {
@@ -90,7 +90,7 @@ export default function AdminTeacherLayoutComponent() {
               {isTeacher && <TeacherNotificationDrawer />}
               <ThemeToggle />
               <p className="text-xs sm:text-sm text-dashboard-text-secondary hidden md:block">
-                {getMoment().format("ddd, DD MMM, YYYY").toUpperCase()}
+                {getNow().format("ddd, DD MMM, YYYY").toUpperCase()}
               </p>
             </div>
           </div>

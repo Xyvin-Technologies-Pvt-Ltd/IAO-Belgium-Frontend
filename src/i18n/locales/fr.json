@@ -1055,6 +1055,7 @@
       "qualificationStatus": "Statut de qualification",
       "stillCompletingQualification": "En cours de finalisation de la qualification",
       "qualificationNotDeferred": "Non différé",
+      "completingQualificationCheckbox": "Je suis encore en train de finaliser ma qualification. Je soumettrai mon diplôme ultérieurement.",
       "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
     },
     "status": {
@@ -1073,7 +1074,8 @@
       "download": "Télécharger",
       "flagDocument": "Signaler le document",
       "unflagDocument": "Retirer le signalement",
-      "documentFlagged": "Document signalé"
+      "documentFlagged": "Document signalé",
+      "notUploadedYet": "Pas encore téléversé"
     }
   },
   "contractManagement": {
