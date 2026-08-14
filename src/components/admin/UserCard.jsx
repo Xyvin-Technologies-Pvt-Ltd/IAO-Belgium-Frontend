@@ -41,12 +41,24 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
     try {
       setUploadingCert(true);
       const res = await uploadFile(file);
-      const currentCerts = Array.isArray(user?.qualification_certificate) ? user.qualification_certificate : [];
+      const currentCerts = Array.isArray(user?.qualification_certificate)
+        ? user.qualification_certificate
+        : [];
+      //* Only send url/flag — Joi rejects Mongo subdoc `_id` on update
+      const existingCerts = currentCerts
+        .filter((cert) => cert?.url)
+        .map((cert) => ({
+          url: cert.url,
+          ...(typeof cert.flag === "boolean" ? { flag: cert.flag } : {}),
+        }));
       await putApplicationMutation.mutateAsync({
         id: user.application_id || user._id, // Application ID
         data: {
-          qualification_certificate: [...currentCerts, { url: res.data.file_url }]
-        }
+          qualification_certificate: [
+            ...existingCerts,
+            { url: res.data.file_url },
+          ],
+        },
       });
       toast.success(t("studentManagement.modal.certUploaded", "Qualification Certificate uploaded successfully"));
     } catch (err) {
