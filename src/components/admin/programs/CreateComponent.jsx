@@ -37,7 +37,7 @@ import {
   useCreateComponent,
   useUpdateComponent,
 } from "@/store/useComponentStore";
-import { useGetComponents } from "@/store/useDropdownStore";
+import { useGetComponents, useGetAllLanguages } from "@/store/useDropdownStore";
 import { useGetExamsDropdown } from "@/store/useExamStore";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -59,6 +59,8 @@ const CreateComponent = ({
   const isEdit = !!componentData;
 
   const [selectedType, setSelectedType] = useState("");
+  const [examKind, setExamKind] = useState("online");
+  const [examLanguageId, setExamLanguageId] = useState("");
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [fileUploadProgress, setFileUploadProgress] = useState({});
   const [instructionContent, setInstructionContent] = useState("");
@@ -150,18 +152,39 @@ const CreateComponent = ({
   );
   const programModules = programModulesData?.data || [];
 
-  // Fetch published exams (for exam type)
-  const { data: publishedExamsData } = useGetExamsDropdown(
+  const { data: languagesData } = useGetAllLanguages(
+    { status: true },
+    { enabled: open && selectedType === "exam" && examKind === "online" },
+  );
+  const languages = languagesData?.data || [];
+
+  const resolvedExamLanguage = examLanguageId || programLanguageId || "";
+
+  const { data: publishedOnlineExamsData } = useGetExamsDropdown(
     {
       status: "published",
       type: "online",
-      ...(programLanguageId && { exam_language: programLanguageId }),
+      ...(resolvedExamLanguage && { exam_language: resolvedExamLanguage }),
     },
     {
-      enabled: open && selectedType === "exam",
+      enabled: open && selectedType === "exam" && examKind === "online",
     },
   );
-  const publishedExams = publishedExamsData?.data || [];
+
+  const { data: publishedPracticalExamsData } = useGetExamsDropdown(
+    {
+      status: "published",
+      type: "practical",
+    },
+    {
+      enabled: open && selectedType === "exam" && examKind === "practical",
+    },
+  );
+
+  const publishedExams =
+    examKind === "practical"
+      ? publishedPracticalExamsData?.data || []
+      : publishedOnlineExamsData?.data || [];
 
   // Filter modules to show only unique system_ids (or modules without system_id)
   // Group by system_id and take the first one from each group
@@ -219,6 +242,8 @@ const CreateComponent = ({
       linked_exam: "",
     });
     setSelectedType(preselectedType || "");
+    setExamKind("online");
+    setExamLanguageId("");
     setInstructionContent("");
     setAdditionalContextContent("");
     setModuleNameSearch("");
@@ -425,6 +450,10 @@ const CreateComponent = ({
     reset(formData);
     setSelectedType(componentType);
     setValue("type", componentType);
+    if (componentType === "exam") {
+      const linkedType = componentData.linked_exam?.type;
+      setExamKind(linkedType === "practical" ? "practical" : "online");
+    }
 
     // Set instruction content separately to ensure RichTextEditor updates
     const instructionText = componentData.instruction || "";
@@ -783,6 +812,59 @@ const CreateComponent = ({
             )}
             {selectedType === "exam" && (
               <>
+                <div className="space-y-2">
+                  <Label>
+                    {t("componentManagement.examKindLabel", "Exam kind")}{" "}
+                    <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={examKind}
+                    onValueChange={(v) => {
+                      setExamKind(v);
+                      setValue("linked_exam", "", { shouldValidate: true });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="online">
+                        {t("exam.form.online", "Online")}
+                      </SelectItem>
+                      <SelectItem value="practical">
+                        {t("exam.form.practical", "Practical")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {examKind === "online" && (
+                  <div className="space-y-2">
+                    <Label>
+                      {t("exam.form.language", "Language")}{" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      value={resolvedExamLanguage}
+                      onValueChange={(v) => {
+                        setExamLanguageId(v);
+                        setValue("linked_exam", "", { shouldValidate: true });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("exam.form.language", "Language")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages.map((lang) => (
+                          <SelectItem key={lang._id} value={lang._id}>
+                            {lang.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label>
                     {t("componentManagement.linkedModuleLabel")}{" "}

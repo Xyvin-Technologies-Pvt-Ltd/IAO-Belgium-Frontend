@@ -27,7 +27,8 @@
       "planning": "Planung",
       "evaluations": "Auswertungen",
       "exams": "Prüfungen",
-      "otherExams": "Andere Prüfungen"
+      "otherExams": "Andere Prüfungen",
+      "practicalExams": "Praktische Prüfungen"
     },
     "admin": {
       "title": "Verwaltungsportal",
@@ -182,6 +183,7 @@
     "trxCount": "Transaktionsanzahl",
     "convenienceFee": "Servicegebühr",
     "paid": "Bezahlt",
+    "issued": "Ausgestellt",
     "failed": "Fehlgeschlagen",
     "overdue": "Überfällig",
     "canceled": "Storniert",
@@ -1558,7 +1560,8 @@
       "pendingEvaluations": "Ausstehende Bewertungen",
       "pendingEvaluationsHint": "{{completed}} bisher abgeschlossen",
       "assignedExams": "Zugewiesene Prüfungen",
-      "assignedExamsHint": "{{other}} weitere Prüfungen • {{unread}} ungelesene Benachrichtigungen",
+      "assignedExamsHint": "{{unread}} ungelesene Benachrichtigungen",
+      "practicalExamsHint": "Zugewiesene praktische Prüfungen",
       "upcomingSessions": "Bevorstehende Sitzungen",
       "recentSubmissions": "Einreichungen zur Bewertung",
       "noUpcomingSessions": "Keine Sitzungen in den nächsten 7 Tagen geplant.",

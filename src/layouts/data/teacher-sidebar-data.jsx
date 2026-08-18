@@ -44,8 +44,8 @@ export const getTeacherSidebarData = (t) => ({
           icon: ClipboardCheck,
         },
         {
-          title: t("sidebar.teacher.otherExams", { defaultValue: "Other Exams" }),
-          url: "/teacher/other-exams",
+          title: t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" }),
+          url: "/teacher/practical-exams",
           icon: ClipboardCheck,
         },
         {

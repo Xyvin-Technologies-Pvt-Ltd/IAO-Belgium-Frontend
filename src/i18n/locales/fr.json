@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Évaluations",
       "exams": "Examens",
-      "otherExams": "Autres examens"
+      "otherExams": "Autres examens",
+      "practicalExams": "Examens pratiques"
     },
     "admin": {
       "title": "Portail administrateur",
@@ -182,6 +183,7 @@
     "trxCount": "Nombre de transactions",
     "convenienceFee": "Frais de service",
     "paid": "Payé",
+    "issued": "Émise",
     "failed": "Échoué",
     "overdue": "En retard",
     "canceled": "Annulé",
@@ -1530,7 +1532,8 @@
       "pendingEvaluations": "Évaluations en attente",
       "pendingEvaluationsHint": "{{completed}} terminées jusqu'à présent",
       "assignedExams": "Examens assignés",
-      "assignedExamsHint": "{{other}} autres examens • {{unread}} notifications non lues",
+      "assignedExamsHint": "{{unread}} notifications non lues",
+      "practicalExamsHint": "Examens pratiques assignés",
       "upcomingSessions": "Sessions à venir",
       "recentSubmissions": "Soumissions à évaluer",
       "noUpcomingSessions": "Aucune session prévue dans les 7 prochains jours.",

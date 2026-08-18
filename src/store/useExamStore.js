@@ -7,6 +7,11 @@ import {
   publishExam,
   archiveExam,
   getTeacherExams,
+  getTeacherPracticalExams,
+  getPracticalExamDetail,
+  getPracticalExamStudents,
+  getPracticalExamFeedback,
+  upsertPracticalExamFeedback,
   getTeacherOtherExams,
   getOtherExamDetail,
   getOtherExamStudents,
@@ -225,6 +230,66 @@ export const useGetAdminExamResults = (params, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useGetTeacherPracticalExams = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-practical-exams", params],
+    queryFn: () => getTeacherPracticalExams(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamDetail = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-detail", id],
+    queryFn: () => getPracticalExamDetail(id),
+    enabled: !!id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamStudents = (id, params, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-students", id, params],
+    queryFn: () => getPracticalExamStudents(id, params),
+    enabled: !!id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamFeedback = (id, applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-feedback", id, applicationId],
+    queryFn: () => getPracticalExamFeedback(id, applicationId),
+    enabled: !!id && !!applicationId,
+    staleTime: 0,
+    ...options,
+  });
+};
+
+export const useUpsertPracticalExamFeedback = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, applicationId, payload }) =>
+      upsertPracticalExamFeedback(id, applicationId, payload),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["practical-exam-feedback", variables.id, variables.applicationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["practical-exam-students", variables.id],
+      });
+      toast.success(response?.message || "Feedback saved");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save feedback");
+    },
   });
 };
 

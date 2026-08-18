@@ -30,6 +30,32 @@ import {
 } from "@/constants/programTypes";
 import { getProgramTypes } from "@/api/programApi";
 
+const toId = (value) => {
+  if (value == null || value === "") return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    const id = value._id ?? value.id;
+    return id != null && id !== "" ? String(id) : "";
+  }
+  return String(value);
+};
+
+const toSelectItem = (value) => {
+  const id = toId(value);
+  if (!id) return null;
+  if (typeof value === "object") {
+    return { _id: id, name: value.name || id };
+  }
+  return { _id: id, name: id };
+};
+
+const mergeSelectItems = (items, extra) => {
+  const extraItem = toSelectItem(extra);
+  if (!extraItem) return items;
+  if (items.some((item) => String(item._id) === extraItem._id)) return items;
+  return [extraItem, ...items];
+};
+
 const CreateProgram = ({ open, onClose, programData }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -55,16 +81,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
       },
       { enabled: open },
     );
-
-  const [selectedCountry, setSelectedCountry] = useState("");
-
-  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
-    {
-      ...(citySearchTerm && { search: citySearchTerm }),
-      ...(selectedCountry && { country: selectedCountry }),
-    },
-    { enabled: open && !!selectedCountry },
-  );
 
   const { data: languagesData, isLoading: languagesLoading } =
     useGetAllLanguages(
@@ -108,14 +124,13 @@ const CreateProgram = ({ open, onClose, programData }) => {
   const isOnlineValue = watch("is_online");
   const documentRequiredValue = watch("document_required");
 
-  useEffect(() => {
-    if (watchedCountry !== selectedCountry) {
-      setSelectedCountry(watchedCountry);
-      if (watchedCountry !== selectedCountry && selectedCity) {
-        setValue("city", "", { shouldValidate: true });
-      }
-    }
-  }, [watchedCountry, selectedCountry, selectedCity, setValue]);
+  const { data: citiesData, isLoading: citiesLoading } = useGetAllCities(
+    {
+      ...(citySearchTerm && { search: citySearchTerm }),
+      ...(watchedCountry && { country: watchedCountry }),
+    },
+    { enabled: open && !!watchedCountry },
+  );
 
   const handleClose = () => {
     reset({
@@ -133,29 +148,26 @@ const CreateProgram = ({ open, onClose, programData }) => {
     setCountrySearchTerm("");
     setCitySearchTerm("");
     setLanguageSearchTerm("");
-    setSelectedCountry("");
     onClose();
   };
 
   useEffect(() => {
     if (!open || !programData) return;
 
-    reset({
+    const nextValues = {
       name: programData.name || "",
       program_code: programData.program_code || "",
       program_type: programData.program_type || "",
       year: programData.year || "",
       duration_unit: programData.duration_unit || "years",
-      language: programData.language?._id || "",
-      country: programData.city?.country?._id || "",
-      city: programData.city?._id || "",
+      language: toId(programData.language),
+      country: toId(programData.city?.country),
+      city: toId(programData.city),
       is_online: programData.is_online || false,
       document_required: programData.document_required !== false,
-    });
+    };
 
-    if (programData.city?.country?._id) {
-      setSelectedCountry(programData.city.country._id);
-    }
+    reset(nextValues, { keepErrors: false });
   }, [open, programData, reset]);
 
   const onSubmit = (formData) => {
@@ -197,6 +209,21 @@ const CreateProgram = ({ open, onClose, programData }) => {
       },
     });
   };
+
+  const languageItems = mergeSelectItems(
+    languagesData?.data || [],
+    programData?.language,
+  );
+  const countryItems = mergeSelectItems(
+    countriesData?.data || [],
+    programData?.city?.country,
+  );
+  const cityItems = mergeSelectItems(
+    citiesData?.data || [],
+    toId(programData?.city?.country) === watchedCountry
+      ? programData?.city
+      : null,
+  );
 
   if (!open) return null;
 
@@ -349,7 +376,6 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   if (checked) {
                     setValue("country", "", { shouldValidate: true });
                     setValue("city", "", { shouldValidate: true });
-                    setSelectedCountry("");
                   }
                 }}
               />
@@ -378,11 +404,11 @@ const CreateProgram = ({ open, onClose, programData }) => {
               label={t("programManagement.modal.languageLabel")}
               placeholder={t("programManagement.modal.languagePlaceholder")}
               searchPlaceholder="Search languages..."
-              items={languagesData?.data || []}
+              items={languageItems}
               value={selectedLanguage || ""}
-              onChange={(value) =>
-                setValue("language", value, { shouldValidate: true })
-              }
+              onChange={(value) => {
+                if (value) setValue("language", value, { shouldValidate: true });
+              }}
               onSearch={setLanguageSearchTerm}
               isLoading={languagesLoading}
               error={errors.language?.message}
@@ -395,11 +421,13 @@ const CreateProgram = ({ open, onClose, programData }) => {
                   label={t("programManagement.modal.countryLabel")}
                   placeholder={t("programManagement.modal.countryPlaceholder")}
                   searchPlaceholder="Search countries..."
-                  items={countriesData?.data || []}
+                  items={countryItems}
                   value={watchedCountry || ""}
-                  onChange={(value) =>
-                    setValue("country", value, { shouldValidate: true })
-                  }
+                  onChange={(value) => {
+                    if (!value || value === watchedCountry) return;
+                    setValue("country", value, { shouldValidate: true });
+                    setValue("city", "");
+                  }}
                   onSearch={setCountrySearchTerm}
                   isLoading={countriesLoading}
                   error={errors.country?.message}
@@ -409,21 +437,21 @@ const CreateProgram = ({ open, onClose, programData }) => {
                 <SearchableSelect
                   label={t("programManagement.modal.cityLabel")}
                   placeholder={
-                    selectedCountry
+                    watchedCountry
                       ? t("programManagement.modal.cityPlaceholder")
                       : t("programManagement.modal.cityPlaceholderDisabled")
                   }
                   searchPlaceholder="Search cities..."
-                  items={citiesData?.data || []}
+                  items={cityItems}
                   value={selectedCity || ""}
-                  onChange={(value) =>
-                    setValue("city", value, { shouldValidate: true })
-                  }
+                  onChange={(value) => {
+                    if (value) setValue("city", value, { shouldValidate: true });
+                  }}
                   onSearch={setCitySearchTerm}
                   isLoading={citiesLoading}
                   error={errors.city?.message}
                   required
-                  disabled={!selectedCountry}
+                  disabled={!watchedCountry}
                 />
               </>
             )}

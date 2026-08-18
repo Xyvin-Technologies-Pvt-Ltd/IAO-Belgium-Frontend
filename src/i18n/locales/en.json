@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Feedback / Evaluation",
       "exams": "Exams",
-      "otherExams": "Other Exams"
+      "otherExams": "Other Exams",
+      "practicalExams": "Practical Exams"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -183,6 +184,7 @@
     "trxCount": "Trx Count",
     "convenienceFee": "Convenience Fee",
     "paid": "Paid",
+    "issued": "Issued",
     "failed": "Failed",
     "overdue": "Overdue",
     "canceled": "Canceled",
@@ -1793,7 +1795,8 @@
       "pendingEvaluations": "Pending evaluations",
       "pendingEvaluationsHint": "{{completed}} completed so far",
       "assignedExams": "Assigned exams",
-      "assignedExamsHint": "{{other}} other exams • {{unread}} unread notifications",
+      "assignedExamsHint": "{{unread}} unread notifications",
+      "practicalExamsHint": "Assigned practical exams",
       "upcomingSessions": "Upcoming sessions",
       "recentSubmissions": "Submissions to review",
       "noUpcomingSessions": "No sessions scheduled in the next 7 days.",

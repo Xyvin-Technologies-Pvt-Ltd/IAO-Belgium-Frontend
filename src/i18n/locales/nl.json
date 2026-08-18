@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Evaluaties",
       "exams": "Examens",
-      "otherExams": "Overige examens"
+      "otherExams": "Overige examens",
+      "practicalExams": "Praktijkexamens"
     },
     "admin": {
       "title": "Beheerdersportaal",
@@ -183,6 +184,7 @@
     "trxCount": "Aantal transacties",
     "convenienceFee": "Servicekosten",
     "paid": "Betaald",
+    "issued": "Uitgegeven",
     "failed": "Mislukt",
     "overdue": "Achterstallig",
     "canceled": "Geannuleerd",
@@ -1553,7 +1555,8 @@
       "pendingEvaluations": "Openstaande evaluaties",
       "pendingEvaluationsHint": "{{completed}} tot nu toe voltooid",
       "assignedExams": "Toegewezen examens",
-      "assignedExamsHint": "{{other}} andere examens • {{unread}} ongelezen meldingen",
+      "assignedExamsHint": "{{unread}} ongelezen meldingen",
+      "practicalExamsHint": "Toegewezen praktijkexamens",
       "upcomingSessions": "Aankomende sessies",
       "recentSubmissions": "Inzendingen om te beoordelen",
       "noUpcomingSessions": "Geen sessies gepland in de komende 7 dagen.",
