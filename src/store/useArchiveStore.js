@@ -39,20 +39,20 @@ export const useLmsStudentArchiveSummary = (applicationId, options = {}) =>
   });
 
 //* Single source of truth for "does this specific year have CoachView
-//* history" — student detail pages use this to decide whether to render the
-//* native (native-LMS) year content or the PreMigrationHistory panel, never
-//* both. Showing an empty "No modules assigned" table right above a panel
-//* that has the real legacy data for that same year reads as broken, so the
-//* two must be mutually exclusive per year, not stacked.
-//* Current placement year (and later) always use LMS progress, even when
-//* the archive also has a bucket for that year.
+//* history". Classic CoachView migrants: prior years replace LMS tables
+//* with PreMigrationHistory. Manual Therapie mixed year-1 students keep LMS
+//* modules and stack the archive panel instead.
 export const useMigratedYearHistory = (
   applicationId,
   migrationRef,
   year,
   currentYear,
+  options = {},
 ) => {
   const isMigrated = migrationRef?.source === "coachview" && !!migrationRef?.cv_id;
+  const isManualTherapie = migrationRef?.import_kind === "manual_therapie";
+  const hasCoachViewCompletions = Boolean(options.hasCoachViewCompletions);
+  const stackArchive = isMigrated && (isManualTherapie || hasCoachViewCompletions);
 
   const query = useLmsStudentArchiveSummary(applicationId, {
     enabled: isMigrated && !!applicationId,
@@ -69,15 +69,17 @@ export const useMigratedYearHistory = (
     enrolments: [],
     counts: { total: 0, completed: 0 },
   };
-  const yearBucket = isPriorYear
-    ? exactBucket || unmappedBucket || emptyBucket
-    : exactBucket;
+  const yearBucket =
+    isPriorYear || stackArchive
+      ? exactBucket || unmappedBucket || emptyBucket
+      : exactBucket;
 
   return {
     isMigrated,
     cvId: migrationRef?.cv_id || null,
     isLoading: isMigrated ? query.isLoading : false,
-    hasHistory: isMigrated && isPriorYear,
+    hasHistory: isMigrated && isPriorYear && !stackArchive,
+    showArchivePanel: stackArchive,
     yearBucket,
     refetch: query.refetch,
   };
