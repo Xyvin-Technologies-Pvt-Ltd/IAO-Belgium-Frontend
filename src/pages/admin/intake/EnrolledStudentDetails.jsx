@@ -105,6 +105,11 @@ const EnrolledStudentDetails = () => {
     student?.data?.migration_ref,
     filter.year,
     student?.data?.current_year,
+    {
+      hasCoachViewCompletions: (student?.data?.assigned_modules || []).some(
+        (m) => m.completion_source === "coachview",
+      ),
+    },
   );
 
   const studentUserId = student?.data?._id;
@@ -642,6 +647,15 @@ const EnrolledStudentDetails = () => {
                     isFetching={attendanceFetching}
                   />
                 </div>
+              </div>
+            )}
+            {yearHistory.showArchivePanel && (
+              <div className="col-span-12">
+                <PreMigrationHistory
+                  cvId={yearHistory.cvId}
+                  yearBucket={yearHistory.yearBucket}
+                  year={filter.year}
+                />
               </div>
             )}
               </>
