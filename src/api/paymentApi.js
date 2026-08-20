@@ -161,3 +161,12 @@ export const adminCancelThirdParty = async (id) => {
     throw error.response?.data || error;
   }
 };
+
+export const adminReconcileThirdParty = async (id) => {
+  try {
+    const response = await axiosInstance.post(`/third-party-payment/${id}/admin-reconcile`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
