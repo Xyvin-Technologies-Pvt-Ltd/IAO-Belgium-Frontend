@@ -168,3 +168,27 @@ export const useAdminCancelThirdParty = () => {
     },
   });
 };
+
+export const useAdminReconcileThirdParty = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) =>
+      import("@/api/paymentApi").then((m) => m.adminReconcileThirdParty(id)),
+    onSuccess: (data) => {
+      if (data?.settled) {
+        toast.success(
+          data?.message || "Payment synced from Mollie and settled successfully.",
+        );
+      } else {
+        toast.success(data?.message || "Application is already paid.");
+      }
+      queryClient.invalidateQueries({ queryKey: ["third-party-applications"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message || "Failed to sync payment from Mollie",
+      );
+    },
+  });
+};
