@@ -14,11 +14,11 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
-import { useGetThirdPartyApplications, useAdminCancelThirdParty } from "@/store/usePaymentStore";
+import { useGetThirdPartyApplications, useAdminCancelThirdParty, useAdminReconcileThirdParty } from "@/store/usePaymentStore";
 import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Ban, Eye, AlertTriangle } from "lucide-react";
+import { Ban, Eye, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import moment from "moment";
 import {
@@ -108,12 +108,14 @@ const ThirdPartyPaymentManagement = () => {
 
   // Mutation
   const cancelMutation = useAdminCancelThirdParty();
+  const reconcileMutation = useAdminReconcileThirdParty();
 
   // Dialog State
   const [selectedApp, setSelectedApp] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [appToCancel, setAppToCancel] = useState(null);
+  const [reconcilingId, setReconcilingId] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -173,6 +175,20 @@ const ThirdPartyPaymentManagement = () => {
       refetch();
     } catch (err) {
       // Error toast is already handled by useAdminCancelThirdParty onError callback
+    }
+  };
+
+  const handleSyncFromMollie = async (app, { closeDetails = false } = {}) => {
+    if (!app?._id) return;
+    setReconcilingId(app._id);
+    try {
+      await reconcileMutation.mutateAsync(app._id);
+      if (closeDetails) setIsDetailsOpen(false);
+      refetch();
+    } catch (err) {
+      // Error toast is already handled by useAdminReconcileThirdParty onError callback
+    } finally {
+      setReconcilingId(null);
     }
   };
 
@@ -374,9 +390,28 @@ const ThirdPartyPaymentManagement = () => {
                       variant="ghost"
                       className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                       onClick={() => handleOpenDetails(app)}
+                      title={t("View details")}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
+                    {canModify && ["invoice_issued", "cancelling"].includes(app.status) && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/20"
+                        onClick={() => handleSyncFromMollie(app)}
+                        disabled={reconcileMutation.isPending && reconcilingId === app._id}
+                        title={t("Sync from Mollie")}
+                      >
+                        <RefreshCw
+                          className={`h-4 w-4 ${
+                            reconcileMutation.isPending && reconcilingId === app._id
+                              ? "animate-spin"
+                              : ""
+                          }`}
+                        />
+                      </Button>
+                    )}
                     {canModify && app.status === "invoice_issued" && (
                       <Button
                         size="icon"
@@ -384,6 +419,7 @@ const ThirdPartyPaymentManagement = () => {
                         className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                         onClick={() => handleCancelClick(app)}
                         disabled={cancelMutation.isPending}
+                        title={t("Cancel")}
                       >
                         <Ban className="h-4 w-4" />
                       </Button>
@@ -529,7 +565,32 @@ const ThirdPartyPaymentManagement = () => {
               )}
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex justify-end gap-2">
+            {canModify &&
+              selectedApp &&
+              ["invoice_issued", "cancelling"].includes(selectedApp.status) && (
+                <Button
+                  variant="outline"
+                  className="rounded-[6px]"
+                  onClick={() =>
+                    handleSyncFromMollie(selectedApp, { closeDetails: true })
+                  }
+                  disabled={
+                    reconcileMutation.isPending &&
+                    reconcilingId === selectedApp._id
+                  }
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${
+                      reconcileMutation.isPending &&
+                      reconcilingId === selectedApp._id
+                        ? "animate-spin"
+                        : ""
+                    }`}
+                  />
+                  {t("Sync from Mollie")}
+                </Button>
+              )}
             <Button onClick={() => setIsDetailsOpen(false)} className="rounded-[6px]">
               {t("Close")}
             </Button>

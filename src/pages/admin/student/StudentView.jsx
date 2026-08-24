@@ -87,6 +87,12 @@ const StudentView = () => {
     student?.data?.migration_ref,
     filter.year,
     student?.data?.current_year,
+    {
+      hasCoachViewCompletions: [
+        ...(student?.data?.assigned_modules || []),
+        ...(student?.data?.completed_modules || []),
+      ].some((m) => m.completion_source === "coachview"),
+    },
   );
 
   useEffect(() => {
@@ -289,6 +295,16 @@ const StudentView = () => {
             </TableBody>
           </Table>
         </div>
+
+        {yearHistory.showArchivePanel && (
+          <div className="col-span-12">
+            <PreMigrationHistory
+              cvId={yearHistory.cvId}
+              yearBucket={yearHistory.yearBucket}
+              year={filter.year}
+            />
+          </div>
+        )}
 
         </>
         )}

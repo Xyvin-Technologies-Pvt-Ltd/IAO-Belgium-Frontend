@@ -22,6 +22,7 @@ import StudentFilterDrawer from "./StudentFilterDrawer";
 import { Button } from "@/components/ui/button";
 import { Download, Upload } from "lucide-react";
 import StudentBulkUploadDialog from "@/components/admin/student-import/StudentBulkUploadDialog";
+import ManualTherapieImportDialog from "@/components/admin/student-import/ManualTherapieImportDialog";
 import {
   STUDENT_MANAGEMENT_FILTERS_KEY,
   STUDENT_MANAGEMENT_SEARCH_KEY,
@@ -55,6 +56,7 @@ const AllStudents = () => {
   const [search, setSearch] = useState(loadStoredStudentSearch);
   const debouncedSearch = useDebounce(search, 500);
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+  const [manualTherapieImportOpen, setManualTherapieImportOpen] = useState(false);
   const [exportPending, setExportPending] = useState(false);
   const profile = useAuthStore((state) => state.profile);
   const canBulkUpload = canModify && profile?.email === "ttj@duck.com";
@@ -156,17 +158,31 @@ const AllStudents = () => {
             setPage={setPage}
           />
         </div>
-        {canBulkUpload && (
-          <Button variant="outline" onClick={() => setBulkUploadOpen(true)}>
-            <Upload className="h-4 w-4" />
-            {t("studentImport.title", "Bulk Upload Students")}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {canBulkUpload && (
+            <Button variant="outline" onClick={() => setBulkUploadOpen(true)}>
+              <Upload className="h-4 w-4" />
+              {t("studentImport.title", "Bulk Upload Students")}
+            </Button>
+          )}
+          {canModify && (
+            <Button variant="outline" onClick={() => setManualTherapieImportOpen(true)}>
+              <Upload className="h-4 w-4" />
+              {t("manualTherapieImport.buttonLabel", "Manual Therapie Import")}
+            </Button>
+          )}
+        </div>
       </div>
       {canBulkUpload && (
         <StudentBulkUploadDialog
           open={bulkUploadOpen}
           onClose={() => setBulkUploadOpen(false)}
+        />
+      )}
+      {canModify && (
+        <ManualTherapieImportDialog
+          open={manualTherapieImportOpen}
+          onClose={() => setManualTherapieImportOpen(false)}
         />
       )}
 
