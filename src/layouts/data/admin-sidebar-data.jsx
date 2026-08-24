@@ -100,8 +100,17 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
           },
           {
             title: t("sidebar.admin.studentManagement"),
-            url: "/admin/student-management",
             icon: Users,
+            items: [
+              {
+                title: t("sidebar.admin.allStudents", "All Students"),
+                url: "/admin/student-management",
+              },
+              {
+                title: t("sidebar.admin.locationChanges", "Location Changes"),
+                url: "/admin/student-management/location-changes",
+              },
+            ],
           },
           {
             title: "Notification Management",
