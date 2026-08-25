@@ -19,9 +19,15 @@ const sessionSchema = z.object({
 
 const plannedExamSchema = z.object({
   component: z.string().min(1, "Exam component is required"),
-  // linked_exam may be an ObjectId string or empty — allow either
   exam: z.string().optional().nullable().default(""),
   teacher: z.string().nullable().optional(),
+});
+
+const plannedPracticalExamSchema = z.object({
+  component: z.string().min(1, "Exam component is required"),
+  exam: z.string().optional().nullable().default(""),
+  teachers: z.array(z.string()).min(1, "At least one teacher is required"),
+  exam_date: z.string().min(1, "Practical exam date is required"),
 });
 
 export const planningSchema = z.object({
@@ -36,4 +42,5 @@ export const planningSchema = z.object({
   trainees: z.array(teacherSchema).optional(),
   sessions: z.array(sessionSchema).min(1, "At least one session is required"),
   exams: z.array(plannedExamSchema).optional(),
+  practical_exams: z.array(plannedPracticalExamSchema).optional(),
 });

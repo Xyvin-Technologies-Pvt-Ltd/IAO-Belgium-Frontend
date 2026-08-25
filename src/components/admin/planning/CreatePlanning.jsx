@@ -22,6 +22,12 @@ import { planningSchema } from "@/validations/admin";
 import { formatTZ, getMoment } from "@/utils/dateUtils";
 import moment from "moment";
 
+const toId = (value) => {
+  if (!value) return "";
+  if (typeof value === "object") return String(value._id || value);
+  return String(value);
+};
+
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const { t } = useTranslation();
   const [programSearchTerm, setProgramSearchTerm] = useState("");
@@ -63,6 +69,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         },
       ],
       exams: [],
+      practical_exams: [],
     },
   });
 
@@ -147,19 +154,23 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   );
 
   const examsList = (open && selectedProgram && selectedComponent) ? (examsData?.data || []) : [];
+  const isPracticalComponent = (examComp) =>
+    examComp?.linked_exam_type === "practical" ||
+    examComp?.linked_exam?.type === "practical" ||
+    examComp?.exam?.type === "practical";
+  const onlineExamsList = examsList.filter((c) => !isPracticalComponent(c));
+  const practicalExamsList = examsList.filter((c) => isPracticalComponent(c));
 
   useEffect(() => {
-    // If exams are still loading from the API, do nothing
     if (examsLoading) return;
 
-    if (open && examsList.length > 0) {
+    if (open && onlineExamsList.length > 0) {
       const currentExams = watch("exams") || [];
 
-      const newExams = examsList.map((examComp) => {
+      const newExams = onlineExamsList.map((examComp) => {
         const existing = currentExams.find((e) => e.component === examComp._id);
         if (existing) return existing;
 
-        // Fallback for edit mode: check if it's in planningData.exams
         if (isEdit && !isComponentChanged) {
           const original = planningData?.exams?.find(
             (ex) => (ex.exam_component?._id || ex.exam_component) === examComp._id
@@ -180,7 +191,9 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         };
       });
 
-      const filteredNewExams = newExams.filter((ne) => examsList.some((el) => el._id === ne.component));
+      const filteredNewExams = newExams.filter((ne) =>
+        onlineExamsList.some((el) => el._id === ne.component),
+      );
       if (JSON.stringify(currentExams) !== JSON.stringify(filteredNewExams)) {
         setValue("exams", filteredNewExams);
       }
@@ -190,7 +203,66 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         setValue("exams", []);
       }
     }
-  }, [examsList, examsLoading, open, setValue, isEdit, isComponentChanged, planningData]);
+  }, [onlineExamsList, examsLoading, open, setValue, isEdit, isComponentChanged, planningData]);
+
+  useEffect(() => {
+    if (examsLoading) return;
+
+    if (open && practicalExamsList.length > 0) {
+      const current = watch("practical_exams") || [];
+
+      const next = practicalExamsList.map((examComp) => {
+        const existing = current.find(
+          (e) => toId(e.component) === toId(examComp._id),
+        );
+        if (existing?.exam_date || (existing?.teachers || []).length > 0) {
+          return existing;
+        }
+
+        if (isEdit && !isComponentChanged) {
+          const original = planningData?.practical_exams?.find(
+            (ex) =>
+              toId(ex.exam_component?._id || ex.exam_component) ===
+              toId(examComp._id),
+          );
+          if (original) {
+            return {
+              component: examComp._id,
+              exam:
+                toId(examComp.linked_exam) ||
+                toId(original.exam?._id || original.exam) ||
+                "",
+              teachers: (original.teachers || []).map((t) => toId(t)).filter(Boolean),
+              exam_date: original.exam_date
+                ? formatTZ(original.exam_date, "YYYY-MM-DD")
+                : existing?.exam_date || "",
+            };
+          }
+        }
+
+        if (existing) return existing;
+
+        return {
+          component: examComp._id,
+          exam: examComp.linked_exam,
+          teachers: [],
+          exam_date: "",
+        };
+      });
+
+      const filtered = next.filter((ne) =>
+        practicalExamsList.some((el) => toId(el._id) === toId(ne.component)),
+      );
+      if (JSON.stringify(current) !== JSON.stringify(filtered)) {
+        setValue("practical_exams", filtered);
+      }
+    } else if (open && !(isEdit && !isComponentChanged)) {
+      const current = watch("practical_exams") || [];
+      if (current.length > 0) {
+        setValue("practical_exams", []);
+      }
+    }
+  }, [practicalExamsList, examsLoading, open, setValue, isEdit, isComponentChanged, planningData]);
 
   const { data: teachersData, isLoading: teachersLoading } = useGetUsers(
     {
@@ -315,6 +387,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         },
       ],
       exams: [],
+      practical_exams: [],
     });
     setProgramSearchTerm("");
     setBatchSearchTerm("");
@@ -371,6 +444,13 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         teacher: ex.teacher?._id || ex.teacher || "",
       })) || [];
 
+      const formattedPracticalExams = planningData.practical_exams?.map((ex) => ({
+        component: toId(ex.exam_component),
+        exam: toId(ex.exam),
+        teachers: (ex.teachers || []).map((t) => toId(t)).filter(Boolean),
+        exam_date: ex.exam_date ? formatTZ(ex.exam_date, "YYYY-MM-DD") : "",
+      })) || [];
+
       reset({
         program: programId,
         batch: batchId,
@@ -380,6 +460,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         description: planningData.description || "",
         sessions: formattedSessions,
         exams: formattedExams,
+        practical_exams: formattedPracticalExams,
       });
     }
   }, [planningData, isEdit, reset, open]);
@@ -454,6 +535,12 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         component: ex.component,
         exam: ex.exam,
         teacher: ex.teacher || null,
+      })),
+      practical_exams: (formData.practical_exams || []).map((ex) => ({
+        component: ex.component,
+        exam: ex.exam,
+        teachers: ex.teachers || [],
+        exam_date: ex.exam_date,
       })),
     };
 
@@ -1068,7 +1155,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 </Label>
                 
                 {watch("exams").map((exam, index) => {
-                  const examComponent = examsList.find((e) => e._id === exam.component);
+                  const examComponent = onlineExamsList.find((e) => e._id === exam.component);
                   const examName = examComponent?.name || t("planningManagement.modal.examLabel", "Exam");
 
                   return (
@@ -1101,6 +1188,100 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                           );
                         })()}
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {watch("practical_exams") && watch("practical_exams").length > 0 && (
+              <div className="space-y-4 border-t dark:border-white/20 pt-4">
+                <Label className="text-base font-semibold">
+                  {t("planningManagement.modal.practicalExamsLabel", "Practical Exams")}
+                </Label>
+
+                {watch("practical_exams").map((exam, index) => {
+                  const examComponent = practicalExamsList.find(
+                    (e) => toId(e._id) === toId(exam.component),
+                  );
+                  const examName = examComponent?.name || t("exam.form.practical", "Practical");
+                  const selectedIds = watch(`practical_exams.${index}.teachers`) || [];
+                  const teacherItems = allStaff.map((staff) => ({
+                    _id: staff._id,
+                    name: staff.name
+                      ? `${staff.name} [${staff._role}]`
+                      : `${staff.first_name ?? ""} ${staff.last_name ?? ""}`.trim() || "Unknown",
+                  }));
+                  const savedTeachers = (
+                    planningData?.practical_exams?.find(
+                      (ex) =>
+                        toId(ex.exam_component?._id || ex.exam_component) ===
+                        toId(exam.component),
+                    )?.teachers || []
+                  ).filter((teacher) => typeof teacher === "object" && teacher._id);
+                  savedTeachers.forEach((teacher) => {
+                    if (
+                      !teacherItems.some(
+                        (item) => toId(item._id) === toId(teacher._id),
+                      )
+                    ) {
+                      teacherItems.push({
+                        _id: teacher._id,
+                        name:
+                          `${teacher.first_name ?? ""} ${teacher.last_name ?? ""}`.trim() ||
+                          "Assigned",
+                      });
+                    }
+                  });
+                  const selectedTeachers = teacherItems.filter((item) =>
+                    selectedIds.map(String).includes(String(item._id)),
+                  );
+
+                  return (
+                    <div
+                      key={exam.component}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50"
+                    >
+                      <h4 className="font-medium text-gray-900 dark:text-white border-b dark:border-white/10 pb-2">
+                        {examName}
+                      </h4>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          {t("planningManagement.modal.practicalExamDate", "Practical exam date")}{" "}
+                          <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          type="date"
+                          value={watch(`practical_exams.${index}.exam_date`) || ""}
+                          onChange={(e) =>
+                            setValue(`practical_exams.${index}.exam_date`, e.target.value, {
+                              shouldValidate: true,
+                            })
+                          }
+                        />
+                        {errors.practical_exams?.[index]?.exam_date && (
+                          <p className="text-sm text-red-500">
+                            {errors.practical_exams[index].exam_date.message}
+                          </p>
+                        )}
+                      </div>
+                      <SearchableMultiSelect
+                        label={t("exam.form.teachersLabel", "Teachers")}
+                        placeholder={t("exam.form.teachersPlaceholder", "Select Teachers")}
+                        searchPlaceholder={t("exam.form.searchTeachers", "Search Teachers")}
+                        items={teacherItems}
+                        selected={selectedTeachers}
+                        onChange={(selectedItems) => {
+                          setValue(
+                            `practical_exams.${index}.teachers`,
+                            selectedItems.map((item) => item._id),
+                            { shouldValidate: true },
+                          );
+                        }}
+                        onSearch={setTeacherSearchTerm}
+                        isLoading={teachersLoading || assistantsLoading || traineesLoading}
+                        error={errors.practical_exams?.[index]?.teachers?.message}
+                      />
                     </div>
                   );
                 })}

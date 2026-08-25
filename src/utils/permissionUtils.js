@@ -87,6 +87,10 @@ const SIDEBAR_PERMISSIONS = {
     "admin_management_view",
     "admin_management_modify",
   ],
+  "/admin/queue-management": [
+    "queue_management_view",
+    "queue_management_modify",
+  ],
   "/admin/admin-logs": ["logs_management_view"],
   "/admin/examination/question-banks": [
     "operations_management_view",
@@ -146,6 +150,7 @@ export const MODULE_MODIFY_PERMISSIONS = {
   academic: "academic_management_modify",
   finance: "finance_management_modify",
   master_data: "master_data_management_modify",
+  queue: "queue_management_modify",
 };
 
 /**

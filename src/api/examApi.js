@@ -40,6 +40,39 @@ export const getTeacherExams = async (params) => {
   return response.data;
 };
 
+export const getTeacherPracticalExams = async (params) => {
+  const response = await axiosInstance.get("/exam/teacher/practical-exams", { params });
+  return response.data;
+};
+
+export const getPracticalExamDetail = async (id) => {
+  const response = await axiosInstance.get(`/exam/teacher/practical-exams/${id}`);
+  return response.data;
+};
+
+export const getPracticalExamStudents = async (id, params) => {
+  const response = await axiosInstance.get(
+    `/exam/teacher/practical-exams/${id}/students`,
+    { params },
+  );
+  return response.data;
+};
+
+export const getPracticalExamFeedback = async (id, applicationId) => {
+  const response = await axiosInstance.get(
+    `/exam/teacher/practical-exams/${id}/students/${applicationId}/feedback`,
+  );
+  return response.data;
+};
+
+export const upsertPracticalExamFeedback = async (id, applicationId, payload) => {
+  const response = await axiosInstance.put(
+    `/exam/teacher/practical-exams/${id}/students/${applicationId}/feedback`,
+    payload,
+  );
+  return response.data;
+};
+
 export const getTeacherOtherExams = async (params) => {
   const response = await axiosInstance.get("/exam/teacher/other-exams", { params });
   return response.data;
@@ -94,5 +127,25 @@ export const getAdminExamResults = async (params) => {
 
 export const exportAdminExamResults = async (params) => {
   const response = await axiosInstance.get("/exam/admin/results/export", { params });
+  return response.data;
+};
+
+export const getAdminPracticalExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/practical-results", { params });
+  return response.data;
+};
+
+export const exportAdminPracticalExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/practical-results/export", { params });
+  return response.data;
+};
+
+export const getStudentPracticalDetailAdmin = async (plannedId, applicationId) => {
+  const response = await axiosInstance.get(`/exam/admin/practical-results/${plannedId}/students/${applicationId}`);
+  return response.data;
+};
+
+export const setStudentPracticalScoreAdmin = async (plannedId, applicationId, score) => {
+  const response = await axiosInstance.put(`/exam/admin/practical-results/${plannedId}/students/${applicationId}`, { score });
   return response.data;
 };

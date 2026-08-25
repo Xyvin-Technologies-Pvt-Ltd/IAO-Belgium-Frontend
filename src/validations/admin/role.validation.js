@@ -13,6 +13,8 @@ const VALID_PERMISSIONS = [
   "finance_management_modify",
   "master_data_management_view",
   "master_data_management_modify",
+  "queue_management_view",
+  "queue_management_modify",
   "logs_management_view"
 ];
 

@@ -97,11 +97,19 @@ const TeacherDashboard = () => {
           title: t("dashboard.teacher.assignedExams"),
           value: String(stats.assignedExams.value),
           subtitle: t("dashboard.teacher.assignedExamsHint", {
-            other: stats.otherExams.value,
             unread: stats.unreadNotifications.value,
           }),
           icon: ClipboardCheck,
           onClick: () => navigate({ to: "/teacher/exams" }),
+        },
+        {
+          title: t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" }),
+          value: String(stats.otherExams.value),
+          subtitle: t("dashboard.teacher.practicalExamsHint", {
+            defaultValue: "Assigned practical exams",
+          }),
+          icon: ClipboardCheck,
+          onClick: () => navigate({ to: "/teacher/practical-exams" }),
         },
       ]
     : [];
@@ -120,7 +128,7 @@ const TeacherDashboard = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {statsList.map((item) => (
           <button
             key={item.title}

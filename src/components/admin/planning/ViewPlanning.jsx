@@ -215,6 +215,46 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               </div>
             </div>
           )}
+          {planningData?.practical_exams && planningData.practical_exams.length > 0 && (
+            <div className="space-y-6">
+              <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("planningManagement.view.practicalExamsLabel", "Practical Exams")}
+              </h3>
+              <div className="grid grid-cols-1 gap-6">
+                {planningData.practical_exams.map((exam, index) => {
+                  const examName = exam.exam?.name || exam.exam_component?.name || "Unnamed Exam";
+                  const teacherNames = (exam.teachers || [])
+                    .map((teacher) =>
+                      `${teacher.last_name || ""} ${teacher.first_name || ""}`.trim(),
+                    )
+                    .filter(Boolean)
+                    .join(", ") || "N/A";
+                  const examDate = exam.exam_date
+                    ? formatTZ(exam.exam_date, "DD-MM-YYYY")
+                    : "N/A";
+
+                  return (
+                    <div key={exam._id || index} className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4 space-y-4 border dark:border-zinc-800">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-gray-900 dark:text-white">{examName}</h4>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <InfoItem
+                          label={t("planningManagement.modal.practicalExamDate", "Practical exam date")}
+                          value={examDate}
+                        />
+                        <InfoItem
+                          label={t("exam.form.teachersLabel", "Teachers")}
+                          value={teacherNames}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           {planningData?.venue && (
             <div>
               <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>

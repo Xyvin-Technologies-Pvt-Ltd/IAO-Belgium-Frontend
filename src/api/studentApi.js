@@ -123,3 +123,14 @@ export const deleteSpecialException = async (id) => {
     throw error.response?.data || error;
   }
 };
+
+export const getLocationChanges = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/user/student/location-changes`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

@@ -18,6 +18,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
+import FeedbackFieldsEditor from "@/components/admin/exam/FeedbackFieldsEditor";
 
 const ExamDetail = () => {
   const { t } = useTranslation();
@@ -123,11 +124,6 @@ const ExamDetail = () => {
                   {t("planningManagement.modal.batchLabel")}: {exam.batch?.name || exam.batch}
                 </span>
               )}
-              {exam.teachers && exam.teachers.length > 0 && exam.type === "practical" && (
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full font-medium">
-                  {t("exam.form.teachers", "Teachers")}: {exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -179,12 +175,10 @@ const ExamDetail = () => {
         />
       </div>
 
-      {(exam.type === "sit-at-home" || exam.type === "practical") && (
+      {exam.type === "sit-at-home" && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm space-y-4">
           <p className="text-sm font-bold border-b pb-2 mb-2">
-            {exam.type === "practical" 
-              ? t("exam.form.practicalSettings", "Practical Exam Settings") 
-              : t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
+            {t("exam.form.sitAtHomeSettings", "Sit-at-home Settings")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             {exam.batch && (
@@ -193,38 +187,32 @@ const ExamDetail = () => {
                 <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
               </div>
             )}
-            {exam.teachers && exam.teachers.length > 0 && exam.type === "practical" && (
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
+              <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
+              <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
+            </div>
+            {exam.module && (
               <div>
-                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.teachers", "Teachers")}</p>
-                <p className="font-semibold text-foreground">{exam.teachers.map(t => `${t.first_name} ${t.last_name}`).join(", ")}</p>
+                <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
+                <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
               </div>
             )}
-            {exam.type === "sit-at-home" && (
-              <>
-                <div>
-                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.maxAttempts", "Max Attempts")}</p>
-                  <p className="font-semibold text-foreground">{exam.max_attempts ?? 2}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.cooldownDays", "Cooldown (Days)")}</p>
-                  <p className="font-semibold text-foreground">{exam.cooldown_days ?? 7} {t("common.days", "days")}</p>
-                </div>
-                {exam.module && (
-                  <div>
-                    <p className="text-xs text-muted-foreground font-medium">{t("exam.form.moduleLabel", "Module")}</p>
-                    <p className="font-semibold text-foreground">{exam.module?.name || exam.module}</p>
-                  </div>
-                )}
-                {exam.deadline && (
-                  <div>
-                    <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
-                    <p className="font-semibold text-foreground">{new Date(exam.deadline).toLocaleDateString()}</p>
-                  </div>
-                )}
-              </>
+            {exam.deadline && (
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.deadline", "Deadline")}</p>
+                <p className="font-semibold text-foreground">{new Date(exam.deadline).toLocaleDateString()}</p>
+              </div>
             )}
           </div>
         </div>
+      )}
+
+      {exam.type === "practical" && canModify && (
+        <FeedbackFieldsEditor exam={exam} onSaved={refetch} />
       )}
 
       {exam.description && (

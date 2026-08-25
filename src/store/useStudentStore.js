@@ -10,6 +10,7 @@ import {
   createSpecialException,
   updateSpecialException,
   deleteSpecialException,
+  getLocationChanges,
 } from "@/api/studentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -118,5 +119,15 @@ export const useDeleteSpecialException = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["special-exceptions"] });
     },
+  });
+};
+
+export const useGetLocationChanges = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["student-location-changes", filter],
+    queryFn: () => getLocationChanges(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };

@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Évaluations",
       "exams": "Examens",
-      "otherExams": "Autres examens"
+      "otherExams": "Autres examens",
+      "practicalExams": "Examens pratiques"
     },
     "admin": {
       "title": "Portail administrateur",
@@ -60,6 +61,7 @@
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
       "integrations": "Intégrations",
+      "queueManagement": "Gestion des files d'attente",
       "adminLogs": "Journaux administrateurs",
       "examination": "Examens",
       "questionBanks": "Banques de questions",
@@ -182,6 +184,7 @@
     "trxCount": "Nombre de transactions",
     "convenienceFee": "Frais de service",
     "paid": "Payé",
+    "issued": "Émise",
     "failed": "Échoué",
     "overdue": "En retard",
     "canceled": "Annulé",
@@ -295,6 +298,56 @@
       "customInvoices": {
         "title": "Factures personnalisées"
       }
+    }
+  },
+  "queues": {
+    "title": "Gestion des files d'attente",
+    "subtitle": "Afficher et gérer les tâches BullMQ pour les e-mails, Exact Online et les contrats.",
+    "refresh": "Actualiser",
+    "loadFailed": "Échec du chargement des files d'attente",
+    "jobsLoadFailed": "Échec du chargement des tâches",
+    "noJobs": "Aucune tâche dans cet état.",
+    "removeSelected": "Supprimer la sélection",
+    "retrySelected": "Réessayer la sélection",
+    "clearAllFailed": "Effacer tous les échecs",
+    "confirmRemoveSelected": "Supprimer les tâches sélectionnées de la file ? Les tâches en attente ne seront pas exécutées. Action irréversible.",
+    "confirmClearFailed": "Supprimer toutes les tâches échouées de cette file ? Action irréversible.",
+    "retryOnlyFailed": "Sélectionnez des tâches échouées à réessayer.",
+    "selectAll": "Tout sélectionner",
+    "selectJob": "Sélectionner la tâche",
+    "tabs": {
+      "email": "E-mail",
+      "exact": "Exact",
+      "contract": "Contrats"
+    },
+    "status": {
+      "waiting": "En attente",
+      "active": "Actif",
+      "delayed": "Différé",
+      "failed": "Échoué"
+    },
+    "counts": {
+      "waiting": "En attente",
+      "active": "Actif",
+      "delayed": "Différé",
+      "failed": "Échoué",
+      "completed": "Terminé"
+    },
+    "table": {
+      "jobId": "ID tâche",
+      "type": "Type",
+      "summary": "Résumé",
+      "created": "Créé",
+      "attempts": "Tentatives",
+      "error": "Erreur"
+    },
+    "detail": {
+      "title": "Détails de la tâche",
+      "status": "Statut",
+      "attempts": "Tentatives",
+      "processed": "Traité le",
+      "payload": "Charge utile (filtrée)",
+      "close": "Fermer"
     }
   },
   "ltiManagement": {
@@ -464,7 +517,8 @@
       "academicManagement": "Gestion académique",
       "financeManagement": "Gestion financière",
       "masterDataManagement": "Gestion des données de référence",
-      "logsManagement": "Gestion des journaux"
+      "logsManagement": "Gestion des journaux",
+      "queueManagement": "Gestion des files d'attente"
     }
   },
   "languageManagement": {
@@ -1530,7 +1584,8 @@
       "pendingEvaluations": "Évaluations en attente",
       "pendingEvaluationsHint": "{{completed}} terminées jusqu'à présent",
       "assignedExams": "Examens assignés",
-      "assignedExamsHint": "{{other}} autres examens • {{unread}} notifications non lues",
+      "assignedExamsHint": "{{unread}} notifications non lues",
+      "practicalExamsHint": "Examens pratiques assignés",
       "upcomingSessions": "Sessions à venir",
       "recentSubmissions": "Soumissions à évaluer",
       "noUpcomingSessions": "Aucune session prévue dans les 7 prochains jours.",
