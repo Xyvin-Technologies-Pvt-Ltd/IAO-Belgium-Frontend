@@ -59,6 +59,30 @@ export const updateTeacherStatus = async (id, data) => {
   }
 };
 
+export const updatePracticalExamTeacherStatus = async (id, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/planning/practical-exam/${id}/teacher-status`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateOnlineExamTeacherStatus = async (id, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/planning/online-exam/${id}/teacher-status`,
+      data,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getPlanningByModule = async (filter) => {
   try {
     const response = await axiosInstance.get(`/planning/teacher/modules`, {

@@ -232,7 +232,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 toId(examComp.linked_exam) ||
                 toId(original.exam?._id || original.exam) ||
                 "",
-              teachers: (original.teachers || []).map((t) => toId(t)).filter(Boolean),
+              teachers: (original.teachers || []).map((t) => toId(t?.teacher || t)).filter(Boolean),
               exam_date: original.exam_date
                 ? formatTZ(original.exam_date, "YYYY-MM-DD")
                 : existing?.exam_date || "",
@@ -447,7 +447,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       const formattedPracticalExams = planningData.practical_exams?.map((ex) => ({
         component: toId(ex.exam_component),
         exam: toId(ex.exam),
-        teachers: (ex.teachers || []).map((t) => toId(t)).filter(Boolean),
+        teachers: (ex.teachers || []).map((t) => toId(t?.teacher || t)).filter(Boolean),
         exam_date: ex.exam_date ? formatTZ(ex.exam_date, "YYYY-MM-DD") : "",
       })) || [];
 
@@ -531,17 +531,38 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(formData.venue_address && { venue_address: formData.venue_address }),
       ...(formData.description && { description: formData.description }),
       sessions: formattedSessions,
-      exams: (formData.exams || []).map((ex) => ({
-        component: ex.component,
-        exam: ex.exam,
-        teacher: ex.teacher || null,
-      })),
-      practical_exams: (formData.practical_exams || []).map((ex) => ({
-        component: ex.component,
-        exam: ex.exam,
-        teachers: ex.teachers || [],
-        exam_date: ex.exam_date,
-      })),
+      exams: (formData.exams || []).map((ex) => {
+        const originalExam = planningData?.exams?.find(
+          (orig) => toId(orig.exam_component) === toId(ex.component)
+        );
+        const isSameTeacher = originalExam && toId(originalExam.teacher) === toId(ex.teacher);
+        return {
+          component: ex.component,
+          exam: ex.exam,
+          teacher: ex.teacher || null,
+          teacher_status: isSameTeacher ? originalExam.teacher_status || "pending" : "pending",
+        };
+      }),
+      practical_exams: (formData.practical_exams || []).map((ex) => {
+        const originalExam = planningData?.practical_exams?.find(
+          (orig) => toId(orig.exam_component) === toId(ex.component)
+        );
+        const mappedTeachers = (ex.teachers || []).map((teacherId) => {
+          const origTeacher = originalExam?.teachers?.find(
+            (t) => toId(t?.teacher || t) === teacherId
+          );
+          return {
+            teacher: teacherId,
+            status: origTeacher?.status || "pending",
+          };
+        });
+        return {
+          component: ex.component,
+          exam: ex.exam,
+          teachers: mappedTeachers,
+          exam_date: ex.exam_date,
+        };
+      }),
     };
 
 

@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
@@ -14,9 +15,12 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useGetTeacherPracticalExams } from "@/store/useExamStore";
+import { useUpdatePracticalExamTeacherStatus } from "@/store/usePlanningStore";
 import { useNavigate } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { formatTZ } from "@/utils/dateUtils";
+import { Check, X } from "lucide-react";
+import StatusBadge from "@/components/StatusBadge";
 
 const PracticalExamList = () => {
   const navigate = useNavigate();
@@ -31,6 +35,21 @@ const PracticalExamList = () => {
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
   });
+
+  const updateStatusMutation = useUpdatePracticalExamTeacherStatus();
+
+  const handleStatusUpdate = async (e, examId, status) => {
+    e.stopPropagation();
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: examId,
+        data: { status },
+      });
+      refetch();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  };
 
   const exams = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -54,14 +73,16 @@ const PracticalExamList = () => {
             <TableHead>{t("exam.table.type", { defaultValue: "Type" })}</TableHead>
             <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
             <TableHead>{t("planningManagement.modal.practicalExamDate", "Date")}</TableHead>
+            <TableHead>{t("planningManagement.table.status")}</TableHead>
+            <TableHead>{t("planningManagement.teacher.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={4} />
+            <TableSkeleton rows={rowsPerPage} columns={6} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center p-8">
+              <TableCell colSpan={6} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -91,11 +112,40 @@ const PracticalExamList = () => {
                 <TableCell>
                   {exam.exam_date ? formatTZ(exam.exam_date, "DD-MM-YYYY") : "—"}
                 </TableCell>
+                <TableCell>
+                  <StatusBadge status={exam.status || "pending"} />
+                </TableCell>
+                <TableCell>
+                  {(exam.status === "pending" || !exam.status) && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
+                        onClick={(e) => handleStatusUpdate(e, exam._id, "accepted")}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        {t("planningManagement.teacher.accept")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
+                        onClick={(e) => handleStatusUpdate(e, exam._id, "rejected")}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        {t("planningManagement.teacher.reject")}
+                      </Button>
+                    </div>
+                  )}
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={6} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>
