@@ -61,6 +61,7 @@
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "integrations": "Integrations",
+      "queueManagement": "Queue Management",
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
@@ -406,6 +407,56 @@
       }
     }
   },
+  "queues": {
+    "title": "Queue Management",
+    "subtitle": "View and manage BullMQ jobs across email, Exact Online, and contract queues.",
+    "refresh": "Refresh",
+    "loadFailed": "Failed to load queue summaries",
+    "jobsLoadFailed": "Failed to load queue jobs",
+    "noJobs": "No jobs in this state.",
+    "removeSelected": "Remove selected",
+    "retrySelected": "Retry selected",
+    "clearAllFailed": "Clear all failed",
+    "confirmRemoveSelected": "Remove selected jobs from the queue? Waiting and delayed jobs will not run. This cannot be undone.",
+    "confirmClearFailed": "Remove all failed jobs in this queue? This cannot be undone.",
+    "retryOnlyFailed": "Select failed jobs to retry.",
+    "selectAll": "Select all jobs",
+    "selectJob": "Select job",
+    "tabs": {
+      "email": "Email",
+      "exact": "Exact",
+      "contract": "Contracts"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "active": "Active",
+      "delayed": "Delayed",
+      "failed": "Failed"
+    },
+    "counts": {
+      "waiting": "Waiting",
+      "active": "Active",
+      "delayed": "Delayed",
+      "failed": "Failed",
+      "completed": "Completed"
+    },
+    "table": {
+      "jobId": "Job ID",
+      "type": "Type",
+      "summary": "Summary",
+      "created": "Created",
+      "attempts": "Attempts",
+      "error": "Error"
+    },
+    "detail": {
+      "title": "Job details",
+      "status": "Status",
+      "attempts": "Attempts",
+      "processed": "Processed at",
+      "payload": "Payload (sanitized)",
+      "close": "Close"
+    }
+  },
   "ltiManagement": {
     "title": "LTI Management",
     "subtitle": "Manage external LTI 1.3 tools integrated with the platform.",
@@ -573,7 +624,8 @@
       "academicManagement": "Academic Management",
       "financeManagement": "Finance Management",
       "masterDataManagement": "Master Data Management",
-      "logsManagement": "Logs Management"
+      "logsManagement": "Logs Management",
+      "queueManagement": "Queue Management"
     }
   },
   "languageManagement": {

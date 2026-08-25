@@ -123,9 +123,6 @@ const FeedbackFieldsEditor = ({ exam, onSaved }) => {
                   <SelectContent>
                     <SelectItem value="score">{t("exam.feedback.score", "Score")}</SelectItem>
                     <SelectItem value="text">{t("exam.feedback.text", "Text")}</SelectItem>
-                    <SelectItem value="pass_fail">
-                      {t("exam.feedback.passFail", "Pass / fail")}
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

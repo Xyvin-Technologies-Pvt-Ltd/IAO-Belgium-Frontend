@@ -129,3 +129,23 @@ export const exportAdminExamResults = async (params) => {
   const response = await axiosInstance.get("/exam/admin/results/export", { params });
   return response.data;
 };
+
+export const getAdminPracticalExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/practical-results", { params });
+  return response.data;
+};
+
+export const exportAdminPracticalExamResults = async (params) => {
+  const response = await axiosInstance.get("/exam/admin/practical-results/export", { params });
+  return response.data;
+};
+
+export const getStudentPracticalDetailAdmin = async (plannedId, applicationId) => {
+  const response = await axiosInstance.get(`/exam/admin/practical-results/${plannedId}/students/${applicationId}`);
+  return response.data;
+};
+
+export const setStudentPracticalScoreAdmin = async (plannedId, applicationId, score) => {
+  const response = await axiosInstance.put(`/exam/admin/practical-results/${plannedId}/students/${applicationId}`, { score });
+  return response.data;
+};

@@ -17,6 +17,7 @@ import {
   Link2,
   Activity,
   Plug,
+  Layers,
   WalletCards,
   CreditCard,
   Landmark,
@@ -108,7 +109,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
               },
               {
                 title: t("sidebar.admin.locationChanges", "Location Changes"),
-                url: "/admin/student-management/location-changes",
+                url: "/admin/location-changes",
               },
             ],
           },
@@ -215,6 +216,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.integrations"),
             url: "/admin/integrations",
             icon: Plug,
+          },
+          {
+            title: t("sidebar.admin.queueManagement"),
+            url: "/admin/queue-management",
+            icon: Layers,
           },
           {
             title: "Student Corner",

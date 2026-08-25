@@ -61,6 +61,7 @@
       "adminManagement": "Beheerdersbeheer",
       "roleManagement": "Rolbeheer",
       "integrations": "Integraties",
+      "queueManagement": "Wachtrijbeheer",
       "adminLogs": "Beheerderslogboeken",
       "examination": "Examens",
       "questionBanks": "Vragenbanken",
@@ -300,6 +301,56 @@
       }
     }
   },
+  "queues": {
+    "title": "Wachtrijbeheer",
+    "subtitle": "Bekijk en beheer BullMQ-taken voor e-mail, Exact Online en contracten.",
+    "refresh": "Vernieuwen",
+    "loadFailed": "Wachtrijoverzicht laden mislukt",
+    "jobsLoadFailed": "Wachtrijtaken laden mislukt",
+    "noJobs": "Geen taken in deze status.",
+    "removeSelected": "Geselecteerde verwijderen",
+    "retrySelected": "Geselecteerde opnieuw proberen",
+    "clearAllFailed": "Alle mislukte wissen",
+    "confirmRemoveSelected": "Geselecteerde taken uit de wachtrij verwijderen? Wachtende taken worden niet uitgevoerd. Dit kan niet ongedaan worden gemaakt.",
+    "confirmClearFailed": "Alle mislukte taken in deze wachtrij verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "retryOnlyFailed": "Selecteer mislukte taken om opnieuw te proberen.",
+    "selectAll": "Alles selecteren",
+    "selectJob": "Taak selecteren",
+    "tabs": {
+      "email": "E-mail",
+      "exact": "Exact",
+      "contract": "Contracten"
+    },
+    "status": {
+      "waiting": "Wachtend",
+      "active": "Actief",
+      "delayed": "Uitgesteld",
+      "failed": "Mislukt"
+    },
+    "counts": {
+      "waiting": "Wachtend",
+      "active": "Actief",
+      "delayed": "Uitgesteld",
+      "failed": "Mislukt",
+      "completed": "Voltooid"
+    },
+    "table": {
+      "jobId": "Taak-ID",
+      "type": "Type",
+      "summary": "Samenvatting",
+      "created": "Aangemaakt",
+      "attempts": "Pogingen",
+      "error": "Fout"
+    },
+    "detail": {
+      "title": "Taakdetails",
+      "status": "Status",
+      "attempts": "Pogingen",
+      "processed": "Verwerkt op",
+      "payload": "Payload (gefilterd)",
+      "close": "Sluiten"
+    }
+  },
   "ltiManagement": {
     "title": "LTI-beheer",
     "subtitle": "Beheer externe LTI 1.3-tools die zijn geïntegreerd met het platform.",
@@ -467,7 +518,8 @@
       "academicManagement": "Academisch beheer",
       "financeManagement": "Financieel beheer",
       "masterDataManagement": "Stamgegevensbeheer",
-      "logsManagement": "Logboekbeheer"
+      "logsManagement": "Logboekbeheer",
+      "queueManagement": "Wachtrijbeheer"
     }
   },
   "languageManagement": {

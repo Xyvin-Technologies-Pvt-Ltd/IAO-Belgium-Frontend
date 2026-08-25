@@ -61,6 +61,7 @@
       "adminManagement": "Administratorenverwaltung",
       "roleManagement": "Rollenverwaltung",
       "integrations": "Integrationen",
+      "queueManagement": "Warteschlangenverwaltung",
       "adminLogs": "Administratorenprotokolle",
       "examination": "Prüfungen",
       "questionBanks": "Fragenbanken",
@@ -326,6 +327,56 @@
       "programActive": "Programm aktiv (jährliche L-Bank-Auswahl)"
     }
   },
+  "queues": {
+    "title": "Warteschlangenverwaltung",
+    "subtitle": "BullMQ-Aufträge für E-Mail, Exact Online und Verträge anzeigen und verwalten.",
+    "refresh": "Aktualisieren",
+    "loadFailed": "Warteschlangenübersicht konnte nicht geladen werden",
+    "jobsLoadFailed": "Warteschlangenaufträge konnten nicht geladen werden",
+    "noJobs": "Keine Aufträge in diesem Status.",
+    "removeSelected": "Auswahl entfernen",
+    "retrySelected": "Auswahl erneut versuchen",
+    "clearAllFailed": "Alle fehlgeschlagenen löschen",
+    "confirmRemoveSelected": "Ausgewählte Aufträge aus der Warteschlange entfernen? Wartende Aufträge werden nicht ausgeführt. Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearFailed": "Alle fehlgeschlagenen Aufträge in dieser Warteschlange entfernen? Dies kann nicht rückgängig gemacht werden.",
+    "retryOnlyFailed": "Wählen Sie fehlgeschlagene Aufträge zum erneuten Versuch aus.",
+    "selectAll": "Alle auswählen",
+    "selectJob": "Auftrag auswählen",
+    "tabs": {
+      "email": "E-Mail",
+      "exact": "Exact",
+      "contract": "Verträge"
+    },
+    "status": {
+      "waiting": "Wartend",
+      "active": "Aktiv",
+      "delayed": "Verzögert",
+      "failed": "Fehlgeschlagen"
+    },
+    "counts": {
+      "waiting": "Wartend",
+      "active": "Aktiv",
+      "delayed": "Verzögert",
+      "failed": "Fehlgeschlagen",
+      "completed": "Abgeschlossen"
+    },
+    "table": {
+      "jobId": "Auftrags-ID",
+      "type": "Typ",
+      "summary": "Zusammenfassung",
+      "created": "Erstellt",
+      "attempts": "Versuche",
+      "error": "Fehler"
+    },
+    "detail": {
+      "title": "Auftragsdetails",
+      "status": "Status",
+      "attempts": "Versuche",
+      "processed": "Verarbeitet am",
+      "payload": "Nutzlast (gefiltert)",
+      "close": "Schließen"
+    }
+  },
   "ltiManagement": {
     "title": "LTI-Verwaltung",
     "subtitle": "Externe LTI 1.3-Tools verwalten, die in die Plattform integriert sind.",
@@ -493,7 +544,8 @@
       "academicManagement": "Akademische Verwaltung",
       "financeManagement": "Finanzverwaltung",
       "masterDataManagement": "Stammdatenverwaltung",
-      "logsManagement": "Protokollverwaltung"
+      "logsManagement": "Protokollverwaltung",
+      "queueManagement": "Warteschlangenverwaltung"
     }
   },
   "languageManagement": {

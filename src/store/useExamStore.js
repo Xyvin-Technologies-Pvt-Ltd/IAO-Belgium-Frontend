@@ -22,6 +22,10 @@ import {
   getStudentAnswerSheet,
   getAdminExamResults,
   exportAdminExamResults,
+  getAdminPracticalExamResults,
+  exportAdminPracticalExamResults,
+  getStudentPracticalDetailAdmin,
+  setStudentPracticalScoreAdmin,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -293,4 +297,44 @@ export const useUpsertPracticalExamFeedback = () => {
   });
 };
 
-export { getAdminExamResults, exportAdminExamResults };
+export const useGetAdminPracticalExamResults = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-practical-exam-results", params],
+    queryFn: () => getAdminPracticalExamResults(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentPracticalDetailAdmin = (plannedId, applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-practical-student-detail", plannedId, applicationId],
+    queryFn: () => getStudentPracticalDetailAdmin(plannedId, applicationId),
+    enabled: !!plannedId && !!applicationId,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useSetStudentPracticalScoreAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ plannedId, applicationId, score }) =>
+      setStudentPracticalScoreAdmin(plannedId, applicationId, score),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-practical-exam-results"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-practical-student-detail", variables.plannedId, variables.applicationId],
+      });
+      toast.success(response?.message || "Score saved successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save score");
+    },
+  });
+};
+
+export { getAdminExamResults, exportAdminExamResults, exportAdminPracticalExamResults };

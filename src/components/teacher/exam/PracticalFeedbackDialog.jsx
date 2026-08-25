@@ -123,21 +123,6 @@ const PracticalFeedbackDialog = ({ open, onClose, plannedId, student }) => {
                         setAnswers((prev) => ({ ...prev, [field.key]: e.target.value }))
                       }
                     />
-                  ) : field.type === "pass_fail" ? (
-                    <Select
-                      value={answers[field.key] || undefined}
-                      onValueChange={(v) =>
-                        setAnswers((prev) => ({ ...prev, [field.key]: v }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("common.select", "Select")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pass">{t("common.pass", "Pass")}</SelectItem>
-                        <SelectItem value="fail">{t("common.fail", "Fail")}</SelectItem>
-                      </SelectContent>
-                    </Select>
                   ) : (
                     <Input
                       type="number"
@@ -154,6 +139,15 @@ const PracticalFeedbackDialog = ({ open, onClose, plannedId, student }) => {
                   )}
                 </div>
               ))}
+
+            {fields.some(f => f.type === "score") && (
+              <div className="p-3 bg-muted/50 rounded-lg flex justify-between items-center text-sm font-semibold">
+                <span>{t("exam.feedback.runningTotal", "Running Score Total")}:</span>
+                <span>
+                  {fields.reduce((sum, f) => sum + (f.type === "score" ? (Number(answers[f.key]) || 0) : 0), 0)} / {fields.reduce((sum, f) => sum + (f.type === "score" ? (Number(f.max_marks) || 0) : 0), 0)}
+                </span>
+              </div>
+            )}
 
             {others.length > 0 && (
               <p className="text-xs text-muted-foreground">

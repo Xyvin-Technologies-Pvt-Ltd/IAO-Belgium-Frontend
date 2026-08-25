@@ -45,6 +45,7 @@ import Notifications from "@/pages/admin/notification";
 import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
 import IntegrationsPage from "@/pages/admin/integrations";
+import QueueManagementPage from "@/pages/admin/queue-management";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
 import ArchiveStudents from "@/pages/admin/archive/students";
@@ -58,6 +59,7 @@ import ArchiveInvoiceDetail from "@/pages/admin/archive/invoices/InvoiceDetail";
 import ArchiveEntities from "@/pages/admin/archive/entities";
 import ArchiveEntityBrowser from "@/pages/admin/archive/entities/EntityBrowser";
 import Results from "@/pages/admin/results";
+import PracticalResultDetailsPage from "@/pages/admin/results/PracticalResultDetailsPage";
 import ContractTypes from "@/pages/admin/contract-type";
 import Departments from "@/pages/admin/department";
 import Regions from "@/pages/admin/region";
@@ -155,7 +157,7 @@ export const adminRoutes = [
     component: withPermissionProtection(AllStudents, "/admin/student-management"),
   },
   {
-    path: "/admin/student-management/location-changes",
+    path: "/admin/location-changes",
     component: withPermissionProtection(LocationChanges, "/admin/student-management"),
   },
   {
@@ -352,6 +354,13 @@ export const adminRoutes = [
     component: withPermissionProtection(Results, "/admin/results"),
   },
   {
+    path: "/admin/results/practical/$plannedId/student/$applicationId",
+    component: withPermissionProtection(
+      PracticalResultDetailsPage,
+      "/admin/results",
+    ),
+  },
+  {
     path: "/admin/contracts",
     component: withPermissionProtection(AllContracts, "/admin/contracts"),
   },
@@ -374,6 +383,13 @@ export const adminRoutes = [
   {
     path: "/admin/integrations",
     component: withPermissionProtection(IntegrationsPage, "/admin/integrations"),
+  },
+  {
+    path: "/admin/queue-management",
+    component: withPermissionProtection(
+      QueueManagementPage,
+      "/admin/queue-management",
+    ),
   },
   {
     path: "/admin/student-corner",
