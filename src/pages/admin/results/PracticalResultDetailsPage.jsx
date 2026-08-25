@@ -109,17 +109,9 @@ const PracticalResultDetailsPage = () => {
   }
 
   return (
-    <div className="space-y-6 mt-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header section with back button */}
+    <div className="space-y-6 mt-4">
+      {/* Header section */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate({ to: "/admin/results", search: { tab: "practical" } })}
-          className="h-8 w-8 text-gray-500 dark:text-white/60"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
         <div>
           <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white capitalize">
             {details?.student ? `${details.student.first_name} ${details.student.last_name}` : ""}

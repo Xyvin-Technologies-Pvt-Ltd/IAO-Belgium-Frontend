@@ -5,6 +5,8 @@ import {
   updatePlanning,
   getPlanningByTeacher,
   updateTeacherStatus,
+  updatePracticalExamTeacherStatus,
+  updateOnlineExamTeacherStatus,
   getPlanningByModule,
   getPlanningById,
 } from "@/api/planningApi";
@@ -82,6 +84,42 @@ export const useUpdateTeacherStatus = () => {
   return useMutation({
     mutationFn: ({ id, data }) => updateTeacherStatus(id, data),
     onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["planning-teacher"] });
+      queryClient.invalidateQueries({ queryKey: ["planning-module"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
+      toast.success(response?.message || "Status updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update status");
+    },
+  });
+};
+
+export const useUpdatePracticalExamTeacherStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => updatePracticalExamTeacherStatus(id, data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["planning"] });
+      queryClient.invalidateQueries({ queryKey: ["planning-teacher"] });
+      queryClient.invalidateQueries({ queryKey: ["planning-module"] });
+      queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
+      toast.success(response?.message || "Status updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update status");
+    },
+  });
+};
+
+export const useUpdateOnlineExamTeacherStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => updateOnlineExamTeacherStatus(id, data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["planning"] });
       queryClient.invalidateQueries({ queryKey: ["planning-teacher"] });
       queryClient.invalidateQueries({ queryKey: ["planning-module"] });
       queryClient.invalidateQueries({ queryKey: ["teacher-exams"] });
