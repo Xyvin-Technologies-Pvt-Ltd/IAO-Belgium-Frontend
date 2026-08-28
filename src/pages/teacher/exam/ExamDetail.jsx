@@ -31,7 +31,7 @@ import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import StatusBadge from "@/components/StatusBadge";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { toast } from "sonner";
-import { getMoment, getNow, formatInstant } from "@/utils/dateUtils";
+import { getMoment, getNow, formatInstant, formatTZ } from "@/utils/dateUtils";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -122,14 +122,25 @@ const ExamDetail = () => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      const today = getNow().format("YYYY-MM-DD");
-      const sessionDate = getMoment(
-        examData.data.first_session.session_date,
-      ).format("YYYY-MM-DD");
-      setCanStart(
-        today === sessionDate &&
-          examData.data.exam_session_status !== "started",
-      );
+      if (examData.data.is_resit) {
+        const now = getMoment(getNow().format("YYYY-MM-DDTHH:mm:ss"));
+        const start = examData.data.first_session.start_time ? getMoment(examData.data.first_session.start_time) : null;
+        const end = examData.data.first_session.end_time ? getMoment(examData.data.first_session.end_time) : null;
+        const insideWindow = (!start || now.isSameOrAfter(start)) && (!end || now.isSameOrBefore(end));
+        setCanStart(
+          insideWindow &&
+            examData.data.exam_session_status !== "started"
+        );
+      } else {
+        const today = getNow().format("YYYY-MM-DD");
+        const sessionDate = getMoment(
+          examData.data.first_session.session_date,
+        ).format("YYYY-MM-DD");
+        setCanStart(
+          today === sessionDate &&
+            examData.data.exam_session_status !== "started",
+        );
+      }
     };
 
     checkSessionDate();
@@ -192,10 +203,26 @@ const ExamDetail = () => {
               )}
               <ExamStatusBadge status={exam.status} />
             </div>
-            <div className="mt-2">
-              <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
-                {exam.uid}
-              </span>
+            <div className="mt-2 flex flex-col gap-1.5">
+              <div>
+                <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
+                  {exam.uid}
+                </span>
+              </div>
+              {exam.first_session && (
+                <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                  <span className="font-semibold">{t("exam.scheduledTime", "Scheduled Start")}:</span>
+                  <span>
+                    {formatTZ(exam.first_session.start_time || exam.first_session.session_date, "DD-MM-YYYY, HH:mm")}
+                  </span>
+                  {exam.first_session.end_time && (
+                    <>
+                      <span>–</span>
+                      <span>{formatTZ(exam.first_session.end_time, "HH:mm")}</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

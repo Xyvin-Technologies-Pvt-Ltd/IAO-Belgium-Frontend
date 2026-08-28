@@ -348,7 +348,7 @@ const PracticalResultsTab = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={10 + allTeachersOnPage.length} className="text-center py-8 text-gray-400">
+              <TableCell colSpan={10} className="text-center py-8 text-gray-400">
                 {t("resultsManagement.table.noResults")}
               </TableCell>
             </TableRow>
