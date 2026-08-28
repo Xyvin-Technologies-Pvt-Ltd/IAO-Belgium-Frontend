@@ -327,7 +327,7 @@ export const useSetStudentPracticalScoreAdmin = () => {
         queryKey: ["admin-practical-exam-results"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["admin-practical-student-detail", variables.plannedId, variables.applicationId],
+        queryKey: ["admin-practical-student-detail"],
       });
       toast.success(response?.message || "Score saved successfully");
     },

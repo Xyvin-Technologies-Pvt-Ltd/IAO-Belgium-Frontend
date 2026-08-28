@@ -26,6 +26,8 @@ export const examSchema = z.object({
   cooldown_days: z.coerce.number().min(0).default(7),
   deadline: z.string().optional().nullable().default(""),
   teachers: z.array(z.string()).optional().default([]),
+  parent_exam: z.string().optional().nullable().default(""),
+  is_resit: z.boolean().optional(),
 }).refine((data) => {
   if (data.passing_type === "marks") {
     return data.passing_marks !== undefined && !isNaN(data.passing_marks) && data.passing_marks >= 0;

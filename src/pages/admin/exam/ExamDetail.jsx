@@ -124,6 +124,11 @@ const ExamDetail = () => {
                   {t("planningManagement.modal.batchLabel")}: {exam.batch?.name || exam.batch}
                 </span>
               )}
+              {exam.is_resit && (
+                <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full font-medium">
+                  {t("exam.resitOf", "Resit of")} {exam.parent_exam?.name || exam.parent_exam || t("exam.resit", "Resit")}
+                </span>
+              )}
             </div>
           </div>
         </div>

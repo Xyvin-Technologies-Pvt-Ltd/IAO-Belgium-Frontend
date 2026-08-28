@@ -187,6 +187,9 @@ const ExamDetail = () => {
               <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
                 {exam.name}
               </h2>
+              {exam.is_resit && (
+                <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+              )}
               <ExamStatusBadge status={exam.status} />
             </div>
             <div className="mt-2">

@@ -98,6 +98,9 @@ const PracticalExamDetail = () => {
         <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
           {exam.name}
         </h2>
+        {exam.is_resit && (
+          <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+        )}
         <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
           {t("exam.form.practical", "Practical")}
         </Badge>

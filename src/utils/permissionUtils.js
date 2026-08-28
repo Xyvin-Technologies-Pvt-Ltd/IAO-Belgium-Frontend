@@ -100,6 +100,10 @@ const SIDEBAR_PERMISSIONS = {
     "operations_management_view",
     "operations_management_modify",
   ],
+  "/admin/examination/resit-planning": [
+    "operations_management_view",
+    "operations_management_modify",
+  ],
   "/admin/submissions": [
     "operations_management_view",
     "operations_management_modify",

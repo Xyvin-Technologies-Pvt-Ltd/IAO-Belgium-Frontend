@@ -207,7 +207,17 @@ const Exams = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{i?.name}</span>
+                    {i?.is_resit && (
+                      <Badge variant="outline">
+                        {t("exam.resitOf", "Resit of")}{" "}
+                        {i?.parent_exam?.name || t("exam.resit", "Resit")}
+                      </Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{getTypeBadge(i?.type)}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
                 <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import QuestionSourceSelector from "./QuestionSourceSelector";
-import { useCreateExam, useUpdateExam } from "@/store/useExamStore";
+import { useCreateExam, useUpdateExam, useGetExamsDropdown } from "@/store/useExamStore";
 import {
   useGetAllLanguages,
   useGetAllPrograms,
@@ -59,6 +59,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       cooldown_days: 7,
       deadline: "",
       teachers: [],
+      parent_exam: "",
     },
   });
 
@@ -113,6 +114,32 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   const questionSources = watch("question_sources") || [];
   const createExam = useCreateExam();
   const updateExam = useUpdateExam();
+  const parentLocked = isEdit && !!(examData?.parent_exam);
+
+  const { data: parentExamsData, isLoading: parentExamsLoading } = useGetExamsDropdown(
+    {
+      type: selectedType,
+      exclude_resits: true,
+      status: "published",
+    },
+    { enabled: open },
+  );
+  const parentExams = [
+    { _id: "__none__", name: t("exam.form.resitOfNone", "None — this is a normal exam") },
+    ...(parentExamsData?.data || []).map((exam) => ({
+      _id: exam._id,
+      name: exam.uid ? `${exam.name} (${exam.uid})` : exam.name,
+    })),
+  ];
+  const currentParent = examData?.parent_exam;
+  if (currentParent?._id && !parentExams.some((e) => e._id === currentParent._id)) {
+    parentExams.splice(1, 0, {
+      _id: currentParent._id,
+      name: currentParent.uid
+        ? `${currentParent.name} (${currentParent.uid})`
+        : currentParent.name,
+    });
+  }
 
   const handleClose = () => {
     reset({
@@ -133,6 +160,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       cooldown_days: 7,
       deadline: "",
       teachers: [],
+      parent_exam: "",
     });
     setProgramSearchTerm("");
     setBatchSearchTerm("");
@@ -170,6 +198,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         cooldown_days: examData.cooldown_days ?? 7,
         deadline: examData.deadline ? examData.deadline.split("T")[0] : "",
         teachers: examData.teachers?.map((t) => typeof t === "object" ? t._id : t) || [],
+        parent_exam: examData.parent_exam?._id || examData.parent_exam || "",
       });
     } else if (!examData && open) {
       reset({
@@ -190,6 +219,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
         cooldown_days: 7,
         deadline: "",
         teachers: [],
+        parent_exam: "",
       });
       setProgramSearchTerm("");
       setBatchSearchTerm("");
@@ -230,6 +260,14 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
       delete finalValues.cooldown_days;
       delete finalValues.deadline;
       delete finalValues.teachers;
+    }
+
+    if (values.parent_exam && values.parent_exam !== "__none__") {
+      finalValues.parent_exam = values.parent_exam;
+      finalValues.is_resit = true;
+    } else {
+      finalValues.parent_exam = null;
+      finalValues.is_resit = false;
     }
 
     const mutation = isEdit ? updateExam : createExam;
@@ -283,6 +321,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 value={watch("type") || "online"}
                 onValueChange={(v) => {
                   setValue("type", v, { shouldValidate: true });
+                  setValue("parent_exam", "");
                   if (v !== "sit-at-home") {
                     setValue("program", "");
                     setValue("batch", "");
@@ -313,6 +352,20 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
                 <p className="text-sm text-red-500">{errors.type.message}</p>
               )}
             </div>
+
+            <SearchableSelect
+              label={t("exam.form.resitOf", "Resit of")}
+              placeholder={t("exam.form.resitOfPlaceholder", "None — this is a normal exam")}
+              searchPlaceholder={t("exam.form.resitOfSearch", "Search exams...")}
+              items={parentExams}
+              value={watch("parent_exam") || "__none__"}
+              onChange={(value) => {
+                setValue("parent_exam", !value || value === "__none__" ? "" : value);
+              }}
+              isLoading={parentExamsLoading}
+              disabled={parentLocked}
+              error={errors.parent_exam?.message}
+            />
 
             {watch("type") === "sit-at-home" && (
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-900/50">

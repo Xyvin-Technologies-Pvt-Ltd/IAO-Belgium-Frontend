@@ -66,6 +66,7 @@
       "examination": "Examination",
       "questionBanks": "Question Banks",
       "exams": "Exams",
+      "resitPlanning": "Resit planning",
       "results": "Results",
       "createInvoice": "Create Custom Invoice"
     },
@@ -1873,6 +1874,8 @@
     "questions": "questions",
     "minutes": "min",
     "cannotEditPublished": "Cannot edit a published exam. Archive it first.",
+    "resit": "Resit",
+    "resitOf": "Resit of",
     "edit": "Edit",
     "publish": "Publish",
     "archive": "Archive",
@@ -1920,6 +1923,10 @@
       "marksPerQuestion": "Marks per Question",
       "passingMarks": "Passing Marks",
       "passingType": "Passing Type",
+      "resitOf": "Resit of",
+      "resitOfNone": "None — this is a normal exam",
+      "resitOfPlaceholder": "None — this is a normal exam",
+      "resitOfSearch": "Search exams...",
       "marks": "Marks",
       "percentage": "Percentage",
       "settings": "Settings",
@@ -2212,10 +2219,57 @@
       "score": "Score",
       "status": "Status",
       "date": "Submitted Date",
+      "resit": "Resit",
+      "resitScore": "Resit score",
       "noResults": "No results found matching search/filter criteria."
+    },
+    "resit": {
+      "assignBtn": "Assign resit",
+      "assignTitle": "Assign resit exam",
+      "assignHint": "Assign {{count}} selected student(s) to a planned resit.",
+      "planning": "Resit planning",
+      "planningPlaceholder": "Select planning",
+      "selectPlanning": "Select a resit planning",
+      "sameExam": "Select failed students from the same exam to assign a resit.",
+      "assigned": "Assigned",
+      "notAssigned": "—"
     },
     "messages": {
       "loadFailed": "Failed to load results data"
+    }
+  },
+  "resitPlanning": {
+    "title": "Resit planning",
+    "create": "Plan resit",
+    "edit": "Edit resit planning",
+    "save": "Save planning",
+    "update": "Update planning",
+    "loadFailed": "Failed to load resit plannings",
+    "empty": "No resit plannings yet",
+    "table": {
+      "exam": "Resit exam",
+      "parent": "Original exam",
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "teacher": "Teacher",
+      "actions": "Actions"
+    },
+    "form": {
+      "exam": "Resit exam",
+      "examPlaceholder": "Select a resit exam",
+      "examRequired": "Resit exam is required",
+      "date": "Date",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "location": "Location",
+      "address": "Address",
+      "teacher": "Teacher",
+      "teachers": "Teachers",
+      "teacherPlaceholder": "Select a teacher",
+      "teachersPlaceholder": "Select teachers",
+      "searchTeachers": "Search teachers...",
+      "teacherRequired": "Teacher is required"
     }
   },
   "specialExceptions": {
