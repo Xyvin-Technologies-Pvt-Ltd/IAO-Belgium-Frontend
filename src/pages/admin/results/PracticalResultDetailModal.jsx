@@ -121,7 +121,11 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                           {tf.score_summary.breakdown?.map((b) => (
                             <div key={b.field_key} className="p-2 bg-sidebar rounded border border-sidebar-border/40">
-                              <span className="font-medium">{b.label}:</span>{" "}
+                              <span className="font-medium">
+                                {b.label}
+                                {b.required && <span className="text-red-500"> *</span>}
+                                :
+                              </span>{" "}
                               <span>
                                 {b.value ?? "—"}
                                 {b.max_marks !== undefined ? ` / ${b.max_marks}` : ""}

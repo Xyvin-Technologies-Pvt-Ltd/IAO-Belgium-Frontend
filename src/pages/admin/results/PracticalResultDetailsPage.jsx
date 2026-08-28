@@ -156,6 +156,7 @@ const PracticalResultDetailsPage = () => {
                         <div key={b.field_key} className="space-y-1">
                           <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
                             {b.label}
+                            {b.required && <span className="text-red-500"> *</span>}
                           </span>
                           <div className="p-3 bg-muted/10 rounded border border-sidebar-border text-sm leading-relaxed whitespace-pre-line text-dashboard-text dark:text-white/80">
                             {b.value || <span className="text-gray-400 italic">No comment provided</span>}
@@ -165,7 +166,10 @@ const PracticalResultDetailsPage = () => {
                     }
                     return (
                       <div key={b.field_key} className="flex justify-between items-center py-2 border-b border-sidebar-border/30 text-sm">
-                        <span className="font-medium text-muted-foreground">{b.label}</span>
+                        <span className="font-medium text-muted-foreground">
+                          {b.label}
+                          {b.required && <span className="text-red-500"> *</span>}
+                        </span>
                         <span className="font-semibold text-dashboard-text dark:text-white">
                           {b.value ?? "—"} / {b.max_marks}
                         </span>

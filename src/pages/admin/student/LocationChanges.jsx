@@ -15,6 +15,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useGetLocationChanges } from "@/store/useStudentStore";
 import moment from "moment";
+import LocationChangesFilterDrawer, { DEFAULT_LOCATION_CHANGES_FILTERS } from "./LocationChangesFilterDrawer";
 
 const LocationChanges = () => {
   const { t } = useTranslation();
@@ -22,6 +23,9 @@ const LocationChanges = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+
+  const [draftFilters, setDraftFilters] = useState({ ...DEFAULT_LOCATION_CHANGES_FILTERS });
+  const [appliedFilters, setAppliedFilters] = useState({ ...DEFAULT_LOCATION_CHANGES_FILTERS });
 
   useEffect(() => {
     setPage(1);
@@ -31,6 +35,12 @@ const LocationChanges = () => {
     page,
     limit: rowsPerPage,
     search: debouncedSearch,
+    program: appliedFilters.program !== "all" ? appliedFilters.program : undefined,
+    batch: appliedFilters.batch !== "all" ? appliedFilters.batch : undefined,
+    original_city: appliedFilters.city !== "all" ? appliedFilters.city : undefined,
+    switched_city: appliedFilters.switched_city !== "all" ? appliedFilters.switched_city : undefined,
+    switched_batch: appliedFilters.switched_batch !== "all" ? appliedFilters.switched_batch : undefined,
+    target_program: appliedFilters.target_program !== "all" ? appliedFilters.target_program : undefined,
   });
 
   const locationOverrides = data?.data || [];
@@ -53,6 +63,13 @@ const LocationChanges = () => {
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+          <LocationChangesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
           />
         </div>
       </div>

@@ -67,6 +67,7 @@ const ResitPlanningPage = () => {
   const resitExams = (examsData?.data || []).map((exam) => ({
       _id: exam._id,
       type: exam.type,
+      duration: exam.duration,
       name: exam.parent_exam?.name
         ? `${exam.name} — ${t("exam.resitOf", "Resit of")} ${exam.parent_exam.name}`
         : exam.name,
@@ -88,7 +89,7 @@ const ResitPlanningPage = () => {
   const selectedTeachers = watch("teachers") || [];
   const isSubmitting = createPlanning.isPending || updatePlanning.isPending;
 
-  const { data: teachersData, isLoading: teachersLoading } = useGetUsers(
+  const { data: teachersData, isLoading: teachersQueryLoading } = useGetUsers(
     {
       role: "teacher",
       teacher_role_key: "teacher",
@@ -97,11 +98,48 @@ const ResitPlanningPage = () => {
     { enabled: open },
   );
 
-  const teacherLabel = (user) =>
-    user?.name ||
-    `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
-    user?.email ||
-    "";
+  const { data: assistantsData, isLoading: assistantsLoading } = useGetUsers(
+    {
+      role: "teacher",
+      teacher_role_key: "assistant",
+      ...(teacherSearch && { search: teacherSearch }),
+    },
+    { enabled: open },
+  );
+
+  const { data: traineesData, isLoading: traineesLoading } = useGetUsers(
+    {
+      role: "teacher",
+      teacher_role_key: "trainee",
+      ...(teacherSearch && { search: teacherSearch }),
+    },
+    { enabled: open },
+  );
+
+  const teachersLoading = teachersQueryLoading || assistantsLoading || traineesLoading;
+
+  const teachersList = (open ? (teachersData?.data || []) : []).map((u) => ({ ...u, _role: "Teacher" }));
+  const assistantsList = (open ? (assistantsData?.data || []) : []).map((u) => ({ ...u, _role: "Assistant" }));
+  const traineesList = (open ? (traineesData?.data || []) : []).map((u) => ({ ...u, _role: "Trainee" }));
+
+  const allStaff = [
+    ...teachersList,
+    ...assistantsList,
+    ...traineesList,
+  ].filter(
+    (u, idx, arr) => arr.findIndex((x) => String(x._id) === String(u._id)) === idx
+  );
+
+  const teacherLabel = (user) => {
+    const rawName = user?.name ||
+      `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
+      user?.email ||
+      "";
+    if (user?._role) {
+      return `${rawName} [${user._role}]`;
+    }
+    return rawName;
+  };
 
   const currentTeacher =
     editing?.teacher && typeof editing.teacher === "object"
@@ -119,7 +157,7 @@ const ResitPlanningPage = () => {
         _id: String(item._id),
         name: teacherLabel(item),
       })),
-    ...(teachersData?.data || []).map((user) => ({
+    ...allStaff.map((user) => ({
       _id: String(user._id),
       name: teacherLabel(user),
     })),
@@ -299,11 +337,11 @@ const ResitPlanningPage = () => {
                 <TableCell className="font-medium">{row.exam?.name || "N/A"}</TableCell>
                 <TableCell>{row.exam?.parent_exam?.name || "N/A"}</TableCell>
                 <TableCell>
-                  {row.exam_date ? formatInstant(row.exam_date, "DD-MM-YYYY") : "N/A"}
+                  {row.exam_date ? formatTZ(row.exam_date, "DD-MM-YYYY") : "N/A"}
                 </TableCell>
                 <TableCell>
                   {row.start_time && row.end_time
-                    ? `${formatInstant(row.start_time, "HH:mm")} – ${formatInstant(row.end_time, "HH:mm")}`
+                    ? `${formatTZ(row.start_time, "HH:mm")} – ${formatTZ(row.end_time, "HH:mm")}`
                     : "N/A"}
                 </TableCell>
                 <TableCell>{row.location || "N/A"}</TableCell>
@@ -368,6 +406,12 @@ const ResitPlanningPage = () => {
                   disabled
                 />
                 <input type="hidden" {...register("exam")} />
+                {editing.exam?.duration && (
+                  <div className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                    <span className="font-semibold">{t("exam.duration", "Duration")}:</span>
+                    <span>{editing.exam.duration} {t("common.durationUnits.minute", "minutes")}</span>
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -388,6 +432,12 @@ const ResitPlanningPage = () => {
                   error={errors.exam?.message}
                 />
                 <input type="hidden" {...register("exam", { required: t("resitPlanning.form.examRequired", "Resit exam is required") })} />
+                {selectedExam?.duration && (
+                  <div className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                    <span className="font-semibold">{t("exam.duration", "Duration")}:</span>
+                    <span>{selectedExam.duration} {t("common.durationUnits.minute", "minutes")}</span>
+                  </div>
+                )}
               </>
             )}
 

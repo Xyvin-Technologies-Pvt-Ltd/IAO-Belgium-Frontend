@@ -25,6 +25,7 @@ import {
 } from "@/store/useExamStore";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { toast } from "sonner";
 
 const PracticalFeedbackDialog = ({ open, onClose, plannedId, student }) => {
   const { t } = useTranslation();
@@ -61,6 +62,31 @@ const PracticalFeedbackDialog = ({ open, onClose, plannedId, student }) => {
   );
 
   const handleSave = (status) => {
+    for (const field of fields) {
+      if (field.type === "score") {
+        const valStr = answers[field.key];
+        if (valStr !== undefined && valStr !== null && valStr !== "") {
+          const val = Number(valStr);
+          if (isNaN(val)) {
+            toast.error(t("exam.feedback.invalidNumber", { defaultValue: `Value for "${field.label}" must be a number` }));
+            return;
+          }
+          if (val < 0) {
+            toast.error(t("exam.feedback.negativeScore", { defaultValue: `Value for "${field.label}" cannot be negative` }));
+            return;
+          }
+          if (field.max_marks !== undefined && val > field.max_marks) {
+            toast.error(
+              t("exam.feedback.maxMarksExceeded", {
+                defaultValue: `Value for "${field.label}" cannot exceed maximum marks of ${field.max_marks}`,
+              })
+            );
+            return;
+          }
+        }
+      }
+    }
+
     saveMutation.mutate(
       {
         id: plannedId,
@@ -114,6 +140,7 @@ const PracticalFeedbackDialog = ({ open, onClose, plannedId, student }) => {
                 <div key={field.key} className="space-y-2">
                   <Label>
                     {field.label}
+                    {field.type === "score" && field.max_marks !== undefined ? ` (Max: ${field.max_marks})` : ""}
                     {field.required ? <span className="text-red-500"> *</span> : null}
                   </Label>
                   {field.type === "text" ? (
