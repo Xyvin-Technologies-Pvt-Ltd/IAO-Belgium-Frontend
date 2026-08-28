@@ -114,18 +114,7 @@ const PracticalResultsTab = () => {
     setAssignOpen(true);
   };
 
-  // Build union of all teachers on this page to make table columns
-  const allTeachersOnPage = useMemo(() => {
-    const union = [];
-    results.forEach(row => {
-      (row.teachers || []).forEach(t => {
-        if (!union.find(u => u._id.toString() === t._id.toString())) {
-          union.push(t);
-        }
-      });
-    });
-    return union;
-  }, [results]);
+
 
   const handleExport = async () => {
     const toastId = toast.loading("Preparing CSV export...");
@@ -217,21 +206,7 @@ const PracticalResultsTab = () => {
     }
   };
 
-  const getTeacherScoreCell = (row, teacherId) => {
-    const isAssigned = (row.teachers || []).some(t => t._id.toString() === teacherId.toString());
-    if (!isAssigned) return <span className="text-gray-400">—</span>;
 
-    const teacherRes = (row.teacher_results || []).find(tr => tr.teacher_id.toString() === teacherId.toString());
-    if (!teacherRes || teacherRes.status !== "submitted") {
-      return <span className="text-yellow-600 dark:text-yellow-400 font-medium text-xs">{t("common.pending", "Pending")}</span>;
-    }
-
-    return (
-      <span className="font-medium text-xs">
-        {teacherRes.total_score} / {teacherRes.max_score}
-      </span>
-    );
-  };
 
   return (
     <div className="space-y-6">
@@ -277,11 +252,7 @@ const PracticalResultsTab = () => {
             <TableHead>{t("resultsManagement.table.program")}</TableHead>
             <TableHead>{t("resultsManagement.table.batch")}</TableHead>
             <TableHead>{t("resultsManagement.table.exam")}</TableHead>
-            {allTeachersOnPage.map((tName) => (
-              <TableHead key={tName._id}>
-                {tName.first_name} {tName.last_name[0]}.
-              </TableHead>
-            ))}
+
             <TableHead>{t("resultsManagement.table.adminScore", "Admin Score")}</TableHead>
             <TableHead>{t("resultsManagement.table.status")}</TableHead>
             <TableHead>{t("resultsManagement.table.resit", "Resit")}</TableHead>
@@ -291,10 +262,10 @@ const PracticalResultsTab = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {resultsLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={10 + allTeachersOnPage.length} />
+            <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={10 + allTeachersOnPage.length} className="text-center p-8">
+              <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("resultsManagement.messages.loadFailed")}
                   onRetry={refetch}
@@ -335,11 +306,7 @@ const PracticalResultsTab = () => {
                 <TableCell className="max-w-[150px] truncate font-medium" title={row.exam?.name}>
                   {row.exam?.name || "N/A"}
                 </TableCell>
-                {allTeachersOnPage.map((tName) => (
-                  <TableCell key={tName._id}>
-                    {getTeacherScoreCell(row, tName._id)}
-                  </TableCell>
-                ))}
+
                 <TableCell className="font-semibold text-dashboard-text dark:text-white">
                   {row.admin_score !== undefined && row.admin_score !== null ? (
                     <span>
