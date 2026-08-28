@@ -150,7 +150,16 @@ const CreateComponent = ({
       enabled: open && selectedType === "exam" && !!programId,
     },
   );
-  const programModules = programModulesData?.data || [];
+  let programModules = programModulesData?.data || [];
+  if (isEdit && componentData?.linked_module) {
+    const currentModule = typeof componentData.linked_module === "object"
+      ? componentData.linked_module
+      : { _id: componentData.linked_module, name: t("common.notAvailable", "N/A") };
+    const exists = programModules.some((mod) => mod._id === currentModule._id);
+    if (!exists) {
+      programModules = [currentModule, ...programModules];
+    }
+  }
 
   const { data: languagesData } = useGetAllLanguages(
     { status: true },
@@ -181,10 +190,22 @@ const CreateComponent = ({
     },
   );
 
-  const publishedExams =
+  let publishedExams =
     examKind === "practical"
       ? publishedPracticalExamsData?.data || []
       : publishedOnlineExamsData?.data || [];
+
+  if (isEdit && componentData?.linked_exam) {
+    const currentExam = typeof componentData.linked_exam === "object"
+      ? componentData.linked_exam
+      : { _id: componentData.linked_exam, name: t("common.notAvailable", "N/A"), type: examKind };
+    if (currentExam.type === examKind) {
+      const exists = publishedExams.some((exam) => exam._id === currentExam._id);
+      if (!exists) {
+        publishedExams = [currentExam, ...publishedExams];
+      }
+    }
+  }
 
   // Filter modules to show only unique system_ids (or modules without system_id)
   // Group by system_id and take the first one from each group
@@ -451,7 +472,8 @@ const CreateComponent = ({
     setSelectedType(componentType);
     setValue("type", componentType);
     if (componentType === "exam") {
-      const linkedType = componentData.linked_exam?.type;
+      const examObj = componentData.linked_exam;
+      const linkedType = typeof examObj === "object" ? examObj?.type : undefined;
       setExamKind(linkedType === "practical" ? "practical" : "online");
     }
 
@@ -818,6 +840,7 @@ const CreateComponent = ({
                     <span className="text-red-500">*</span>
                   </Label>
                   <Select
+                    key={examKind}
                     value={examKind}
                     onValueChange={(v) => {
                       setExamKind(v);
