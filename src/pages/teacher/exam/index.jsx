@@ -16,8 +16,10 @@ import { useTranslation } from "react-i18next";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import { useGetTeacherExams } from "@/store/useExamStore";
 import { useUpdateOnlineExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,14 +39,22 @@ const ExamList = () => {
   });
 
   const updateStatusMutation = useUpdateOnlineExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
 
-  const handleStatusUpdate = async (e, plannedExamId, status) => {
+  const handleStatusUpdate = async (e, exam, status) => {
     e.stopPropagation();
     try {
-      await updateStatusMutation.mutateAsync({
-        id: plannedExamId,
-        data: { status },
-      });
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam.planned_exam_id || exam.planning_id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      }
       refetch();
     } catch (err) {
       console.error("Failed to update status:", err);
@@ -57,7 +67,10 @@ const ExamList = () => {
   const handleRowClick = (exam) => {
     navigate({
       to: "/teacher/exams/$exam_id/$planning_id",
-      params: { exam_id: exam.exam_id, planning_id: exam.planning_id },
+      params: {
+        exam_id: String(exam.exam_id?._id || exam.exam_id),
+        planning_id: String(exam.planning_id),
+      },
     });
   };
 
@@ -109,7 +122,14 @@ const ExamList = () => {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(exam)}
               >
-                <TableCell>{exam?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{exam?.name}</span>
+                    {exam?.is_resit && (
+                      <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-medium">{exam?.module_name}</span>
@@ -139,8 +159,8 @@ const ExamList = () => {
                         size="sm"
                         variant="outline"
                         className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
-                        onClick={(e) => handleStatusUpdate(e, exam.planned_exam_id, "accepted")}
-                        disabled={updateStatusMutation.isPending}
+                        onClick={(e) => handleStatusUpdate(e, exam, "accepted")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
                       >
                         <Check className="h-4 w-4 mr-1" />
                         {t("planningManagement.teacher.accept")}
@@ -149,8 +169,8 @@ const ExamList = () => {
                         size="sm"
                         variant="outline"
                         className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
-                        onClick={(e) => handleStatusUpdate(e, exam.planned_exam_id, "rejected")}
-                        disabled={updateStatusMutation.isPending}
+                        onClick={(e) => handleStatusUpdate(e, exam, "rejected")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
                       >
                         <X className="h-4 w-4 mr-1" />
                         {t("planningManagement.teacher.reject")}

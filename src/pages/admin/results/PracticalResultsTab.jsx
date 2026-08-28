@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -16,20 +17,25 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAdminPracticalExamResults, exportAdminPracticalExamResults } from "@/store/useExamStore";
 import ResultsFilterDrawer from "./ResultsFilterDrawer";
+import AssignResitDialog from "./AssignResitDialog";
 import StatusBadge from "@/components/StatusBadge";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import moment from "moment";
 import { toast } from "sonner";
 import { formatInstant } from "@/utils/dateUtils";
 import { useNavigate } from "@tanstack/react-router";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const PracticalResultsTab = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const [selected, setSelected] = useState({});
+  const [assignOpen, setAssignOpen] = useState(false);
 
   const [appliedFilters, setAppliedFilters] = useState({
     program: "all",
@@ -73,6 +79,40 @@ const PracticalResultsTab = () => {
 
   const results = resultsData?.data || [];
   const totalRows = resultsData?.total_count || 0;
+  const selectedList = Object.values(selected);
+  const selectedExamIds = [...new Set(selectedList.map((s) => s.examId))];
+  const canAssign = selectedList.length > 0 && selectedExamIds.length === 1;
+
+  const rowKey = (row) => `${row.planned_practical_exam._id}-${row.student._id}`;
+
+  const toggleRow = (row, e) => {
+    e?.stopPropagation();
+    const key = rowKey(row);
+    setSelected((prev) => {
+      const next = { ...prev };
+      if (next[key]) delete next[key];
+      else {
+        next[key] = {
+          applicationId: row.student?._id,
+          examId: row.exam?._id,
+        };
+      }
+      return next;
+    });
+  };
+
+  const handleOpenAssign = () => {
+    if (!canAssign) {
+      toast.error(
+        t(
+          "resultsManagement.resit.sameExam",
+          "Select failed students from the same exam to assign a resit.",
+        ),
+      );
+      return;
+    }
+    setAssignOpen(true);
+  };
 
   // Build union of all teachers on this page to make table columns
   const allTeachersOnPage = useMemo(() => {
@@ -119,7 +159,10 @@ const PracticalResultsTab = () => {
         "Official Admin Score",
         "Percentage",
         "Result Status",
-        "Date Decided"
+        "Date Decided",
+        "Resit Assigned",
+        "Resit Score",
+        "Resit Status",
       ];
 
       const csvRows = [
@@ -135,6 +178,9 @@ const PracticalResultsTab = () => {
           const percentage = row.percentage !== undefined && row.percentage !== null ? `${Math.round(row.percentage * 100) / 100}%` : "Pending";
           const result = row.result || "Pending";
           const date = row.decided_at ? formatInstant(row.decided_at, "YYYY-MM-DD HH:mm:ss") : "N/A";
+          const resitAssigned = row.resit_assigned ? "Yes" : "No";
+          const resitScore = row.resit_score !== undefined && row.resit_score !== null ? row.resit_score : "N/A";
+          const resitStatus = row.resit_result || "N/A";
 
           return [
             `"${studentName.replace(/"/g, '""')}"`,
@@ -146,7 +192,10 @@ const PracticalResultsTab = () => {
             `"${String(adminScore).replace(/"/g, '""')}"`,
             `"${percentage.replace(/"/g, '""')}"`,
             `"${result.replace(/"/g, '""')}"`,
-            `"${date.replace(/"/g, '""')}"`
+            `"${date.replace(/"/g, '""')}"`,
+            `"${resitAssigned}"`,
+            `"${String(resitScore).replace(/"/g, '""')}"`,
+            `"${String(resitStatus).replace(/"/g, '""')}"`,
           ].join(",");
         }),
       ];
@@ -208,11 +257,22 @@ const PracticalResultsTab = () => {
           <Download className="h-4 w-4" />
           {t("resultsManagement.exportBtn")}
         </Button>
+        {canModify && (
+          <Button
+            variant="outline"
+            onClick={handleOpenAssign}
+            disabled={selectedList.length === 0}
+          >
+            {t("resultsManagement.resit.assignBtn", "Assign resit")}
+            {selectedList.length > 0 ? ` (${selectedList.length})` : ""}
+          </Button>
+        )}
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10"></TableHead>
             <TableHead>{t("resultsManagement.table.student")}</TableHead>
             <TableHead>{t("resultsManagement.table.program")}</TableHead>
             <TableHead>{t("resultsManagement.table.batch")}</TableHead>
@@ -224,15 +284,17 @@ const PracticalResultsTab = () => {
             ))}
             <TableHead>{t("resultsManagement.table.adminScore", "Admin Score")}</TableHead>
             <TableHead>{t("resultsManagement.table.status")}</TableHead>
+            <TableHead>{t("resultsManagement.table.resit", "Resit")}</TableHead>
+            <TableHead>{t("resultsManagement.table.resitScore", "Resit score")}</TableHead>
             <TableHead>{t("resultsManagement.table.date")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {resultsLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7 + allTeachersOnPage.length} />
+            <TableSkeleton rows={rowsPerPage} columns={10 + allTeachersOnPage.length} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7 + allTeachersOnPage.length} className="text-center p-8">
+              <TableCell colSpan={10 + allTeachersOnPage.length} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("resultsManagement.messages.loadFailed")}
                   onRetry={refetch}
@@ -255,6 +317,13 @@ const PracticalResultsTab = () => {
                   })
                 }
               >
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={!!selected[rowKey(row)]}
+                    onCheckedChange={() => toggleRow(row)}
+                    disabled={row.result !== "fail" || row.resit_assigned}
+                  />
+                </TableCell>
                 <TableCell className="font-medium text-dashboard-text dark:text-white">
                   <div>
                     <span>{`${row.student?.first_name || ""} ${row.student?.last_name || ""}`.trim() || "N/A"}</span>
@@ -290,6 +359,21 @@ const PracticalResultsTab = () => {
                 <TableCell>
                   <StatusBadge status={row.result || "pending"} />
                 </TableCell>
+                <TableCell>
+                  {row.resit_assigned
+                    ? t("resultsManagement.resit.assigned", "Assigned")
+                    : t("resultsManagement.resit.notAssigned", "—")}
+                </TableCell>
+                <TableCell>
+                  {row.resit_result ? (
+                    <span>
+                      {row.resit_score ?? "—"}{" "}
+                      <StatusBadge status={row.resit_result} />
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
                 <TableCell className="text-gray-500 dark:text-white/60">
                   {row.decided_at ? formatInstant(row.decided_at, "DD-MM-YYYY") : "N/A"}
                 </TableCell>
@@ -297,7 +381,7 @@ const PracticalResultsTab = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7 + allTeachersOnPage.length} className="text-center py-8 text-gray-400">
+              <TableCell colSpan={10 + allTeachersOnPage.length} className="text-center py-8 text-gray-400">
                 {t("resultsManagement.table.noResults")}
               </TableCell>
             </TableRow>
@@ -311,6 +395,13 @@ const PracticalResultsTab = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
+      />
+      <AssignResitDialog
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        parentExamId={selectedExamIds[0]}
+        applicationIds={selectedList.map((s) => s.applicationId)}
+        onAssigned={() => setSelected({})}
       />
     </div>
   );

@@ -38,6 +38,7 @@ import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
 import ExamDetail from "@/pages/admin/exam/ExamDetail";
+import ResitPlanningPage from "@/pages/admin/exam/ResitPlanning";
 import AttendenceView from "@/pages/admin/student/AttendenceView";
 import AllContracts from "@/pages/admin/contract/AllContracts";
 import StudentContracts from "@/pages/admin/contract/StudentContracts";
@@ -347,6 +348,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       ExamDetail,
       "/admin/examination/exams",
+    ),
+  },
+  {
+    path: "/admin/examination/resit-planning",
+    component: withPermissionProtection(
+      ResitPlanningPage,
+      "/admin/examination/resit-planning",
     ),
   },
   {

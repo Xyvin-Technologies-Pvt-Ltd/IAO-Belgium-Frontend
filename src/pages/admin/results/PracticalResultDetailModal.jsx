@@ -40,7 +40,7 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
     }
   }, [details]);
 
-  const maxTotalMarks = details?.exam?.total_marks || details?.exam?.passing_marks || 100;
+  const maxTotalMarks = Number(details?.exam?.total_marks) > 0 ? details.exam.total_marks : 100;
 
   const derivedResult = useMemo(() => {
     if (adminScore === "" || isNaN(Number(adminScore))) return null;

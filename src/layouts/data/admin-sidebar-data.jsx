@@ -84,6 +84,10 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
                 url: "/admin/examination/exams",
               },
               {
+                title: t("sidebar.admin.resitPlanning", "Resit planning"),
+                url: "/admin/examination/resit-planning",
+              },
+              {
                 title: t("sidebar.admin.results"),
                 url: "/admin/results",
               },

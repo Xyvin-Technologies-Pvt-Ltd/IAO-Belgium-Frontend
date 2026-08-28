@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -16,18 +17,23 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetAdminExamResults, exportAdminExamResults } from "@/store/useExamStore";
 import ResultsFilterDrawer from "./ResultsFilterDrawer";
+import AssignResitDialog from "./AssignResitDialog";
 import StatusBadge from "@/components/StatusBadge";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import moment from "moment";
 import { toast } from "sonner";
 import { formatInstant } from "@/utils/dateUtils";
+import { useCanModify } from "@/hooks/useCanModify";
 
 const OnlineResultsTab = () => {
   const { t } = useTranslation();
+  const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const [selected, setSelected] = useState({});
+  const [assignOpen, setAssignOpen] = useState(false);
 
   const [appliedFilters, setAppliedFilters] = useState({
     program: "all",
@@ -68,6 +74,37 @@ const OnlineResultsTab = () => {
 
   const results = resultsData?.data || [];
   const totalRows = resultsData?.total_count || 0;
+  const selectedList = Object.values(selected);
+  const selectedExamIds = [...new Set(selectedList.map((s) => s.examId))];
+  const canAssign = selectedList.length > 0 && selectedExamIds.length === 1;
+
+  const toggleRow = (row) => {
+    const key = row._id;
+    setSelected((prev) => {
+      const next = { ...prev };
+      if (next[key]) delete next[key];
+      else {
+        next[key] = {
+          applicationId: row.student?._id,
+          examId: row.exam?._id,
+        };
+      }
+      return next;
+    });
+  };
+
+  const handleOpenAssign = () => {
+    if (!canAssign) {
+      toast.error(
+        t(
+          "resultsManagement.resit.sameExam",
+          "Select failed students from the same exam to assign a resit.",
+        ),
+      );
+      return;
+    }
+    setAssignOpen(true);
+  };
 
   const handleExport = async () => {
     const toastId = toast.loading("Preparing CSV export...");
@@ -101,7 +138,10 @@ const OnlineResultsTab = () => {
         "Score",
         "Percentage",
         "Status",
-        "Submitted Date"
+        "Submitted Date",
+        "Resit Assigned",
+        "Resit Score",
+        "Resit Status",
       ];
 
       const csvRows = [
@@ -118,6 +158,9 @@ const OnlineResultsTab = () => {
           const percentage = row.percentage !== undefined && row.percentage !== null ? `${Math.round(row.percentage * 100) / 100}%` : "N/A";
           const status = row.result || row.status || "N/A";
           const date = row.submitted_at ? formatInstant(row.submitted_at, "YYYY-MM-DD HH:mm:ss") : "N/A";
+          const resitAssigned = row.resit_assigned ? "Yes" : "No";
+          const resitScore = row.resit_score !== undefined && row.resit_score !== null ? row.resit_score : "N/A";
+          const resitStatus = row.resit_result || "N/A";
 
           return [
             `"${studentName.replace(/"/g, '""')}"`,
@@ -130,7 +173,10 @@ const OnlineResultsTab = () => {
             `"${String(score).replace(/"/g, '""')}"`,
             `"${percentage.replace(/"/g, '""')}"`,
             `"${status.replace(/"/g, '""')}"`,
-            `"${date.replace(/"/g, '""')}"`
+            `"${date.replace(/"/g, '""')}"`,
+            `"${resitAssigned}"`,
+            `"${String(resitScore).replace(/"/g, '""')}"`,
+            `"${String(resitStatus).replace(/"/g, '""')}"`,
           ].join(",");
         }),
       ];
@@ -174,11 +220,22 @@ const OnlineResultsTab = () => {
           <Download className="h-4 w-4" />
           {t("resultsManagement.exportBtn")}
         </Button>
+        {canModify && (
+          <Button
+            variant="outline"
+            onClick={handleOpenAssign}
+            disabled={selectedList.length === 0}
+          >
+            {t("resultsManagement.resit.assignBtn", "Assign resit")}
+            {selectedList.length > 0 ? ` (${selectedList.length})` : ""}
+          </Button>
+        )}
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10"></TableHead>
             <TableHead>{t("resultsManagement.table.student")}</TableHead>
             <TableHead>{t("resultsManagement.table.uid")}</TableHead>
             <TableHead>{t("resultsManagement.table.program")}</TableHead>
@@ -187,15 +244,17 @@ const OnlineResultsTab = () => {
             <TableHead>{t("resultsManagement.table.exam")}</TableHead>
             <TableHead>{t("resultsManagement.table.score")}</TableHead>
             <TableHead>{t("resultsManagement.table.status")}</TableHead>
+            <TableHead>{t("resultsManagement.table.resit", "Resit")}</TableHead>
+            <TableHead>{t("resultsManagement.table.resitScore", "Resit score")}</TableHead>
             <TableHead>{t("resultsManagement.table.date")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {resultsLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={11} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("resultsManagement.messages.loadFailed")}
                   onRetry={refetch}
@@ -206,6 +265,13 @@ const OnlineResultsTab = () => {
           ) : results?.length > 0 ? (
             results.map((row) => (
               <TableRow key={row._id} className="hover:bg-muted/50">
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={!!selected[row._id]}
+                    onCheckedChange={() => toggleRow(row)}
+                    disabled={row.result !== "fail" || row.resit_assigned}
+                  />
+                </TableCell>
                 <TableCell className="font-medium text-dashboard-text dark:text-white">
                   {`${row.student?.first_name || ""} ${row.student?.last_name || ""}`.trim() || "N/A"}
                 </TableCell>
@@ -233,6 +299,21 @@ const OnlineResultsTab = () => {
                 <TableCell>
                   <StatusBadge status={row.result || row.status || "N/A"} />
                 </TableCell>
+                <TableCell>
+                  {row.resit_assigned
+                    ? t("resultsManagement.resit.assigned", "Assigned")
+                    : t("resultsManagement.resit.notAssigned", "—")}
+                </TableCell>
+                <TableCell>
+                  {row.resit_result ? (
+                    <span>
+                      {row.resit_score ?? "—"}{" "}
+                      <StatusBadge status={row.resit_result} />
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
                 <TableCell className="text-gray-500 dark:text-white/60">
                   {row.submitted_at ? formatInstant(row.submitted_at, "DD-MM-YYYY HH:mm") : "N/A"}
                 </TableCell>
@@ -240,7 +321,7 @@ const OnlineResultsTab = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-gray-400">
+              <TableCell colSpan={11} className="text-center py-8 text-gray-400">
                 {t("resultsManagement.table.noResults")}
               </TableCell>
             </TableRow>
@@ -254,6 +335,13 @@ const OnlineResultsTab = () => {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
+      />
+      <AssignResitDialog
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        parentExamId={selectedExamIds[0]}
+        applicationIds={selectedList.map((s) => s.applicationId)}
+        onAssigned={() => setSelected({})}
       />
     </div>
   );

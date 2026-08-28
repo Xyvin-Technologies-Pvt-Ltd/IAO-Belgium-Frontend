@@ -16,6 +16,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useGetTeacherPracticalExams } from "@/store/useExamStore";
 import { useUpdatePracticalExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
 import { useNavigate } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { formatTZ } from "@/utils/dateUtils";
@@ -37,14 +38,22 @@ const PracticalExamList = () => {
   });
 
   const updateStatusMutation = useUpdatePracticalExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
 
-  const handleStatusUpdate = async (e, examId, status) => {
+  const handleStatusUpdate = async (e, exam, status) => {
     e.stopPropagation();
     try {
-      await updateStatusMutation.mutateAsync({
-        id: examId,
-        data: { status },
-      });
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam._id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam._id,
+          data: { status },
+        });
+      }
       refetch();
     } catch (err) {
       console.error("Failed to update status:", err);
@@ -102,7 +111,14 @@ const PracticalExamList = () => {
                   })
                 }
               >
-                <TableCell className="font-medium">{exam?.name}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <span>{exam?.name}</span>
+                    {exam?.is_resit && (
+                      <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
                     {t("exam.form.practical", "Practical")}
@@ -122,8 +138,8 @@ const PracticalExamList = () => {
                         size="sm"
                         variant="outline"
                         className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
-                        onClick={(e) => handleStatusUpdate(e, exam._id, "accepted")}
-                        disabled={updateStatusMutation.isPending}
+                        onClick={(e) => handleStatusUpdate(e, exam, "accepted")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
                       >
                         <Check className="h-4 w-4 mr-1" />
                         {t("planningManagement.teacher.accept")}
@@ -132,8 +148,8 @@ const PracticalExamList = () => {
                         size="sm"
                         variant="outline"
                         className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
-                        onClick={(e) => handleStatusUpdate(e, exam._id, "rejected")}
-                        disabled={updateStatusMutation.isPending}
+                        onClick={(e) => handleStatusUpdate(e, exam, "rejected")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
                       >
                         <X className="h-4 w-4 mr-1" />
                         {t("planningManagement.teacher.reject")}
