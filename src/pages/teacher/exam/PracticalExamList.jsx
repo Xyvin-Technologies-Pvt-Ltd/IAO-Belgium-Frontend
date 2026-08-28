@@ -112,10 +112,17 @@ const PracticalExamList = () => {
                 }
               >
                 <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    <span>{exam?.name}</span>
-                    {exam?.is_resit && (
-                      <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <span>{exam?.name}</span>
+                      {exam?.is_resit && (
+                        <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+                      )}
+                    </div>
+                    {exam?.module_name && (
+                      <span className="text-xs text-muted-foreground font-normal">
+                        {exam.module_name}
+                      </span>
                     )}
                   </div>
                 </TableCell>
