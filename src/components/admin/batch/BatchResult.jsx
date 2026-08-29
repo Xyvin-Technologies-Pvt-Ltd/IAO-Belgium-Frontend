@@ -76,7 +76,16 @@ const BatchResult = () => {
                 <TableCell className="px-6 py-4 capitalize">
                   {result.student?.last_name} {result.student?.first_name}
                 </TableCell>
-                <TableCell>{result.exam?.name || t("batchManagement.table.unnamedExam")}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{result.exam?.name || t("batchManagement.table.unnamedExam")}</span>
+                    {result.is_resit && (
+                      <span className="text-xs font-semibold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">
+                        {t("assessment.exams.resit", "Resit")}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="text-center font-medium">
                   {result.score}
                 </TableCell>
