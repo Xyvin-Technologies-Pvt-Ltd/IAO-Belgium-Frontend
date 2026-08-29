@@ -21,7 +21,7 @@
     "teacher": {
       "title": "Portail enseignant",
       "main": "Principal",
-      "operations": "Opérations",
+      "operations": "Activités",
       "dashboard": "Tableau de bord",
       "schedules": "Horaires",
       "planning": "Planning",
@@ -1594,7 +1594,7 @@
       "unknownStudent": "Étudiant inconnu",
       "unreadNotifications": "{{count}} notifications non lues",
       "sessionsTrend": "Sessions cette année",
-      "evaluationsTrend": "Évaluations terminées cette année",
+      "evaluationsTrend": "Évaluations réalisées cette année",
       "sessionsCount": "Sessions",
       "evaluationsCount": "Évaluations"
     }

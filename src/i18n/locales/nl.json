@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Docentenportaal",
       "main": "Hoofd",
-      "operations": "Operaties",
+      "operations": "Activiteiten",
       "dashboard": "Dashboard",
       "schedules": "Roosters",
       "planning": "Planning",
-      "evaluations": "Evaluaties",
+      "evaluations": "Beoordelingen",
       "exams": "Examens",
       "otherExams": "Overige examens",
       "practicalExams": "Praktijkexamens"
@@ -1604,7 +1604,7 @@
       "pendingInvitesHint": "Planningssessies die op uw reactie wachten",
       "acceptedModules": "Mijn modules",
       "acceptedModulesHint": "Geaccepteerde moduleschema's",
-      "pendingEvaluations": "Openstaande evaluaties",
+      "pendingEvaluations": "Beoordelingen in afwachting",
       "pendingEvaluationsHint": "{{completed}} tot nu toe voltooid",
       "assignedExams": "Toegewezen examens",
       "assignedExamsHint": "{{unread}} ongelezen meldingen",
@@ -1617,9 +1617,9 @@
       "unknownStudent": "Onbekende student",
       "unreadNotifications": "{{count}} ongelezen meldingen",
       "sessionsTrend": "Sessies dit jaar",
-      "evaluationsTrend": "Voltooide evaluaties dit jaar",
+      "evaluationsTrend": "Beoordelingen die dit jaar zijn afgerond",
       "sessionsCount": "Sessies",
-      "evaluationsCount": "Evaluaties"
+      "evaluationsCount": "Beoordelingen"
     }
   },
   "exam": {

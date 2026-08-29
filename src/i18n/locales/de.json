@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Dozentenportal",
       "main": "Haupt",
-      "operations": "Betrieb",
+      "operations": "Aktivitäten",
       "dashboard": "Dashboard",
       "schedules": "Stundenpläne",
       "planning": "Planung",
-      "evaluations": "Auswertungen",
+      "evaluations": "Beurteilungen",
       "exams": "Prüfungen",
       "otherExams": "Andere Prüfungen",
       "practicalExams": "Praktische Prüfungen"
@@ -1622,9 +1622,9 @@
       "unknownStudent": "Unbekannter Student",
       "unreadNotifications": "{{count}} ungelesene Benachrichtigungen",
       "sessionsTrend": "Sitzungen dieses Jahr",
-      "evaluationsTrend": "Abgeschlossene Bewertungen dieses Jahr",
+      "evaluationsTrend": "Die Bewertungen wurden in diesem Jahr abgeschlossen.",
       "sessionsCount": "Sitzungen",
-      "evaluationsCount": "Bewertungen"
+      "evaluationsCount": "Beurteilungen"
     }
   },
   "exam": {
