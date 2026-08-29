@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Lecturer Dashboard",
       "main": "Main",
-      "operations": "Operations",
+      "operations": "Activities",
       "dashboard": "Dashboard",
       "schedules": "Schedules",
       "planning": "Planning",
-      "evaluations": "Feedback / Evaluation",
+      "evaluations": "Assessments",
       "exams": "Exams",
       "otherExams": "Other Exams"
     },
@@ -1790,7 +1790,7 @@
       "pendingInvitesHint": "Planning sessions awaiting your response",
       "acceptedModules": "My modules",
       "acceptedModulesHint": "Accepted module schedules",
-      "pendingEvaluations": "Pending evaluations",
+      "pendingEvaluations": "Pending Assessments",
       "pendingEvaluationsHint": "{{completed}} completed so far",
       "assignedExams": "Assigned exams",
       "assignedExamsHint": "{{other}} other exams • {{unread}} unread notifications",
@@ -1802,9 +1802,9 @@
       "unknownStudent": "Unknown student",
       "unreadNotifications": "{{count}} unread notifications",
       "sessionsTrend": "Sessions this year",
-      "evaluationsTrend": "Evaluations completed this year",
+      "evaluationsTrend": "Assessments completed this year",
       "sessionsCount": "Sessions",
-      "evaluationsCount": "Evaluations"
+      "evaluationsCount": "Assessments"
     }
   },
   "exam": {
