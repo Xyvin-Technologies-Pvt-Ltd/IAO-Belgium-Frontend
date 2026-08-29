@@ -6,6 +6,7 @@ import {
   updateExam,
   publishExam,
   archiveExam,
+  unarchiveExam,
   getTeacherExams,
   getTeacherPracticalExams,
   getPracticalExamDetail,
@@ -118,6 +119,22 @@ export const useArchiveExam = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to archive exam");
+    },
+  });
+};
+
+export const useUnarchiveExam = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: unarchiveExam,
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["exams"] });
+      queryClient.invalidateQueries({ queryKey: ["exam", variables] });
+      queryClient.invalidateQueries({ queryKey: ["exams-dropdown"] });
+      toast.success(response?.message || "Exam unarchived successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to unarchive exam");
     },
   });
 };

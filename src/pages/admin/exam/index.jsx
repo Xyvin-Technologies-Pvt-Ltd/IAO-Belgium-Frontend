@@ -30,6 +30,7 @@ import {
   useGetExams,
   usePublishExam,
   useArchiveExam,
+  useUnarchiveExam,
 } from "@/store/useExamStore";
 import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { useNavigate } from "@tanstack/react-router";
@@ -66,6 +67,7 @@ const Exams = () => {
   });
   const publishExam = usePublishExam();
   const archiveExam = useArchiveExam();
+  const unarchiveExam = useUnarchiveExam();
 
   const exams = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -96,6 +98,15 @@ const Exams = () => {
   const handleArchive = async (exam) => {
     try {
       await archiveExam.mutateAsync(exam._id);
+      refetch();
+    } catch (err) {
+      // Error handled by store
+    }
+  };
+
+  const handleUnarchive = async (exam) => {
+    try {
+      await unarchiveExam.mutateAsync(exam._id);
       refetch();
     } catch (err) {
       // Error handled by store
@@ -257,7 +268,14 @@ const Exams = () => {
                                   onClick: () => handleArchive(i),
                                 },
                               ]
-                            : []),
+                            : i?.status === "archived"
+                              ? [
+                                  {
+                                    label: t("exam.table.unarchive", "Unarchive"),
+                                    onClick: () => handleUnarchive(i),
+                                  },
+                                ]
+                              : []),
                       ]}
                     />
                   )}

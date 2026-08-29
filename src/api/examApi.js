@@ -35,6 +35,11 @@ export const archiveExam = async (id) => {
   return response.data;
 };
 
+export const unarchiveExam = async (id) => {
+  const response = await axiosInstance.put(`/exam/${id}/unarchive`);
+  return response.data;
+};
+
 export const getTeacherExams = async (params) => {
   const response = await axiosInstance.get("/exam/teacher", { params });
   return response.data;
