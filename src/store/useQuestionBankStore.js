@@ -54,7 +54,11 @@ export const useCreateQuestionBank = () => {
       toast.success(response?.message || "Question bank created successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to create question bank");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to create question bank",
+      );
     },
   });
 };
@@ -70,7 +74,11 @@ export const useUpdateQuestionBank = () => {
       toast.success(response?.message || "Question bank updated successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to update question bank");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update question bank",
+      );
     },
   });
 };
@@ -85,7 +93,11 @@ export const useDeleteQuestionBank = () => {
       toast.success(response?.message || "Question bank deleted successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to delete question bank");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to delete question bank",
+      );
     },
   });
 };
@@ -126,7 +138,11 @@ export const useAddQuestion = () => {
       toast.success(response?.message || "Question added successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to add question");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to add question",
+      );
     },
   });
 };
@@ -146,7 +162,11 @@ export const useUpdateQuestion = () => {
       toast.success(response?.message || "Question updated successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to update question");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update question",
+      );
     },
   });
 };
@@ -167,7 +187,11 @@ export const useDeleteQuestion = () => {
       toast.success(response?.message || "Question deleted successfully!");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to delete question");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to delete question",
+      );
     },
   });
 };
@@ -190,7 +214,11 @@ export const useBulkUploadQuestions = () => {
       );
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to import questions");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to import questions",
+      );
     },
   });
 };

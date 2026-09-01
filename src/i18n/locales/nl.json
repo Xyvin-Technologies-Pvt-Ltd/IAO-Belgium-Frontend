@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Docentenportaal",
       "main": "Hoofd",
-      "operations": "Operaties",
+      "operations": "Activiteiten",
       "dashboard": "Dashboard",
       "schedules": "Roosters",
       "planning": "Planning",
-      "evaluations": "Evaluaties",
+      "evaluations": "Beoordelingen",
       "exams": "Examens",
       "otherExams": "Overige examens",
       "practicalExams": "Praktijkexamens"
@@ -116,6 +116,10 @@
     "unknown": "Onbekend",
     "notAvailable": "N/B",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Geen inschrijvingskosten",
+      "paidAmount": "Betaald {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Vandaag",
     "more": "meer",
@@ -977,6 +981,7 @@
       "searchCities": "Steden zoeken",
       "paymentStatus": "Betalingsstatus",
       "paymentMethod": "Betaalmethode",
+      "noFee": "Geen inschrijvingskosten",
       "bankTransfer": "Bankoverschrijving",
       "creditCard": "Creditcard",
       "module": "Module",
@@ -1120,11 +1125,30 @@
       "reject": "Afwijzen",
       "waitlist": "In behandeling",
       "accept": "Accepteren",
+      "paymentInfo": "Betaling",
+      "noRegistrationFee": "Geen inschrijvingskosten voor deze intake.",
+      "acceptRequiresPayment": "Accepteren is beschikbaar nadat de inschrijvingskosten zijn betaald.",
       "qualificationStatus": "Status kwalificatie",
       "stillCompletingQualification": "Nog bezig met afronden kwalificatie",
       "qualificationNotDeferred": "Niet uitgesteld",
       "completingQualificationCheckbox": "Ik ben nog bezig met mijn kwalificatie. Ik zal mijn diploma later indienen.",
-      "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload."
+      "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload.",
+      "rejectionReason": "Afwijzingsreden",
+      "noRejectionReason": "Geen afwijzingsreden geregistreerd",
+      "confirm": {
+        "approveTitle": "Candidatuur accepteren?",
+        "approveMessage": "Dit accepteert {{name}} en wijst hen toe aan een batch. De student ontvangt een e-mailmelding.",
+        "waitlistTitle": "Markeren als in behandeling?",
+        "waitlistMessage": "Dit markeert de candidatuur van {{name}} als in behandeling. De student wordt per e-mail geïnformeerd.",
+        "rejectTitle": "Candidatuur afwijzen?",
+        "rejectMessage": "Dit wijst de candidatuur van {{name}} af. Deze actie kan niet ongedaan worden gemaakt en de student ontvangt een afwijzingsmail.",
+        "rejectReasonLabel": "Afwijzingsreden (verplicht)",
+        "rejectReasonPlaceholder": "Voer de reden voor afwijzing in...",
+        "cancel": "Annuleren",
+        "confirmApprove": "Accepteren",
+        "confirmWaitlist": "In behandeling",
+        "confirmReject": "Afwijzen"
+      }
     },
     "status": {
       "pending": "In behandeling",
@@ -1144,6 +1168,9 @@
       "unflagDocument": "Markering verwijderen",
       "documentFlagged": "Document gemarkeerd",
       "notUploadedYet": "Nog niet geüpload"
+    },
+    "filters": {
+      "noFee": "Geen inschrijvingskosten"
     }
   },
   "contractManagement": {
@@ -1604,7 +1631,7 @@
       "pendingInvitesHint": "Planningssessies die op uw reactie wachten",
       "acceptedModules": "Mijn modules",
       "acceptedModulesHint": "Geaccepteerde moduleschema's",
-      "pendingEvaluations": "Openstaande evaluaties",
+      "pendingEvaluations": "Beoordelingen in afwachting",
       "pendingEvaluationsHint": "{{completed}} tot nu toe voltooid",
       "assignedExams": "Toegewezen examens",
       "assignedExamsHint": "{{unread}} ongelezen meldingen",
@@ -1617,9 +1644,9 @@
       "unknownStudent": "Onbekende student",
       "unreadNotifications": "{{count}} ongelezen meldingen",
       "sessionsTrend": "Sessies dit jaar",
-      "evaluationsTrend": "Voltooide evaluaties dit jaar",
+      "evaluationsTrend": "Beoordelingen die dit jaar zijn afgerond",
       "sessionsCount": "Sessies",
-      "evaluationsCount": "Evaluaties"
+      "evaluationsCount": "Beoordelingen"
     }
   },
   "exam": {

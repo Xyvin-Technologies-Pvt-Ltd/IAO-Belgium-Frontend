@@ -15,6 +15,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
+import AdmissionPaymentBadge from "@/components/admin/AdmissionPaymentBadge";
 import { useGetStudents } from "@/store/useStudentStore";
 import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -276,13 +277,18 @@ const AllStudents = () => {
                   </TableCell>
                   <TableCell>
                     {i?.payment_status ? (
-                      <StatusBadge status={i.payment_status} />
+                      <AdmissionPaymentBadge
+                        payment_status={i.payment_status}
+                        payment_amount={i.payment_amount}
+                      />
                     ) : (
                       t("common.dash", "-")
                     )}
                   </TableCell>
                   <TableCell>
-                    {formatPaymentMethod(i?.payment_method, t)}
+                    {(i?.payment_amount ?? 0) === 0 && i?.payment_status === "paid"
+                      ? t("common.admissionPayment.noFeeRequired", "No fee required")
+                      : formatPaymentMethod(i?.payment_method, t)}
                   </TableCell>
                   <TableCell>
                     {i?.last_login

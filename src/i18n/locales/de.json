@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Dozentenportal",
       "main": "Haupt",
-      "operations": "Betrieb",
+      "operations": "Aktivitäten",
       "dashboard": "Dashboard",
       "schedules": "Stundenpläne",
       "planning": "Planung",
-      "evaluations": "Auswertungen",
+      "evaluations": "Beurteilungen",
       "exams": "Prüfungen",
       "otherExams": "Andere Prüfungen",
       "practicalExams": "Praktische Prüfungen"
@@ -115,6 +115,10 @@
     "unknown": "Unbekannt",
     "notAvailable": "N/V",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Keine Anmeldegebühr",
+      "paidAmount": "Bezahlt {{currency}}{{amount}}"
+    },
     "document": "Dokument",
     "today": "Heute",
     "more": "mehr",
@@ -993,6 +997,7 @@
       "searchCities": "Städte suchen",
       "paymentStatus": "Zahlungsstatus",
       "paymentMethod": "Zahlungsmethode",
+      "noFee": "Keine Anmeldegebühr",
       "bankTransfer": "Banküberweisung",
       "creditCard": "Kreditkarte",
       "module": "Modul",
@@ -1136,11 +1141,30 @@
       "reject": "Ablehnen",
       "waitlist": "In Bearbeitung",
       "accept": "Annehmen",
+      "paymentInfo": "Zahlung",
+      "noRegistrationFee": "Keine Anmeldegebühr für diese Aufnahme.",
+      "acceptRequiresPayment": "Annehmen ist verfügbar, nachdem die Anmeldegebühr bezahlt wurde.",
       "qualificationStatus": "Status der Qualifikation",
       "stillCompletingQualification": "Qualifikation wird noch abgeschlossen",
       "qualificationNotDeferred": "Nicht aufgeschoben",
       "completingQualificationCheckbox": "Ich schließe noch meine Qualifikation ab. Ich werde mein Diplom zu einem späteren Zeitpunkt einreichen.",
-      "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen."
+      "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen.",
+      "rejectionReason": "Ablehnungsgrund",
+      "noRejectionReason": "Kein Ablehnungsgrund erfasst",
+      "confirm": {
+        "approveTitle": "Bewerbung annehmen?",
+        "approveMessage": "Dies nimmt {{name}} an und weist sie einer Gruppe zu. Der Student erhält eine E-Mail-Benachrichtigung.",
+        "waitlistTitle": "Als in Bearbeitung markieren?",
+        "waitlistMessage": "Dies markiert die Bewerbung von {{name}} als in Bearbeitung. Der Student wird per E-Mail benachrichtigt.",
+        "rejectTitle": "Bewerbung ablehnen?",
+        "rejectMessage": "Dies lehnt die Bewerbung von {{name}} ab. Diese Aktion kann nicht rückgängig gemacht werden und der Student erhält eine Ablehnungs-E-Mail.",
+        "rejectReasonLabel": "Ablehnungsgrund (erforderlich)",
+        "rejectReasonPlaceholder": "Ablehnungsgrund eingeben...",
+        "cancel": "Abbrechen",
+        "confirmApprove": "Annehmen",
+        "confirmWaitlist": "In Bearbeitung",
+        "confirmReject": "Ablehnen"
+      }
     },
     "status": {
       "pending": "Ausstehend",
@@ -1160,6 +1184,9 @@
       "unflagDocument": "Markierung entfernen",
       "documentFlagged": "Dokument markiert",
       "notUploadedYet": "Noch nicht hochgeladen"
+    },
+    "filters": {
+      "noFee": "Keine Anmeldegebühr"
     }
   },
   "contractManagement": {
@@ -1622,9 +1649,9 @@
       "unknownStudent": "Unbekannter Student",
       "unreadNotifications": "{{count}} ungelesene Benachrichtigungen",
       "sessionsTrend": "Sitzungen dieses Jahr",
-      "evaluationsTrend": "Abgeschlossene Bewertungen dieses Jahr",
+      "evaluationsTrend": "Die Bewertungen wurden in diesem Jahr abgeschlossen.",
       "sessionsCount": "Sitzungen",
-      "evaluationsCount": "Bewertungen"
+      "evaluationsCount": "Beurteilungen"
     }
   },
   "exam": {

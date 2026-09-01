@@ -16,6 +16,9 @@ import { useTranslation } from "react-i18next";
 import { useGetLocationChanges } from "@/store/useStudentStore";
 import moment from "moment";
 import LocationChangesFilterDrawer, { DEFAULT_LOCATION_CHANGES_FILTERS } from "./LocationChangesFilterDrawer";
+import AdminChangeLocationDialog from "@/components/admin/student/AdminChangeLocationDialog";
+import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 
 const LocationChanges = () => {
   const { t } = useTranslation();
@@ -26,6 +29,7 @@ const LocationChanges = () => {
 
   const [draftFilters, setDraftFilters] = useState({ ...DEFAULT_LOCATION_CHANGES_FILTERS });
   const [appliedFilters, setAppliedFilters] = useState({ ...DEFAULT_LOCATION_CHANGES_FILTERS });
+  const [changeLocationOpen, setChangeLocationOpen] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -54,6 +58,10 @@ const LocationChanges = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("studentManagement.locationChangesTitle", "Student Location Changes")}
         </h2>
+        <Button onClick={() => setChangeLocationOpen(true)}>
+          <MapPin className="h-4 w-4 mr-2" />
+          {t("studentManagement.changeLocation", "Change Location")}
+        </Button>
       </div>
 
       <div className="flex items-center justify-between gap-2">
@@ -165,6 +173,11 @@ const LocationChanges = () => {
           )}
         </div>
       )}
+      <AdminChangeLocationDialog
+        open={changeLocationOpen}
+        onOpenChange={setChangeLocationOpen}
+        onSuccess={() => setPage(1)}
+      />
     </div>
   );
 };

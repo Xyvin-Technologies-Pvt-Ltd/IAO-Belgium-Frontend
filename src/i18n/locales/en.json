@@ -21,11 +21,11 @@
     "teacher": {
       "title": "Lecturer Dashboard",
       "main": "Main",
-      "operations": "Operations",
+      "operations": "Activities",
       "dashboard": "Dashboard",
       "schedules": "Schedules",
       "planning": "Planning",
-      "evaluations": "Feedback / Evaluation",
+      "evaluations": "Assessments",
       "exams": "Exams",
       "otherExams": "Other Exams",
       "practicalExams": "Practical Exams"
@@ -117,6 +117,10 @@
     "unknown": "Unknown",
     "notAvailable": "N/A",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "No Fee Required",
+      "paidAmount": "Paid {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Today",
     "more": "more",
@@ -1200,6 +1204,7 @@
       "searchCities": "Search cities",
       "paymentStatus": "Payment Status",
       "paymentMethod": "Payment Method",
+      "noFee": "No Fee Required",
       "bankTransfer": "Bank Transfer",
       "creditCard": "Credit Card",
       "module": "Module",
@@ -1343,11 +1348,30 @@
       "reject": "Reject",
       "waitlist": "In progress",
       "accept": "Accept",
+      "paymentInfo": "Payment",
+      "noRegistrationFee": "No registration fee for this intake.",
+      "acceptRequiresPayment": "Accept is available after admission fee is paid.",
       "qualificationStatus": "Qualification status",
       "stillCompletingQualification": "Still completing qualification",
       "qualificationNotDeferred": "Not deferred",
       "completingQualificationCheckbox": "I'm still completing my qualification. I will submit my diploma later.",
-      "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet."
+      "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet.",
+      "rejectionReason": "Rejection reason",
+      "noRejectionReason": "No rejection reason recorded",
+      "confirm": {
+        "approveTitle": "Accept application?",
+        "approveMessage": "This will accept {{name}} and assign them to a batch. The student will receive an email notification.",
+        "waitlistTitle": "Mark as in progress?",
+        "waitlistMessage": "This will mark {{name}}'s application as in progress. The student will be notified by email.",
+        "rejectTitle": "Reject application?",
+        "rejectMessage": "This will reject {{name}}'s application. This action cannot be undone and the student will receive a rejection email.",
+        "rejectReasonLabel": "Rejection reason (required)",
+        "rejectReasonPlaceholder": "Enter the reason for rejection...",
+        "cancel": "Cancel",
+        "confirmApprove": "Accept",
+        "confirmWaitlist": "Mark in progress",
+        "confirmReject": "Reject"
+      }
     },
     "status": {
       "pending": "Pending",
@@ -1367,6 +1391,9 @@
       "unflagDocument": "Unflag document",
       "documentFlagged": "Document flagged",
       "notUploadedYet": "Not uploaded yet"
+    },
+    "filters": {
+      "noFee": "No Fee Required"
     }
   },
   "contractManagement": {
@@ -1845,7 +1872,7 @@
       "pendingInvitesHint": "Planning sessions awaiting your response",
       "acceptedModules": "My modules",
       "acceptedModulesHint": "Accepted module schedules",
-      "pendingEvaluations": "Pending evaluations",
+      "pendingEvaluations": "Pending Assessments",
       "pendingEvaluationsHint": "{{completed}} completed so far",
       "assignedExams": "Assigned exams",
       "assignedExamsHint": "{{unread}} unread notifications",
@@ -1858,9 +1885,9 @@
       "unknownStudent": "Unknown student",
       "unreadNotifications": "{{count}} unread notifications",
       "sessionsTrend": "Sessions this year",
-      "evaluationsTrend": "Evaluations completed this year",
+      "evaluationsTrend": "Assessments completed this year",
       "sessionsCount": "Sessions",
-      "evaluationsCount": "Evaluations"
+      "evaluationsCount": "Assessments"
     }
   },
   "exam": {

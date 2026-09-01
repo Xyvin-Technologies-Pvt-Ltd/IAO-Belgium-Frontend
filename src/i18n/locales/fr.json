@@ -21,7 +21,7 @@
     "teacher": {
       "title": "Portail enseignant",
       "main": "Principal",
-      "operations": "Opérations",
+      "operations": "Activités",
       "dashboard": "Tableau de bord",
       "schedules": "Horaires",
       "planning": "Planning",
@@ -115,6 +115,10 @@
     "unknown": "Inconnu",
     "notAvailable": "N/A",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Aucun frais d'inscription",
+      "paidAmount": "Payé {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Aujourd'hui",
     "more": "plus",
@@ -965,6 +969,7 @@
       "searchCities": "Rechercher des villes",
       "paymentStatus": "Statut du paiement",
       "paymentMethod": "Mode de paiement",
+      "noFee": "Aucun frais d'inscription",
       "bankTransfer": "Virement bancaire",
       "creditCard": "Carte de crédit",
       "module": "Module",
@@ -1108,11 +1113,30 @@
       "reject": "Rejeter",
       "waitlist": "En cours",
       "accept": "Accepter",
+      "paymentInfo": "Paiement",
+      "noRegistrationFee": "Aucun frais d'inscription pour cette session.",
+      "acceptRequiresPayment": "L'acceptation est disponible après le paiement des frais d'inscription.",
       "qualificationStatus": "Statut de qualification",
       "stillCompletingQualification": "En cours de finalisation de la qualification",
       "qualificationNotDeferred": "Non différé",
       "completingQualificationCheckbox": "Je suis encore en train de finaliser ma qualification. Je soumettrai mon diplôme ultérieurement.",
-      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
+      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé.",
+      "rejectionReason": "Motif de refus",
+      "noRejectionReason": "Aucun motif de refus enregistré",
+      "confirm": {
+        "approveTitle": "Accepter la candidature ?",
+        "approveMessage": "Cela accepte {{name}} et l'assigne à un groupe. Le candidat recevra une notification par e-mail.",
+        "waitlistTitle": "Marquer comme en cours ?",
+        "waitlistMessage": "Cela marque la candidature de {{name}} comme en cours. Le candidat sera informé par e-mail.",
+        "rejectTitle": "Rejeter la candidature ?",
+        "rejectMessage": "Cela rejette la candidature de {{name}}. Cette action est irréversible et le candidat recevra un e-mail de refus.",
+        "rejectReasonLabel": "Motif de refus (obligatoire)",
+        "rejectReasonPlaceholder": "Saisir le motif du refus...",
+        "cancel": "Annuler",
+        "confirmApprove": "Accepter",
+        "confirmWaitlist": "Marquer en cours",
+        "confirmReject": "Rejeter"
+      }
     },
     "status": {
       "pending": "En attente",
@@ -1132,6 +1156,9 @@
       "unflagDocument": "Retirer le signalement",
       "documentFlagged": "Document signalé",
       "notUploadedYet": "Pas encore téléversé"
+    },
+    "filters": {
+      "noFee": "Aucun frais d'inscription"
     }
   },
   "contractManagement": {
@@ -1594,7 +1621,7 @@
       "unknownStudent": "Étudiant inconnu",
       "unreadNotifications": "{{count}} notifications non lues",
       "sessionsTrend": "Sessions cette année",
-      "evaluationsTrend": "Évaluations terminées cette année",
+      "evaluationsTrend": "Évaluations réalisées cette année",
       "sessionsCount": "Sessions",
       "evaluationsCount": "Évaluations"
     }
