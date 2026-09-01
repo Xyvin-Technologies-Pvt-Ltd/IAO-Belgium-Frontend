@@ -134,3 +134,65 @@ export const getLocationChanges = async (filter) => {
     throw error.response?.data || error;
   }
 };
+
+export const getModulesForLocationSwitch = async (studentId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/user/student/${studentId}/modules-for-switch`,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getAdminStudentComponentSlots = async (studentId, systemId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/user/student/${studentId}/component/system-id/${systemId}`,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getAdminChangeLocationQuote = async (
+  studentId,
+  currentPlanningId,
+  newPlanningId,
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/user/student/${studentId}/change-location`,
+      {
+        params: {
+          current_planning_id: currentPlanningId,
+          new_planning_id: newPlanningId,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const adminSwapStudentLocation = async (
+  studentId,
+  currentPlanningId,
+  newPlanningId,
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/user/student/${studentId}/change-location`,
+      {
+        current_planning_id: currentPlanningId,
+        new_planning_id: newPlanningId,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

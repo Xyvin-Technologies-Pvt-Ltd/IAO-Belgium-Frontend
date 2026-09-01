@@ -11,6 +11,10 @@ import {
   updateSpecialException,
   deleteSpecialException,
   getLocationChanges,
+  getModulesForLocationSwitch,
+  getAdminStudentComponentSlots,
+  getAdminChangeLocationQuote,
+  adminSwapStudentLocation,
 } from "@/api/studentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -129,5 +133,62 @@ export const useGetLocationChanges = (filter, options = {}) => {
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     ...options,
+  });
+};
+
+export const useGetModulesForLocationSwitch = (studentId, options = {}) => {
+  return useQuery({
+    queryKey: ["modules-for-location-switch", studentId],
+    queryFn: () => getModulesForLocationSwitch(studentId),
+    enabled: !!studentId,
+    ...options,
+  });
+};
+
+export const useGetAdminStudentComponentSlots = (
+  studentId,
+  systemId,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: ["admin-student-component-slots", studentId, systemId],
+    queryFn: () => getAdminStudentComponentSlots(studentId, systemId),
+    enabled: !!studentId && !!systemId,
+    ...options,
+  });
+};
+
+export const useGetAdminChangeLocationQuote = (
+  studentId,
+  currentPlanningId,
+  newPlanningId,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: [
+      "admin-change-location-quote",
+      studentId,
+      currentPlanningId,
+      newPlanningId,
+    ],
+    queryFn: () =>
+      getAdminChangeLocationQuote(
+        studentId,
+        currentPlanningId,
+        newPlanningId,
+      ),
+    enabled: !!studentId && !!currentPlanningId && !!newPlanningId,
+    ...options,
+  });
+};
+
+export const useAdminSwapStudentLocation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ studentId, currentPlanningId, newPlanningId }) =>
+      adminSwapStudentLocation(studentId, currentPlanningId, newPlanningId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-location-changes"] });
+    },
   });
 };

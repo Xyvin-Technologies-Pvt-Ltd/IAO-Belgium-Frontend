@@ -192,6 +192,7 @@ const StudentFilterDrawer = ({
   const paymentStatuses = [
     { label: t("common.pending", "Pending"), value: "pending" },
     { label: t("common.paid", "Paid"), value: "paid" },
+    { label: t("studentManagement.filters.noFee", "No Fee Required"), value: "no_fee" },
     { label: t("common.failed", "Failed"), value: "failed" },
   ];
 
