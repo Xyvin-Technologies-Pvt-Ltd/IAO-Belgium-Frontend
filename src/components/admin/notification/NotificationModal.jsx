@@ -169,7 +169,7 @@ const NotificationModal = ({ open, onClose, notification = null }) => {
   const { data: programsData } = useGetProgramsByCitiesAndLanguages(activeCity, activeLanguage, { enabled: open && step === 2 && (!!activeCity || !!activeLanguage) });
 
   const activeProgram = category === "notification" ? selectedProgram : scProgram;
-  const { data: batchesData } = useGetBatches(activeProgram, {}, { enabled: open && step === 2 && !!activeProgram });
+  const { data: batchesData } = useGetBatches(activeProgram, { include_closed: true }, { enabled: open && step === 2 && !!activeProgram });
 
   const { data: componentsData } = useGetComponents({
     program: activeProgram,
