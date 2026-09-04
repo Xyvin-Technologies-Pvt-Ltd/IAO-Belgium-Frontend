@@ -59,10 +59,16 @@ const SessionAttendence = () => {
   const sessionDay = sessionDate
     ? getMoment(sessionDate).format("YYYY-MM-DD")
     : null;
+  const markingDeadline = sessionDate
+    ? getMoment(sessionDate).add(7, "days").format("YYYY-MM-DD")
+    : null;
   const today = getNow().format("YYYY-MM-DD");
   const isSessionFuture = sessionDay ? sessionDay > today : false;
-  const isSessionPast = sessionDay ? sessionDay < today : false;
-  const canMarkAttendance = sessionDay ? sessionDay === today : false;
+  const isSessionPast = markingDeadline ? today > markingDeadline : false;
+  const canMarkAttendance =
+    sessionDay && markingDeadline
+      ? today >= sessionDay && today <= markingDeadline
+      : false;
   const isAttendanceLocked = !canMarkAttendance;
 
   useEffect(() => {
@@ -112,7 +118,7 @@ const SessionAttendence = () => {
             <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md">
               <p className="text-sm text-yellow-800">
                 Attendance marking is not available yet. You can mark attendance
-                only on the session date.
+                from the session date through 7 days after.
               </p>
             </div>
           )}
@@ -120,7 +126,8 @@ const SessionAttendence = () => {
           {isSessionPast && (
             <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-800">
-                Attendance marking is closed. The session date has passed.
+                Attendance marking is closed. The 7-day window after the session
+                has ended.
               </p>
             </div>
           )}
