@@ -36,6 +36,15 @@ export const reconcileExact = async () => {
   }
 };
 
+export const backfillExactContacts = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/backfill-contacts");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const disconnectExact = async () => {
   try {
     const response = await axiosInstance.delete("/exact/disconnect");

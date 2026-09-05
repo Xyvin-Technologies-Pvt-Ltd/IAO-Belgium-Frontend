@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Plug, RefreshCw, Unplug } from "lucide-react";
+import { ExternalLink, Plug, RefreshCw, Unplug, Users } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   useGetExactUnsynced,
   useGetExactSent,
   useReconcileExact,
+  useBackfillExactContacts,
   useDisconnectExact,
 } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
@@ -99,6 +100,8 @@ const IntegrationsPage = () => {
   );
 
   const { mutate: reconcile, isPending: isReconciling } = useReconcileExact();
+  const { mutate: backfillContacts, isPending: isBackfillingContacts } =
+    useBackfillExactContacts();
   const { mutate: disconnect, isPending: isDisconnecting } = useDisconnectExact();
 
   const status = statusResponse?.data;
@@ -147,6 +150,10 @@ const IntegrationsPage = () => {
 
   const handleSync = () => {
     reconcile();
+  };
+
+  const handleBackfillContacts = () => {
+    backfillContacts();
   };
 
   const handleDisconnect = () => {
@@ -390,23 +397,44 @@ const IntegrationsPage = () => {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              {canModify && (
-                <Button
-                  onClick={handleSync}
-                  disabled={!isConnected || isReconciling || unsyncedCount === 0}
-                >
-                  <RefreshCw
-                    className={`w-4 h-4 mr-2 ${isReconciling ? "animate-spin" : ""}`}
-                  />
-                  {isReconciling
-                    ? t("integrations.exact.syncing")
-                    : t("integrations.exact.syncNow")}
-                </Button>
-              )}
-              {!isConnected && (
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                {canModify && (
+                  <Button
+                    onClick={handleSync}
+                    disabled={!isConnected || isReconciling || unsyncedCount === 0}
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 mr-2 ${isReconciling ? "animate-spin" : ""}`}
+                    />
+                    {isReconciling
+                      ? t("integrations.exact.syncing")
+                      : t("integrations.exact.syncNow")}
+                  </Button>
+                )}
+                {canModify && (
+                  <Button
+                    variant="outline"
+                    onClick={handleBackfillContacts}
+                    disabled={!isConnected || isBackfillingContacts}
+                  >
+                    <Users
+                      className={`w-4 h-4 mr-2 ${isBackfillingContacts ? "animate-pulse" : ""}`}
+                    />
+                    {isBackfillingContacts
+                      ? t("integrations.exact.backfillingContacts")
+                      : t("integrations.exact.backfillContacts")}
+                  </Button>
+                )}
+                {!isConnected && (
+                  <p className="text-sm text-muted-foreground">
+                    {t("integrations.exact.authoriseFirst")}
+                  </p>
+                )}
+              </div>
+              {isConnected && (
                 <p className="text-sm text-muted-foreground">
-                  {t("integrations.exact.authoriseFirst")}
+                  {t("integrations.exact.backfillContactsHint")}
                 </p>
               )}
             </div>
