@@ -81,6 +81,7 @@ const PracticalExamList = () => {
             <TableHead>{t("exam.table.name")}</TableHead>
             <TableHead>{t("exam.table.type", { defaultValue: "Type" })}</TableHead>
             <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
+            <TableHead>{t("exam.table.location", { defaultValue: "Location" })}</TableHead>
             <TableHead>{t("planningManagement.modal.practicalExamDate", "Date")}</TableHead>
             <TableHead>{t("planningManagement.table.status")}</TableHead>
             <TableHead>{t("planningManagement.teacher.actions")}</TableHead>
@@ -88,10 +89,10 @@ const PracticalExamList = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={6} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -132,6 +133,7 @@ const PracticalExamList = () => {
                   </Badge>
                 </TableCell>
                 <TableCell>{exam?.batch?.name || "—"}</TableCell>
+                <TableCell>{exam?.location || "—"}</TableCell>
                 <TableCell>
                   {exam.exam_date ? formatTZ(exam.exam_date, "DD-MM-YYYY") : "—"}
                 </TableCell>
@@ -168,7 +170,7 @@ const PracticalExamList = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={7} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>

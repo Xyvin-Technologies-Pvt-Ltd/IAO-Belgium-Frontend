@@ -107,12 +107,20 @@ const PracticalExamDetail = () => {
       </div>
 
       <div className="text-sm text-muted-foreground flex flex-wrap gap-4">
-        {exam.batch && (
+        {exam.batch?.name && (
           <span>
             <span className="font-medium text-dashboard-text dark:text-white">
               {t("exam.table.batch", { defaultValue: "Batch" })}:
             </span>{" "}
             {exam.batch.name}
+          </span>
+        )}
+        {exam.location && (
+          <span>
+            <span className="font-medium text-dashboard-text dark:text-white">
+              {t("exam.table.location", { defaultValue: "Location" })}:
+            </span>{" "}
+            {exam.location}
           </span>
         )}
         {exam.exam_date && (

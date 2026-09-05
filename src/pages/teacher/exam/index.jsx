@@ -94,6 +94,7 @@ const ExamList = () => {
             <TableHead>{t("exam.table.name")}</TableHead>
             <TableHead>{t("exam.table.module")}</TableHead>
             <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
+            <TableHead>{t("exam.table.location", { defaultValue: "Location" })}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
@@ -104,10 +105,10 @@ const ExamList = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={10} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={10} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -139,6 +140,7 @@ const ExamList = () => {
                   </div>
                 </TableCell>
                 <TableCell>{exam?.batch_name ?? "—"}</TableCell>
+                <TableCell>{exam?.location || "—"}</TableCell>
                 <TableCell>{exam?.total_questions ?? 0}</TableCell>
                 <TableCell>{exam?.duration ?? 0} min</TableCell>
                 <TableCell>
@@ -182,7 +184,7 @@ const ExamList = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center">
+              <TableCell colSpan={10} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>
