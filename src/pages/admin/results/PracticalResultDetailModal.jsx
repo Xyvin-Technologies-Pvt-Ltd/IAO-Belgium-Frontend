@@ -19,6 +19,12 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import StatusBadge from "@/components/StatusBadge";
 
+const isValidScore = (score, max) => {
+  if (score === "" || score === null || score === undefined) return false;
+  const n = Number(score);
+  return Number.isFinite(n) && n >= 0 && n <= max;
+};
+
 const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId }) => {
   const { t } = useTranslation();
   const { data: detailData, isLoading, error, refetch } = useGetStudentPracticalDetailAdmin(
@@ -41,9 +47,14 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
   }, [details]);
 
   const maxTotalMarks = Number(details?.exam?.total_marks) > 0 ? details.exam.total_marks : 100;
+  const scoreValid = isValidScore(adminScore, maxTotalMarks);
+  const scoreError =
+    adminScore !== "" && !scoreValid
+      ? t("exam.results.scoreRangeError", "Score must be between 0 and {{max}}", { max: maxTotalMarks })
+      : null;
 
   const derivedResult = useMemo(() => {
-    if (adminScore === "" || isNaN(Number(adminScore))) return null;
+    if (!scoreValid) return null;
     const scoreVal = Number(adminScore);
     const exam = details?.exam;
     if (!exam) return null;
@@ -59,10 +70,10 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
     }
 
     return { percentage, result };
-  }, [adminScore, details?.exam, maxTotalMarks]);
+  }, [adminScore, details?.exam, maxTotalMarks, scoreValid]);
 
   const handleSave = () => {
-    if (adminScore === "" || isNaN(Number(adminScore))) return;
+    if (!scoreValid) return;
     saveMutation.mutate(
       {
         plannedId,
@@ -169,7 +180,11 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
                     value={adminScore}
                     onChange={(e) => setAdminScore(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={t("exam.results.enterScore", "Enter score")}
+                    aria-invalid={!!scoreError}
                   />
+                  {scoreError && (
+                    <p className="text-xs text-red-600 dark:text-red-400">{scoreError}</p>
+                  )}
                 </div>
                 {derivedResult && (
                   <>
@@ -202,7 +217,7 @@ const PracticalResultDetailModal = ({ open, onClose, plannedId, applicationId })
           </Button>
           {details?.can_set_result && (
             <Button
-              disabled={adminScore === "" || saveMutation.isPending}
+              disabled={!scoreValid || saveMutation.isPending}
               onClick={handleSave}
             >
               {t("common.save", "Save")}

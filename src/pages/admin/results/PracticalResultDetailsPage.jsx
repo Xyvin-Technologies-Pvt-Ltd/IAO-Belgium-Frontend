@@ -14,6 +14,12 @@ import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import StatusBadge from "@/components/StatusBadge";
 
+const isValidScore = (score, max) => {
+  if (score === "" || score === null || score === undefined) return false;
+  const n = Number(score);
+  return Number.isFinite(n) && n >= 0 && n <= max;
+};
+
 const PracticalResultDetailsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -64,9 +70,14 @@ const PracticalResultDetailsPage = () => {
   }, [details]);
 
   const maxTotalMarks = Number(details?.exam?.total_marks) > 0 ? details.exam.total_marks : 100;
+  const scoreValid = isValidScore(adminScore, maxTotalMarks);
+  const scoreError =
+    adminScore !== "" && !scoreValid
+      ? t("exam.results.scoreRangeError", "Score must be between 0 and {{max}}", { max: maxTotalMarks })
+      : null;
 
   const derivedResult = useMemo(() => {
-    if (adminScore === "" || isNaN(Number(adminScore))) return null;
+    if (!scoreValid) return null;
     const scoreVal = Number(adminScore);
     const exam = details?.exam;
     if (!exam) return null;
@@ -80,13 +91,18 @@ const PracticalResultDetailsPage = () => {
       result = scoreVal >= threshold ? "pass" : "fail";
     }
     return { percentage, result };
-  }, [adminScore, details?.exam, maxTotalMarks]);
+  }, [adminScore, details?.exam, maxTotalMarks, scoreValid]);
 
   const resitMaxTotalMarks =
     Number(details?.resit?.exam?.total_marks) > 0 ? details.resit.exam.total_marks : 100;
+  const resitScoreValid = isValidScore(resitAdminScore, resitMaxTotalMarks);
+  const resitScoreError =
+    resitAdminScore !== "" && !resitScoreValid
+      ? t("exam.results.scoreRangeError", "Score must be between 0 and {{max}}", { max: resitMaxTotalMarks })
+      : null;
 
   const derivedResitResult = useMemo(() => {
-    if (resitAdminScore === "" || isNaN(Number(resitAdminScore))) return null;
+    if (!resitScoreValid) return null;
     const scoreVal = Number(resitAdminScore);
     const exam = details?.resit?.exam;
     if (!exam) return null;
@@ -100,10 +116,10 @@ const PracticalResultDetailsPage = () => {
       result = scoreVal >= threshold ? "pass" : "fail";
     }
     return { percentage, result };
-  }, [resitAdminScore, details?.resit?.exam, resitMaxTotalMarks]);
+  }, [resitAdminScore, details?.resit?.exam, resitMaxTotalMarks, resitScoreValid]);
 
   const handleSave = () => {
-    if (adminScore === "" || isNaN(Number(adminScore))) return;
+    if (!scoreValid) return;
     saveMutation.mutate(
       {
         plannedId,
@@ -119,7 +135,7 @@ const PracticalResultDetailsPage = () => {
   };
 
   const handleSaveResit = () => {
-    if (resitAdminScore === "" || isNaN(Number(resitAdminScore))) return;
+    if (!resitScoreValid) return;
     const resitPlannedId = details?.resit?.planned_practical_exam?._id;
     if (!resitPlannedId) return;
     saveMutation.mutate({
@@ -263,7 +279,11 @@ const PracticalResultDetailsPage = () => {
                     onChange={(e) => setAdminScore(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={t("exam.results.enterScore", "Enter score")}
                     className="w-full bg-sidebar border-sidebar-border"
+                    aria-invalid={!!scoreError}
                   />
+                  {scoreError && (
+                    <p className="text-xs text-red-600 dark:text-red-400">{scoreError}</p>
+                  )}
                 </div>
 
                 {derivedResult && (
@@ -290,7 +310,7 @@ const PracticalResultDetailsPage = () => {
 
               {details?.can_set_result && (
                 <Button
-                  disabled={adminScore === "" || saveMutation.isPending}
+                  disabled={!scoreValid || saveMutation.isPending}
                   onClick={handleSave}
                   className="w-full flex items-center justify-center gap-2 mt-4"
                 >
@@ -343,7 +363,11 @@ const PracticalResultDetailsPage = () => {
                       onChange={(e) => setResitAdminScore(e.target.value === "" ? "" : Number(e.target.value))}
                       placeholder={t("exam.results.enterScore", "Enter score")}
                       className="w-full bg-sidebar border-sidebar-border"
+                      aria-invalid={!!resitScoreError}
                     />
+                    {resitScoreError && (
+                      <p className="text-xs text-red-600 dark:text-red-400">{resitScoreError}</p>
+                    )}
                   </div>
                   {derivedResitResult && (
                     <div className="space-y-3 pt-2">
@@ -368,7 +392,7 @@ const PracticalResultDetailsPage = () => {
                 </div>
                 {details.resit.can_set_result && (
                   <Button
-                    disabled={resitAdminScore === "" || saveMutation.isPending}
+                    disabled={!resitScoreValid || saveMutation.isPending}
                     onClick={handleSaveResit}
                     className="w-full flex items-center justify-center gap-2 mt-4"
                   >

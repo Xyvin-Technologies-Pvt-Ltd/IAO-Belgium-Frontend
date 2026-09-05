@@ -209,20 +209,38 @@ const ExamDetail = () => {
                   {exam.uid}
                 </span>
               </div>
-              {exam.first_session && (
-                <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                  <span className="font-semibold">{t("exam.scheduledTime", "Scheduled Start")}:</span>
+              <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
+                {exam.batch_name && (
                   <span>
-                    {formatTZ(exam.first_session.start_time || exam.first_session.session_date, "DD-MM-YYYY, HH:mm")}
+                    <span className="font-semibold">
+                      {t("exam.table.batch", { defaultValue: "Batch" })}:
+                    </span>{" "}
+                    {exam.batch_name}
                   </span>
-                  {exam.first_session.end_time && (
-                    <>
-                      <span>–</span>
-                      <span>{formatTZ(exam.first_session.end_time, "HH:mm")}</span>
-                    </>
-                  )}
-                </div>
-              )}
+                )}
+                {exam.location && (
+                  <span>
+                    <span className="font-semibold">
+                      {t("exam.table.location", { defaultValue: "Location" })}:
+                    </span>{" "}
+                    {exam.location}
+                  </span>
+                )}
+                {exam.first_session && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="font-semibold">{t("exam.scheduledTime", "Scheduled Start")}:</span>
+                    <span>
+                      {formatTZ(exam.first_session.start_time || exam.first_session.session_date, "DD-MM-YYYY, HH:mm")}
+                    </span>
+                    {exam.first_session.end_time && (
+                      <>
+                        <span>–</span>
+                        <span>{formatTZ(exam.first_session.end_time, "HH:mm")}</span>
+                      </>
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
