@@ -65,34 +65,29 @@ export const useBackfillExactContacts = () => {
       const data = res?.data || {};
       const contacts = data.contacts || data;
       const yourRef = data.your_ref || {};
-      const documents = data.documents || {};
 
       const contactParts = [
         `${contacts.created ?? 0} contacts created`,
         `${contacts.existing ?? 0} existing`,
         `${contacts.failed ?? 0} failed`,
+        `${contacts.skipped ?? 0} skipped`,
       ];
       const refParts = [
         `${yourRef.updated ?? 0} your ref updated`,
         `${yourRef.skipped ?? 0} skipped`,
         `${yourRef.failed ?? 0} failed`,
       ];
-      const docParts = [
-        `${documents.printed ?? 0} documents printed`,
-        `${documents.skipped ?? 0} skipped`,
-        `${documents.failed ?? 0} failed`,
-      ];
 
       toast.success(
         res?.message
-          ? `${res.message}. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}. Documents: ${docParts.join(", ")}`
-          : `Backfill done. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}. Documents: ${docParts.join(", ")}`,
+          ? `${res.message}. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}`
+          : `Backfill done. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}`,
       );
       queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
       queryClient.invalidateQueries({ queryKey: ["exact-status"] });
     },
     onError: (err) =>
-      toast.error(err?.message || "Failed to backfill Exact contacts, documents & your ref"),
+      toast.error(err?.message || "Failed to backfill Exact contacts & your ref"),
   });
 };
 
