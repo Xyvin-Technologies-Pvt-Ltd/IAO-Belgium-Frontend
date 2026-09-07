@@ -78,3 +78,14 @@ export const getPlanningById= async (id) => {
     throw error.response.data;
   }
 }
+
+export const getPlanningStudents = async (id, filter = {}) => {
+  try {
+    const response = await axiosInstance.get(`/planning/${id}/students`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
