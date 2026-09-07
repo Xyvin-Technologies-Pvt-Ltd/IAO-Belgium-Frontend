@@ -5,6 +5,7 @@ import {
   getExactUnsynced,
   getExactSent,
   reconcileExact,
+  backfillExactContacts,
   disconnectExact,
 } from "@/api/exactApi";
 
@@ -53,6 +54,28 @@ export const useReconcileExact = () => {
     },
     onError: (err) =>
       toast.error(err?.message || "Failed to sync payments to Exact Online"),
+  });
+};
+
+export const useBackfillExactContacts = () => {
+  return useMutation({
+    mutationFn: backfillExactContacts,
+    onSuccess: (res) => {
+      const {
+        processed = 0,
+        created = 0,
+        existing = 0,
+        failed = 0,
+        skipped = 0,
+      } = res?.data || {};
+      toast.success(
+        res?.message
+          ? `${res.message}: ${created} created, ${existing} existing, ${failed} failed (${processed} processed, ${skipped} skipped)`
+          : `Contact backfill: ${created} created, ${existing} existing, ${failed} failed`,
+      );
+    },
+    onError: (err) =>
+      toast.error(err?.message || "Failed to backfill Exact contact persons"),
   });
 };
 
