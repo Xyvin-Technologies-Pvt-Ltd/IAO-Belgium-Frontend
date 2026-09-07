@@ -442,7 +442,7 @@ const IntegrationsPage = () => {
         ) : (
           <>
             {isSentLoading ? (
-              <TableSkeleton rows={3} columns={12} />
+              <TableSkeleton rows={3} columns={15} />
             ) : sentError ? (
               <ErrorMessage
                 message={
@@ -462,7 +462,7 @@ const IntegrationsPage = () => {
                 </div>
 
                 <div className="w-full border dark:border-white/10 rounded-lg overflow-x-auto">
-                  <Table className="w-full min-w-[1400px]">
+                  <Table className="w-full min-w-[1800px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t("integrations.exact.table.date")}</TableHead>
@@ -470,6 +470,9 @@ const IntegrationsPage = () => {
                         <TableHead>{t("integrations.exact.table.source")}</TableHead>
                         <TableHead>{t("integrations.exact.table.type")}</TableHead>
                         <TableHead>{t("integrations.exact.table.document")}</TableHead>
+                        <TableHead>{t("integrations.exact.table.invoice")}</TableHead>
+                        <TableHead>{t("integrations.exact.table.transactionId")}</TableHead>
+                        <TableHead>{t("integrations.exact.table.yourRef")}</TableHead>
                         <TableHead>{t("integrations.exact.table.description")}</TableHead>
                         <TableHead>{t("integrations.exact.table.program")}</TableHead>
                         <TableHead>{t("integrations.exact.table.glAccount")}</TableHead>
@@ -499,6 +502,21 @@ const IntegrationsPage = () => {
                             </TableCell>
                             <TableCell className="font-mono text-sm whitespace-nowrap">
                               {row.uid || "—"}
+                            </TableCell>
+                            <TableCell className="font-mono text-sm whitespace-nowrap">
+                              {row.invoice_uid || "—"}
+                            </TableCell>
+                            <TableCell
+                              className="font-mono text-xs max-w-[160px] truncate"
+                              title={row.transaction_id || undefined}
+                            >
+                              {row.transaction_id || "—"}
+                            </TableCell>
+                            <TableCell
+                              className="font-mono text-xs max-w-[200px] truncate"
+                              title={row.your_ref || undefined}
+                            >
+                              {row.your_ref || "—"}
                             </TableCell>
                             <TableCell
                               className="max-w-[280px] truncate"
