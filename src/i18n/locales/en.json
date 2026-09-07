@@ -1761,6 +1761,7 @@
       "moduleLabel": "Module",
       "programLabel": "Programme",
       "batchLabel": "Group",
+      "studentsLabel": "Students",
       "descriptionLabel": "Description",
       "sessionLabel": "Session",
       "sessionsLabel": "Sessions",
@@ -1769,7 +1770,15 @@
       "timeFromLabel": "Time From",
       "timeTillLabel": "Time Till",
       "teachersLabel": "Lecturers",
-      "venueLabel": "Venue"
+      "venueLabel": "Venue",
+      "studentListTitle": "Student list",
+      "searchStudents": "Search students...",
+      "studentNameColumn": "Student",
+      "locationColumn": "Location",
+      "locationChanged": "Location changed",
+      "locationChangedFrom": "Location changed (from {{batch}})",
+      "noStudents": "No students found for this module",
+      "studentsLoadFailed": "Failed to load students"
     },
     "calendar": {
       "today": "Today",

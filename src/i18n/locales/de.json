@@ -1520,6 +1520,7 @@
       "moduleLabel": "Modul",
       "programLabel": "Ausbildung",
       "batchLabel": "Gruppe",
+      "studentsLabel": "Studierende",
       "descriptionLabel": "Beschreibung",
       "sessionLabel": "Sitzung",
       "sessionsLabel": "Sitzungen",
@@ -1528,7 +1529,15 @@
       "timeFromLabel": "Startzeit",
       "timeTillLabel": "Endzeit",
       "teachersLabel": "Dozenten",
-      "venueLabel": "Veranstaltungsort"
+      "venueLabel": "Veranstaltungsort",
+      "studentListTitle": "Studierendenliste",
+      "searchStudents": "Studierende suchen...",
+      "studentNameColumn": "Studierende/r",
+      "locationColumn": "Standort",
+      "locationChanged": "Standort geändert",
+      "locationChangedFrom": "Standort geändert (von {{batch}})",
+      "noStudents": "Keine Studierenden für dieses Modul gefunden",
+      "studentsLoadFailed": "Studierende konnten nicht geladen werden"
     },
     "calendar": {
       "today": "Heute",

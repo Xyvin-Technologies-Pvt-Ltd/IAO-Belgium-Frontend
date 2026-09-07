@@ -1,12 +1,51 @@
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, MapPin, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table/table";
+import TableSkeleton from "@/components/ui/table/TableSkeleton";
+import { Pagination } from "@/components/ui/table/Pagination";
+import ErrorMessage from "@/components/common/ErrorMessage";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useGetPlanningStudents } from "@/store/usePlanningStore";
 
 const ViewPlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
+
+  const planningId = planningData?._id;
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, planningId]);
+
+  const { data, isLoading, error, refetch, isFetching } = useGetPlanningStudents(
+    planningId,
+    {
+      page,
+      limit: rowsPerPage,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    },
+    { enabled: open && !!planningId },
+  );
 
   if (!open || !planningData) return null;
+
+  const students = data?.data?.students || [];
+  const attendanceSessions = data?.data?.sessions || [];
+  const totalRows = data?.total_count || 0;
 
   const getBadgeStyles = (status) => {
     switch (status?.toLowerCase()) {
@@ -20,9 +59,35 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
     }
   };
 
+  const getAttendanceIcon = (status) => {
+    if (status === "present") {
+      return (
+        <div className="flex items-center justify-center">
+          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+            <Check className="w-2 h-2 text-white stroke-3" />
+          </div>
+        </div>
+      );
+    }
+    if (status === "absent") {
+      return (
+        <div className="flex items-center justify-center">
+          <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
+            <X className="w-2 h-2 text-white stroke-3" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center justify-center">
+        <div className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" />
+      </div>
+    );
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-black w-full max-w-2xl rounded-xl shadow-lg overflow-hidden border dark:border-white/20 max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-black w-full max-w-5xl rounded-xl shadow-lg overflow-hidden border dark:border-white/20 max-h-[90vh] flex flex-col">
         <div className="flex items-start justify-between p-6 border-b dark:border-white/20">
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -49,7 +114,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               value={planningData?.batch?.name || "N/A"}
             />
             <InfoItem
-              label="Students"
+              label={t("planningManagement.view.studentsLabel")}
               value={planningData?.student_count || 0}
             />
             {planningData?.description && (
@@ -59,6 +124,139 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               />
             )}
           </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("planningManagement.view.studentListTitle")}
+              </h3>
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("planningManagement.view.searchStudents")}
+                className="sm:max-w-xs"
+              />
+            </div>
+
+            {error ? (
+              <ErrorMessage
+                message={
+                  error?.message ||
+                  t("planningManagement.view.studentsLoadFailed")
+                }
+                onRetry={refetch}
+              />
+            ) : isLoading ? (
+              <div className="overflow-x-auto rounded-md border dark:border-white/20">
+                <Table>
+                  <TableBody>
+                    <TableSkeleton
+                      columns={3 + Math.max(attendanceSessions.length, 1)}
+                      rows={5}
+                    />
+                  </TableBody>
+                </Table>
+              </div>
+            ) : students.length === 0 ? (
+              <p className="text-sm text-muted-foreground dark:text-white/60">
+                {t("planningManagement.view.noStudents")}
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded-md border dark:border-white/20">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                        {t("planningManagement.view.studentNameColumn")}
+                      </TableHead>
+                      <TableHead>
+                        {t("planningManagement.view.locationColumn")}
+                      </TableHead>
+                      {attendanceSessions.map((session) => (
+                        <TableHead
+                          key={session._id}
+                          className="text-center whitespace-nowrap"
+                        >
+                          <div>
+                            {session.name ||
+                              t("planningManagement.view.sessionLabel")}
+                          </div>
+                          <div className="text-xs font-normal text-muted-foreground">
+                            {formatTZ(session.session_date, "YYYY-MM-DD") || ""}
+                          </div>
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody
+                    className={
+                      isFetching ? "opacity-50 pointer-events-none" : ""
+                    }
+                  >
+                    {students.map((student) => {
+                      const name =
+                        `${student.last_name || ""} ${student.first_name || ""}`.trim() ||
+                        "—";
+                      const locationTitle = student.home_batch?.name
+                        ? t("planningManagement.view.locationChangedFrom", {
+                            batch: student.home_batch.name,
+                          })
+                        : t("planningManagement.view.locationChanged");
+
+                      return (
+                        <TableRow key={student.application_id}>
+                          <TableCell className="font-medium">{name}</TableCell>
+                          <TableCell>
+                            {student.location_override ? (
+                              <div
+                                className="flex items-center gap-2"
+                                title={locationTitle}
+                              >
+                                <div className="w-4 h-4 rounded-full bg-orange-400 flex items-center justify-center shrink-0">
+                                  <MapPin className="w-2 h-2 text-white stroke-3" />
+                                </div>
+                                <span className="text-sm text-muted-foreground dark:text-white/70">
+                                  {student.home_batch?.name ||
+                                    t(
+                                      "planningManagement.view.locationChanged",
+                                    )}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                —
+                              </span>
+                            )}
+                          </TableCell>
+                          {attendanceSessions.map((session) => (
+                            <TableCell
+                              key={session._id}
+                              className="text-center"
+                            >
+                              {getAttendanceIcon(
+                                student.attendance?.[session._id] ?? null,
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {totalRows > 0 && (
+              <Pagination
+                page={page}
+                setPage={setPage}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                totalRows={totalRows}
+              />
+            )}
+          </div>
+
           {planningData?.sessions && planningData.sessions.length > 0 && (
             <div className="space-y-6">
               {planningData.sessions.map((session, index) => (
@@ -192,20 +390,31 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               </h3>
               <div className="grid grid-cols-1 gap-6">
                 {planningData.exams.map((exam, index) => {
-                  const examName = exam.exam?.name || exam.exam_component?.name || "Unnamed Exam";
+                  const examName =
+                    exam.exam?.name ||
+                    exam.exam_component?.name ||
+                    "Unnamed Exam";
                   const teacherName = exam.teacher
                     ? `${exam.teacher.last_name || ""} ${exam.teacher.first_name || ""}`.trim()
                     : "N/A";
-                  
+
                   return (
-                    <div key={exam._id || index} className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4 space-y-4 border dark:border-zinc-800">
+                    <div
+                      key={exam._id || index}
+                      className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4 space-y-4 border dark:border-zinc-800"
+                    >
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-gray-900 dark:text-white">{examName}</h4>
+                        <h4 className="font-bold text-gray-900 dark:text-white">
+                          {examName}
+                        </h4>
                       </div>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <InfoItem
-                          label={t("planningManagement.view.examTeacherLabel", "Supervisor / Teacher")}
+                          label={t(
+                            "planningManagement.view.examTeacherLabel",
+                            "Supervisor / Teacher",
+                          )}
                           value={teacherName}
                         />
                       </div>

@@ -1515,6 +1515,7 @@
       "moduleLabel": "Module",
       "programLabel": "Opleiding",
       "batchLabel": "Groep",
+      "studentsLabel": "Studenten",
       "descriptionLabel": "Beschrijving",
       "sessionLabel": "Sessie",
       "sessionsLabel": "Sessies",
@@ -1523,7 +1524,15 @@
       "timeFromLabel": "Begintijd",
       "timeTillLabel": "Eindtijd",
       "teachersLabel": "Docenten",
-      "venueLabel": "Locatie"
+      "venueLabel": "Locatie",
+      "studentListTitle": "Studentenlijst",
+      "searchStudents": "Zoek studenten...",
+      "studentNameColumn": "Student",
+      "locationColumn": "Locatie",
+      "locationChanged": "Locatie gewijzigd",
+      "locationChangedFrom": "Locatie gewijzigd (van {{batch}})",
+      "noStudents": "Geen studenten gevonden voor deze module",
+      "studentsLoadFailed": "Studenten laden mislukt"
     },
     "calendar": {
       "today": "Vandaag",
