@@ -37,6 +37,7 @@ export const planningSchema = z.object({
   venue: z.string().min(1, "Venue is required"),
   venue_address: z.string().optional(),
   description: z.string().optional(),
+  internal_notes: z.string().optional(),
   teachers: z.array(teacherSchema).optional(),
   assistants: z.array(teacherSchema).optional(),
   trainees: z.array(teacherSchema).optional(),

@@ -58,24 +58,36 @@ export const useReconcileExact = () => {
 };
 
 export const useBackfillExactContacts = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: backfillExactContacts,
     onSuccess: (res) => {
-      const {
-        processed = 0,
-        created = 0,
-        existing = 0,
-        failed = 0,
-        skipped = 0,
-      } = res?.data || {};
+      const data = res?.data || {};
+      const contacts = data.contacts || data;
+      const yourRef = data.your_ref || {};
+
+      const contactParts = [
+        `${contacts.created ?? 0} contacts created`,
+        `${contacts.existing ?? 0} existing`,
+        `${contacts.failed ?? 0} failed`,
+        `${contacts.skipped ?? 0} skipped`,
+      ];
+      const refParts = [
+        `${yourRef.updated ?? 0} your ref updated`,
+        `${yourRef.skipped ?? 0} skipped`,
+        `${yourRef.failed ?? 0} failed`,
+      ];
+
       toast.success(
         res?.message
-          ? `${res.message}: ${created} created, ${existing} existing, ${failed} failed (${processed} processed, ${skipped} skipped)`
-          : `Contact backfill: ${created} created, ${existing} existing, ${failed} failed`,
+          ? `${res.message}. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}`
+          : `Backfill done. Contacts: ${contactParts.join(", ")}. YourRef: ${refParts.join(", ")}`,
       );
+      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-status"] });
     },
     onError: (err) =>
-      toast.error(err?.message || "Failed to backfill Exact contact persons"),
+      toast.error(err?.message || "Failed to backfill Exact contacts & your ref"),
   });
 };
 

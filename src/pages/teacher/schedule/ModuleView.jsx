@@ -117,6 +117,14 @@ const ModuleView = () => {
         </div>
       )}
 
+      {/* Internal Notes */}
+      {data.internal_notes && (
+        <div className="p-5 border rounded-lg bg-amber-500/10 border-amber-500/20 text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2 text-amber-600 dark:text-amber-400">Internal Notes:</p>
+          <p className="text-sm text-card-foreground/90 whitespace-pre-wrap">{data.internal_notes}</p>
+        </div>
+      )}
+
       {/* Sessions */}
       <h3 className="text-lg font-semibold text-dashboard-text dark:text-white">Sessions</h3>
       <SessionCard sessions={sessions || []} isLoading={false} />

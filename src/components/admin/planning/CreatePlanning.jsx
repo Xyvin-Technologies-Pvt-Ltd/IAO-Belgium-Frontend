@@ -54,6 +54,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       venue: "",
       venue_address: "",
       description: "",
+      internal_notes: "",
       teachers: [],
       assistants: [],
       trainees: [],
@@ -458,6 +459,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         venue: planningData.venue || "",
         venue_address: planningData.venue_address || "",
         description: planningData.description || "",
+        internal_notes: planningData.internal_notes || "",
         sessions: formattedSessions,
         exams: formattedExams,
         practical_exams: formattedPracticalExams,
@@ -530,6 +532,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       venue: formData.venue,
       ...(formData.venue_address && { venue_address: formData.venue_address }),
       ...(formData.description && { description: formData.description }),
+      ...(formData.internal_notes && { internal_notes: formData.internal_notes }),
       sessions: formattedSessions,
       exams: (formData.exams || []).map((ex) => {
         const originalExam = planningData?.exams?.find(
@@ -802,6 +805,25 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
               {errors.description && (
                 <p className="text-sm text-red-500">
                   {errors.description.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                {t("planningManagement.modal.internalNotesLabel", "Internal Notes")}
+              </Label>
+              <Textarea
+                placeholder={t(
+                  "planningManagement.modal.internalNotesPlaceholder",
+                  "Enter internal notes (visible only to admins and teachers)",
+                )}
+                {...register("internal_notes")}
+                className="min-h-25"
+              />
+              {errors.internal_notes && (
+                <p className="text-sm text-red-500">
+                  {errors.internal_notes.message}
                 </p>
               )}
             </div>

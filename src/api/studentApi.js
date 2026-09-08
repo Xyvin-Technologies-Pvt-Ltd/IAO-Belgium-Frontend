@@ -97,6 +97,15 @@ export const updateStudentSpecialExceptions = async (id, specialExceptions) => {
   }
 };
 
+export const updateStudent = async (id, data) => {
+  try {
+    const response = await axiosInstance.put(`/user/student/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const createSpecialException = async (data) => {
   try {
     const response = await axiosInstance.post("/special-exceptions", data);
