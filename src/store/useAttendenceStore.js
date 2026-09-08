@@ -10,8 +10,10 @@ export const useMarkAttendance = () => {
     mutationFn: markAttendance,
     onSuccess: (data) => {
       toast.success(data.message || "Attendance marked successfully");
-      // Invalidate student-component queries to refetch with updated attendance
+      // Invalidate student-component and planning-students queries to refetch with updated attendance
       queryClient.invalidateQueries({ queryKey: ["student-component"] });
+      queryClient.invalidateQueries({ queryKey: ["planning-students"] });
+      queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
     },
     onError: (error) => {
       toast.error(
