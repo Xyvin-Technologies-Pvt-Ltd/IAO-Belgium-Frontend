@@ -116,8 +116,11 @@ export const useMoveStudentToAnotherBatch = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ applicationId, targetBatchId }) => 
-      moveStudentToAnotherBatch(applicationId, { target_batch_id: targetBatchId }),
+    mutationFn: ({ applicationId, targetBatchId, currentYear }) =>
+      moveStudentToAnotherBatch(applicationId, {
+        target_batch_id: targetBatchId,
+        ...(currentYear != null ? { current_year: currentYear } : {}),
+      }),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["batches"] });
