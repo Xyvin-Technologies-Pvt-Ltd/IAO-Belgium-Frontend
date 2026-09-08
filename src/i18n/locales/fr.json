@@ -1550,6 +1550,8 @@
       "preferredVenues": "Lieux préférés",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Saisir une description",
+      "internalNotesLabel": "Notes internes",
+      "internalNotesPlaceholder": "Saisir des notes internes (visibles uniquement par les administrateurs et formateurs)",
       "sessionsLabel": "Séances",
       "sessionLabel": "Séance",
       "sessionNameLabel": "Nom de la séance",
@@ -1573,6 +1575,7 @@
       "moduleLabel": "Module",
       "programLabel": "Formation",
       "batchLabel": "Groupe",
+      "studentsLabel": "Étudiants",
       "descriptionLabel": "Description",
       "sessionLabel": "Séance",
       "sessionsLabel": "Séances",
@@ -1581,7 +1584,15 @@
       "timeFromLabel": "Heure de début",
       "timeTillLabel": "Heure de fin",
       "teachersLabel": "Enseignants",
-      "venueLabel": "Lieu"
+      "venueLabel": "Lieu",
+      "studentListTitle": "Liste des étudiants",
+      "searchStudents": "Rechercher des étudiants...",
+      "studentNameColumn": "Étudiant",
+      "locationColumn": "Lieu",
+      "locationChanged": "Changement de lieu",
+      "locationChangedFrom": "Changement de lieu (depuis {{batch}})",
+      "noStudents": "Aucun étudiant trouvé pour ce module",
+      "studentsLoadFailed": "Échec du chargement des étudiants"
     },
     "calendar": {
       "today": "Aujourd'hui",

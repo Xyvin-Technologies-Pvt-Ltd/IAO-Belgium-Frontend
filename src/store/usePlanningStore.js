@@ -9,6 +9,7 @@ import {
   updateOnlineExamTeacherStatus,
   getPlanningByModule,
   getPlanningById,
+  getPlanningStudents,
 } from "@/api/planningApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -150,3 +151,14 @@ export const useGetPlanningById=(id, options = {}) => {
     ...options,
   });
 }
+
+export const useGetPlanningStudents = (id, filter = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["planning-students", id, filter],
+    queryFn: () => getPlanningStudents(id, filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id,
+    ...options,
+  });
+};

@@ -64,6 +64,7 @@ const Plannings = () => {
           program_name: session.program_name || "N/A",
           component_name: session.module_name || "N/A",
           venue: session.venue || "N/A",
+          internal_notes: session.internal_notes || "",
           language: session.language || "N/A",
           location: session.location || "N/A",
           batch_name: session.batch_name || "N/A",
@@ -257,6 +258,17 @@ const Plannings = () => {
                       )}
                     </TableCell>
                   </TableRow>
+
+                  {isExpanded && planning.internal_notes && (
+                    <TableRow className="bg-amber-500/5 border-l-4 border-l-amber-500">
+                      <TableCell className="pl-12 font-semibold text-amber-600 dark:text-amber-400" colSpan={2}>
+                        Internal Notes:
+                      </TableCell>
+                      <TableCell colSpan={9} className="text-sm text-gray-700 dark:text-gray-300 italic">
+                        {planning.internal_notes}
+                      </TableCell>
+                    </TableRow>
+                  )}
 
                   {isExpanded &&
                     planning.sessions?.map((session) => (

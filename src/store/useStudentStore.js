@@ -15,6 +15,7 @@ import {
   getAdminStudentComponentSlots,
   getAdminChangeLocationQuote,
   adminSwapStudentLocation,
+  updateStudent,
 } from "@/api/studentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -91,6 +92,18 @@ export const useUpdateStudentSpecialExceptions = () => {
   return useMutation({
     mutationFn: ({ id, specialExceptions }) => updateStudentSpecialExceptions(id, specialExceptions),
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student", variables.id] });
+    },
+  });
+};
+
+export const useUpdateStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => updateStudent(id, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student-list"] });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
       queryClient.invalidateQueries({ queryKey: ["student", variables.id] });
     },
   });
