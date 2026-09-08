@@ -813,7 +813,19 @@
         "cancel": "Abbrechen",
         "move": "Studierende/n verschieben",
         "moving": "Wird verschoben...",
-        "loadBatchesFailed": "Gruppen konnten nicht geladen werden"
+        "loadBatchesFailed": "Gruppen konnten nicht geladen werden",
+        "studyYear": "Studienjahr",
+        "selectStudyYear": "Studienjahr auswählen",
+        "academicYear": "Akademisches Jahr",
+        "selectAcademicYear": "Akademisches Jahr auswählen",
+        "searchAcademicYears": "Akademische Jahre suchen…",
+        "program": "Studiengang",
+        "selectProgram": "Studiengang auswählen",
+        "searchPrograms": "Studiengänge suchen…",
+        "searchBatches": "Gruppen suchen…",
+        "noBatches": "Keine Gruppen für diesen Studiengang und dieses akademische Jahr verfügbar.",
+        "missingProgram": "Der Studiengang dieses Studierenden konnte nicht ermittelt werden. Bitte aktualisieren und erneut versuchen.",
+        "blockingAvailabilities": "Dieser Studierende kann nicht verschoben werden, weil ein oder mehrere Module in Bearbeitung oder abgeschlossen sind. Verschieben ist nur möglich, wenn alle Module verfügbar oder gesperrt sind."
       }
     },
     "actions": {
