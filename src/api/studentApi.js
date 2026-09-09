@@ -33,6 +33,16 @@ export const getStudentById = async (id, filter) => {
   }
 }
 
+export const getStudentProfileLogs = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/user/${id}/profile-logs`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
 export const getStudentAttendance = async (id, filter) => {
   try {
     const response = await axiosInstance.get(`/user/attendance/${id}`, {

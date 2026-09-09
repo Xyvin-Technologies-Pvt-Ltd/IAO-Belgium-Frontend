@@ -1,3 +1,5 @@
+import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
+import { Pencil, Download } from "lucide-react";
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
@@ -13,7 +15,9 @@ import {
   useGetStudentInvoices,
   useGetStudentReceipts,
   useUpdateStudentSpecialExceptions,
+  useGetStudentProfileLogs,
 } from "@/store/useStudentStore";
+import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { getInvoiceHtml, getInvoicePrintHtml } from "@/api/paymentApi";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -29,9 +33,9 @@ import {
 } from "@/components/ui/table/table";
 import { Pagination } from "@/components/ui/table/Pagination";
 import StatusBadge from "@/components/StatusBadge";
-import { Download } from "lucide-react";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
+
 
 const formatSubmissionType = (type) =>
   type
@@ -64,7 +68,7 @@ const getDurationUnitLabel = (durationUnit, t) => {
 };
 
 const StudentDetails = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
@@ -78,6 +82,7 @@ const StudentDetails = () => {
   const [receiptsPage, setReceiptsPage] = useState(1);
   const [receiptsRowsPerPage, setReceiptsRowsPerPage] = useState(10);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isStudentEditOpen, setIsStudentEditOpen] = useState(false);
   const [selectedExceptions, setSelectedExceptions] = useState([]);
 
   const { data: allExceptionsData, isLoading: isExceptionsLoading } =
@@ -98,6 +103,11 @@ const StudentDetails = () => {
     id,
     activeTab === "progress" ? { year: filter.year } : {},
   );
+
+  const studentData = student?.data;
+  const { data: auditLogsRes, isLoading: isLogsLoading } = useGetStudentProfileLogs(studentData?._id);
+  const auditLogs = auditLogsRes?.data || [];
+
   //* Must run before the isLoading/error early returns below (Rules of
   //* Hooks) — safe with undefined values via optional chaining.
   const yearHistory = useMigratedYearHistory(
@@ -351,8 +361,8 @@ const StudentDetails = () => {
     );
   }
 
-  const studentData = student?.data;
   if (!studentData) return null;
+
 
   const totalYears = studentData?.year || 1;
   const years = Array.from({ length: totalYears }, (_, i) => i + 1);
@@ -372,7 +382,7 @@ const StudentDetails = () => {
 
   return (
     <div className="space-y-6 mt-4 bg-sidebar rounded-xl p-5 border border-sidebar-border">
-      <UserCard student={studentData} />
+      <UserCard student={studentData} onEdit={() => setIsStudentEditOpen(true)} />
 
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
@@ -674,15 +684,15 @@ const StudentDetails = () => {
                       "Special Exceptions",
                     )}
                   </h3>
-                  <button
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
-                  >
-                    {t(
-                      "studentManagement.details.configureExceptions",
-                      "Configure",
-                    )}
-                  </button>
+                    <button
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
+                    >
+                      {t(
+                        "studentManagement.details.configureExceptions",
+                        "Configure",
+                      )}
+                    </button>
                 </div>
                 <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
                   {studentData.special_exceptions &&
@@ -707,7 +717,62 @@ const StudentDetails = () => {
                   )}
                 </div>
             </div>
+
+            {/* Profile Change Audit History Section */}
+            <div className="col-span-12 mt-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900 dark:text-white">Profile Audit & Change History</h3>
+              </div>
+              <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
+                {isLogsLoading ? (
+                  <p className="text-sm text-muted-foreground py-2">Loading audit logs...</p>
+                ) : auditLogs && auditLogs.length > 0 ? (
+                  <div className="space-y-4">
+                    {auditLogs.map((log) => {
+                      const performer = log.changed_by
+                        ? `${log.changed_by.first_name || ""} ${log.changed_by.last_name || ""}`.trim() || log.changed_by.email
+                        : log.changed_by_role === "admin" ? "Admin" : "Student";
+                      return (
+                        <div key={log._id} className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-900/50 space-y-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">
+                              Updated by <span className="capitalize">{performer}</span> ({log.changed_by_role || "user"})
+                            </span>
+                            <span>{moment(log.createdAt).format("DD MMM YYYY, HH:mm")}</span>
+                          </div>
+                          <div className="space-y-1">
+                            {log.changes?.map((ch, idx) => {
+                              let oldLabel = ch.old_value || "-";
+                              let newLabel = ch.new_value || "-";
+                              if (ch.field === "previous_education") {
+                                oldLabel = resolvePreviousEducationLabel(ch.old_value, studentData?.previous_education_options || [], i18n.language) || ch.old_value || "-";
+                                newLabel = resolvePreviousEducationLabel(ch.new_value, studentData?.previous_education_options || [], i18n.language) || ch.new_value || "-";
+                              }
+                              return (
+                                <div key={idx} className="text-xs flex items-center gap-2">
+                                  <span className="font-mono capitalize text-gray-700 dark:text-gray-300 w-36">
+                                    {ch.field.replace(/_/g, " ")}:
+                                  </span>
+                                  <span className="line-through text-red-500">{oldLabel}</span>
+                                  <span>➔</span>
+                                  <span className="font-semibold text-green-600 dark:text-green-400">{newLabel}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">
+                    No profile changes logged yet.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
+
         </div>
       )}
 
@@ -1163,6 +1228,15 @@ const StudentDetails = () => {
         </div>
       )}
 
+      {/* Edit Student Profile Dialog */}
+      {isStudentEditOpen && (
+        <EditStudentDialog
+          open={isStudentEditOpen}
+          onClose={() => setIsStudentEditOpen(false)}
+          studentData={studentData}
+        />
+      )}
+
       {(() => {
         if (
           isEditModalOpen &&
@@ -1179,3 +1253,4 @@ const StudentDetails = () => {
 };
 
 export default StudentDetails;
+

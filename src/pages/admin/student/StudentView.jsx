@@ -3,11 +3,19 @@ import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory"
 import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentById, useGetSpecialExceptions, useUpdateStudentSpecialExceptions } from "@/store/useStudentStore";
+import {
+  useGetStudentById,
+  useGetSpecialExceptions,
+  useUpdateStudentSpecialExceptions,
+} from "@/store/useStudentStore";
+import moment from "moment";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
+
+
+
 import {
   Table,
   TableBody,
@@ -72,9 +80,13 @@ const StudentView = () => {
   const allExceptions = allExceptionsData?.data || [];
   const updateExceptionsMutation = useUpdateStudentSpecialExceptions();
 
+  const { data: auditLogsRes, isLoading: isLogsLoading } = useGetStudentProfileLogs(id);
+  const auditLogs = auditLogsRes?.data || [];
+
   const {
     data: student,
     isLoading,
+
     isFetching,
     isPlaceholderData,
     error,
@@ -152,6 +164,8 @@ const StudentView = () => {
   return (
     <div className="space-y-6 mt-4 bg-sidebar  rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} hide />
+
+
 
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 dark:border-white/20">
@@ -474,5 +488,7 @@ const StudentView = () => {
     </div>
   );
 };
+
+
 
 export default StudentView;

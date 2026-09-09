@@ -4,6 +4,7 @@ import {
   getStudentInvoices,
   getStudentReceipts,
   getStudentById,
+  getStudentProfileLogs,
   getStudents,
   getSpecialExceptions,
   updateStudentSpecialExceptions,
@@ -37,6 +38,17 @@ export const useGetStudentById = (id, filter, options = {}) => {
     ...options,
   });
 };
+
+export const useGetStudentProfileLogs = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["student-profile-logs", id],
+    queryFn: () => getStudentProfileLogs(id),
+    enabled: Boolean(id),
+    staleTime: 10000,
+    ...options,
+  });
+};
+
 
 export const useGetStudentAttendance = (id, filter, options = {}) => {
   return useQuery({
@@ -105,7 +117,9 @@ export const useUpdateStudent = () => {
       queryClient.invalidateQueries({ queryKey: ["student-list"] });
       queryClient.invalidateQueries({ queryKey: ["students"] });
       queryClient.invalidateQueries({ queryKey: ["student", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["student-profile-logs", variables.id] });
     },
+
   });
 };
 

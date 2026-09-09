@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, Download, FileText, Upload, Plus, Loader2 } from "lucide-react";
+import { Eye, Download, FileText, Upload, Plus, Loader2, Pencil } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { uploadFile } from "@/api/uploadApi";
 import { usePutApplication } from "@/store/useApplication";
 
-const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
+const UserCard = ({ student, teacher, isTeacher = false, hide, onEdit }) => {
   const { t, i18n } = useTranslation();
   const user = isTeacher ? teacher : student;
   const [uploadingIdCard, setUploadingIdCard] = useState(false);
@@ -84,46 +84,59 @@ const UserCard = ({ student, teacher, isTeacher = false, hide }) => {
 
   return (
     <div
-      className={`${hide ? "" : "rounded-xl p-5 border border-sidebar-border"} bg-sidebar   space-y-6`}
+      className={`${hide ? "" : "rounded-xl p-5 border border-sidebar-border"} bg-sidebar space-y-6`}
     >
-      <div className="flex items-start gap-4 pb-4 border-b border-sidebar-border">
-        <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl">
-          {user?.first_name
-            ? user.first_name.charAt(0).toUpperCase()
-            : user?.email?.charAt(0).toUpperCase() || "?"}
+      <div className="flex items-start justify-between gap-4 pb-4 border-b border-sidebar-border">
+        <div className="flex items-start gap-4 flex-1">
+          <div className="w-16 h-16 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-xl shrink-0">
+            {user?.first_name
+              ? user.first_name.charAt(0).toUpperCase()
+              : user?.email?.charAt(0).toUpperCase() || "?"}
+          </div>
+
+          <div className="space-y-1 flex-1">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-sidebar-foreground capitalize">
+                {user?.first_name && user?.last_name
+                  ? `${user.last_name} ${user.first_name}`
+                  : user?.email ||
+                    t("userCard.unknownUser", {
+                      type: isTeacher ? t("common.teacher") : t("common.student"),
+                    })}
+              </h2>
+              {user?.uid && (
+                <span
+                  className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-sidebar-foreground bg-[#0A0A0A]/20`}
+                >
+                  {user?.uid}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-sidebar-foreground/70">
+                {isTeacher
+                  ? user?.teacher_role?.name || t("common.notAvailable")
+                  : programDisplay}
+              </p>
+              {!isTeacher && user?.is_online && (
+                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border border-green-200 dark:border-green-900/50">
+                  {t("common.online", "Online")}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-1 flex-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-sidebar-foreground capitalize">
-              {user?.first_name && user?.last_name
-                ? `${user.last_name} ${user.first_name}`
-                : user?.email ||
-                  t("userCard.unknownUser", {
-                    type: isTeacher ? t("common.teacher") : t("common.student"),
-                  })}
-            </h2>
-            {user?.uid && (
-              <span
-                className={`px-1.5 py-0.5 text-xs font-medium rounded-[6px] text-sidebar-foreground bg-[#0A0A0A]/20`}
-              >
-                {user?.uid}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-medium text-sidebar-foreground/70">
-              {isTeacher
-                ? user?.teacher_role?.name || t("common.notAvailable")
-                : programDisplay}
-            </p>
-            {!isTeacher && user?.is_online && (
-              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border border-green-200 dark:border-green-900/50">
-                {t("common.online", "Online")}
-              </span>
-            )}
-          </div>
-        </div>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-[#ff8904] rounded-lg hover:bg-[#e07b03] transition-colors cursor-pointer shadow-sm shrink-0"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            {t("common.edit", "Edit Student")}
+          </button>
+        )}
       </div>
       <div>
         <h3 className="text-base font-semibold mb-4 text-sidebar-foreground">

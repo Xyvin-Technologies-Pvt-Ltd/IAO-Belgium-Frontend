@@ -16,11 +16,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUpdateStudent } from "@/store/useStudentStore";
+import {
+  getActivePreviousEducationOptions,
+  resolvePreviousEducationLabel,
+  humanizePreviousEducationKey,
+} from "@/utils/previousEducation";
 
 const editStudentSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().min(1, "Email is required").email("Invalid email address"),
+  phone: z.string().optional(),
+  previous_education: z.string().optional(),
   address: z.string().optional(),
   postal_code: z.string().optional(),
   country: z.string().optional(),
@@ -28,9 +35,29 @@ const editStudentSchema = z.object({
 });
 
 const EditStudentDialog = ({ open, onClose, studentData }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [countries, setCountries] = useState([]);
   const updateStudentMutation = useUpdateStudent();
+
+  const rawOptions =
+    studentData?.previous_education_options ||
+    studentData?.program?.previous_education_options ||
+    studentData?.batch?.intake?.program?.previous_education_options ||
+    [];
+
+  const previousEducationOptions = getActivePreviousEducationOptions(rawOptions);
+
+  if (
+    studentData?.previous_education &&
+    !previousEducationOptions.some((opt) => opt.key === studentData.previous_education)
+  ) {
+    previousEducationOptions.unshift({
+      key: studentData.previous_education,
+      labels: { en: humanizePreviousEducationKey(studentData.previous_education) },
+      status: true,
+    });
+  }
+
 
   useEffect(() => {
     if (!open) return;
@@ -55,6 +82,8 @@ const EditStudentDialog = ({ open, onClose, studentData }) => {
       first_name: "",
       last_name: "",
       email: "",
+      phone: "",
+      previous_education: "",
       address: "",
       postal_code: "",
       country: "",
@@ -69,6 +98,8 @@ const EditStudentDialog = ({ open, onClose, studentData }) => {
       first_name: studentData.first_name || "",
       last_name: studentData.last_name || "",
       email: studentData.email || "",
+      phone: studentData.phone || "",
+      previous_education: studentData.previous_education || "",
       address: studentData.address || "",
       postal_code: studentData.postal_code || "",
       country: studentData.country || "",
@@ -83,6 +114,8 @@ const EditStudentDialog = ({ open, onClose, studentData }) => {
       first_name: formData.first_name.trim(),
       last_name: formData.last_name.trim(),
       email: formData.email.trim(),
+      phone: formData.phone ? formData.phone.trim() : "",
+      previous_education: formData.previous_education || "",
       address: formData.address ? formData.address.trim() : "",
       postal_code: formData.postal_code ? formData.postal_code.trim() : "",
       country: formData.country || "",
@@ -144,14 +177,58 @@ const EditStudentDialog = ({ open, onClose, studentData }) => {
               />
             </div>
 
-            <FormField
-              label={t("studentManagement.modal.emailLabel", "Email")}
-              placeholder={t("studentManagement.modal.emailPlaceholder", "Enter email address")}
-              type="email"
-              {...register("email")}
-              error={errors.email?.message}
-              required
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label={t("studentManagement.modal.emailLabel", "Email")}
+                placeholder={t("studentManagement.modal.emailPlaceholder", "Enter email address")}
+                type="email"
+                {...register("email")}
+                error={errors.email?.message}
+                required
+              />
+              <FormField
+                label={t("studentManagement.modal.phoneLabel", "Phone")}
+                placeholder={t("studentManagement.modal.phonePlaceholder", "Enter phone number")}
+                {...register("phone")}
+                error={errors.phone?.message}
+              />
+            </div>
+
+            {previousEducationOptions.length > 0 && (
+              <FormField
+                label={t("studentManagement.modal.previousEducationLabel", "Previous Education")}
+                error={errors.previous_education?.message}
+              >
+                <Controller
+                  name="previous_education"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`${field.value}-${previousEducationOptions.length}`}
+                      onValueChange={(val) => field.onChange(val)}
+                      value={field.value || ""}
+                    >
+
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={t(
+                            "studentManagement.modal.previousEducationPlaceholder",
+                            "Select previous education"
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {previousEducationOptions.map((opt) => (
+                          <SelectItem key={opt.key} value={opt.key}>
+                            {resolvePreviousEducationLabel(opt.key, [opt], i18n.language)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FormField>
+            )}
 
             <FormField
               label={t("studentManagement.modal.addressLabel", "Address")}
@@ -216,3 +293,4 @@ const EditStudentDialog = ({ open, onClose, studentData }) => {
 };
 
 export default EditStudentDialog;
+
