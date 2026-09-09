@@ -464,6 +464,8 @@
       "operationsManagement": "Operationeel beheer",
       "academicManagement": "Academisch beheer",
       "financeManagement": "Financieel beheer",
+      "kmoManagement": "KMO-Portefeuille",
+      "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Stamgegevensbeheer",
       "logsManagement": "Logboekbeheer"
     }

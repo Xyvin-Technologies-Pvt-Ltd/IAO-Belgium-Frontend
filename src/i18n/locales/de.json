@@ -490,6 +490,8 @@
       "operationsManagement": "Betriebsverwaltung",
       "academicManagement": "Akademische Verwaltung",
       "financeManagement": "Finanzverwaltung",
+      "kmoManagement": "KMO-Portefeuille",
+      "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Stammdatenverwaltung",
       "logsManagement": "Protokollverwaltung"
     }

@@ -1,6 +1,14 @@
 import { createRole, deleteRole, getRoles, updateRole } from "@/api/roleApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/useAuthStore";
+
+const refreshCurrentUserProfile = () => {
+  const { isAuthenticated, fetchProfile } = useAuthStore.getState();
+  if (isAuthenticated) {
+    fetchProfile().catch(() => {});
+  }
+};
 
 export const useGetRoles = (filter, options = {}) => {
   return useQuery({
@@ -19,6 +27,7 @@ export const useCreateRole = () => {
     mutationFn: createRole,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
+      refreshCurrentUserProfile();
       toast.success(response?.message || "Role created successfully!");
     },
     onError: (error) => {
@@ -35,6 +44,7 @@ export const useUpdateRole = () => {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       queryClient.invalidateQueries({ queryKey: ["role", variables.id] });
+      refreshCurrentUserProfile();
       toast.success(response?.message || "Role updated successfully!");
     },
     onError: (error) => {
@@ -50,6 +60,7 @@ export const useDeleteRole = () => {
     mutationFn: deleteRole,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
+      refreshCurrentUserProfile();
       toast.success(response?.message || "Role deleted successfully!");
     },
     onError: (error) => {

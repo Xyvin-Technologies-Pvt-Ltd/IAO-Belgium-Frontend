@@ -11,10 +11,16 @@ const VALID_PERMISSIONS = [
   "academic_management_modify",
   "finance_management_view",
   "finance_management_modify",
+  "kmo_management_view",
+  "kmo_management_modify",
+  "fkf_management_view",
+  "fkf_management_modify",
   "master_data_management_view",
   "master_data_management_modify",
   "logs_management_view"
 ];
+
+export { VALID_PERMISSIONS };
 
 export const roleSchema = z.object({
   name: z
