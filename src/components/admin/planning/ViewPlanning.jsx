@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, MapPin, X } from "lucide-react";
+import { Check, MapPin, X, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +17,14 @@ import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetPlanningStudents } from "@/store/usePlanningStore";
+import { useMarkAttendance } from "@/store/useAttendenceStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ViewPlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
@@ -24,6 +32,11 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+
+  const profile = useAuthStore((state) => state.profile);
+  const canMarkAttendance = profile?.role === "admin" || profile?.role === "teacher";
+  const markAttendanceMutation = useMarkAttendance();
+  const [pendingCell, setPendingCell] = useState(null);
 
   const planningId = planningData?._id;
 
@@ -46,6 +59,22 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
   const students = data?.data?.students || [];
   const attendanceSessions = data?.data?.sessions || [];
   const totalRows = data?.total_count || 0;
+
+  const handleMarkAttendance = (applicationId, sessionId, status) => {
+    setPendingCell({ applicationId, sessionId });
+    markAttendanceMutation.mutate(
+      {
+        session_id: sessionId,
+        application_id: applicationId,
+        status,
+      },
+      {
+        onSettled: () => {
+          setPendingCell(null);
+        },
+      }
+    );
+  };
 
   const getBadgeStyles = (status) => {
     switch (status?.toLowerCase()) {
@@ -234,16 +263,88 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                               </span>
                             )}
                           </TableCell>
-                          {attendanceSessions.map((session) => (
-                            <TableCell
-                              key={session._id}
-                              className="text-center"
-                            >
-                              {getAttendanceIcon(
-                                student.attendance?.[session._id] ?? null,
-                              )}
-                            </TableCell>
-                          ))}
+                          {attendanceSessions.map((session) => {
+                            const currentStatus = student.attendance?.[session._id] ?? null;
+                            const detail = student.attendance_details?.[session._id];
+                            const markedBy = detail?.marked_by;
+                            const markedByName = markedBy
+                              ? `${markedBy.last_name || ""} ${markedBy.first_name || ""}`.trim() || markedBy.email
+                              : null;
+                            const markedByRole = markedBy?.role;
+                            const isPendingThisCell =
+                              pendingCell?.applicationId === student.application_id &&
+                              pendingCell?.sessionId === session._id;
+
+                            const tooltipTitle = markedByName
+                              ? `Status: ${currentStatus || "Not marked"}\nMarked by: ${markedByName} (${markedByRole})`
+                              : currentStatus
+                              ? `Status: ${currentStatus}`
+                              : "Not marked";
+
+                            const cellContent = (
+                              <div
+                                className={`flex flex-col items-center justify-center p-1.5 rounded transition-all ${
+                                  canMarkAttendance
+                                    ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800/80"
+                                    : ""
+                                }`}
+                                title={tooltipTitle}
+                              >
+                                {isPendingThisCell ? (
+                                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                ) : (
+                                  getAttendanceIcon(currentStatus)
+                                )}
+                                {markedByName && (
+                                  <span className="text-[10px] leading-tight text-muted-foreground dark:text-white/60 mt-1 max-w-[80px] truncate text-center">
+                                    {markedByName} ({markedByRole})
+                                  </span>
+                                )}
+                              </div>
+                            );
+
+                            return (
+                              <TableCell key={session._id} className="text-center">
+                                {canMarkAttendance ? (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      {cellContent}
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="center">
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          handleMarkAttendance(
+                                            student.application_id,
+                                            session._id,
+                                            "present"
+                                          )
+                                        }
+                                        className="cursor-pointer text-green-600 focus:text-green-700 font-medium"
+                                      >
+                                        <Check className="w-4 h-4 mr-2" />
+                                        Mark Present
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          handleMarkAttendance(
+                                            student.application_id,
+                                            session._id,
+                                            "absent"
+                                          )
+                                        }
+                                        className="cursor-pointer text-red-600 focus:text-red-700 font-medium"
+                                      >
+                                        <X className="w-4 h-4 mr-2" />
+                                        Mark Absent
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                ) : (
+                                  cellContent
+                                )}
+                              </TableCell>
+                            );
+                          })}
                         </TableRow>
                       );
                     })}

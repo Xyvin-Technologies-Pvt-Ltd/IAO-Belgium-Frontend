@@ -844,7 +844,19 @@
         "cancel": "Annuler",
         "move": "Déplacer l'étudiant",
         "moving": "Déplacement en cours...",
-        "loadBatchesFailed": "Échec du chargement des groupes"
+        "loadBatchesFailed": "Échec du chargement des groupes",
+        "studyYear": "Année d'études",
+        "selectStudyYear": "Sélectionner l'année d'études",
+        "academicYear": "Année académique",
+        "selectAcademicYear": "Sélectionner l'année académique",
+        "searchAcademicYears": "Rechercher des années académiques…",
+        "program": "Programme",
+        "selectProgram": "Sélectionner un programme",
+        "searchPrograms": "Rechercher des programmes…",
+        "searchBatches": "Rechercher des groupes…",
+        "noBatches": "Aucun groupe disponible pour ce programme et cette année académique.",
+        "missingProgram": "Impossible de déterminer le programme de cet étudiant. Actualisez et réessayez.",
+        "blockingAvailabilities": "Cet étudiant ne peut pas être déplacé car un ou plusieurs modules sont en cours ou terminés. Seuls les étudiants dont les modules sont disponibles ou verrouillés peuvent être déplacés."
       }
     },
     "actions": {
