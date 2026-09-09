@@ -968,7 +968,19 @@
         "cancel": "Cancel",
         "move": "Move Student",
         "moving": "Moving...",
-        "loadBatchesFailed": "Failed to load groups"
+        "loadBatchesFailed": "Failed to load groups",
+        "studyYear": "Study year",
+        "selectStudyYear": "Select study year",
+        "academicYear": "Academic year",
+        "selectAcademicYear": "Select academic year",
+        "searchAcademicYears": "Search academic years…",
+        "program": "Programme",
+        "selectProgram": "Select a programme",
+        "searchPrograms": "Search programmes…",
+        "searchBatches": "Search groups…",
+        "noBatches": "No groups available for this programme and academic year.",
+        "missingProgram": "Could not determine this student's programme. Refresh and try again.",
+        "blockingAvailabilities": "This student cannot be moved because one or more modules are in progress or completed. Only students with available or locked modules can be moved."
       },
       "reEnrollStudent": {
         "title": "Re-enroll Student",

@@ -855,7 +855,19 @@
         "cancel": "Annuleren",
         "move": "Student verplaatsen",
         "moving": "Verplaatsen...",
-        "loadBatchesFailed": "Laden van groepen mislukt"
+        "loadBatchesFailed": "Laden van groepen mislukt",
+        "studyYear": "Studiejaar",
+        "selectStudyYear": "Selecteer studiejaar",
+        "academicYear": "Academiejaar",
+        "selectAcademicYear": "Selecteer academiejaar",
+        "searchAcademicYears": "Academiejaren zoeken…",
+        "program": "Opleiding",
+        "selectProgram": "Selecteer een opleiding",
+        "searchPrograms": "Opleidingen zoeken…",
+        "searchBatches": "Groepen zoeken…",
+        "noBatches": "Geen groepen beschikbaar voor deze opleiding en dit academiejaar.",
+        "missingProgram": "De opleiding van deze student kon niet worden bepaald. Vernieuw en probeer opnieuw.",
+        "blockingAvailabilities": "Deze student kan niet worden verplaatst omdat een of meer modules bezig of voltooid zijn. Alleen studenten met beschikbare of vergrendelde modules kunnen worden verplaatst."
       }
     },
     "actions": {
