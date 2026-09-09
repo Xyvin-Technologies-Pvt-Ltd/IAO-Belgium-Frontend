@@ -60,7 +60,7 @@ const formatKmoAmount = (app) => {
 
 const KmoManagement = () => {
   const { t } = useTranslation();
-  const canModify = useCanModify("finance");
+  const canModify = useCanModify("kmo");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   

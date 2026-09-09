@@ -32,16 +32,16 @@ const SIDEBAR_PERMISSIONS = {
     "finance_management_modify",
   ],
   "/admin/kmo-applications": [
-    "finance_management_view",
-    "finance_management_modify",
+    "kmo_management_view",
+    "kmo_management_modify",
   ],
   "/admin/third-party-payments": [
     "finance_management_view",
     "finance_management_modify",
   ],
   "/admin/fkf": [
-    "finance_management_view",
-    "finance_management_modify",
+    "fkf_management_view",
+    "fkf_management_modify",
   ],
   "/admin/custom-invoices": [
     "finance_management_view",
@@ -145,7 +145,31 @@ export const MODULE_MODIFY_PERMISSIONS = {
   operations: "operations_management_modify",
   academic: "academic_management_modify",
   finance: "finance_management_modify",
+  kmo: "kmo_management_modify",
+  fkf: "fkf_management_modify",
   master_data: "master_data_management_modify",
+};
+
+/** Full finance access also covers KMO-Portefeuille and Fachkursförderung. */
+const FINANCE_IMPLIED_PERMISSIONS = {
+  finance_management_view: ["kmo_management_view", "fkf_management_view"],
+  finance_management_modify: ["kmo_management_modify", "fkf_management_modify"],
+};
+
+/**
+ * Expand stored role permissions with implied keys (finance → KMO + FKF).
+ * @param {string[]} userPermissions
+ * @returns {string[]}
+ */
+export const expandPermissions = (userPermissions = []) => {
+  const expanded = new Set(userPermissions);
+  for (const permission of userPermissions) {
+    const implied = FINANCE_IMPLIED_PERMISSIONS[permission];
+    if (implied) {
+      implied.forEach((key) => expanded.add(key));
+    }
+  }
+  return Array.from(expanded);
 };
 
 /**
@@ -171,9 +195,11 @@ export const hasPermission = (url, userPermissions = []) => {
     return true;
   }
 
+  const effectivePermissions = expandPermissions(userPermissions);
+
   // Check if user has at least one of the required permissions
   return requiredPermissions.some((permission) =>
-    userPermissions.includes(permission)
+    effectivePermissions.includes(permission)
   );
 };
 
@@ -200,7 +226,7 @@ export const hasModifyPermission = (
 ) => {
   const permission = resolveModifyPermission(moduleOrPermission);
   if (!permission) return false;
-  return userPermissions.includes(permission);
+  return expandPermissions(userPermissions).includes(permission);
 };
 
 /**
@@ -221,9 +247,13 @@ export const getModifyPermissionForPath = (path) => {
  * @returns {boolean}
  */
 export const canModifyPath = (path, userPermissions = []) => {
-  const modifyPerm = getModifyPermissionForPath(path);
-  if (!modifyPerm) return false;
-  return userPermissions.includes(modifyPerm);
+  const perms = SIDEBAR_PERMISSIONS[path] || [];
+  const modifyPerms = perms.filter((p) => p.endsWith("_modify"));
+  if (modifyPerms.length === 0) return false;
+  const effectivePermissions = expandPermissions(userPermissions);
+  return modifyPerms.some((permission) =>
+    effectivePermissions.includes(permission)
+  );
 };
 
 /**
