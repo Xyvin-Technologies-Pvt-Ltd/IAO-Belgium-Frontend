@@ -7,7 +7,7 @@ import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory"
 import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentByApplication } from "@/store/useIntakeStore";
+import { useGetStudentByApplication, useGetStudentExamsByApplication } from "@/store/useIntakeStore";
 import {
   useGetSpecialExceptions,
   useGetStudentAttendance,
@@ -102,6 +102,16 @@ const StudentDetails = () => {
   } = useGetStudentByApplication(
     id,
     activeTab === "progress" ? { year: filter.year } : {},
+  );
+
+  const {
+    data: examsResponse,
+    isLoading: isExamsLoading,
+    isFetching: isExamsFetching,
+  } = useGetStudentExamsByApplication(
+    id,
+    {},
+    { enabled: !!id && activeTab === "exams" },
   );
 
   const studentData = student?.data;
@@ -368,7 +378,7 @@ const StudentDetails = () => {
   const years = Array.from({ length: totalYears }, (_, i) => i + 1);
 
   const modules = studentData?.assigned_modules || [];
-  const exams = studentData?.completed_exams || [];
+  const exams = examsResponse?.data?.exams || [];
   const apps = studentData?.assigned_apps || [];
   const invoices = invoicesResponse?.data || [];
   const invoicesTotal = invoicesResponse?.total_count || 0;
@@ -395,6 +405,16 @@ const StudentDetails = () => {
             }`}
           >
             {t("studentManagement.tabs.progress", "Academic Progress")}
+          </button>
+          <button
+            onClick={() => setActiveTab("exams")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "exams"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.exams", "Exams")}
           </button>
           {studentData.program_type === "Manual Therapie" && (
             <button
@@ -492,7 +512,7 @@ const StudentDetails = () => {
               </div>
             ) : (
               <>
-            <div className="col-span-12 lg:col-span-6">
+            <div className="col-span-12">
               <h3 className="font-semibold mb-4">
                 {t("studentManagement.details.assignedModules", "Assigned Modules")}
               </h3>
@@ -508,6 +528,9 @@ const StudentDetails = () => {
                     <TableHead>
                       {t("studentManagement.table.status", "Status")}
                     </TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.payment", "Payment")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -519,66 +542,20 @@ const StudentDetails = () => {
                         <TableCell>
                           <StatusBadge status={m.status} />
                         </TableCell>
+                        <TableCell>
+                          <StatusBadge status={m.payment_status || "unpaid"} />
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={3}
+                        colSpan={4}
                         className="text-center text-muted-foreground"
                       >
                         {t(
                           "studentManagement.details.noAssignedModules",
                           "No modules assigned",
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="col-span-12 lg:col-span-6">
-              <h3 className="font-semibold mb-4">
-                {t(
-                  "studentManagement.details.completedExams",
-                  "Completed Exams",
-                )}
-              </h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("common.exam", "Exam")}</TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.scores", "Scores")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.table.status", "Status")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {exams.length > 0 ? (
-                    exams.map((exam) => (
-                      <TableRow key={exam._id}>
-                        <TableCell>{exam.exam_name}</TableCell>
-                        <TableCell>
-                          {exam.percentage?.toFixed(2)}/100
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={exam.result} />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-center text-muted-foreground"
-                      >
-                        {t(
-                          "studentManagement.details.noExamsCompleted",
-                          "No exams completed",
                         )}
                       </TableCell>
                     </TableRow>
@@ -773,6 +750,98 @@ const StudentDetails = () => {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {activeTab === "exams" && (
+        <div className="space-y-6">
+          {isExamsLoading || isExamsFetching ? (
+            <LoadingState
+              size="sm"
+              text={t("common.loading", "Loading...")}
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("common.exam", "Exam")}</TableHead>
+                  <TableHead>{t("common.type", "Type")}</TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.moduleName", "Module")}
+                  </TableHead>
+                  <TableHead>
+                    {t("common.year", "Year")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.scores", "Scores")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.table.status", "Result")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.completion", "Completion")}
+                  </TableHead>
+                  <TableHead>{t("common.date", "Date")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {exams.length > 0 ? (
+                  exams.map((exam) => (
+                    <TableRow key={String(exam._id)}>
+                      <TableCell>{exam.exam_name}</TableCell>
+                      <TableCell className="capitalize">
+                        {exam.type || "-"}
+                      </TableCell>
+                      <TableCell>{exam.module_name || "-"}</TableCell>
+                      <TableCell>{exam.year ?? "-"}</TableCell>
+                      <TableCell>
+                        {exam.percentage != null
+                          ? `${Number(exam.percentage).toFixed(2)}/100`
+                          : exam.score != null
+                            ? exam.score
+                            : "—"}
+                      </TableCell>
+                      <TableCell>
+                        {exam.result ? (
+                          <StatusBadge status={exam.result} />
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          status={
+                            exam.is_completed
+                              ? "completed"
+                              : exam.lock_reason || "not_completed"
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {exam.submitted_at
+                          ? formatTZ(exam.submitted_at, "DD MMM YYYY")
+                          : exam.exam_date
+                            ? formatTZ(exam.exam_date, "DD MMM YYYY")
+                            : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground"
+                    >
+                      {t(
+                        "studentManagement.details.noExams",
+                        "No exams found",
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </div>
       )}
 

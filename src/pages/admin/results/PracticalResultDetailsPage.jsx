@@ -1,10 +1,18 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   useGetStudentPracticalDetailAdmin,
@@ -26,15 +34,22 @@ const PracticalResultDetailsPage = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
   const { plannedId, applicationId } = useParams({ strict: false });
 
-  const { data: detailData, isLoading, error, refetch } = useGetStudentPracticalDetailAdmin(
-    plannedId,
-    applicationId,
-    { enabled: !!plannedId && !!applicationId }
-  );
+  const {
+    data: detailData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetStudentPracticalDetailAdmin(plannedId, applicationId, {
+    enabled: !!plannedId && !!applicationId,
+  });
 
   const saveMutation = useSetStudentPracticalScoreAdmin();
   const [adminScore, setAdminScore] = useState("");
+  const [adminFeedback, setAdminFeedback] = useState("");
+  const [adminResult, setAdminResult] = useState("");
   const [resitAdminScore, setResitAdminScore] = useState("");
+  const [resitAdminFeedback, setResitAdminFeedback] = useState("");
+  const [resitAdminResult, setResitAdminResult] = useState("");
 
   const details = detailData?.data;
 
@@ -59,96 +74,94 @@ const PracticalResultDetailsPage = () => {
   useEffect(() => {
     if (details?.admin_result) {
       setAdminScore(details.admin_result.score);
+      setAdminFeedback(details.admin_result.feedback || "");
+      setAdminResult(details.admin_result.result || "");
     } else {
       setAdminScore("");
+      setAdminFeedback("");
+      setAdminResult("");
     }
     if (details?.resit?.admin_result) {
       setResitAdminScore(details.resit.admin_result.score);
+      setResitAdminFeedback(details.resit.admin_result.feedback || "");
+      setResitAdminResult(details.resit.admin_result.result || "");
     } else {
       setResitAdminScore("");
+      setResitAdminFeedback("");
+      setResitAdminResult("");
     }
   }, [details]);
 
-  const maxTotalMarks = Number(details?.exam?.total_marks) > 0 ? details.exam.total_marks : 100;
+  const maxTotalMarks =
+    Number(details?.exam?.total_marks) > 0 ? details.exam.total_marks : 100;
   const scoreValid = isValidScore(adminScore, maxTotalMarks);
   const scoreError =
     adminScore !== "" && !scoreValid
-      ? t("exam.results.scoreRangeError", "Score must be between 0 and {{max}}", { max: maxTotalMarks })
+      ? t(
+          "exam.results.scoreRangeError",
+          "Score must be between 0 and {{max}}",
+          { max: maxTotalMarks },
+        )
       : null;
-
-  const derivedResult = useMemo(() => {
-    if (!scoreValid) return null;
-    const scoreVal = Number(adminScore);
-    const exam = details?.exam;
-    if (!exam) return null;
-    const percentage = maxTotalMarks > 0 ? (scoreVal / maxTotalMarks) * 100 : 0;
-    let result;
-    if (exam.passing_type === "percentage") {
-      const threshold = exam.passing_percentage ?? 50;
-      result = percentage >= threshold ? "pass" : "fail";
-    } else {
-      const threshold = exam.passing_marks ?? 0;
-      result = scoreVal >= threshold ? "pass" : "fail";
-    }
-    return { percentage, result };
-  }, [adminScore, details?.exam, maxTotalMarks, scoreValid]);
+  const canSave =
+    scoreValid && ["pass", "fail"].includes(adminResult) && !saveMutation.isPending;
 
   const resitMaxTotalMarks =
-    Number(details?.resit?.exam?.total_marks) > 0 ? details.resit.exam.total_marks : 100;
+    Number(details?.resit?.exam?.total_marks) > 0
+      ? details.resit.exam.total_marks
+      : 100;
   const resitScoreValid = isValidScore(resitAdminScore, resitMaxTotalMarks);
   const resitScoreError =
     resitAdminScore !== "" && !resitScoreValid
-      ? t("exam.results.scoreRangeError", "Score must be between 0 and {{max}}", { max: resitMaxTotalMarks })
+      ? t(
+          "exam.results.scoreRangeError",
+          "Score must be between 0 and {{max}}",
+          { max: resitMaxTotalMarks },
+        )
       : null;
-
-  const derivedResitResult = useMemo(() => {
-    if (!resitScoreValid) return null;
-    const scoreVal = Number(resitAdminScore);
-    const exam = details?.resit?.exam;
-    if (!exam) return null;
-    const percentage = resitMaxTotalMarks > 0 ? (scoreVal / resitMaxTotalMarks) * 100 : 0;
-    let result;
-    if (exam.passing_type === "percentage") {
-      const threshold = exam.passing_percentage ?? 50;
-      result = percentage >= threshold ? "pass" : "fail";
-    } else {
-      const threshold = exam.passing_marks ?? 0;
-      result = scoreVal >= threshold ? "pass" : "fail";
-    }
-    return { percentage, result };
-  }, [resitAdminScore, details?.resit?.exam, resitMaxTotalMarks, resitScoreValid]);
+  const canSaveResit =
+    resitScoreValid &&
+    ["pass", "fail"].includes(resitAdminResult) &&
+    !saveMutation.isPending;
 
   const handleSave = () => {
-    if (!scoreValid) return;
+    if (!canSave) return;
     saveMutation.mutate(
       {
         plannedId,
         applicationId,
         score: Number(adminScore),
+        feedback: adminFeedback,
+        result: adminResult,
       },
       {
         onSuccess: () => {
           navigate({ to: "/admin/results", search: { tab: "practical" } });
         },
-      }
+      },
     );
   };
 
   const handleSaveResit = () => {
-    if (!resitScoreValid) return;
+    if (!canSaveResit) return;
     const resitPlannedId = details?.resit?.planned_practical_exam?._id;
     if (!resitPlannedId) return;
     saveMutation.mutate({
       plannedId: resitPlannedId,
       applicationId,
       score: Number(resitAdminScore),
+      feedback: resitAdminFeedback,
+      result: resitAdminResult,
     });
   };
 
   const renderFeedbackCards = (feedbacks = []) => (
     <div className="space-y-6">
       {feedbacks.map((tf) => (
-        <Card key={tf.teacher._id} className="border border-sidebar-border overflow-hidden bg-sidebar">
+        <Card
+          key={tf.teacher._id}
+          className="border border-sidebar-border overflow-hidden bg-sidebar"
+        >
           <CardHeader className="bg-muted/30 py-3 flex flex-row items-center justify-between border-b border-sidebar-border">
             <CardTitle className="text-base font-semibold">
               {tf.teacher.first_name} {tf.teacher.last_name}
@@ -161,12 +174,14 @@ const PracticalResultDetailsPage = () => {
                 <div className="flex justify-between items-center bg-muted/20 p-3 rounded-lg border border-sidebar-border/50 text-sm font-medium">
                   <span>{t("exam.results.totalScore", "Total Score")}</span>
                   <span>
-                    {tf.score_summary.total_score} / {tf.score_summary.max_score} ({Math.round(tf.score_summary.percentage * 100) / 100}%)
+                    {tf.score_summary.total_score} / {tf.score_summary.max_score}{" "}
+                    ({Math.round(tf.score_summary.percentage * 100) / 100}%)
                   </span>
                 </div>
                 <div className="space-y-4">
                   {tf.score_summary.breakdown?.map((b) => {
-                    const isComment = b.max_marks === undefined || b.max_marks === null;
+                    const isComment =
+                      b.max_marks === undefined || b.max_marks === null;
                     if (isComment) {
                       return (
                         <div key={b.field_key} className="space-y-1">
@@ -175,13 +190,20 @@ const PracticalResultDetailsPage = () => {
                             {b.required && <span className="text-red-500"> *</span>}
                           </span>
                           <div className="p-3 bg-muted/10 rounded border border-sidebar-border text-sm leading-relaxed whitespace-pre-line text-dashboard-text dark:text-white/80">
-                            {b.value || <span className="text-gray-400 italic">No comment provided</span>}
+                            {b.value || (
+                              <span className="text-gray-400 italic">
+                                No comment provided
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
                     }
                     return (
-                      <div key={b.field_key} className="flex justify-between items-center py-2 border-b border-sidebar-border/30 text-sm">
+                      <div
+                        key={b.field_key}
+                        className="flex justify-between items-center py-2 border-b border-sidebar-border/30 text-sm"
+                      >
                         <span className="font-medium text-muted-foreground">
                           {b.label}
                           {b.required && <span className="text-red-500"> *</span>}
@@ -196,13 +218,127 @@ const PracticalResultDetailsPage = () => {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground italic py-4 text-center">
-                {t("exam.results.pendingFeedback", "Feedback is still pending")}
+                {t(
+                  "exam.results.pendingFeedback",
+                  "Feedback is still pending",
+                )}
               </p>
             )}
           </CardContent>
         </Card>
       ))}
     </div>
+  );
+
+  const renderResultForm = ({
+    scoreId,
+    feedbackId,
+    resultId,
+    maxMarks,
+    score,
+    setScore,
+    feedback,
+    setFeedback,
+    result,
+    setResult,
+    scoreErr,
+    onSave,
+    saveEnabled,
+    title,
+    showOptionalNote = false,
+  }) => (
+    <Card className="border border-sidebar-border bg-sidebar sticky top-6">
+      <CardHeader className="py-4 border-b border-sidebar-border bg-muted/10">
+        <CardTitle className="text-base font-semibold">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-6">
+        {showOptionalNote && (
+          <div className="p-3 bg-muted/20 text-muted-foreground text-xs rounded-lg border border-sidebar-border leading-relaxed">
+            {t(
+              "exam.results.teachersOptional",
+              "Teacher in-app feedback is optional. You can enter the official result from Jotform.",
+            )}
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor={scoreId} className="text-sm font-medium">
+              {t("exam.results.finalGrade", "Final grade")} (Max: {maxMarks})
+            </Label>
+            <Input
+              id={scoreId}
+              type="number"
+              min={0}
+              max={maxMarks}
+              disabled={saveMutation.isPending}
+              value={score}
+              onChange={(e) =>
+                setScore(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              placeholder={t("exam.results.enterFinalGrade", "Enter final grade")}
+              className="w-full bg-sidebar border-sidebar-border"
+              aria-invalid={!!scoreErr}
+            />
+            {scoreErr && (
+              <p className="text-xs text-red-600 dark:text-red-400">{scoreErr}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={feedbackId} className="text-sm font-medium">
+              {t("exam.results.feedback", "Feedback")}
+            </Label>
+            <Textarea
+              id={feedbackId}
+              rows={5}
+              disabled={saveMutation.isPending}
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder={t(
+                "exam.results.enterFeedback",
+                "Enter feedback from Jotform",
+              )}
+              className="w-full bg-sidebar border-sidebar-border"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={resultId} className="text-sm font-medium">
+              {t("exam.results.passFail", "Pass / Fail")}
+            </Label>
+            <Select
+              value={result || undefined}
+              onValueChange={setResult}
+              disabled={saveMutation.isPending}
+            >
+              <SelectTrigger id={resultId} className="w-full bg-sidebar border-sidebar-border">
+                <SelectValue
+                  placeholder={t("exam.results.selectResult", "Select result")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pass">
+                  {t("common.pass", "Pass")}
+                </SelectItem>
+                <SelectItem value="fail">
+                  {t("common.fail", "Fail")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <Button
+          disabled={!saveEnabled}
+          onClick={onSave}
+          className="w-full flex items-center justify-center gap-2 mt-4"
+        >
+          <Save className="h-4 w-4" />
+          {t("common.save", "Save")}
+        </Button>
+      </CardContent>
+    </Card>
   );
 
   if (isLoading) return <LoadingState />;
@@ -221,105 +357,51 @@ const PracticalResultDetailsPage = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      {/* Header section */}
       <div className="flex items-center gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white capitalize">
-            {details?.student ? `${details.student.first_name} ${details.student.last_name}` : ""}
+            {details?.student
+              ? `${details.student.first_name} ${details.student.last_name}`
+              : ""}
           </h2>
           <p className="text-xs text-muted-foreground">
-            {details?.student?.uid ? `UID: ${details.student.uid}` : ""} · {details?.exam?.name}
+            {details?.student?.uid ? `UID: ${details.student.uid}` : ""} ·{" "}
+            {details?.exam?.name}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Teacher Feedbacks (takes 2 cols) */}
         <div className="lg:col-span-2 space-y-6">
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
             {t("exam.results.teacherFeedback", "Teacher Feedback")}
           </h3>
-
           <div className="space-y-6">
             {renderFeedbackCards(details?.teacher_feedbacks)}
           </div>
         </div>
 
-        {/* Right Column: Official Score Input (takes 1 col) */}
         <div className="space-y-6">
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
             {t("exam.results.officialResult", "Official Result")}
           </h3>
-
-          <Card className="border border-sidebar-border bg-sidebar sticky top-6">
-            <CardHeader className="py-4 border-b border-sidebar-border bg-muted/10">
-              <CardTitle className="text-base font-semibold">
-                {t("exam.results.scoreEntry", "Score Entry")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              {!details?.can_set_result && (
-                <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200 text-xs rounded-lg border border-yellow-200 dark:border-yellow-900 leading-relaxed">
-                  {t("exam.results.waitingTeachers", "Waiting for all assigned teachers to submit their feedback before official result can be entered.")}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="admin-score" className="text-sm font-medium">
-                    {t("exam.results.officialScore", "Official Score")} (Max: {maxTotalMarks})
-                  </Label>
-                  <Input
-                    id="admin-score"
-                    type="number"
-                    min={0}
-                    max={maxTotalMarks}
-                    disabled={!details?.can_set_result || saveMutation.isPending}
-                    value={adminScore}
-                    onChange={(e) => setAdminScore(e.target.value === "" ? "" : Number(e.target.value))}
-                    placeholder={t("exam.results.enterScore", "Enter score")}
-                    className="w-full bg-sidebar border-sidebar-border"
-                    aria-invalid={!!scoreError}
-                  />
-                  {scoreError && (
-                    <p className="text-xs text-red-600 dark:text-red-400">{scoreError}</p>
-                  )}
-                </div>
-
-                {derivedResult && (
-                  <div className="space-y-3 pt-2">
-                    <div className="p-3 bg-muted/20 rounded-lg flex justify-between items-center text-sm border border-sidebar-border/40">
-                      <span className="text-muted-foreground">
-                        {t("exam.results.derivedPercentage", "Percentage")}
-                      </span>
-                      <span className="font-semibold">
-                        {Math.round(derivedResult.percentage * 100) / 100}%
-                      </span>
-                    </div>
-                    <div className="p-3 bg-muted/20 rounded-lg flex justify-between items-center text-sm border border-sidebar-border/40">
-                      <span className="text-muted-foreground">
-                        {t("exam.results.derivedResult", "Result")}
-                      </span>
-                      <span>
-                        <StatusBadge status={derivedResult.result} />
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {details?.can_set_result && (
-                <Button
-                  disabled={!scoreValid || saveMutation.isPending}
-                  onClick={handleSave}
-                  className="w-full flex items-center justify-center gap-2 mt-4"
-                >
-                  <Save className="h-4 w-4" />
-                  {t("common.save", "Save Score")}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          {renderResultForm({
+            scoreId: "admin-score",
+            feedbackId: "admin-feedback",
+            resultId: "admin-result",
+            maxMarks: maxTotalMarks,
+            score: adminScore,
+            setScore: setAdminScore,
+            feedback: adminFeedback,
+            setFeedback: setAdminFeedback,
+            result: adminResult,
+            setResult: setAdminResult,
+            scoreErr: scoreError,
+            onSave: handleSave,
+            saveEnabled: canSave,
+            title: t("exam.results.resultEntry", "Result entry"),
+            showOptionalNote: true,
+          })}
         </div>
       </div>
 
@@ -336,72 +418,22 @@ const PracticalResultDetailsPage = () => {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
               {t("exam.results.resitOfficialResult", "Resit official result")}
             </h3>
-            <Card className="border border-sidebar-border bg-sidebar sticky top-6">
-              <CardHeader className="py-4 border-b border-sidebar-border bg-muted/10">
-                <CardTitle className="text-base font-semibold">
-                  {t("exam.results.scoreEntry", "Score Entry")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                {!details.resit.can_set_result && (
-                  <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 text-yellow-800 dark:text-yellow-200 text-xs rounded-lg border border-yellow-200 dark:border-yellow-900 leading-relaxed">
-                    {t("exam.results.waitingTeachers", "Waiting for all assigned teachers to submit their feedback before official result can be entered.")}
-                  </div>
-                )}
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="resit-admin-score" className="text-sm font-medium">
-                      {t("exam.results.officialScore", "Official Score")} (Max: {resitMaxTotalMarks})
-                    </Label>
-                    <Input
-                      id="resit-admin-score"
-                      type="number"
-                      min={0}
-                      max={resitMaxTotalMarks}
-                      disabled={!details.resit.can_set_result || saveMutation.isPending}
-                      value={resitAdminScore}
-                      onChange={(e) => setResitAdminScore(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder={t("exam.results.enterScore", "Enter score")}
-                      className="w-full bg-sidebar border-sidebar-border"
-                      aria-invalid={!!resitScoreError}
-                    />
-                    {resitScoreError && (
-                      <p className="text-xs text-red-600 dark:text-red-400">{resitScoreError}</p>
-                    )}
-                  </div>
-                  {derivedResitResult && (
-                    <div className="space-y-3 pt-2">
-                      <div className="p-3 bg-muted/20 rounded-lg flex justify-between items-center text-sm border border-sidebar-border/40">
-                        <span className="text-muted-foreground">
-                          {t("exam.results.derivedPercentage", "Percentage")}
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(derivedResitResult.percentage * 100) / 100}%
-                        </span>
-                      </div>
-                      <div className="p-3 bg-muted/20 rounded-lg flex justify-between items-center text-sm border border-sidebar-border/40">
-                        <span className="text-muted-foreground">
-                          {t("exam.results.derivedResult", "Result")}
-                        </span>
-                        <span>
-                          <StatusBadge status={derivedResitResult.result} />
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {details.resit.can_set_result && (
-                  <Button
-                    disabled={!resitScoreValid || saveMutation.isPending}
-                    onClick={handleSaveResit}
-                    className="w-full flex items-center justify-center gap-2 mt-4"
-                  >
-                    <Save className="h-4 w-4" />
-                    {t("common.save", "Save Score")}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+            {renderResultForm({
+              scoreId: "resit-admin-score",
+              feedbackId: "resit-admin-feedback",
+              resultId: "resit-admin-result",
+              maxMarks: resitMaxTotalMarks,
+              score: resitAdminScore,
+              setScore: setResitAdminScore,
+              feedback: resitAdminFeedback,
+              setFeedback: setResitAdminFeedback,
+              result: resitAdminResult,
+              setResult: setResitAdminResult,
+              scoreErr: resitScoreError,
+              onSave: handleSaveResit,
+              saveEnabled: canSaveResit,
+              title: t("exam.results.resultEntry", "Result entry"),
+            })}
           </div>
         </div>
       )}

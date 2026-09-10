@@ -241,14 +241,14 @@ export const adminRoutes = [
     path: "/admin/kmo-applications",
     component: withPermissionProtection(
       KmoManagement,
-      "/admin/finance-reports",
+      "/admin/kmo-applications",
     ),
   },
   {
     path: "/admin/third-party-payments",
     component: withPermissionProtection(
       ThirdPartyPaymentManagement,
-      "/admin/finance-reports",
+      "/admin/third-party-payments",
     ),
   },
   {

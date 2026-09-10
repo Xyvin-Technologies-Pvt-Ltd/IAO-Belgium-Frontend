@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { Navigate } from "@tanstack/react-router";
+import { expandPermissions } from "@/utils/permissionUtils";
 
 const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
   const { profile, isAuthenticated } = useAuthStore();
@@ -10,7 +11,9 @@ const ProtectedRoute = ({ children, requiredPermissions = [] }) => {
   }
 
   // Get user permissions
-  const userPermissions = profile?.role_access?.permissions || [];
+  const userPermissions = expandPermissions(
+    profile?.role_access?.permissions || [],
+  );
 
   // Check if user has required permissions
   const hasAccess =

@@ -42,6 +42,24 @@ export default function AdminTeacherLayout() {
     }
   }, [isAuthenticated, role, isInitialized, navigate, location.pathname])
 
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const syncProfile = () => {
+      if (document.visibilityState === "visible") {
+        useAuthStore.getState().fetchProfile().catch(() => {})
+      }
+    }
+
+    window.addEventListener("focus", syncProfile)
+    document.addEventListener("visibilitychange", syncProfile)
+
+    return () => {
+      window.removeEventListener("focus", syncProfile)
+      document.removeEventListener("visibilitychange", syncProfile)
+    }
+  }, [isAuthenticated])
+
   // Show loading while initializing
   if (!isInitialized) {
     return (

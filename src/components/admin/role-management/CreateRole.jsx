@@ -7,8 +7,19 @@ import FormActions from "@/components/ui/forms/FormActions";
 import { useCreateRole, useUpdateRole } from "@/store/useRoleStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { roleSchema } from "@/validations/admin";
+import { roleSchema, VALID_PERMISSIONS } from "@/validations/admin";
+import { expandPermissions } from "@/utils/permissionUtils";
 import { useTranslation } from "react-i18next";
+
+const IMPLIED_BY_FINANCE = {
+  kmo_management_view: "finance_management_view",
+  kmo_management_modify: "finance_management_modify",
+  fkf_management_view: "finance_management_view",
+  fkf_management_modify: "finance_management_modify",
+};
+
+const knownPermissions = (permissions = []) =>
+  permissions.filter((permission) => VALID_PERMISSIONS.includes(permission));
 
 const CreateRole = ({ open, onClose, roleData }) => {
   const { t } = useTranslation();
@@ -81,6 +92,32 @@ const CreateRole = ({ open, onClose, roleData }) => {
       ],
     },
     {
+      name: t("roleManagement.permissions.kmoManagement"),
+      permissions: [
+        {
+          id: "kmo_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "kmo_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
+      ],
+    },
+    {
+      name: t("roleManagement.permissions.fkfManagement"),
+      permissions: [
+        {
+          id: "fkf_management_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "fkf_management_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
+      ],
+    },
+    {
       name: t("roleManagement.permissions.masterDataManagement"),
       permissions: [
         {
@@ -137,14 +174,24 @@ const CreateRole = ({ open, onClose, roleData }) => {
 
   useEffect(() => {
     if (roleData && isEdit && open) {
+      const permissions = knownPermissions(roleData.permissions || []);
       setValue("name", roleData.name || "");
       setValue("description", roleData.description || "");
-      setValue("permissions", roleData.permissions || []);
-      setSelectedPermissions(roleData.permissions || []);
+      setValue("permissions", permissions);
+      setSelectedPermissions(permissions);
     }
   }, [roleData, isEdit, setValue, open]);
 
+  const displayPermissions = expandPermissions(selectedPermissions);
+
+  const isImpliedByFinance = (permissionId) => {
+    const parent = IMPLIED_BY_FINANCE[permissionId];
+    return Boolean(parent && selectedPermissions.includes(parent));
+  };
+
   const togglePermission = (permissionId) => {
+    if (isImpliedByFinance(permissionId)) return;
+
     const newPermissions = selectedPermissions.includes(permissionId)
       ? selectedPermissions.filter((id) => id !== permissionId)
       : [...selectedPermissions, permissionId];
@@ -161,7 +208,7 @@ const CreateRole = ({ open, onClose, roleData }) => {
   const onSubmit = (formData) => {
     const payload = {
       ...formData,
-      permissions: selectedPermissions,
+      permissions: knownPermissions(selectedPermissions),
     };
 
     const mutation = isEdit ? updateRole : createRole;
@@ -250,9 +297,10 @@ const CreateRole = ({ open, onClose, roleData }) => {
                       {module.permissions[0] && (
                         <Checkbox
                           id={module.permissions[0].id}
-                          checked={selectedPermissions.includes(
+                          checked={displayPermissions.includes(
                             module.permissions[0].id
                           )}
+                          disabled={isImpliedByFinance(module.permissions[0].id)}
                           onCheckedChange={() =>
                             togglePermission(module.permissions[0].id)
                           }
@@ -263,9 +311,10 @@ const CreateRole = ({ open, onClose, roleData }) => {
                       {module.permissions[1] && (
                         <Checkbox
                           id={module.permissions[1].id}
-                          checked={selectedPermissions.includes(
+                          checked={displayPermissions.includes(
                             module.permissions[1].id
                           )}
+                          disabled={isImpliedByFinance(module.permissions[1].id)}
                           onCheckedChange={() =>
                             togglePermission(module.permissions[1].id)
                           }

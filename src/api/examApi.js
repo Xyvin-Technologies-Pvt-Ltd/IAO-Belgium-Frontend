@@ -150,7 +150,10 @@ export const getStudentPracticalDetailAdmin = async (plannedId, applicationId) =
   return response.data;
 };
 
-export const setStudentPracticalScoreAdmin = async (plannedId, applicationId, score) => {
-  const response = await axiosInstance.put(`/exam/admin/practical-results/${plannedId}/students/${applicationId}`, { score });
+export const setStudentPracticalScoreAdmin = async (plannedId, applicationId, payload) => {
+  const response = await axiosInstance.put(
+    `/exam/admin/practical-results/${plannedId}/students/${applicationId}`,
+    payload,
+  );
   return response.data;
 };

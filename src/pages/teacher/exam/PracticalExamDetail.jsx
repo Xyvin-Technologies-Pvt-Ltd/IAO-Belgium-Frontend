@@ -143,6 +143,26 @@ const PracticalExamDetail = () => {
         )}
       </div>
 
+      {exam.feedback_instructions &&
+        exam.feedback_instructions !== "<p></p>" && (
+          <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm space-y-2">
+            <h3 className="text-sm font-semibold text-dashboard-text dark:text-white">
+              {t("exam.feedback.instructionsTitle", "Feedback instructions")}
+            </h3>
+            <div
+              className="prose prose-sm dark:prose-invert max-w-none text-sm [&_a]:text-[#ff8904] [&_a]:underline"
+              dangerouslySetInnerHTML={{ __html: exam.feedback_instructions }}
+              onClick={(e) => {
+                const anchor = e.target.closest("a");
+                if (anchor?.href) {
+                  e.preventDefault();
+                  window.open(anchor.href, "_blank", "noopener,noreferrer");
+                }
+              }}
+            />
+          </div>
+        )}
+
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-dashboard-text dark:text-white">

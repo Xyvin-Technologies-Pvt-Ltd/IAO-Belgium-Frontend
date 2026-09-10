@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useUserPermissions } from "@/hooks/useCanModify";
+import { hasPermission } from "@/utils/permissionUtils";
 
 const REPORT_CARDS = [
   {
@@ -21,6 +23,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(59,130,246,0.08)",
     accentColor: "#3b82f6",
     path: "/admin/finance-reports/all",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "city",
@@ -31,6 +34,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(34,197,94,0.08)",
     accentColor: "#22c55e",
     path: "/admin/finance-reports/city",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "program",
@@ -41,6 +45,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(255,137,4,0.08)",
     accentColor: "#ff8904",
     path: "/admin/finance-reports/program",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "batch",
@@ -51,6 +56,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(139,92,246,0.08)",
     accentColor: "#8b5cf6",
     path: "/admin/finance-reports/batch",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "student",
@@ -61,6 +67,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(239,68,68,0.08)",
     accentColor: "#ef4444",
     path: "/admin/finance-reports/student",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "transactions",
@@ -71,6 +78,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(6,182,212,0.08)",
     accentColor: "#06b6d4",
     path: "/admin/finance-reports/transactions",
+    permissionPath: "/admin/finance-reports",
   },
   {
     key: "kmo",
@@ -81,6 +89,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(217,119,6,0.08)",
     accentColor: "#d97706",
     path: "/admin/kmo-applications",
+    permissionPath: "/admin/kmo-applications",
   },
   {
     key: "third_party",
@@ -91,6 +100,7 @@ const REPORT_CARDS = [
     bgColor: "rgba(79,70,229,0.08)",
     accentColor: "#4f46e5",
     path: "/admin/third-party-payments",
+    permissionPath: "/admin/third-party-payments",
   },
   {
     key: "fkf",
@@ -101,12 +111,17 @@ const REPORT_CARDS = [
     bgColor: "rgba(13,148,136,0.08)",
     accentColor: "#0d9488",
     path: "/admin/fkf",
+    permissionPath: "/admin/fkf",
   },
 ];
 
 const FinanceManagement = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const userPermissions = useUserPermissions();
+  const visibleCards = REPORT_CARDS.filter((card) =>
+    hasPermission(card.permissionPath, userPermissions),
+  );
 
   return (
     <div className="space-y-6 mt-4">
@@ -117,7 +132,7 @@ const FinanceManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {REPORT_CARDS.map((card) => {
+        {visibleCards.map((card) => {
           const Icon = card.icon;
           return (
             <div
