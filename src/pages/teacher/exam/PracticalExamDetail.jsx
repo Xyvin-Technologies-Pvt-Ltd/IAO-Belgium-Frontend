@@ -185,11 +185,17 @@ const PracticalExamDetail = () => {
               <TableHead className="text-center">
                 {t("exam.feedback.others", "Other teachers")}
               </TableHead>
+              <TableHead className="text-center">
+                {t("exam.results.finalGrade", "Final grade")}
+              </TableHead>
+              <TableHead className="text-center">
+                {t("exam.detail.result", { defaultValue: "Result" })}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={studentsFetching ? "opacity-50 pointer-events-none" : ""}>
             {studentsLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={3} />
+              <TableSkeleton rows={rowsPerPage} columns={5} />
             ) : studentsData?.data?.length > 0 ? (
               studentsData.data.map((item) => {
                 const myTeacherId = item.my_feedback?.teacher
@@ -200,6 +206,9 @@ const PracticalExamDetail = () => {
                     f.status === "submitted" &&
                     String(f.teacher) !== myTeacherId,
                 ).length;
+                const hasResult =
+                  item.result ||
+                  (item.score !== null && item.score !== undefined);
                 return (
                   <TableRow
                     key={item._id}
@@ -228,12 +237,30 @@ const PracticalExamDetail = () => {
                     <TableCell className="text-center text-sm text-muted-foreground">
                       {submittedOthers} {t("exam.feedback.submittedCount", "submitted")}
                     </TableCell>
+                    <TableCell className="text-center font-medium">
+                      {item.score !== null && item.score !== undefined ? (
+                        item.score
+                      ) : (
+                        <span className="text-xs text-muted-foreground font-normal">
+                          {t("exam.results.pendingAdmin", "Pending")}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {hasResult && item.result ? (
+                        <StatusBadge status={item.result} />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          {t("exam.results.pendingAdmin", "Pending")}
+                        </span>
+                      )}
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                   {t("common.noResultsFound", { defaultValue: "No students found." })}
                 </TableCell>
               </TableRow>
