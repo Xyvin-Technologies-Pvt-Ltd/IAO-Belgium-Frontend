@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -23,7 +23,7 @@ import { formatTZ } from "@/utils/dateUtils";
 import { Check, X } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
-const PracticalExamList = () => {
+const PracticalExamList = ({ showHeader = true, statusFilter }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
@@ -35,6 +35,7 @@ const PracticalExamList = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(statusFilter ? { teacher_status: statusFilter, status: statusFilter } : {}),
   });
 
   const updateStatusMutation = useUpdatePracticalExamTeacherStatus();
@@ -60,14 +61,23 @@ const PracticalExamList = () => {
     }
   };
 
-  const exams = data?.data || [];
-  const totalRows = data?.total_count || 0;
+  const rawExams = data?.data || [];
+  const exams = useMemo(() => {
+    if (!statusFilter) return rawExams;
+    return rawExams.filter((exam) => {
+      const st = exam.status || exam.teacher_status || "pending";
+      return st === statusFilter;
+    });
+  }, [rawExams, statusFilter]);
+  const totalRows = statusFilter ? exams.length : (data?.total_count || 0);
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        {t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" })}
-      </h2>
+      {showHeader && (
+        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+          {t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" })}
+        </h2>
+      )}
       <Input
         placeholder={t("exam.search")}
         className="max-w-xs"

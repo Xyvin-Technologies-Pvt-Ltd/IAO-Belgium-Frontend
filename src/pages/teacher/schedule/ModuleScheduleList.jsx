@@ -6,12 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useGetPlanningByModule } from "@/store/usePlanningStore";
-import { useNavigate } from "@tanstack/react-router";
+import { useGetTeacherExams, useGetTeacherPracticalExams } from "@/store/useExamStore";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { List, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,8 +20,11 @@ import TeacherCalendarView from "@/components/teacher/schedule/TeacherCalendarVi
 import ModuleScheduleFilterDrawer from "./ModuleScheduleFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getMoment } from "@/utils/dateUtils";
+import { useTranslation } from "react-i18next";
+import ExamList from "@/pages/teacher/exam";
+import PracticalExamList from "@/pages/teacher/exam/PracticalExamList";
 
-const ModuleScheduleList = () => {
+const SessionsScheduleView = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -51,7 +55,7 @@ const ModuleScheduleList = () => {
       { enabled: view === "list" }
     );
 
-  // Calendar query — no pagination, is_all, date-filtered, only active when in calendar view
+  // Calendar queries — only active when in calendar view
   const calendarDateParams =
     calendarViewType === "week"
       ? {
@@ -70,12 +74,57 @@ const ModuleScheduleList = () => {
     { enabled: view === "calendar" }
   );
 
+  const { data: calendarExamsData, isLoading: examsLoading } = useGetTeacherExams(
+    { limit: 1000, is_all: true, teacher_status: "accepted" },
+    { enabled: view === "calendar" }
+  );
+
+  const { data: calendarPracticalData, isLoading: practicalLoading } = useGetTeacherPracticalExams(
+    { limit: 1000, is_all: true, teacher_status: "accepted" },
+    { enabled: view === "calendar" }
+  );
+
   const sessions = data?.data || [];
   const totalRows = data?.total_count || 0;
-  const calendarSessions = calendarData?.data || [];
+
+  const combinedCalendarEvents = useMemo(() => {
+    const sessionList = calendarData?.data || [];
+    const examList = (calendarExamsData?.data || [])
+      .filter((e) => (e.teacher_status || e.status || "accepted") === "accepted")
+      .map((e) => ({ ...e, item_type: "exam" }));
+    const practicalList = (calendarPracticalData?.data || [])
+      .filter((p) => (p.status || p.teacher_status || "accepted") === "accepted")
+      .map((p) => ({ ...p, item_type: "practical" }));
+
+    return [...sessionList, ...examList, ...practicalList];
+  }, [calendarData, calendarExamsData, calendarPracticalData]);
 
   const handleView = (id) => {
-    navigate({ to: "/teacher/schedules/$id", params: { id } });
+    if (id) {
+      navigate({ to: "/teacher/schedules/$id", params: { id } });
+    }
+  };
+
+  const handleCalendarItemClick = (item) => {
+    if (item.item_type === "exam") {
+      navigate({
+        to: "/teacher/exams/$exam_id/$planning_id",
+        params: {
+          exam_id: String(item.exam_id?._id || item.exam_id || item._id),
+          planning_id: String(item.planning_id || item._id),
+        },
+      });
+    } else if (item.item_type === "practical") {
+      navigate({
+        to: "/teacher/practical-exams/$id",
+        params: { id: String(item._id) },
+      });
+    } else {
+      const pid = item.planning_id || item._id;
+      if (pid) {
+        navigate({ to: "/teacher/schedules/$id", params: { id: String(pid) } });
+      }
+    }
   };
 
   const handleMonthChange = (month, year) => {
@@ -91,8 +140,10 @@ const ModuleScheduleList = () => {
     setCalendarViewType(type);
   };
 
+  const isCalendarLoading = calendarLoading || examsLoading || practicalLoading;
+
   return (
-    <div className="space-y-6 mt-4">
+    <div className="space-y-6">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-1">
@@ -141,9 +192,9 @@ const ModuleScheduleList = () => {
         </div>
       ) : view === "calendar" ? (
         <TeacherCalendarView
-          sessions={calendarSessions}
-          isLoading={calendarLoading}
-          onSessionClick={(session) => handleView(session.planning_id)}
+          sessions={combinedCalendarEvents}
+          isLoading={isCalendarLoading}
+          onSessionClick={handleCalendarItemClick}
           onMonthChange={handleMonthChange}
           viewType={calendarViewType}
           onViewTypeChange={handleViewTypeChange}
@@ -195,6 +246,64 @@ const ModuleScheduleList = () => {
           />
         </>
       )}
+    </div>
+  );
+};
+
+const ModuleScheduleList = () => {
+  const { t } = useTranslation();
+  const searchParams = useSearch({ strict: false });
+  const initialTab = searchParams?.tab || localStorage.getItem("teacherScheduleActiveTab") || "sessions";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (searchParams?.tab) {
+      setActiveTab(searchParams.tab);
+    }
+  }, [searchParams?.tab]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    localStorage.setItem("teacherScheduleActiveTab", tabId);
+  };
+
+  const tabs = [
+    { id: "sessions", label: t("sidebar.teacher.schedules", { defaultValue: "Sessions Schedule" }) },
+    { id: "exams", label: t("sidebar.teacher.exams", { defaultValue: "Exams Schedule" }) },
+    { id: "practical", label: t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams Schedule" }) },
+  ];
+
+  return (
+    <div className="space-y-6 mt-4">
+      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+        {t("sidebar.teacher.schedules", { defaultValue: "My Schedules" })}
+      </h2>
+
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200 dark:border-white/20">
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+                activeTab === tab.id
+                  ? "border-[#ff8904] text-[#ff8904]"
+                  : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-4">
+        {activeTab === "sessions" && <SessionsScheduleView />}
+        {activeTab === "exams" && <ExamList showHeader={false} statusFilter="accepted" />}
+        {activeTab === "practical" && <PracticalExamList showHeader={false} statusFilter="accepted" />}
+      </div>
     </div>
   );
 };

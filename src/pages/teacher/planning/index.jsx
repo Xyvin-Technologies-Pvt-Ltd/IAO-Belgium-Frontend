@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo, Fragment, useEffect } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -19,13 +19,16 @@ import {
   useUpdateTeacherStatus,
 } from "@/store/usePlanningStore";
 import StatusBadge from "@/components/StatusBadge";
-import { Check, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Check, X, ChevronRight } from "lucide-react";
 import { formatTZ } from "@/utils/dateUtils";
 import ModuleScheduleFilterDrawer from "@/pages/teacher/schedule/ModuleScheduleFilterDrawer";
+import ExamList from "@/pages/teacher/exam";
+import PracticalExamList from "@/pages/teacher/exam/PracticalExamList";
+import { useSearch } from "@tanstack/react-router";
 
 const defaultFilters = { program: "all", batch: "all" };
 
-const Plannings = () => {
+const SessionsPlanningTable = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,11 +51,9 @@ const Plannings = () => {
   const rawSessions = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  // Group flat session array by planning_id into the structure the table expects
   const plannings = useMemo(() => {
     if (!rawSessions?.length) return [];
 
-    // If data is already grouped (has sessions sub-array), return as-is
     if (rawSessions[0]?.sessions) return rawSessions;
 
     const grouped = new Map();
@@ -105,8 +106,8 @@ const Plannings = () => {
   };
 
   return (
-    <div className="space-y-6 mt-4">
-      <div className="flex  flex-1 items-center gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-1 items-center gap-2">
         <Input
           placeholder={t("planningManagement.search")}
           className="max-w-xs"
@@ -182,7 +183,7 @@ const Plannings = () => {
                             />
                           </button>
                         ) : (
-                          <div className="w-6" /> // Placeholder for alignment
+                          <div className="w-6" />
                         )}
                         {planning.program_name}
                       </div>
@@ -199,9 +200,7 @@ const Plannings = () => {
                         : planning.sessions?.[0]?.name || "N/A"}
                     </TableCell>
                     {hasMultipleSessions ? (
-                      <TableCell colSpan={3} className="text-muted-foreground italic text-[10px]">
-                        {/* Optionally show date range here */}
-                      </TableCell>
+                      <TableCell colSpan={3} className="text-muted-foreground italic text-[10px]" />
                     ) : (
                       <>
                         <TableCell>
@@ -348,7 +347,7 @@ const Plannings = () => {
           )}
         </TableBody>
       </Table>
-      
+
       <Pagination
         page={page}
         setPage={setPage}
@@ -356,6 +355,64 @@ const Plannings = () => {
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
       />
+    </div>
+  );
+};
+
+const Plannings = () => {
+  const { t } = useTranslation();
+  const searchParams = useSearch({ strict: false });
+  const initialTab = searchParams?.tab || localStorage.getItem("teacherPlanningActiveTab") || "sessions";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (searchParams?.tab) {
+      setActiveTab(searchParams.tab);
+    }
+  }, [searchParams?.tab]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    localStorage.setItem("teacherPlanningActiveTab", tabId);
+  };
+
+  const tabs = [
+    { id: "sessions", label: t("sidebar.teacher.planning", { defaultValue: "Sessions Planning" }) },
+    { id: "exams", label: t("sidebar.teacher.exams", { defaultValue: "Exams" }) },
+    { id: "practical", label: t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" }) },
+  ];
+
+  return (
+    <div className="space-y-6 mt-4">
+      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+        {t("sidebar.teacher.planning", { defaultValue: "Planning Management" })}
+      </h2>
+
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200 dark:border-white/20">
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+                activeTab === tab.id
+                  ? "border-[#ff8904] text-[#ff8904]"
+                  : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-4">
+        {activeTab === "sessions" && <SessionsPlanningTable />}
+        {activeTab === "exams" && <ExamList showHeader={false} />}
+        {activeTab === "practical" && <PracticalExamList showHeader={false} />}
+      </div>
     </div>
   );
 };
