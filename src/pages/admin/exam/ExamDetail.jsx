@@ -18,7 +18,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
-import FeedbackFieldsEditor from "@/components/admin/exam/FeedbackFieldsEditor";
 import FeedbackInstructionsEditor from "@/components/admin/exam/FeedbackInstructionsEditor";
 
 const ExamDetail = () => {
@@ -218,10 +217,7 @@ const ExamDetail = () => {
       )}
 
       {exam.type === "practical" && canModify && (
-        <div className="space-y-4">
-          <FeedbackInstructionsEditor exam={exam} onSaved={refetch} />
-          <FeedbackFieldsEditor exam={exam} onSaved={refetch} />
-        </div>
+        <FeedbackInstructionsEditor exam={exam} onSaved={refetch} />
       )}
 
       {exam.description && (
