@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, Download, FileText, Upload, Plus, Loader2, Pencil } from "lucide-react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
@@ -260,6 +261,11 @@ const UserCard = ({ student, teacher, isTeacher = false, hide, onEdit }) => {
               <InfoItem
                 label={t("studentManagement.modal.batch")}
                 value={user?.batch_name || t("common.notAvailable")}
+                to={
+                  user?.batch_id
+                    ? `/admin/admission-administration/academics/intakes/batch/${user.batch_id}`
+                    : undefined
+                }
               />
               <InfoItem
                 label={t("userCard.intake")}
@@ -412,10 +418,19 @@ const UserCard = ({ student, teacher, isTeacher = false, hide, onEdit }) => {
 
 export default UserCard;
 
-const InfoItem = ({ label, value }) => (
+const InfoItem = ({ label, value, to }) => (
   <div>
     <p className="text-sm text-sidebar-foreground/70">{label}</p>
-    <p className="text-base font-semibold text-sidebar-foreground">{value}</p>
+    {to ? (
+      <Link
+        to={to}
+        className="text-base font-semibold text-[#ff8904] hover:underline cursor-pointer"
+      >
+        {value}
+      </Link>
+    ) : (
+      <p className="text-base font-semibold text-sidebar-foreground">{value}</p>
+    )}
   </div>
 );
 

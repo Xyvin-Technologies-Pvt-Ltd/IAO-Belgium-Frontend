@@ -202,7 +202,7 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "present" && (markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased)
+                          currentStatus === "present" && (markAttendanceMutation.isPending || isAttendanceLocked)
                             ? { backgroundColor: "#49BA6C", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
@@ -210,7 +210,7 @@ const SessionAttendence = () => {
                           handleAttendanceUpdate(student.application_id, "present")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased
+                          markAttendanceMutation.isPending || isAttendanceLocked
                         }
                       >
                         <Check className="h-4 w-4 mr-1" />
@@ -227,7 +227,7 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "absent" && (markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased)
+                          currentStatus === "absent" && (markAttendanceMutation.isPending || isAttendanceLocked)
                             ? { backgroundColor: "#E7000B", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
@@ -235,7 +235,7 @@ const SessionAttendence = () => {
                           handleAttendanceUpdate(student.application_id, "absent")
                         }
                         disabled={
-                          markAttendanceMutation.isPending || isAttendanceLocked || !student.purchased
+                          markAttendanceMutation.isPending || isAttendanceLocked
                         }
                       >
                         <X className="h-4 w-4 mr-1" />

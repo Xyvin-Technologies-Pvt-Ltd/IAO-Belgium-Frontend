@@ -634,6 +634,8 @@
       "operationsManagement": "Operations Management",
       "academicManagement": "Academic Management",
       "financeManagement": "Finance Management",
+      "kmoManagement": "KMO-Portefeuille",
+      "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Master Data Management",
       "logsManagement": "Logs Management",
       "queueManagement": "Queue Management"

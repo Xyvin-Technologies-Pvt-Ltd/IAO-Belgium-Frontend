@@ -82,6 +82,18 @@ export const getStudentByApplication = async (applicationId, filter = {}) => {
   }
 };
 
+export const getStudentExamsByApplication = async (applicationId, filter = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      `/intake/application/student/${applicationId}/exams`,
+      { params: filter },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const moveStudentToAnotherBatch = async (id, data) => {
   try {
     const response = await axiosInstance.post(

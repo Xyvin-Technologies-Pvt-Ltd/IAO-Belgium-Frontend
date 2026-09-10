@@ -520,6 +520,8 @@
       "operationsManagement": "Gestion des opérations",
       "academicManagement": "Gestion académique",
       "financeManagement": "Gestion financière",
+      "kmoManagement": "KMO-Portefeuille",
+      "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Gestion des données de référence",
       "logsManagement": "Gestion des journaux",
       "queueManagement": "Gestion des files d'attente"

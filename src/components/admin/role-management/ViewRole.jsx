@@ -1,5 +1,6 @@
 import { Check, Minus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { expandPermissions } from "@/utils/permissionUtils";
 
 const ViewRole = ({ open, onClose, roleData }) => {
   const { t } = useTranslation();
@@ -31,6 +32,16 @@ const ViewRole = ({ open, onClose, roleData }) => {
       modifyId: "finance_management_modify",
     },
     {
+      name: t("roleManagement.permissions.kmoManagement"),
+      viewId: "kmo_management_view",
+      modifyId: "kmo_management_modify",
+    },
+    {
+      name: t("roleManagement.permissions.fkfManagement"),
+      viewId: "fkf_management_view",
+      modifyId: "fkf_management_modify",
+    },
+    {
       name: t("roleManagement.permissions.masterDataManagement"),
       viewId: "master_data_management_view",
       modifyId: "master_data_management_modify",
@@ -44,7 +55,7 @@ const ViewRole = ({ open, onClose, roleData }) => {
 
   if (!open || !roleData) return null;
 
-  const permissions = roleData.permissions || [];
+  const permissions = expandPermissions(roleData.permissions || []);
 
   const hasPermission = (permissionId) => {
     return permissionId && permissions.includes(permissionId);

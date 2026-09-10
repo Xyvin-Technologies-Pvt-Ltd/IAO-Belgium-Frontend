@@ -57,6 +57,20 @@ const statusVariants = {
 
   // Payment statuses
   paid: "text-green-600 dark:text-green-400",
+  unpaid: "text-red-600 dark:text-red-400",
+  free: "text-blue-600 dark:text-blue-400",
+  paid_kmo: "text-green-600 dark:text-green-400",
+  waiting_kmo: "text-amber-600 dark:text-amber-400",
+  submitted_kmo: "text-blue-600 dark:text-blue-400",
+  contribution_received_kmo: "text-indigo-600 dark:text-indigo-400",
+  payment_released_kmo: "text-purple-600 dark:text-purple-400",
+  waiting_third_party: "text-amber-600 dark:text-amber-400",
+  not_completed: "text-gray-500 dark:text-gray-400",
+  completed: "text-green-600 dark:text-green-400",
+  not_available: "text-gray-500 dark:text-gray-400",
+  not_started: "text-amber-600 dark:text-amber-400",
+  deadline_passed: "text-red-600 dark:text-red-400",
+  cooldown: "text-amber-600 dark:text-amber-400",
   overdue: "text-red-600 dark:text-red-400",
   credited: "text-amber-700 dark:text-amber-300",
   refunded: "text-red-700 dark:text-red-300",
@@ -151,6 +165,34 @@ const StatusBadge = ({ status }) => {
     displayText = "Not Submitted";
   } else if (status === "overdue") {
     displayText = "Overdue";
+  } else if (status === "free") {
+    displayText = "Free";
+  } else if (status === "unpaid") {
+    displayText = "Unpaid";
+  } else if (status === "paid_kmo") {
+    displayText = "Paid (KMO)";
+  } else if (status === "waiting_kmo") {
+    displayText = "Waiting (KMO)";
+  } else if (status === "submitted_kmo") {
+    displayText = "Submitted (KMO)";
+  } else if (status === "contribution_received_kmo") {
+    displayText = "Contribution received (KMO)";
+  } else if (status === "payment_released_kmo") {
+    displayText = "Payment released (KMO)";
+  } else if (status === "waiting_third_party") {
+    displayText = "Waiting (third party)";
+  } else if (status === "not_completed") {
+    displayText = "Not completed";
+  } else if (status === "completed") {
+    displayText = "Completed";
+  } else if (status === "not_available") {
+    displayText = "Not available";
+  } else if (status === "not_started") {
+    displayText = "Not started";
+  } else if (status === "deadline_passed") {
+    displayText = "Deadline passed";
+  } else if (status === "cooldown") {
+    displayText = "Cooldown";
   } else if (status === "used_via_kmo") {
     displayText = "Used via KMO";
   } else if (status === "used_via_location_switch") {

@@ -19,6 +19,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
 import FeedbackFieldsEditor from "@/components/admin/exam/FeedbackFieldsEditor";
+import FeedbackInstructionsEditor from "@/components/admin/exam/FeedbackInstructionsEditor";
 
 const ExamDetail = () => {
   const { t } = useTranslation();
@@ -217,7 +218,10 @@ const ExamDetail = () => {
       )}
 
       {exam.type === "practical" && canModify && (
-        <FeedbackFieldsEditor exam={exam} onSaved={refetch} />
+        <div className="space-y-4">
+          <FeedbackInstructionsEditor exam={exam} onSaved={refetch} />
+          <FeedbackFieldsEditor exam={exam} onSaved={refetch} />
+        </div>
       )}
 
       {exam.description && (

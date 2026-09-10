@@ -337,19 +337,23 @@ export const useGetStudentPracticalDetailAdmin = (plannedId, applicationId, opti
 export const useSetStudentPracticalScoreAdmin = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ plannedId, applicationId, score }) =>
-      setStudentPracticalScoreAdmin(plannedId, applicationId, score),
-    onSuccess: (response, variables) => {
+    mutationFn: ({ plannedId, applicationId, score, feedback, result }) =>
+      setStudentPracticalScoreAdmin(plannedId, applicationId, {
+        score,
+        feedback,
+        result,
+      }),
+    onSuccess: (response) => {
       queryClient.invalidateQueries({
         queryKey: ["admin-practical-exam-results"],
       });
       queryClient.invalidateQueries({
         queryKey: ["admin-practical-student-detail"],
       });
-      toast.success(response?.message || "Score saved successfully");
+      toast.success(response?.message || "Result saved successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to save score");
+      toast.error(error?.message || "Failed to save result");
     },
   });
 };

@@ -78,7 +78,7 @@ const programLabel = (p) =>
 
 const FkfManagement = () => {
   const { t } = useTranslation();
-  const canModify = useCanModify("finance");
+  const canModify = useCanModify("fkf");
   const [activeTab, setActiveTab] = useState("students");
 
   // Students tab
