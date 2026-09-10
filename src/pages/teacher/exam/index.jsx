@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ExamList = () => {
+const ExamList = ({ showHeader = true, statusFilter }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
@@ -36,6 +36,7 @@ const ExamList = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(statusFilter ? { teacher_status: statusFilter, status: statusFilter } : {}),
   });
 
   const updateStatusMutation = useUpdateOnlineExamTeacherStatus();
@@ -61,8 +62,15 @@ const ExamList = () => {
     }
   };
 
-  const exams = data?.data || [];
-  const totalRows = data?.total_count || 0;
+  const rawExams = data?.data || [];
+  const exams = useMemo(() => {
+    if (!statusFilter) return rawExams;
+    return rawExams.filter((exam) => {
+      const st = exam.teacher_status || exam.status || "pending";
+      return st === statusFilter;
+    });
+  }, [rawExams, statusFilter]);
+  const totalRows = statusFilter ? exams.length : (data?.total_count || 0);
 
   const handleRowClick = (exam) => {
     navigate({
@@ -76,9 +84,11 @@ const ExamList = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        {t("exam.myExams", { defaultValue: "My Exams" })}
-      </h2>
+      {showHeader && (
+        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+          {t("exam.myExams", { defaultValue: "My Exams" })}
+        </h2>
+      )}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <Input
           placeholder={t("exam.search")}
