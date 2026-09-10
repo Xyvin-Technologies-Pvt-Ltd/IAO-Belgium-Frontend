@@ -122,25 +122,14 @@ const ExamDetail = () => {
     if (!examData?.data?.first_session) return;
 
     const checkSessionDate = () => {
-      if (examData.data.is_resit) {
-        const now = getMoment(getNow().format("YYYY-MM-DDTHH:mm:ss"));
-        const start = examData.data.first_session.start_time ? getMoment(examData.data.first_session.start_time) : null;
-        const end = examData.data.first_session.end_time ? getMoment(examData.data.first_session.end_time) : null;
-        const insideWindow = (!start || now.isSameOrAfter(start)) && (!end || now.isSameOrBefore(end));
-        setCanStart(
-          insideWindow &&
-            examData.data.exam_session_status !== "started"
-        );
-      } else {
-        const today = getNow().format("YYYY-MM-DD");
-        const sessionDate = getMoment(
-          examData.data.first_session.session_date,
-        ).format("YYYY-MM-DD");
-        setCanStart(
-          today === sessionDate &&
-            examData.data.exam_session_status !== "started",
-        );
-      }
+      const today = getNow().format("YYYY-MM-DD");
+      const sessionDate = getMoment(
+        examData.data.first_session.session_date,
+      ).format("YYYY-MM-DD");
+      setCanStart(
+        today === sessionDate &&
+          examData.data.exam_session_status !== "started",
+      );
     };
 
     checkSessionDate();
@@ -228,11 +217,21 @@ const ExamDetail = () => {
                 )}
                 {exam.first_session && (
                   <span className="flex items-center gap-1.5">
-                    <span className="font-semibold">{t("exam.scheduledTime", "Scheduled Start")}:</span>
-                    <span>
-                      {formatTZ(exam.first_session.start_time || exam.first_session.session_date, "DD-MM-YYYY, HH:mm")}
+                    <span className="font-semibold">
+                      {exam.is_resit
+                        ? t("exam.scheduledDate", "Scheduled date")
+                        : t("exam.scheduledTime", "Scheduled Start")}
+                      :
                     </span>
-                    {exam.first_session.end_time && (
+                    <span>
+                      {exam.is_resit
+                        ? formatTZ(exam.first_session.session_date, "DD-MM-YYYY")
+                        : formatTZ(
+                            exam.first_session.start_time || exam.first_session.session_date,
+                            "DD-MM-YYYY, HH:mm",
+                          )}
+                    </span>
+                    {!exam.is_resit && exam.first_session.end_time && (
                       <>
                         <span>–</span>
                         <span>{formatTZ(exam.first_session.end_time, "HH:mm")}</span>

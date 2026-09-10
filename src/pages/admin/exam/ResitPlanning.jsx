@@ -27,16 +27,15 @@ import {
 } from "@/components/ui/dialog";
 import { useGetExams } from "@/store/useExamStore";
 import { useGetUsers } from "@/store/useDropdownStore";
+import { useGetCities } from "@/store/useCityStore";
 import { useGetResitPlannings, useCreateResitPlanning, useUpdateResitPlanning } from "@/store/useResitStore";
-import { formatInstant, formatTZ } from "@/utils/dateUtils";
+import { formatTZ } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
 import { Pencil } from "lucide-react";
 
 const emptyForm = {
   exam: "",
   exam_date: "",
-  start_time: "",
-  end_time: "",
   location: "",
   location_address: "",
   teacher: "",
@@ -52,6 +51,9 @@ const ResitPlanningPage = () => {
   const [editing, setEditing] = useState(null);
   const [examSearch, setExamSearch] = useState("");
   const [teacherSearch, setTeacherSearch] = useState("");
+  const [citySearch, setCitySearch] = useState("");
+  const [selectedCityId, setSelectedCityId] = useState("");
+  const [preferredVenues, setPreferredVenues] = useState([]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetResitPlannings({
     page,
@@ -63,6 +65,32 @@ const ResitPlanningPage = () => {
     { page: 1, limit: 50, status: "published", is_resit: true, ...(examSearch ? { search: examSearch } : {}) },
     { enabled: open },
   );
+  const { data: citiesData, isLoading: citiesLoading } = useGetCities(
+    {
+      status: true,
+      page: 1,
+      limit: 200,
+      ...(citySearch ? { search: citySearch } : {}),
+    },
+    { enabled: open },
+  );
+
+  const cities = (citiesData?.data || []).map((city) => ({
+    _id: city._id,
+    name: city.name,
+    venue: city.venue || [],
+  }));
+
+  const handleCityChange = (value) => {
+    const nextId = value || "";
+    setSelectedCityId(nextId);
+    if (!nextId) {
+      setPreferredVenues([]);
+      return;
+    }
+    const city = cities.find((item) => String(item._id) === String(nextId));
+    setPreferredVenues(city?.venue || []);
+  };
 
   const resitExams = (examsData?.data || []).map((exam) => ({
       _id: exam._id,
@@ -170,11 +198,17 @@ const ResitPlanningPage = () => {
   const closeDialog = () => {
     setOpen(false);
     setEditing(null);
+    setSelectedCityId("");
+    setPreferredVenues([]);
+    setCitySearch("");
     reset(emptyForm);
   };
 
   const openCreate = () => {
     setEditing(null);
+    setSelectedCityId("");
+    setPreferredVenues([]);
+    setCitySearch("");
     reset(emptyForm);
     setOpen(true);
   };
@@ -182,11 +216,12 @@ const ResitPlanningPage = () => {
   const openEdit = (row) => {
     const teacher = row.teacher?._id || row.teacher || "";
     setEditing(row);
+    setSelectedCityId("");
+    setPreferredVenues([]);
+    setCitySearch("");
     reset({
       exam: row.exam?._id || row.exam || "",
       exam_date: row.exam_date ? formatTZ(row.exam_date, "YYYY-MM-DD") : "",
-      start_time: row.start_time ? formatTZ(row.start_time, "HH:mm") : "",
-      end_time: row.end_time ? formatTZ(row.end_time, "HH:mm") : "",
       location: row.location || "",
       location_address: row.location_address || "",
       teacher,
@@ -212,8 +247,6 @@ const ResitPlanningPage = () => {
     const payload = {
       exam: values.exam,
       exam_date: values.exam_date,
-      start_time: values.start_time,
-      end_time: values.end_time,
       location: values.location,
       location_address: values.location_address,
     };
@@ -310,7 +343,6 @@ const ResitPlanningPage = () => {
             <TableHead>{t("resitPlanning.table.exam", "Resit exam")}</TableHead>
             <TableHead>{t("resitPlanning.table.parent", "Original exam")}</TableHead>
             <TableHead>{t("resitPlanning.table.date", "Date")}</TableHead>
-            <TableHead>{t("resitPlanning.table.time", "Time")}</TableHead>
             <TableHead>{t("resitPlanning.table.location", "Location")}</TableHead>
             <TableHead>{t("resitPlanning.table.teacher", "Teacher")}</TableHead>
             {canModify && (
@@ -320,10 +352,10 @@ const ResitPlanningPage = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={canModify ? 7 : 6} />
+            <TableSkeleton rows={rowsPerPage} columns={canModify ? 6 : 5} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={canModify ? 7 : 6} className="text-center p-8">
+              <TableCell colSpan={canModify ? 6 : 5} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("resitPlanning.loadFailed", "Failed to load resit plannings")}
                   onRetry={refetch}
@@ -338,11 +370,6 @@ const ResitPlanningPage = () => {
                 <TableCell>{row.exam?.parent_exam?.name || "N/A"}</TableCell>
                 <TableCell>
                   {row.exam_date ? formatTZ(row.exam_date, "DD-MM-YYYY") : "N/A"}
-                </TableCell>
-                <TableCell>
-                  {row.start_time && row.end_time
-                    ? `${formatTZ(row.start_time, "HH:mm")} – ${formatTZ(row.end_time, "HH:mm")}`
-                    : "N/A"}
                 </TableCell>
                 <TableCell>{row.location || "N/A"}</TableCell>
                 <TableCell>{teacherCell(row)}</TableCell>
@@ -362,7 +389,7 @@ const ResitPlanningPage = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={canModify ? 7 : 6} className="text-center py-8 text-gray-400">
+              <TableCell colSpan={canModify ? 6 : 5} className="text-center py-8 text-gray-400">
                 {t("resitPlanning.empty", "No resit plannings yet")}
               </TableCell>
             </TableRow>
@@ -447,20 +474,16 @@ const ResitPlanningPage = () => {
               </Label>
               <Input type="date" {...register("exam_date", { required: true })} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>
-                  {t("resitPlanning.form.startTime", "Start time")} <span className="text-red-500">*</span>
-                </Label>
-                <Input type="time" {...register("start_time", { required: true })} />
-              </div>
-              <div className="space-y-2">
-                <Label>
-                  {t("resitPlanning.form.endTime", "End time")} <span className="text-red-500">*</span>
-                </Label>
-                <Input type="time" {...register("end_time", { required: true })} />
-              </div>
-            </div>
+            <SearchableSelect
+              label={t("resitPlanning.form.city", "City")}
+              placeholder={t("resitPlanning.form.cityPlaceholder", "Select a city (optional)")}
+              searchPlaceholder={t("resitPlanning.form.searchCities", "Search cities...")}
+              items={cities}
+              value={selectedCityId}
+              onChange={handleCityChange}
+              onSearch={setCitySearch}
+              isLoading={citiesLoading}
+            />
             <div className="space-y-2">
               <Label>
                 {t("resitPlanning.form.location", "Location")} <span className="text-red-500">*</span>
@@ -471,6 +494,35 @@ const ResitPlanningPage = () => {
               <Label>{t("resitPlanning.form.address", "Address")}</Label>
               <Input {...register("location_address")} />
             </div>
+            {preferredVenues.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-600 dark:text-gray-400">
+                  {t("planningManagement.modal.preferredVenues", "Preferred venues")}
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {preferredVenues.map((venueObj, index) => {
+                    const venueName = typeof venueObj === "string" ? venueObj : venueObj.name;
+                    const venueAddress =
+                      typeof venueObj === "string" ? "" : venueObj.address || "";
+                    if (!venueName) return null;
+                    return (
+                      <button
+                        key={`${venueName}-${index}`}
+                        type="button"
+                        onClick={() => {
+                          setValue("location", venueName, { shouldValidate: true });
+                          setValue("location_address", venueAddress, { shouldValidate: true });
+                        }}
+                        className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs mr-2 mb-1"
+                        title={venueAddress || venueName}
+                      >
+                        {venueName}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {isPractical ? (
               <SearchableMultiSelect
                 label={t("resitPlanning.form.teachers", "Teachers")}
