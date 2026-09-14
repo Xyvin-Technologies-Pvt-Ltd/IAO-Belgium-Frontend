@@ -1567,7 +1567,9 @@
       "location": "Locatie",
       "actions": "Acties",
       "accept": "Accepteren",
-      "reject": "Afwijzen"
+      "reject": "Afwijzen",
+      "assignment": "Docenttoewijzing",
+      "acceptOrRejectPrompt": "Accepteer of weiger uw toewijzing voor dit examen."
     },
     "modal": {
       "createTitle": "Nieuwe planning aanmaken",
@@ -1710,8 +1712,17 @@
       "archive": "Archiveren",
       "noExams": "Geen examens gevonden"
     },
+    "starting": "Bezig met starten...",
+    "ending": "Bezig met beëindigen...",
+    "mins": "min",
+    "searchStudents": "Zoek studenten...",
+    "loadingResults": "Resultaten laden...",
+    "noResultsFound": "Geen resultaten gevonden voor deze examensessie.",
     "messages": {
-      "loadFailed": "Laden van examens mislukt"
+      "loadFailed": "Laden van examens mislukt",
+      "missingPlanningSession": "Ontbrekende planningssessiegegevens om het examen te starten.",
+      "noActiveSession": "Geen actieve sessie om te beëindigen.",
+      "acceptAssignmentFirst": "Accepteer eerst uw docenttoewijzing voordat u feedback geeft."
     },
     "form": {
       "name": "Naam",
@@ -1746,7 +1757,34 @@
       "passingMarks": "Slaaggrens",
       "duration": "Duur",
       "questionSources": "Vraagbronnen",
+      "questionSource": "Bron",
+      "numberOfQuestions": "Aantal vragen",
+      "questionsCount": "{{count}} vragen",
+      "questionsAvailable": "({{total}} vragen beschikbaar)",
+      "studentResults": "Studentenresultaten",
+      "students": "Studenten",
+      "student": "Student",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Resultaat",
+      "submittedAt": "Ingediend op",
+      "passMark": "Voldoende score",
+      "passFail": "Geslaagd / Herkansing",
+      "tba": "N.t.b.",
+      "description": "Beschrijving:",
+      "instructions": "Instructies:",
+      "feedbackInstructions": "Feedbackinstructies:",
       "available": "beschikbaar"
+    },
+    "feedback": {
+      "myStatus": "Mijn feedback",
+      "others": "Andere docenten",
+      "notStarted": "Niet gestart",
+      "submittedCount": "ingediend"
+    },
+    "results": {
+      "finalGrade": "Eindcijfer",
+      "pendingAdmin": "In afwachting"
     }
   },
   "componentManagement": {

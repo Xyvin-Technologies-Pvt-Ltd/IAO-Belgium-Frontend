@@ -138,9 +138,9 @@ const PracticalExamDetail = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
             <div className="text-sm">
-              <p className="font-semibold">Teacher Assignment</p>
+              <p className="font-semibold">{t("planningManagement.teacher.assignment", "Teacher Assignment")}</p>
               <p className="text-xs opacity-90">
-                Please accept or reject your assignment for this exam.
+                {t("planningManagement.teacher.acceptOrRejectPrompt", "Please accept or reject your assignment for this exam.")}
               </p>
             </div>
           </div>
@@ -240,12 +240,12 @@ const PracticalExamDetail = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <DashboardCard
           title={t("exam.table.location", { defaultValue: "Location" })}
-          value={exam.location || "TBA"}
+          value={exam.location || t("exam.detail.tba", "TBA")}
           icon={MapPin}
         />
         <DashboardCard
           title={t("exam.detail.duration", { defaultValue: "Duration" })}
-          value={exam.duration ? `${exam.duration} mins` : "TBA"}
+          value={exam.duration ? `${exam.duration} ${t("exam.mins", "mins")}` : t("exam.detail.tba", "TBA")}
           icon={Timer}
         />
         <DashboardCard
@@ -259,13 +259,13 @@ const PracticalExamDetail = () => {
               ? `${exam.passing_percentage}%`
               : exam.passing_marks != null
               ? `${exam.passing_marks}`
-              : "Pass / Fail"
+              : t("exam.detail.passFail", "Pass / Fail")
           }
           icon={GraduationCap}
         />
         <DashboardCard
           title={t("planningManagement.modal.practicalExamDate", { defaultValue: "Exam Date" })}
-          value={exam.exam_date ? formatTZ(exam.exam_date, "DD-MM-YYYY") : "TBA"}
+          value={exam.exam_date ? formatTZ(exam.exam_date, "DD-MM-YYYY") : t("exam.detail.tba", "TBA")}
           icon={Calendar}
         />
       </div>
@@ -273,7 +273,7 @@ const PracticalExamDetail = () => {
       {/* Description section matching ExamDetail.jsx UI */}
       {exam.description && exam.description !== "<p></p>" && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Description:</p>
+          <p className="text-sm font-bold mb-2">{t("exam.detail.description", "Description:")}</p>
           <div
             className="text-sm text-card-foreground/80 whitespace-pre-wrap [&_a]:text-primary [&_a]:underline"
             dangerouslySetInnerHTML={{ __html: exam.description }}
@@ -284,7 +284,7 @@ const PracticalExamDetail = () => {
       {/* Instructions section matching ExamDetail.jsx UI */}
       {exam.instructions && exam.instructions !== "<p></p>" && exam.instructions !== exam.description && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Instructions:</p>
+          <p className="text-sm font-bold mb-2">{t("exam.detail.instructions", "Instructions:")}</p>
           <div
             className="text-sm text-card-foreground/80 whitespace-pre-wrap [&_a]:text-primary [&_a]:underline"
             dangerouslySetInnerHTML={{ __html: exam.instructions }}
@@ -296,7 +296,7 @@ const PracticalExamDetail = () => {
       {isAccepted && exam.feedback_instructions &&
         exam.feedback_instructions !== "<p></p>" && (
           <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-            <p className="text-sm font-bold mb-2">Feedback Instructions:</p>
+            <p className="text-sm font-bold mb-2">{t("exam.detail.feedbackInstructions", "Feedback Instructions:")}</p>
             <div
               className="text-sm text-card-foreground/80 [&_a]:text-[#ff8904] [&_a]:underline"
               dangerouslySetInnerHTML={{ __html: exam.feedback_instructions }}

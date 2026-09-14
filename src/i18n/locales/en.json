@@ -1816,7 +1816,9 @@
       "location": "Location",
       "actions": "Actions",
       "accept": "Accept",
-      "reject": "Reject"
+      "reject": "Reject",
+      "assignment": "Teacher Assignment",
+      "acceptOrRejectPrompt": "Please accept or reject your assignment for this exam."
     },
     "modal": {
       "createTitle": "Create a new planning",
@@ -1961,8 +1963,17 @@
       "archive": "Archive",
       "noExams": "No exams found"
     },
+    "starting": "Starting...",
+    "ending": "Ending...",
+    "mins": "mins",
+    "searchStudents": "Search students...",
+    "loadingResults": "Loading results...",
+    "noResultsFound": "No results found for this exam session.",
     "messages": {
-      "loadFailed": "Failed to load exams"
+      "loadFailed": "Failed to load exams",
+      "missingPlanningSession": "Missing planning session data to start the exam.",
+      "noActiveSession": "No active session to end.",
+      "acceptAssignmentFirst": "Please accept your teacher assignment first before providing feedback."
     },
     "form": {
       "name": "Name",
@@ -2001,7 +2012,34 @@
       "passingMarks": "Passing Marks",
       "duration": "Duration",
       "questionSources": "Question Sources",
+      "questionSource": "Source",
+      "numberOfQuestions": "Number of Questions",
+      "questionsCount": "{{count}} questions",
+      "questionsAvailable": "({{total}} questions available)",
+      "studentResults": "Student Results",
+      "students": "Students",
+      "student": "Student",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Result",
+      "submittedAt": "Submitted At",
+      "passMark": "Pass Mark",
+      "passFail": "Pass / Fail",
+      "tba": "TBA",
+      "description": "Description:",
+      "instructions": "Instructions:",
+      "feedbackInstructions": "Feedback Instructions:",
       "available": "available"
+    },
+    "feedback": {
+      "myStatus": "My feedback",
+      "others": "Other teachers",
+      "notStarted": "Not started",
+      "submittedCount": "submitted"
+    },
+    "results": {
+      "finalGrade": "Final grade",
+      "pendingAdmin": "Pending"
     }
   },
   "componentManagement": {

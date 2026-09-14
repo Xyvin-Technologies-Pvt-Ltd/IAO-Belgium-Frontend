@@ -1572,7 +1572,9 @@
       "location": "Standort",
       "actions": "Aktionen",
       "accept": "Annehmen",
-      "reject": "Ablehnen"
+      "reject": "Ablehnen",
+      "assignment": "Dozentenzuweisung",
+      "acceptOrRejectPrompt": "Bitte nehmen Sie Ihre Zuweisung für diese Prüfung an oder lehnen Sie sie ab."
     },
     "modal": {
       "createTitle": "Neue Planung erstellen",
@@ -1715,8 +1717,17 @@
       "archive": "Archivieren",
       "noExams": "Keine Prüfungen gefunden"
     },
+    "starting": "Startet...",
+    "ending": "Beendet...",
+    "mins": "Min.",
+    "searchStudents": "Studenten suchen...",
+    "loadingResults": "Ergebnisse werden geladen...",
+    "noResultsFound": "Keine Ergebnisse für diese Prüfungssitzung gefunden.",
     "messages": {
-      "loadFailed": "Prüfungen konnten nicht geladen werden"
+      "loadFailed": "Prüfungen konnten nicht geladen werden",
+      "missingPlanningSession": "Fehlende Planungssitzungsdaten zum Starten der Prüfung.",
+      "noActiveSession": "Keine aktive Sitzung zum Beenden.",
+      "acceptAssignmentFirst": "Bitte nehmen Sie zuerst Ihre Dozentenzuweisung an, bevor Sie Feedback geben."
     },
     "form": {
       "name": "Name",
@@ -1751,7 +1762,34 @@
       "passingMarks": "Bestehensnote",
       "duration": "Dauer",
       "questionSources": "Fragenquellen",
+      "questionSource": "Quelle",
+      "numberOfQuestions": "Anzahl der Fragen",
+      "questionsCount": "{{count}} Fragen",
+      "questionsAvailable": "({{total}} Fragen verfügbar)",
+      "studentResults": "Studentenergebnisse",
+      "students": "Studenten",
+      "student": "Student",
+      "score": "Punktzahl",
+      "percentage": "Prozentsatz",
+      "result": "Ergebnis",
+      "submittedAt": "Eingereicht am",
+      "passMark": "Bestehensgrenze",
+      "passFail": "Bestanden / Nicht bestanden",
+      "tba": "Wird bekannt gegeben",
+      "description": "Beschreibung:",
+      "instructions": "Anweisungen:",
+      "feedbackInstructions": "Feedback-Anweisungen:",
       "available": "verfügbar"
+    },
+    "feedback": {
+      "myStatus": "Mein Feedback",
+      "others": "Andere Dozenten",
+      "notStarted": "Nicht gestartet",
+      "submittedCount": "eingereicht"
+    },
+    "results": {
+      "finalGrade": "Endnote",
+      "pendingAdmin": "Ausstehend"
     }
   },
   "componentManagement": {
