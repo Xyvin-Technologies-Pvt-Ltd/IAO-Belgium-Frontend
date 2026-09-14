@@ -6,6 +6,9 @@ import {
   HelpCircle,
   GraduationCap,
   Timer,
+  AlertCircle,
+  Check,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +27,8 @@ import {
   useEndExamSession,
   useGetExamResults,
 } from "@/store/useExamStore";
+import { useUpdateOnlineExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import AnswerSheetModal from "@/components/teacher/exam/AnswerSheetModal";
@@ -81,6 +86,8 @@ const ExamDetail = () => {
 
   const startSessionMutation = useStartExamSession();
   const endSessionMutation = useEndExamSession();
+  const updateStatusMutation = useUpdateOnlineExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
 
   useEffect(() => {
     if (examData?.data) {
@@ -176,10 +183,67 @@ const ExamDetail = () => {
   }
 
   const exam = examData.data;
-  const isNonSessionExam = exam.type === "practical";
+
+  const isNonSessionExam = exam.type === "assignment" || exam.type === "practical" || Boolean(exam.is_non_session);
+  const isAccepted = exam.teacher_status ? exam.teacher_status === "accepted" : true;
+
+  const handleStatusUpdate = async (status) => {
+    try {
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      }
+      refetch();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      toast.error(err?.message || "Failed to update assignment status");
+    }
+  };
 
   return (
     <div className="space-y-6 mt-4">
+      {!isAccepted && (
+        <div className="p-4 border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 rounded-xl flex flex-wrap items-center justify-between gap-4 text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+            <div className="text-sm">
+              <p className="font-semibold">Teacher Assignment</p>
+              <p className="text-xs opacity-90">
+                Please accept or reject your assignment for this exam.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              className="bg-[#49BA6C] hover:bg-[#3ea15d] text-white border-none"
+              onClick={() => handleStatusUpdate("accepted")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <Check className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.accept", "Accept Assignment")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[#E7000B] border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={() => handleStatusUpdate("rejected")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.reject", "Reject")}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
@@ -253,7 +317,7 @@ const ExamDetail = () => {
           {!isNonSessionExam && !examStarted && !examEnded && (
             <Button
               onClick={handleStartExam}
-              disabled={!canStart || startSessionMutation.isPending}
+              disabled={!canStart || !isAccepted || startSessionMutation.isPending}
             >
               <PlayCircle className="h-4 w-4" />
               {startSessionMutation.isPending
