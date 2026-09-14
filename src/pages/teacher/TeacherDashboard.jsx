@@ -134,7 +134,7 @@ const TeacherDashboard = () => {
             key={item.title}
             type="button"
             onClick={item.onClick}
-            className="text-left"
+            className="text-left h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl hover:opacity-95 transition-opacity"
           >
             <DashboardCard {...item} />
           </button>
