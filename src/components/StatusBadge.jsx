@@ -52,7 +52,6 @@ const statusVariants = {
   fail: "text-red-600",
   failed: "text-red-600 dark:text-red-400",
   started: "text-indigo-600",
-  not_started: "text-gray-500",
   ended: "text-green-600",
 
   // Payment statuses
@@ -93,7 +92,6 @@ const statusVariants = {
   accepted: "text-blue-600",
   arrived: "text-purple-600",
   in_progress: "text-indigo-600",
-  completed: "text-green-600",
 
   // Boolean
   true: "text-green-600",

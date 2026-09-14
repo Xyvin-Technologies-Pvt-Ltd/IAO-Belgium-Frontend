@@ -17,12 +17,27 @@ import {
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import StatusBadge from "@/components/StatusBadge";
+import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { formatTZ } from "@/utils/dateUtils";
 import PracticalFeedbackDialog from "@/components/teacher/exam/PracticalFeedbackDialog";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { useUpdatePracticalExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
+import {
+  GraduationCap,
+  Timer,
+  MapPin,
+  Calendar,
+  AlertCircle,
+  Check,
+  X,
+} from "lucide-react";
 
 const PracticalExamDetail = () => {
   const { t } = useTranslation();
@@ -34,6 +49,9 @@ const PracticalExamDetail = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
   const [selectedStudent, setSelectedStudent] = useState(null);
+
+  const updateStatusMutation = useUpdatePracticalExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
 
   useEffect(() => {
     setPage(1);
@@ -91,66 +109,196 @@ const PracticalExamDetail = () => {
   }
 
   const exam = examData.data;
+  const isAccepted = exam.teacher_status === "accepted" || exam.is_accepted;
+
+  const handleStatusUpdate = async (status) => {
+    try {
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam._id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam._id,
+          data: { status },
+        });
+      }
+      refetch();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  };
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-3">
-        <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
-          {exam.name}
-        </h2>
-        {exam.is_resit && (
-          <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
-        )}
-        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
-          {t("exam.form.practical", "Practical")}
-        </Badge>
+      {/* Teacher Assignment Acceptance Banner */}
+      {!isAccepted && (
+        <div className="p-4 border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 rounded-xl flex flex-wrap items-center justify-between gap-4 text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+            <div className="text-sm">
+              <p className="font-semibold">{t("planningManagement.teacher.assignment", "Teacher Assignment")}</p>
+              <p className="text-xs opacity-90">
+                {t("planningManagement.teacher.acceptOrRejectPrompt", "Please accept or reject your assignment for this exam.")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              className="bg-[#49BA6C] hover:bg-[#3ea15d] text-white border-none"
+              onClick={() => handleStatusUpdate("accepted")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <Check className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.accept", "Accept Assignment")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[#E7000B] border-red-200 hover:bg-red-50"
+              onClick={() => handleStatusUpdate("rejected")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.reject", "Reject")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Header UI matching ExamDetail.jsx */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-semibold text-dashboard-text dark:text-white">
+                {exam.name}
+              </h2>
+              {exam.is_resit && (
+                <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+              )}
+              <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                {t("exam.form.practical", "Practical")}
+              </Badge>
+              {exam.status && (
+                <StatusBadge status={exam.status} />
+              )}
+            </div>
+            <div className="mt-2 flex flex-col gap-1.5">
+              {exam.uid && (
+                <div>
+                  <span className="inline-block px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
+                    {exam.uid}
+                  </span>
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
+                {exam.batch?.name && (
+                  <span>
+                    <span className="font-semibold">
+                      {t("exam.table.batch", { defaultValue: "Batch" })}:
+                    </span>{" "}
+                    {exam.batch.name}
+                  </span>
+                )}
+                {exam.location && (
+                  <span>
+                    <span className="font-semibold">
+                      {t("exam.table.location", { defaultValue: "Location" })}:
+                    </span>{" "}
+                    {exam.location}
+                  </span>
+                )}
+                {exam.exam_date && (
+                  <span>
+                    <span className="font-semibold">
+                      {t("planningManagement.modal.practicalExamDate", "Exam Date")}:
+                    </span>{" "}
+                    {formatTZ(exam.exam_date, "DD-MM-YYYY")}
+                  </span>
+                )}
+                {exam.teachers?.length > 0 && (
+                  <span>
+                    <span className="font-semibold">
+                      {t("exam.form.teachers", "Teachers")}:
+                    </span>{" "}
+                    {exam.teachers
+                      .map((t) => `${t.first_name || ""} ${t.last_name || ""}`.trim())
+                      .filter(Boolean)
+                      .join(", ")}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="text-sm text-muted-foreground flex flex-wrap gap-4">
-        {exam.batch?.name && (
-          <span>
-            <span className="font-medium text-dashboard-text dark:text-white">
-              {t("exam.table.batch", { defaultValue: "Batch" })}:
-            </span>{" "}
-            {exam.batch.name}
-          </span>
-        )}
-        {exam.location && (
-          <span>
-            <span className="font-medium text-dashboard-text dark:text-white">
-              {t("exam.table.location", { defaultValue: "Location" })}:
-            </span>{" "}
-            {exam.location}
-          </span>
-        )}
-        {exam.exam_date && (
-          <span>
-            <span className="font-medium text-dashboard-text dark:text-white">
-              {t("planningManagement.modal.practicalExamDate", "Date")}:
-            </span>{" "}
-            {formatTZ(exam.exam_date, "DD-MM-YYYY")}
-          </span>
-        )}
-        {exam.teachers?.length > 0 && (
-          <span>
-            <span className="font-medium text-dashboard-text dark:text-white">
-              {t("exam.form.teachers", "Teachers")}:
-            </span>{" "}
-            {exam.teachers
-              .map((teacher) => `${teacher.first_name || ""} ${teacher.last_name || ""}`.trim())
-              .join(", ")}
-          </span>
-        )}
+      {/* Dashboard Cards Grid matching ExamDetail.jsx */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <DashboardCard
+          title={t("exam.table.location", { defaultValue: "Location" })}
+          value={exam.location || t("exam.detail.tba", "TBA")}
+          icon={MapPin}
+        />
+        <DashboardCard
+          title={t("exam.detail.duration", { defaultValue: "Duration" })}
+          value={exam.duration ? `${exam.duration} ${t("exam.mins", "mins")}` : t("exam.detail.tba", "TBA")}
+          icon={Timer}
+        />
+        <DashboardCard
+          title={
+            exam.passing_type === "percentage"
+              ? t("exam.detail.passingPercentage", { defaultValue: "Passing Percentage" })
+              : t("exam.detail.passingMarks", { defaultValue: "Pass Mark" })
+          }
+          value={
+            exam.passing_type === "percentage" && exam.passing_percentage != null
+              ? `${exam.passing_percentage}%`
+              : exam.passing_marks != null
+              ? `${exam.passing_marks}`
+              : t("exam.detail.passFail", "Pass / Fail")
+          }
+          icon={GraduationCap}
+        />
+        <DashboardCard
+          title={t("planningManagement.modal.practicalExamDate", { defaultValue: "Exam Date" })}
+          value={exam.exam_date ? formatTZ(exam.exam_date, "DD-MM-YYYY") : t("exam.detail.tba", "TBA")}
+          icon={Calendar}
+        />
       </div>
 
-      {exam.feedback_instructions &&
+      {/* Description section matching ExamDetail.jsx UI */}
+      {exam.description && exam.description !== "<p></p>" && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">{t("exam.detail.description", "Description:")}</p>
+          <div
+            className="text-sm text-card-foreground/80 whitespace-pre-wrap [&_a]:text-primary [&_a]:underline"
+            dangerouslySetInnerHTML={{ __html: exam.description }}
+          />
+        </div>
+      )}
+
+      {/* Instructions section matching ExamDetail.jsx UI */}
+      {exam.instructions && exam.instructions !== "<p></p>" && exam.instructions !== exam.description && (
+        <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+          <p className="text-sm font-bold mb-2">{t("exam.detail.instructions", "Instructions:")}</p>
+          <div
+            className="text-sm text-card-foreground/80 whitespace-pre-wrap [&_a]:text-primary [&_a]:underline"
+            dangerouslySetInnerHTML={{ __html: exam.instructions }}
+          />
+        </div>
+      )}
+
+      {/* Feedback Instructions section - Only rendered when teacher has accepted */}
+      {isAccepted && exam.feedback_instructions &&
         exam.feedback_instructions !== "<p></p>" && (
-          <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm space-y-2">
-            <h3 className="text-sm font-semibold text-dashboard-text dark:text-white">
-              {t("exam.feedback.instructionsTitle", "Feedback instructions")}
-            </h3>
+          <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
+            <p className="text-sm font-bold mb-2">{t("exam.detail.feedbackInstructions", "Feedback Instructions:")}</p>
             <div
-              className="prose prose-sm dark:prose-invert max-w-none text-sm [&_a]:text-[#ff8904] [&_a]:underline"
+              className="text-sm text-card-foreground/80 [&_a]:text-[#ff8904] [&_a]:underline"
               dangerouslySetInnerHTML={{ __html: exam.feedback_instructions }}
               onClick={(e) => {
                 const anchor = e.target.closest("a");
@@ -163,6 +311,7 @@ const PracticalExamDetail = () => {
           </div>
         )}
 
+      {/* Student Results Table */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-dashboard-text dark:text-white">
@@ -213,7 +362,13 @@ const PracticalExamDetail = () => {
                   <TableRow
                     key={item._id}
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => setSelectedStudent(item.student)}
+                    onClick={() => {
+                      if (!isAccepted) {
+                        toast.error(t("exam.messages.acceptAssignmentFirst", "Please accept your teacher assignment first before providing feedback."));
+                        return;
+                      }
+                      setSelectedStudent(item.student);
+                    }}
                   >
                     <TableCell className="px-4 py-4">
                       <div className="flex flex-col">

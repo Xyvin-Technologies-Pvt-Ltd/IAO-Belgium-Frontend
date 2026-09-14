@@ -6,6 +6,9 @@ import {
   HelpCircle,
   GraduationCap,
   Timer,
+  AlertCircle,
+  Check,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +27,8 @@ import {
   useEndExamSession,
   useGetExamResults,
 } from "@/store/useExamStore";
+import { useUpdateOnlineExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import AnswerSheetModal from "@/components/teacher/exam/AnswerSheetModal";
@@ -81,6 +86,8 @@ const ExamDetail = () => {
 
   const startSessionMutation = useStartExamSession();
   const endSessionMutation = useEndExamSession();
+  const updateStatusMutation = useUpdateOnlineExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
 
   useEffect(() => {
     if (examData?.data) {
@@ -140,7 +147,7 @@ const ExamDetail = () => {
 
   const handleStartExam = () => {
     if (!examData?.data?.first_session?.planning_id) {
-      toast.error("Missing planning session data to start the exam.");
+      toast.error(t("exam.messages.missingPlanningSession", "Missing planning session data to start the exam."));
       return;
     }
     const payload = {
@@ -153,7 +160,7 @@ const ExamDetail = () => {
 
   const handleEndExam = () => {
     if (!activeSessionId) {
-      toast.error("No active session to end.");
+      toast.error(t("exam.messages.noActiveSession", "No active session to end."));
       return;
     }
     endSessionMutation.mutate(activeSessionId);
@@ -176,10 +183,67 @@ const ExamDetail = () => {
   }
 
   const exam = examData.data;
-  const isNonSessionExam = exam.type === "practical";
+
+  const isNonSessionExam = exam.type === "assignment" || exam.type === "practical" || Boolean(exam.is_non_session);
+  const isAccepted = exam.teacher_status ? exam.teacher_status === "accepted" : true;
+
+  const handleStatusUpdate = async (status) => {
+    try {
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      }
+      refetch();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      toast.error(err?.message || "Failed to update assignment status");
+    }
+  };
 
   return (
     <div className="space-y-6 mt-4">
+      {!isAccepted && (
+        <div className="p-4 border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900 rounded-xl flex flex-wrap items-center justify-between gap-4 text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+            <div className="text-sm">
+              <p className="font-semibold">{t("planningManagement.teacher.assignment", "Teacher Assignment")}</p>
+              <p className="text-xs opacity-90">
+                {t("planningManagement.teacher.acceptOrRejectPrompt", "Please accept or reject your assignment for this exam.")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              className="bg-[#49BA6C] hover:bg-[#3ea15d] text-white border-none"
+              onClick={() => handleStatusUpdate("accepted")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <Check className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.accept", "Accept Assignment")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[#E7000B] border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={() => handleStatusUpdate("rejected")}
+              disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-1" />
+              {t("planningManagement.teacher.reject", "Reject")}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
@@ -253,11 +317,11 @@ const ExamDetail = () => {
           {!isNonSessionExam && !examStarted && !examEnded && (
             <Button
               onClick={handleStartExam}
-              disabled={!canStart || startSessionMutation.isPending}
+              disabled={!canStart || !isAccepted || startSessionMutation.isPending}
             >
               <PlayCircle className="h-4 w-4" />
               {startSessionMutation.isPending
-                ? "Starting..."
+                ? t("exam.starting", "Starting...")
                 : t("exam.startExam", { defaultValue: "Start Exam" })}
             </Button>
           )}
@@ -270,7 +334,7 @@ const ExamDetail = () => {
             >
               <StopCircle className="h-4 w-4" />
               {endSessionMutation.isPending
-                ? "Ending..."
+                ? t("exam.ending", "Ending...")
                 : t("exam.endExam", { defaultValue: "End Exam" })}
             </Button>
           )}
@@ -301,21 +365,21 @@ const ExamDetail = () => {
         />
         <DashboardCard
           title={t("exam.detail.duration", { defaultValue: "Duration" })}
-          value={`${exam.duration || 0} mins`}
+          value={`${exam.duration || 0} ${t("exam.mins", "mins")}`}
           icon={Timer}
         />
       </div>
 
       {exam.description && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Description:</p>
+          <p className="text-sm font-bold mb-2">{t("exam.detail.description", "Description:")}</p>
           <p className="text-sm text-card-foreground/80">{exam.description}</p>
         </div>
       )}
 
       {exam.instructions && (
         <div className="p-5 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <p className="text-sm font-bold mb-2">Instructions:</p>
+          <p className="text-sm font-bold mb-2">{t("exam.detail.instructions", "Instructions:")}</p>
           <div className="text-sm text-card-foreground/80 whitespace-pre-wrap">
             {exam.instructions}
           </div>
@@ -325,14 +389,14 @@ const ExamDetail = () => {
       {exam.question_sources && exam.question_sources.length > 0 && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-dashboard-text dark:text-white mb-4">
-            Question Sources
+            {t("exam.detail.questionSources", "Question Sources")}
           </h3>
           <div className="border rounded-lg overflow-hidden bg-white dark:bg-card text-card-foreground shadow-sm">
             <table className="w-full text-sm text-left">
               <thead className="bg-[#f4f4f5] dark:bg-muted text-muted-foreground text-xs font-semibold">
                 <tr>
-                  <th className="px-6 py-4 border-b">Source</th>
-                  <th className="px-6 py-4 border-b">Number of Questions</th>
+                  <th className="px-6 py-4 border-b">{t("exam.detail.questionSource", "Source")}</th>
+                  <th className="px-6 py-4 border-b">{t("exam.detail.numberOfQuestions", "Number of Questions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -344,9 +408,9 @@ const ExamDetail = () => {
                         "Osteopathic principles"}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      {source.count} questions{" "}
+                      {t("exam.detail.questionsCount", { count: source.count, defaultValue: "{{count}} questions" })}{" "}
                       {source.question_bank?.total_questions
-                        ? `(${source.question_bank.total_questions} questions available)`
+                        ? t("exam.detail.questionsAvailable", { total: source.question_bank.total_questions, defaultValue: "({{total}} questions available)" })
                         : ""}
                     </td>
                   </tr>
@@ -363,10 +427,10 @@ const ExamDetail = () => {
         <div className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-dashboard-text dark:text-white">
-              Student Results
+              {t("exam.detail.studentResults", "Student Results")}
             </h3>
             <Input
-              placeholder="Search students..."
+              placeholder={t("exam.searchStudents", { defaultValue: "Search students..." })}
               className="max-w-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -375,14 +439,14 @@ const ExamDetail = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-6">Student</TableHead>
-                <TableHead className="text-center">Score</TableHead>
-                <TableHead className="text-center">Percentage</TableHead>
-                <TableHead className="text-center">Result</TableHead>
+                <TableHead className="px-6">{t("exam.detail.student", "Student")}</TableHead>
+                <TableHead className="text-center">{t("exam.detail.score", "Score")}</TableHead>
+                <TableHead className="text-center">{t("exam.detail.percentage", "Percentage")}</TableHead>
+                <TableHead className="text-center">{t("exam.detail.result", "Result")}</TableHead>
                 <TableHead className="text-center">
                   {t("exam.detail.warnings", { defaultValue: "Warnings" })}
                 </TableHead>
-                <TableHead className="text-center px-6">Submitted At</TableHead>
+                <TableHead className="text-center px-6">{t("exam.detail.submittedAt", "Submitted At")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -392,7 +456,7 @@ const ExamDetail = () => {
                     colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    {t("common.loading") || "Loading results..."}
+                    {t("exam.loadingResults", "Loading results...")}
                   </TableCell>
                 </TableRow>
               ) : resultsData?.data?.length > 0 ? (
@@ -442,8 +506,7 @@ const ExamDetail = () => {
                     colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    {t("common.noResultsFound") ||
-                      "No results found for this exam session."}
+                    {t("exam.noResultsFound", "No results found for this exam session.")}
                   </TableCell>
                 </TableRow>
               )}

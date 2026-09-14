@@ -1544,7 +1544,9 @@
       "location": "Lieu",
       "actions": "Actions",
       "accept": "Accepter",
-      "reject": "Refuser"
+      "reject": "Refuser",
+      "assignment": "Affectation de l'enseignant",
+      "acceptOrRejectPrompt": "Veuillez accepter ou refuser votre affectation pour cet examen."
     },
     "modal": {
       "createTitle": "Créer un nouveau planning",
@@ -1687,8 +1689,17 @@
       "archive": "Archiver",
       "noExams": "Aucun examen trouvé"
     },
+    "starting": "Démarrage...",
+    "ending": "Fin en cours...",
+    "mins": "min",
+    "searchStudents": "Rechercher des étudiants...",
+    "loadingResults": "Chargement des résultats...",
+    "noResultsFound": "Aucun résultat trouvé pour cette session d'examen.",
     "messages": {
-      "loadFailed": "Échec du chargement des examens"
+      "loadFailed": "Échec du chargement des examens",
+      "missingPlanningSession": "Données de session de planification manquantes pour démarrer l'examen.",
+      "noActiveSession": "Aucune session active à terminer.",
+      "acceptAssignmentFirst": "Veuillez d'abord accepter votre affectation d'enseignant avant de fournir des commentaires."
     },
     "form": {
       "name": "Nom",
@@ -1723,7 +1734,34 @@
       "passingMarks": "Note de passage",
       "duration": "Durée",
       "questionSources": "Sources des questions",
+      "questionSource": "Source",
+      "numberOfQuestions": "Nombre de questions",
+      "questionsCount": "{{count}} questions",
+      "questionsAvailable": "({{total}} questions disponibles)",
+      "studentResults": "Résultats des étudiants",
+      "students": "Étudiants",
+      "student": "Étudiant",
+      "score": "Score",
+      "percentage": "Pourcentage",
+      "result": "Résultat",
+      "submittedAt": "Soumis le",
+      "passMark": "Note de passage",
+      "passFail": "Réussi / Échoué",
+      "tba": "À déterminer",
+      "description": "Description :",
+      "instructions": "Instructions :",
+      "feedbackInstructions": "Instructions de commentaires :",
       "available": "disponible(s)"
+    },
+    "feedback": {
+      "myStatus": "Mes commentaires",
+      "others": "Autres enseignants",
+      "notStarted": "Pas commencé",
+      "submittedCount": "soumis"
+    },
+    "results": {
+      "finalGrade": "Note finale",
+      "pendingAdmin": "En attente"
     }
   },
   "componentManagement": {
