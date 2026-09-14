@@ -24,6 +24,7 @@ import {
 } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
+import ReconciliationTab from "./ReconciliationTab";
 
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
@@ -325,6 +326,17 @@ const IntegrationsPage = () => {
             {t("integrations.exact.tabSent")}
             {sentCount > 0 ? ` (${sentCount})` : ""}
           </button>
+          <button
+            type="button"
+            onClick={() => setSyncTab("reconciliation")}
+            className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              syncTab === "reconciliation"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-muted-foreground hover:text-gray-900 dark:hover:text-white"
+            }`}
+          >
+            {t("integrations.exact.tabReconciliation")}
+          </button>
         </div>
 
         {syncTab === "pending" ? (
@@ -439,7 +451,7 @@ const IntegrationsPage = () => {
               )}
             </div>
           </>
-        ) : (
+        ) : syncTab === "sent" ? (
           <>
             {isSentLoading ? (
               <TableSkeleton rows={3} columns={15} />
@@ -564,6 +576,13 @@ const IntegrationsPage = () => {
               </div>
             )}
           </>
+        ) : (
+          <ReconciliationTab
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+          />
         )}
       </div>
     </div>
