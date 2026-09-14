@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
@@ -25,13 +26,19 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { useGetExams } from "@/store/useExamStore";
 import { useGetUsers } from "@/store/useDropdownStore";
 import { useGetCities } from "@/store/useCityStore";
-import { useGetResitPlannings, useCreateResitPlanning, useUpdateResitPlanning } from "@/store/useResitStore";
+import {
+  useGetResitPlannings,
+  useCreateResitPlanning,
+  useUpdateResitPlanning,
+  useGetResitPlanningAssignments,
+} from "@/store/useResitStore";
 import { formatTZ } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
-import { Pencil } from "lucide-react";
+import { Pencil, Eye, Users, FileText, CheckCircle2, Clock } from "lucide-react";
 
 const emptyForm = {
   exam: "",
@@ -40,10 +47,14 @@ const emptyForm = {
   location_address: "",
   teacher: "",
   teachers: [],
+  is_free: true,
+  amount: 0,
+  currency: "EUR",
 };
 
 const ResitPlanningPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("operations");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -213,6 +224,12 @@ const ResitPlanningPage = () => {
     setOpen(true);
   };
 
+  const [viewingPlanningId, setViewingPlanningId] = useState(null);
+  const { data: assignmentsData, isLoading: assignmentsLoading } = useGetResitPlanningAssignments(
+    viewingPlanningId,
+    { enabled: Boolean(viewingPlanningId) }
+  );
+
   const openEdit = (row) => {
     const teacher = row.teacher?._id || row.teacher || "";
     setEditing(row);
@@ -232,6 +249,9 @@ const ResitPlanningPage = () => {
           name: teacherLabel(person),
         };
       }),
+      is_free: row.is_free !== undefined ? row.is_free : true,
+      amount: row.amount || 0,
+      currency: row.currency || "EUR",
     });
     setOpen(true);
   };
@@ -244,11 +264,15 @@ const ResitPlanningPage = () => {
   const totalRows = data?.total_count || 0;
 
   const onSubmit = (values) => {
+    const isFree = Boolean(values.is_free);
     const payload = {
       exam: values.exam,
       exam_date: values.exam_date,
       location: values.location,
       location_address: values.location_address,
+      is_free: isFree,
+      amount: isFree ? 0 : Math.max(0, Number(values.amount || 0)),
+      currency: values.currency || "EUR",
     };
     if (isPractical) {
       payload.teachers = (values.teachers || []).map((item) => item._id || item);
@@ -345,17 +369,16 @@ const ResitPlanningPage = () => {
             <TableHead>{t("resitPlanning.table.date", "Date")}</TableHead>
             <TableHead>{t("resitPlanning.table.location", "Location")}</TableHead>
             <TableHead>{t("resitPlanning.table.teacher", "Teacher")}</TableHead>
-            {canModify && (
-              <TableHead className="w-[80px]">{t("resitPlanning.table.actions", "Actions")}</TableHead>
-            )}
+            <TableHead>{t("resitPlanning.table.fee", "Fee / Status")}</TableHead>
+            <TableHead className="w-[100px]">{t("resitPlanning.table.actions", "Actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={canModify ? 6 : 5} />
+            <TableSkeleton rows={rowsPerPage} columns={7} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={canModify ? 6 : 5} className="text-center p-8">
+              <TableCell colSpan={7} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("resitPlanning.loadFailed", "Failed to load resit plannings")}
                   onRetry={refetch}
@@ -373,8 +396,27 @@ const ResitPlanningPage = () => {
                 </TableCell>
                 <TableCell>{row.location || "N/A"}</TableCell>
                 <TableCell>{teacherCell(row)}</TableCell>
-                {canModify && (
-                  <TableCell>
+                <TableCell>
+                  {row.is_free || !row.amount ? (
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      {t("resitPlanning.free", "Free")}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 font-semibold">
+                      {row.currency === "USD" ? "$" : row.currency === "GBP" ? "£" : row.currency === "EUR" ? "€" : `${row.currency || "EUR"} `}{Number(row.amount).toFixed(2)}
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: `/admin/examination/resit-planning/${row._id}` })}
+                    className="cursor-pointer p-1.5 rounded-md text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+                    title={t("resitPlanning.viewDetails", "View planning details & assigned students")}
+                  >
+                    <Eye size={15} />
+                  </button>
+                  {canModify && (
                     <button
                       type="button"
                       onClick={() => openEdit(row)}
@@ -383,13 +425,13 @@ const ResitPlanningPage = () => {
                     >
                       <Pencil size={15} />
                     </button>
-                  </TableCell>
-                )}
+                  )}
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={canModify ? 6 : 5} className="text-center py-8 text-gray-400">
+              <TableCell colSpan={7} className="text-center py-8 text-gray-400">
                 {t("resitPlanning.empty", "No resit plannings yet")}
               </TableCell>
             </TableRow>
@@ -560,6 +602,62 @@ const ResitPlanningPage = () => {
                 },
               })}
             />
+            <div className="flex items-center justify-between p-3 border rounded-lg bg-slate-50 dark:bg-slate-900/50">
+              <div className="space-y-0.5">
+                <Label htmlFor="is_free" className="font-semibold text-sm cursor-pointer">
+                  {t("resitPlanning.form.freeResit", "Free Resit")}
+                </Label>
+                <div className="text-xs text-muted-foreground">
+                  {watch("is_free")
+                    ? t("resitPlanning.form.freeNotice", "No fee will be charged to students")
+                    : t("resitPlanning.form.paidNotice", "Students must pay the fee before taking the resit")}
+                </div>
+              </div>
+              <Switch
+                id="is_free"
+                checked={Boolean(watch("is_free"))}
+                onCheckedChange={(checked) => {
+                  setValue("is_free", checked);
+                  if (checked) setValue("amount", 0);
+                }}
+              />
+            </div>
+
+            {!watch("is_free") && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="amount">
+                    {t("resitPlanning.form.amount", "Resit Fee")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="50.00"
+                    {...register("amount", {
+                      required: !watch("is_free"),
+                      min: 0,
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="currency">
+                    {t("resitPlanning.form.currency", "Currency")}
+                  </Label>
+                  <select
+                    id="currency"
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+                    {...register("currency")}
+                  >
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="GBP">GBP (£)</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={closeDialog}>
                 {t("common.cancel", "Cancel")}

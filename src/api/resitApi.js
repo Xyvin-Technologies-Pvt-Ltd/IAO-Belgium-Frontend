@@ -29,3 +29,8 @@ export const updateResitTeacherStatus = async (id, data) => {
   const response = await axiosInstance.patch(`/resit/plannings/${id}/teacher-status`, data);
   return response.data;
 };
+
+export const getResitPlanningAssignments = async (id, params = {}) => {
+  const response = await axiosInstance.get(`/resit/plannings/${id}/assignments`, { params });
+  return response.data;
+};
