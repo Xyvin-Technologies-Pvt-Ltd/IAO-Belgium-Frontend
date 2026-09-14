@@ -781,6 +781,9 @@ const StudentDetails = () => {
                   <TableHead>
                     {t("studentManagement.details.completion", "Completion")}
                   </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.paymentStatus", "Payment Status")}
+                  </TableHead>
                   <TableHead>{t("common.date", "Date")}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -818,6 +821,23 @@ const StudentDetails = () => {
                         />
                       </TableCell>
                       <TableCell>
+                        {exam.is_resit || exam.payment_status ? (
+                          <StatusBadge
+                            status={
+                              exam.payment_status === "paid"
+                                ? "paid"
+                                : exam.payment_status === "free" || exam.is_free
+                                  ? "free"
+                                  : exam.payment_status === "waiting_third_party"
+                                    ? "waiting_third_party"
+                                    : "unpaid"
+                            }
+                          />
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
                         {exam.submitted_at
                           ? formatTZ(exam.submitted_at, "DD MMM YYYY")
                           : exam.exam_date
@@ -829,7 +849,7 @@ const StudentDetails = () => {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center text-muted-foreground"
                     >
                       {t(
