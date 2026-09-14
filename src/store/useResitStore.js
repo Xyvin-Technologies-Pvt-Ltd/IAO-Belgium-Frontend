@@ -6,7 +6,18 @@ import {
   getResitPlannings,
   assignResitStudents,
   updateResitTeacherStatus,
+  getResitPlanningAssignments,
 } from "@/api/resitApi";
+
+export const useGetResitPlanningAssignments = (id, params = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["resit-planning-assignments", id, params],
+    queryFn: () => getResitPlanningAssignments(id, params),
+    enabled: Boolean(id),
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
 
 export const useGetResitPlannings = (params = {}, options = {}) => {
   return useQuery({
