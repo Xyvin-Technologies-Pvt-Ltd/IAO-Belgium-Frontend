@@ -157,7 +157,7 @@ const ResitPlanningDetailPage = () => {
                 {t("resitPlanning.free", "Free Resit")}
               </Badge>
             ) : (
-              <span className="text-emerald-600 font-bold">€{Number(planning.amount).toFixed(2)}</span>
+              <span className="text-emerald-600 font-bold">{planning.currency === "USD" ? "$" : planning.currency === "GBP" ? "£" : planning.currency === "EUR" ? "€" : `${planning.currency || "EUR"} `}{Number(planning.amount).toFixed(2)}</span>
             )
           }
           icon={Sparkles}

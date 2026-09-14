@@ -49,6 +49,7 @@ const emptyForm = {
   teachers: [],
   is_free: true,
   amount: 0,
+  currency: "EUR",
 };
 
 const ResitPlanningPage = () => {
@@ -250,6 +251,7 @@ const ResitPlanningPage = () => {
       }),
       is_free: row.is_free !== undefined ? row.is_free : true,
       amount: row.amount || 0,
+      currency: row.currency || "EUR",
     });
     setOpen(true);
   };
@@ -270,6 +272,7 @@ const ResitPlanningPage = () => {
       location_address: values.location_address,
       is_free: isFree,
       amount: isFree ? 0 : Math.max(0, Number(values.amount || 0)),
+      currency: values.currency || "EUR",
     };
     if (isPractical) {
       payload.teachers = (values.teachers || []).map((item) => item._id || item);
@@ -400,7 +403,7 @@ const ResitPlanningPage = () => {
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 font-semibold">
-                      €{Number(row.amount).toFixed(2)}
+                      {row.currency === "USD" ? "$" : row.currency === "GBP" ? "£" : row.currency === "EUR" ? "€" : `${row.currency || "EUR"} `}{Number(row.amount).toFixed(2)}
                     </Badge>
                   )}
                 </TableCell>
@@ -621,21 +624,37 @@ const ResitPlanningPage = () => {
             </div>
 
             {!watch("is_free") && (
-              <div className="space-y-2">
-                <Label htmlFor="amount">
-                  {t("resitPlanning.form.amount", "Resit Fee (€)")} <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="50.00"
-                  {...register("amount", {
-                    required: !watch("is_free"),
-                    min: 0,
-                  })}
-                />
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="amount">
+                    {t("resitPlanning.form.amount", "Resit Fee")} <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="50.00"
+                    {...register("amount", {
+                      required: !watch("is_free"),
+                      min: 0,
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="currency">
+                    {t("resitPlanning.form.currency", "Currency")}
+                  </Label>
+                  <select
+                    id="currency"
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+                    {...register("currency")}
+                  >
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="GBP">GBP (£)</option>
+                  </select>
+                </div>
               </div>
             )}
 
