@@ -454,15 +454,16 @@ const ResitPlanningPage = () => {
           else setOpen(true);
         }}
       >
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
             <DialogTitle>
               {editing
                 ? t("resitPlanning.edit", "Edit resit planning")
                 : t("resitPlanning.create", "Plan resit")}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            <div className="space-y-4 overflow-y-auto flex-1 px-6 py-2">
             {editing ? (
               <div className="space-y-2">
                 <Label>{t("resitPlanning.form.exam", "Resit exam")}</Label>
@@ -658,7 +659,9 @@ const ResitPlanningPage = () => {
               </div>
             )}
 
-            <DialogFooter>
+            </div>
+
+            <DialogFooter className="px-6 py-4 shrink-0 border-t">
               <Button type="button" variant="outline" onClick={closeDialog}>
                 {t("common.cancel", "Cancel")}
               </Button>
