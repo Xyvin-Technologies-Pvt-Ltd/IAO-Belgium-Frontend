@@ -22,6 +22,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatTZ } from "@/utils/dateUtils";
 
 const ExamList = ({ showHeader = true, statusFilter }) => {
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const ExamList = ({ showHeader = true, statusFilter }) => {
             <TableHead>{t("exam.table.module")}</TableHead>
             <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
             <TableHead>{t("exam.table.location", { defaultValue: "Location" })}</TableHead>
+            <TableHead>{t("planningManagement.modal.practicalExamDate", "Date")}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
@@ -115,10 +117,10 @@ const ExamList = ({ showHeader = true, statusFilter }) => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={10} />
+            <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center p-8">
+              <TableCell colSpan={11} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -151,6 +153,11 @@ const ExamList = ({ showHeader = true, statusFilter }) => {
                 </TableCell>
                 <TableCell>{exam?.batch_name ?? "—"}</TableCell>
                 <TableCell>{exam?.location || "—"}</TableCell>
+                <TableCell>
+                  {exam?.exam_date || exam?.session_date
+                    ? formatTZ(exam.exam_date || exam.session_date, "DD-MM-YYYY")
+                    : "—"}
+                </TableCell>
                 <TableCell>{exam?.total_questions ?? 0}</TableCell>
                 <TableCell>{exam?.duration ?? 0} min</TableCell>
                 <TableCell>
@@ -194,7 +201,7 @@ const ExamList = ({ showHeader = true, statusFilter }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={10} className="text-center">
+              <TableCell colSpan={11} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>
