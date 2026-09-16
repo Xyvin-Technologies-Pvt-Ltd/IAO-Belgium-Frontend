@@ -31,6 +31,14 @@ import {
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCanModify } from "@/hooks/useCanModify";
 
+/** Statuses that can be synced from Mollie (must match backend allow-list). */
+const MOLLIE_RECONCILE_STATUSES = [
+  "invoice_issued",
+  "cancelling",
+  "expired",
+  "cancelled",
+];
+
 const ThirdPartyPaymentManagement = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
@@ -394,7 +402,7 @@ const ThirdPartyPaymentManagement = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    {canModify && ["invoice_issued", "cancelling"].includes(app.status) && (
+                    {canModify && MOLLIE_RECONCILE_STATUSES.includes(app.status) && (
                       <Button
                         size="icon"
                         variant="ghost"
@@ -568,7 +576,7 @@ const ThirdPartyPaymentManagement = () => {
           <DialogFooter className="flex justify-end gap-2">
             {canModify &&
               selectedApp &&
-              ["invoice_issued", "cancelling"].includes(selectedApp.status) && (
+              MOLLIE_RECONCILE_STATUSES.includes(selectedApp.status) && (
                 <Button
                   variant="outline"
                   className="rounded-[6px]"
