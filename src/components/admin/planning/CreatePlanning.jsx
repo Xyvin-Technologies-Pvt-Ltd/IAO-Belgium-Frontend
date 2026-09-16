@@ -71,6 +71,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ],
       exams: [],
       practical_exams: [],
+      shared_with: [],
     },
   });
 
@@ -452,6 +453,11 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         exam_date: ex.exam_date ? formatTZ(ex.exam_date, "YYYY-MM-DD") : "",
       })) || [];
 
+      const formattedSharedWith = (planningData.shared_with || []).map((sw) => ({
+        batch: toId(sw.batch),
+        component: toId(sw.component),
+      }));
+
       reset({
         program: programId,
         batch: batchId,
@@ -463,6 +469,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
         sessions: formattedSessions,
         exams: formattedExams,
         practical_exams: formattedPracticalExams,
+        shared_with: formattedSharedWith,
       });
     }
   }, [planningData, isEdit, reset, open]);
@@ -533,6 +540,7 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
       ...(formData.venue_address && { venue_address: formData.venue_address }),
       ...(formData.description && { description: formData.description }),
       ...(formData.internal_notes && { internal_notes: formData.internal_notes }),
+      ...(formData.shared_with && { shared_with: formData.shared_with }),
       sessions: formattedSessions,
       exams: (formData.exams || []).map((ex) => {
         const originalExam = planningData?.exams?.find(

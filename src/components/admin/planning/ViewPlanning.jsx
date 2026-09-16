@@ -142,6 +142,14 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               label={t("planningManagement.view.batchLabel")}
               value={planningData?.batch?.name || "N/A"}
             />
+            {planningData?.shared_with?.length > 0 && (
+              <InfoItem
+                label={t("planningManagement.shareModal.sharedWithLabel", "Shared With Batches")}
+                value={planningData.shared_with
+                  .map((sw) => `${sw.batch?.name || "Batch"} (${sw.component?.name || "Component"})`)
+                  .join(", ")}
+              />
+            )}
             <InfoItem
               label={t("planningManagement.view.studentsLabel")}
               value={planningData?.student_count || 0}

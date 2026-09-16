@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { useDeletePlanning, useGetPlanning } from "@/store/usePlanningStore";
 import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
+import SharePlanningModal from "@/components/admin/planning/SharePlanningModal";
 import StatusBadge from "@/components/StatusBadge";
 import { getMoment } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
@@ -54,8 +55,10 @@ const PlanningTable = ({ activeCity }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [selectedPlanning, setSelectedPlanning] = useState(null);
   const [viewPlanning, setViewPlanning] = useState(null);
+  const [sharePlanningData, setSharePlanningData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const prevCityRef = useRef(activeCity);
 
@@ -424,10 +427,17 @@ const PlanningTable = ({ activeCity }) => {
               >
                 <TableCell>{i?.component?.program?.name}</TableCell>
                 <TableCell
-                  className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="max-w-[170px] overflow-hidden text-ellipsis whitespace-nowrap"
                   title={i?.batch?.name}
                 >
-                  {i?.batch?.name}
+                  <div className="flex flex-col gap-0.5">
+                    <span>{i?.batch?.name}</span>
+                    {i?.shared_with?.length > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 w-max">
+                        + {i.shared_with.length} Shared Batch{i.shared_with.length > 1 ? "es" : ""}
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell
                   className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap"
@@ -472,6 +482,14 @@ const PlanningTable = ({ activeCity }) => {
                   {canModify && (
                     <RowActionMenu
                       actions={[
+                        {
+                          label: t("planningManagement.table.share", "Share with Batch"),
+                          icon: Users,
+                          onClick: () => {
+                            setSharePlanningData(i);
+                            setIsShareModalOpen(true);
+                          },
+                        },
                         {
                           label: t("planningManagement.table.edit"),
                           icon: Edit,
@@ -519,6 +537,15 @@ const PlanningTable = ({ activeCity }) => {
         open={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         planningData={viewPlanning}
+      />
+
+      <SharePlanningModal
+        open={isShareModalOpen}
+        onClose={() => {
+          setIsShareModalOpen(false);
+          setSharePlanningData(null);
+        }}
+        planningData={sharePlanningData}
       />
 
       <DeleteConfirm
