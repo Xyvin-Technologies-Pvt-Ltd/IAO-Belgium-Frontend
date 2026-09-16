@@ -43,7 +43,6 @@ const PracticalResultsTab = () => {
     academic: "all",
     exam: "all",
     failed: false,
-    pending_admin_score: false,
   });
 
   const [draftFilters, setDraftFilters] = useState({
@@ -52,7 +51,6 @@ const PracticalResultsTab = () => {
     academic: "all",
     exam: "all",
     failed: false,
-    pending_admin_score: false,
   });
 
   useEffect(() => {
@@ -74,7 +72,6 @@ const PracticalResultsTab = () => {
     academic: appliedFilters.academic !== "all" ? appliedFilters.academic : undefined,
     exam: appliedFilters.exam !== "all" ? appliedFilters.exam : undefined,
     failed: appliedFilters.failed ? true : undefined,
-    pending_admin_score: appliedFilters.pending_admin_score ? true : undefined,
   });
 
   const results = resultsData?.data || [];
@@ -126,7 +123,6 @@ const PracticalResultsTab = () => {
         academic: appliedFilters.academic !== "all" ? appliedFilters.academic : undefined,
         exam: appliedFilters.exam !== "all" ? appliedFilters.exam : undefined,
         failed: appliedFilters.failed ? true : undefined,
-        pending_admin_score: appliedFilters.pending_admin_score ? true : undefined,
         search: debouncedSearch || undefined,
       };
 
@@ -225,7 +221,6 @@ const PracticalResultsTab = () => {
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
             examType="practical"
-            showPendingScoreFilter={true}
           />
         </div>
         <Button onClick={handleExport} className="flex items-center gap-2 bg-[#ff8904] hover:bg-[#ff8904]/90 text-white font-medium">
