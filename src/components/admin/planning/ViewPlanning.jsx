@@ -152,6 +152,12 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                 value={planningData.description}
               />
             )}
+            {planningData?.internal_notes && (
+              <InfoItem
+                label={t("planningManagement.modal.internalNotesLabel", "Internal Notes")}
+                value={planningData.internal_notes}
+              />
+            )}
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
@@ -495,9 +501,11 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                     exam.exam?.name ||
                     exam.exam_component?.name ||
                     "Unnamed Exam";
-                  const teacherName = exam.teacher
-                    ? `${exam.teacher.last_name || ""} ${exam.teacher.first_name || ""}`.trim()
+                  const teacher = exam.teacher;
+                  const teacherName = teacher
+                    ? `${teacher.last_name || ""} ${teacher.first_name || ""}`.trim()
                     : "N/A";
+                  const teacherStatus = exam.teacher_status || "pending";
 
                   return (
                     <div
@@ -510,14 +518,75 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                         </h4>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
+                            {t("planningManagement.view.examTeacherLabel", "Supervisor / Teacher")}
+                          </p>
+                          {teacher ? (
+                            <Badge variant="outline" className={`text-xs capitalize ${getBadgeStyles(teacherStatus)}`}>
+                              {teacherName}
+                            </Badge>
+                          ) : (
+                            <span className="text-sm text-gray-950 dark:text-gray-200">N/A</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {planningData?.practical_exams && planningData.practical_exams.length > 0 && (
+            <div className="space-y-6">
+              <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t("planningManagement.view.practicalExamsLabel", "Practical Exams")}
+              </h3>
+              <div className="grid grid-cols-1 gap-6">
+                {planningData.practical_exams.map((exam, index) => {
+                  const examName = exam.exam?.name || exam.exam_component?.name || "Unnamed Exam";
+                  const examDate = exam.exam_date
+                    ? formatTZ(exam.exam_date, "DD-MM-YYYY")
+                    : "N/A";
+
+                  return (
+                    <div key={exam._id || index} className="bg-gray-50 dark:bg-zinc-900 rounded-lg p-4 space-y-4 border dark:border-zinc-800">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-gray-900 dark:text-white">{examName}</h4>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoItem
                           label={t(
-                            "planningManagement.view.examTeacherLabel",
-                            "Supervisor / Teacher",
+                            "planningManagement.modal.practicalExamDate",
+                            "Practical exam date",
                           )}
-                          value={teacherName}
+                          value={examDate}
                         />
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 dark:text-white/70 mb-2">
+                            {t("exam.form.teachersLabel", "Teachers")}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {exam.teachers?.map((tObj, tIdx) => {
+                              const tUser = tObj.teacher || tObj;
+                              const tName = tUser.first_name && tUser.last_name
+                                ? `${tUser.last_name} ${tUser.first_name}`.trim()
+                                : tUser.name || "Unknown Teacher";
+                              const status = tObj.status || "pending";
+                              return (
+                                <Badge
+                                  key={tUser._id || tIdx}
+                                  variant="outline"
+                                  className={`text-xs capitalize ${getBadgeStyles(status)}`}
+                                >
+                                  {tName}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );

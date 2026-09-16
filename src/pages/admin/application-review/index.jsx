@@ -17,6 +17,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useGetApplications } from "@/store/useApplication";
 import ViewApplication from "@/components/admin/application-review/ViewApplication";
 import StatusBadge from "@/components/StatusBadge";
+import AdmissionPaymentBadge from "@/components/admin/AdmissionPaymentBadge";
 import { useTranslation } from "react-i18next";
 import {
   getApplicationPreviousEducationOptions,
@@ -367,6 +368,7 @@ const ApplicationReview = () => {
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="no_fee">{t("applicationReview.filters.noFee", "No Fee Required")}</SelectItem>
                 <SelectItem value="failed">Failed</SelectItem>
               </SelectContent>
             </Select>
@@ -538,7 +540,12 @@ const ApplicationReview = () => {
                   {calculateDaysWaiting(i?.status_changed_at)}
                 </TableCell>
                 <TableCell>{i?.user?.country || "-"}</TableCell>
-                <TableCell><StatusBadge status={i?.payment_status} /></TableCell>
+                <TableCell>
+                  <AdmissionPaymentBadge
+                    payment_status={i?.payment_status}
+                    payment_amount={i?.payment_amount}
+                  />
+                </TableCell>
                 <TableCell><StatusBadge status={i?.status} /></TableCell>
                 <TableCell>
                   <Button

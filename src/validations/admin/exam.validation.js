@@ -26,6 +26,8 @@ export const examSchema = z.object({
   cooldown_days: z.coerce.number().min(0).default(7),
   deadline: z.string().optional().nullable().default(""),
   teachers: z.array(z.string()).optional().default([]),
+  parent_exam: z.string().optional().nullable().default(""),
+  is_resit: z.boolean().optional(),
 }).refine((data) => {
   if (data.passing_type === "marks") {
     return data.passing_marks !== undefined && !isNaN(data.passing_marks) && data.passing_marks >= 0;
@@ -83,14 +85,6 @@ export const examSchema = z.object({
   message: "End date (deadline) is required for sit-at-home exams",
   path: ["deadline"],
 }).refine((data) => {
-  if (data.type === "practical") {
-    return data.teachers ? data.teachers.length <= 3 : true;
-  }
-  return true;
-}, {
-  message: "A maximum of three teachers can be assigned to practical exams",
-  path: ["teachers"],
-}).refine((data) => {
   if (data.type !== "practical") {
     return !!data.exam_language && data.exam_language.trim() !== "";
   }
@@ -98,12 +92,4 @@ export const examSchema = z.object({
 }, {
   message: "Language is required",
   path: ["exam_language"],
-}).refine((data) => {
-  if (data.type === "practical" && data.program) {
-    return !!data.batch && data.batch.trim() !== "";
-  }
-  return true;
-}, {
-  message: "Batch is required when program is selected",
-  path: ["batch"],
 });

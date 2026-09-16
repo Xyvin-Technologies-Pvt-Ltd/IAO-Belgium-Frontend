@@ -113,6 +113,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
     reset,
     watch,
     setValue,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(teacherSchema),
@@ -185,12 +186,45 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
     onClose();
   };
 
+const resolveDropdownId = (val, dropdownData = []) => {
+  if (!val) return "";
+  let resolved = "";
+  if (typeof val === "object") {
+    if (val._id) resolved = String(val._id);
+    else if (val.id) resolved = String(val.id);
+    else if (val.name && Array.isArray(dropdownData) && dropdownData.length > 0) {
+      const match = dropdownData.find(
+        (item) => item.name?.toLowerCase() === val.name?.toLowerCase()
+      );
+      if (match) resolved = String(match._id || match.id);
+    }
+  } else if (typeof val === "string" && val.trim() !== "") {
+    const trimmed = val.trim();
+    if (Array.isArray(dropdownData) && dropdownData.length > 0) {
+      const matchById = dropdownData.find(
+        (item) => String(item._id || item.id) === trimmed
+      );
+      if (matchById) resolved = String(matchById._id || matchById.id);
+      else {
+        const matchByName = dropdownData.find(
+          (item) => item.name?.toLowerCase() === trimmed.toLowerCase()
+        );
+        if (matchByName) resolved = String(matchByName._id || matchByName.id);
+        else resolved = trimmed;
+      }
+    } else {
+      resolved = trimmed;
+    }
+  }
+  return resolved;
+};
+
   useEffect(() => {
     if (!open || !teacherData) return;
 
-    const teacherRoleId = teacherData.teacher_role?._id || teacherData.teacher_role || "";
-    const motherTongueId = teacherData.mother_tongue?._id || teacherData.mother_tongue || "";
-    const contractTypeId = teacherData.contract_type?._id || teacherData.contract_type || "";
+    const teacherRoleId = resolveDropdownId(teacherData.teacher_role, rolesData?.data);
+    const motherTongueId = resolveDropdownId(teacherData.mother_tongue, motherTonguesData?.data);
+    const contractTypeId = resolveDropdownId(teacherData.contract_type, contractTypesData?.data);
     // academic_degree may arrive as a single object (legacy) or an array (new)
     const academicDegreeArr = Array.isArray(teacherData.academic_degree)
       ? teacherData.academic_degree
@@ -222,6 +256,31 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       language: Array.isArray(teacherData.language) ? teacherData.language : [],
     });
   }, [open, teacherData, reset]);
+
+  // Asynchronous resolution once dropdown option data finishes loading
+  useEffect(() => {
+    if (!open || !teacherData) return;
+
+    if (rolesData?.data?.length) {
+      const resolvedRole = resolveDropdownId(teacherData.teacher_role, rolesData.data);
+      if (resolvedRole) {
+        setValue("teacher_role", resolvedRole, { shouldValidate: true, shouldDirty: true });
+        clearErrors("teacher_role");
+      }
+    }
+    if (motherTonguesData?.data?.length) {
+      const resolvedMotherTongue = resolveDropdownId(teacherData.mother_tongue, motherTonguesData.data);
+      if (resolvedMotherTongue) {
+        setValue("mother_tongue", resolvedMotherTongue);
+      }
+    }
+    if (contractTypesData?.data?.length) {
+      const resolvedContractType = resolveDropdownId(teacherData.contract_type, contractTypesData.data);
+      if (resolvedContractType) {
+        setValue("contract_type", resolvedContractType);
+      }
+    }
+  }, [open, teacherData, rolesData, motherTonguesData, contractTypesData, setValue]);
 
   const onSubmit = (data) => {
     const payload = {

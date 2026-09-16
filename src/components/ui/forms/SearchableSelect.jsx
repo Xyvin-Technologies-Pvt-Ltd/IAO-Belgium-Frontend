@@ -72,6 +72,7 @@ const SearchableSelect = ({
       )}
 
       <Select
+        key={`${value || ""}-${items?.length || 0}`}
         open={isOpen}
         value={value || ""}
         onValueChange={onChange}

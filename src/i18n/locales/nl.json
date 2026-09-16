@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Beoordelingen",
       "exams": "Examens",
-      "otherExams": "Overige examens"
+      "otherExams": "Overige examens",
+      "practicalExams": "Praktijkexamens"
     },
     "admin": {
       "title": "Beheerdersportaal",
@@ -60,6 +61,7 @@
       "adminManagement": "Beheerdersbeheer",
       "roleManagement": "Rolbeheer",
       "integrations": "Integraties",
+      "queueManagement": "Wachtrijbeheer",
       "adminLogs": "Beheerderslogboeken",
       "examination": "Examens",
       "questionBanks": "Vragenbanken",
@@ -114,6 +116,10 @@
     "unknown": "Onbekend",
     "notAvailable": "N/B",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Geen inschrijvingskosten",
+      "paidAmount": "Betaald {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Vandaag",
     "more": "meer",
@@ -183,6 +189,7 @@
     "trxCount": "Aantal transacties",
     "convenienceFee": "Servicekosten",
     "paid": "Betaald",
+    "issued": "Uitgegeven",
     "failed": "Mislukt",
     "overdue": "Achterstallig",
     "canceled": "Geannuleerd",
@@ -296,6 +303,56 @@
       "customInvoices": {
         "title": "Aangepaste facturen"
       }
+    }
+  },
+  "queues": {
+    "title": "Wachtrijbeheer",
+    "subtitle": "Bekijk en beheer BullMQ-taken voor e-mail, Exact Online en contracten.",
+    "refresh": "Vernieuwen",
+    "loadFailed": "Wachtrijoverzicht laden mislukt",
+    "jobsLoadFailed": "Wachtrijtaken laden mislukt",
+    "noJobs": "Geen taken in deze status.",
+    "removeSelected": "Geselecteerde verwijderen",
+    "retrySelected": "Geselecteerde opnieuw proberen",
+    "clearAllFailed": "Alle mislukte wissen",
+    "confirmRemoveSelected": "Geselecteerde taken uit de wachtrij verwijderen? Wachtende taken worden niet uitgevoerd. Dit kan niet ongedaan worden gemaakt.",
+    "confirmClearFailed": "Alle mislukte taken in deze wachtrij verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "retryOnlyFailed": "Selecteer mislukte taken om opnieuw te proberen.",
+    "selectAll": "Alles selecteren",
+    "selectJob": "Taak selecteren",
+    "tabs": {
+      "email": "E-mail",
+      "exact": "Exact",
+      "contract": "Contracten"
+    },
+    "status": {
+      "waiting": "Wachtend",
+      "active": "Actief",
+      "delayed": "Uitgesteld",
+      "failed": "Mislukt"
+    },
+    "counts": {
+      "waiting": "Wachtend",
+      "active": "Actief",
+      "delayed": "Uitgesteld",
+      "failed": "Mislukt",
+      "completed": "Voltooid"
+    },
+    "table": {
+      "jobId": "Taak-ID",
+      "type": "Type",
+      "summary": "Samenvatting",
+      "created": "Aangemaakt",
+      "attempts": "Pogingen",
+      "error": "Fout"
+    },
+    "detail": {
+      "title": "Taakdetails",
+      "status": "Status",
+      "attempts": "Pogingen",
+      "processed": "Verwerkt op",
+      "payload": "Payload (gefilterd)",
+      "close": "Sluiten"
     }
   },
   "ltiManagement": {
@@ -467,7 +524,8 @@
       "kmoManagement": "KMO-Portefeuille",
       "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Stamgegevensbeheer",
-      "logsManagement": "Logboekbeheer"
+      "logsManagement": "Logboekbeheer",
+      "queueManagement": "Wachtrijbeheer"
     }
   },
   "languageManagement": {
@@ -937,6 +995,7 @@
       "searchCities": "Steden zoeken",
       "paymentStatus": "Betalingsstatus",
       "paymentMethod": "Betaalmethode",
+      "noFee": "Geen inschrijvingskosten",
       "bankTransfer": "Bankoverschrijving",
       "creditCard": "Creditcard",
       "module": "Module",
@@ -1080,11 +1139,30 @@
       "reject": "Afwijzen",
       "waitlist": "In behandeling",
       "accept": "Accepteren",
+      "paymentInfo": "Betaling",
+      "noRegistrationFee": "Geen inschrijvingskosten voor deze intake.",
+      "acceptRequiresPayment": "Accepteren is beschikbaar nadat de inschrijvingskosten zijn betaald.",
       "qualificationStatus": "Status kwalificatie",
       "stillCompletingQualification": "Nog bezig met afronden kwalificatie",
       "qualificationNotDeferred": "Niet uitgesteld",
       "completingQualificationCheckbox": "Ik ben nog bezig met mijn kwalificatie. Ik zal mijn diploma later indienen.",
-      "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload."
+      "completingQualificationNotice": "De aanvrager heeft aangegeven nog bezig te zijn met het afronden van de kwalificatie. Er is nog geen certificaat geüpload.",
+      "rejectionReason": "Afwijzingsreden",
+      "noRejectionReason": "Geen afwijzingsreden geregistreerd",
+      "confirm": {
+        "approveTitle": "Candidatuur accepteren?",
+        "approveMessage": "Dit accepteert {{name}} en wijst hen toe aan een batch. De student ontvangt een e-mailmelding.",
+        "waitlistTitle": "Markeren als in behandeling?",
+        "waitlistMessage": "Dit markeert de candidatuur van {{name}} als in behandeling. De student wordt per e-mail geïnformeerd.",
+        "rejectTitle": "Candidatuur afwijzen?",
+        "rejectMessage": "Dit wijst de candidatuur van {{name}} af. Deze actie kan niet ongedaan worden gemaakt en de student ontvangt een afwijzingsmail.",
+        "rejectReasonLabel": "Afwijzingsreden (verplicht)",
+        "rejectReasonPlaceholder": "Voer de reden voor afwijzing in...",
+        "cancel": "Annuleren",
+        "confirmApprove": "Accepteren",
+        "confirmWaitlist": "In behandeling",
+        "confirmReject": "Afwijzen"
+      }
     },
     "status": {
       "pending": "In behandeling",
@@ -1104,6 +1182,9 @@
       "unflagDocument": "Markering verwijderen",
       "documentFlagged": "Document gemarkeerd",
       "notUploadedYet": "Nog niet geüpload"
+    },
+    "filters": {
+      "noFee": "Geen inschrijvingskosten"
     }
   },
   "contractManagement": {
@@ -1486,7 +1567,9 @@
       "location": "Locatie",
       "actions": "Acties",
       "accept": "Accepteren",
-      "reject": "Afwijzen"
+      "reject": "Afwijzen",
+      "assignment": "Docenttoewijzing",
+      "acceptOrRejectPrompt": "Accepteer of weiger uw toewijzing voor dit examen."
     },
     "modal": {
       "createTitle": "Nieuwe planning aanmaken",
@@ -1506,6 +1589,8 @@
       "preferredVenues": "Voorkeurslocaties",
       "descriptionLabel": "Beschrijving",
       "descriptionPlaceholder": "Beschrijving invoeren",
+      "internalNotesLabel": "Interne opmerkingen",
+      "internalNotesPlaceholder": "Voer interne opmerkingen in (alleen zichtbaar voor beheerders en docenten)",
       "sessionsLabel": "Sessies",
       "sessionLabel": "Sessie",
       "sessionNameLabel": "Sessienaam",
@@ -1576,7 +1661,8 @@
       "pendingEvaluations": "Beoordelingen in afwachting",
       "pendingEvaluationsHint": "{{completed}} tot nu toe voltooid",
       "assignedExams": "Toegewezen examens",
-      "assignedExamsHint": "{{other}} andere examens • {{unread}} ongelezen meldingen",
+      "assignedExamsHint": "{{unread}} ongelezen meldingen",
+      "practicalExamsHint": "Toegewezen praktijkexamens",
       "upcomingSessions": "Aankomende sessies",
       "recentSubmissions": "Inzendingen om te beoordelen",
       "noUpcomingSessions": "Geen sessies gepland in de komende 7 dagen.",
@@ -1626,8 +1712,17 @@
       "archive": "Archiveren",
       "noExams": "Geen examens gevonden"
     },
+    "starting": "Bezig met starten...",
+    "ending": "Bezig met beëindigen...",
+    "mins": "min",
+    "searchStudents": "Zoek studenten...",
+    "loadingResults": "Resultaten laden...",
+    "noResultsFound": "Geen resultaten gevonden voor deze examensessie.",
     "messages": {
-      "loadFailed": "Laden van examens mislukt"
+      "loadFailed": "Laden van examens mislukt",
+      "missingPlanningSession": "Ontbrekende planningssessiegegevens om het examen te starten.",
+      "noActiveSession": "Geen actieve sessie om te beëindigen.",
+      "acceptAssignmentFirst": "Accepteer eerst uw docenttoewijzing voordat u feedback geeft."
     },
     "form": {
       "name": "Naam",
@@ -1662,7 +1757,34 @@
       "passingMarks": "Slaaggrens",
       "duration": "Duur",
       "questionSources": "Vraagbronnen",
+      "questionSource": "Bron",
+      "numberOfQuestions": "Aantal vragen",
+      "questionsCount": "{{count}} vragen",
+      "questionsAvailable": "({{total}} vragen beschikbaar)",
+      "studentResults": "Studentenresultaten",
+      "students": "Studenten",
+      "student": "Student",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Resultaat",
+      "submittedAt": "Ingediend op",
+      "passMark": "Voldoende score",
+      "passFail": "Geslaagd / Herkansing",
+      "tba": "N.t.b.",
+      "description": "Beschrijving:",
+      "instructions": "Instructies:",
+      "feedbackInstructions": "Feedbackinstructies:",
       "available": "beschikbaar"
+    },
+    "feedback": {
+      "myStatus": "Mijn feedback",
+      "others": "Andere docenten",
+      "notStarted": "Niet gestart",
+      "submittedCount": "ingediend"
+    },
+    "results": {
+      "finalGrade": "Eindcijfer",
+      "pendingAdmin": "In afwachting"
     }
   },
   "componentManagement": {

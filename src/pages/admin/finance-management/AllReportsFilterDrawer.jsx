@@ -116,11 +116,13 @@ const AllReportsFilterDrawer = ({
                     <>
                       <SelectItem value="pending">{t("common.pending")}</SelectItem>
                       <SelectItem value="paid">{t("common.paid")}</SelectItem>
+                      <SelectItem value="issued">{t("common.issued")}</SelectItem>
                     </>
                   ) : (
                     <>
                       <SelectItem value="pending">{t("common.pending")}</SelectItem>
                       <SelectItem value="paid">{t("common.paid")}</SelectItem>
+                      <SelectItem value="issued">{t("common.issued")}</SelectItem>
                       <SelectItem value="failed">{t("common.failed")}</SelectItem>
                       <SelectItem value="canceled">{t("common.canceled")}</SelectItem>
                     </>

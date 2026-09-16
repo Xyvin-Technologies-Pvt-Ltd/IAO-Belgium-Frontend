@@ -40,12 +40,12 @@ export const getTeacherSidebarData = (t) => ({
         },
         {
           title: t("sidebar.teacher.exams"),
-          url: "/teacher/exams",
+          url: "/teacher/planning?tab=exams",
           icon: ClipboardCheck,
         },
         {
-          title: t("sidebar.teacher.otherExams", { defaultValue: "Other Exams" }),
-          url: "/teacher/other-exams",
+          title: t("sidebar.teacher.practicalExams", { defaultValue: "Practical Exams" }),
+          url: "/teacher/planning?tab=practical",
           icon: ClipboardCheck,
         },
         {

@@ -87,12 +87,20 @@ const SIDEBAR_PERMISSIONS = {
     "admin_management_view",
     "admin_management_modify",
   ],
+  "/admin/queue-management": [
+    "queue_management_view",
+    "queue_management_modify",
+  ],
   "/admin/admin-logs": ["logs_management_view"],
   "/admin/examination/question-banks": [
     "operations_management_view",
     "operations_management_modify",
   ],
   "/admin/examination/exams": [
+    "operations_management_view",
+    "operations_management_modify",
+  ],
+  "/admin/examination/resit-planning": [
     "operations_management_view",
     "operations_management_modify",
   ],
@@ -148,6 +156,7 @@ export const MODULE_MODIFY_PERMISSIONS = {
   kmo: "kmo_management_modify",
   fkf: "fkf_management_modify",
   master_data: "master_data_management_modify",
+  queue: "queue_management_modify",
 };
 
 /** Full finance access also covers KMO-Portefeuille and Fachkursförderung. */

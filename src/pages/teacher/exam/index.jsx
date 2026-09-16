@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -15,10 +15,16 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import ExamStatusBadge from "@/components/admin/exam/ExamStatusBadge";
 import { useGetTeacherExams } from "@/store/useExamStore";
+import { useUpdateOnlineExamTeacherStatus } from "@/store/usePlanningStore";
+import { useUpdateResitTeacherStatus } from "@/store/useResitStore";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
+import { Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatTZ } from "@/utils/dateUtils";
 
-const ExamList = () => {
+const ExamList = ({ showHeader = true, statusFilter }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
@@ -31,23 +37,59 @@ const ExamList = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(statusFilter ? { teacher_status: statusFilter, status: statusFilter } : {}),
   });
 
-  const exams = data?.data || [];
-  const totalRows = data?.total_count || 0;
+  const updateStatusMutation = useUpdateOnlineExamTeacherStatus();
+  const updateResitStatusMutation = useUpdateResitTeacherStatus();
+
+  const handleStatusUpdate = async (e, exam, status) => {
+    e.stopPropagation();
+    try {
+      if (exam.is_resit) {
+        await updateResitStatusMutation.mutateAsync({
+          id: exam.planned_exam_id || exam.planning_id,
+          data: { status },
+        });
+      } else {
+        await updateStatusMutation.mutateAsync({
+          id: exam.planned_exam_id,
+          data: { status },
+        });
+      }
+      refetch();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  };
+
+  const rawExams = data?.data || [];
+  const exams = useMemo(() => {
+    if (!statusFilter) return rawExams;
+    return rawExams.filter((exam) => {
+      const st = exam.teacher_status || exam.status || "pending";
+      return st === statusFilter;
+    });
+  }, [rawExams, statusFilter]);
+  const totalRows = statusFilter ? exams.length : (data?.total_count || 0);
 
   const handleRowClick = (exam) => {
     navigate({
       to: "/teacher/exams/$exam_id/$planning_id",
-      params: { exam_id: exam.exam_id, planning_id: exam.planning_id },
+      params: {
+        exam_id: String(exam.exam_id?._id || exam.exam_id),
+        planning_id: String(exam.planning_id),
+      },
     });
   };
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        {t("exam.myExams", { defaultValue: "My Exams" })}
-      </h2>
+      {showHeader && (
+        <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
+          {t("exam.myExams", { defaultValue: "My Exams" })}
+        </h2>
+      )}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <Input
           placeholder={t("exam.search")}
@@ -63,18 +105,22 @@ const ExamList = () => {
             <TableHead>{t("exam.table.name")}</TableHead>
             <TableHead>{t("exam.table.module")}</TableHead>
             <TableHead>{t("exam.table.batch", { defaultValue: "Batch" })}</TableHead>
+            <TableHead>{t("exam.table.location", { defaultValue: "Location" })}</TableHead>
+            <TableHead>{t("planningManagement.modal.practicalExamDate", "Date")}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
             <TableHead>{t("exam.table.status")}</TableHead>
+            <TableHead>{t("planningManagement.table.status")}</TableHead>
+            <TableHead>{t("planningManagement.teacher.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={11} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -89,7 +135,14 @@ const ExamList = () => {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(exam)}
               >
-                <TableCell>{exam?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{exam?.name}</span>
+                    {exam?.is_resit && (
+                      <Badge variant="outline">{t("exam.resit", "Resit")}</Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-medium">{exam?.module_name}</span>
@@ -99,6 +152,12 @@ const ExamList = () => {
                   </div>
                 </TableCell>
                 <TableCell>{exam?.batch_name ?? "—"}</TableCell>
+                <TableCell>{exam?.location || "—"}</TableCell>
+                <TableCell>
+                  {exam?.exam_date || exam?.session_date
+                    ? formatTZ(exam.exam_date || exam.session_date, "DD-MM-YYYY")
+                    : "—"}
+                </TableCell>
                 <TableCell>{exam?.total_questions ?? 0}</TableCell>
                 <TableCell>{exam?.duration ?? 0} min</TableCell>
                 <TableCell>
@@ -109,11 +168,40 @@ const ExamList = () => {
                 <TableCell>
                   <StatusBadge status={exam?.exam_session_status ?? "not_started"} />
                 </TableCell>
+                <TableCell>
+                  <StatusBadge status={exam?.teacher_status || "pending"} />
+                </TableCell>
+                <TableCell>
+                  {(exam?.teacher_status === "pending" || !exam?.teacher_status) && exam?.planned_exam_id && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-[#49BA6C] bg-[#49BA6C]/10 hover:bg-[#49BA6C]/20 border-none"
+                        onClick={(e) => handleStatusUpdate(e, exam, "accepted")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        {t("planningManagement.teacher.accept")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-[#E7000B] border-none bg-[#E7000B]/10 dark:bg-[#E7000B] hover:bg-[#E7000B]/20"
+                        onClick={(e) => handleStatusUpdate(e, exam, "rejected")}
+                        disabled={updateStatusMutation.isPending || updateResitStatusMutation.isPending}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        {t("planningManagement.teacher.reject")}
+                      </Button>
+                    </div>
+                  )}
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center">
+              <TableCell colSpan={11} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>

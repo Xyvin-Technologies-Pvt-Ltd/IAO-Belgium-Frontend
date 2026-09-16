@@ -30,6 +30,7 @@ import {
   useGetExams,
   usePublishExam,
   useArchiveExam,
+  useUnarchiveExam,
 } from "@/store/useExamStore";
 import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { useNavigate } from "@tanstack/react-router";
@@ -66,6 +67,7 @@ const Exams = () => {
   });
   const publishExam = usePublishExam();
   const archiveExam = useArchiveExam();
+  const unarchiveExam = useUnarchiveExam();
 
   const exams = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -96,6 +98,15 @@ const Exams = () => {
   const handleArchive = async (exam) => {
     try {
       await archiveExam.mutateAsync(exam._id);
+      refetch();
+    } catch (err) {
+      // Error handled by store
+    }
+  };
+
+  const handleUnarchive = async (exam) => {
+    try {
+      await unarchiveExam.mutateAsync(exam._id);
       refetch();
     } catch (err) {
       // Error handled by store
@@ -207,7 +218,17 @@ const Exams = () => {
                 onClick={() => handleRowClick(i._id)}
               >
                 <TableCell>{i?.uid}</TableCell>
-                <TableCell>{i?.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{i?.name}</span>
+                    {i?.is_resit && (
+                      <Badge variant="outline">
+                        {t("exam.resitOf", "Resit of")}{" "}
+                        {i?.parent_exam?.name || t("exam.resit", "Resit")}
+                      </Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{getTypeBadge(i?.type)}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
                 <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
@@ -247,7 +268,14 @@ const Exams = () => {
                                   onClick: () => handleArchive(i),
                                 },
                               ]
-                            : []),
+                            : i?.status === "archived"
+                              ? [
+                                  {
+                                    label: t("exam.table.unarchive", "Unarchive"),
+                                    onClick: () => handleUnarchive(i),
+                                  },
+                                ]
+                              : []),
                       ]}
                     />
                   )}

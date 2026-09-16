@@ -6,6 +6,7 @@ import {
   getIntakeById,
   getIntakes,
   getStudentByApplication,
+  getStudentExamsByApplication,
   updateintake,
   moveStudentToAnotherBatch,
   markStudentAsFailed,
@@ -108,6 +109,20 @@ export const useGetStudentByApplication = (applicationId, filter = {}, options =
     queryFn: () => getStudentByApplication(applicationId, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentExamsByApplication = (
+  applicationId,
+  filter = {},
+  options = {},
+) => {
+  return useQuery({
+    queryKey: ["student-exams", applicationId, filter],
+    queryFn: () => getStudentExamsByApplication(applicationId, filter),
+    staleTime: 30000,
+    enabled: !!applicationId,
     ...options,
   });
 };

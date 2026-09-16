@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, ClipboardCheck, BookOpen } from "lucide-react";
 import { getMoment } from "@/utils/dateUtils";
 import { useTranslation } from "react-i18next";
 
@@ -37,20 +37,64 @@ const TeacherCalendarView = ({
 
   const sessionsByDate = useMemo(() => {
     const map = {};
-    sessions.forEach((module) => {
-      (module.sessions || []).forEach((s) => {
-        if (!s.session_date) return;
-        const dateKey = getMoment(s.session_date).format("YYYY-MM-DD");
-        if (!map[dateKey]) map[dateKey] = [];
-        map[dateKey].push({
-          ...s,
-          component_name: module.component_name,
-          batch_name: module.batch_name,
-          planning_id: module.planning_id,
-          venue: module.venue,
+    const addToMap = (dateVal, item) => {
+      if (!dateVal) return;
+      const dateKey = getMoment(dateVal).format("YYYY-MM-DD");
+      if (!map[dateKey]) map[dateKey] = [];
+      map[dateKey].push(item);
+    };
+
+    sessions.forEach((item) => {
+      // Grouped session structure
+      if (item.sessions && Array.isArray(item.sessions)) {
+        item.sessions.forEach((s) => {
+          addToMap(s.session_date, {
+            ...s,
+            item_type: "session",
+            component_name: s.name || item.component_name,
+            batch_name: item.batch_name,
+            planning_id: item.planning_id || s.planning_id,
+            venue: item.venue,
+            status: s.status || item.teacher_status || "accepted",
+          });
         });
-      });
+      } 
+      // Flat Exam item
+      else if (item.item_type === "exam" || item.total_questions !== undefined || item.planned_exam_id) {
+        const examDate = item.exam_date || item.session_date || item.start_time || item.date || item.createdAt || item.created_at;
+        addToMap(examDate, {
+          ...item,
+          item_type: "exam",
+          component_name: item.name || item.module_name || "Online Exam",
+          batch_name: item.batch_name || item.batch?.name || "N/A",
+          planning_id: item.planning_id,
+          status: item.teacher_status || item.status || "accepted",
+        });
+      }
+      // Flat Practical Exam item
+      else if (item.item_type === "practical" || (item.module_name && (item.exam_date || item.createdAt))) {
+        const practicalDate = item.exam_date || item.session_date || item.start_time || item.date || item.createdAt || item.created_at;
+        addToMap(practicalDate, {
+          ...item,
+          item_type: "practical",
+          component_name: item.name || item.module_name || "Practical Exam",
+          batch_name: item.batch?.name || item.batch_name || "N/A",
+          status: item.status || item.teacher_status || "accepted",
+        });
+      }
+      // General fallback session item
+      else {
+        const sessionDate = item.session_date || item.date || item.exam_date;
+        addToMap(sessionDate, {
+          ...item,
+          item_type: item.item_type || "session",
+          component_name: item.component_name || item.name || item.module_name || "Session",
+          batch_name: item.batch_name || item.batch?.name || "N/A",
+          status: item.status || item.teacher_status || "accepted",
+        });
+      }
     });
+
     return map;
   }, [sessions]);
 
@@ -87,39 +131,63 @@ const TeacherCalendarView = ({
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "accepted":
-        return { bg: "bg-green-100 dark:bg-green-900/30", text: "text-green-600 dark:text-green-400", dot: null };
+  const getItemStyle = (session) => {
+    if (session.item_type === "exam") {
+      return {
+        bg: "bg-purple-100 dark:bg-purple-900/30",
+        text: "text-purple-700 dark:text-purple-300",
+        label: "Exam",
+        icon: FileText,
+      };
+    }
+    if (session.item_type === "practical") {
+      return {
+        bg: "bg-amber-100 dark:bg-amber-900/30",
+        text: "text-amber-700 dark:text-amber-300",
+        label: "Practical",
+        icon: ClipboardCheck,
+      };
+    }
+    
+    // Status check for sessions
+    switch (session.status?.toLowerCase()) {
       case "rejected":
-        return { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-600 dark:text-red-400", dot: null };
+        return { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-600 dark:text-red-400", label: "Session", icon: BookOpen };
       case "pending":
+        return { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-600 dark:text-yellow-400", label: "Session", icon: BookOpen };
+      case "accepted":
       default:
-        return { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-600 dark:text-yellow-400", dot: "bg-yellow-500 dark:bg-yellow-400" };
+        return { bg: "bg-green-100 dark:bg-green-900/30", text: "text-green-700 dark:text-green-300", label: "Session", icon: BookOpen };
     }
   };
 
   const SessionCard = ({ session, idx }) => {
-    const colors = getStatusColor(session.status);
+    const style = getItemStyle(session);
+    const Icon = style.icon;
     const time = session.start_time ? getMoment(session.start_time).format("h:mma") : null;
+    const displayName = session.item_type && session.item_type !== "session"
+      ? `[${style.label}] ${session.component_name}`
+      : session.component_name;
+
     return (
       <div
         key={idx}
         onClick={() => onSessionClick?.(session)}
-        className={`flex items-center gap-1 rounded cursor-pointer hover:opacity-80 transition-opacity px-1.5 py-0.5 ${colors.bg}`}
-        title={`${session.component_name} - ${session.batch_name}`}
+        className={`flex items-center gap-1 rounded cursor-pointer hover:opacity-80 transition-opacity px-1.5 py-0.5 ${style.bg}`}
+        title={`${displayName} - ${session.batch_name || ""}`}
       >
-        {colors.dot && <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${colors.dot}`} />}
-        <span className={`text-xs truncate font-medium ${colors.text}`}>
+        <Icon className={`shrink-0 w-3 h-3 ${style.text}`} />
+        <span className={`text-xs truncate font-medium ${style.text}`}>
           {time && <span className="opacity-75 font-normal">{time} </span>}
-          {session.component_name}
+          {displayName}
         </span>
       </div>
     );
   };
 
   const AgendaSessionRow = ({ session }) => {
-    const colors = getStatusColor(session.status);
+    const style = getItemStyle(session);
+    const Icon = style.icon;
     const hasTime =
       session.start_time &&
       !getMoment(session.start_time).isSame(getMoment(session.start_time).startOf("day"));
@@ -129,23 +197,29 @@ const TeacherCalendarView = ({
     return (
       <div
         onClick={() => onSessionClick?.(session)}
-        className={`w-full rounded-lg px-4 py-3 cursor-pointer hover:opacity-90 transition-opacity ${colors.bg}`}
+        className={`w-full rounded-lg px-4 py-3 cursor-pointer hover:opacity-90 transition-opacity ${style.bg}`}
       >
-        {startTime && (
-          <div className="flex items-center gap-3 mb-1">
-            <span className={`text-xs font-medium ${colors.text}`}>
-              {startTime}{endTime ? ` – ${endTime}` : ""}
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center gap-1.5">
+            <Icon className={`w-4 h-4 ${style.text}`} />
+            <span className={`text-xs font-semibold uppercase tracking-wider ${style.text}`}>
+              {style.label}
             </span>
           </div>
-        )}
-        <p className={`text-sm font-semibold leading-tight ${colors.text}`}>
+          {startTime && (
+            <span className={`text-xs font-medium ${style.text}`}>
+              {startTime}{endTime ? ` – ${endTime}` : ""}
+            </span>
+          )}
+        </div>
+        <p className={`text-sm font-semibold leading-tight ${style.text}`}>
           {session.component_name || t("calendar.session")}
         </p>
         {session.batch_name && (
-          <p className={`text-xs mt-0.5 ${colors.text} opacity-60`}>{session.batch_name}</p>
+          <p className={`text-xs mt-0.5 ${style.text} opacity-70`}>{session.batch_name}</p>
         )}
         {session.venue && (
-          <p className={`text-xs mt-0.5 ${colors.text} opacity-50`}>{session.venue}</p>
+          <p className={`text-xs mt-0.5 ${style.text} opacity-60`}>{session.venue}</p>
         )}
       </div>
     );
@@ -274,6 +348,19 @@ const TeacherCalendarView = ({
         <h3 className="text-base font-bold text-gray-900 dark:text-sidebar-foreground flex-1">
           {headerTitle}
         </h3>
+
+        {/* Legend */}
+        <div className="hidden md:flex items-center gap-3 text-xs mr-2">
+          <span className="flex items-center gap-1 text-green-700 dark:text-green-300 font-medium">
+            <span className="w-2 h-2 rounded-full bg-green-500" /> Session
+          </span>
+          <span className="flex items-center gap-1 text-purple-700 dark:text-purple-300 font-medium">
+            <span className="w-2 h-2 rounded-full bg-purple-500" /> Exam
+          </span>
+          <span className="flex items-center gap-1 text-amber-700 dark:text-amber-300 font-medium">
+            <span className="w-2 h-2 rounded-full bg-amber-500" /> Practical
+          </span>
+        </div>
 
         {onViewTypeChange && (
           <div className="flex rounded-md border border-gray-200 dark:border-sidebar-border overflow-hidden">

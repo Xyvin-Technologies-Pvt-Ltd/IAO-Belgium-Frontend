@@ -6,7 +6,13 @@ import {
   updateExam,
   publishExam,
   archiveExam,
+  unarchiveExam,
   getTeacherExams,
+  getTeacherPracticalExams,
+  getPracticalExamDetail,
+  getPracticalExamStudents,
+  getPracticalExamFeedback,
+  upsertPracticalExamFeedback,
   getTeacherOtherExams,
   getOtherExamDetail,
   getOtherExamStudents,
@@ -17,6 +23,10 @@ import {
   getStudentAnswerSheet,
   getAdminExamResults,
   exportAdminExamResults,
+  getAdminPracticalExamResults,
+  exportAdminPracticalExamResults,
+  getStudentPracticalDetailAdmin,
+  setStudentPracticalScoreAdmin,
 } from "@/api/examApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -109,6 +119,22 @@ export const useArchiveExam = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to archive exam");
+    },
+  });
+};
+
+export const useUnarchiveExam = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: unarchiveExam,
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["exams"] });
+      queryClient.invalidateQueries({ queryKey: ["exam", variables] });
+      queryClient.invalidateQueries({ queryKey: ["exams-dropdown"] });
+      toast.success(response?.message || "Exam unarchived successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to unarchive exam");
     },
   });
 };
@@ -228,4 +254,108 @@ export const useGetAdminExamResults = (params, options = {}) => {
   });
 };
 
-export { getAdminExamResults, exportAdminExamResults };
+export const useGetTeacherPracticalExams = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["teacher-practical-exams", params],
+    queryFn: () => getTeacherPracticalExams(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamDetail = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-detail", id],
+    queryFn: () => getPracticalExamDetail(id),
+    enabled: !!id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamStudents = (id, params, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-students", id, params],
+    queryFn: () => getPracticalExamStudents(id, params),
+    enabled: !!id,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetPracticalExamFeedback = (id, applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["practical-exam-feedback", id, applicationId],
+    queryFn: () => getPracticalExamFeedback(id, applicationId),
+    enabled: !!id && !!applicationId,
+    staleTime: 0,
+    ...options,
+  });
+};
+
+export const useUpsertPracticalExamFeedback = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, applicationId, payload }) =>
+      upsertPracticalExamFeedback(id, applicationId, payload),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["practical-exam-feedback", variables.id, variables.applicationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["practical-exam-students", variables.id],
+      });
+      toast.success(response?.message || "Feedback saved");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save feedback");
+    },
+  });
+};
+
+export const useGetAdminPracticalExamResults = (params, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-practical-exam-results", params],
+    queryFn: () => getAdminPracticalExamResults(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetStudentPracticalDetailAdmin = (plannedId, applicationId, options = {}) => {
+  return useQuery({
+    queryKey: ["admin-practical-student-detail", plannedId, applicationId],
+    queryFn: () => getStudentPracticalDetailAdmin(plannedId, applicationId),
+    enabled: !!plannedId && !!applicationId,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useSetStudentPracticalScoreAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ plannedId, applicationId, score, feedback, result }) =>
+      setStudentPracticalScoreAdmin(plannedId, applicationId, {
+        score,
+        feedback,
+        result,
+      }),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-practical-exam-results"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-practical-student-detail"],
+      });
+      toast.success(response?.message || "Result saved successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save result");
+    },
+  });
+};
+
+export { getAdminExamResults, exportAdminExamResults, exportAdminPracticalExamResults };

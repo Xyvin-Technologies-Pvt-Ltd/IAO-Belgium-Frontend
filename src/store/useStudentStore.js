@@ -4,12 +4,19 @@ import {
   getStudentInvoices,
   getStudentReceipts,
   getStudentById,
+  getStudentProfileLogs,
   getStudents,
   getSpecialExceptions,
   updateStudentSpecialExceptions,
   createSpecialException,
   updateSpecialException,
   deleteSpecialException,
+  getLocationChanges,
+  getModulesForLocationSwitch,
+  getAdminStudentComponentSlots,
+  getAdminChangeLocationQuote,
+  adminSwapStudentLocation,
+  updateStudent,
 } from "@/api/studentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -31,6 +38,17 @@ export const useGetStudentById = (id, filter, options = {}) => {
     ...options,
   });
 };
+
+export const useGetStudentProfileLogs = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["student-profile-logs", id],
+    queryFn: () => getStudentProfileLogs(id),
+    enabled: Boolean(id),
+    staleTime: 10000,
+    ...options,
+  });
+};
+
 
 export const useGetStudentAttendance = (id, filter, options = {}) => {
   return useQuery({
@@ -91,6 +109,20 @@ export const useUpdateStudentSpecialExceptions = () => {
   });
 };
 
+export const useUpdateStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => updateStudent(id, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student-list"] });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["student", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["student-profile-logs", variables.id] });
+    },
+
+  });
+};
+
 export const useCreateSpecialException = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -117,6 +149,73 @@ export const useDeleteSpecialException = () => {
     mutationFn: (id) => deleteSpecialException(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["special-exceptions"] });
+    },
+  });
+};
+
+export const useGetLocationChanges = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["student-location-changes", filter],
+    queryFn: () => getLocationChanges(filter),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useGetModulesForLocationSwitch = (studentId, options = {}) => {
+  return useQuery({
+    queryKey: ["modules-for-location-switch", studentId],
+    queryFn: () => getModulesForLocationSwitch(studentId),
+    enabled: !!studentId,
+    ...options,
+  });
+};
+
+export const useGetAdminStudentComponentSlots = (
+  studentId,
+  systemId,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: ["admin-student-component-slots", studentId, systemId],
+    queryFn: () => getAdminStudentComponentSlots(studentId, systemId),
+    enabled: !!studentId && !!systemId,
+    ...options,
+  });
+};
+
+export const useGetAdminChangeLocationQuote = (
+  studentId,
+  currentPlanningId,
+  newPlanningId,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: [
+      "admin-change-location-quote",
+      studentId,
+      currentPlanningId,
+      newPlanningId,
+    ],
+    queryFn: () =>
+      getAdminChangeLocationQuote(
+        studentId,
+        currentPlanningId,
+        newPlanningId,
+      ),
+    enabled: !!studentId && !!currentPlanningId && !!newPlanningId,
+    ...options,
+  });
+};
+
+export const useAdminSwapStudentLocation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ studentId, currentPlanningId, newPlanningId }) =>
+      adminSwapStudentLocation(studentId, currentPlanningId, newPlanningId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-location-changes"] });
     },
   });
 };

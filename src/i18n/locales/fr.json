@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Évaluations",
       "exams": "Examens",
-      "otherExams": "Autres examens"
+      "otherExams": "Autres examens",
+      "practicalExams": "Examens pratiques"
     },
     "admin": {
       "title": "Portail administrateur",
@@ -60,6 +61,7 @@
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
       "integrations": "Intégrations",
+      "queueManagement": "Gestion des files d'attente",
       "adminLogs": "Journaux administrateurs",
       "examination": "Examens",
       "questionBanks": "Banques de questions",
@@ -113,6 +115,10 @@
     "unknown": "Inconnu",
     "notAvailable": "N/A",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Aucun frais d'inscription",
+      "paidAmount": "Payé {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Aujourd'hui",
     "more": "plus",
@@ -182,6 +188,7 @@
     "trxCount": "Nombre de transactions",
     "convenienceFee": "Frais de service",
     "paid": "Payé",
+    "issued": "Émise",
     "failed": "Échoué",
     "overdue": "En retard",
     "canceled": "Annulé",
@@ -295,6 +302,56 @@
       "customInvoices": {
         "title": "Factures personnalisées"
       }
+    }
+  },
+  "queues": {
+    "title": "Gestion des files d'attente",
+    "subtitle": "Afficher et gérer les tâches BullMQ pour les e-mails, Exact Online et les contrats.",
+    "refresh": "Actualiser",
+    "loadFailed": "Échec du chargement des files d'attente",
+    "jobsLoadFailed": "Échec du chargement des tâches",
+    "noJobs": "Aucune tâche dans cet état.",
+    "removeSelected": "Supprimer la sélection",
+    "retrySelected": "Réessayer la sélection",
+    "clearAllFailed": "Effacer tous les échecs",
+    "confirmRemoveSelected": "Supprimer les tâches sélectionnées de la file ? Les tâches en attente ne seront pas exécutées. Action irréversible.",
+    "confirmClearFailed": "Supprimer toutes les tâches échouées de cette file ? Action irréversible.",
+    "retryOnlyFailed": "Sélectionnez des tâches échouées à réessayer.",
+    "selectAll": "Tout sélectionner",
+    "selectJob": "Sélectionner la tâche",
+    "tabs": {
+      "email": "E-mail",
+      "exact": "Exact",
+      "contract": "Contrats"
+    },
+    "status": {
+      "waiting": "En attente",
+      "active": "Actif",
+      "delayed": "Différé",
+      "failed": "Échoué"
+    },
+    "counts": {
+      "waiting": "En attente",
+      "active": "Actif",
+      "delayed": "Différé",
+      "failed": "Échoué",
+      "completed": "Terminé"
+    },
+    "table": {
+      "jobId": "ID tâche",
+      "type": "Type",
+      "summary": "Résumé",
+      "created": "Créé",
+      "attempts": "Tentatives",
+      "error": "Erreur"
+    },
+    "detail": {
+      "title": "Détails de la tâche",
+      "status": "Statut",
+      "attempts": "Tentatives",
+      "processed": "Traité le",
+      "payload": "Charge utile (filtrée)",
+      "close": "Fermer"
     }
   },
   "ltiManagement": {
@@ -466,7 +523,8 @@
       "kmoManagement": "KMO-Portefeuille",
       "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Gestion des données de référence",
-      "logsManagement": "Gestion des journaux"
+      "logsManagement": "Gestion des journaux",
+      "queueManagement": "Gestion des files d'attente"
     }
   },
   "languageManagement": {
@@ -925,6 +983,7 @@
       "searchCities": "Rechercher des villes",
       "paymentStatus": "Statut du paiement",
       "paymentMethod": "Mode de paiement",
+      "noFee": "Aucun frais d'inscription",
       "bankTransfer": "Virement bancaire",
       "creditCard": "Carte de crédit",
       "module": "Module",
@@ -1068,11 +1127,30 @@
       "reject": "Rejeter",
       "waitlist": "En cours",
       "accept": "Accepter",
+      "paymentInfo": "Paiement",
+      "noRegistrationFee": "Aucun frais d'inscription pour cette session.",
+      "acceptRequiresPayment": "L'acceptation est disponible après le paiement des frais d'inscription.",
       "qualificationStatus": "Statut de qualification",
       "stillCompletingQualification": "En cours de finalisation de la qualification",
       "qualificationNotDeferred": "Non différé",
       "completingQualificationCheckbox": "Je suis encore en train de finaliser ma qualification. Je soumettrai mon diplôme ultérieurement.",
-      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé."
+      "completingQualificationNotice": "Le candidat a indiqué qu'il est en cours de finalisation de sa qualification. Aucun certificat n'a encore été téléchargé.",
+      "rejectionReason": "Motif de refus",
+      "noRejectionReason": "Aucun motif de refus enregistré",
+      "confirm": {
+        "approveTitle": "Accepter la candidature ?",
+        "approveMessage": "Cela accepte {{name}} et l'assigne à un groupe. Le candidat recevra une notification par e-mail.",
+        "waitlistTitle": "Marquer comme en cours ?",
+        "waitlistMessage": "Cela marque la candidature de {{name}} comme en cours. Le candidat sera informé par e-mail.",
+        "rejectTitle": "Rejeter la candidature ?",
+        "rejectMessage": "Cela rejette la candidature de {{name}}. Cette action est irréversible et le candidat recevra un e-mail de refus.",
+        "rejectReasonLabel": "Motif de refus (obligatoire)",
+        "rejectReasonPlaceholder": "Saisir le motif du refus...",
+        "cancel": "Annuler",
+        "confirmApprove": "Accepter",
+        "confirmWaitlist": "Marquer en cours",
+        "confirmReject": "Rejeter"
+      }
     },
     "status": {
       "pending": "En attente",
@@ -1092,6 +1170,9 @@
       "unflagDocument": "Retirer le signalement",
       "documentFlagged": "Document signalé",
       "notUploadedYet": "Pas encore téléversé"
+    },
+    "filters": {
+      "noFee": "Aucun frais d'inscription"
     }
   },
   "contractManagement": {
@@ -1463,7 +1544,9 @@
       "location": "Lieu",
       "actions": "Actions",
       "accept": "Accepter",
-      "reject": "Refuser"
+      "reject": "Refuser",
+      "assignment": "Affectation de l'enseignant",
+      "acceptOrRejectPrompt": "Veuillez accepter ou refuser votre affectation pour cet examen."
     },
     "modal": {
       "createTitle": "Créer un nouveau planning",
@@ -1483,6 +1566,8 @@
       "preferredVenues": "Lieux préférés",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Saisir une description",
+      "internalNotesLabel": "Notes internes",
+      "internalNotesPlaceholder": "Saisir des notes internes (visibles uniquement par les administrateurs et formateurs)",
       "sessionsLabel": "Séances",
       "sessionLabel": "Séance",
       "sessionNameLabel": "Nom de la séance",
@@ -1553,7 +1638,8 @@
       "pendingEvaluations": "Évaluations en attente",
       "pendingEvaluationsHint": "{{completed}} terminées jusqu'à présent",
       "assignedExams": "Examens assignés",
-      "assignedExamsHint": "{{other}} autres examens • {{unread}} notifications non lues",
+      "assignedExamsHint": "{{unread}} notifications non lues",
+      "practicalExamsHint": "Examens pratiques assignés",
       "upcomingSessions": "Sessions à venir",
       "recentSubmissions": "Soumissions à évaluer",
       "noUpcomingSessions": "Aucune session prévue dans les 7 prochains jours.",
@@ -1603,8 +1689,17 @@
       "archive": "Archiver",
       "noExams": "Aucun examen trouvé"
     },
+    "starting": "Démarrage...",
+    "ending": "Fin en cours...",
+    "mins": "min",
+    "searchStudents": "Rechercher des étudiants...",
+    "loadingResults": "Chargement des résultats...",
+    "noResultsFound": "Aucun résultat trouvé pour cette session d'examen.",
     "messages": {
-      "loadFailed": "Échec du chargement des examens"
+      "loadFailed": "Échec du chargement des examens",
+      "missingPlanningSession": "Données de session de planification manquantes pour démarrer l'examen.",
+      "noActiveSession": "Aucune session active à terminer.",
+      "acceptAssignmentFirst": "Veuillez d'abord accepter votre affectation d'enseignant avant de fournir des commentaires."
     },
     "form": {
       "name": "Nom",
@@ -1639,7 +1734,34 @@
       "passingMarks": "Note de passage",
       "duration": "Durée",
       "questionSources": "Sources des questions",
+      "questionSource": "Source",
+      "numberOfQuestions": "Nombre de questions",
+      "questionsCount": "{{count}} questions",
+      "questionsAvailable": "({{total}} questions disponibles)",
+      "studentResults": "Résultats des étudiants",
+      "students": "Étudiants",
+      "student": "Étudiant",
+      "score": "Score",
+      "percentage": "Pourcentage",
+      "result": "Résultat",
+      "submittedAt": "Soumis le",
+      "passMark": "Note de passage",
+      "passFail": "Réussi / Échoué",
+      "tba": "À déterminer",
+      "description": "Description :",
+      "instructions": "Instructions :",
+      "feedbackInstructions": "Instructions de commentaires :",
       "available": "disponible(s)"
+    },
+    "feedback": {
+      "myStatus": "Mes commentaires",
+      "others": "Autres enseignants",
+      "notStarted": "Pas commencé",
+      "submittedCount": "soumis"
+    },
+    "results": {
+      "finalGrade": "Note finale",
+      "pendingAdmin": "En attente"
     }
   },
   "componentManagement": {

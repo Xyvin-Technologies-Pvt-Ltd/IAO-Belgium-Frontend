@@ -27,7 +27,8 @@
       "planning": "Planning",
       "evaluations": "Assessments",
       "exams": "Exams",
-      "otherExams": "Other Exams"
+      "otherExams": "Other Exams",
+      "practicalExams": "Practical Exams"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -60,10 +61,12 @@
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
       "integrations": "Integrations",
+      "queueManagement": "Queue Management",
       "adminLogs": "Admin Logs",
       "examination": "Examination",
       "questionBanks": "Question Banks",
       "exams": "Exams",
+      "resitPlanning": "Resit planning",
       "results": "Results",
       "createInvoice": "Create Custom Invoice"
     },
@@ -114,6 +117,10 @@
     "unknown": "Unknown",
     "notAvailable": "N/A",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "No Fee Required",
+      "paidAmount": "Paid {{currency}}{{amount}}"
+    },
     "document": "document",
     "today": "Today",
     "more": "more",
@@ -183,6 +190,7 @@
     "trxCount": "Trx Count",
     "convenienceFee": "Convenience Fee",
     "paid": "Paid",
+    "issued": "Issued",
     "failed": "Failed",
     "overdue": "Overdue",
     "canceled": "Canceled",
@@ -410,6 +418,56 @@
       }
     }
   },
+  "queues": {
+    "title": "Queue Management",
+    "subtitle": "View and manage BullMQ jobs across email, Exact Online, and contract queues.",
+    "refresh": "Refresh",
+    "loadFailed": "Failed to load queue summaries",
+    "jobsLoadFailed": "Failed to load queue jobs",
+    "noJobs": "No jobs in this state.",
+    "removeSelected": "Remove selected",
+    "retrySelected": "Retry selected",
+    "clearAllFailed": "Clear all failed",
+    "confirmRemoveSelected": "Remove selected jobs from the queue? Waiting and delayed jobs will not run. This cannot be undone.",
+    "confirmClearFailed": "Remove all failed jobs in this queue? This cannot be undone.",
+    "retryOnlyFailed": "Select failed jobs to retry.",
+    "selectAll": "Select all jobs",
+    "selectJob": "Select job",
+    "tabs": {
+      "email": "Email",
+      "exact": "Exact",
+      "contract": "Contracts"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "active": "Active",
+      "delayed": "Delayed",
+      "failed": "Failed"
+    },
+    "counts": {
+      "waiting": "Waiting",
+      "active": "Active",
+      "delayed": "Delayed",
+      "failed": "Failed",
+      "completed": "Completed"
+    },
+    "table": {
+      "jobId": "Job ID",
+      "type": "Type",
+      "summary": "Summary",
+      "created": "Created",
+      "attempts": "Attempts",
+      "error": "Error"
+    },
+    "detail": {
+      "title": "Job details",
+      "status": "Status",
+      "attempts": "Attempts",
+      "processed": "Processed at",
+      "payload": "Payload (sanitized)",
+      "close": "Close"
+    }
+  },
   "ltiManagement": {
     "title": "LTI Management",
     "subtitle": "Manage external LTI 1.3 tools integrated with the platform.",
@@ -579,7 +637,8 @@
       "kmoManagement": "KMO-Portefeuille",
       "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Master Data Management",
-      "logsManagement": "Logs Management"
+      "logsManagement": "Logs Management",
+      "queueManagement": "Queue Management"
     }
   },
   "languageManagement": {
@@ -1134,6 +1193,8 @@
       "studentId": "Application ID",
       "studentName": "Student Name",
       "name": "Name",
+      "firstName": "First Name",
+      "lastName": "Last Name",
       "email": "Email",
       "phone": "Phone",
       "country": "Country",
@@ -1165,6 +1226,7 @@
       "searchCities": "Search cities",
       "paymentStatus": "Payment Status",
       "paymentMethod": "Payment Method",
+      "noFee": "No Fee Required",
       "bankTransfer": "Bank Transfer",
       "creditCard": "Credit Card",
       "module": "Module",
@@ -1308,11 +1370,30 @@
       "reject": "Reject",
       "waitlist": "In progress",
       "accept": "Accept",
+      "paymentInfo": "Payment",
+      "noRegistrationFee": "No registration fee for this intake.",
+      "acceptRequiresPayment": "Accept is available after admission fee is paid.",
       "qualificationStatus": "Qualification status",
       "stillCompletingQualification": "Still completing qualification",
       "qualificationNotDeferred": "Not deferred",
       "completingQualificationCheckbox": "I'm still completing my qualification. I will submit my diploma later.",
-      "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet."
+      "completingQualificationNotice": "The applicant indicated they are still completing their qualification. A certificate has not been uploaded yet.",
+      "rejectionReason": "Rejection reason",
+      "noRejectionReason": "No rejection reason recorded",
+      "confirm": {
+        "approveTitle": "Accept application?",
+        "approveMessage": "This will accept {{name}} and assign them to a batch. The student will receive an email notification.",
+        "waitlistTitle": "Mark as in progress?",
+        "waitlistMessage": "This will mark {{name}}'s application as in progress. The student will be notified by email.",
+        "rejectTitle": "Reject application?",
+        "rejectMessage": "This will reject {{name}}'s application. This action cannot be undone and the student will receive a rejection email.",
+        "rejectReasonLabel": "Rejection reason (required)",
+        "rejectReasonPlaceholder": "Enter the reason for rejection...",
+        "cancel": "Cancel",
+        "confirmApprove": "Accept",
+        "confirmWaitlist": "Mark in progress",
+        "confirmReject": "Reject"
+      }
     },
     "status": {
       "pending": "Pending",
@@ -1332,6 +1413,9 @@
       "unflagDocument": "Unflag document",
       "documentFlagged": "Document flagged",
       "notUploadedYet": "Not uploaded yet"
+    },
+    "filters": {
+      "noFee": "No Fee Required"
     }
   },
   "contractManagement": {
@@ -1732,7 +1816,9 @@
       "location": "Location",
       "actions": "Actions",
       "accept": "Accept",
-      "reject": "Reject"
+      "reject": "Reject",
+      "assignment": "Teacher Assignment",
+      "acceptOrRejectPrompt": "Please accept or reject your assignment for this exam."
     },
     "modal": {
       "createTitle": "Create a new planning",
@@ -1752,6 +1838,8 @@
       "preferredVenues": "Preferred Venues",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter a description",
+      "internalNotesLabel": "Internal Notes",
+      "internalNotesPlaceholder": "Enter internal notes (visible only to admins and teachers)",
       "sessionsLabel": "Sessions",
       "sessionLabel": "Session",
       "sessionNameLabel": "Session Name",
@@ -1822,7 +1910,8 @@
       "pendingEvaluations": "Pending Assessments",
       "pendingEvaluationsHint": "{{completed}} completed so far",
       "assignedExams": "Assigned exams",
-      "assignedExamsHint": "{{other}} other exams • {{unread}} unread notifications",
+      "assignedExamsHint": "{{unread}} unread notifications",
+      "practicalExamsHint": "Assigned practical exams",
       "upcomingSessions": "Upcoming sessions",
       "recentSubmissions": "Submissions to review",
       "noUpcomingSessions": "No sessions scheduled in the next 7 days.",
@@ -1847,6 +1936,8 @@
     "questions": "questions",
     "minutes": "min",
     "cannotEditPublished": "Cannot edit a published exam. Archive it first.",
+    "resit": "Resit",
+    "resitOf": "Resit of",
     "edit": "Edit",
     "publish": "Publish",
     "archive": "Archive",
@@ -1872,8 +1963,17 @@
       "archive": "Archive",
       "noExams": "No exams found"
     },
+    "starting": "Starting...",
+    "ending": "Ending...",
+    "mins": "mins",
+    "searchStudents": "Search students...",
+    "loadingResults": "Loading results...",
+    "noResultsFound": "No results found for this exam session.",
     "messages": {
-      "loadFailed": "Failed to load exams"
+      "loadFailed": "Failed to load exams",
+      "missingPlanningSession": "Missing planning session data to start the exam.",
+      "noActiveSession": "No active session to end.",
+      "acceptAssignmentFirst": "Please accept your teacher assignment first before providing feedback."
     },
     "form": {
       "name": "Name",
@@ -1894,6 +1994,10 @@
       "marksPerQuestion": "Marks per Question",
       "passingMarks": "Passing Marks",
       "passingType": "Passing Type",
+      "resitOf": "Resit of",
+      "resitOfNone": "None — this is a normal exam",
+      "resitOfPlaceholder": "None — this is a normal exam",
+      "resitOfSearch": "Search exams...",
       "marks": "Marks",
       "percentage": "Percentage",
       "settings": "Settings",
@@ -1908,7 +2012,34 @@
       "passingMarks": "Passing Marks",
       "duration": "Duration",
       "questionSources": "Question Sources",
+      "questionSource": "Source",
+      "numberOfQuestions": "Number of Questions",
+      "questionsCount": "{{count}} questions",
+      "questionsAvailable": "({{total}} questions available)",
+      "studentResults": "Student Results",
+      "students": "Students",
+      "student": "Student",
+      "score": "Score",
+      "percentage": "Percentage",
+      "result": "Result",
+      "submittedAt": "Submitted At",
+      "passMark": "Pass Mark",
+      "passFail": "Pass / Fail",
+      "tba": "TBA",
+      "description": "Description:",
+      "instructions": "Instructions:",
+      "feedbackInstructions": "Feedback Instructions:",
       "available": "available"
+    },
+    "feedback": {
+      "myStatus": "My feedback",
+      "others": "Other teachers",
+      "notStarted": "Not started",
+      "submittedCount": "submitted"
+    },
+    "results": {
+      "finalGrade": "Final grade",
+      "pendingAdmin": "Pending"
     }
   },
   "componentManagement": {
@@ -2186,10 +2317,57 @@
       "score": "Score",
       "status": "Status",
       "date": "Submitted Date",
+      "resit": "Resit",
+      "resitScore": "Resit score",
       "noResults": "No results found matching search/filter criteria."
+    },
+    "resit": {
+      "assignBtn": "Assign resit",
+      "assignTitle": "Assign resit exam",
+      "assignHint": "Assign {{count}} selected student(s) to a planned resit.",
+      "planning": "Resit planning",
+      "planningPlaceholder": "Select planning",
+      "selectPlanning": "Select a resit planning",
+      "sameExam": "Select failed students from the same exam to assign a resit.",
+      "assigned": "Assigned",
+      "notAssigned": "—"
     },
     "messages": {
       "loadFailed": "Failed to load results data"
+    }
+  },
+  "resitPlanning": {
+    "title": "Resit planning",
+    "create": "Plan resit",
+    "edit": "Edit resit planning",
+    "save": "Save planning",
+    "update": "Update planning",
+    "loadFailed": "Failed to load resit plannings",
+    "empty": "No resit plannings yet",
+    "table": {
+      "exam": "Resit exam",
+      "parent": "Original exam",
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "teacher": "Teacher",
+      "actions": "Actions"
+    },
+    "form": {
+      "exam": "Resit exam",
+      "examPlaceholder": "Select a resit exam",
+      "examRequired": "Resit exam is required",
+      "date": "Date",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "location": "Location",
+      "address": "Address",
+      "teacher": "Teacher",
+      "teachers": "Teachers",
+      "teacherPlaceholder": "Select a teacher",
+      "teachersPlaceholder": "Select teachers",
+      "searchTeachers": "Search teachers...",
+      "teacherRequired": "Teacher is required"
     }
   },
   "specialExceptions": {

@@ -1,3 +1,5 @@
+import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
+import { Pencil, Download } from "lucide-react";
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
@@ -5,7 +7,7 @@ import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory"
 import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
-import { useGetStudentByApplication } from "@/store/useIntakeStore";
+import { useGetStudentByApplication, useGetStudentExamsByApplication } from "@/store/useIntakeStore";
 import {
   useGetSpecialExceptions,
   useGetStudentAttendance,
@@ -13,7 +15,9 @@ import {
   useGetStudentInvoices,
   useGetStudentReceipts,
   useUpdateStudentSpecialExceptions,
+  useGetStudentProfileLogs,
 } from "@/store/useStudentStore";
+import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { getInvoiceHtml, getInvoicePrintHtml } from "@/api/paymentApi";
 import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -29,9 +33,9 @@ import {
 } from "@/components/ui/table/table";
 import { Pagination } from "@/components/ui/table/Pagination";
 import StatusBadge from "@/components/StatusBadge";
-import { Download } from "lucide-react";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
+
 
 const formatSubmissionType = (type) =>
   type
@@ -64,7 +68,7 @@ const getDurationUnitLabel = (durationUnit, t) => {
 };
 
 const StudentDetails = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
@@ -78,6 +82,7 @@ const StudentDetails = () => {
   const [receiptsPage, setReceiptsPage] = useState(1);
   const [receiptsRowsPerPage, setReceiptsRowsPerPage] = useState(10);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isStudentEditOpen, setIsStudentEditOpen] = useState(false);
   const [selectedExceptions, setSelectedExceptions] = useState([]);
 
   const { data: allExceptionsData, isLoading: isExceptionsLoading } =
@@ -98,6 +103,21 @@ const StudentDetails = () => {
     id,
     activeTab === "progress" ? { year: filter.year } : {},
   );
+
+  const {
+    data: examsResponse,
+    isLoading: isExamsLoading,
+    isFetching: isExamsFetching,
+  } = useGetStudentExamsByApplication(
+    id,
+    {},
+    { enabled: !!id && activeTab === "exams" },
+  );
+
+  const studentData = student?.data;
+  const { data: auditLogsRes, isLoading: isLogsLoading } = useGetStudentProfileLogs(studentData?._id);
+  const auditLogs = auditLogsRes?.data || [];
+
   //* Must run before the isLoading/error early returns below (Rules of
   //* Hooks) — safe with undefined values via optional chaining.
   const yearHistory = useMigratedYearHistory(
@@ -351,14 +371,14 @@ const StudentDetails = () => {
     );
   }
 
-  const studentData = student?.data;
   if (!studentData) return null;
+
 
   const totalYears = studentData?.year || 1;
   const years = Array.from({ length: totalYears }, (_, i) => i + 1);
 
   const modules = studentData?.assigned_modules || [];
-  const exams = studentData?.completed_exams || [];
+  const exams = examsResponse?.data?.exams || [];
   const apps = studentData?.assigned_apps || [];
   const invoices = invoicesResponse?.data || [];
   const invoicesTotal = invoicesResponse?.total_count || 0;
@@ -372,7 +392,7 @@ const StudentDetails = () => {
 
   return (
     <div className="space-y-6 mt-4 bg-sidebar rounded-xl p-5 border border-sidebar-border">
-      <UserCard student={studentData} />
+      <UserCard student={studentData} onEdit={() => setIsStudentEditOpen(true)} />
 
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
@@ -385,6 +405,16 @@ const StudentDetails = () => {
             }`}
           >
             {t("studentManagement.tabs.progress", "Academic Progress")}
+          </button>
+          <button
+            onClick={() => setActiveTab("exams")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "exams"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.exams", "Exams")}
           </button>
           {studentData.program_type === "Manual Therapie" && (
             <button
@@ -482,7 +512,7 @@ const StudentDetails = () => {
               </div>
             ) : (
               <>
-            <div className="col-span-12 lg:col-span-6">
+            <div className="col-span-12">
               <h3 className="font-semibold mb-4">
                 {t("studentManagement.details.assignedModules", "Assigned Modules")}
               </h3>
@@ -498,6 +528,9 @@ const StudentDetails = () => {
                     <TableHead>
                       {t("studentManagement.table.status", "Status")}
                     </TableHead>
+                    <TableHead>
+                      {t("studentManagement.details.payment", "Payment")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -509,66 +542,20 @@ const StudentDetails = () => {
                         <TableCell>
                           <StatusBadge status={m.status} />
                         </TableCell>
+                        <TableCell>
+                          <StatusBadge status={m.payment_status || "unpaid"} />
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={3}
+                        colSpan={4}
                         className="text-center text-muted-foreground"
                       >
                         {t(
                           "studentManagement.details.noAssignedModules",
                           "No modules assigned",
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="col-span-12 lg:col-span-6">
-              <h3 className="font-semibold mb-4">
-                {t(
-                  "studentManagement.details.completedExams",
-                  "Completed Exams",
-                )}
-              </h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("common.exam", "Exam")}</TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.scores", "Scores")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.table.status", "Status")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {exams.length > 0 ? (
-                    exams.map((exam) => (
-                      <TableRow key={exam._id}>
-                        <TableCell>{exam.exam_name}</TableCell>
-                        <TableCell>
-                          {exam.percentage?.toFixed(2)}/100
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={exam.result} />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className="text-center text-muted-foreground"
-                      >
-                        {t(
-                          "studentManagement.details.noExamsCompleted",
-                          "No exams completed",
                         )}
                       </TableCell>
                     </TableRow>
@@ -674,15 +661,15 @@ const StudentDetails = () => {
                       "Special Exceptions",
                     )}
                   </h3>
-                  <button
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
-                  >
-                    {t(
-                      "studentManagement.details.configureExceptions",
-                      "Configure",
-                    )}
-                  </button>
+                    <button
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="text-[#ff8904] hover:text-[#e07b03] font-medium text-sm transition-colors cursor-pointer"
+                    >
+                      {t(
+                        "studentManagement.details.configureExceptions",
+                        "Configure",
+                      )}
+                    </button>
                 </div>
                 <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
                   {studentData.special_exceptions &&
@@ -707,7 +694,174 @@ const StudentDetails = () => {
                   )}
                 </div>
             </div>
+
+            {/* Profile Change Audit History Section */}
+            <div className="col-span-12 mt-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900 dark:text-white">Profile Audit & Change History</h3>
+              </div>
+              <div className="border border-sidebar-border rounded-lg p-5 bg-card text-card-foreground shadow-sm">
+                {isLogsLoading ? (
+                  <p className="text-sm text-muted-foreground py-2">Loading audit logs...</p>
+                ) : auditLogs && auditLogs.length > 0 ? (
+                  <div className="space-y-4">
+                    {auditLogs.map((log) => {
+                      const performer = log.changed_by
+                        ? `${log.changed_by.first_name || ""} ${log.changed_by.last_name || ""}`.trim() || log.changed_by.email
+                        : log.changed_by_role === "admin" ? "Admin" : "Student";
+                      return (
+                        <div key={log._id} className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-900/50 space-y-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">
+                              Updated by <span className="capitalize">{performer}</span> ({log.changed_by_role || "user"})
+                            </span>
+                            <span>{moment(log.createdAt).format("DD MMM YYYY, HH:mm")}</span>
+                          </div>
+                          <div className="space-y-1">
+                            {log.changes?.map((ch, idx) => {
+                              let oldLabel = ch.old_value || "-";
+                              let newLabel = ch.new_value || "-";
+                              if (ch.field === "previous_education") {
+                                oldLabel = resolvePreviousEducationLabel(ch.old_value, studentData?.previous_education_options || [], i18n.language) || ch.old_value || "-";
+                                newLabel = resolvePreviousEducationLabel(ch.new_value, studentData?.previous_education_options || [], i18n.language) || ch.new_value || "-";
+                              }
+                              return (
+                                <div key={idx} className="text-xs flex items-center gap-2">
+                                  <span className="font-mono capitalize text-gray-700 dark:text-gray-300 w-36">
+                                    {ch.field.replace(/_/g, " ")}:
+                                  </span>
+                                  <span className="line-through text-red-500">{oldLabel}</span>
+                                  <span>➔</span>
+                                  <span className="font-semibold text-green-600 dark:text-green-400">{newLabel}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">
+                    No profile changes logged yet.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
+
+        </div>
+      )}
+
+      {activeTab === "exams" && (
+        <div className="space-y-6">
+          {isExamsLoading || isExamsFetching ? (
+            <LoadingState
+              size="sm"
+              text={t("common.loading", "Loading...")}
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("common.exam", "Exam")}</TableHead>
+                  <TableHead>{t("common.type", "Type")}</TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.moduleName", "Module")}
+                  </TableHead>
+                  <TableHead>
+                    {t("common.year", "Year")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.scores", "Scores")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.table.status", "Result")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.completion", "Completion")}
+                  </TableHead>
+                  <TableHead>
+                    {t("studentManagement.details.paymentStatus", "Payment Status")}
+                  </TableHead>
+                  <TableHead>{t("common.date", "Date")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {exams.length > 0 ? (
+                  exams.map((exam) => (
+                    <TableRow key={String(exam._id)}>
+                      <TableCell>{exam.exam_name}</TableCell>
+                      <TableCell className="capitalize">
+                        {exam.type || "-"}
+                      </TableCell>
+                      <TableCell>{exam.module_name || "-"}</TableCell>
+                      <TableCell>{exam.year ?? "-"}</TableCell>
+                      <TableCell>
+                        {exam.percentage != null
+                          ? `${Number(exam.percentage).toFixed(2)}/100`
+                          : exam.score != null
+                            ? exam.score
+                            : "—"}
+                      </TableCell>
+                      <TableCell>
+                        {exam.result ? (
+                          <StatusBadge status={exam.result} />
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          status={
+                            exam.is_completed
+                              ? "completed"
+                              : exam.lock_reason || "not_completed"
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {exam.is_resit || exam.payment_status ? (
+                          <StatusBadge
+                            status={
+                              exam.payment_status === "paid"
+                                ? "paid"
+                                : exam.payment_status === "free" || exam.is_free
+                                  ? "free"
+                                  : exam.payment_status === "waiting_third_party"
+                                    ? "waiting_third_party"
+                                    : "unpaid"
+                            }
+                          />
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {exam.submitted_at
+                          ? formatTZ(exam.submitted_at, "DD MMM YYYY")
+                          : exam.exam_date
+                            ? formatTZ(exam.exam_date, "DD MMM YYYY")
+                            : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={9}
+                      className="text-center text-muted-foreground"
+                    >
+                      {t(
+                        "studentManagement.details.noExams",
+                        "No exams found",
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </div>
       )}
 
@@ -1163,6 +1317,15 @@ const StudentDetails = () => {
         </div>
       )}
 
+      {/* Edit Student Profile Dialog */}
+      {isStudentEditOpen && (
+        <EditStudentDialog
+          open={isStudentEditOpen}
+          onClose={() => setIsStudentEditOpen(false)}
+          studentData={studentData}
+        />
+      )}
+
       {(() => {
         if (
           isEditModalOpen &&
@@ -1179,3 +1342,4 @@ const StudentDetails = () => {
 };
 
 export default StudentDetails;
+

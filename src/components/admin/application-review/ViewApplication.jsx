@@ -12,6 +12,27 @@ import {
   resolvePreviousEducationLabel,
 } from "@/utils/previousEducation";
 import { useCanModify } from "@/hooks/useCanModify";
+import AdmissionPaymentBadge from "@/components/admin/AdmissionPaymentBadge";
+import ApplicationStatusConfirm from "@/components/admin/application-review/ApplicationStatusConfirm";
+
+const getApplicantDisplayName = (application, t) => {
+  if (application?.user?.first_name && application?.user?.last_name) {
+    return `${application.user.last_name} ${application.user.first_name}`;
+  }
+  return application?.user?.email || t("applicationReview.modal.unknownApplicant");
+};
+
+const getRejectionReason = (application) => {
+  const rejectedLogs = (application?.admin_logs || [])
+    .filter((log) => log.status === "rejected" && log.remarks?.trim())
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  if (rejectedLogs.length > 0) {
+    return rejectedLogs[0].remarks.trim();
+  }
+
+  return application?.remarks?.trim() || "";
+};
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t, i18n } = useTranslation();
@@ -23,6 +44,7 @@ const ViewApplication = ({ open, onClose, application }) => {
     qualification_certificate: [],
     qualification_missing: false,
   });
+  const [pendingStatus, setPendingStatus] = useState(null);
   
   const updateApplicationMutation = useUpdateApplication();
 
@@ -81,12 +103,14 @@ const ViewApplication = ({ open, onClose, application }) => {
 
   if (!open || !application) return null;
 
-  const handleStatusUpdate = (status) => {
+  const handleStatusUpdate = (status, overrideRemarks) => {
     const updateData = {
       status,
     };
 
-    if (remarks.trim()) {
+    if (status === "rejected") {
+      updateData.remarks = overrideRemarks?.trim() || "";
+    } else if (remarks.trim()) {
       updateData.remarks = remarks.trim();
     }
 
@@ -113,10 +137,19 @@ const ViewApplication = ({ open, onClose, application }) => {
       onSuccess: () => {
         setRequestAdditionalInfo(false);
         setRemarks("");
+        setPendingStatus(null);
         onClose(); 
       }
     });
   };
+
+  const handleConfirmStatus = (overrideRemarks) => {
+    if (!pendingStatus) return;
+    handleStatusUpdate(pendingStatus, overrideRemarks);
+  };
+
+  const applicantDisplayName = getApplicantDisplayName(application, t);
+  const rejectionReason = getRejectionReason(application);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -185,6 +218,22 @@ const ViewApplication = ({ open, onClose, application }) => {
               <InfoItem label={t("applicationReview.modal.programType", "Program Type")} value={application?.program_type || application?.intake?.program?.program_type || application?.batch?.intake?.program?.program_type || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.address")} value={application?.user?.address || t("common.notAvailable")} />
               <InfoItem label={t("applicationReview.modal.applicationId")} value={application?.uid || t("common.notAvailable")} />
+              <div className="min-w-0 break-words">
+                <p className="text-sm text-muted-foreground dark:text-white/70">
+                  {t("applicationReview.modal.paymentInfo", "Payment")}
+                </p>
+                <div className="mt-1">
+                  <AdmissionPaymentBadge
+                    payment_status={application?.payment_status}
+                    payment_amount={application?.payment_amount}
+                  />
+                </div>
+                {(application?.payment_amount ?? 0) === 0 && application?.payment_status === "paid" ? (
+                  <p className="text-xs text-muted-foreground dark:text-white/60 mt-1">
+                    {t("applicationReview.modal.noRegistrationFee", "No registration fee for this intake.")}
+                  </p>
+                ) : null}
+              </div>
             </div>
             <div className="mt-4 flex items-start gap-3 p-3 rounded-lg border dark:border-white/20 bg-gray-50 dark:bg-white/5">
               <input
@@ -231,6 +280,23 @@ const ViewApplication = ({ open, onClose, application }) => {
               </div>
             )}
           </div>
+
+          {application.status === "rejected" && (
+            <div className="p-4 border border-red-200 dark:border-red-900/50 rounded-lg bg-red-50 dark:bg-red-950/20">
+              <h3 className="text-base font-semibold mb-2 text-dashboard-text dark:text-white">
+                {t("applicationReview.modal.rejectionReason")}
+              </h3>
+              {rejectionReason ? (
+                <p className="text-sm text-gray-700 dark:text-white/80 whitespace-pre-wrap">
+                  {rejectionReason}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground dark:text-white/60 italic">
+                  {t("applicationReview.modal.noRejectionReason")}
+                </p>
+              )}
+            </div>
+          )}
 
           <div>
             <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
@@ -332,14 +398,14 @@ const ViewApplication = ({ open, onClose, application }) => {
           <div className="flex items-center justify-end gap-3 p-6 border-t dark:border-white/20">
             <Button 
               variant="secondary"
-              onClick={() => handleStatusUpdate('rejected')}
+              onClick={() => setPendingStatus("rejected")}
               disabled={updateApplicationMutation.isPending}
             >
               {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.reject")}
             </Button>
             <Button 
               variant="secondary"
-              onClick={() => handleStatusUpdate('waitlisted')}
+              onClick={() => setPendingStatus("waitlisted")}
               disabled={updateApplicationMutation.isPending}
             >
               {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.waitlist")}
@@ -348,10 +414,15 @@ const ViewApplication = ({ open, onClose, application }) => {
               <Button 
                 disabled={requestAdditionalInfo || hasAnyFlaggedDocument || updateApplicationMutation.isPending}
                 className={`${requestAdditionalInfo || hasAnyFlaggedDocument ? "opacity-50 cursor-not-allowed" : ""}`}
-                onClick={() => handleStatusUpdate('approved')}
+                onClick={() => setPendingStatus("approved")}
               >
                 {updateApplicationMutation.isPending ? t("applicationReview.modal.processing") : t("applicationReview.modal.accept")}
               </Button>
+            )}
+            {!isPaymentPaid && (
+              <p className="text-sm text-muted-foreground dark:text-white/60 mr-auto">
+                {t("applicationReview.modal.acceptRequiresPayment", "Accept is available after admission fee is paid.")}
+              </p>
             )}
           </div>
         ) : (
@@ -362,6 +433,15 @@ const ViewApplication = ({ open, onClose, application }) => {
           </div>
         )}
       </div>
+
+      <ApplicationStatusConfirm
+        open={pendingStatus !== null}
+        status={pendingStatus}
+        studentName={applicantDisplayName}
+        onClose={() => setPendingStatus(null)}
+        onConfirm={handleConfirmStatus}
+        isLoading={updateApplicationMutation.isPending}
+      />
     </div>
   );
 };

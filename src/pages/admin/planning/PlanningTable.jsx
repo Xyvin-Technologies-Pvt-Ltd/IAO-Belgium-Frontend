@@ -216,8 +216,13 @@ const PlanningTable = ({ activeCity }) => {
     );
   };
 
-  const renderExamChips = (exams) => {
-    if (!exams || exams.length === 0) {
+  const renderExamChips = (exams, practicalExams) => {
+    const allExams = [
+      ...(exams || []).map(ex => ({ ...ex, isPractical: false })),
+      ...(practicalExams || []).map(ex => ({ ...ex, isPractical: true })),
+    ];
+
+    if (allExams.length === 0) {
       return (
         <span className="text-gray-500 text-sm">
           No exams
@@ -227,13 +232,89 @@ const PlanningTable = ({ activeCity }) => {
 
     return (
       <div className="flex flex-wrap gap-1">
-        {exams.map((ex) => (
+        {allExams.map((ex, idx) => (
           <Badge
-            key={ex._id}
+            key={ex._id || idx}
             variant="secondary"
-            className="text-xs whitespace-nowrap bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
+            className={`text-xs whitespace-nowrap ${
+              ex.isPractical
+                ? "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800"
+                : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
+            }`}
           >
-            {ex.exam?.name || ex.exam_component?.name || "Unnamed Exam"}
+            {ex.exam?.name || ex.exam_component?.name || "Unnamed Exam"}{ex.isPractical ? " (Pr.)" : ""}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
+
+  const getExamTeachers = (planning) => {
+    const seen = new Map();
+
+    if (planning?.exams) {
+      planning.exams.forEach((ex) => {
+        const person = ex.teacher;
+        if (person && person._id && !seen.has(person._id)) {
+          seen.set(person._id, {
+            _id: person._id,
+            name: `${person.last_name || ""} ${person.first_name || ""}`.trim() || person.name || "Unknown",
+            status: ex.teacher_status || "pending",
+            role: "Exam",
+          });
+        }
+      });
+    }
+
+    if (planning?.practical_exams) {
+      planning.practical_exams.forEach((ex) => {
+        if (!ex.teachers) return;
+        ex.teachers.forEach((item) => {
+          const person = item.teacher;
+          if (person && person._id && !seen.has(person._id)) {
+            seen.set(person._id, {
+              _id: person._id,
+              name: `${person.last_name || ""} ${person.first_name || ""}`.trim() || person.name || "Unknown",
+              status: item.status || "pending",
+              role: "Pr. Exam",
+            });
+          }
+        });
+      });
+    }
+
+    return Array.from(seen.values());
+  };
+
+  const renderExamTeachersColumn = (planning) => {
+    const teachers = getExamTeachers(planning);
+
+    if (teachers.length === 0) {
+      return <span className="text-gray-500 text-sm">No exam teachers</span>;
+    }
+
+    const getBadgeColor = (status) => {
+      switch (status?.toLowerCase()) {
+        case "accepted":
+          return "bg-green-100 text-green-800 hover:bg-green-200 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+        case "rejected":
+          return "bg-red-100 text-red-800 hover:bg-red-200 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
+        case "pending":
+        default:
+          return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
+      }
+    };
+
+    return (
+      <div className="flex flex-wrap gap-1 max-w-[200px]">
+        {teachers.map((p) => (
+          <Badge
+            key={p._id}
+            variant="outline"
+            className={`text-xs whitespace-nowrap ${getBadgeColor(p.status)}`}
+            title={`${p.name} (${p.role})`}
+          >
+            {p.name}
           </Badge>
         ))}
       </div>
@@ -308,6 +389,7 @@ const PlanningTable = ({ activeCity }) => {
             <TableHead>Session End Date</TableHead>
             <TableHead>{t("planningManagement.table.venue")}</TableHead>
             <TableHead>{t("planningManagement.table.exams", "Exams")}</TableHead>
+            <TableHead>{t("planningManagement.table.examTeachers", "Exam Teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.teachers")}</TableHead>
             <TableHead>{t("planningManagement.table.assistants", "Assistants")}</TableHead>
             <TableHead>{t("planningManagement.table.trainees", "Trainees")}</TableHead>
@@ -319,10 +401,10 @@ const PlanningTable = ({ activeCity }) => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={15} />
+            <TableSkeleton rows={rowsPerPage} columns={16} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={15} className="text-center p-8">
+              <TableCell colSpan={16} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -377,7 +459,8 @@ const PlanningTable = ({ activeCity }) => {
                 >
                   {i?.venue || "N/A"}
                 </TableCell>
-                <TableCell>{renderExamChips(i?.exams)}</TableCell>
+                <TableCell>{renderExamChips(i?.exams, i?.practical_exams)}</TableCell>
+                <TableCell>{renderExamTeachersColumn(i)}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'teachers')}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'assistants')}</TableCell>
                 <TableCell>{renderPersonnelChips(i?.sessions, 'trainees')}</TableCell>
@@ -407,7 +490,7 @@ const PlanningTable = ({ activeCity }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={15} className="text-center">
+              <TableCell colSpan={16} className="text-center">
                 {t("planningManagement.table.noPlannings")}
               </TableCell>
             </TableRow>

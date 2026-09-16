@@ -39,6 +39,7 @@ const ResultsFilterDrawer = ({
   appliedFilters,
   setAppliedFilters,
   setPage,
+  examType,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -69,7 +70,7 @@ const ResultsFilterDrawer = ({
   );
 
   const { data: examsData } = useGetExamsDropdown(
-    {},
+    { ...(examType && { type: examType }) },
     { enabled: isOpen }
   );
 

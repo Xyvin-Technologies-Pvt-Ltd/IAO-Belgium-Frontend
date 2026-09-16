@@ -258,7 +258,10 @@ const Teachers = () => {
 
       <CreateTeacher
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedTeacher(null);
+        }}
         teacherData={selectedTeacher}
       />
 

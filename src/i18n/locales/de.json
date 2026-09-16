@@ -27,7 +27,8 @@
       "planning": "Planung",
       "evaluations": "Beurteilungen",
       "exams": "Prüfungen",
-      "otherExams": "Andere Prüfungen"
+      "otherExams": "Andere Prüfungen",
+      "practicalExams": "Praktische Prüfungen"
     },
     "admin": {
       "title": "Verwaltungsportal",
@@ -60,6 +61,7 @@
       "adminManagement": "Administratorenverwaltung",
       "roleManagement": "Rollenverwaltung",
       "integrations": "Integrationen",
+      "queueManagement": "Warteschlangenverwaltung",
       "adminLogs": "Administratorenprotokolle",
       "examination": "Prüfungen",
       "questionBanks": "Fragenbanken",
@@ -113,6 +115,10 @@
     "unknown": "Unbekannt",
     "notAvailable": "N/V",
     "dash": "-",
+    "admissionPayment": {
+      "noFeeRequired": "Keine Anmeldegebühr",
+      "paidAmount": "Bezahlt {{currency}}{{amount}}"
+    },
     "document": "Dokument",
     "today": "Heute",
     "more": "mehr",
@@ -182,6 +188,7 @@
     "trxCount": "Transaktionsanzahl",
     "convenienceFee": "Servicegebühr",
     "paid": "Bezahlt",
+    "issued": "Ausgestellt",
     "failed": "Fehlgeschlagen",
     "overdue": "Überfällig",
     "canceled": "Storniert",
@@ -322,6 +329,56 @@
       "noEligibleStudents": "Keine berechtigten Studierenden gefunden.",
       "postalCodes": "Berechtigte Postleitzahlen (kommagetrennt)",
       "programActive": "Programm aktiv (jährliche L-Bank-Auswahl)"
+    }
+  },
+  "queues": {
+    "title": "Warteschlangenverwaltung",
+    "subtitle": "BullMQ-Aufträge für E-Mail, Exact Online und Verträge anzeigen und verwalten.",
+    "refresh": "Aktualisieren",
+    "loadFailed": "Warteschlangenübersicht konnte nicht geladen werden",
+    "jobsLoadFailed": "Warteschlangenaufträge konnten nicht geladen werden",
+    "noJobs": "Keine Aufträge in diesem Status.",
+    "removeSelected": "Auswahl entfernen",
+    "retrySelected": "Auswahl erneut versuchen",
+    "clearAllFailed": "Alle fehlgeschlagenen löschen",
+    "confirmRemoveSelected": "Ausgewählte Aufträge aus der Warteschlange entfernen? Wartende Aufträge werden nicht ausgeführt. Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearFailed": "Alle fehlgeschlagenen Aufträge in dieser Warteschlange entfernen? Dies kann nicht rückgängig gemacht werden.",
+    "retryOnlyFailed": "Wählen Sie fehlgeschlagene Aufträge zum erneuten Versuch aus.",
+    "selectAll": "Alle auswählen",
+    "selectJob": "Auftrag auswählen",
+    "tabs": {
+      "email": "E-Mail",
+      "exact": "Exact",
+      "contract": "Verträge"
+    },
+    "status": {
+      "waiting": "Wartend",
+      "active": "Aktiv",
+      "delayed": "Verzögert",
+      "failed": "Fehlgeschlagen"
+    },
+    "counts": {
+      "waiting": "Wartend",
+      "active": "Aktiv",
+      "delayed": "Verzögert",
+      "failed": "Fehlgeschlagen",
+      "completed": "Abgeschlossen"
+    },
+    "table": {
+      "jobId": "Auftrags-ID",
+      "type": "Typ",
+      "summary": "Zusammenfassung",
+      "created": "Erstellt",
+      "attempts": "Versuche",
+      "error": "Fehler"
+    },
+    "detail": {
+      "title": "Auftragsdetails",
+      "status": "Status",
+      "attempts": "Versuche",
+      "processed": "Verarbeitet am",
+      "payload": "Nutzlast (gefiltert)",
+      "close": "Schließen"
     }
   },
   "ltiManagement": {
@@ -493,7 +550,8 @@
       "kmoManagement": "KMO-Portefeuille",
       "fkfManagement": "Fachkursförderung",
       "masterDataManagement": "Stammdatenverwaltung",
-      "logsManagement": "Protokollverwaltung"
+      "logsManagement": "Protokollverwaltung",
+      "queueManagement": "Warteschlangenverwaltung"
     }
   },
   "languageManagement": {
@@ -953,6 +1011,7 @@
       "searchCities": "Städte suchen",
       "paymentStatus": "Zahlungsstatus",
       "paymentMethod": "Zahlungsmethode",
+      "noFee": "Keine Anmeldegebühr",
       "bankTransfer": "Banküberweisung",
       "creditCard": "Kreditkarte",
       "module": "Modul",
@@ -1096,11 +1155,30 @@
       "reject": "Ablehnen",
       "waitlist": "In Bearbeitung",
       "accept": "Annehmen",
+      "paymentInfo": "Zahlung",
+      "noRegistrationFee": "Keine Anmeldegebühr für diese Aufnahme.",
+      "acceptRequiresPayment": "Annehmen ist verfügbar, nachdem die Anmeldegebühr bezahlt wurde.",
       "qualificationStatus": "Status der Qualifikation",
       "stillCompletingQualification": "Qualifikation wird noch abgeschlossen",
       "qualificationNotDeferred": "Nicht aufgeschoben",
       "completingQualificationCheckbox": "Ich schließe noch meine Qualifikation ab. Ich werde mein Diplom zu einem späteren Zeitpunkt einreichen.",
-      "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen."
+      "completingQualificationNotice": "Der Bewerber hat angegeben, dass er seine Qualifikation noch abschließt. Es wurde noch kein Zertifikat hochgeladen.",
+      "rejectionReason": "Ablehnungsgrund",
+      "noRejectionReason": "Kein Ablehnungsgrund erfasst",
+      "confirm": {
+        "approveTitle": "Bewerbung annehmen?",
+        "approveMessage": "Dies nimmt {{name}} an und weist sie einer Gruppe zu. Der Student erhält eine E-Mail-Benachrichtigung.",
+        "waitlistTitle": "Als in Bearbeitung markieren?",
+        "waitlistMessage": "Dies markiert die Bewerbung von {{name}} als in Bearbeitung. Der Student wird per E-Mail benachrichtigt.",
+        "rejectTitle": "Bewerbung ablehnen?",
+        "rejectMessage": "Dies lehnt die Bewerbung von {{name}} ab. Diese Aktion kann nicht rückgängig gemacht werden und der Student erhält eine Ablehnungs-E-Mail.",
+        "rejectReasonLabel": "Ablehnungsgrund (erforderlich)",
+        "rejectReasonPlaceholder": "Ablehnungsgrund eingeben...",
+        "cancel": "Abbrechen",
+        "confirmApprove": "Annehmen",
+        "confirmWaitlist": "In Bearbeitung",
+        "confirmReject": "Ablehnen"
+      }
     },
     "status": {
       "pending": "Ausstehend",
@@ -1120,6 +1198,9 @@
       "unflagDocument": "Markierung entfernen",
       "documentFlagged": "Dokument markiert",
       "notUploadedYet": "Noch nicht hochgeladen"
+    },
+    "filters": {
+      "noFee": "Keine Anmeldegebühr"
     }
   },
   "contractManagement": {
@@ -1491,7 +1572,9 @@
       "location": "Standort",
       "actions": "Aktionen",
       "accept": "Annehmen",
-      "reject": "Ablehnen"
+      "reject": "Ablehnen",
+      "assignment": "Dozentenzuweisung",
+      "acceptOrRejectPrompt": "Bitte nehmen Sie Ihre Zuweisung für diese Prüfung an oder lehnen Sie sie ab."
     },
     "modal": {
       "createTitle": "Neue Planung erstellen",
@@ -1511,6 +1594,8 @@
       "preferredVenues": "Bevorzugte Veranstaltungsorte",
       "descriptionLabel": "Beschreibung",
       "descriptionPlaceholder": "Beschreibung eingeben",
+      "internalNotesLabel": "Interne Notizen",
+      "internalNotesPlaceholder": "Interne Notizen eingeben (nur für Administratoren und Dozenten sichtbar)",
       "sessionsLabel": "Sitzungen",
       "sessionLabel": "Sitzung",
       "sessionNameLabel": "Sitzungsname",
@@ -1581,7 +1666,8 @@
       "pendingEvaluations": "Ausstehende Bewertungen",
       "pendingEvaluationsHint": "{{completed}} bisher abgeschlossen",
       "assignedExams": "Zugewiesene Prüfungen",
-      "assignedExamsHint": "{{other}} weitere Prüfungen • {{unread}} ungelesene Benachrichtigungen",
+      "assignedExamsHint": "{{unread}} ungelesene Benachrichtigungen",
+      "practicalExamsHint": "Zugewiesene praktische Prüfungen",
       "upcomingSessions": "Bevorstehende Sitzungen",
       "recentSubmissions": "Einreichungen zur Bewertung",
       "noUpcomingSessions": "Keine Sitzungen in den nächsten 7 Tagen geplant.",
@@ -1631,8 +1717,17 @@
       "archive": "Archivieren",
       "noExams": "Keine Prüfungen gefunden"
     },
+    "starting": "Startet...",
+    "ending": "Beendet...",
+    "mins": "Min.",
+    "searchStudents": "Studenten suchen...",
+    "loadingResults": "Ergebnisse werden geladen...",
+    "noResultsFound": "Keine Ergebnisse für diese Prüfungssitzung gefunden.",
     "messages": {
-      "loadFailed": "Prüfungen konnten nicht geladen werden"
+      "loadFailed": "Prüfungen konnten nicht geladen werden",
+      "missingPlanningSession": "Fehlende Planungssitzungsdaten zum Starten der Prüfung.",
+      "noActiveSession": "Keine aktive Sitzung zum Beenden.",
+      "acceptAssignmentFirst": "Bitte nehmen Sie zuerst Ihre Dozentenzuweisung an, bevor Sie Feedback geben."
     },
     "form": {
       "name": "Name",
@@ -1667,7 +1762,34 @@
       "passingMarks": "Bestehensnote",
       "duration": "Dauer",
       "questionSources": "Fragenquellen",
+      "questionSource": "Quelle",
+      "numberOfQuestions": "Anzahl der Fragen",
+      "questionsCount": "{{count}} Fragen",
+      "questionsAvailable": "({{total}} Fragen verfügbar)",
+      "studentResults": "Studentenergebnisse",
+      "students": "Studenten",
+      "student": "Student",
+      "score": "Punktzahl",
+      "percentage": "Prozentsatz",
+      "result": "Ergebnis",
+      "submittedAt": "Eingereicht am",
+      "passMark": "Bestehensgrenze",
+      "passFail": "Bestanden / Nicht bestanden",
+      "tba": "Wird bekannt gegeben",
+      "description": "Beschreibung:",
+      "instructions": "Anweisungen:",
+      "feedbackInstructions": "Feedback-Anweisungen:",
       "available": "verfügbar"
+    },
+    "feedback": {
+      "myStatus": "Mein Feedback",
+      "others": "Andere Dozenten",
+      "notStarted": "Nicht gestartet",
+      "submittedCount": "eingereicht"
+    },
+    "results": {
+      "finalGrade": "Endnote",
+      "pendingAdmin": "Ausstehend"
     }
   },
   "componentManagement": {

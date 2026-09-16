@@ -15,14 +15,17 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
+import AdmissionPaymentBadge from "@/components/admin/AdmissionPaymentBadge";
 import { useGetStudents } from "@/store/useStudentStore";
 import { resolvePreviousEducationLabel } from "@/utils/previousEducation";
 import { useAuthStore } from "@/store/useAuthStore";
 import StudentFilterDrawer from "./StudentFilterDrawer";
 import { Button } from "@/components/ui/button";
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, Edit } from "lucide-react";
 import StudentBulkUploadDialog from "@/components/admin/student-import/StudentBulkUploadDialog";
 import ManualTherapieImportDialog from "@/components/admin/student-import/ManualTherapieImportDialog";
+import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import {
   STUDENT_MANAGEMENT_FILTERS_KEY,
   STUDENT_MANAGEMENT_SEARCH_KEY,
@@ -61,6 +64,8 @@ const AllStudents = () => {
   const profile = useAuthStore((state) => state.profile);
   const canBulkUpload = canModify && profile?.email === "ttj@duck.com";
 
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState(loadStoredStudentFilters);
   const [draftFilters, setDraftFilters] = useState(loadStoredStudentFilters);
 
@@ -121,7 +126,7 @@ const AllStudents = () => {
     }
   };
 
-  const columnCount = 16;
+  const columnCount = canModify ? 18 : 17;
 
   return (
     <div className="space-y-6 mt-4">
@@ -191,7 +196,8 @@ const AllStudents = () => {
           <TableHeader>
             <TableRow>
               <TableHead>{t("studentManagement.table.uid")}</TableHead>
-              <TableHead>{t("studentManagement.table.name")}</TableHead>
+              <TableHead>{t("studentManagement.table.firstName", "First Name")}</TableHead>
+              <TableHead>{t("studentManagement.table.lastName", "Last Name")}</TableHead>
               <TableHead>{t("studentManagement.table.email")}</TableHead>
               <TableHead>{t("studentManagement.table.phone")}</TableHead>
               <TableHead>{t("studentManagement.table.country")}</TableHead>
@@ -220,6 +226,11 @@ const AllStudents = () => {
               <TableHead>
                 {t("studentManagement.table.qualificationCert", "Qual. Cert")}
               </TableHead>
+              {canModify && (
+                <TableHead className="text-right">
+                  {t("common.actions", "Actions")}
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody
@@ -248,9 +259,8 @@ const AllStudents = () => {
                   onClick={() => handleRowClick(i._id)}
                 >
                   <TableCell className="capitalize">{i?.uid}</TableCell>
-                  <TableCell className="capitalize">
-                    {i?.last_name} {i?.first_name}
-                  </TableCell>
+                  <TableCell className="capitalize">{i?.first_name}</TableCell>
+                  <TableCell className="capitalize">{i?.last_name}</TableCell>
                   <TableCell>{i?.email}</TableCell>
                   <TableCell>{i?.phone}</TableCell>
                   <TableCell>{i?.country}</TableCell>
@@ -276,13 +286,18 @@ const AllStudents = () => {
                   </TableCell>
                   <TableCell>
                     {i?.payment_status ? (
-                      <StatusBadge status={i.payment_status} />
+                      <AdmissionPaymentBadge
+                        payment_status={i.payment_status}
+                        payment_amount={i.payment_amount}
+                      />
                     ) : (
                       t("common.dash", "-")
                     )}
                   </TableCell>
                   <TableCell>
-                    {formatPaymentMethod(i?.payment_method, t)}
+                    {(i?.payment_amount ?? 0) === 0 && i?.payment_status === "paid"
+                      ? t("common.admissionPayment.noFeeRequired", "No fee required")
+                      : formatPaymentMethod(i?.payment_method, t)}
                   </TableCell>
                   <TableCell>
                     {i?.last_login
@@ -298,6 +313,22 @@ const AllStudents = () => {
                       t={t}
                     />
                   </TableCell>
+                  {canModify && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <RowActionMenu
+                        actions={[
+                          {
+                            label: t("common.edit", "Edit"),
+                            icon: Edit,
+                            onClick: () => {
+                              setEditingStudent(i);
+                              setIsEditOpen(true);
+                            },
+                          },
+                        ]}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
@@ -317,6 +348,16 @@ const AllStudents = () => {
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
       />
+      {canModify && isEditOpen && (
+        <EditStudentDialog
+          open={isEditOpen}
+          onClose={() => {
+            setIsEditOpen(false);
+            setEditingStudent(null);
+          }}
+          studentData={editingStudent}
+        />
+      )}
     </div>
   );
 };

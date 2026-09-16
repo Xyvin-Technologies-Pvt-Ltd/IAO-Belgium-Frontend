@@ -23,6 +23,7 @@ import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
+import LocationChanges from "@/pages/admin/student/LocationChanges";
 import AllReports from "@/pages/admin/finance-management/AllReports";
 import CityReports from "@/pages/admin/finance-management/CityReports";
 import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
@@ -37,6 +38,8 @@ import QuestionBanks from "@/pages/admin/question-bank";
 import QuestionBankDetail from "@/pages/admin/question-bank/QuestionBankDetail";
 import Exams from "@/pages/admin/exam";
 import ExamDetail from "@/pages/admin/exam/ExamDetail";
+import ResitPlanningPage from "@/pages/admin/exam/ResitPlanning";
+import ResitPlanningDetailPage from "@/pages/admin/exam/ResitPlanningDetail";
 import AttendenceView from "@/pages/admin/student/AttendenceView";
 import AllContracts from "@/pages/admin/contract/AllContracts";
 import StudentContracts from "@/pages/admin/contract/StudentContracts";
@@ -44,6 +47,7 @@ import Notifications from "@/pages/admin/notification";
 import NotificationDetail from "@/pages/admin/notification/NotificationDetail";
 import LtiManagement from "@/pages/admin/lti";
 import IntegrationsPage from "@/pages/admin/integrations";
+import QueueManagementPage from "@/pages/admin/queue-management";
 import CustomInvoices from "@/pages/admin/finance-management/CustomInvoices";
 import StudentCornerCMS from "@/pages/admin/student-corner";
 import ArchiveStudents from "@/pages/admin/archive/students";
@@ -57,6 +61,7 @@ import ArchiveInvoiceDetail from "@/pages/admin/archive/invoices/InvoiceDetail";
 import ArchiveEntities from "@/pages/admin/archive/entities";
 import ArchiveEntityBrowser from "@/pages/admin/archive/entities/EntityBrowser";
 import Results from "@/pages/admin/results";
+import PracticalResultDetailsPage from "@/pages/admin/results/PracticalResultDetailsPage";
 import ContractTypes from "@/pages/admin/contract-type";
 import Departments from "@/pages/admin/department";
 import Regions from "@/pages/admin/region";
@@ -152,6 +157,10 @@ export const adminRoutes = [
    {
     path: "/admin/student-management",
     component: withPermissionProtection(AllStudents, "/admin/student-management"),
+  },
+  {
+    path: "/admin/location-changes",
+    component: withPermissionProtection(LocationChanges, "/admin/student-management"),
   },
   {
     path: "/admin/student-management/$id",
@@ -343,8 +352,36 @@ export const adminRoutes = [
     ),
   },
   {
+    path: "/admin/examination/resit-planning",
+    component: withPermissionProtection(
+      ResitPlanningPage,
+      "/admin/examination/resit-planning",
+    ),
+  },
+  {
+    path: "/admin/examination/resit-planning/$id",
+    component: withPermissionProtection(
+      ResitPlanningDetailPage,
+      "/admin/examination/resit-planning",
+    ),
+  },
+  {
+    path: "/admin/examination/resit-planning/:id",
+    component: withPermissionProtection(
+      ResitPlanningDetailPage,
+      "/admin/examination/resit-planning",
+    ),
+  },
+  {
     path: "/admin/results",
     component: withPermissionProtection(Results, "/admin/results"),
+  },
+  {
+    path: "/admin/results/practical/$plannedId/student/$applicationId",
+    component: withPermissionProtection(
+      PracticalResultDetailsPage,
+      "/admin/results",
+    ),
   },
   {
     path: "/admin/contracts",
@@ -369,6 +406,13 @@ export const adminRoutes = [
   {
     path: "/admin/integrations",
     component: withPermissionProtection(IntegrationsPage, "/admin/integrations"),
+  },
+  {
+    path: "/admin/queue-management",
+    component: withPermissionProtection(
+      QueueManagementPage,
+      "/admin/queue-management",
+    ),
   },
   {
     path: "/admin/student-corner",
