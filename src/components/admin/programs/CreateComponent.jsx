@@ -173,6 +173,7 @@ const CreateComponent = ({
     {
       status: "published",
       type: "online",
+      exclude_resits: true,
       ...(resolvedExamLanguage && { exam_language: resolvedExamLanguage }),
     },
     {
@@ -184,16 +185,18 @@ const CreateComponent = ({
     {
       status: "published",
       type: "practical",
+      exclude_resits: true,
     },
     {
       enabled: open && selectedType === "exam" && examKind === "practical",
     },
   );
 
-  let publishedExams =
+  let publishedExams = (
     examKind === "practical"
       ? publishedPracticalExamsData?.data || []
-      : publishedOnlineExamsData?.data || [];
+      : publishedOnlineExamsData?.data || []
+  ).filter((exam) => !exam.is_resit);
 
   if (isEdit && componentData?.linked_exam) {
     const currentExam = typeof componentData.linked_exam === "object"
