@@ -124,6 +124,8 @@ const CityReportsFilterDrawer = ({ draftFilters, setDraftFilters, appliedFilters
                   <SelectItem value="all">{t("finance.filters.allPurposes")}</SelectItem>
                   <SelectItem value="admission-fee">{t("finance.purposes.admissionFee")}</SelectItem>
                   <SelectItem value="module-purchase">{t("finance.purposes.modulePurchase")}</SelectItem>
+                  <SelectItem value="location-switch">{t("finance.purposes.locationSwitch", "Location Switch")}</SelectItem>
+                  <SelectItem value="resit-purchase">{t("finance.purposes.resitPurchase", "Resit Exam")}</SelectItem>
                   <SelectItem value="custom-invoice">{t("finance.purposes.other")}</SelectItem>
                 </SelectContent>
               </Select>
