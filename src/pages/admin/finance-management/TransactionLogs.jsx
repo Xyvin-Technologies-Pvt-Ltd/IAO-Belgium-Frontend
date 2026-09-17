@@ -99,6 +99,8 @@ const TransactionLogs = () => {
         return "text-amber-600 dark:text-amber-400";
       case "custom-invoice":
         return "text-purple-600 dark:text-purple-400";
+      case "resit-purchase":
+        return "text-orange-600 dark:text-orange-400";
       default:
         return "text-gray-600 dark:text-gray-400";
     }
@@ -115,6 +117,8 @@ const TransactionLogs = () => {
         return t("finance.purposes.locationSwitch");
       case "custom-invoice":
         return t("finance.purposes.customInvoice");
+      case "resit-purchase":
+        return t("finance.purposes.resitPurchase", "Resit Exam");
       default:
         return purpose
           .split("-")
