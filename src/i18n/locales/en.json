@@ -266,6 +266,7 @@
       "modulePurchase": "Module Purchase",
       "locationSwitch": "Location Switch",
       "customInvoice": "Custom Invoice",
+      "resitPurchase": "Resit Exam",
       "other": "Other"
     },
     "messages": {

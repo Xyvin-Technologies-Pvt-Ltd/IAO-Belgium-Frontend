@@ -257,6 +257,7 @@
       "modulePurchase": "Modulkauf",
       "locationSwitch": "Standortwechsel",
       "customInvoice": "Benutzerdefinierte Rechnung",
+      "resitPurchase": "Wiederholungsprüfung",
       "other": "Sonstiges"
     },
     "messages": {
