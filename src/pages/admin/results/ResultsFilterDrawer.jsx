@@ -40,7 +40,6 @@ const ResultsFilterDrawer = ({
   setAppliedFilters,
   setPage,
   examType,
-  showPendingScoreFilter,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +76,6 @@ const ResultsFilterDrawer = ({
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(([key, val]) => {
     if (key === "failed" && val === true) return true;
-    if (key === "pending_admin_score" && val === true) return true;
     return val !== "all" && val !== "" && val !== false;
   }).length;
 
@@ -88,7 +86,6 @@ const ResultsFilterDrawer = ({
       academic: "all",
       exam: "all",
       failed: false,
-      pending_admin_score: false,
     };
     setDraftFilters(resetObj);
     setAppliedFilters(resetObj);
@@ -251,7 +248,7 @@ const ResultsFilterDrawer = ({
               </Select>
             </FilterSection>
 
-             {/* Failed Only */}
+            {/* Failed Only */}
             <div className="flex items-center space-x-2 pt-2">
               <Checkbox
                 id="failed-filter-drawer"
@@ -267,25 +264,6 @@ const ResultsFilterDrawer = ({
                 {t("resultsManagement.failedOnly")}
               </label>
             </div>
-
-            {/* Pending Admin Score */}
-            {showPendingScoreFilter && (
-              <div className="flex items-center space-x-2 pt-2">
-                <Checkbox
-                  id="pending-score-filter-drawer"
-                  checked={draftFilters.pending_admin_score}
-                  onCheckedChange={(checked) =>
-                    setDraftFilters((prev) => ({ ...prev, pending_admin_score: !!checked }))
-                  }
-                />
-                <label
-                  htmlFor="pending-score-filter-drawer"
-                  className="text-xs sm:text-sm font-medium leading-none cursor-pointer text-dashboard-text dark:text-white"
-                >
-                  {t("resultsManagement.pendingScore", "Pending admin score")}
-                </label>
-              </div>
-            )}
           </div>
         </div>
 

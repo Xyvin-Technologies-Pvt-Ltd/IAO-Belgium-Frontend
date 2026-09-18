@@ -65,12 +65,14 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
     { enabled: open && !!selectedProgram },
   );
 
+  const targetComponentType = planningData?.component?.type || "module";
+
   const { data: componentsData, isFetching: componentsFetching } =
     useGetComponents(
       {
         ...(componentSearch && { search: componentSearch }),
         program: selectedProgram,
-        type: "module",
+        type: targetComponentType,
         status: true,
       },
       { enabled: open && !!selectedProgram },
@@ -82,15 +84,27 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
   const batches = open && selectedProgram ? batchesData?.data || [] : [];
   const rawComponents = open && selectedProgram ? componentsData?.data || [] : [];
 
-  const components = rawComponents.filter((c) => {
-    if (primarySystemId && c.system_id) {
-      return c.system_id === primarySystemId;
-    }
-    if (primaryComponentName && c.name) {
-      return c.name.trim().toLowerCase() === primaryComponentName.trim().toLowerCase();
-    }
-    return true;
-  });
+  const components = rawComponents
+    .filter((c) => {
+      if (primarySystemId && c.system_id) {
+        return c.system_id === primarySystemId;
+      }
+      if (primaryComponentName && c.name) {
+        return c.name.trim().toLowerCase() === primaryComponentName.trim().toLowerCase();
+      }
+      return true;
+    })
+    .map((comp) => {
+      const linkedExams = (comp.linked_exams || []).filter((e) => e.name);
+      if (linkedExams.length > 0) {
+        const examNames = linkedExams.map((e) => e.name).join(", ");
+        return {
+          ...comp,
+          name: `${comp.name} (Exam: ${examNames})`,
+        };
+      }
+      return comp;
+    });
 
   const handleAddLink = () => {
     if (!selectedBatch || !selectedComponent) return;

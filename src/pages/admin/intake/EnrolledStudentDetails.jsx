@@ -252,6 +252,8 @@ const EnrolledStudentDetails = () => {
         return t("finance.purposes.customInvoice");
       case "location-switch":
         return t("finance.purposes.locationSwitch", "Location Switch");
+      case "resit-purchase":
+        return t("finance.purposes.resitPurchase", "Resit Exam");
       default:
         return purpose
           .split("-")

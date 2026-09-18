@@ -31,6 +31,14 @@ import {
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCanModify } from "@/hooks/useCanModify";
 
+/** Statuses that can be synced from Mollie (must match backend allow-list). */
+const MOLLIE_RECONCILE_STATUSES = [
+  "invoice_issued",
+  "cancelling",
+  "expired",
+  "cancelled",
+];
+
 const ThirdPartyPaymentManagement = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
@@ -129,6 +137,8 @@ const ThirdPartyPaymentManagement = () => {
         return t("Location Switch");
       case "module-purchase":
         return t("Module Purchase");
+      case "resit-purchase":
+        return t("finance.purposes.resitPurchase", "Resit Exam");
       default:
         return purpose || t("Module Purchase");
     }
@@ -147,6 +157,12 @@ const ThirdPartyPaymentManagement = () => {
       return {
         title: app.module_id?.name || t("Location Switch"),
         subtitle: app.module_id?.code || t("Location switch"),
+      };
+    }
+    if (app.purpose === "resit-purchase") {
+      return {
+        title: app.module_id?.name || app.component_id?.name || t("Resit Exam"),
+        subtitle: app.module_id?.code || t("Resit exam fee"),
       };
     }
     return {
@@ -233,6 +249,7 @@ const ThirdPartyPaymentManagement = () => {
               <SelectItem value="admission-fee">Admission Fee</SelectItem>
               <SelectItem value="module-purchase">Module Purchase</SelectItem>
               <SelectItem value="location-switch">Location Switch</SelectItem>
+              <SelectItem value="resit-purchase">Resit Exam</SelectItem>
             </SelectContent>
           </Select>
 
@@ -394,7 +411,7 @@ const ThirdPartyPaymentManagement = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    {canModify && ["invoice_issued", "cancelling"].includes(app.status) && (
+                    {canModify && MOLLIE_RECONCILE_STATUSES.includes(app.status) && (
                       <Button
                         size="icon"
                         variant="ghost"
@@ -568,7 +585,7 @@ const ThirdPartyPaymentManagement = () => {
           <DialogFooter className="flex justify-end gap-2">
             {canModify &&
               selectedApp &&
-              ["invoice_issued", "cancelling"].includes(selectedApp.status) && (
+              MOLLIE_RECONCILE_STATUSES.includes(selectedApp.status) && (
                 <Button
                   variant="outline"
                   className="rounded-[6px]"

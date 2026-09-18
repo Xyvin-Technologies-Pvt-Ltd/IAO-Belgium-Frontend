@@ -1207,7 +1207,15 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                 
                 {watch("exams").map((exam, index) => {
                   const examComponent = onlineExamsList.find((e) => e._id === exam.component);
-                  const examName = examComponent?.name || t("planningManagement.modal.examLabel", "Exam");
+                  const origExam = planningData?.exams?.find(
+                    (ex) => toId(ex.exam_component?._id || ex.exam_component) === toId(exam.component),
+                  );
+                  const examName =
+                    examComponent?.linked_exam_name ||
+                    examComponent?.name ||
+                    origExam?.exam?.name ||
+                    origExam?.exam_component?.name ||
+                    t("planningManagement.modal.examLabel", "Exam");
 
                   return (
                     <div
@@ -1255,7 +1263,15 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
                   const examComponent = practicalExamsList.find(
                     (e) => toId(e._id) === toId(exam.component),
                   );
-                  const examName = examComponent?.name || t("exam.form.practical", "Practical");
+                  const origExam = planningData?.practical_exams?.find(
+                    (ex) => toId(ex.exam_component?._id || ex.exam_component) === toId(exam.component),
+                  );
+                  const examName =
+                    examComponent?.linked_exam_name ||
+                    examComponent?.name ||
+                    origExam?.exam?.name ||
+                    origExam?.exam_component?.name ||
+                    t("exam.form.practical", "Practical");
                   const selectedIds = watch(`practical_exams.${index}.teachers`) || [];
                   const teacherItems = allStaff.map((staff) => ({
                     _id: staff._id,
