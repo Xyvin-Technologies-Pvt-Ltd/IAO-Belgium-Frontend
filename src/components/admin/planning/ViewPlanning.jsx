@@ -144,9 +144,12 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
             />
             {planningData?.shared_with?.length > 0 && (
               <InfoItem
-                label={t("planningManagement.shareModal.sharedWithLabel", "Shared With Batches")}
+                label={t("planningManagement.shareModal.sharedWithLabel", "Shared With Groups")}
                 value={planningData.shared_with
-                  .map((sw) => `${sw.batch?.name || "Batch"} (${sw.component?.name || "Component"})`)
+                  .map(
+                    (sw) =>
+                      `${sw.batch?.name || t("planningManagement.shareModal.groupFallback", "Group")} (${sw.component?.name || "Component"})`,
+                  )
                   .join(", ")}
               />
             )}

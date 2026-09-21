@@ -57,4 +57,33 @@ export const getComponentById= async (id) => {
   } catch (error) {
     throw error.response.data;
   }
-}
+};
+
+export const linkComponentSystemId = async (id, target_component_id, force = false) => {
+  try {
+    const response = await axiosInstance.post(`/components/${id}/link-system-id`, {
+      target_component_id,
+      force,
+    });
+    return response.data;
+  } catch (error) {
+    throw {
+      ...(error.response?.data || {}),
+      status: error.response?.status,
+    };
+  }
+};
+
+export const unlinkComponentSystemId = async (id, force = false) => {
+  try {
+    const response = await axiosInstance.post(`/components/${id}/unlink-system-id`, {
+      force,
+    });
+    return response.data;
+  } catch (error) {
+    throw {
+      ...(error.response?.data || {}),
+      status: error.response?.status,
+    };
+  }
+};

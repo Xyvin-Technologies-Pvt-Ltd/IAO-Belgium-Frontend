@@ -434,7 +434,13 @@ const PlanningTable = ({ activeCity }) => {
                     <span>{i?.batch?.name}</span>
                     {i?.shared_with?.length > 0 && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 w-max">
-                        + {i.shared_with.length} Shared Batch{i.shared_with.length > 1 ? "es" : ""}
+                        {t("planningManagement.table.sharedGroups", {
+                          count: i.shared_with.length,
+                          defaultValue:
+                            i.shared_with.length === 1
+                              ? "+ {{count}} Shared Group"
+                              : "+ {{count}} Shared Groups",
+                        })}
                       </span>
                     )}
                   </div>
@@ -483,7 +489,7 @@ const PlanningTable = ({ activeCity }) => {
                     <RowActionMenu
                       actions={[
                         {
-                          label: t("planningManagement.table.share", "Share with Batch"),
+                          label: t("planningManagement.table.share", "Share with Group"),
                           icon: Users,
                           onClick: () => {
                             setSharePlanningData(i);

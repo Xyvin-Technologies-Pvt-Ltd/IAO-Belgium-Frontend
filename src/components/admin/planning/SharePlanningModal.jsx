@@ -24,6 +24,10 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
 
   const updatePlanning = useUpdatePlanning();
 
+  const primarySystemId = planningData?.component?.system_id;
+  const primaryComponentName = planningData?.component?.name;
+  const targetComponentType = planningData?.component?.type || "module";
+
   useEffect(() => {
     if (planningData && open) {
       const existingShared = (planningData.shared_with || []).map((sw) => ({
@@ -46,6 +50,7 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
     {
       is_online: false,
       ...(programSearch && { search: programSearch }),
+      ...(primarySystemId && { system_id: primarySystemId }),
     },
     { enabled: open },
   );
@@ -65,8 +70,6 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
     { enabled: open && !!selectedProgram },
   );
 
-  const targetComponentType = planningData?.component?.type || "module";
-
   const { data: componentsData, isFetching: componentsFetching } =
     useGetComponents(
       {
@@ -77,9 +80,6 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
       },
       { enabled: open && !!selectedProgram },
     );
-
-  const primarySystemId = planningData?.component?.system_id;
-  const primaryComponentName = planningData?.component?.name;
 
   const batches = open && selectedProgram ? batchesData?.data || [] : [];
   const rawComponents = open && selectedProgram ? componentsData?.data || [] : [];
@@ -122,7 +122,7 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
       ...prev,
       {
         batch: selectedBatch,
-        batch_name: foundBatch?.name || "Batch",
+        batch_name: foundBatch?.name || t("planningManagement.shareModal.groupFallback", "Group"),
         component: selectedComponent,
         component_name: foundComp?.name || "Module",
         program_name: foundProg?.name || "",
@@ -189,7 +189,8 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
               <Info className="h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
               <span>
                 {t("planningManagement.shareModal.matchingSystemIdNotice", {
-                  defaultValue: "Filtering target components matching System ID: {{systemId}}",
+                  defaultValue:
+                    "Showing programmes that have a component with System ID: {{systemId}}",
                   systemId: primarySystemId,
                 })}
               </span>
@@ -199,7 +200,7 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           {/* Form to Add New Cohort Link */}
           <div className="border p-4 rounded-lg dark:border-white/10 space-y-3 bg-gray-50/50 dark:bg-white/[0.02]">
             <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-200">
-              {t("planningManagement.shareModal.addCohortLink", "Add Additional Batch / Component")}
+              {t("planningManagement.shareModal.addCohortLink", "Add Additional Group / Component")}
             </h3>
 
             <SearchableSelect
@@ -217,8 +218,8 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
             />
 
             <SearchableSelect
-              label={t("planningManagement.modal.batchLabel", "Target Batch")}
-              placeholder={t("planningManagement.modal.batchPlaceholder", "Select Batch...")}
+              label={t("planningManagement.modal.batchLabel", "Target Group")}
+              placeholder={t("planningManagement.modal.batchPlaceholder", "Select group")}
               items={batches}
               value={selectedBatch}
               onChange={(val) => setSelectedBatch(val || "")}
@@ -254,12 +255,12 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           {/* Attached Shared List */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-              {t("planningManagement.shareModal.currentlySharedWith", "Currently Shared Batches:")} ({sharedWithList.length})
+              {t("planningManagement.shareModal.currentlySharedWith", "Currently Shared Groups:")} ({sharedWithList.length})
             </h3>
 
             {sharedWithList.length === 0 ? (
               <p className="text-xs text-gray-400 italic">
-                {t("planningManagement.shareModal.noSharedBatches", "No additional batches linked yet.")}
+                {t("planningManagement.shareModal.noSharedBatches", "No additional groups linked yet.")}
               </p>
             ) : (
               <div className="space-y-2">
