@@ -2,15 +2,23 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { X, FileText, CheckCircle, XCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatTZ } from "@/utils/dateUtils";
 import { openSecureFile } from "@/utils/secureFile";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
+import { useGetComponentById } from "@/store/useComponentStore";
 import moment from "moment";
 
 const ViewComponent = ({ open, onClose, componentData, program }) => {
   const { t, i18n } = useTranslation();
+
+  const { data: componentResponse } = useGetComponentById(
+    open ? componentData?._id : null,
+  );
+  const fetchedComponent = componentResponse?.data;
+  const viewData = fetchedComponent
+    ? { ...componentData, ...fetchedComponent }
+    : componentData;
 
   useMemo(() => {
     if (i18n.language) {
@@ -19,8 +27,8 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
   }, [i18n.language]);
 
   //* Rewrite embedded private-file references in rich text to presigned URLs.
-  const secureAdditionalContext = useSecureHtml(componentData?.additional_context);
-  const secureInstruction = useSecureHtml(componentData?.instruction);
+  const secureAdditionalContext = useSecureHtml(viewData?.additional_context);
+  const secureInstruction = useSecureHtml(viewData?.instruction);
 
   if (!open || !componentData) return null;
 
@@ -34,12 +42,27 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
     return typeLabels[type] || type;
   };
 
+  const formatProgramLabel = (sharedProgram) => {
+    const parts = [sharedProgram.name].filter(Boolean);
+    const city = sharedProgram.city?.name;
+    const language = sharedProgram.language?.name;
+    if (city || language) {
+      parts.push([city, language].filter(Boolean).join(" · "));
+    }
+    return parts.join(" — ");
+  };
+
   const handleView = (file) => {
     //* Open file via a short-lived presigned URL.
     if (file.url) {
       openSecureFile(file.url);
     }
   };
+
+  const sharedPrograms =
+    viewData?.type === "module" && Array.isArray(viewData.shared_programs)
+      ? viewData.shared_programs
+      : [];
 
   return (
     <>
@@ -81,11 +104,11 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
           <div className="flex items-center justify-between p-6 border-b">
             <div>
               <h2 className="text-xl font-bold">
-                {componentData.name || componentData.linked_exam?.name} -{" "}
-                {componentData.uid}
+                {viewData.name || viewData.linked_exam?.name} -{" "}
+                {viewData.uid}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {getTypeLabel(componentData.type)}
+                {getTypeLabel(viewData.type)}
               </p>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -100,49 +123,49 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     ? t("componentManagement.levelLabel", "Level")
                     : t("componentManagement.year")}
                 </h3>
-                <p className="text-lg">{componentData.year}</p>
+                <p className="text-lg">{viewData.year}</p>
               </div>
 
-              {componentData.submission_deadline && (
+              {viewData.submission_deadline && (
                 <div>
                   <h3 className="font-medium text-sm text-muted-foreground">
                     {t("componentManagement.submissionDeadlineLabel")}
                   </h3>
                   <p className="text-lg">
-                    {formatTZ(componentData.submission_deadline, "DD-MM-YYYY")}
+                    {formatTZ(viewData.submission_deadline, "DD-MM-YYYY")}
                   </p>
                 </div>
               )}
 
-              {componentData.amount !== undefined &&
-                componentData.type === "module" && (
+              {viewData.amount !== undefined &&
+                viewData.type === "module" && (
                   <div>
                     <h3 className="font-medium text-sm text-muted-foreground">
                       {t("componentManagement.amountLabel")}
                     </h3>
                     <p className="text-lg">
-                      {componentData.currency
-                        ? `${componentData.currency} ${componentData.amount || 0}`
-                        : componentData.amount || 0}
+                      {viewData.currency
+                        ? `${viewData.currency} ${viewData.amount || 0}`
+                        : viewData.amount || 0}
                     </p>
                   </div>
                 )}
             </div>
 
-            {componentData.type === "exam" && (
+            {viewData.type === "exam" && (
               <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-dashed border-muted-foreground/30">
                 <div>
                   <h3 className="font-medium text-sm text-muted-foreground">
                     {t("componentManagement.linkedModuleLabel")}
                   </h3>
                   <p className="text-base font-semibold">
-                    {componentData.linked_module?.name || t("common.notAvailable")}
-                    {componentData.linked_module?.module_number &&
+                    {viewData.linked_module?.name || t("common.notAvailable")}
+                    {viewData.linked_module?.module_number &&
                       ` (${
                         program?.duration_unit && program.duration_unit !== "years"
                           ? t("componentManagement.levelLabel", "Level")
                           : t("componentManagement.year")
-                      } ${componentData.linked_module.module_number})`}
+                      } ${viewData.linked_module.module_number})`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 italic">
                     {t("componentManagement.linkedModuleHint")}
@@ -153,15 +176,41 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     {t("componentManagement.linkedExamLabel")}
                   </h3>
                   <p className="text-base font-semibold">
-                    {componentData.linked_exam?.name || t("common.notAvailable")}
-                    {componentData.linked_exam?.uid &&
-                      ` (${componentData.linked_exam.uid})`}
+                    {viewData.linked_exam?.name || t("common.notAvailable")}
+                    {viewData.linked_exam?.uid &&
+                      ` (${viewData.linked_exam.uid})`}
                   </p>
                 </div>
               </div>
             )}
 
-            {componentData.type === "module" && componentData.additional_context && (
+            {viewData.type === "module" && sharedPrograms.length > 0 && (
+              <div>
+                <h3 className="font-medium text-sm text-muted-foreground mb-2">
+                  {t("componentManagement.sharedProgramsLabel")}
+                </h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t("componentManagement.sharedProgramsHint")}
+                </p>
+                <ul className="space-y-2">
+                  {sharedPrograms.map((sharedProgram) => (
+                    <li
+                      key={sharedProgram._id}
+                      className="text-sm bg-muted/50 rounded-lg px-3 py-2"
+                    >
+                      {formatProgramLabel(sharedProgram)}
+                      {sharedProgram.uid && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          ({sharedProgram.uid})
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {viewData.type === "module" && viewData.additional_context && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-2">
                   {t("componentManagement.additionalContextLabel", "Additional Context")}
@@ -177,7 +226,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
               </div>
             )}
 
-            {componentData.instruction && (
+            {viewData.instruction && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-2">
                   {t("componentManagement.instructionsLabel")}
@@ -192,13 +241,13 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                 </div>
               </div>
             )}
-            {componentData.files && componentData.files.length > 0 && (
+            {viewData.files && viewData.files.length > 0 && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-3">
                   {t("resourceModule.resources.title")}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {componentData.files.map((file, index) => (
+                  {viewData.files.map((file, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between hover:bg-muted/50 p-2 rounded-lg transition-colors cursor-pointer"
@@ -223,14 +272,14 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
               </div>
             )}
 
-            {componentData.submissions && componentData.type === "app" && (
+            {viewData.submissions && viewData.type === "app" && (
               <div>
                 <h3 className="font-medium text-sm text-muted-foreground mb-3">
                   {t("componentManagement.submissionTypesLabel")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.onboarding ? (
+                    {viewData.submissions.onboarding ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -238,7 +287,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.onboarding")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.scientific_research_intro ? (
+                    {viewData.submissions.scientific_research_intro ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -246,7 +295,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.scientificResearchIntro")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.peer_groups ? (
+                    {viewData.submissions.peer_groups ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -254,7 +303,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.peerGroups")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.internships ? (
+                    {viewData.submissions.internships ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -262,7 +311,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.internships")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.essays ? (
+                    {viewData.submissions.essays ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -270,7 +319,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                     <span className="text-sm">{t("componentManagement.essays")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {componentData.submissions.case_studies ? (
+                    {viewData.submissions.case_studies ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <XCircle className="h-4 w-4 text-gray-400" />
@@ -289,10 +338,10 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
               </span>
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-2 h-2 rounded-full ${componentData.status ? "bg-green-500" : "bg-red-500"}`}
+                  className={`w-2 h-2 rounded-full ${viewData.status ? "bg-green-500" : "bg-red-500"}`}
                 />
                 <span className="text-sm font-medium">
-                  {componentData.status ? t("common.active") : t("common.inactive")}
+                  {viewData.status ? t("common.active") : t("common.inactive")}
                 </span>
               </div>
             </div>
