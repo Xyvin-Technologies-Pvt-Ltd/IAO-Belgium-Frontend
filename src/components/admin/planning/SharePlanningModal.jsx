@@ -182,25 +182,8 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           </button>
         </div>
 
-        {/* Content */}
+        {/* Content — share planning only */}
         <div className="p-5 space-y-4 overflow-y-auto max-h-[70vh]">
-          <p className="text-xs text-gray-500 dark:text-white/70">
-            {t(
-              "planningManagement.shareModal.description",
-              "Link this planning session with additional cohorts (e.g., Lateral Entry Year 1) so their students share the exact same dates, venue, and teachers.",
-            )}
-          </p>
-
-          {/* Current Primary Planning Info */}
-          <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-lg border dark:border-white/10 text-xs space-y-1">
-            <div className="font-semibold text-gray-700 dark:text-gray-300">
-              {t("planningManagement.shareModal.primaryPlanning", "Primary Planning:")}
-            </div>
-            <div className="text-gray-900 dark:text-white font-medium">
-              {planningData?.component?.name || "N/A"} — {planningData?.batch?.name || "N/A"}
-            </div>
-          </div>
-
           {primarySystemId && (
             <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800/60 text-xs flex items-center gap-2">
               <Info className="h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
