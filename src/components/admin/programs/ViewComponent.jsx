@@ -126,24 +126,25 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
   const isUnlinking = unlinkMutation.isPending;
   const isBusy = isLinking || isUnlinking;
 
-  const showSuccessReminder = (response) => {
-    const warnings = response?.data?.warnings;
-    toast.success(response?.message || t("common.success", "Success"));
-    if (warnings?.review_shared_plannings || warnings?.review_location_switch) {
-      toast.message(
-        t("componentManagement.reviewAfterChange", {
-          count: warnings?.shared_plannings || 0,
-        }),
-      );
-    }
-  };
-
   const formatFlags = (flags = {}) =>
     t("componentManagement.financialFlagsSummary", {
       paid: flags.paid || 0,
       pendingFkf: flags.pending_fkf || 0,
       kmo: flags.kmo || 0,
     });
+
+  const showBlockErrorToast = (error) => {
+    const sharedCount = error?.data?.shared_plannings || 0;
+    if (sharedCount > 0) {
+      toast.error(
+        t("componentManagement.sharedPlanningsWarning", {
+          count: sharedCount,
+        }),
+      );
+      return;
+    }
+    toast.error(error?.message || t("common.error", "Something went wrong"));
+  };
 
   const runLink = (module, force = false) => {
     if (!viewData?._id || !module?._id) return;
@@ -159,10 +160,11 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
         onSuccess: (response) => {
           setLinkSearch("");
           setConfirmAction(null);
-          showSuccessReminder(response);
+          toast.success(response?.message || t("common.success", "Success"));
         },
         onError: (error) => {
           if (error?.status === 409 || error?.code === "SYSTEM_ID_LINK_BLOCKED") {
+            showBlockErrorToast(error);
             setConfirmAction({
               type: "link_force",
               module,
@@ -184,10 +186,11 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
       {
         onSuccess: (response) => {
           setConfirmAction(null);
-          showSuccessReminder(response);
+          toast.success(response?.message || t("common.success", "Success"));
         },
         onError: (error) => {
           if (error?.status === 409 || error?.code === "SYSTEM_ID_UNLINK_BLOCKED") {
+            showBlockErrorToast(error);
             setConfirmAction({
               type: "unlink_force",
               block: error.data || {},
