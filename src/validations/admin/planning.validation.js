@@ -30,10 +30,16 @@ const plannedPracticalExamSchema = z.object({
   exam_date: z.string().min(1, "Practical exam date is required"),
 });
 
+const sharedWithSchema = z.object({
+  batch: z.string(),
+  component: z.string(),
+});
+
 export const planningSchema = z.object({
   program: z.string().min(1, "Program is required"),
   batch: z.string().min(1, "Batch is required"),
   component: z.string().min(1, "Component is required"),
+  shared_with: z.array(sharedWithSchema).optional(),
   venue: z.string().min(1, "Venue is required"),
   venue_address: z.string().optional(),
   description: z.string().optional(),
