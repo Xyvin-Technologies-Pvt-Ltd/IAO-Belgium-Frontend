@@ -7,6 +7,8 @@ import {
   reconcileExact,
   backfillExactContacts,
   disconnectExact,
+  getExactReconciliation,
+  verifyExactReconciliation,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -31,6 +33,27 @@ export const useGetExactSent = (params = {}, options = {}) =>
     queryFn: () => getExactSent(params),
     staleTime: 30000,
     ...options,
+  });
+
+export const useGetExactReconciliation = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-reconciliation", params],
+    queryFn: () => getExactReconciliation(params),
+    staleTime: 30000,
+    //* Keep the current rows on screen while paging/filtering instead of flashing empty.
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+/**
+ * Live Mollie + Exact check for specific rows. Read-only on the server, so there
+ * is nothing to invalidate — the caller holds the verdicts in local state.
+ */
+export const useVerifyExactReconciliation = () =>
+  useMutation({
+    mutationFn: verifyExactReconciliation,
+    onError: (err) =>
+      toast.error(err?.message || "Failed to verify against Mollie and Exact"),
   });
 
 export const useReconcileExact = () => {
