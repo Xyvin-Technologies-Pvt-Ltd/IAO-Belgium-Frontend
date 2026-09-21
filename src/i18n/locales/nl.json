@@ -1828,6 +1828,8 @@
     "essays": "Essay",
     "internships": "Stage",
     "activeStatus": "Actieve status",
+    "sharedProgramsLabel": "Ook gebruikt in programma's",
+    "sharedProgramsHint": "Andere programma's die deze module delen via dezelfde systeem-ID.",
     "uploadingFiles": "Bestanden uploaden...",
     "types": {
       "module": "Leermodule",

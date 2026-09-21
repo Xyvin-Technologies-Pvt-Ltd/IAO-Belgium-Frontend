@@ -1805,6 +1805,8 @@
     "essays": "Essai",
     "internships": "Stage",
     "activeStatus": "Statut actif",
+    "sharedProgramsLabel": "Également utilisé dans les programmes",
+    "sharedProgramsHint": "Autres programmes qui partagent ce module via le même identifiant système.",
     "uploadingFiles": "Téléversement des fichiers...",
     "types": {
       "module": "Module d'apprentissage",

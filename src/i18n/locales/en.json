@@ -2083,6 +2083,8 @@
     "essays": "Essay",
     "internships": "Internship",
     "activeStatus": "Active Status",
+    "sharedProgramsLabel": "Also used in programmes",
+    "sharedProgramsHint": "Other programmes that share this module via the same system ID.",
     "uploadingFiles": "Uploading files...",
     "waitForUploads": "Please wait for file uploads to finish",
     "pendingUploads": "Some files have not finished uploading yet",

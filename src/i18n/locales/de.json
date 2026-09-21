@@ -1833,6 +1833,8 @@
     "essays": "Essay",
     "internships": "Praktikum",
     "activeStatus": "Aktiver Status",
+    "sharedProgramsLabel": "Auch verwendet in Programmen",
+    "sharedProgramsHint": "Andere Programme, die dieses Modul über dieselbe System-ID teilen.",
     "uploadingFiles": "Dateien werden hochgeladen...",
     "types": {
       "module": "Lernmodul",
