@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Download, Search, ShieldCheck, XCircle } from "lucide-react";
+import {
+  ArrowRightLeft,
+  CheckCircle2,
+  Download,
+  Search,
+  ShieldCheck,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -19,6 +26,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
@@ -27,6 +41,7 @@ import { useCanModify } from "@/hooks/useCanModify";
 import {
   useGetExactReconciliation,
   useVerifyExactReconciliation,
+  useResyncExactReconciliationRow,
 } from "@/store/useExactStore";
 import { exportExactReconciliation } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
@@ -68,6 +83,7 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
   const [to, setTo] = useState("");
   const [verdicts, setVerdicts] = useState({});
   const [isExporting, setIsExporting] = useState(false);
+  const [resyncTarget, setResyncTarget] = useState(null);
 
   const filterParams = useMemo(
     () => ({
@@ -90,6 +106,8 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
   });
 
   const { mutate: verify, isPending: isVerifying } = useVerifyExactReconciliation();
+  const { mutate: resyncRow, isPending: isResyncing } =
+    useResyncExactReconciliationRow();
 
   const rows = data?.data ?? [];
   const totalRows = data?.total_count ?? 0;
@@ -120,6 +138,13 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
       rows.map((r) => r.id),
       { onSuccess: (res) => applyResults(res?.data || []) },
     );
+
+  //* Accountant confirms per row — no bulk trigger. Dialog stays open on error
+  //* so a transient failure (rate limit, etc.) can be retried immediately.
+  const handleConfirmResync = () => {
+    if (!resyncTarget) return;
+    resyncRow(resyncTarget.id, { onSuccess: () => setResyncTarget(null) });
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -402,7 +427,7 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
                         )}
                       </TableCell>
                       {canModify ? (
-                        <TableCell className="text-right">
+                        <TableCell className="text-right whitespace-nowrap">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -411,6 +436,18 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
                           >
                             {t("integrations.exact.reconciliation.verify")}
                           </Button>
+                          {!isInvoice && row.source !== "credit_note" ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="ml-2"
+                              disabled={isResyncing}
+                              onClick={() => setResyncTarget(row)}
+                            >
+                              <ArrowRightLeft className="h-3.5 w-3.5 mr-1.5" />
+                              {t("integrations.exact.reconciliation.convertToInvoice")}
+                            </Button>
+                          ) : null}
                         </TableCell>
                       ) : null}
                     </TableRow>
@@ -429,6 +466,75 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
           />
         </div>
       )}
+
+      <Dialog
+        open={Boolean(resyncTarget)}
+        onOpenChange={(open) => !open && !isResyncing && setResyncTarget(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowRightLeft className="h-4 w-4 text-amber-500" />
+              {t("integrations.exact.reconciliation.convertTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("integrations.exact.reconciliation.convertDescription")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {resyncTarget ? (
+            <div className="rounded-md border dark:border-white/10 px-3 py-2 text-sm space-y-1">
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">
+                  {t("integrations.exact.reconciliation.iaoDocument")}
+                </span>
+                <span className="font-medium">
+                  {resyncTarget.invoice_uid || resyncTarget.uid}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">
+                  {t("integrations.exact.reconciliation.student")}
+                </span>
+                <span className="font-medium truncate max-w-[220px]">
+                  {resyncTarget.student_name || resyncTarget.email || "—"}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">
+                  {t("integrations.exact.table.amount")}
+                </span>
+                <span className="font-medium">
+                  {resyncTarget.amount} {resyncTarget.currency}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">
+                  {t("integrations.exact.table.exactEntry")}
+                </span>
+                <span className="font-mono">
+                  {resyncTarget.exact_entry_number ?? "—"}
+                </span>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setResyncTarget(null)}
+              disabled={isResyncing}
+            >
+              {t("integrations.exact.reconciliation.convertCancel")}
+            </Button>
+            <Button onClick={handleConfirmResync} disabled={isResyncing}>
+              {isResyncing
+                ? t("integrations.exact.reconciliation.converting")
+                : t("integrations.exact.reconciliation.convertConfirm")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
