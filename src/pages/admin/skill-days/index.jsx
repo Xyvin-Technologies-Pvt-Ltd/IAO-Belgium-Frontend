@@ -80,7 +80,7 @@ const SkillDaysList = () => {
 
   const handleRowClick = (id) => {
     navigate({
-      to: "/admin/skill-days/$id",
+      to: "/admin/standalone-modules/$id",
       params: { id: id },
     });
   };
@@ -89,14 +89,14 @@ const SkillDaysList = () => {
     <div className="space-y-6 mt-4">
       {/* Page Title */}
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        Skill Days Management
+        {t("admin.skillDays.management", { defaultValue: `${t("sidebar.admin.skillDays", "Standalone Modules")} Management` })}
       </h2>
 
       {/* Action Top Bar */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 flex items-center gap-2">
           <Input
-            placeholder="Search skill days..."
+            placeholder={t("admin.skillDays.searchPlaceholder", "Search standalone modules...")}
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -104,7 +104,7 @@ const SkillDaysList = () => {
         </div>
         <div className="flex gap-2">
           <Button onClick={handleOpenCreate}>
-            Create Skill Day
+            {t("admin.skillDays.createBtn", "Create Standalone Module")}
           </Button>
         </div>
       </div>
@@ -113,7 +113,7 @@ const SkillDaysList = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Skill Day Name</TableHead>
+            <TableHead>{t("admin.skillDays.nameCol", "Standalone Module Name")}</TableHead>
             <TableHead>Date Range</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Attached Groups</TableHead>
@@ -127,7 +127,7 @@ const SkillDaysList = () => {
             <TableRow>
               <TableCell colSpan={5} className="text-center p-8">
                 <ErrorMessage
-                  message={error?.message || "Failed to load skill days"}
+                  message={error?.message || t("admin.skillDays.loadError", "Failed to load standalone modules")}
                   onRetry={refetch}
                   variant="inline"
                 />
@@ -189,7 +189,7 @@ const SkillDaysList = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={5} className="text-center p-8 text-muted-foreground">
-                No skill days found. Click "Create Skill Day" above to get started.
+                {t("admin.skillDays.noData", 'No standalone modules found. Click "Create Standalone Module" above to get started.')}
               </TableCell>
             </TableRow>
           )}

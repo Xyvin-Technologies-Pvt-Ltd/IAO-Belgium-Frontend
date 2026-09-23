@@ -36,6 +36,15 @@ export const reconcileExact = async () => {
   }
 };
 
+export const reconcileExactPayment = async (paymentId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/reconcile/${paymentId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const backfillExactContacts = async () => {
   try {
     const response = await axiosInstance.post("/exact/backfill-contacts");
@@ -80,6 +89,20 @@ export const verifyExactReconciliation = async (ids = []) => {
     const response = await axiosInstance.post("/exact/reconciliation/verify", {
       ids,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Single row only — reverses the old bare Sales Entry and reposts it as a real
+//* Sales Invoice + Document. No bulk variant on purpose: accountant clicks one
+//* row at a time. rowId is the reconciliation row's own id ("pay-…" / "inv-…").
+export const resyncExactReconciliationRow = async (rowId) => {
+  try {
+    const response = await axiosInstance.post(
+      `/exact/reconciliation/${rowId}/resync`,
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

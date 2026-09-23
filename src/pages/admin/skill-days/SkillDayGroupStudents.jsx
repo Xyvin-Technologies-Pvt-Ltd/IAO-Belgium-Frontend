@@ -58,18 +58,18 @@ const SkillDayGroupStudents = () => {
         navigable: true,
       },
       {
-        label: t("sidebar.admin.skillDays", "Skill Days"),
-        path: "/admin/skill-days",
+        label: t("sidebar.admin.skillDays", "Standalone Modules"),
+        path: "/admin/standalone-modules",
         navigable: true,
       },
       {
-        label: skillDay?.name || "Skill Day",
-        path: `/admin/skill-days/${id}`,
+        label: skillDay?.name || "Standalone Module",
+        path: `/admin/standalone-modules/${id}`,
         navigable: true,
       },
       {
         label: `${batchInfo.name || "Group"} Students`,
-        path: `/admin/skill-days/${id}/attachment/${attachmentId}`,
+        path: `/admin/standalone-modules/${id}/attachment/${attachmentId}`,
         navigable: false,
       },
     ]);
@@ -114,7 +114,7 @@ const SkillDayGroupStudents = () => {
             {batchInfo.name || "Group"} — <span className="text-[#ff8904]">Program Year {yearInfo}</span>
           </h2>
           <p className="text-xs text-muted-foreground">
-            Skill Day: {skillDay?.name || "Skill Day"}
+            Standalone Module: {skillDay?.name || "Standalone Module"}
           </p>
         </div>
       </div>

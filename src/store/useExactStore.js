@@ -5,10 +5,12 @@ import {
   getExactUnsynced,
   getExactSent,
   reconcileExact,
+  reconcileExactPayment,
   backfillExactContacts,
   disconnectExact,
   getExactReconciliation,
   verifyExactReconciliation,
+  resyncExactReconciliationRow,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -80,6 +82,28 @@ export const useReconcileExact = () => {
   });
 };
 
+export const useReconcileExactPayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: reconcileExactPayment,
+    onSuccess: (res) => {
+      const uid = res?.data?.uid;
+      toast.success(uid ? `Queued ${uid} for Exact Online` : "Payment queued for Exact Online");
+      // The worker posts to Exact asynchronously, so the row only leaves Pending once
+      // it has an entry id. Refetch now for the queue state, then again once the push
+      // has realistically finished, so the result shows up without a manual reload.
+      const refresh = () => {
+        queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+      };
+      refresh();
+      setTimeout(refresh, 6000);
+    },
+    onError: (err) =>
+      toast.error(err?.message || "Failed to sync this payment to Exact Online"),
+  });
+};
+
 export const useBackfillExactContacts = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -111,6 +135,34 @@ export const useBackfillExactContacts = () => {
     },
     onError: (err) =>
       toast.error(err?.message || "Failed to backfill Exact contacts & your ref"),
+  });
+};
+
+/**
+ * Single-row conversion: reverse the old bare Sales Entry and repost it as a
+ * real Sales Invoice + Document. No bulk variant — the accountant reviews and
+ * clicks one row at a time, then watches it flip from Entry to Invoice.
+ */
+export const useResyncExactReconciliationRow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: resyncExactReconciliationRow,
+    onSuccess: (res) => {
+      const data = res?.data || {};
+      if (data.skipped) {
+        toast.info(res?.message || "Row already has an Exact invoice");
+      } else {
+        toast.success(
+          data.invoice_number
+            ? `Converted — Exact invoice ${data.invoice_number} created`
+            : res?.message || "Converted to a Sales Invoice with a document",
+        );
+      }
+      queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+    },
+    onError: (err) =>
+      toast.error(err?.message || "Failed to convert this row to an invoice"),
   });
 };
 

@@ -26,6 +26,9 @@ const isPracticalComponent = (examComp) =>
   examComp?.linked_exam?.type === "practical" ||
   examComp?.exam?.type === "practical";
 
+/** Stable empty array so `|| []` fallbacks do not invalidate memo/effect deps every render. */
+const EMPTY_ARRAY = [];
+
 const SharePlanningModal = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
   const [selectedProgram, setSelectedProgram] = useState("");
@@ -49,8 +52,8 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
 
   const fullPlanning = planningDetailData?.data || planningData;
   const primarySystemId = fullPlanning?.component?.system_id;
-  const primaryComponentName = fullPlanning?.component?.name;
   const primaryComponentId = toId(fullPlanning?.component);
+  const primaryProgramId = toId(fullPlanning?.component?.program);
   const targetComponentType = fullPlanning?.component?.type || "module";
   const selectedLanguageId =
     fullPlanning?.component?.program?.language?._id ||
@@ -72,8 +75,8 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
       setSelectedProgram("");
       setSelectedBatch("");
       setSelectedComponent("");
-      setSiblingOnlineExams([]);
-      setSiblingPracticalExams([]);
+      setSiblingOnlineExams((prev) => (prev.length === 0 ? prev : []));
+      setSiblingPracticalExams((prev) => (prev.length === 0 ? prev : []));
       setTeacherSearch("");
     }
   }, [fullPlanning, open, t]);
@@ -88,10 +91,13 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
   );
 
   const programsRaw = open ? programsData?.data || [] : [];
-  const programs = programsRaw.map((p) => ({
-    _id: p._id,
-    name: `${p.name} - ${p.city?.name || "N/A"} (${p.language?.name || "N/A"})`,
-  }));
+  // Exclude the planning's own program — sharing targets other programmes only.
+  const programs = programsRaw
+    .filter((p) => !primaryProgramId || toId(p._id) !== primaryProgramId)
+    .map((p) => ({
+      _id: p._id,
+      name: `${p.name} - ${p.city?.name || "N/A"} (${p.language?.name || "N/A"})`,
+    }));
 
   const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
     selectedProgram,
@@ -109,6 +115,7 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
         program: selectedProgram,
         type: targetComponentType,
         status: true,
+        ...(primarySystemId && { system_id: primarySystemId }),
       },
       { enabled: open && !!selectedProgram },
     );
@@ -138,8 +145,10 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
       },
     );
 
-  const familyExamsList =
-    open && primaryComponentId ? siblingExamsData?.data || [] : [];
+  const familyExamsList = useMemo(() => {
+    if (!open || !primaryComponentId) return EMPTY_ARRAY;
+    return siblingExamsData?.data || EMPTY_ARRAY;
+  }, [open, primaryComponentId, siblingExamsData?.data]);
 
   const primaryExamComponentIds = useMemo(() => {
     const ids = new Set();
@@ -168,20 +177,59 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
     [siblingExamsList],
   );
 
+  const siblingOnlineKey = useMemo(
+    () =>
+      siblingOnlineList
+        .map((c) => toId(c._id))
+        .filter(Boolean)
+        .sort()
+        .join(","),
+    [siblingOnlineList],
+  );
+  const siblingPracticalKey = useMemo(
+    () =>
+      siblingPracticalList
+        .map((c) => toId(c._id))
+        .filter(Boolean)
+        .sort()
+        .join(","),
+    [siblingPracticalList],
+  );
+
+  const planningExamsKey = useMemo(() => {
+    const online = (fullPlanning?.exams || [])
+      .map(
+        (ex) =>
+          `${toId(ex.exam_component)}:${toId(ex.exam)}:${toId(ex.teacher)}:${ex.teacher_status || ""}`,
+      )
+      .join("|");
+    const practical = (fullPlanning?.practical_exams || [])
+      .map((ex) => {
+        const teachers = (ex.teachers || [])
+          .map((teacher) => toId(teacher?.teacher || teacher))
+          .filter(Boolean)
+          .sort()
+          .join(",");
+        return `${toId(ex.exam_component)}:${toId(ex.exam)}:${teachers}:${ex.exam_date || ""}`;
+      })
+      .join("|");
+    return `${online}#${practical}`;
+  }, [fullPlanning?.exams, fullPlanning?.practical_exams]);
+
   // Sync form state when sibling exam list or existing planned exams change
   useEffect(() => {
     if (!open || sharedComponentIds.size === 0) {
-      setSiblingOnlineExams([]);
-      setSiblingPracticalExams([]);
+      setSiblingOnlineExams((prev) => (prev.length === 0 ? prev : []));
+      setSiblingPracticalExams((prev) => (prev.length === 0 ? prev : []));
       return;
     }
     if (siblingExamsLoading) return;
 
-    const existingOnline = fullPlanning?.exams || [];
-    const existingPractical = fullPlanning?.practical_exams || [];
+    const existingOnline = fullPlanning?.exams || EMPTY_ARRAY;
+    const existingPractical = fullPlanning?.practical_exams || EMPTY_ARRAY;
 
-    setSiblingOnlineExams((prev) =>
-      siblingOnlineList.map((examComp) => {
+    setSiblingOnlineExams((prev) => {
+      const next = siblingOnlineList.map((examComp) => {
         const fromPrev = prev.find(
           (e) => toId(e.component) === toId(examComp._id),
         );
@@ -195,7 +243,9 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           t("planningManagement.modal.examLabel", "Exam");
 
         if (fromPrev) {
-          return { ...fromPrev, name, exam: fromPrev.exam || examComp.linked_exam || "" };
+          const exam = fromPrev.exam || examComp.linked_exam || "";
+          if (fromPrev.name === name && fromPrev.exam === exam) return fromPrev;
+          return { ...fromPrev, name, exam };
         }
 
         return {
@@ -205,11 +255,19 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           teacher_status: existing?.teacher_status || "pending",
           name,
         };
-      }),
-    );
+      });
 
-    setSiblingPracticalExams((prev) =>
-      siblingPracticalList.map((examComp) => {
+      if (
+        prev.length === next.length &&
+        next.every((item, i) => item === prev[i])
+      ) {
+        return prev;
+      }
+      return next;
+    });
+
+    setSiblingPracticalExams((prev) => {
+      const next = siblingPracticalList.map((examComp) => {
         const fromPrev = prev.find(
           (e) => toId(e.component) === toId(examComp._id),
         );
@@ -223,10 +281,12 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
           t("exam.form.practical", "Practical");
 
         if (fromPrev) {
+          const exam = fromPrev.exam || examComp.linked_exam || "";
+          if (fromPrev.name === name && fromPrev.exam === exam) return fromPrev;
           return {
             ...fromPrev,
             name,
-            exam: fromPrev.exam || examComp.linked_exam || "",
+            exam,
           };
         }
 
@@ -241,17 +301,27 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
             : "",
           name,
         };
-      }),
-    );
+      });
+
+      if (
+        prev.length === next.length &&
+        next.every((item, i) => item === prev[i])
+      ) {
+        return prev;
+      }
+      return next;
+    });
   }, [
     open,
     sharedComponentKey,
+    sharedComponentIds.size,
     siblingExamsLoading,
+    siblingOnlineKey,
+    siblingPracticalKey,
     siblingOnlineList,
     siblingPracticalList,
-    fullPlanning,
+    planningExamsKey,
     t,
-    sharedComponentIds.size,
   ]);
 
   const showStaffQuery =
@@ -292,13 +362,9 @@ const SharePlanningModal = ({ open, onClose, planningData }) => {
 
   const components = rawComponents
     .filter((c) => {
-      if (primarySystemId && c.system_id) {
-        return c.system_id === primarySystemId;
-      }
-      if (primaryComponentName && c.name) {
-        return c.name.trim().toLowerCase() === primaryComponentName.trim().toLowerCase();
-      }
-      return true;
+      // Only modules that share the planning component's system_id.
+      if (!primarySystemId) return false;
+      return String(c.system_id || "") === String(primarySystemId);
     })
     .map((comp) => {
       const linkedExams = (comp.linked_exams || []).filter((e) => e.name);
