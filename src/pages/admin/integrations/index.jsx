@@ -19,6 +19,7 @@ import {
   useGetExactUnsynced,
   useGetExactSent,
   useReconcileExact,
+  useReconcileExactPayment,
   useBackfillExactContacts,
   useDisconnectExact,
 } from "@/store/useExactStore";
@@ -101,6 +102,8 @@ const IntegrationsPage = () => {
   );
 
   const { mutate: reconcile, isPending: isReconciling } = useReconcileExact();
+  const { mutate: reconcilePayment, isPending: isReconcilingRow, variables: syncingPaymentId } =
+    useReconcileExactPayment();
   const { mutate: backfillContacts, isPending: isBackfillingContacts } =
     useBackfillExactContacts();
   const { mutate: disconnect, isPending: isDisconnecting } = useDisconnectExact();
@@ -376,6 +379,11 @@ const IntegrationsPage = () => {
                         <TableHead className="text-right">
                           {t("integrations.exact.table.amount")}
                         </TableHead>
+                        {canModify && (
+                          <TableHead className="text-right">
+                            {t("integrations.exact.table.action")}
+                          </TableHead>
+                        )}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -393,6 +401,26 @@ const IntegrationsPage = () => {
                           <TableCell className="text-right whitespace-nowrap">
                             {row.amount} {row.currency}
                           </TableCell>
+                          {canModify && (
+                            <TableCell className="text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => reconcilePayment(row.payment_id)}
+                                disabled={!isConnected || isReconciling || isReconcilingRow}
+                                title={t("integrations.exact.syncRowHint")}
+                              >
+                                <RefreshCw
+                                  className={`w-3.5 h-3.5 mr-1.5 ${
+                                    isReconcilingRow && syncingPaymentId === row.payment_id
+                                      ? "animate-spin"
+                                      : ""
+                                  }`}
+                                />
+                                {t("integrations.exact.syncRow")}
+                              </Button>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>

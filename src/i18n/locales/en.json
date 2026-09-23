@@ -54,7 +54,7 @@
       "academics": "Academic Years",
       "planning": "Planning",
       "modulePlanning": "Module Planning",
-      "skillDays": "Skill Days",
+      "skillDays": "Standalone Modules",
       "teacherManagement": "Lecturer Management",
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
@@ -379,6 +379,8 @@
       "sentBanner": "{{count}} line(s) posted to Exact Online",
       "syncNow": "Sync now",
       "syncing": "Syncing…",
+      "syncRow": "Sync",
+      "syncRowHint": "Post only this payment to Exact Online, so the result can be checked before syncing the rest.",
       "backfillContacts": "Backfill contacts & your ref",
       "backfillingContacts": "Backfilling…",
       "backfillContactsHint": "For already-synced Exact records only: fills Contactpersoon and sets YourRef (invoice + transaction ID). Does not sync Pending payments, create documents, create new invoices, or email from Exact.",
@@ -401,6 +403,7 @@
         "program": "Programme",
         "glAccount": "GL account",
         "amount": "Amount",
+        "action": "Action",
         "currency": "Currency",
         "description": "Description",
         "exactEntry": "Exact entry #",
@@ -457,7 +460,13 @@
           "no_transaction_id": "No transaction ID",
           "exact_error": "Exact lookup failed",
           "error": "Error"
-        }
+        },
+        "convertToInvoice": "Convert to invoice",
+        "converting": "Converting…",
+        "convertTitle": "Convert this entry to a real invoice?",
+        "convertDescription": "This reverses the existing Sales Entry in Exact with a negative entry, then posts a new Sales Invoice with a document for the same amount. Net effect on the ledger is zero — revenue is not double-counted. This cannot be undone from here.",
+        "convertConfirm": "Reverse & convert",
+        "convertCancel": "Cancel"
       }
     }
   },

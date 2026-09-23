@@ -38,10 +38,10 @@ export const useCreateSkillDay = () => {
     mutationFn: createSkillDay,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["skill-days"] });
-      toast.success(response?.message || "Skill Day created successfully");
+      toast.success(response?.message || "Standalone Module created successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to create Skill Day");
+      toast.error(error?.message || "Failed to create Standalone Module");
     },
   });
 };
@@ -53,10 +53,10 @@ export const useUpdateSkillDay = () => {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["skill-days"] });
       queryClient.invalidateQueries({ queryKey: ["skill-day", variables.id] });
-      toast.success(response?.message || "Skill Day updated successfully");
+      toast.success(response?.message || "Standalone Module updated successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to update Skill Day");
+      toast.error(error?.message || "Failed to update Standalone Module");
     },
   });
 };
@@ -67,10 +67,10 @@ export const useDeleteSkillDay = () => {
     mutationFn: deleteSkillDay,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["skill-days"] });
-      toast.success(response?.message || "Skill Day deleted successfully");
+      toast.success(response?.message || "Standalone Module deleted successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to delete Skill Day");
+      toast.error(error?.message || "Failed to delete Standalone Module");
     },
   });
 };

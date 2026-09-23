@@ -88,7 +88,7 @@ const CreateSkillDayModal = ({ open, onClose, skillDayData = null }) => {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isEdit ? "Edit Skill Day" : "Create Skill Day"}
+                {isEdit ? "Edit Standalone Module" : "Create Standalone Module"}
               </h2>
             </div>
             <button
@@ -106,12 +106,12 @@ const CreateSkillDayModal = ({ open, onClose, skillDayData = null }) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground border-l-2 border-gray-300 dark:border-zinc-700 pl-2.5">
-                Skill Day Information
+                Standalone Module Information
               </h3>
 
               <FormField
-                label="Skill Day Name"
-                placeholder="Enter skill day name"
+                label="Standalone Module Name"
+                placeholder="Enter standalone module name"
                 {...register("name", { required: "Name is required" })}
                 error={errors.name?.message}
                 required
@@ -151,7 +151,7 @@ const CreateSkillDayModal = ({ open, onClose, skillDayData = null }) => {
               onCancel={handleClose}
               isLoading={isLoading}
               isEdit={isEdit}
-              submitText={isEdit ? "Update Skill Day" : "Create Skill Day"}
+              submitText={isEdit ? "Update Standalone Module" : "Create Standalone Module"}
               cancelText="Cancel"
             />
           </form>

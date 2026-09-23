@@ -63,13 +63,13 @@ const SkillDayDetail = () => {
           navigable: true,
         },
         {
-          label: t("sidebar.admin.skillDays", "Skill Days"),
-          path: "/admin/skill-days",
+          label: t("sidebar.admin.skillDays", "Standalone Modules"),
+          path: "/admin/standalone-modules",
           navigable: true,
         },
         {
-          label: skillDay.name || "Skill Day Detail",
-          path: `/admin/skill-days/${id}`,
+          label: skillDay.name || "Standalone Module Detail",
+          path: `/admin/standalone-modules/${id}`,
           navigable: false,
         },
       ]);
@@ -107,14 +107,14 @@ const SkillDayDetail = () => {
   };
 
   if (isLoading) {
-    return <LoadingState text="Loading Skill Day details..." fullHeight />;
+    return <LoadingState text="Loading Standalone Module details..." fullHeight />;
   }
 
   if (error) {
     return (
       <div className="p-6">
         <ErrorMessage
-          message={error?.message || "Failed to load Skill Day details"}
+          message={error?.message || "Failed to load Standalone Module details"}
           onRetry={refetch}
           variant="card"
         />
@@ -132,7 +132,7 @@ const SkillDayDetail = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Skill Days — <span className="font-medium text-gray-700 dark:text-gray-300">{skillDay.name}</span>
+            {t("sidebar.admin.skillDays", "Standalone Modules")} — <span className="font-medium text-gray-700 dark:text-gray-300">{skillDay.name}</span>
           </h2>
         </div>
         <Button
@@ -150,7 +150,7 @@ const SkillDayDetail = () => {
         <DashboardCard
           title="DATE / TIME"
           value={`${moment(skillDay.start_date).format("DD/MM/YYYY")} — ${moment(skillDay.end_date).format("DD/MM/YYYY")}`}
-          subtitle="Skill Day Session Schedule"
+          subtitle="Standalone Module Session Schedule"
           icon={Calendar}
         />
 
@@ -214,7 +214,7 @@ const SkillDayDetail = () => {
                     className="hover:bg-muted/50 cursor-pointer"
                     onClick={() =>
                       navigate({
-                        to: `/admin/skill-days/${id}/attachment/${att._id}`,
+                        to: `/admin/standalone-modules/${id}/attachment/${att._id}`,
                       })
                     }
                   >
@@ -244,7 +244,7 @@ const SkillDayDetail = () => {
                             icon: Users,
                             onClick: () =>
                               navigate({
-                                to: `/admin/skill-days/${id}/attachment/${att._id}`,
+                                to: `/admin/standalone-modules/${id}/attachment/${att._id}`,
                               }),
                           },
                           {

@@ -231,7 +231,7 @@ const AttachGroupModal = ({
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {isEdit ? "Edit Group Attachment" : "Attach Group to Skill Day"}
+                {isEdit ? "Edit Group Attachment" : "Attach Group to Standalone Module"}
               </h2>
             </div>
             <button

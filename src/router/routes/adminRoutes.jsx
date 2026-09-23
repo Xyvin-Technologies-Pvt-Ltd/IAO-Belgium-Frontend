@@ -102,15 +102,15 @@ export const adminRoutes = [
     component: withPermissionProtection(Planning, "/admin/planning"),
   },
   {
-    path: "/admin/skill-days",
+    path: "/admin/standalone-modules",
     component: withPermissionProtection(SkillDaysList, "/admin/planning"),
   },
   {
-    path: "/admin/skill-days/$id",
+    path: "/admin/standalone-modules/$id",
     component: withPermissionProtection(SkillDayDetail, "/admin/planning"),
   },
   {
-    path: "/admin/skill-days/$id/attachment/$attachmentId",
+    path: "/admin/standalone-modules/$id/attachment/$attachmentId",
     component: withPermissionProtection(SkillDayGroupStudents, "/admin/planning"),
   },
   {
