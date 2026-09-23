@@ -28,6 +28,71 @@ const toId = (value) => {
   return String(value);
 };
 
+/** Stable key for collapsing sibling exam components into one logical exam. */
+const getExamLogicalKey = (examComp) => {
+  const type = examComp?.linked_exam_type || examComp?.linked_exam?.type || "";
+  const name = (
+    examComp?.linked_exam_name ||
+    examComp?.name ||
+    ""
+  )
+    .trim()
+    .toLowerCase();
+  // Shared siblings often have separate Exam docs per language with the same label.
+  if (name) return `name:${type}|${name}`;
+  const linkedExamId = toId(examComp?.linked_exam);
+  if (linkedExamId) return `exam:${linkedExamId}`;
+  if (examComp?.system_id) return `sys:${examComp.system_id}`;
+  return `fallback:${type}|${toId(examComp?._id)}`;
+};
+
+/**
+ * Shared modules: keep family exams, one row per logical exam.
+ * Prefer the selected module's exam component, then same program, then first sibling.
+ */
+const collapseSharedModuleExams = (exams, selectedModuleId, selectedProgramId) => {
+  const groups = new Map();
+  for (const examComp of exams) {
+    const key = getExamLogicalKey(examComp);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(examComp);
+  }
+
+  return Array.from(groups.values()).map((group) => {
+    const onSelectedModule = group.find(
+      (c) => toId(c.linked_module) === toId(selectedModuleId),
+    );
+    if (onSelectedModule) return onSelectedModule;
+
+    const onSelectedProgram = group.find(
+      (c) => toId(c.program?._id || c.program) === toId(selectedProgramId),
+    );
+    if (onSelectedProgram) return onSelectedProgram;
+
+    return group[0];
+  });
+};
+
+/**
+ * Normal module → only exams linked to selectedComponent.
+ * Shared module (any exam linked outside selectedComponent) → family list collapsed by logical exam.
+ */
+const resolvePlanningExamsList = (examsList, selectedModuleId, selectedProgramId) => {
+  if (!selectedModuleId || !examsList?.length) return [];
+
+  const isSharedModule = examsList.some(
+    (c) => toId(c.linked_module) && toId(c.linked_module) !== toId(selectedModuleId),
+  );
+
+  if (!isSharedModule) {
+    return examsList.filter(
+      (c) => toId(c.linked_module) === toId(selectedModuleId),
+    );
+  }
+
+  return collapseSharedModuleExams(examsList, selectedModuleId, selectedProgramId);
+};
+
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
   const { t } = useTranslation();
   const [programSearchTerm, setProgramSearchTerm] = useState("");
@@ -155,7 +220,13 @@ const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
     { enabled: open && !!selectedProgram && !!selectedComponent },
   );
 
-  const examsList = (open && selectedProgram && selectedComponent) ? (examsData?.data || []) : [];
+  const rawExamsList =
+    open && selectedProgram && selectedComponent ? examsData?.data || [] : [];
+  const examsList = resolvePlanningExamsList(
+    rawExamsList,
+    selectedComponent,
+    selectedProgram,
+  );
   const isPracticalComponent = (examComp) =>
     examComp?.linked_exam_type === "practical" ||
     examComp?.linked_exam?.type === "practical" ||

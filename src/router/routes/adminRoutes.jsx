@@ -21,6 +21,9 @@ import TeacherQualification from "@/pages/admin/teacher-qualification";
 import Teachers from "@/pages/admin/teacher";
 import TeacherDetails from "@/pages/admin/teacher/TeacherDetails";
 import Planning from "@/pages/admin/planning";
+import SkillDaysList from "@/pages/admin/skill-days";
+import SkillDayDetail from "@/pages/admin/skill-days/SkillDayDetail";
+import SkillDayGroupStudents from "@/pages/admin/skill-days/SkillDayGroupStudents";
 import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
 import LocationChanges from "@/pages/admin/student/LocationChanges";
@@ -97,6 +100,18 @@ export const adminRoutes = [
   {
     path: "/admin/planning",
     component: withPermissionProtection(Planning, "/admin/planning"),
+  },
+  {
+    path: "/admin/skill-days",
+    component: withPermissionProtection(SkillDaysList, "/admin/planning"),
+  },
+  {
+    path: "/admin/skill-days/$id",
+    component: withPermissionProtection(SkillDayDetail, "/admin/planning"),
+  },
+  {
+    path: "/admin/skill-days/$id/attachment/$attachmentId",
+    component: withPermissionProtection(SkillDayGroupStudents, "/admin/planning"),
   },
   {
     path: "/admin/locations",
