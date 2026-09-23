@@ -53,3 +53,35 @@ export const disconnectExact = async () => {
     throw error.response?.data || error;
   }
 };
+export const getExactReconciliation = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/reconciliation", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Returns raw CSV text (not the JSON envelope) for downloadCsv().
+export const exportExactReconciliation = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/reconciliation/export", {
+      params,
+      responseType: "text",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const verifyExactReconciliation = async (ids = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/reconciliation/verify", {
+      ids,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
