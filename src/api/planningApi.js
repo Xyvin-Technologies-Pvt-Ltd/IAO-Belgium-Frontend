@@ -113,3 +113,26 @@ export const getPlanningStudents = async (id, filter = {}) => {
     throw error.response.data;
   }
 };
+
+export const exportPlanningsCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/planning/export-csv`, {
+      params: filter,
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportPlanningStudentsCsv = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/planning/${id}/students/export-csv`, {
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

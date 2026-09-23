@@ -52,6 +52,8 @@ const DEFAULT_FILTERS = {
   program: "all",
   batch: "all",
   academic: "all",
+  start_date: "",
+  end_date: "",
 };
 
 const PlanningFilterDrawer = ({
@@ -288,6 +290,43 @@ const PlanningFilterDrawer = ({
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
+            </FilterSection>
+
+            <FilterSection label="Date Range (Session Dates)">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] text-muted-foreground block mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full bg-sidebar border border-sidebar-border rounded-md p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    value={draftFilters.start_date || ""}
+                    onChange={(e) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        start_date: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground block mb-1">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full bg-sidebar border border-sidebar-border rounded-md p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    value={draftFilters.end_date || ""}
+                    onChange={(e) =>
+                      setDraftFilters((prev) => ({
+                        ...prev,
+                        end_date: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
             </FilterSection>
           </div>
         </div>
