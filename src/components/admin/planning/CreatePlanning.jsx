@@ -74,23 +74,19 @@ const collapseSharedModuleExams = (exams, selectedModuleId, selectedProgramId) =
 };
 
 /**
- * Normal module → only exams linked to selectedComponent.
- * Shared module (any exam linked outside selectedComponent) → family list collapsed by logical exam.
+ * Only exams linked to the selected module.
+ * Family/sibling rows from find_dropdown are ignored so a module with no exams
+ * does not inherit sibling exam cards; shared duplicates on other modules are dropped.
  */
 const resolvePlanningExamsList = (examsList, selectedModuleId, selectedProgramId) => {
   if (!selectedModuleId || !examsList?.length) return [];
 
-  const isSharedModule = examsList.some(
-    (c) => toId(c.linked_module) && toId(c.linked_module) !== toId(selectedModuleId),
+  const ownExams = examsList.filter(
+    (c) => toId(c.linked_module) === toId(selectedModuleId),
   );
+  if (!ownExams.length) return [];
 
-  if (!isSharedModule) {
-    return examsList.filter(
-      (c) => toId(c.linked_module) === toId(selectedModuleId),
-    );
-  }
-
-  return collapseSharedModuleExams(examsList, selectedModuleId, selectedProgramId);
+  return collapseSharedModuleExams(ownExams, selectedModuleId, selectedProgramId);
 };
 
 const CreatePlanning = ({ open, onClose, planningData, activeCity }) => {
