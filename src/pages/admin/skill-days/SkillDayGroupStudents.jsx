@@ -4,7 +4,6 @@ import {
   Search,
   Users,
   Clock,
-  FileText,
   UserCheck,
   UserX,
   Check,
@@ -196,7 +195,7 @@ const SkillDayGroupStudents = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search by student, email, invoice..."
+            placeholder="Search by student or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9 w-full bg-white dark:bg-black border dark:border-white/20"
@@ -214,14 +213,13 @@ const SkillDayGroupStudents = () => {
             <TableHead>PAYMENT STATUS</TableHead>
             <TableHead>ATTENDANCE</TableHead>
             <TableHead>PAID AMOUNT</TableHead>
-            <TableHead className="text-right">INVOICE</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {students.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={7}
+                colSpan={6}
                 className="px-6 py-8 text-center text-sm text-muted-foreground"
               >
                 No students found for this group attachment.
@@ -317,21 +315,6 @@ const SkillDayGroupStudents = () => {
                     {s.cost_type === "free"
                       ? "Free"
                       : `${s.currency || "EUR"} ${s.paid_amount || s.amount || 0}`}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {s.invoice_number ? (
-                      <a
-                        href={s.invoice_url || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-[#0162DD] hover:underline"
-                      >
-                        <FileText className="h-3.5 w-3.5" />
-                        {s.invoice_number}
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
                   </TableCell>
                 </TableRow>
               );

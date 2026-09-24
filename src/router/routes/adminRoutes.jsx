@@ -103,15 +103,15 @@ export const adminRoutes = [
   },
   {
     path: "/admin/standalone-modules",
-    component: withPermissionProtection(SkillDaysList, "/admin/planning"),
+    component: withPermissionProtection(SkillDaysList, "/admin/standalone-modules"),
   },
   {
     path: "/admin/standalone-modules/$id",
-    component: withPermissionProtection(SkillDayDetail, "/admin/planning"),
+    component: withPermissionProtection(SkillDayDetail, "/admin/standalone-modules"),
   },
   {
     path: "/admin/standalone-modules/$id/attachment/$attachmentId",
-    component: withPermissionProtection(SkillDayGroupStudents, "/admin/planning"),
+    component: withPermissionProtection(SkillDayGroupStudents, "/admin/standalone-modules"),
   },
   {
     path: "/admin/locations",
