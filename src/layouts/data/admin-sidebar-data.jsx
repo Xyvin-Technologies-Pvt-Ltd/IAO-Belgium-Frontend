@@ -68,8 +68,17 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
           },
           {
             title: t("sidebar.admin.planning"),
-            url: "/admin/planning",
             icon: Calendars,
+            items: [
+              {
+                title: t("sidebar.admin.modulePlanning", { defaultValue: "Module Planning" }),
+                url: "/admin/planning",
+              },
+              {
+                title: t("sidebar.admin.skillDays", { defaultValue: "Standalone Modules" }),
+                url: "/admin/standalone-modules",
+              },
+            ],
           },
           {
             title: t("sidebar.admin.examination"),

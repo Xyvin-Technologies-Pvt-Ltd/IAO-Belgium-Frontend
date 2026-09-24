@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Users } from "lucide-react";
+import { Edit, Trash2, Users, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import PlanningFilterDrawer, { DEFAULT_FILTERS } from "./PlanningFilterDrawer";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
@@ -19,7 +19,11 @@ import DeleteConfirm from "@/components/DeleteConfirm";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { useDeletePlanning, useGetPlanning } from "@/store/usePlanningStore";
+import {
+  useDeletePlanning,
+  useGetPlanning,
+  useExportPlanningsCsv,
+} from "@/store/usePlanningStore";
 import CreatePlanning from "@/components/admin/planning/CreatePlanning";
 import ViewPlanning from "@/components/admin/planning/ViewPlanning";
 import SharePlanningModal from "@/components/admin/planning/SharePlanningModal";
@@ -93,9 +97,7 @@ const PlanningTable = ({ activeCity }) => {
     }));
   }, [activeCity]);
 
-  const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
-    page: page,
-    limit: rowsPerPage,
+  const queryFilters = {
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(activeCity !== "all" ? { city: activeCity } : {}),
     ...(appliedFilters.module_number !== "all" ? { module_number: appliedFilters.module_number } : {}),
@@ -103,9 +105,22 @@ const PlanningTable = ({ activeCity }) => {
     ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
     ...(appliedFilters.academic !== "all" ? { academic: appliedFilters.academic } : {}),
     ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
+    ...(appliedFilters.start_date ? { start_date: appliedFilters.start_date } : {}),
+    ...(appliedFilters.end_date ? { end_date: appliedFilters.end_date } : {}),
+  };
+
+  const { data, isLoading, isFetching, error, refetch } = useGetPlanning({
+    page: page,
+    limit: rowsPerPage,
+    ...queryFilters,
   });
   const { mutateAsync: deletePlanning, isPending: isDeleting } =
     useDeletePlanning();
+  const exportPlanningsCsvMutation = useExportPlanningsCsv();
+
+  const handleExportCsv = () => {
+    exportPlanningsCsvMutation.mutate(queryFilters);
+  };
 
   const plannings = data?.data || [];
   const totalRows = data?.total_count || 0;
@@ -371,6 +386,15 @@ const PlanningTable = ({ activeCity }) => {
             setPage={setPage}
             activeCity={activeCity}
           />
+          <Button
+            variant="outline"
+            onClick={handleExportCsv}
+            disabled={exportPlanningsCsvMutation.isPending}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            {exportPlanningsCsvMutation.isPending ? "Exporting..." : "Export CSV"}
+          </Button>
         </div>
         {canModify && (
           <Button onClick={handleOpenCreate}>

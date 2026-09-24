@@ -53,6 +53,9 @@ const ProgramConfigDrawer = ({ programId }) => {
     internship: {
       min_cases: 0,
     },
+    skill_days: {
+      required: false,
+    },
     status: true,
   });
 
@@ -128,6 +131,9 @@ const ProgramConfigDrawer = ({ programId }) => {
         internship: {
           min_cases: existingConfig.internship?.min_cases || 0,
         },
+        skill_days: {
+          required: existingConfig.skill_days?.required ?? false,
+        },
         status: existingConfig.status ?? true,
       });
     } else if (isCreatingNew) {
@@ -147,6 +153,7 @@ const ProgramConfigDrawer = ({ programId }) => {
           internships: { required: false, min_pass_percentage: 50 },
         },
         internship: { min_cases: 0 },
+        skill_days: { required: false },
         status: true,
       });
     }
@@ -441,6 +448,28 @@ const ProgramConfigDrawer = ({ programId }) => {
                     value={formData.internship.min_cases}
                     onChange={(e) => updateField("internship.min_cases", parseInt(e.target.value))}
                     className="bg-sidebar border-sidebar-border"
+                  />
+                </div>
+              </div>
+
+              {/* Standalone Modules / Skill Days */}
+              <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#94a3b8" }}>
+                  {t("programConfig.requirements.skillDays.title", "Standalone Modules / Skill Days")}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="skill-days-required" className="font-medium">
+                      {t("programConfig.requirements.skillDays.required", "Skill days required")}
+                    </Label>
+                    <p className="text-xs text-dashboard-text-secondary mt-1">
+                      {t("programConfig.requirements.skillDays.hint", "When enabled, students must attend all required standalone modules for this year to complete year progression.")}
+                    </p>
+                  </div>
+                  <Switch
+                    id="skill-days-required"
+                    checked={formData.skill_days?.required || false}
+                    onCheckedChange={(checked) => updateField("skill_days.required", checked)}
                   />
                 </div>
               </div>
