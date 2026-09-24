@@ -100,14 +100,27 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
     return typeLabels[type] || type;
   };
 
-  const formatProgramLabel = (sharedProgram) => {
-    const parts = [sharedProgram.name].filter(Boolean);
-    const city = sharedProgram.city?.name;
-    const language = sharedProgram.language?.name;
+  const formatProgramLabel = (program) => {
+    if (!program) return "";
+    const parts = [program.name].filter(Boolean);
+    const city = program.city?.name;
+    const language = program.language?.name;
     if (city || language) {
       parts.push([city, language].filter(Boolean).join(" · "));
     }
     return parts.join(" — ");
+  };
+
+  const formatSharedSiblingLabel = (sibling) => {
+    const moduleParts = [sibling.name].filter(Boolean);
+    if (sibling.uid) moduleParts.push(`(${sibling.uid})`);
+    const moduleLabel = moduleParts.join(" ");
+    const program = sibling.program || sibling;
+    const programLabel = formatProgramLabel(program);
+    const programUid = program?.uid;
+    const programParts = [programLabel].filter(Boolean);
+    if (programUid) programParts.push(`(${programUid})`);
+    return [moduleLabel, programParts.join(" ")].filter(Boolean).join(" — ");
   };
 
   const handleView = (file) => {
@@ -484,17 +497,12 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
 
                 {sharedPrograms.length > 0 ? (
                   <ul className="space-y-2 mb-4">
-                    {sharedPrograms.map((sharedProgram) => (
+                    {sharedPrograms.map((sharedSibling) => (
                       <li
-                        key={sharedProgram._id}
+                        key={sharedSibling._id}
                         className="text-sm bg-muted/50 rounded-lg px-3 py-2"
                       >
-                        {formatProgramLabel(sharedProgram)}
-                        {sharedProgram.uid && (
-                          <span className="text-xs text-muted-foreground ml-2">
-                            ({sharedProgram.uid})
-                          </span>
-                        )}
+                        {formatSharedSiblingLabel(sharedSibling)}
                       </li>
                     ))}
                   </ul>

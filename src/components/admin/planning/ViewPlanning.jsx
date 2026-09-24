@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, MapPin, X, Loader2 } from "lucide-react";
+import { Check, MapPin, X, Loader2, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,7 +17,10 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useTranslation } from "react-i18next";
 import { formatTZ } from "@/utils/dateUtils";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useGetPlanningStudents } from "@/store/usePlanningStore";
+import {
+  useGetPlanningStudents,
+  useExportPlanningStudentsCsv,
+} from "@/store/usePlanningStore";
 import { useMarkAttendance } from "@/store/useAttendenceStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
@@ -43,6 +47,14 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, planningId]);
+
+  const exportStudentsCsvMutation = useExportPlanningStudentsCsv();
+
+  const handleExportStudentsCsv = () => {
+    if (planningId) {
+      exportStudentsCsvMutation.mutate(planningId);
+    }
+  };
 
   const { data, isLoading, error, refetch, isFetching } = useGetPlanningStudents(
     planningId,
@@ -176,12 +188,24 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {t("planningManagement.view.studentListTitle")}
               </h3>
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("planningManagement.view.searchStudents")}
-                className="sm:max-w-xs"
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t("planningManagement.view.searchStudents")}
+                  className="sm:max-w-xs"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportStudentsCsv}
+                  disabled={exportStudentsCsvMutation.isPending || !planningId}
+                  className="gap-2 whitespace-nowrap"
+                >
+                  <Download className="h-4 w-4" />
+                  {exportStudentsCsvMutation.isPending ? "Exporting..." : "Export Students"}
+                </Button>
+              </div>
             </div>
 
             {error ? (

@@ -9,9 +9,9 @@ export const getAllSkillDays = async (params) => {
   }
 };
 
-export const getSkillDayById = async (id) => {
+export const getSkillDayById = async (id, params = {}) => {
   try {
-    const response = await axiosInstance.get(`/skill-day/${id}`);
+    const response = await axiosInstance.get(`/skill-day/${id}`, { params });
     return response.data;
   } catch (error) {
     throw error?.response?.data || error;
@@ -72,9 +72,21 @@ export const removeAttachment = async ({ skillDayId, attachmentId }) => {
   }
 };
 
-export const getAttachmentStudents = async ({ skillDayId, attachmentId }) => {
+export const getAttachmentStudents = async ({ skillDayId, attachmentId, ...params }) => {
   try {
-    const response = await axiosInstance.get(`/skill-day/${skillDayId}/attachment/${attachmentId}/students`);
+    const response = await axiosInstance.get(
+      `/skill-day/${skillDayId}/attachment/${attachmentId}/students`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data || error;
+  }
+};
+
+export const markSkillDayAttendance = async ({ skillDayId, ...data }) => {
+  try {
+    const response = await axiosInstance.post(`/skill-day/${skillDayId}/attendance`, data);
     return response.data;
   } catch (error) {
     throw error?.response?.data || error;

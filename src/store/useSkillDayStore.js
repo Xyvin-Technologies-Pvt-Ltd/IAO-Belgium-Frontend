@@ -8,6 +8,7 @@ import {
   updateAttachment,
   removeAttachment,
   getAttachmentStudents,
+  markSkillDayAttendance,
 } from "@/api/skillDayApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,10 +23,10 @@ export const useGetSkillDays = (filter, options = {}) => {
   });
 };
 
-export const useGetSkillDayById = (id, options = {}) => {
+export const useGetSkillDayById = (id, filter = {}, options = {}) => {
   return useQuery({
-    queryKey: ["skill-day", id],
-    queryFn: () => getSkillDayById(id),
+    queryKey: ["skill-day", id, filter],
+    queryFn: () => getSkillDayById(id, filter),
     enabled: !!id,
     staleTime: 30000,
     ...options,
@@ -120,12 +121,32 @@ export const useRemoveAttachment = () => {
   });
 };
 
-export const useGetAttachmentStudents = (skillDayId, attachmentId, options = {}) => {
+export const useGetAttachmentStudents = (
+  skillDayId,
+  attachmentId,
+  filter = {},
+  options = {}
+) => {
   return useQuery({
-    queryKey: ["skill-day-students", skillDayId, attachmentId],
-    queryFn: () => getAttachmentStudents({ skillDayId, attachmentId }),
+    queryKey: ["skill-day-students", skillDayId, attachmentId, filter],
+    queryFn: () =>
+      getAttachmentStudents({ skillDayId, attachmentId, ...filter }),
     enabled: !!skillDayId && !!attachmentId,
     staleTime: 10000,
     ...options,
+  });
+};
+
+export const useMarkSkillDayAttendance = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markSkillDayAttendance,
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["skill-day-students", variables.skillDayId] });
+      toast.success(response?.message || "Attendance marked successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark attendance");
+    },
   });
 };

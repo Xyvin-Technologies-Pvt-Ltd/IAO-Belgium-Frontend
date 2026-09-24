@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table/table";
+import { Pagination } from "@/components/ui/table/Pagination";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import {
@@ -40,6 +41,8 @@ const SkillDayDetail = () => {
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
 
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
   const [isAttachModalOpen, setIsAttachModalOpen] = useState(false);
   const [editingAttachment, setEditingAttachment] = useState(null);
@@ -47,11 +50,15 @@ const SkillDayDetail = () => {
   const [deleteAttachmentId, setDeleteAttachmentId] = useState(null);
   const [openDelete, setOpenDelete] = useState(false);
 
-  const { data, isLoading, error, refetch } = useGetSkillDayById(id);
+  const { data, isLoading, error, refetch } = useGetSkillDayById(id, {
+    page,
+    limit: rowsPerPage,
+  });
   const { mutateAsync: removeAttachment, isPending: isRemoving } =
     useRemoveAttachment();
 
   const skillDay = data?.data || null;
+  const totalRows = data?.total_count || 0;
 
   // Breadcrumb Top Navigation matching ProgramDetail pattern
   useEffect(() => {
@@ -163,7 +170,7 @@ const SkillDayDetail = () => {
 
         <DashboardCard
           title="ATTACHED GROUPS"
-          value={attachments.length}
+          value={totalRows}
           subtitle="Total Attached Groups & Program Years"
           icon={Users}
         />
@@ -267,6 +274,14 @@ const SkillDayDetail = () => {
             )}
           </TableBody>
         </Table>
+
+        <Pagination
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          totalRows={totalRows}
+        />
       </div>
 
       {/* Modals */}
