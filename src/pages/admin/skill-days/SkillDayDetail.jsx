@@ -157,14 +157,22 @@ const SkillDayDetail = () => {
         <DashboardCard
           title="DATE / TIME"
           value={`${moment(skillDay.start_date).format("DD/MM/YYYY")} — ${moment(skillDay.end_date).format("DD/MM/YYYY")}`}
-          subtitle="Standalone Module Session Schedule"
+          subtitle={
+            skillDay.start_time && skillDay.end_time
+              ? `Time: ${skillDay.start_time} - ${skillDay.end_time}`
+              : "Standalone Module Session Schedule"
+          }
           icon={Calendar}
         />
 
         <DashboardCard
           title="LOCATION"
-          value={skillDay.location}
-          subtitle="Venue Address"
+          value={skillDay.venue || skillDay.location}
+          subtitle={
+            skillDay.city?.name
+              ? `${skillDay.city.name}${skillDay.city.country?.name ? `, ${skillDay.city.country.name}` : ""}`
+              : skillDay.venue_address || "Venue Address"
+          }
           icon={MapPin}
         />
 
@@ -175,6 +183,19 @@ const SkillDayDetail = () => {
           icon={Users}
         />
       </div>
+
+      {/* Description Section */}
+      {skillDay.description && (
+        <div className="bg-white dark:bg-black border dark:border-white/20 rounded-xl p-5 space-y-2 shadow-xs">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Description / Context
+          </h3>
+          <div
+            className="prose dark:prose-invert max-w-none text-sm text-gray-800 dark:text-gray-200"
+            dangerouslySetInnerHTML={{ __html: skillDay.description }}
+          />
+        </div>
+      )}
 
       {/* Attachments Subheader & Button */}
       <div className="space-y-4 pt-2">
