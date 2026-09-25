@@ -1,8 +1,13 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { X, FileText, CheckCircle, XCircle, Eye } from "lucide-react";
+import { X, FileText, CheckCircle, XCircle, Eye, ChevronDown, ChevronUp, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { formatTZ } from "@/utils/dateUtils";
 import { openSecureFile } from "@/utils/secureFile";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
@@ -11,6 +16,7 @@ import moment from "moment";
 
 const ViewComponent = ({ open, onClose, componentData, program }) => {
   const { t, i18n } = useTranslation();
+  const [isSharedProgramsOpen, setIsSharedProgramsOpen] = useState(false);
 
   const { data: componentResponse } = useGetComponentById(
     open ? componentData?._id : null,
@@ -185,29 +191,62 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
             )}
 
             {viewData.type === "module" && sharedPrograms.length > 0 && (
-              <div>
-                <h3 className="font-medium text-sm text-muted-foreground mb-2">
-                  {t("componentManagement.sharedProgramsLabel")}
-                </h3>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {t("componentManagement.sharedProgramsHint")}
-                </p>
-                <ul className="space-y-2">
-                  {sharedPrograms.map((sharedProgram) => (
-                    <li
-                      key={sharedProgram._id}
-                      className="text-sm bg-muted/50 rounded-lg px-3 py-2"
-                    >
-                      {formatProgramLabel(sharedProgram)}
-                      {sharedProgram.uid && (
-                        <span className="text-xs text-muted-foreground ml-2">
-                          ({sharedProgram.uid})
-                        </span>
+              <Collapsible
+                open={isSharedProgramsOpen}
+                onOpenChange={setIsSharedProgramsOpen}
+                className="border rounded-xl bg-muted/30 border-border/60 overflow-hidden transition-all duration-200"
+              >
+                <CollapsibleTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between p-3.5 text-left font-medium hover:bg-muted/50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Layers className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                      <span className="text-sm font-semibold">
+                        {t("componentManagement.sharedProgramsLabel")}
+                      </span>
+                      <span className="px-2 py-0.5 text-xs font-semibold bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 rounded-full">
+                        {sharedPrograms.length}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                      <span>
+                        {isSharedProgramsOpen
+                          ? t("common.hideDetails", "Hide details")
+                          : t("common.showDetails", "Show details")}
+                      </span>
+                      {isSharedProgramsOpen ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
                       )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                    </div>
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-4 pb-4 pt-1 space-y-3 border-t border-border/40 bg-background/50">
+                  <p className="text-xs text-muted-foreground pt-2">
+                    {t("componentManagement.sharedProgramsHint")}
+                  </p>
+                  <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    {sharedPrograms.map((sharedProgram) => (
+                      <li
+                        key={sharedProgram._id}
+                        className="text-sm bg-muted/50 hover:bg-muted/80 border border-border/40 rounded-lg px-3 py-2 flex items-center justify-between transition-colors"
+                      >
+                        <span className="font-medium text-foreground">
+                          {formatProgramLabel(sharedProgram)}
+                        </span>
+                        {sharedProgram.uid && (
+                          <span className="text-xs font-mono bg-background border px-2 py-0.5 rounded text-muted-foreground ml-2 shrink-0">
+                            {sharedProgram.uid}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
             )}
 
             {viewData.type === "module" && viewData.additional_context && (
