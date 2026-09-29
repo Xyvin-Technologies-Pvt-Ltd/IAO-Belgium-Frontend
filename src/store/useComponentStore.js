@@ -1,5 +1,5 @@
 
-import { createComponent, getComponentById, getComponentFilterOptions, getComponents, getStudentsByComponent, updateComponent } from "@/api/componentApi";
+import { createComponent, getComponentById, getComponentFilterOptions, getComponents, getStudentsByComponent, linkComponentSystemId, unlinkComponentSystemId, updateComponent } from "@/api/componentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -98,3 +98,28 @@ export const useGetComponentById=(id,options={})=>{
     ...options,
   });
 }
+
+export const useLinkComponentSystemId = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, target_component_id, force = false }) =>
+      linkComponentSystemId(id, target_component_id, force),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["component", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["components"] });
+    },
+  });
+};
+
+export const useUnlinkComponentSystemId = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, force = false }) => unlinkComponentSystemId(id, force),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["component", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["components"] });
+    },
+  });
+};

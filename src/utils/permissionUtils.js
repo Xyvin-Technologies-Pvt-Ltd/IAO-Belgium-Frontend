@@ -15,6 +15,10 @@ const SIDEBAR_PERMISSIONS = {
     "operations_management_modify",
   ],
   "/admin/planning": ["operations_management_view", "operations_management_modify"],
+  "/admin/standalone-modules": [
+    "operations_management_view",
+    "operations_management_modify",
+  ],
   "/admin/teacher-management": [
     "academic_management_view",
     "academic_management_modify",
