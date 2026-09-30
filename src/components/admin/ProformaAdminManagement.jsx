@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
 import TemporaryProformaTestTrigger from "./TemporaryProformaTestTrigger";
+import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
+import { Eye, FileText } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -306,19 +308,32 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                         {new Date(inv.updatedAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-center whitespace-nowrap">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            if (onViewInvoice) {
-                              onViewInvoice(inv._id);
-                            } else {
-                              navigate({ to: `/admin/proforma-invoices/${inv._id}` });
-                            }
-                          }}
-                        >
-                          View Details
-                        </Button>
+                        <div className="flex items-center justify-center gap-1">
+                          {(inv.status === "MOVED_TO_FINANCE" || inv.status === "PAID") && (
+                            <button
+                              type="button"
+                              title="View invoice"
+                              onClick={() => openProformaInvoiceTab(inv._id)}
+                              className="p-1.5 rounded-md text-muted-foreground hover:text-indigo-600 hover:bg-indigo-500/10 transition-colors"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            title="View details"
+                            onClick={() => {
+                              if (onViewInvoice) {
+                                onViewInvoice(inv._id);
+                              } else {
+                                navigate({ to: `/admin/proforma-invoices/${inv._id}` });
+                              }
+                            }}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

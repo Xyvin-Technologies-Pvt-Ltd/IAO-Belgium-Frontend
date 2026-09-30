@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,22 +35,53 @@ import {
   useDeleteProformaRegion,
 } from "@/store/useProformaStore";
 import { useGetTeacherRole } from "@/store/useTeacherRoleStore";
-import { useGetCities } from "@/store/useCityStore";
+import { useGetAllCities } from "@/store/useDropdownStore";
+import { toast } from "sonner";
+
+const DEFAULT_TRAVEL_RULES = [
+  {
+    key: "road",
+    name: "Road",
+    calc: "Travel Formula (€0.4326/km, Return x2, nearest km)",
+    rate_per_km: 0.4326,
+    multiplier: 2,
+    rounding: "NEAREST_KM",
+    amount: "—",
+    cap: "—",
+    proof_required: false,
+    status: true,
+  },
+  {
+    key: "rail",
+    name: "Rail",
+    calc: "Actual cost",
+    amount: "—",
+    cap: "—",
+    proof_required: true,
+    status: true,
+  },
+  {
+    key: "flight",
+    name: "Flight",
+    calc: "Actual cost",
+    amount: "—",
+    cap: "—",
+    proof_required: true,
+    status: true,
+  },
+];
 
 export default function ProformaSettingsConfig() {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("claimable_costs"); // 'claimable_costs' | 'regions'
+  const [activeTab, setActiveTab] = useState("claimable_costs");
 
-  // API Queries
   const { data: defaultsRes } = useGetGlobalDefaults();
   const { data: regionsRes } = useGetProformaRegions();
   const { data: teacherRolesRes } = useGetTeacherRole();
-  const { data: citiesRes } = useGetCities();
+  const { data: citiesRes } = useGetAllCities({});
 
   const globalDefaults = defaultsRes?.data;
   const regionsList = regionsRes?.data || [];
 
-  // Filter ONLY active lecturer roles with useMemo to prevent creating a new array reference on every render
   const teacherRoles = useMemo(() => {
     return (teacherRolesRes?.data || []).filter(
       (role) => role.status !== false && role.status !== "inactive" && role.status !== "deleted"
@@ -60,13 +90,11 @@ export default function ProformaSettingsConfig() {
 
   const cities = citiesRes?.data || [];
 
-  // Mutations
   const updateDefaultsMutation = useUpdateGlobalDefaults();
   const createRegionMutation = useCreateProformaRegion();
   const updateRegionMutation = useUpdateProformaRegion();
   const deleteRegionMutation = useDeleteProformaRegion();
 
-  // Category Toggles State
   const [toggles, setToggles] = useState({
     travel_enabled: true,
     food_enabled: true,
@@ -74,57 +102,7 @@ export default function ProformaSettingsConfig() {
     miscellaneous_enabled: true,
   });
 
-  useEffect(() => {
-    if (globalDefaults?.category_toggles) {
-      const next = globalDefaults.category_toggles;
-      setToggles((prev) => {
-        if (
-          prev.travel_enabled === next.travel_enabled &&
-          prev.food_enabled === next.food_enabled &&
-          prev.stay_enabled === next.stay_enabled &&
-          prev.miscellaneous_enabled === next.miscellaneous_enabled
-        ) {
-          return prev;
-        }
-        return { ...next };
-      });
-    }
-  }, [globalDefaults]);
-
-  // Detailed Editable Rules Data
-  const [travelRules, setTravelRules] = useState([
-    {
-      key: "road",
-      name: "Road",
-      calc: "Travel Formula (€0.4326/km, Return x2, nearest km)",
-      rate_per_km: 0.4326,
-      multiplier: 2,
-      rounding: "NEAREST_KM",
-      amount: "—",
-      cap: "—",
-      proof_required: false,
-      status: true,
-    },
-    {
-      key: "rail",
-      name: "Rail",
-      calc: "Actual cost",
-      amount: "—",
-      cap: "—",
-      proof_required: true,
-      status: true,
-    },
-    {
-      key: "flight",
-      name: "Flight",
-      calc: "Actual cost",
-      amount: "—",
-      cap: "—",
-      proof_required: true,
-      status: true,
-    },
-  ]);
-
+  const [travelRules, setTravelRules] = useState(DEFAULT_TRAVEL_RULES);
   const [stayRules, setStayRules] = useState([
     {
       key: "food",
@@ -148,7 +126,6 @@ export default function ProformaSettingsConfig() {
       status: true,
     },
   ]);
-
   const [otherRules, setOtherRules] = useState([
     {
       key: "miscellaneous",
@@ -161,7 +138,100 @@ export default function ProformaSettingsConfig() {
     },
   ]);
 
-  // Modal States
+  useEffect(() => {
+    if (!globalDefaults) return;
+
+    if (globalDefaults.category_toggles) {
+      const next = globalDefaults.category_toggles;
+      setToggles((prev) => {
+        if (
+          prev.travel_enabled === next.travel_enabled &&
+          prev.food_enabled === next.food_enabled &&
+          prev.stay_enabled === next.stay_enabled &&
+          prev.miscellaneous_enabled === next.miscellaneous_enabled
+        ) {
+          return prev;
+        }
+        return { ...next };
+      });
+    }
+
+    const t = globalDefaults.travel || {};
+    const rate = t.rate_per_km ?? 0.4326;
+    const mult = t.trip_multiplier ?? 2;
+    const rounding = t.rounding || "NEAREST_KM";
+    setTravelRules([
+      {
+        key: "road",
+        name: "Road",
+        calc: `Travel Formula (€${rate}/km, Return x${mult}, ${String(rounding).toLowerCase().replace(/_/g, " ")})`,
+        rate_per_km: rate,
+        multiplier: mult,
+        rounding,
+        amount: "—",
+        cap: "—",
+        proof_required: t.road?.proof_required ?? false,
+        status: true,
+      },
+      {
+        key: "rail",
+        name: "Rail",
+        calc: "Actual cost",
+        amount: "—",
+        cap: "—",
+        proof_required: t.rail?.proof_required ?? true,
+        status: true,
+      },
+      {
+        key: "flight",
+        name: "Flight",
+        calc: "Actual cost",
+        amount: "—",
+        cap: "—",
+        proof_required: t.flight?.proof_required ?? true,
+        status: true,
+      },
+    ]);
+
+    const foodRate = globalDefaults.food?.daily_rate ?? 25;
+    const stayCap = globalDefaults.stay?.max_nightly_rate ?? 120;
+    setStayRules([
+      {
+        key: "food",
+        name: "Food",
+        calc: "Fixed per day",
+        amount: `${foodRate},00 € / day`,
+        daily_rate: foodRate,
+        min_hours: globalDefaults.food?.minimum_hours ?? 4,
+        cap: "—",
+        proof_required: false,
+        status: true,
+      },
+      {
+        key: "accommodation",
+        name: "Accommodation",
+        calc: "Actual cost",
+        amount: `Max ${stayCap},00 € / night`,
+        cap: `${stayCap},00 €`,
+        max_nightly_rate: stayCap,
+        proof_required: globalDefaults.stay?.requires_receipt ?? true,
+        status: true,
+      },
+    ]);
+
+    setOtherRules([
+      {
+        key: "miscellaneous",
+        name: "Miscellaneous Claims",
+        calc: "Actual cost",
+        amount: "—",
+        cap: "—",
+        proof_required: globalDefaults.miscellaneous?.proof_required ?? true,
+        status: true,
+      },
+    ]);
+  }, [globalDefaults]);
+
   const [showAddRegionModal, setShowAddRegionModal] = useState(false);
   const [showEditRegionModal, setShowEditRegionModal] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(null);
@@ -169,7 +239,7 @@ export default function ProformaSettingsConfig() {
     name: "",
     code: "",
     cities: [],
-    status: true,
+    is_active: true,
     blocks_per_module: "",
     travel_rate: "",
     food_rate: "",
@@ -182,10 +252,11 @@ export default function ProformaSettingsConfig() {
     name: "",
     calc_type: "ACTUAL_COST",
     rate_per_km: 0.4326,
+    multiplier: 2,
+    rounding: "NEAREST_KM",
     daily_rate: 25.0,
-    max_cap: 120.0,
+    max_nightly_rate: 120.0,
     proof_required: false,
-    status: true,
   });
 
   const [matrixState, setMatrixState] = useState({});
@@ -217,7 +288,7 @@ export default function ProformaSettingsConfig() {
       name: region.name || "",
       code: region.code || "",
       cities: assignedCityIds,
-      status: region.status !== false,
+      is_active: region.is_active !== false,
       blocks_per_module: region.blocks_per_module ?? "",
       travel_rate: region.travel?.rate_per_km ?? "",
       food_rate: region.food?.daily_rate ?? "",
@@ -235,11 +306,18 @@ export default function ProformaSettingsConfig() {
           name: editRegionForm.name,
           code: editRegionForm.code,
           cities: editRegionForm.cities,
-          status: editRegionForm.status,
-          blocks_per_module: editRegionForm.blocks_per_module !== "" ? parseInt(editRegionForm.blocks_per_module, 10) : null,
-          ...(editRegionForm.travel_rate !== "" ? { travel: { rate_per_km: parseFloat(editRegionForm.travel_rate) } } : {}),
-          ...(editRegionForm.food_rate !== "" ? { food: { daily_rate: parseFloat(editRegionForm.food_rate) } } : {}),
-          ...(editRegionForm.stay_rate !== "" ? { stay: { max_nightly_rate: parseFloat(editRegionForm.stay_rate) } } : {}),
+          is_active: editRegionForm.is_active,
+          blocks_per_module:
+            editRegionForm.blocks_per_module !== "" ? parseInt(editRegionForm.blocks_per_module, 10) : null,
+          ...(editRegionForm.travel_rate !== ""
+            ? { travel: { rate_per_km: parseFloat(editRegionForm.travel_rate) } }
+            : {}),
+          ...(editRegionForm.food_rate !== ""
+            ? { food: { daily_rate: parseFloat(editRegionForm.food_rate) } }
+            : {}),
+          ...(editRegionForm.stay_rate !== ""
+            ? { stay: { max_nightly_rate: parseFloat(editRegionForm.stay_rate) } }
+            : {}),
         },
       },
       {
@@ -256,7 +334,6 @@ export default function ProformaSettingsConfig() {
     }
   };
 
-  // INSTANT AUTO-SAVE TOGGLE SWITCH
   const handleToggleChange = (categoryKey, newValue) => {
     const updatedToggles = { ...toggles, [categoryKey]: newValue };
     setToggles(updatedToggles);
@@ -265,55 +342,79 @@ export default function ProformaSettingsConfig() {
 
   const handleEditRuleClick = (rule, category) => {
     setSelectedRule({ ...rule, category });
+    let calc_type = "ACTUAL_COST";
+    if (rule.key === "road" || rule.calc?.includes("Formula")) calc_type = "FORMULA";
+    else if (rule.key === "food" || rule.calc?.includes("Fixed")) calc_type = "FIXED_PER_DAY";
+
     setEditRuleForm({
       name: rule.name,
-      calc_type: rule.calc.includes("Formula") ? "FORMULA" : rule.calc.includes("Fixed") ? "FIXED_PER_DAY" : "ACTUAL_COST",
+      calc_type,
       rate_per_km: rule.rate_per_km || 0.4326,
+      multiplier: rule.multiplier || 2,
+      rounding: rule.rounding || "NEAREST_KM",
       daily_rate: rule.daily_rate || 25.0,
-      max_cap: parseFloat(rule.cap) || 120.0,
-      proof_required: rule.proof_required,
-      status: rule.status,
+      max_nightly_rate: rule.max_nightly_rate || 120.0,
+      proof_required: Boolean(rule.proof_required),
     });
     setShowEditRuleModal(true);
   };
 
   const handleSaveRule = () => {
     if (!selectedRule) return;
-
     const { category, key } = selectedRule;
-    const isFormula = editRuleForm.calc_type === "FORMULA";
-    const isFixed = editRuleForm.calc_type === "FIXED_PER_DAY";
-
-    const calcDisplay = isFormula
-      ? `Travel Formula (€${editRuleForm.rate_per_km}/km, Return x2, nearest km)`
-      : isFixed
-      ? `Fixed per day (${editRuleForm.daily_rate} € / day)`
-      : "Actual cost";
-
-    const amountDisplay = isFixed ? `${editRuleForm.daily_rate},00 € / day` : "—";
-    const capDisplay = editRuleForm.max_cap > 0 ? `${editRuleForm.max_cap},00 €` : "—";
-
-    const updatedObj = {
-      ...selectedRule,
-      name: editRuleForm.name,
-      calc: calcDisplay,
-      amount: amountDisplay,
-      cap: capDisplay,
-      rate_per_km: editRuleForm.rate_per_km,
-      daily_rate: editRuleForm.daily_rate,
-      proof_required: editRuleForm.proof_required,
-      status: editRuleForm.status,
-    };
 
     if (category === "travel") {
-      setTravelRules(travelRules.map((r) => (r.key === key ? updatedObj : r)));
-    } else if (category === "stay") {
-      setStayRules(stayRules.map((r) => (r.key === key ? updatedObj : r)));
-    } else if (category === "other") {
-      setOtherRules(otherRules.map((r) => (r.key === key ? updatedObj : r)));
+      if (key === "road") {
+        updateDefaultsMutation.mutate(
+          {
+            travel: {
+              rate_per_km: editRuleForm.rate_per_km,
+              trip_multiplier: editRuleForm.multiplier,
+              rounding: editRuleForm.rounding,
+              road: { proof_required: editRuleForm.proof_required },
+            },
+          },
+          { onSuccess: () => setShowEditRuleModal(false) }
+        );
+      } else if (key === "rail" || key === "flight") {
+        updateDefaultsMutation.mutate(
+          {
+            travel: {
+              [key]: { proof_required: editRuleForm.proof_required },
+            },
+          },
+          { onSuccess: () => setShowEditRuleModal(false) }
+        );
+      }
+      return;
     }
 
-    setShowEditRuleModal(false);
+    if (category === "stay") {
+      if (key === "food") {
+        updateDefaultsMutation.mutate(
+          { food: { daily_rate: editRuleForm.daily_rate } },
+          { onSuccess: () => setShowEditRuleModal(false) }
+        );
+      } else if (key === "accommodation") {
+        updateDefaultsMutation.mutate(
+          {
+            stay: {
+              max_nightly_rate: editRuleForm.max_nightly_rate,
+              requires_receipt: editRuleForm.proof_required,
+            },
+          },
+          { onSuccess: () => setShowEditRuleModal(false) }
+        );
+      }
+      return;
+    }
+
+    if (category === "other" && key === "miscellaneous") {
+      updateDefaultsMutation.mutate(
+        { miscellaneous: { proof_required: editRuleForm.proof_required } },
+        { onSuccess: () => setShowEditRuleModal(false) }
+      );
+    }
   };
 
   const handleCreateRegion = () => {
@@ -336,18 +437,26 @@ export default function ProformaSettingsConfig() {
     }));
   };
 
-  const handleSaveAllMatrixRates = () => {
-    regionsList.forEach((region) => {
-      const ratesArray = teacherRoles.map((role) => ({
-        teacher_role_id: role._id,
-        hourly_rate: parseFloat(matrixState[region._id]?.[role._id] || 0),
-      }));
+  const handleSaveAllMatrixRates = async () => {
+    try {
+      await Promise.all(
+        regionsList.map((region) => {
+          const ratesArray = teacherRoles.map((role) => ({
+            teacher_role_id: role._id,
+            hourly_rate: parseFloat(matrixState[region._id]?.[role._id] || 0),
+          }));
 
-      updateRegionMutation.mutate({
-        id: region._id,
-        data: { teaching_rates: ratesArray },
-      });
-    });
+          return updateRegionMutation.mutateAsync({
+            id: region._id,
+            data: { teaching_rates: ratesArray },
+            silent: true,
+          });
+        })
+      );
+      toast.success("Rates saved successfully!");
+    } catch (error) {
+      toast.error(error?.message || "Failed to save rates");
+    }
   };
 
   return (
@@ -390,13 +499,20 @@ export default function ProformaSettingsConfig() {
           {/* Claimable Category Toggles */}
           <Card className="w-full">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Claimable Cost Category Toggles</CardTitle>
+              <CardTitle className="text-base">Enable Claimable Cost Categories</CardTitle>
+              <CardDescription>
+                On: category is included when generating teacher proforma invoices (and teachers can claim it).
+                Off: category is skipped on new invoices and cannot be claimed.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex items-center justify-between p-4 bg-sidebar rounded-xl border border-sidebar-border">
                   <div>
                     <p className="text-sm font-semibold text-foreground">Travel Expenses</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {toggles.travel_enabled ? "Included on invoices" : "Excluded from invoices"}
+                    </p>
                   </div>
                   <Switch
                     checked={Boolean(toggles.travel_enabled)}
@@ -407,6 +523,9 @@ export default function ProformaSettingsConfig() {
                 <div className="flex items-center justify-between p-4 bg-sidebar rounded-xl border border-sidebar-border">
                   <div>
                     <p className="text-sm font-semibold text-foreground">Food / Meal Allowance</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {toggles.food_enabled ? "Included on invoices" : "Excluded from invoices"}
+                    </p>
                   </div>
                   <Switch
                     checked={Boolean(toggles.food_enabled)}
@@ -417,6 +536,9 @@ export default function ProformaSettingsConfig() {
                 <div className="flex items-center justify-between p-4 bg-sidebar rounded-xl border border-sidebar-border">
                   <div>
                     <p className="text-sm font-semibold text-foreground">Stay / Accommodation</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {toggles.stay_enabled ? "Included on invoices" : "Excluded from invoices"}
+                    </p>
                   </div>
                   <Switch
                     checked={Boolean(toggles.stay_enabled)}
@@ -427,6 +549,9 @@ export default function ProformaSettingsConfig() {
                 <div className="flex items-center justify-between p-4 bg-sidebar rounded-xl border border-sidebar-border">
                   <div>
                     <p className="text-sm font-semibold text-foreground">Miscellaneous Claims</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {toggles.miscellaneous_enabled ? "Included on invoices" : "Excluded from invoices"}
+                    </p>
                   </div>
                   <Switch
                     checked={Boolean(toggles.miscellaneous_enabled)}
@@ -645,7 +770,7 @@ export default function ProformaSettingsConfig() {
                               ⚙️
                             </Button>
                           </div>
-                          {region.status === false && (
+                          {region.is_active === false && (
                             <span className="block text-[10px] bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 px-1.5 py-0.5 rounded font-mono font-normal">
                               Disabled
                             </span>
@@ -706,76 +831,82 @@ export default function ProformaSettingsConfig() {
           <div className="space-y-4 py-2">
             <div>
               <Label className="text-xs uppercase font-semibold">Rule Name</Label>
-              <Input
-                type="text"
-                value={editRuleForm.name}
-                onChange={(e) => setEditRuleForm({ ...editRuleForm, name: e.target.value })}
-              />
+              <Input type="text" value={editRuleForm.name} disabled className="bg-muted" />
             </div>
-            <div>
-              <Label className="text-xs uppercase font-semibold">Calculation Method</Label>
-              <Select
-                value={editRuleForm.calc_type}
-                onValueChange={(val) => setEditRuleForm({ ...editRuleForm, calc_type: val })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="FORMULA">Travel Formula (€ / km)</SelectItem>
-                  <SelectItem value="FIXED_PER_DAY">Fixed per day (€ / day)</SelectItem>
-                  <SelectItem value="FIXED_PER_WEEKEND">Fixed per teaching weekend (€ / weekend)</SelectItem>
-                  <SelectItem value="ACTUAL_COST">Actual cost (Receipt based)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {editRuleForm.calc_type === "FORMULA" && (
-              <div>
-                <Label className="text-xs uppercase font-semibold">Rate per km (€)</Label>
-                <Input
-                  type="number"
-                  step="0.0001"
-                  value={editRuleForm.rate_per_km}
-                  onChange={(e) => setEditRuleForm({ ...editRuleForm, rate_per_km: parseFloat(e.target.value) })}
-                />
-              </div>
+
+            {selectedRule?.key === "road" && (
+              <>
+                <div>
+                  <Label className="text-xs uppercase font-semibold">Calculation</Label>
+                  <Input value="Travel Formula (€ / km)" disabled className="bg-muted mt-1" />
+                </div>
+                <div>
+                  <Label className="text-xs uppercase font-semibold">Rate per km (€)</Label>
+                  <Input
+                    type="number"
+                    step="0.0001"
+                    value={editRuleForm.rate_per_km}
+                    onChange={(e) =>
+                      setEditRuleForm({ ...editRuleForm, rate_per_km: parseFloat(e.target.value) })
+                    }
+                  />
+                </div>
+              </>
             )}
-            {editRuleForm.calc_type === "FIXED_PER_DAY" && (
+
+            {selectedRule?.key === "food" && (
               <div>
                 <Label className="text-xs uppercase font-semibold">Daily Fixed Rate (€)</Label>
                 <Input
                   type="number"
                   step="1"
                   value={editRuleForm.daily_rate}
-                  onChange={(e) => setEditRuleForm({ ...editRuleForm, daily_rate: parseFloat(e.target.value) })}
+                  onChange={(e) =>
+                    setEditRuleForm({ ...editRuleForm, daily_rate: parseFloat(e.target.value) })
+                  }
                 />
               </div>
             )}
-            <div>
-              <Label className="text-xs uppercase font-semibold">Max Cap Limit (€, 0 = No Cap)</Label>
-              <Input
-                type="number"
-                step="10"
-                value={editRuleForm.max_cap}
-                onChange={(e) => setEditRuleForm({ ...editRuleForm, max_cap: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-xl border">
+
+            {selectedRule?.key === "accommodation" && (
               <div>
-                <p className="text-sm font-semibold">Proof Required (Receipt Upload)</p>
+                <Label className="text-xs uppercase font-semibold">Max Nightly Rate (€)</Label>
+                <Input
+                  type="number"
+                  step="1"
+                  value={editRuleForm.max_nightly_rate}
+                  onChange={(e) =>
+                    setEditRuleForm({ ...editRuleForm, max_nightly_rate: parseFloat(e.target.value) })
+                  }
+                />
               </div>
-              <Switch
-                checked={editRuleForm.proof_required}
-                onCheckedChange={(val) => setEditRuleForm({ ...editRuleForm, proof_required: val })}
-              />
-            </div>
+            )}
+
+            {(selectedRule?.key === "rail" || selectedRule?.key === "flight") && (
+              <div>
+                <Label className="text-xs uppercase font-semibold">Calculation</Label>
+                <Input value="Actual cost (receipt based)" disabled className="bg-muted mt-1" />
+              </div>
+            )}
+
+            {selectedRule?.key !== "food" && (
+              <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-xl border">
+                <div>
+                  <p className="text-sm font-semibold">Proof Required (Receipt Upload)</p>
+                </div>
+                <Switch
+                  checked={editRuleForm.proof_required}
+                  onCheckedChange={(val) => setEditRuleForm({ ...editRuleForm, proof_required: val })}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditRuleModal(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveRule}>
-              Save Rule Configuration
+            <Button onClick={handleSaveRule} disabled={updateDefaultsMutation.isPending}>
+              {updateDefaultsMutation.isPending ? "Saving..." : "Save Rule Configuration"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -910,8 +1041,8 @@ export default function ProformaSettingsConfig() {
                     <p className="text-[11px] text-muted-foreground mt-0.5">Disabled regions block invoice generation</p>
                   </div>
                   <Switch
-                    checked={editRegionForm.status}
-                    onCheckedChange={(val) => setEditRegionForm({ ...editRegionForm, status: val })}
+                    checked={editRegionForm.is_active}
+                    onCheckedChange={(val) => setEditRegionForm({ ...editRegionForm, is_active: val })}
                   />
                 </div>
               </div>

@@ -1,19 +1,37 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { triggerPlanningProformaTest } from "@/api/proformaApi";
+import { useAuthStore } from "@/store/useAuthStore";
+
+const ALLOWED_TEST_EMAIL = "ttj@duck.com";
 
 /**
  * TEMPORARY TEST TRIGGER SCREEN
  * Allows admins/developers to enter a planning_id and trigger proforma invoice calculation on demand.
- * This is a standalone file that can be easily removed later.
+ * Visible only for ttj@duck.com. Standalone file — easy to remove later.
  */
 export default function TemporaryProformaTestTrigger({ onTriggerSuccess }) {
+  const { profile, user } = useAuthStore();
+  const email = String(profile?.email || user?.email || "")
+    .trim()
+    .toLowerCase();
+  const canSeeTestTool = email === ALLOWED_TEST_EMAIL;
+
   const [planningId, setPlanningId] = useState("6ab4a4a18f9bacf250937c2c");
   const [loading, setLoading] = useState(false);
   const [logOutput, setLogOutput] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  if (!canSeeTestTool) return null;
 
   const handleTrigger = async (e) => {
     e.preventDefault();
@@ -30,7 +48,11 @@ export default function TemporaryProformaTestTrigger({ onTriggerSuccess }) {
         onTriggerSuccess();
       }
     } catch (err) {
-      setErrorMsg(err?.response?.data?.message || err.message || "Failed to trigger planning invoice calculation.");
+      setErrorMsg(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to trigger planning invoice calculation."
+      );
     } finally {
       setLoading(false);
     }
@@ -45,7 +67,8 @@ export default function TemporaryProformaTestTrigger({ onTriggerSuccess }) {
               ⚡ Temporary Test Tool: Trigger Proforma Invoice Calculation
             </CardTitle>
             <CardDescription className="text-xs text-amber-800/80 dark:text-amber-400 mt-1">
-              Enter any Planning ID below to manually trigger tariff resolution and invoice generation for assigned teachers.
+              Enter any Planning ID below to manually trigger tariff resolution and invoice
+              generation for assigned teachers.
             </CardDescription>
           </div>
           <span className="px-2 py-0.5 text-xs font-mono bg-amber-200 text-amber-900 rounded font-bold">
@@ -87,10 +110,15 @@ export default function TemporaryProformaTestTrigger({ onTriggerSuccess }) {
               {logOutput.results?.map((res, idx) => (
                 <div key={idx} className="flex items-center justify-between">
                   <span>
-                    {res.type === "INVOICE" ? "🎉 Invoice Generated:" : "⚠️ Configuration Exception:"} {res.proforma_number || res.error_message}
+                    {res.type === "INVOICE"
+                      ? "🎉 Invoice Generated:"
+                      : "⚠️ Configuration Exception:"}{" "}
+                    {res.proforma_number || res.error_message}
                   </span>
                   {res.grand_total !== undefined && (
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">€{res.grand_total}</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                      €{res.grand_total}
+                    </span>
                   )}
                 </div>
               ))}
@@ -98,6 +126,11 @@ export default function TemporaryProformaTestTrigger({ onTriggerSuccess }) {
           </div>
         )}
       </CardContent>
+      <CardFooter className="pt-0 pb-4">
+        <p className="text-[11px] text-amber-800/70 dark:text-amber-500/80">
+          Visible only to {ALLOWED_TEST_EMAIL} · temporary developer tool
+        </p>
+      </CardFooter>
     </Card>
   );
 }

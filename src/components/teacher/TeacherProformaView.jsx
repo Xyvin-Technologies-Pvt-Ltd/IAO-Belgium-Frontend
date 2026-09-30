@@ -170,7 +170,15 @@ export default function TeacherProformaView({ proformaData }) {
                   )}
                 </td>
                 <td className="py-3.5 px-4 text-center font-mono">
-                  {item.item_type === "TRAVEL" ? `${item.distance_km} km` : item.hours ? `${item.hours} hrs` : "1"}
+                  {item.item_type === "TRAVEL"
+                    ? `${item.distance_km} km`
+                    : item.item_type === "TEACHING"
+                    ? `${item.blocks || item.multiplier || 1} blocks`
+                    : item.multiplier
+                    ? item.multiplier
+                    : item.hours
+                    ? `${item.hours} hrs`
+                    : "1"}
                 </td>
                 <td className="py-3.5 px-4 text-right font-mono">€{item.unit_rate?.toFixed(2)}</td>
                 <td className="py-3.5 px-4 text-right font-semibold font-mono text-slate-900">

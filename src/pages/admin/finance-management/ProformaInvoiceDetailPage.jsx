@@ -21,15 +21,24 @@ import {
   Loader2,
   ArrowRight,
   CheckCircle2,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import ProformaSectionNotes from "@/components/proforma/ProformaSectionNotes";
 import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/proforma/ProformaActivityLog";
+import { openProformaInvoiceTab } from "@/components/admin/ProformaInvoiceDocument";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
+const CATEGORY_TOGGLE_KEY = {
+  TRAVEL: "travel_enabled",
+  FOOD: "food_enabled",
+  STAY: "stay_enabled",
+  MISCELLANEOUS: "miscellaneous_enabled",
+};
+
 const SECTIONS = [
-  { key: "TEACHING", title: "1. Teaching Fee", totalKey: "teaching_total", qtyLabel: "Blocks / Hours" },
+  { key: "TEACHING", title: "1. Teaching Fee", totalKey: "teaching_total", qtyLabel: "Blocks" },
   { key: "TRAVEL", title: "2. Travel Expenses", totalKey: "travel_total", qtyLabel: "Distance (KM)" },
   { key: "FOOD", title: "3. Meal Allowance", totalKey: "food_total", qtyLabel: "Days" },
   { key: "STAY", title: "4. Stay / Accommodation", totalKey: "stay_total", qtyLabel: "Nights" },
@@ -38,7 +47,22 @@ const SECTIONS = [
 
 function savedQty(item) {
   if (!item) return 1;
-  return Number(item.multiplier || item.blocks || item.distance_km || item.hours || 1);
+  if (item.item_type === "TEACHING") {
+    return Number(item.blocks || item.multiplier || 1);
+  }
+  if (item.item_type === "TRAVEL") {
+    const mode = String(item.travel_mode || "ROAD").toUpperCase();
+    if (mode === "RAIL" || mode === "FLIGHT") return 1;
+    return Number(
+      item.distance_km ||
+        (item.road_one_way_km != null && item.road_multiplier != null
+          ? Number(item.road_one_way_km) * Number(item.road_multiplier)
+          : 0) ||
+        item.multiplier ||
+        1
+    );
+  }
+  return Number(item.multiplier || item.distance_km || item.hours || 1);
 }
 
 export default function ProformaInvoiceDetailPage() {
@@ -90,7 +114,18 @@ export default function ProformaInvoiceDetailPage() {
     );
   };
 
-  const activeSections = SECTION_KEYS.filter((k) => sectionIsActive(k));
+  /** Hide sections turned off in settings (unless this invoice already has an amount). */
+  const sectionIsVisible = (sec) => {
+    if (sec === "TEACHING") return true;
+    const toggleKey = CATEGORY_TOGGLE_KEY[sec];
+    if (!toggleKey) return true;
+    const enabled = proforma?.category_toggles?.[toggleKey];
+    if (enabled === false) return sectionIsActive(sec);
+    return true;
+  };
+
+  const visibleSections = SECTIONS.filter((s) => sectionIsVisible(s.key));
+  const activeSections = SECTION_KEYS.filter((k) => sectionIsVisible(k) && sectionIsActive(k));
   const allAccepted = activeSections.every((k) => dual[k]?.admin_approved);
   const allConfirmed = activeSections.every((k) => dual[k]?.teacher_approved);
   const isSigned =
@@ -169,10 +204,23 @@ export default function ProformaInvoiceDetailPage() {
   };
 
   const setField = (sec, field, value) => {
-    setDraft((prev) => ({
-      ...prev,
-      [sec]: { ...formFor(sec), [field]: value },
-    }));
+    setDraft((prev) => {
+      const current = prev[sec] || baseForm(sec);
+      return {
+        ...prev,
+        [sec]: { ...current, [field]: value },
+      };
+    });
+  };
+
+  const setFields = (sec, patch) => {
+    setDraft((prev) => {
+      const current = prev[sec] || baseForm(sec);
+      return {
+        ...prev,
+        [sec]: { ...current, ...patch },
+      };
+    });
   };
 
   const discard = (sec) => {
@@ -185,6 +233,10 @@ export default function ProformaInvoiceDetailPage() {
 
   const save = (sec) => {
     const form = formFor(sec);
+    const existing = (itemsByType[sec] || [])[0];
+    const travelMode = String(existing?.travel_mode || "ROAD").toUpperCase();
+    const isActualTravel = sec === "TRAVEL" && ["RAIL", "FLIGHT"].includes(travelMode);
+
     setSavingSection(sec);
     updateItemsMutation.mutate(
       {
@@ -193,8 +245,9 @@ export default function ProformaInvoiceDetailPage() {
         items: [
           {
             description: form.description,
-            multiplier: parseFloat(form.multiplier) || 1,
+            multiplier: isActualTravel ? 1 : parseFloat(form.multiplier) || 1,
             unit_rate: parseFloat(form.unit_rate) || 0,
+            ...(sec === "TRAVEL" ? { travel_mode: travelMode } : {}),
           },
         ],
       },
@@ -265,6 +318,17 @@ export default function ProformaInvoiceDetailPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {inFinance && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs font-semibold flex items-center gap-1.5"
+              onClick={() => openProformaInvoiceTab(proforma._id)}
+            >
+              <Printer className="w-4 h-4" />
+              View invoice
+            </Button>
+          )}
           {!inFinance ? (
             <Button
               size="sm"
@@ -294,8 +358,9 @@ export default function ProformaInvoiceDetailPage() {
       )}
 
       <div className="space-y-6">
-        {SECTIONS.map((sec) => {
+        {visibleSections.map((sec) => {
           const items = itemsByType[sec.key] || [];
+          const item = items[0];
           const docs = items.flatMap((i) => i.attachments || []);
           const comments = (proforma.section_comments || []).filter((c) => c.section === sec.key);
           const form = formFor(sec.key);
@@ -318,6 +383,11 @@ export default function ProformaInvoiceDetailPage() {
                   <span className="font-mono text-xs font-bold text-foreground bg-background px-2.5 py-0.5 rounded border">
                     €{Number(proforma[sec.totalKey] || 0).toFixed(2)}
                   </span>
+                  {sec.key === "TRAVEL" && item?.travel_mode && (
+                    <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-border text-foreground bg-muted/50 uppercase">
+                      {String(item.travel_mode).toLowerCase()}
+                    </span>
+                  )}
                   {!active ? (
                     <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-border text-muted-foreground bg-muted/50">
                       No amount — no accept needed
@@ -373,6 +443,92 @@ export default function ProformaInvoiceDetailPage() {
 
               <CardContent className="p-0">
                 <div className="p-5 space-y-4">
+                  {sec.key === "TRAVEL" && item && ["RAIL", "FLIGHT"].includes(String(item.travel_mode || "").toUpperCase()) ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Travel mode</Label>
+                        <Input
+                          value={`Travel (${String(item.travel_mode).toLowerCase()})`}
+                          disabled
+                          className="mt-1 text-sm bg-muted"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Ticket cost (€)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={form.unit_rate}
+                          disabled={inFinance}
+                          onChange={(e) =>
+                            setFields(sec.key, {
+                              unit_rate: e.target.value,
+                              multiplier: 1,
+                            })
+                          }
+                          className="font-mono text-sm mt-1"
+                        />
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          Starts from the road amount — set the real {String(item.travel_mode).toLowerCase()} ticket cost from the proof.
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
+                        <Input
+                          value={Number(form.unit_rate || 0).toFixed(2)}
+                          disabled
+                          className={`font-mono text-sm mt-1 ${dirty ? "bg-amber-50" : "bg-muted"}`}
+                        />
+                      </div>
+                      <div className="sm:col-span-3">
+                        <p className="text-xs text-muted-foreground">
+                          {item.calculation_breakdown || item.description}
+                        </p>
+                      </div>
+                    </div>
+                  ) : sec.key === "TRAVEL" && item ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Travel mode</Label>
+                        <Input value="Travel (road)" disabled className="mt-1 text-sm bg-muted" />
+                      </div>
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Distance (KM)</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={form.multiplier}
+                          disabled={inFinance}
+                          onChange={(e) => setField(sec.key, "multiplier", e.target.value)}
+                          className="font-mono text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Unit rate (€/km)</Label>
+                        <Input
+                          type="number"
+                          step="0.0001"
+                          value={form.unit_rate}
+                          disabled={inFinance}
+                          onChange={(e) => setField(sec.key, "unit_rate", e.target.value)}
+                          className="font-mono text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
+                        <Input
+                          value={preview.toFixed(2)}
+                          disabled
+                          className={`font-mono text-sm mt-1 ${dirty ? "bg-amber-50" : "bg-muted"}`}
+                        />
+                      </div>
+                      <div className="sm:col-span-3">
+                        <p className="text-xs text-muted-foreground">
+                          {item.calculation_breakdown || item.description}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="sm:col-span-3">
                       <Label className="text-xs uppercase font-semibold">Description</Label>
@@ -414,6 +570,7 @@ export default function ProformaInvoiceDetailPage() {
                       />
                     </div>
                   </div>
+                  )}
 
                   <div>
                     <p className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">

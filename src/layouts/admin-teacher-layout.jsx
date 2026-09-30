@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { AppBreadcrumbs } from "../components/ui/AppBreadcrumbs";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 import { BreadcrumbProvider } from "@/context/BreadCrumbContext";
 import { useThemeStore } from "@/store/useThemeStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -23,6 +23,10 @@ export default function AdminTeacherLayoutComponent() {
   const { initializeTheme } = useThemeStore();
   const { user } = useAuthStore();
   const { t, i18n } = useTranslation();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPrintOnly =
+    typeof pathname === "string" &&
+    /\/admin\/proforma-invoices\/[^/]+\/print\/?$/.test(pathname);
 
   useEffect(() => {
     initializeTheme();
@@ -43,6 +47,14 @@ export default function AdminTeacherLayoutComponent() {
 
   const currentLanguage =
     languages.find((lang) => lang.code === i18n.language) || languages[0];
+
+  if (isPrintOnly) {
+    return (
+      <BreadcrumbProvider>
+        <Outlet />
+      </BreadcrumbProvider>
+    );
+  }
 
   return (
     <SidebarProvider>

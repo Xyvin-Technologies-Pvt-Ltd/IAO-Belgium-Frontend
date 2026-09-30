@@ -6,6 +6,7 @@ import {
   useAddSectionComment,
   useUpdateSectionApproval,
   useSubmitTeacherUpdate,
+  useAddSectionAttachment,
 } from "@/store/useProformaStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
@@ -32,8 +33,15 @@ import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/pr
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 const EXPENSE_SECTIONS = ["TRAVEL", "STAY", "MISCELLANEOUS"];
 
+const CATEGORY_TOGGLE_KEY = {
+  TRAVEL: "travel_enabled",
+  FOOD: "food_enabled",
+  STAY: "stay_enabled",
+  MISCELLANEOUS: "miscellaneous_enabled",
+};
+
 const SECTIONS = [
-  { key: "TEACHING", title: "1. Teaching Fee", totalKey: "teaching_total", qtyLabel: "Blocks / Hours" },
+  { key: "TEACHING", title: "1. Teaching Fee", totalKey: "teaching_total", qtyLabel: "Blocks" },
   { key: "TRAVEL", title: "2. Travel Expenses", totalKey: "travel_total", qtyLabel: "Distance (KM)" },
   { key: "FOOD", title: "3. Meal Allowance", totalKey: "food_total", qtyLabel: "Days" },
   { key: "STAY", title: "4. Stay / Accommodation", totalKey: "stay_total", qtyLabel: "Nights" },
@@ -42,7 +50,20 @@ const SECTIONS = [
 
 function savedQty(item) {
   if (!item) return 1;
-  return Number(item.multiplier || item.blocks || item.distance_km || item.hours || 1);
+  if (item.item_type === "TEACHING") {
+    return Number(item.blocks || item.multiplier || 1);
+  }
+  if (item.item_type === "TRAVEL") {
+    if ((item.travel_mode || "ROAD") === "ROAD") {
+      return Number(item.distance_km || item.multiplier || 1);
+    }
+    return 1;
+  }
+  return Number(item.multiplier || item.distance_km || item.hours || 1);
+}
+
+function travelModeOf(item) {
+  return (item?.travel_mode || "ROAD").toUpperCase();
 }
 
 const statusBadge = (p) => {
@@ -73,11 +94,14 @@ export default function TeacherProformaDetailPage() {
   const addCommentMutation = useAddSectionComment();
   const updateApprovalMutation = useUpdateSectionApproval();
   const submitUpdateMutation = useSubmitTeacherUpdate();
+  const addAttachmentMutation = useAddSectionAttachment();
 
   const [signedByName, setSignedByName] = useState("");
   const [notes, setNotes] = useState({});
   const [draftQty, setDraftQty] = useState({});
   const [draftFiles, setDraftFiles] = useState({});
+  const [draftTravelMode, setDraftTravelMode] = useState({});
+  const [draftActualAmount, setDraftActualAmount] = useState({});
   const [savingSection, setSavingSection] = useState(null);
 
   useEffect(() => {
@@ -112,7 +136,17 @@ export default function TeacherProformaDetailPage() {
     );
   };
 
-  const activeSections = SECTION_KEYS.filter((k) => sectionIsActive(k));
+  const sectionIsVisible = (sec) => {
+    if (sec === "TEACHING") return true;
+    const toggleKey = CATEGORY_TOGGLE_KEY[sec];
+    if (!toggleKey) return true;
+    const enabled = proforma?.category_toggles?.[toggleKey];
+    if (enabled === false) return sectionIsActive(sec);
+    return true;
+  };
+
+  const visibleSections = SECTIONS.filter((s) => sectionIsVisible(s.key));
+  const activeSections = SECTION_KEYS.filter((k) => sectionIsVisible(k) && sectionIsActive(k));
   const allConfirmed = activeSections.every((k) => dual[k]?.teacher_approved);
   const allAccepted = activeSections.every((k) => dual[k]?.admin_approved);
 
@@ -121,25 +155,54 @@ export default function TeacherProformaDetailPage() {
       SECTION_KEYS.some((k) => {
         const item = (itemsByType[k] || [])[0];
         const qtyDirty = draftQty[k] != null && Number(draftQty[k]) !== savedQty(item);
-        return qtyDirty || (draftFiles[k] || []).length > 0;
+        const priorMode = item ? travelModeOf(item) : "";
+        const modeDirty =
+          k === "TRAVEL" &&
+          draftTravelMode[k] != null &&
+          draftTravelMode[k] !== priorMode;
+        const amountDirty =
+          k === "TRAVEL" &&
+          draftActualAmount[k] != null &&
+          String(draftActualAmount[k]).trim() !== "" &&
+          Number(draftActualAmount[k]) !== Number(item?.line_total || 0);
+        return qtyDirty || modeDirty || amountDirty || (draftFiles[k] || []).length > 0;
       }),
-    [draftQty, draftFiles, itemsByType]
+    [draftQty, draftFiles, draftTravelMode, draftActualAmount, itemsByType]
   );
 
   const missingReceipts = useMemo(() => {
     if (!proforma) return [];
-    const totals = {
-      TRAVEL: proforma.travel_total,
-      STAY: proforma.stay_total,
-      MISCELLANEOUS: proforma.miscellaneous_total,
-    };
-    return EXPENSE_SECTIONS.filter((sec) => {
-      if (!(totals[sec] > 0)) return false;
+    const policy = proforma.proof_policy || {};
+    const toggles = proforma.category_toggles || {};
+    const needed = [];
+
+    if (Number(proforma.travel_total) > 0 && toggles.travel_enabled !== false) {
+      const travelItem = (itemsByType.TRAVEL || [])[0];
+      const mode = String(draftTravelMode.TRAVEL || travelItem?.travel_mode || "ROAD").toLowerCase();
+      const modeKey = ["road", "rail", "flight"].includes(mode) ? mode : "road";
+      if (policy.travel?.[modeKey]?.proof_required === true) needed.push("TRAVEL");
+    }
+    if (
+      Number(proforma.stay_total) > 0 &&
+      toggles.stay_enabled !== false &&
+      policy.stay?.requires_receipt === true
+    ) {
+      needed.push("STAY");
+    }
+    if (
+      Number(proforma.miscellaneous_total) > 0 &&
+      toggles.miscellaneous_enabled !== false &&
+      policy.miscellaneous?.proof_required === true
+    ) {
+      needed.push("MISCELLANEOUS");
+    }
+
+    return needed.filter((sec) => {
       const saved = (itemsByType[sec] || []).some((i) => (i.attachments || []).length > 0);
       const draft = (draftFiles[sec] || []).length > 0;
       return !saved && !draft;
     });
-  }, [proforma, itemsByType, draftFiles]);
+  }, [proforma, itemsByType, draftFiles, draftTravelMode]);
 
   const canSign = !signed && !anyDirty && allConfirmed && allAccepted && missingReceipts.length === 0;
   const badge = statusBadge(proforma);
@@ -169,10 +232,26 @@ export default function TeacherProformaDetailPage() {
   const isSectionDirty = (sec) => {
     const item = (itemsByType[sec] || [])[0];
     const qtyDirty = draftQty[sec] != null && Number(draftQty[sec]) !== savedQty(item);
-    return qtyDirty || (draftFiles[sec] || []).length > 0;
+    const priorMode = item ? travelModeOf(item) : "";
+    const modeDirty =
+      sec === "TRAVEL" &&
+      draftTravelMode[sec] != null &&
+      draftTravelMode[sec] !== priorMode;
+    const amountDirty =
+      sec === "TRAVEL" &&
+      draftActualAmount[sec] != null &&
+      String(draftActualAmount[sec]).trim() !== "" &&
+      Number(draftActualAmount[sec]) !== Number(item?.line_total || 0);
+    return qtyDirty || modeDirty || amountDirty || (draftFiles[sec] || []).length > 0;
   };
 
   const displayQty = (sec) => (draftQty[sec] != null ? draftQty[sec] : savedQty((itemsByType[sec] || [])[0]));
+
+  const displayTravelMode = (item) => {
+    if (draftTravelMode.TRAVEL) return draftTravelMode.TRAVEL;
+    if (item) return travelModeOf(item);
+    return "";
+  };
 
   const discardSection = (sec) => {
     setDraftQty((prev) => {
@@ -185,17 +264,108 @@ export default function TeacherProformaDetailPage() {
       delete next[sec];
       return next;
     });
+    if (sec === "TRAVEL") {
+      setDraftTravelMode((prev) => {
+        const next = { ...prev };
+        delete next.TRAVEL;
+        return next;
+      });
+      setDraftActualAmount((prev) => {
+        const next = { ...prev };
+        delete next.TRAVEL;
+        return next;
+      });
+    }
   };
 
   const saveSection = (sec) => {
     const item = (itemsByType[sec] || [])[0];
+    const files = draftFiles[sec] || [];
+
+    if (sec === "TRAVEL") {
+      const mode = displayTravelMode(item);
+      const priorMode = item ? travelModeOf(item) : "";
+      const modeChanged = Boolean(mode) && mode !== priorMode;
+      const creatingTravel = !item && ["RAIL", "FLIGHT"].includes(mode);
+      const amountRaw =
+        draftActualAmount.TRAVEL != null && String(draftActualAmount.TRAVEL).trim() !== ""
+          ? Number(draftActualAmount.TRAVEL)
+          : Number(item?.line_total || 0);
+      const amount = amountRaw;
+      const amountChanged =
+        ["RAIL", "FLIGHT"].includes(mode) &&
+        draftActualAmount.TRAVEL != null &&
+        String(draftActualAmount.TRAVEL).trim() !== "" &&
+        Number(amount) !== Number(item?.line_total || 0);
+
+      if (!modeChanged && !amountChanged && !creatingTravel && files.length === 0) return;
+
+      if (creatingTravel || ["RAIL", "FLIGHT"].includes(mode)) {
+        if (!["RAIL", "FLIGHT"].includes(mode)) {
+          toast.error("Select Rail or Flight");
+          return;
+        }
+        if (!amount || amount <= 0) {
+          toast.error("Enter the ticket cost for Rail or Flight");
+          return;
+        }
+        const modeKey = mode.toLowerCase();
+        const needsProof = proforma.proof_policy?.travel?.[modeKey]?.proof_required === true;
+        const hasProof = (item?.attachments || []).length > 0 || files.length > 0;
+        if (needsProof && !hasProof) {
+          toast.error("Attach proof (ticket/receipt) for Rail or Flight");
+          return;
+        }
+      }
+
+      if (mode === "ROAD" && !item) {
+        toast.error("Road travel needs a calculated distance. Choose Rail or Flight instead.");
+        return;
+      }
+
+      const section_updates =
+        modeChanged || amountChanged || creatingTravel
+          ? [
+              {
+                section: "TRAVEL",
+                travel_mode: mode,
+                ...(mode === "ROAD" ? {} : { actual_amount: amount, multiplier: 1 }),
+              },
+            ]
+          : [];
+
+      if (section_updates.length === 0 && files.length === 0) return;
+
+      setSavingSection(sec);
+      submitUpdateMutation.mutate(
+        {
+          id: proforma._id,
+          data: {
+            section_updates,
+            attachments: files.length ? [{ section: "TRAVEL", files }] : [],
+            reason: creatingTravel
+              ? `Teacher added travel (${mode})`
+              : modeChanged
+                ? `Teacher switched travel to ${mode}`
+                : files.length
+                  ? "Teacher attached travel documents"
+                  : "Teacher updated travel",
+          },
+        },
+        {
+          onSettled: () => setSavingSection(null),
+          onSuccess: () => discardSection(sec),
+        }
+      );
+      return;
+    }
+
     const qty = Number(displayQty(sec));
     if (!qty || qty <= 0) {
       toast.error("Enter a valid quantity");
       return;
     }
     const qtyChanged = qty !== savedQty(item);
-    const files = draftFiles[sec] || [];
     if (!qtyChanged && files.length === 0) return;
 
     setSavingSection(sec);
@@ -274,7 +444,7 @@ export default function TeacherProformaDetailPage() {
 
       {/* Sections */}
       <div className="space-y-6">
-        {SECTIONS.map((sec) => {
+        {visibleSections.map((sec) => {
           const items = itemsByType[sec.key] || [];
           const item = items[0];
           const comments = (proforma.section_comments || []).filter((c) => c.section === sec.key);
@@ -358,40 +528,228 @@ export default function TeacherProformaDetailPage() {
               <CardContent className="p-0">
                 <div className="p-5 space-y-4">
                   {item ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">{sec.qtyLabel}</Label>
-                        <Input
-                          type="number"
-                          step="1"
-                          min="0"
-                          value={qty}
-                          disabled={signed}
-                          onChange={(e) =>
-                            setDraftQty((prev) => ({ ...prev, [sec.key]: e.target.value }))
-                          }
-                          className="font-mono text-sm mt-1"
-                        />
+                    sec.key === "TRAVEL" ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-xs uppercase font-semibold">Travel mode</Label>
+                            <select
+                              className="mt-1 w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                              disabled={signed}
+                              value={displayTravelMode(item)}
+                              onChange={(e) => {
+                                const mode = e.target.value;
+                                setDraftTravelMode((prev) => ({ ...prev, TRAVEL: mode }));
+                                if (mode === "ROAD") {
+                                  setDraftActualAmount((prev) => {
+                                    const next = { ...prev };
+                                    delete next.TRAVEL;
+                                    return next;
+                                  });
+                                }
+                              }}
+                            >
+                              <option value="ROAD">Road (formula)</option>
+                              <option value="RAIL">Rail</option>
+                              <option value="FLIGHT">Flight</option>
+                            </select>
+                          </div>
+
+                          {displayTravelMode(item) === "ROAD" ? (
+                            <>
+                              <div>
+                                <Label className="text-xs uppercase font-semibold">Distance (KM)</Label>
+                                <Input
+                                  value={Number(
+                                    item.road_one_way_km && item.road_multiplier
+                                      ? item.road_one_way_km * item.road_multiplier
+                                      : item.road_calculated_total
+                                      ? item.distance_km || item.road_one_way_km * 2
+                                      : item.distance_km || item.road_one_way_km || 0
+                                  ).toFixed(1)}
+                                  disabled
+                                  className="font-mono text-sm mt-1 bg-muted"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs uppercase font-semibold">Unit rate (€/km)</Label>
+                                <Input
+                                  value={Number(item.road_unit_rate || item.unit_rate || 0).toFixed(4)}
+                                  disabled
+                                  className="font-mono text-sm mt-1 bg-muted"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
+                                <Input
+                                  value={Number(
+                                    item.road_calculated_total || item.line_total || 0
+                                  ).toFixed(2)}
+                                  disabled
+                                  className="font-mono text-sm mt-1 bg-muted"
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
+                                <Input
+                                  value={Number(
+                                    draftActualAmount.TRAVEL != null && draftActualAmount.TRAVEL !== ""
+                                      ? draftActualAmount.TRAVEL
+                                      : item.line_total || 0
+                                  ).toFixed(2)}
+                                  disabled
+                                  className="font-mono text-sm mt-1 bg-muted"
+                                />
+                                <p className="text-[11px] text-muted-foreground mt-1">
+                                  Amount stays €{Number(item.line_total || 0).toFixed(2)} when you switch
+                                  mode — only attach proof unless the ticket cost differs.
+                                </p>
+                              </div>
+                              <div>
+                                <Label className="text-xs uppercase font-semibold">
+                                  Override ticket cost (€)
+                                  <span className="ml-1 font-normal normal-case text-muted-foreground">
+                                    optional
+                                  </span>
+                                </Label>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  disabled={signed}
+                                  placeholder={Number(item.line_total || 0).toFixed(2)}
+                                  value={
+                                    draftActualAmount.TRAVEL != null ? draftActualAmount.TRAVEL : ""
+                                  }
+                                  onChange={(e) =>
+                                    setDraftActualAmount((prev) => ({
+                                      ...prev,
+                                      TRAVEL: e.target.value,
+                                    }))
+                                  }
+                                  className="font-mono text-sm mt-1"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {displayTravelMode(item) === "ROAD"
+                            ? item.calculation_breakdown ||
+                              (item.road_one_way_km
+                                ? `${item.road_one_way_km} km × ${item.road_multiplier || 2} × €${Number(
+                                    item.road_unit_rate || 0
+                                  ).toFixed(4)}`
+                                : item.description)
+                            : `Mode: ${displayTravelMode(item).toLowerCase()} · amount €${Number(
+                                draftActualAmount.TRAVEL != null && draftActualAmount.TRAVEL !== ""
+                                  ? draftActualAmount.TRAVEL
+                                  : item.line_total || 0
+                              ).toFixed(2)} (unchanged unless you override)`}
+                          {item.blocks_source ? ` · ${item.blocks_source}` : ""}
+                        </p>
+                        {displayTravelMode(item) === "ROAD" &&
+                          (item.road_calculated_total != null || item.road_one_way_km) && (
+                          <p className="text-xs text-emerald-700">
+                            Road formula is saved on this invoice. Switching back to Road restores it.
+                          </p>
+                        )}
+                        {["RAIL", "FLIGHT"].includes(displayTravelMode(item)) &&
+                          proforma.proof_policy?.travel?.[displayTravelMode(item).toLowerCase()]
+                            ?.proof_required === true && (
+                          <p className="text-xs text-amber-700">
+                            Attach ticket/receipt proof below before saving Rail or Flight.
+                          </p>
+                        )}
                       </div>
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Unit Rate (€)</Label>
-                        <Input
-                          value={rate.toFixed(2)}
-                          disabled
-                          className="font-mono text-sm mt-1 bg-muted"
-                        />
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-xs uppercase font-semibold">{sec.qtyLabel}</Label>
+                          <Input
+                            type="number"
+                            step="1"
+                            min="0"
+                            value={qty}
+                            disabled={signed}
+                            onChange={(e) =>
+                              setDraftQty((prev) => ({ ...prev, [sec.key]: e.target.value }))
+                            }
+                            className="font-mono text-sm mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs uppercase font-semibold">Unit Rate (€)</Label>
+                          <Input
+                            value={rate.toFixed(2)}
+                            disabled
+                            className="font-mono text-sm mt-1 bg-muted"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
+                          <Input
+                            value={preview.toFixed(2)}
+                            disabled
+                            className={`font-mono text-sm mt-1 ${dirty ? "bg-amber-50" : "bg-muted"}`}
+                          />
+                        </div>
+                        <div className="sm:col-span-3">
+                          <p className="text-xs text-muted-foreground">{item.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
-                        <Input
-                          value={preview.toFixed(2)}
-                          disabled
-                          className={`font-mono text-sm mt-1 ${dirty ? "bg-amber-50" : "bg-muted"}`}
-                        />
+                    )
+                  ) : sec.key === "TRAVEL" && !signed ? (
+                    <div className="space-y-4">
+                      <p className="text-xs text-muted-foreground">
+                        No road distance was calculated for this planning. You can still claim Rail or
+                        Flight travel with ticket cost and proof.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-xs uppercase font-semibold">Travel mode</Label>
+                          <select
+                            className="mt-1 w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            value={displayTravelMode(null)}
+                            onChange={(e) =>
+                              setDraftTravelMode((prev) => ({ ...prev, TRAVEL: e.target.value }))
+                            }
+                          >
+                            <option value="">Select mode…</option>
+                            <option value="RAIL">Rail</option>
+                            <option value="FLIGHT">Flight</option>
+                          </select>
+                        </div>
+                        {["RAIL", "FLIGHT"].includes(displayTravelMode(null)) && (
+                          <div>
+                            <Label className="text-xs uppercase font-semibold">Ticket cost (€)</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={draftActualAmount.TRAVEL ?? ""}
+                              onChange={(e) =>
+                                setDraftActualAmount((prev) => ({
+                                  ...prev,
+                                  TRAVEL: e.target.value,
+                                }))
+                              }
+                              placeholder="0.00"
+                              className="font-mono text-sm mt-1"
+                            />
+                          </div>
+                        )}
                       </div>
-                      <div className="sm:col-span-3">
-                        <p className="text-xs text-muted-foreground">{item.description}</p>
-                      </div>
+                      {["RAIL", "FLIGHT"].includes(displayTravelMode(null)) &&
+                        proforma.proof_policy?.travel?.[displayTravelMode(null).toLowerCase()]
+                          ?.proof_required === true && (
+                          <p className="text-xs text-amber-700">
+                            Attach ticket/receipt proof below, then Save changes.
+                          </p>
+                        )}
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground text-center py-2">No line items for this section.</p>
@@ -432,14 +790,24 @@ export default function TeacherProformaDetailPage() {
                     <MultiFileSectionUploader
                       sectionKey={sec.key}
                       existingAttachments={savedDocs}
-                      disabled={signed}
+                      disabled={signed || addAttachmentMutation.isPending}
                       successToastMessage={false}
-                      onUploadSuccess={(files) =>
-                        setDraftFiles((prev) => ({
-                          ...prev,
-                          [sec.key]: [...(prev[sec.key] || []), ...files],
-                        }))
-                      }
+                      onUploadSuccess={(files) => {
+                        if (!files?.length || !proforma?._id) return;
+                        // Persist immediately so admin can see docs without a separate Save
+                        addAttachmentMutation.mutate(
+                          { id: proforma._id, section: sec.key, files },
+                          {
+                            onError: () => {
+                              // Fallback: keep as draft so teacher can still Save changes
+                              setDraftFiles((prev) => ({
+                                ...prev,
+                                [sec.key]: [...(prev[sec.key] || []), ...files],
+                              }));
+                            },
+                          }
+                        );
+                      }}
                     />
                   </div>
                 </div>
@@ -449,7 +817,14 @@ export default function TeacherProformaDetailPage() {
                     <p className="text-xs font-medium text-amber-900">
                       Unsaved changes
                       {pending.length > 0 ? ` · ${pending.length} file(s)` : ""}
-                      {draftQty[sec.key] != null && Number(draftQty[sec.key]) !== savedQty(item)
+                      {sec.key === "TRAVEL" &&
+                      draftTravelMode.TRAVEL &&
+                      draftTravelMode.TRAVEL !== travelModeOf(item)
+                        ? " · travel mode"
+                        : ""}
+                      {sec.key !== "TRAVEL" &&
+                      draftQty[sec.key] != null &&
+                      Number(draftQty[sec.key]) !== savedQty(item)
                         ? " · quantity"
                         : ""}
                     </p>

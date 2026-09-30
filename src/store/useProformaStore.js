@@ -75,12 +75,16 @@ export const useUpdateProformaRegion = () => {
 
   return useMutation({
     mutationFn: ({ id, data }) => updateProformaRegion({ id, data }),
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-regions"] });
-      toast.success(response?.message || "Proforma region updated successfully!");
+      if (!variables?.silent) {
+        toast.success(response?.message || "Proforma region updated successfully!");
+      }
     },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to update proforma region");
+    onError: (error, variables) => {
+      if (!variables?.silent) {
+        toast.error(error?.message || "Failed to update proforma region");
+      }
     },
   });
 };
