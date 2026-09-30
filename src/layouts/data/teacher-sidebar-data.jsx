@@ -6,6 +6,7 @@ import {
   BookOpenCheck,
   ClipboardCheck,
   Bell,
+  Receipt,
 } from "lucide-react";
 
 export const getTeacherSidebarData = (t) => ({
@@ -32,6 +33,11 @@ export const getTeacherSidebarData = (t) => ({
           title: t("sidebar.teacher.planning"),
           url: "/teacher/planning",
           icon: Calendars,
+        },
+        {
+          title: "My Proforma Invoices",
+          url: "/teacher/proforma-invoices",
+          icon: Receipt,
         },
         {
           title: t("sidebar.teacher.evaluations"),

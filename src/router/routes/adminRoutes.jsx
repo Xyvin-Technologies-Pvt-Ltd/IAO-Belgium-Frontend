@@ -70,6 +70,10 @@ import Departments from "@/pages/admin/department";
 import Regions from "@/pages/admin/region";
 import TeachingRegions from "@/pages/admin/teaching-region";
 import AccountingMappings from "@/pages/admin/accounting-mapping";
+import ProformaAdminManagement from "@/components/admin/ProformaAdminManagement";
+import ProformaSettingsConfig from "@/components/admin/ProformaSettingsConfig";
+import ProformaInvoiceDetailPage from "@/pages/admin/finance-management/ProformaInvoiceDetailPage";
+import ProformaInvoicePrintPage from "@/pages/admin/finance-management/ProformaInvoicePrintPage";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -216,6 +220,34 @@ export const adminRoutes = [
     component: withPermissionProtection(
       CustomInvoices,
       "/admin/custom-invoices",
+    ),
+  },
+  {
+    path: "/admin/proforma-invoices",
+    component: withPermissionProtection(
+      ProformaAdminManagement,
+      "/admin/proforma-invoices",
+    ),
+  },
+  {
+    path: "/admin/proforma-invoices/$id",
+    component: withPermissionProtection(
+      ProformaInvoiceDetailPage,
+      "/admin/proforma-invoices",
+    ),
+  },
+  {
+    path: "/admin/proforma-invoices/$id/print",
+    component: withPermissionProtection(
+      ProformaInvoicePrintPage,
+      "/admin/proforma-invoices",
+    ),
+  },
+  {
+    path: "/admin/proforma-settings",
+    component: withPermissionProtection(
+      ProformaSettingsConfig,
+      "/admin/proforma-settings",
     ),
   },
   {

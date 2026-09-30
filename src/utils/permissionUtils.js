@@ -51,6 +51,14 @@ const SIDEBAR_PERMISSIONS = {
     "finance_management_view",
     "finance_management_modify",
   ],
+  "/admin/proforma-invoices": [
+    "finance_management_view",
+    "finance_management_modify",
+  ],
+  "/admin/proforma-settings": [
+    "master_data_management_view",
+    "master_data_management_modify",
+  ],
   "/admin/integrations": [
     "finance_management_view",
     "finance_management_modify",

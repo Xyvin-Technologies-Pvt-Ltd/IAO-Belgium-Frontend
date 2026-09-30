@@ -22,6 +22,7 @@ import {
   CreditCard,
   Landmark,
   Archive,
+  Calculator,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -161,11 +162,21 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/custom-invoices",
             icon: NotebookText,
           },
+          {
+            title: "Teacher Proforma Invoices",
+            url: "/admin/proforma-invoices",
+            icon: FileText,
+          },
         ],
       },
       {
         title: t("sidebar.admin.masterData"),
         items: [
+          {
+            title: "Proforma Tariffs & Settings",
+            url: "/admin/proforma-settings",
+            icon: Calculator,
+          },
           {
             title: t("sidebar.admin.locations"),
             url: "/admin/locations",

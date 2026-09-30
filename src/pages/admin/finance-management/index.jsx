@@ -7,6 +7,7 @@ import {
   History,
   Briefcase,
   CreditCard,
+  FileText,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -112,6 +113,17 @@ const REPORT_CARDS = [
     accentColor: "#0d9488",
     path: "/admin/fkf",
     permissionPath: "/admin/fkf",
+  },
+  {
+    key: "proforma_invoices",
+    titleKey: "Teacher Proforma Invoices",
+    descriptionKey: "Track sent, updated, and signed teacher proforma invoices",
+    icon: FileText,
+    iconColor: "#10b981",
+    bgColor: "rgba(16,185,129,0.08)",
+    accentColor: "#10b981",
+    path: "/admin/proforma-invoices",
+    permissionPath: "/admin/proforma-invoices",
   },
 ];
 
