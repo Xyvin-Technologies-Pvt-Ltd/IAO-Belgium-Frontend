@@ -24,7 +24,7 @@ export function getProformaStatusChip(proforma) {
 const ACTION_LABELS = {
   TEACHER_UPDATED_SECTION: "Teacher updated section",
   SECTION_EDITED: "Admin edited section",
-  SECTION_APPROVED: "Section confirmed / accepted",
+  SECTION_APPROVED: "Section confirmed",
   SECTION_UNAPPROVED: "Section unconfirmed",
   TEACHER_SIGNED: "Teacher signed",
   STATUS_CHANGED: "Status changed",

@@ -9,7 +9,7 @@ import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
 import ProformaInvoicesFilterDrawer, {
   EMPTY_PROFORMA_FILTERS,
 } from "./ProformaInvoicesFilterDrawer";
-import { coursePlanningLabel } from "@/utils/proformaCourseLabel";
+import { coursePlanningLabel, proformaTeacherName, proformaTeacherRole } from "@/utils/proformaCourseLabel";
 import { Eye, FileText } from "lucide-react";
 import {
   Table,
@@ -86,7 +86,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       bg: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400",
     },
     TEACHER_SIGNED_APPROVED: {
-      label: "Signed — ready to accept",
+      label: "Signed — ready for finance",
       bg: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400",
     },
     MOVED_TO_FINANCE: {
@@ -252,7 +252,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                       {err.city || err.planning_id?.city || "Unassigned City"}
                     </TableCell>
                     <TableCell className="font-medium text-foreground">
-                      {err.teacher_id?.full_name || err.teacher_id?.name || "Teacher"}
+                      {proformaTeacherName(err.teacher_id)}
                       <span className="block text-xs text-muted-foreground font-normal mt-0.5">{err.teacher_id?.email}</span>
                     </TableCell>
                     <TableCell className="whitespace-normal break-words text-red-600 dark:text-red-400 font-mono text-xs leading-relaxed max-w-md">
@@ -300,7 +300,9 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
               <TableRow className="bg-muted/50">
                 <TableHead>Invoice #</TableHead>
                 <TableHead>Teacher Name & Email</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Course Planning</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Region</TableHead>
                 <TableHead className="text-right">Grand Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
@@ -311,23 +313,44 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
             <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
               {isLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={8} />
+                <TableSkeleton rows={rowsPerPage} columns={10} />
               ) : invoices.length > 0 ? (
                 invoices.map((inv) => {
                   const badge = getStatusBadge(inv);
-                  const { title, subtitle } = coursePlanningLabel(inv);
+                  const { title, subtitle, locationLines } = coursePlanningLabel(inv);
+                  const role = proformaTeacherRole(inv);
 
                   return (
                     <TableRow key={inv._id} className="hover:bg-muted/40 transition">
                       <TableCell className="font-semibold text-foreground">{inv.proforma_number}</TableCell>
                       <TableCell className="font-medium text-foreground">
-                        {inv.teacher_id?.full_name || inv.teacher_id?.name || "Teacher"}
+                        {proformaTeacherName(inv.teacher_id)}
                         <span className="block text-xs text-muted-foreground font-normal mt-0.5">{inv.teacher_id?.email}</span>
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground whitespace-nowrap">
+                        {role || "—"}
                       </TableCell>
                       <TableCell className="font-medium text-foreground">
                         {title}
                         {subtitle && (
                           <span className="block text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm text-foreground max-w-[220px]">
+                        {locationLines.length > 0 ? (
+                          <>
+                            <span className="font-medium">{locationLines[0]}</span>
+                            {locationLines.slice(1).map((line) => (
+                              <span
+                                key={line}
+                                className="block text-xs text-muted-foreground font-normal mt-0.5"
+                              >
+                                {line}
+                              </span>
+                            ))}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground font-medium text-xs">
@@ -377,7 +400,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center p-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center p-8 text-muted-foreground">
                     No proforma invoices found.
                   </TableCell>
                 </TableRow>

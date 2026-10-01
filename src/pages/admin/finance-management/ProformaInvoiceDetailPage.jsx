@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import {
   useGetProformaById,
   useUpdateProformaStatus,
-  useUpdateSectionApproval,
   useAddSectionComment,
   useUpdateSectionItems,
 } from "@/store/useProformaStore";
@@ -26,6 +25,9 @@ import {
 import { toast } from "sonner";
 import ProformaSectionNotes from "@/components/proforma/ProformaSectionNotes";
 import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/proforma/ProformaActivityLog";
+import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard";
+import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCard";
+import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
 import { openProformaInvoiceTab } from "@/components/admin/ProformaInvoiceDocument";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
@@ -39,7 +41,7 @@ const CATEGORY_TOGGLE_KEY = {
 
 const SECTIONS = [
   { key: "TEACHING", title: "1. Teaching Fee", totalKey: "teaching_total", qtyLabel: "Blocks" },
-  { key: "TRAVEL", title: "2. Travel Expenses", totalKey: "travel_total", qtyLabel: "Distance (KM)" },
+  { key: "TRAVEL", title: "2. Travel Allowance", totalKey: "travel_total", qtyLabel: "Distance (KM)" },
   { key: "FOOD", title: "3. Meal Allowance", totalKey: "food_total", qtyLabel: "Days" },
   { key: "STAY", title: "4. Stay / Accommodation", totalKey: "stay_total", qtyLabel: "Nights" },
   { key: "MISCELLANEOUS", title: "5. Miscellaneous", totalKey: "miscellaneous_total", qtyLabel: "Amount" },
@@ -52,7 +54,7 @@ function savedQty(item) {
   }
   if (item.item_type === "TRAVEL") {
     const mode = String(item.travel_mode || "ROAD").toUpperCase();
-    if (mode === "RAIL" || mode === "FLIGHT") return 1;
+    if (mode === "RAIL" || mode === "FLIGHT" || mode === "FIXED") return Number(item.multiplier ?? 1);
     const billable =
       item.distance_km ??
       (item.road_one_way_km != null && item.road_multiplier != null
@@ -83,6 +85,7 @@ function sectionNeedsDocument(proforma, sec, itemsByType) {
     return travelItems.some((item) => {
       if (Number(item.line_total) <= 0) return false;
       const mode = String(item.travel_mode || "ROAD").toLowerCase();
+      if (mode === "fixed") return false;
       const modeKey = ["road", "rail", "flight"].includes(mode) ? mode : "road";
       return policy.travel?.[modeKey]?.proof_required === true;
     });
@@ -111,13 +114,14 @@ export default function ProformaInvoiceDetailPage() {
   const proforma = responseData?.data || responseData;
 
   const updateStatusMutation = useUpdateProformaStatus();
-  const updateApprovalMutation = useUpdateSectionApproval();
   const addCommentMutation = useAddSectionComment();
   const updateItemsMutation = useUpdateSectionItems();
 
   const [notes, setNotes] = useState({});
   const [draft, setDraft] = useState({});
   const [savingSection, setSavingSection] = useState(null);
+  const [adjustingTravel, setAdjustingTravel] = useState(false);
+  const [travelOneWay, setTravelOneWay] = useState("");
 
   useEffect(() => {
     if (proforma?.proforma_number) {
@@ -154,13 +158,12 @@ export default function ProformaInvoiceDetailPage() {
 
   const visibleSections = SECTIONS.filter((s) => sectionIsVisible(s.key));
   const activeSections = SECTION_KEYS.filter((k) => sectionIsVisible(k) && sectionIsActive(k));
-  const allAccepted = activeSections.every((k) => dual[k]?.admin_approved);
   const allConfirmed = activeSections.every((k) => dual[k]?.teacher_approved);
   const isSigned =
     proforma?.digital_signature?.is_signed || proforma?.status === "TEACHER_SIGNED_APPROVED";
   const inFinance = proforma?.status === "MOVED_TO_FINANCE" || proforma?.status === "PAID";
   const canSendToFinance =
-    isSigned && allAccepted && allConfirmed && proforma?.status === "TEACHER_SIGNED_APPROVED";
+    isSigned && allConfirmed && proforma?.status === "TEACHER_SIGNED_APPROVED";
 
   const statusBadges = {
     SENT_TO_TEACHER: {
@@ -310,7 +313,14 @@ export default function ProformaInvoiceDetailPage() {
                 ? 1
                 : parseFloat(form.multiplier) || 1,
         unit_rate: parseFloat(form.unit_rate) || 0,
-        ...(sec === "TRAVEL" ? { travel_mode: travelMode } : {}),
+        ...(sec === "TRAVEL"
+          ? {
+              travel_mode: travelMode,
+              ...(travelMode === "ROAD" && adjustingTravel && travelOneWay !== ""
+                ? { road_one_way_km: parseFloat(travelOneWay) || 0 }
+                : {}),
+            }
+          : {}),
         attachments: row.attachments || [],
       };
     });
@@ -337,27 +347,9 @@ export default function ProformaInvoiceDetailPage() {
     );
   };
 
-  const accept = (sec) => {
-    if (!dual[sec]?.teacher_approved) {
-      toast.error("Teacher must confirm this section first");
-      return;
-    }
-    if (isDirty(sec)) {
-      toast.error("Save or discard edits first");
-      return;
-    }
-    if (dual[sec]?.admin_approved) return;
-    updateApprovalMutation.mutate({
-      id: proforma._id,
-      section: sec,
-      action: "APPROVE",
-      notes: `Admin accepted ${sec}`,
-    });
-  };
-
   const sendToFinance = () => {
     if (!canSendToFinance) {
-      toast.error("Teacher must sign and all sections must be accepted");
+      toast.error("Teacher must confirm all sections and digitally sign first");
       return;
     }
     updateStatusMutation.mutate({
@@ -376,21 +368,21 @@ export default function ProformaInvoiceDetailPage() {
               <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold border ${badgeInfo.bg}`}>
                 {badgeInfo.label}
               </span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {proforma.teacher_id?.full_name || proforma.teacher_id?.name || "Teacher"}
-              {" · "}
-              <span className="font-semibold text-foreground">
-                {proforma.planning_id?.city || proforma.region_snapshot_name || "—"}
-              </span>
-              {" · "}
-              <span className="font-mono font-semibold text-foreground">
+              <span className="font-mono text-sm font-bold text-foreground">
                 €{Number(proforma.grand_total || 0).toFixed(2)}
               </span>
-            </p>
-            {proforma.teacher_id?.IBAN && (
-              <p className="text-xs font-mono text-muted-foreground mt-0.5">
+            </div>
+            {proforma.teacher_id?.IBAN && !proforma.digital_signature?.bank_account_number && (
+              <p className="text-xs font-mono text-muted-foreground mt-1">
                 IBAN: <span className="font-semibold text-foreground">{proforma.teacher_id.IBAN}</span>
+              </p>
+            )}
+            {proforma.digital_signature?.bank_account_number && (
+              <p className="text-xs font-mono text-muted-foreground mt-1">
+                Bank:{" "}
+                <span className="font-semibold text-foreground">
+                  {proforma.digital_signature.bank_account_number}
+                </span>
               </p>
             )}
           </div>
@@ -414,7 +406,7 @@ export default function ProformaInvoiceDetailPage() {
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 disabled:opacity-50"
               onClick={sendToFinance}
               disabled={!canSendToFinance || updateStatusMutation.isPending}
-              title={!canSendToFinance ? "Requires teacher signature and all sections accepted" : undefined}
+              title={!canSendToFinance ? "Requires teacher confirm + digital signature" : undefined}
             >
               <ArrowRight className="w-4 h-4" />
               {updateStatusMutation.isPending ? "Sending..." : "Send to finance"}
@@ -427,12 +419,21 @@ export default function ProformaInvoiceDetailPage() {
         </div>
       </div>
 
+      <ProformaContextSummary proforma={proforma} showTeacherName />
+
       <ProformaLatestChangeBanner proforma={proforma} viewerRole="ADMIN" />
 
       {isSigned && (
-        <div className="flex items-center gap-2 text-sm text-emerald-700 px-1">
-          <CheckCircle2 className="w-4 h-4" />
-          Digitally signed by {proforma.digital_signature?.signed_by_name}
+        <div className="text-sm text-emerald-700 px-1 space-y-0.5">
+          <p className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            Digitally signed by {proforma.digital_signature?.signed_by_name}
+          </p>
+          {proforma.digital_signature?.bank_account_number && (
+            <p className="text-xs font-mono text-emerald-800/90 pl-6">
+              Bank: {proforma.digital_signature.bank_account_number}
+            </p>
+          )}
         </div>
       )}
 
@@ -457,7 +458,6 @@ export default function ProformaInvoiceDetailPage() {
           const form = formFor(sec.key);
           const dirty = isDirty(sec.key);
           const teacherOk = dual[sec.key]?.teacher_approved;
-          const adminOk = dual[sec.key]?.admin_approved;
           const active = sectionIsActive(sec.key);
           const isSaving = savingSection === sec.key && updateItemsMutation.isPending;
           const preview =
@@ -478,12 +478,12 @@ export default function ProformaInvoiceDetailPage() {
                     €{Number(proforma[sec.totalKey] || 0).toFixed(2)}
                   </span>
                   {sec.key === "TRAVEL" && (
-                    <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-border text-foreground bg-muted/50">
+                    <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-amber-200 text-amber-900 bg-amber-50">
                       {fixedTravelItems.length > 0
-                        ? `fixed · ${fixedTravelItems.length} session(s)`
+                        ? `Fixed · ${fixedTravelItems.length} session(s)`
                         : roadItem
-                          ? "weekend fee"
-                          : "tickets only"}
+                          ? "Road"
+                          : "Tickets"}
                       {ticketItems.length > 0 ? ` · ${ticketItems.length} ticket(s)` : ""}
                     </span>
                   )}
@@ -511,29 +511,18 @@ export default function ProformaInvoiceDetailPage() {
                   })()}
                   {!active ? (
                     <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-border text-muted-foreground bg-muted/50">
-                      No amount — no accept needed
+                      No amount — no confirm needed
                     </span>
                   ) : (
-                    <>
-                      <span
-                        className={`px-2 py-0.5 text-[11px] rounded-full font-semibold border flex items-center gap-1 ${
-                          teacherOk
-                            ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                            : "bg-gray-100 text-gray-700 border-gray-300"
-                        }`}
-                      >
-                        {teacherOk ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />} Teacher confirmed
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 text-[11px] rounded-full font-semibold border flex items-center gap-1 ${
-                          adminOk
-                            ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                            : "bg-gray-100 text-gray-700 border-gray-300"
-                        }`}
-                      >
-                        {adminOk ? <ShieldCheck className="w-3 h-3" /> : <Clock className="w-3 h-3" />} Accepted
-                      </span>
-                    </>
+                    <span
+                      className={`px-2 py-0.5 text-[11px] rounded-full font-semibold border flex items-center gap-1 ${
+                        teacherOk
+                          ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                          : "bg-gray-100 text-gray-700 border-gray-300"
+                      }`}
+                    >
+                      {teacherOk ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />} Teacher confirmed
+                    </span>
                   )}
                   {active &&
                     Array.isArray(proforma.last_revision?.sections) &&
@@ -543,23 +532,6 @@ export default function ProformaInvoiceDetailPage() {
                       </span>
                     )}
                 </div>
-
-                {!inFinance && active && (
-                  <Button
-                    size="sm"
-                    variant={adminOk ? "default" : "outline"}
-                    className={
-                      adminOk
-                        ? "bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs font-semibold"
-                        : "h-7 text-xs"
-                    }
-                    disabled={adminOk || !teacherOk || dirty}
-                    onClick={() => accept(sec.key)}
-                  >
-                    <Check className="w-3.5 h-3.5 mr-1" />
-                    {adminOk ? "Accepted" : "Accept"}
-                  </Button>
-                )}
               </CardHeader>
 
               <CardContent className="p-0">
@@ -593,75 +565,48 @@ export default function ProformaInvoiceDetailPage() {
                   )}
 
                   {sec.key === "TRAVEL" && roadItem ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Teaching weekend fee</Label>
-                        <Input value="Travel (road)" disabled className="mt-1 text-sm bg-muted" />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Distance (KM)</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={form.multiplier}
-                          disabled={inFinance}
-                          onChange={(e) => setField(sec.key, "multiplier", e.target.value)}
-                          className="font-mono text-sm mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Unit rate (€/km)</Label>
-                        <Input
-                          type="number"
-                          step="0.0001"
-                          value={form.unit_rate}
-                          disabled={inFinance}
-                          onChange={(e) => setField(sec.key, "unit_rate", e.target.value)}
-                          className="font-mono text-sm mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
-                        <Input
-                          value={preview.toFixed(2)}
-                          disabled
-                          className={`font-mono text-sm mt-1 ${dirty ? "bg-amber-50" : "bg-muted"}`}
-                        />
-                      </div>
-                      <div className="sm:col-span-3">
-                        <p className="text-xs text-muted-foreground">
-                          {roadItem.calculation_breakdown || roadItem.description}
-                        </p>
-                      </div>
-                    </div>
+                    <ProformaTravelRoadCard
+                      item={roadItem}
+                      editable={!inFinance}
+                      adjusting={adjustingTravel}
+                      dirty={dirty}
+                      oneWayKm={
+                        adjustingTravel
+                          ? travelOneWay
+                          : roadItem.road_one_way_km ??
+                            (Number(form.multiplier) && Number(roadItem.road_multiplier || 2)
+                              ? Number(form.multiplier) / Number(roadItem.road_multiplier || 2)
+                              : 0)
+                      }
+                      ratePerKm={form.unit_rate}
+                      onToggleAdjust={(on) => {
+                        if (on) {
+                          const trip = Number(roadItem.road_multiplier || 2) || 2;
+                          const ow =
+                            roadItem.road_one_way_km != null
+                              ? Number(roadItem.road_one_way_km)
+                              : Number(form.multiplier || 0) / trip;
+                          setTravelOneWay(String(ow));
+                          setAdjustingTravel(true);
+                        } else {
+                          setAdjustingTravel(false);
+                          discard(sec.key);
+                        }
+                      }}
+                      onOneWayChange={(v) => {
+                        setTravelOneWay(v);
+                        const trip = Number(roadItem.road_multiplier || 2) || 2;
+                        const billable = Math.round(Number(v || 0) * trip * 1000) / 1000;
+                        setFields(sec.key, { multiplier: billable });
+                      }}
+                      onRateChange={(v) => setField(sec.key, "unit_rate", v)}
+                      onSaveAdjust={() => {
+                        save(sec.key);
+                        setAdjustingTravel(false);
+                      }}
+                    />
                   ) : sec.key === "TRAVEL" && fixedTravelItems.length > 0 ? (
-                    <div className="space-y-2">
-                      <p className="text-xs font-bold text-foreground uppercase tracking-wide">
-                        Fixed session travel
-                      </p>
-                      {fixedTravelItems.map((line) => (
-                        <div
-                          key={line._id}
-                          className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
-                        >
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium">{line.description}</p>
-                            <p className="text-xs font-mono text-muted-foreground">
-                              {line.calculation_breakdown ||
-                                `€${Number(line.line_total || 0).toFixed(2)}`}
-                            </p>
-                            {line.session_date && (
-                              <p className="text-[11px] text-muted-foreground mt-0.5">
-                                {new Date(line.session_date).toLocaleDateString()}
-                              </p>
-                            )}
-                          </div>
-                          <span className="font-mono text-sm font-semibold">
-                            €{Number(line.line_total || 0).toFixed(2)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <ProformaTravelFixedCard items={fixedTravelItems} />
                   ) : sec.key === "TRAVEL" && !roadItem && ticketItems.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No travel lines.</p>
                   ) : sec.key === "STAY" && items.length === 0 ? (
