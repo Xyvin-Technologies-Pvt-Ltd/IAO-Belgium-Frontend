@@ -443,11 +443,15 @@ export default function ProformaInvoiceDetailPage() {
             sec.key === "TRAVEL"
               ? items.find((i) => (i.travel_mode || "ROAD") === "ROAD")
               : null;
+          const fixedTravelItems =
+            sec.key === "TRAVEL"
+              ? items.filter((i) => String(i.travel_mode || "").toUpperCase() === "FIXED")
+              : [];
           const ticketItems =
             sec.key === "TRAVEL"
               ? items.filter((i) => ["RAIL", "FLIGHT"].includes(String(i.travel_mode || "").toUpperCase()))
               : [];
-          const item = sec.key === "TRAVEL" ? roadItem || items[0] : items[0];
+          const item = sec.key === "TRAVEL" ? roadItem || fixedTravelItems[0] || items[0] : items[0];
           const docs = items.flatMap((i) => i.attachments || []);
           const comments = (proforma.section_comments || []).filter((c) => c.section === sec.key);
           const form = formFor(sec.key);
@@ -475,7 +479,11 @@ export default function ProformaInvoiceDetailPage() {
                   </span>
                   {sec.key === "TRAVEL" && (
                     <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-border text-foreground bg-muted/50">
-                      {roadItem ? "weekend fee" : "tickets only"}
+                      {fixedTravelItems.length > 0
+                        ? `fixed · ${fixedTravelItems.length} session(s)`
+                        : roadItem
+                          ? "weekend fee"
+                          : "tickets only"}
                       {ticketItems.length > 0 ? ` · ${ticketItems.length} ticket(s)` : ""}
                     </span>
                   )}
@@ -625,6 +633,34 @@ export default function ProformaInvoiceDetailPage() {
                           {roadItem.calculation_breakdown || roadItem.description}
                         </p>
                       </div>
+                    </div>
+                  ) : sec.key === "TRAVEL" && fixedTravelItems.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="text-xs font-bold text-foreground uppercase tracking-wide">
+                        Fixed session travel
+                      </p>
+                      {fixedTravelItems.map((line) => (
+                        <div
+                          key={line._id}
+                          className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">{line.description}</p>
+                            <p className="text-xs font-mono text-muted-foreground">
+                              {line.calculation_breakdown ||
+                                `€${Number(line.line_total || 0).toFixed(2)}`}
+                            </p>
+                            {line.session_date && (
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                {new Date(line.session_date).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                          <span className="font-mono text-sm font-semibold">
+                            €{Number(line.line_total || 0).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   ) : sec.key === "TRAVEL" && !roadItem && ticketItems.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No travel lines.</p>
