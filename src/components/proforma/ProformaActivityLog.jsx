@@ -30,7 +30,9 @@ const ACTION_LABELS = {
   STATUS_CHANGED: "Status changed",
   ATTACHMENT_ADDED: "Document attached",
   COMMENT_ADDED: "Note added",
+  SECTION_COMMENT_ADDED: "Section note added",
   SENT_TO_FINANCE: "Sent to finance",
+  SENT_BACK_TO_TEACHER: "Sent back to teacher",
   MOVED_TO_FINANCE: "Moved to finance",
   SIGNATURE_VOIDED: "Signature cleared",
 };
@@ -50,16 +52,46 @@ export function ProformaLatestChangeBanner({ proforma, viewerRole = "ADMIN" }) {
   const isOwn = (viewerRole === "ADMIN" && byAdmin) || (viewerRole === "TEACHER" && byTeacher);
   const who = byTeacher ? "Teacher" : "Admin";
   const sections = Array.isArray(rev.sections) && rev.sections.length > 0 ? rev.sections.join(", ") : null;
+  const adminSentBackToTeacher =
+    viewerRole === "TEACHER" &&
+    byAdmin &&
+    (proforma?.status === "CHANGE_REQUESTED" || proforma?.workflow_next_actor === "TEACHER");
 
   return (
-    <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4 space-y-2">
+    <div
+      className={`rounded-xl border p-4 space-y-2 ${
+        adminSentBackToTeacher
+          ? "border-orange-400 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-800"
+          : "border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800"
+      }`}
+    >
       <div className="flex items-start gap-2">
-        <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 mt-0.5 shrink-0" />
+        <AlertCircle
+          className={`w-4 h-4 mt-0.5 shrink-0 ${
+            adminSentBackToTeacher ? "text-orange-700 dark:text-orange-400" : "text-amber-700 dark:text-amber-400"
+          }`}
+        />
         <div className="min-w-0 space-y-1">
-          <p className="text-sm font-bold text-amber-950 dark:text-amber-100">
-            {isOwn ? "Your last update" : `Latest update from ${who}`}
+          <p
+            className={`text-sm font-bold ${
+              adminSentBackToTeacher
+                ? "text-orange-950 dark:text-orange-100"
+                : "text-amber-950 dark:text-amber-100"
+            }`}
+          >
+            {adminSentBackToTeacher
+              ? "Admin sent this back — please revise"
+              : isOwn
+                ? "Your last update"
+                : `Latest update from ${who}`}
           </p>
-          <p className="text-xs text-amber-900/90 dark:text-amber-200/90">
+          <p
+            className={`text-xs ${
+              adminSentBackToTeacher
+                ? "text-orange-900/90 dark:text-orange-200/90"
+                : "text-amber-900/90 dark:text-amber-200/90"
+            }`}
+          >
             <span className="font-semibold">{rev.requested_by_name || who}</span>
             {rev.requested_at && (
               <>
@@ -69,14 +101,21 @@ export function ProformaLatestChangeBanner({ proforma, viewerRole = "ADMIN" }) {
             )}
             {sections && (
               <>
-                {" · Only: "}
+                {" · Sections: "}
                 <span className="font-mono font-semibold">{sections}</span>
-                <span> (other sections unchanged)</span>
               </>
             )}
           </p>
           {rev.reason && (
-            <p className="text-sm text-amber-950 dark:text-amber-50 leading-relaxed">{rev.reason}</p>
+            <p
+              className={`text-sm leading-relaxed font-medium ${
+                adminSentBackToTeacher
+                  ? "text-orange-950 dark:text-orange-50"
+                  : "text-amber-950 dark:text-amber-50"
+              }`}
+            >
+              {rev.reason}
+            </p>
           )}
         </div>
       </div>

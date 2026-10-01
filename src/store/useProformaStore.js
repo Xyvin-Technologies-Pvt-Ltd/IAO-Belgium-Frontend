@@ -17,6 +17,9 @@ import {
   addSectionAttachment,
   submitTeacherUpdate,
   sendBackToTeacher,
+  addProformaLineItem,
+  updateProformaLineItem,
+  removeProformaLineItem,
   triggerPlanningProformaTest,
 } from "@/api/proformaApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -203,10 +206,11 @@ export const useAddSectionComment = () => {
     mutationFn: ({ id, section, comment }) => addSectionComment({ id, section, comment }),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
-      toast.success(response?.message || "Comment added successfully!");
+      queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
+      toast.success(response?.message || "Note added");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to add comment");
+      toast.error(error?.message || "Failed to add note");
     },
   });
 };
@@ -251,10 +255,54 @@ export const useSubmitTeacherUpdate = () => {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
-      toast.success(response?.message || "Update submitted for admin review!");
+      if (!variables?.silent) {
+        toast.success(response?.message || "Update submitted for admin review!");
+      }
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to submit update");
+    },
+  });
+};
+
+export const useAddProformaLineItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => addProformaLineItem({ id, data }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
+      toast.success(response?.message || "Item added");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add item");
+    },
+  });
+};
+
+export const useUpdateProformaLineItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, itemId, data }) => updateProformaLineItem({ id, itemId, data }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
+      if (!variables?.silent) toast.success(response?.message || "Item updated");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update item");
+    },
+  });
+};
+
+export const useRemoveProformaLineItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, itemId }) => removeProformaLineItem({ id, itemId }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
+      toast.success(response?.message || "Item removed");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to remove item");
     },
   });
 };

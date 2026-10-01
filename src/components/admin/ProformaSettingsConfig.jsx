@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -102,6 +102,8 @@ export default function ProformaSettingsConfig() {
     miscellaneous_enabled: true,
   });
 
+  const [programTypeProforma, setProgramTypeProforma] = useState([]);
+
   const [travelRules, setTravelRules] = useState(DEFAULT_TRAVEL_RULES);
   const [stayRules, setStayRules] = useState([
     {
@@ -112,7 +114,7 @@ export default function ProformaSettingsConfig() {
       daily_rate: 25.0,
       min_hours: 4.0,
       cap: "—",
-      proof_required: false,
+      proof_required: true,
       status: true,
     },
     {
@@ -154,6 +156,10 @@ export default function ProformaSettingsConfig() {
         }
         return { ...next };
       });
+    }
+
+    if (Array.isArray(globalDefaults.program_type_proforma)) {
+      setProgramTypeProforma(globalDefaults.program_type_proforma);
     }
 
     const t = globalDefaults.travel || {};
@@ -200,19 +206,19 @@ export default function ProformaSettingsConfig() {
         key: "food",
         name: "Food",
         calc: "Fixed per day",
-        amount: `${foodRate},00 € / day`,
+        amount: `${Number(foodRate).toFixed(2).replace(".", ",")} € / day`,
         daily_rate: foodRate,
         min_hours: globalDefaults.food?.minimum_hours ?? 4,
         cap: "—",
-        proof_required: false,
+        proof_required: globalDefaults.food?.requires_receipt ?? true,
         status: true,
       },
       {
         key: "accommodation",
         name: "Accommodation",
         calc: "Actual cost",
-        amount: `Max ${stayCap},00 € / night`,
-        cap: `${stayCap},00 €`,
+        amount: `Max ${Number(stayCap).toFixed(2).replace(".", ",")} € / night`,
+        cap: `${Number(stayCap).toFixed(2).replace(".", ",")} €`,
         max_nightly_rate: stayCap,
         proof_required: globalDefaults.stay?.requires_receipt ?? true,
         status: true,
@@ -340,6 +346,14 @@ export default function ProformaSettingsConfig() {
     updateDefaultsMutation.mutate({ category_toggles: updatedToggles });
   };
 
+  const handleProgramTypeProformaChange = (programType, enabled) => {
+    const updated = programTypeProforma.map((row) =>
+      row.program_type === programType ? { ...row, enabled } : row
+    );
+    setProgramTypeProforma(updated);
+    updateDefaultsMutation.mutate({ program_type_proforma: updated });
+  };
+
   const handleEditRuleClick = (rule, category) => {
     setSelectedRule({ ...rule, category });
     let calc_type = "ACTUAL_COST";
@@ -349,11 +363,12 @@ export default function ProformaSettingsConfig() {
     setEditRuleForm({
       name: rule.name,
       calc_type,
-      rate_per_km: rule.rate_per_km || 0.4326,
-      multiplier: rule.multiplier || 2,
+      rate_per_km: rule.rate_per_km ?? 0.4326,
+      multiplier: rule.multiplier ?? 2,
       rounding: rule.rounding || "NEAREST_KM",
-      daily_rate: rule.daily_rate || 25.0,
-      max_nightly_rate: rule.max_nightly_rate || 120.0,
+      // Use nullish coalescing so 0 is preserved (0 || 25 was forcing 25)
+      daily_rate: rule.daily_rate ?? 25.0,
+      max_nightly_rate: rule.max_nightly_rate ?? 120.0,
       proof_required: Boolean(rule.proof_required),
     });
     setShowEditRuleModal(true);
@@ -392,14 +407,19 @@ export default function ProformaSettingsConfig() {
     if (category === "stay") {
       if (key === "food") {
         updateDefaultsMutation.mutate(
-          { food: { daily_rate: editRuleForm.daily_rate } },
+          {
+            food: {
+              daily_rate: Number(editRuleForm.daily_rate) || 0,
+              requires_receipt: editRuleForm.proof_required,
+            },
+          },
           { onSuccess: () => setShowEditRuleModal(false) }
         );
       } else if (key === "accommodation") {
         updateDefaultsMutation.mutate(
           {
             stay: {
-              max_nightly_rate: editRuleForm.max_nightly_rate,
+              max_nightly_rate: Number(editRuleForm.max_nightly_rate) || 0,
               requires_receipt: editRuleForm.proof_required,
             },
           },
@@ -496,14 +516,41 @@ export default function ProformaSettingsConfig() {
       {/* TAB 1: Claimable Costs & Section Toggles */}
       {activeTab === "claimable_costs" && (
         <div className="space-y-6 w-full">
+          {/* Program type master switch */}
+          <Card className="w-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Teacher proforma by program type</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {programTypeProforma.map((row) => (
+                  <div
+                    key={row.program_type}
+                    className="flex items-center justify-between p-4 bg-sidebar rounded-xl border border-sidebar-border gap-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{row.program_type}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {row.enabled ? "Proforma generated" : "Proforma skipped"}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={Boolean(row.enabled)}
+                      onCheckedChange={(val) => handleProgramTypeProformaChange(row.program_type, val)}
+                    />
+                  </div>
+                ))}
+                {programTypeProforma.length === 0 && (
+                  <p className="text-sm text-muted-foreground col-span-full">Loading program types…</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Claimable Category Toggles */}
           <Card className="w-full">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Enable Claimable Cost Categories</CardTitle>
-              <CardDescription>
-                On: category is included when generating teacher proforma invoices (and teachers can claim it).
-                Off: category is skipped on new invoices and cannot be claimed.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -859,11 +906,16 @@ export default function ProformaSettingsConfig() {
                 <Label className="text-xs uppercase font-semibold">Daily Fixed Rate (€)</Label>
                 <Input
                   type="number"
-                  step="1"
+                  step="0.01"
+                  min="0"
                   value={editRuleForm.daily_rate}
-                  onChange={(e) =>
-                    setEditRuleForm({ ...editRuleForm, daily_rate: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setEditRuleForm({
+                      ...editRuleForm,
+                      daily_rate: raw === "" ? 0 : Number(raw),
+                    });
+                  }}
                 />
               </div>
             )}
@@ -873,11 +925,16 @@ export default function ProformaSettingsConfig() {
                 <Label className="text-xs uppercase font-semibold">Max Nightly Rate (€)</Label>
                 <Input
                   type="number"
-                  step="1"
+                  step="0.01"
+                  min="0"
                   value={editRuleForm.max_nightly_rate}
-                  onChange={(e) =>
-                    setEditRuleForm({ ...editRuleForm, max_nightly_rate: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    setEditRuleForm({
+                      ...editRuleForm,
+                      max_nightly_rate: raw === "" ? 0 : Number(raw),
+                    });
+                  }}
                 />
               </div>
             )}
@@ -889,17 +946,19 @@ export default function ProformaSettingsConfig() {
               </div>
             )}
 
-            {selectedRule?.key !== "food" && (
-              <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-xl border">
-                <div>
-                  <p className="text-sm font-semibold">Proof Required (Receipt Upload)</p>
-                </div>
-                <Switch
-                  checked={editRuleForm.proof_required}
-                  onCheckedChange={(val) => setEditRuleForm({ ...editRuleForm, proof_required: val })}
-                />
+            {/* Proof / document required — Food, Accommodation, Travel modes, Misc */}
+            <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-xl border">
+              <div>
+                <p className="text-sm font-semibold">Document Required (Receipt Upload)</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Teacher must attach proof when this section has an amount
+                </p>
               </div>
-            )}
+              <Switch
+                checked={editRuleForm.proof_required}
+                onCheckedChange={(val) => setEditRuleForm({ ...editRuleForm, proof_required: val })}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditRuleModal(false)}>

@@ -85,9 +85,7 @@ export function ProformaInvoiceDocument({ proforma }) {
 
   const teacher = proforma.teacher_id || {};
   const planning = proforma.planning_id || {};
-  const items = (proforma.items || []).filter(
-    (i) => Number(i.line_total || 0) > 0 || Number(i.unit_rate || 0) > 0
-  );
+  const items = (proforma.items || []).filter((i) => Number(i.line_total || 0) > 0);
   const signature = proforma.digital_signature || {};
   const roleName =
     teacher.teacher_role?.name || items.find((i) => i.teacher_role_name)?.teacher_role_name || "—";
