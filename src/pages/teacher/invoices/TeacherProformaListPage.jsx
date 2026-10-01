@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { FileText, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { coursePlanningLabel } from "@/utils/proformaCourseLabel";
 
 export default function TeacherProformaListPage() {
   const navigate = useNavigate();
@@ -59,16 +60,19 @@ export default function TeacherProformaListPage() {
         icon: AlertCircle,
       };
     }
-    return statusBadges[inv.status] || {
-      label: inv.status,
-      bg: "bg-muted text-muted-foreground",
-      icon: Clock,
-    };
+    return (
+      statusBadges[inv.status] || {
+        label: inv.status,
+        bg: "bg-muted text-muted-foreground",
+        icon: Clock,
+      }
+    );
   };
+
+  const resetPage = () => setPage(1);
 
   return (
     <div className="space-y-6 mt-4 pb-12 w-full max-w-full">
-      {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
           <FileText className="w-5 h-5 text-amber-600" />
@@ -79,10 +83,12 @@ export default function TeacherProformaListPage() {
         </p>
       </div>
 
-      {/* Tabs Header */}
       <div className="flex border-b border-border gap-6 text-sm font-medium flex-wrap">
         <button
-          onClick={() => setStatusFilter("ALL")}
+          onClick={() => {
+            setStatusFilter("ALL");
+            resetPage();
+          }}
           className={`pb-3 border-b-2 transition ${
             statusFilter === "ALL"
               ? "border-primary text-primary font-semibold"
@@ -93,7 +99,10 @@ export default function TeacherProformaListPage() {
         </button>
 
         <button
-          onClick={() => setStatusFilter("SENT_TO_TEACHER,CHANGE_REQUESTED")}
+          onClick={() => {
+            setStatusFilter("SENT_TO_TEACHER,CHANGE_REQUESTED");
+            resetPage();
+          }}
           className={`pb-3 border-b-2 transition ${
             statusFilter === "SENT_TO_TEACHER,CHANGE_REQUESTED"
               ? "border-primary text-primary font-semibold"
@@ -104,7 +113,10 @@ export default function TeacherProformaListPage() {
         </button>
 
         <button
-          onClick={() => setStatusFilter("TEACHER_SIGNED_APPROVED")}
+          onClick={() => {
+            setStatusFilter("TEACHER_SIGNED_APPROVED");
+            resetPage();
+          }}
           className={`pb-3 border-b-2 transition ${
             statusFilter === "TEACHER_SIGNED_APPROVED"
               ? "border-primary text-primary font-semibold"
@@ -115,7 +127,10 @@ export default function TeacherProformaListPage() {
         </button>
 
         <button
-          onClick={() => setStatusFilter("MOVED_TO_FINANCE")}
+          onClick={() => {
+            setStatusFilter("MOVED_TO_FINANCE");
+            resetPage();
+          }}
           className={`pb-3 border-b-2 transition ${
             statusFilter === "MOVED_TO_FINANCE"
               ? "border-purple-600 text-purple-600 font-semibold"
@@ -126,7 +141,6 @@ export default function TeacherProformaListPage() {
         </button>
       </div>
 
-      {/* Table Container */}
       <div className="border border-border rounded-xl overflow-hidden bg-card">
         <Table>
           <TableHeader>
@@ -147,15 +161,16 @@ export default function TeacherProformaListPage() {
               invoices.map((inv) => {
                 const badge = getStatusBadge(inv);
                 const BadgeIcon = badge.icon;
+                const { title, subtitle } = coursePlanningLabel(inv);
 
                 return (
                   <TableRow key={inv._id} className="hover:bg-muted/40 transition">
                     <TableCell className="font-semibold text-foreground font-mono">{inv.proforma_number}</TableCell>
                     <TableCell className="font-medium text-foreground">
-                      {inv.planning_id?.title || inv.planning_id?.description || "Course Planning"}
-                      <span className="block text-xs text-muted-foreground font-normal mt-0.5">
-                        City: {inv.planning_id?.city || "N/A"}
-                      </span>
+                      {title}
+                      {subtitle && (
+                        <span className="block text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground font-medium text-xs">
                       {inv.region_snapshot_name}
@@ -164,7 +179,9 @@ export default function TeacherProformaListPage() {
                       €{inv.grand_total?.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-center whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}
+                      >
                         <BadgeIcon className="w-3.5 h-3.5" />
                         {badge.label}
                       </span>
@@ -172,7 +189,11 @@ export default function TeacherProformaListPage() {
                     <TableCell className="text-center whitespace-nowrap">
                       <Button
                         size="sm"
-                        className={inv.status === "SENT_TO_TEACHER" ? "bg-amber-700 hover:bg-amber-800 text-white font-semibold" : "variant-outline"}
+                        className={
+                          inv.status === "SENT_TO_TEACHER"
+                            ? "bg-amber-700 hover:bg-amber-800 text-white font-semibold"
+                            : "variant-outline"
+                        }
                         variant={inv.status === "SENT_TO_TEACHER" ? "default" : "outline"}
                         onClick={() => navigate({ to: `/teacher/proforma-invoices/${inv._id}` })}
                       >
@@ -193,7 +214,6 @@ export default function TeacherProformaListPage() {
         </Table>
       </div>
 
-      {/* Pagination */}
       <Pagination
         page={page}
         setPage={setPage}

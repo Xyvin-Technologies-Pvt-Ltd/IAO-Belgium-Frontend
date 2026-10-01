@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useGetFinanceQueue, useGetProformaErrors, useTriggerPlanningProformaTest } from "@/store/useProformaStore";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
 import TemporaryProformaTestTrigger from "./TemporaryProformaTestTrigger";
 import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
+import ProformaInvoicesFilterDrawer, {
+  EMPTY_PROFORMA_FILTERS,
+} from "./ProformaInvoicesFilterDrawer";
+import { coursePlanningLabel } from "@/utils/proformaCourseLabel";
 import { Eye, FileText } from "lucide-react";
 import {
   Table,
@@ -25,19 +29,38 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [draftFilters, setDraftFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
+  const [appliedFilters, setAppliedFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
 
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, appliedFilters]);
 
-  const { data: queueData, isLoading: loadingQueue, isFetching: fetchingQueue, refetch: refetchQueue } = useGetFinanceQueue({
-    page,
-    limit: rowsPerPage,
-    status: statusFilter,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  }, { enabled: statusFilter !== "ERRORS" });
+  const queueFilter = useMemo(() => {
+    const f = {
+      page,
+      limit: rowsPerPage,
+      status: statusFilter,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    };
+    if (appliedFilters.program_type && appliedFilters.program_type !== "all") {
+      f.program_type = appliedFilters.program_type;
+    }
+    if (appliedFilters.program_id && appliedFilters.program_id !== "all") {
+      f.program_id = appliedFilters.program_id;
+    }
+    if (appliedFilters.component_id && appliedFilters.component_id !== "all") {
+      f.component_id = appliedFilters.component_id;
+    }
+    return f;
+  }, [page, rowsPerPage, statusFilter, debouncedSearch, appliedFilters]);
+
+  const { data: queueData, isLoading: loadingQueue, isFetching: fetchingQueue, refetch: refetchQueue } = useGetFinanceQueue(
+    queueFilter,
+    { enabled: statusFilter !== "ERRORS" }
+  );
 
   const { data: errorsData, isLoading: loadingErrors, isFetching: fetchingErrors, refetch: refetchErrors } = useGetProformaErrors({
     page,
@@ -51,6 +74,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const invoices = queueData?.data || [];
   const errorsList = errorsData?.data || [];
   const totalRows = isErrorsTab ? (errorsData?.total_count || 0) : (queueData?.total_count || 0);
+  const filterOptions = queueData?.filter_options || { programs: [], modules: [] };
 
   const statusBadges = {
     SENT_TO_TEACHER: {
@@ -96,8 +120,16 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
           </h1>
         </div>
 
-        {/* Search Input */}
-        <div>
+        {/* Search + Filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          <ProformaInvoicesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+            filterOptions={filterOptions}
+          />
           <Input
             type="text"
             value={search}
@@ -268,7 +300,8 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
               <TableRow className="bg-muted/50">
                 <TableHead>Invoice #</TableHead>
                 <TableHead>Teacher Name & Email</TableHead>
-                <TableHead>Course / Region</TableHead>
+                <TableHead>Course Planning</TableHead>
+                <TableHead>Region</TableHead>
                 <TableHead className="text-right">Grand Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-center">Last Updated</TableHead>
@@ -278,10 +311,11 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
             <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
               {isLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={7} />
+                <TableSkeleton rows={rowsPerPage} columns={8} />
               ) : invoices.length > 0 ? (
                 invoices.map((inv) => {
                   const badge = getStatusBadge(inv);
+                  const { title, subtitle } = coursePlanningLabel(inv);
 
                   return (
                     <TableRow key={inv._id} className="hover:bg-muted/40 transition">
@@ -290,11 +324,14 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                         {inv.teacher_id?.full_name || inv.teacher_id?.name || "Teacher"}
                         <span className="block text-xs text-muted-foreground font-normal mt-0.5">{inv.teacher_id?.email}</span>
                       </TableCell>
-                      <TableCell className="text-muted-foreground font-medium">
-                        {inv.region_snapshot_name}
-                        {inv.planning_id?.city && (
-                          <span className="block text-xs text-muted-foreground font-normal mt-0.5">City: {inv.planning_id.city}</span>
+                      <TableCell className="font-medium text-foreground">
+                        {title}
+                        {subtitle && (
+                          <span className="block text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</span>
                         )}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground font-medium text-xs">
+                        {inv.region_snapshot_name || "—"}
                       </TableCell>
                       <TableCell className="text-right font-mono font-bold text-foreground">
                         €{inv.grand_total?.toFixed(2)}
@@ -340,7 +377,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center p-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center p-8 text-muted-foreground">
                     No proforma invoices found.
                   </TableCell>
                 </TableRow>

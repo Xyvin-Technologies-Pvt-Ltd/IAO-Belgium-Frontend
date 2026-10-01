@@ -187,6 +187,33 @@ export const submitTeacherUpdate = async ({ id, data }) => {
   }
 };
 
+export const addProformaLineItem = async ({ id, data }) => {
+  try {
+    const response = await axiosInstance.post(`/proforma-invoice/invoices/${id}/items`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateProformaLineItem = async ({ id, itemId, data }) => {
+  try {
+    const response = await axiosInstance.put(`/proforma-invoice/invoices/${id}/items/${itemId}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const removeProformaLineItem = async ({ id, itemId }) => {
+  try {
+    const response = await axiosInstance.delete(`/proforma-invoice/invoices/${id}/items/${itemId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 // Admin: Send back to teacher with reason
 export const sendBackToTeacher = async ({ id, data }) => {
   try {
