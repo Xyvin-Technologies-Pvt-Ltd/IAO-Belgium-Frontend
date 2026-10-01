@@ -6,8 +6,10 @@ import {
   useUpdateSectionApproval,
   useSubmitTeacherUpdate,
   useAddProformaLineItem,
+  useUpdateProformaLineItem,
   useRemoveProformaLineItem,
   useAddSectionComment,
+  useAddSectionAttachment,
 } from "@/store/useProformaStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
@@ -23,7 +25,6 @@ import {
   Paperclip,
   PenTool,
   Plus,
-  Trash2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard
 import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCard";
 import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
 import ProformaSignDialog from "@/components/proforma/ProformaSignDialog";
+import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClaimRow";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
@@ -52,6 +54,9 @@ const statusBadge = (p) => {
   }
   if (p?.digital_signature?.is_signed || p?.status === "TEACHER_SIGNED_APPROVED") {
     return { label: "Signed — awaiting admin", className: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+  }
+  if (p?.workflow_next_actor === "ADMIN" && p?.status === "CHANGE_REQUESTED") {
+    return { label: "Awaiting admin acceptance", className: "bg-orange-100 text-orange-800 border-orange-300" };
   }
   if (p?.workflow_next_actor === "TEACHER" && p?.last_revision?.requested_by_role === "BACKOFFICE") {
     return { label: "Admin sent back — review", className: "bg-orange-100 text-orange-800 border-orange-300" };
@@ -74,18 +79,22 @@ export default function TeacherProformaDetailPage() {
   const updateApprovalMutation = useUpdateSectionApproval();
   const submitUpdateMutation = useSubmitTeacherUpdate();
   const addItemMutation = useAddProformaLineItem();
+  const updateItemMutation = useUpdateProformaLineItem();
   const removeItemMutation = useRemoveProformaLineItem();
   const addCommentMutation = useAddSectionComment();
+  const addAttachmentMutation = useAddSectionAttachment();
 
   const [showSignDialog, setShowSignDialog] = useState(false);
   const [travelTab, setTravelTab] = useState("ROAD");
   const [editingTeaching, setEditingTeaching] = useState(false);
   const [teachingBlocks, setTeachingBlocks] = useState("");
   const [teachingNote, setTeachingNote] = useState("");
+  const [editingFood, setEditingFood] = useState(false);
+  const [foodDays, setFoodDays] = useState("");
   const [ticketForm, setTicketForm] = useState({ description: "", amount: "", files: [] });
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [itemForm, setItemForm] = useState({ description: "", amount: "", files: [] });
-  const [addingSection, setAddingSection] = useState(null); // FOOD | STAY | MISCELLANEOUS
+  const [addingSection, setAddingSection] = useState(null); // STAY | MISCELLANEOUS
   const [busy, setBusy] = useState(false);
   const [notes, setNotes] = useState({});
 
@@ -115,8 +124,11 @@ export default function TeacherProformaDetailPage() {
   const pendingChanges = (proforma?.pending_teacher_changes || []).filter((c) => c.status === "PENDING");
   const teachingPending = pendingChanges.find((c) => c.section === "TEACHING");
   const teachingItem = (itemsByType.TEACHING || [])[0];
-  // Meal claims only (ignore generated €0 placeholder line)
-  const mealItems = (itemsByType.FOOD || []).filter((i) => Number(i.line_total) > 0);
+  const foodLine = (itemsByType.FOOD || [])[0];
+  const hasPendingFor = (section) => pendingChanges.some((c) => c.section === section);
+  const hasAnyPending = pendingChanges.length > 0;
+  /** Any teacher save that changes amounts is a Request for update until admin Accepts */
+  const requestUpdateLabel = () => "Request for update";
 
   const roadLine = (itemsByType.TRAVEL || []).find((i) => (i.travel_mode || "ROAD") === "ROAD");
   const fixedTravelLines = (itemsByType.TRAVEL || []).filter(
@@ -128,7 +140,7 @@ export default function TeacherProformaDetailPage() {
   const travelTabs = useMemo(() => {
     const primary =
       fixedTravelLines.length > 0
-        ? { key: "FIXED", label: "Fixed session" }
+        ? { key: "FIXED", label: "Fixed module" }
         : { key: "ROAD", label: "Road" };
     return [primary, { key: "RAIL", label: "Rail" }, { key: "FLIGHT", label: "Air" }];
   }, [fixedTravelLines.length]);
@@ -206,6 +218,7 @@ export default function TeacherProformaDetailPage() {
   const canSign =
     !signed &&
     allConfirmed &&
+    !hasAnyPending &&
     missingReceipts.length === 0;
 
   const badge = statusBadge(proforma);
@@ -308,10 +321,64 @@ export default function TeacherProformaDetailPage() {
         onSettled: () => setBusy(false),
         onSuccess: () => {
           setEditingTeaching(false);
-          toast.success("Teaching updated — confirm this section when ready");
+          toast.success("Update requested — awaiting admin acceptance");
         },
       }
     );
+  };
+
+  const saveFoodDays = () => {
+    const days = Number(foodDays);
+    if (Number.isNaN(days) || days < 0) {
+      toast.error("Enter a valid number of days");
+      return;
+    }
+    setBusy(true);
+    const onDone = {
+      onSettled: () => setBusy(false),
+      onSuccess: () => {
+        setEditingFood(false);
+        toast.success("Update requested — awaiting admin acceptance");
+      },
+    };
+    if (foodLine?._id) {
+      updateItemMutation.mutate(
+        {
+          id: proforma._id,
+          itemId: foodLine._id,
+          data: { multiplier: days },
+          silent: true,
+        },
+        onDone
+      );
+    } else {
+      // No FOOD shell yet — create via teacher update with regional rate
+      submitUpdateMutation.mutate(
+        {
+          id: proforma._id,
+          data: {
+            reason: "Set meal days",
+            section_updates: [{ section: "FOOD", multiplier: days }],
+          },
+        },
+        onDone
+      );
+    }
+  };
+
+  const updateClaimLine = async (itemId, section, data) => {
+    setBusy(true);
+    try {
+      await updateItemMutation.mutateAsync({
+        id: proforma._id,
+        itemId,
+        data,
+        silent: true,
+      });
+      toast.success("Update requested — awaiting admin acceptance");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const saveTicket = () => {
@@ -347,6 +414,7 @@ export default function TeacherProformaDetailPage() {
         onSuccess: () => {
           setTicketForm({ description: "", amount: "", files: [] });
           setShowTicketForm(false);
+          toast.success("Update requested — awaiting admin acceptance");
         },
       }
     );
@@ -366,7 +434,7 @@ export default function TeacherProformaDetailPage() {
     const needsProof =
       (section === "STAY" && policy.stay?.requires_receipt) ||
       (section === "MISCELLANEOUS" && policy.miscellaneous?.proof_required) ||
-      (section === "FOOD" && policy.food?.requires_receipt);
+      (section === "FOOD" && Number(proforma?.food_total) > 0 && policy.food?.requires_receipt);
     if (needsProof && !(itemForm.files || []).length) {
       toast.error("Attach a receipt / proof");
       return;
@@ -387,6 +455,7 @@ export default function TeacherProformaDetailPage() {
         onSuccess: () => {
           setItemForm({ description: "", amount: "", files: [] });
           setAddingSection(null);
+          toast.success("Update requested — awaiting admin acceptance");
         },
       }
     );
@@ -402,6 +471,10 @@ export default function TeacherProformaDetailPage() {
 
   const confirmSection = (sec) => {
     if (dual[sec]?.teacher_approved) return;
+    if (hasPendingFor(sec)) {
+      toast.error("Admin must accept your update request before you can confirm this section");
+      return;
+    }
     updateApprovalMutation.mutate({
       id: proforma._id,
       section: sec,
@@ -412,6 +485,9 @@ export default function TeacherProformaDetailPage() {
 
   const confirmAllAndPrepareSign = async () => {
     for (const sec of activeSections) {
+      if (hasPendingFor(sec)) {
+        throw new Error(`Admin must accept your update for ${sec} before you can confirm`);
+      }
       if (!dual[sec]?.teacher_approved) {
         await updateApprovalMutation.mutateAsync({
           id: proforma._id,
@@ -424,6 +500,10 @@ export default function TeacherProformaDetailPage() {
   };
 
   const openSignDialog = () => {
+    if (hasAnyPending) {
+      toast.error("Admin must accept your update requests before you can sign");
+      return;
+    }
     if (!allConfirmed) {
       toast.error("Confirm all sections with amounts first");
       return;
@@ -457,42 +537,15 @@ export default function TeacherProformaDetailPage() {
         <p className="text-sm text-muted-foreground py-2">No tickets added yet.</p>
       )}
       {tickets.map((t) => (
-        <div
+        <ProformaEditableClaimRow
           key={t._id}
-          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
-        >
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{t.description}</p>
-            <p className="text-xs text-muted-foreground font-mono">{eur(t.line_total)}</p>
-            {(t.attachments || []).length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {t.attachments.map((a, idx) => (
-                  <a
-                    key={idx}
-                    href={a.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:underline"
-                  >
-                    <Paperclip className="w-3 h-3" />
-                    {a.file_name}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-          {!signed && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-destructive h-8"
-              disabled={busy}
-              onClick={() => removeItem(t._id)}
-            >
-              <Trash2 className="w-4 h-4 mr-1" /> Remove
-            </Button>
-          )}
-        </div>
+          line={t}
+          editable={!signed}
+          busy={busy}
+          modeBadge={t.travel_mode}
+          onSave={(data) => updateClaimLine(t._id, "TRAVEL", data)}
+          onRemove={!signed ? (itemId) => removeItem(itemId) : undefined}
+        />
       ))}
     </div>
   );
@@ -508,42 +561,14 @@ export default function TeacherProformaDetailPage() {
         <p className="text-sm text-muted-foreground py-1">{eur(0)} — {emptyLabel}.</p>
       )}
       {items.map((t) => (
-        <div
+        <ProformaEditableClaimRow
           key={t._id}
-          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
-        >
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{t.description}</p>
-            <p className="text-xs text-muted-foreground font-mono">{eur(t.line_total)}</p>
-            {(t.attachments || []).length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {t.attachments.map((a, idx) => (
-                  <a
-                    key={idx}
-                    href={a.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:underline"
-                  >
-                    <Paperclip className="w-3 h-3" />
-                    {a.file_name}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-          {!signed && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-destructive h-8"
-              disabled={busy}
-              onClick={() => removeItem(t._id)}
-            >
-              <Trash2 className="w-4 h-4 mr-1" /> Remove
-            </Button>
-          )}
-        </div>
+          line={t}
+          editable={!signed}
+          busy={busy}
+          onSave={(data) => updateClaimLine(t._id, section, data)}
+          onRemove={!signed ? (itemId) => removeItem(itemId) : undefined}
+        />
       ))}
       {!signed && addingSection === section && (
         <div className="rounded-lg border border-dashed border-border p-3 space-y-3 bg-background">
@@ -554,13 +579,7 @@ export default function TeacherProformaDetailPage() {
                 className="mt-1"
                 value={itemForm.description}
                 onChange={(e) => setItemForm((p) => ({ ...p, description: e.target.value }))}
-                placeholder={
-                  section === "FOOD"
-                    ? "e.g. Lunch day 1"
-                    : section === "STAY"
-                      ? "e.g. Hotel night"
-                      : "e.g. Parking"
-                }
+                placeholder={section === "STAY" ? "e.g. Hotel night" : "e.g. Parking"}
               />
             </div>
             <div>
@@ -592,7 +611,7 @@ export default function TeacherProformaDetailPage() {
           />
           <div className="flex gap-2">
             <Button size="sm" disabled={busy} onClick={() => saveClaimItem(section)}>
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : requestUpdateLabel()}
             </Button>
             <Button
               size="sm"
@@ -648,8 +667,14 @@ export default function TeacherProformaDetailPage() {
       );
     }
     const teacherOk = dual[section]?.teacher_approved;
+    const pending = hasPendingFor(section);
     return (
       <div className="flex flex-wrap items-center gap-2 justify-end">
+        {pending && (
+          <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-orange-400 text-orange-900 bg-orange-50">
+            Awaiting admin acceptance
+          </span>
+        )}
         <span
           className={`px-2 py-0.5 text-[11px] rounded-full font-semibold border flex items-center gap-1 ${
             teacherOk
@@ -668,7 +693,8 @@ export default function TeacherProformaDetailPage() {
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white h-7 text-xs font-semibold"
                 : "h-7 text-xs"
             }
-            disabled={teacherOk || updateApprovalMutation.isPending}
+            disabled={teacherOk || pending || updateApprovalMutation.isPending}
+            title={pending ? "Admin must accept your update first" : undefined}
             onClick={() => confirmSection(section)}
           >
             <Check className="w-3.5 h-3.5 mr-1" />
@@ -849,7 +875,7 @@ export default function TeacherProformaDetailPage() {
               </div>
               <div className="flex gap-2">
                 <Button size="sm" disabled={busy} onClick={saveTeachingChange}>
-                  {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
+                  {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : requestUpdateLabel()}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setEditingTeaching(false)}>
                   Cancel
@@ -912,7 +938,7 @@ export default function TeacherProformaDetailPage() {
               fixedTravelLines.length > 0 ? (
                 <ProformaTravelFixedCard items={fixedTravelLines} />
               ) : (
-                <p className="text-sm text-muted-foreground">No fixed session travel on this invoice.</p>
+                <p className="text-sm text-muted-foreground">No fixed module travel on this invoice.</p>
               )
             )}
             {travelTab === "ROAD" && (
@@ -972,7 +998,7 @@ export default function TeacherProformaDetailPage() {
                     />
                     <div className="flex gap-2">
                       <Button size="sm" disabled={busy} onClick={saveTicket}>
-                        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
+                        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : requestUpdateLabel()}
                       </Button>
                       <Button
                         size="sm"
@@ -994,7 +1020,7 @@ export default function TeacherProformaDetailPage() {
         </section>
       )}
 
-      {/* Meal — same add-item pattern as Stay / Misc */}
+      {/* Meal — days × fixed regional rate */}
       {sectionIsVisible("FOOD") && (
         <section className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-border bg-muted/30">
@@ -1003,11 +1029,117 @@ export default function TeacherProformaDetailPage() {
               <span className="font-mono text-xs font-semibold">{eur(proforma.food_total)}</span>
             </div>
             <div className="flex flex-wrap items-center gap-2 justify-end">
-              <AddItemButton section="FOOD" />
+              {!signed && !editingFood && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setFoodDays(String(foodLine?.multiplier ?? 0));
+                    setEditingFood(true);
+                  }}
+                >
+                  {foodLine ? "Edit days" : "Set days"}
+                </Button>
+              )}
               <SectionConfirmControls section="FOOD" />
             </div>
           </div>
-          <div className="p-4">{renderClaimList("FOOD", mealItems, "add meal items if needed")}</div>
+          <div className="p-4 space-y-3">
+            {editingFood ? (
+              <div className="rounded-lg border border-dashed border-border p-3 space-y-3 max-w-md">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs">Days</Label>
+                    <Input
+                      className="mt-1 font-mono"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={foodDays}
+                      onChange={(e) => setFoodDays(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Daily rate</Label>
+                    <Input
+                      className="mt-1 font-mono bg-muted"
+                      value={eur(foodLine?.unit_rate ?? proforma.food_daily_rate ?? 0)}
+                      disabled
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {Number(foodDays) || 0} days × {eur(foodLine?.unit_rate ?? proforma.food_daily_rate ?? 0)} ={" "}
+                  {eur(
+                    (Number(foodDays) || 0) *
+                      Number(foodLine?.unit_rate ?? proforma.food_daily_rate ?? 0)
+                  )}
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" disabled={busy} onClick={saveFoodDays}>
+                    {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : requestUpdateLabel()}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingFood(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : foodLine ? (
+              <p className="text-sm font-mono text-muted-foreground">
+                {foodLine.calculation_breakdown ||
+                  `${foodLine.multiplier || 0} days × ${eur(foodLine.unit_rate)} = ${eur(foodLine.line_total)}`}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No meal days set yet — daily rate {eur(proforma.food_daily_rate ?? 0)}. Use{" "}
+                <span className="font-medium text-foreground">Set days</span> to claim meal allowance.
+              </p>
+            )}
+
+            {/* Meal receipt upload — required when food_total > 0 and policy requires receipt */}
+            {!signed && Number(proforma.food_total) > 0 && (
+              <div className="space-y-1.5 pt-1 border-t border-border/60">
+                <p className="text-xs font-medium text-foreground">
+                  Meal receipt
+                  {proforma.proof_policy?.food?.requires_receipt &&
+                    !(foodLine?.attachments || []).length && (
+                      <span className="text-rose-700 font-semibold"> — required to sign</span>
+                    )}
+                </p>
+                <MultiFileSectionUploader
+                  sectionKey="FOOD"
+                  existingAttachments={foodLine?.attachments || []}
+                  disabled={busy || addAttachmentMutation.isPending}
+                  successToastMessage={false}
+                  onUploadSuccess={(uploaded) => {
+                    if (!uploaded?.length) return;
+                    addAttachmentMutation.mutate({
+                      id: proforma._id,
+                      section: "FOOD",
+                      files: uploaded,
+                    });
+                  }}
+                />
+              </div>
+            )}
+            {signed && (foodLine?.attachments || []).length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {foodLine.attachments.map((a, idx) => (
+                  <a
+                    key={a._id || a.file_url || idx}
+                    href={a.file_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:underline"
+                  >
+                    <Paperclip className="w-3 h-3" />
+                    {a.file_name}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
           {renderSectionNotes("FOOD")}
         </section>
       )}
