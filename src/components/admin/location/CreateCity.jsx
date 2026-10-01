@@ -9,6 +9,7 @@ import { citySchema } from "@/validations/admin";
 import { useTranslation } from "react-i18next";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useGetAllCountries } from "@/store/useDropdownStore";
+import { Switch } from "@/components/ui/switch";
 
 const CreateCity = ({ open, onClose, cityData }) => {
   const { t } = useTranslation();
@@ -38,6 +39,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
       country: "",
       times: [{ start: "", end: "" }],
       venue: [{ name: "", address: "" }],
+      payment_window_always_open: false,
     },
   });
 
@@ -56,6 +58,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
   const updateCity = useUpdateCity();
 
   const selectedCountry = watch("country");
+  const paymentWindowAlwaysOpen = watch("payment_window_always_open");
 
   const handleClose = () => {
     reset({
@@ -63,6 +66,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
       country: "",
       times: [{ start: "", end: "" }],
       venue: [{ name: "", address: "" }],
+      payment_window_always_open: false,
     });
     setSearchTerm("");
     onClose();
@@ -88,6 +92,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
       venue: cityData.venue?.length > 0 
         ? cityData.venue.map(v => typeof v === 'string' ? { name: v, address: "" } : { name: v.name || "", address: v.address || "" }) 
         : [{ name: "", address: "" }],
+      payment_window_always_open: Boolean(cityData.payment_window_always_open),
     });
   }, [cityData, open, reset]);
 
@@ -97,6 +102,7 @@ const CreateCity = ({ open, onClose, cityData }) => {
       country: formData.country,
       times: formData.times.filter(time => time.start && time.end),
       venue: formData.venue.filter(v => v.name && v.name.trim() !== ""),
+      payment_window_always_open: Boolean(formData.payment_window_always_open),
     };
 
     const mutation = isEdit ? updateCity : createCity;
@@ -165,6 +171,31 @@ const CreateCity = ({ open, onClose, cityData }) => {
             isLoading={countriesLoading}
             required
           />
+
+          <div className="flex items-center justify-between gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-white">
+                {t(
+                  "cityManagement.modal.paymentWindowAlwaysOpen",
+                  "Payment window always open",
+                )}
+              </label>
+              <p className="text-xs text-gray-500 dark:text-white/60 mt-0.5">
+                {t(
+                  "cityManagement.modal.paymentWindowAlwaysOpenHint",
+                  "When enabled, students can pay anytime (no 30-day wait before first session).",
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={Boolean(paymentWindowAlwaysOpen)}
+              onCheckedChange={(checked) =>
+                setValue("payment_window_always_open", checked, {
+                  shouldValidate: true,
+                })
+              }
+            />
+          </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">

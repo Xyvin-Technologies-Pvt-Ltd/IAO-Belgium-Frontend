@@ -87,6 +87,7 @@ const ExamForm = ({ open, onClose, examData, onSuccess }) => {
   const { data: batchesData, isLoading: batchesLoading } = useGetBatches(
     selectedProgram,
     {
+      include_closed: true,
       ...(batchSearchTerm && { search: batchSearchTerm }),
     },
     { enabled: open && selectedType === "sit-at-home" && !!selectedProgram },
