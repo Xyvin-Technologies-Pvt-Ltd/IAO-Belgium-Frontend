@@ -47,6 +47,7 @@ export const citySchema = z
         })
       )
       .min(1, "At least one venue is required"),
+    payment_window_always_open: z.boolean().optional().default(false),
   })
   .refine(
     (data) => {
