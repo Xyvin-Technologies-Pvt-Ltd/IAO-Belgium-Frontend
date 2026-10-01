@@ -1,38 +1,42 @@
 import axios from "axios";
-import { useAuthStore } from "../store/useAuthStore";
 
 const baseURL = import.meta.env.VITE_APP_API_URL;
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
-  withCredentials: true, 
+  withCredentials: true,
 });
 
+/** Lazy store access — avoids circular init with useAuthStore → authApi → axios */
+const getAuthStore = async () => {
+  const mod = await import("../store/useAuthStore");
+  return mod.useAuthStore;
+};
+
 axiosInstance.interceptors.request.use(
-  (config) => {
+  async (config) => {
     config.headers["x-api-key"] = apiKey;
+    const useAuthStore = await getAuthStore();
     const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
     const skipAuthRefresh = originalRequest.skipAuthRefresh;
+    const useAuthStore = await getAuthStore();
 
     if (
-      error.response?.status === 401 && 
-      !originalRequest._retry && 
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
       !skipAuthRefresh &&
       useAuthStore.getState().isAuthenticated
     ) {
@@ -40,10 +44,8 @@ axiosInstance.interceptors.response.use(
 
       try {
         await useAuthStore.getState().refreshAccessToken();
-
         const newToken = useAuthStore.getState().token;
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().logout();

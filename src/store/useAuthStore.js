@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { verifyOtp, refreshToken as refreshTokenApi, logout as logoutApi, getProfile } from "../api/authApi";
-import { queryClient } from "../main";
+import { queryClient } from "../queryClient";
 
 export const useAuthStore = create((set, get) => ({
   token: null, 

@@ -5,11 +5,10 @@ import {
   InvoicePrintHeader,
   InvoicePrintFooter,
 } from "@/components/admin/invoice-print/InvoicePrintBrand";
+import { proformaTeacherName } from "@/utils/proformaCourseLabel";
 
 function teacherDisplayName(teacher = {}) {
-  if (teacher.full_name || teacher.name) return teacher.full_name || teacher.name;
-  const parts = [teacher.first_name, teacher.last_name].filter(Boolean);
-  return parts.length ? parts.join(" ") : "Lecturer";
+  return proformaTeacherName(teacher, "Lecturer");
 }
 
 function teacherFullAddress(teacher = {}) {
@@ -36,8 +35,9 @@ function programmeType(planning = {}) {
 function itemLabel(item) {
   if (item.item_type === "TEACHING") return "Teaching fee";
   if (item.item_type === "TRAVEL") {
-    const mode = (item.travel_mode || "ROAD").toLowerCase();
-    return `Travel (${mode})`;
+    const mode = String(item.travel_mode || "ROAD").toUpperCase();
+    if (mode === "FIXED") return "Travel (fixed session)";
+    return `Travel (${mode.toLowerCase()})`;
   }
   if (item.item_type === "FOOD") return "Meal allowance";
   if (item.item_type === "STAY") return "Accommodation";
@@ -45,13 +45,41 @@ function itemLabel(item) {
 }
 
 function itemCalculation(item) {
-  if (item.calculation_breakdown) return item.calculation_breakdown;
   if (item.item_type === "TEACHING") {
-    const blocks = item.blocks || item.multiplier || 1;
-    return `${blocks} blocks × €${Number(item.unit_rate || 0).toFixed(2)}`;
+    const blocks = Number(item.blocks || item.multiplier || 0) || 1;
+    const lineTotal = Number(item.line_total || 0);
+    let rate = Number(item.unit_rate || 0);
+    // Prefer rate implied by line_total when stored breakdown/rate is stale
+    if (blocks > 0 && lineTotal > 0) {
+      const implied = Math.round((lineTotal / blocks) * 100) / 100;
+      const fromRate = Math.round(blocks * rate * 100) / 100;
+      if (Math.abs(fromRate - lineTotal) > 0.02) {
+        rate = implied;
+      }
+    }
+    return `${blocks} blocks × €${rate.toFixed(2)}`;
+  }
+  if (item.calculation_breakdown) {
+    // Travel / other: trust breakdown only if it roughly matches line_total
+    const lineTotal = Number(item.line_total || 0);
+    if (lineTotal <= 0) return item.calculation_breakdown;
+    const match = item.calculation_breakdown.match(/€\s*([\d.,]+)\s*$/);
+    if (match) {
+      const shown = parseFloat(String(match[1]).replace(",", "."));
+      if (!Number.isNaN(shown) && Math.abs(shown - lineTotal) > 0.05) {
+        // fall through to rebuild
+      } else {
+        return item.calculation_breakdown;
+      }
+    } else {
+      return item.calculation_breakdown;
+    }
   }
   if (item.item_type === "TRAVEL") {
     const mode = String(item.travel_mode || "ROAD").toUpperCase();
+    if (mode === "FIXED") {
+      return `1 session × €${Number(item.line_total || item.unit_rate || 0).toFixed(2)}`;
+    }
     if (mode === "RAIL" || mode === "FLIGHT") {
       return `Actual cost · €${Number(item.unit_rate || item.line_total || 0).toFixed(2)}`;
     }
@@ -66,12 +94,16 @@ function itemCalculation(item) {
 }
 
 function itemSource(item) {
-  if (item.blocks_source) return item.blocks_source;
+  if (item.item_type === "TEACHING") {
+    if (item.teacher_role_name) return `Role: ${item.teacher_role_name}`;
+    return "";
+  }
   if (item.origin_address || item.destination_address) {
     return [item.origin_address, item.destination_address].filter(Boolean).join(" — ");
   }
+  if (item.item_type === "TRAVEL" && item.blocks_source) return item.blocks_source;
   if (item.teacher_role_name) return `Role: ${item.teacher_role_name}`;
-  return item.description || "";
+  return "";
 }
 
 function statusLabel(status) {
@@ -87,6 +119,8 @@ export function ProformaInvoiceDocument({ proforma }) {
   const planning = proforma.planning_id || {};
   const items = (proforma.items || []).filter((i) => Number(i.line_total || 0) > 0);
   const signature = proforma.digital_signature || {};
+  const payoutBank =
+    signature.bank_account_number || teacher.IBAN || null;
   const roleName =
     teacher.teacher_role?.name || items.find((i) => i.teacher_role_name)?.teacher_role_name || "—";
   const sessionDates = [
@@ -168,6 +202,12 @@ export function ProformaInvoiceDocument({ proforma }) {
             <p className="m-0 mt-2 text-xs text-[#6b7280]">
               Role: <span className="text-[#374151] font-semibold">{roleName}</span>
             </p>
+            {payoutBank && (
+              <p className="m-0 mt-1 text-xs text-[#6b7280]">
+                Bank account:{" "}
+                <span className="text-[#374151] font-semibold font-mono">{payoutBank}</span>
+              </p>
+            )}
           </div>
           <div>
             <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">Course</p>
@@ -242,6 +282,11 @@ export function ProformaInvoiceDocument({ proforma }) {
               >
                 {signature.signed_by_name}
               </p>
+              {signature.bank_account_number && (
+                <p className="m-0 mt-1 text-xs font-mono text-[#374151]">
+                  Bank account: {signature.bank_account_number}
+                </p>
+              )}
               <p className="m-0 mt-1 text-[11px] font-medium text-[#137333] flex items-center gap-1">
                 <CheckCircle className="w-3.5 h-3.5" />
                 Electronically signed on {moment(signature.signed_at).format("DD MMM YYYY, HH:mm")}

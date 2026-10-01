@@ -23,7 +23,6 @@ import {
   Paperclip,
   PenTool,
   Plus,
-  ShieldCheck,
   Trash2,
   X,
 } from "lucide-react";
@@ -31,6 +30,10 @@ import { toast } from "sonner";
 import MultiFileSectionUploader from "@/components/common/MultiFileSectionUploader";
 import ProformaSectionNotes from "@/components/proforma/ProformaSectionNotes";
 import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/proforma/ProformaActivityLog";
+import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard";
+import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCard";
+import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
+import ProformaSignDialog from "@/components/proforma/ProformaSignDialog";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
@@ -40,12 +43,6 @@ const CATEGORY_TOGGLE_KEY = {
   STAY: "stay_enabled",
   MISCELLANEOUS: "miscellaneous_enabled",
 };
-
-const TRAVEL_TABS = [
-  { key: "WEEKEND", label: "Teaching weekend fee" },
-  { key: "RAIL", label: "Rail" },
-  { key: "FLIGHT", label: "Air" },
-];
 
 const eur = (n) => `€${Number(n || 0).toFixed(2)}`;
 
@@ -61,21 +58,6 @@ const statusBadge = (p) => {
   }
   return { label: "Needs confirm & sign", className: "bg-amber-100 text-amber-800 border-amber-300" };
 };
-
-function courseMeta(proforma) {
-  const planning = proforma?.planning_id;
-  const program =
-    planning?.component?.program?.name ||
-    planning?.batch?.intake?.program?.name ||
-    planning?.description ||
-    "Course";
-  const venue = planning?.venue || planning?.venue_address || proforma?.region_snapshot_name || "—";
-  const role =
-    proforma?.teacher_id?.teacher_role?.name ||
-    proforma?.items?.find((i) => i.item_type === "TEACHING")?.teacher_role_name ||
-    "Teacher";
-  return { program, venue, role };
-}
 
 export default function TeacherProformaDetailPage() {
   const params = useParams({ strict: false });
@@ -95,8 +77,8 @@ export default function TeacherProformaDetailPage() {
   const removeItemMutation = useRemoveProformaLineItem();
   const addCommentMutation = useAddSectionComment();
 
-  const [signedByName, setSignedByName] = useState("");
-  const [travelTab, setTravelTab] = useState("WEEKEND");
+  const [showSignDialog, setShowSignDialog] = useState(false);
+  const [travelTab, setTravelTab] = useState("ROAD");
   const [editingTeaching, setEditingTeaching] = useState(false);
   const [teachingBlocks, setTeachingBlocks] = useState("");
   const [teachingNote, setTeachingNote] = useState("");
@@ -143,6 +125,21 @@ export default function TeacherProformaDetailPage() {
   const railTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "RAIL");
   const airTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "FLIGHT");
 
+  const travelTabs = useMemo(() => {
+    const primary =
+      fixedTravelLines.length > 0
+        ? { key: "FIXED", label: "Fixed session" }
+        : { key: "ROAD", label: "Road" };
+    return [primary, { key: "RAIL", label: "Rail" }, { key: "FLIGHT", label: "Air" }];
+  }, [fixedTravelLines.length]);
+
+  useEffect(() => {
+    const primaryKey = fixedTravelLines.length > 0 ? "FIXED" : "ROAD";
+    if (travelTab === "WEEKEND" || (travelTab === "FIXED" && fixedTravelLines.length === 0) || (travelTab === "ROAD" && !roadLine && fixedTravelLines.length > 0)) {
+      setTravelTab(primaryKey);
+    }
+  }, [fixedTravelLines.length, roadLine, travelTab]);
+
   const sectionIsActive = (sec) => {
     const totals = {
       TEACHING: proforma?.teaching_total,
@@ -166,7 +163,6 @@ export default function TeacherProformaDetailPage() {
 
   const activeSections = SECTION_KEYS.filter((k) => sectionIsVisible(k) && sectionIsActive(k));
   const allConfirmed = activeSections.every((k) => dual[k]?.teacher_approved);
-  const allAccepted = activeSections.every((k) => dual[k]?.admin_approved);
 
   const missingReceipts = useMemo(() => {
     if (!proforma) return [];
@@ -176,6 +172,7 @@ export default function TeacherProformaDetailPage() {
     const travelLines = (itemsByType.TRAVEL || []).filter((i) => Number(i.line_total) > 0);
     const travelNeeds = travelLines.some((item) => {
       const mode = String(item.travel_mode || "ROAD").toLowerCase();
+      if (mode === "fixed") return false;
       const modeKey = ["road", "rail", "flight"].includes(mode) ? mode : "road";
       if (policy.travel?.[modeKey]?.proof_required !== true) return false;
       return !(item.attachments || []).length;
@@ -209,11 +206,9 @@ export default function TeacherProformaDetailPage() {
   const canSign =
     !signed &&
     allConfirmed &&
-    allAccepted &&
     missingReceipts.length === 0;
 
   const badge = statusBadge(proforma);
-  const meta = courseMeta(proforma);
 
   // Admin note / change request (last_revision) — teacher must revise & re-confirm
   const adminQuery = useMemo(() => {
@@ -428,11 +423,7 @@ export default function TeacherProformaDetailPage() {
     }
   };
 
-  const sign = async () => {
-    if (!signedByName.trim()) {
-      toast.error("Type your full legal name");
-      return;
-    }
+  const openSignDialog = () => {
     if (!allConfirmed) {
       toast.error("Confirm all sections with amounts first");
       return;
@@ -441,17 +432,18 @@ export default function TeacherProformaDetailPage() {
       toast.error(`Attach receipts for: ${missingReceipts.join(", ")}`);
       return;
     }
-    if (!allAccepted) {
-      toast.error("Wait for admin to accept all sections before signing");
-      return;
-    }
+    setShowSignDialog(true);
+  };
+
+  const sign = async ({ signed_by_name, bank_account_number }) => {
     try {
       setBusy(true);
       await confirmAllAndPrepareSign();
       await signMutation.mutateAsync({
         id: proforma._id,
-        data: { signed_by_name: signedByName.trim() },
+        data: { signed_by_name, bank_account_number },
       });
+      setShowSignDialog(false);
     } catch (err) {
       toast.error(err?.message || "Could not sign");
     } finally {
@@ -656,7 +648,6 @@ export default function TeacherProformaDetailPage() {
       );
     }
     const teacherOk = dual[section]?.teacher_approved;
-    const adminOk = dual[section]?.admin_approved;
     return (
       <div className="flex flex-wrap items-center gap-2 justify-end">
         <span
@@ -667,15 +658,6 @@ export default function TeacherProformaDetailPage() {
           }`}
         >
           {teacherOk ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />} Confirmed
-        </span>
-        <span
-          className={`px-2 py-0.5 text-[11px] rounded-full font-semibold border flex items-center gap-1 ${
-            adminOk
-              ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-              : "bg-gray-100 text-gray-700 border-gray-300"
-          }`}
-        >
-          {adminOk ? <ShieldCheck className="w-3 h-3" /> : <Clock className="w-3 h-3" />} Admin accepted
         </span>
         {!signed && (
           <Button
@@ -707,31 +689,17 @@ export default function TeacherProformaDetailPage() {
             <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold border ${badge.className}`}>
               {badge.label}
             </span>
+            <span className="font-mono text-sm font-bold text-foreground">{eur(proforma.grand_total)}</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {meta.program}
-            {" · "}
-            <span className="font-semibold text-foreground">{meta.venue}</span>
-            {" · "}
-            {meta.role}
-            {" · "}
-            <span className="font-mono font-semibold text-foreground">{eur(proforma.grand_total)}</span>
-          </p>
         </div>
 
         {!signed && (
           <div className="flex flex-col sm:items-end gap-2 min-w-[220px]">
-            <Input
-              placeholder="Type your full legal name"
-              value={signedByName}
-              onChange={(e) => setSignedByName(e.target.value)}
-              className="h-9"
-            />
             <Button
               size="sm"
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
               disabled={busy || !canSign}
-              onClick={sign}
+              onClick={openSignDialog}
             >
               {busy ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -742,22 +710,40 @@ export default function TeacherProformaDetailPage() {
             </Button>
             {!allConfirmed && (
               <p className="text-[11px] text-muted-foreground text-right max-w-xs">
-                Confirm each section with an amount, then wait for admin accept before signing.
+                Confirm each section with an amount, then sign.
               </p>
             )}
-            {allConfirmed && !allAccepted && (
+            {allConfirmed && missingReceipts.length > 0 && (
               <p className="text-[11px] text-muted-foreground text-right max-w-xs">
-                Admin must accept each section before you can sign.
+                Attach required receipts before signing: {missingReceipts.join(", ")}.
               </p>
             )}
           </div>
         )}
         {signed && (
-          <div className="flex items-center gap-2 text-emerald-700 text-sm font-semibold">
-            <CheckCircle2 className="w-5 h-5" /> Signed by {proforma.digital_signature?.signed_by_name}
+          <div className="text-sm text-emerald-700 space-y-0.5">
+            <p className="font-semibold flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 shrink-0" />
+              Signed by {proforma.digital_signature?.signed_by_name}
+            </p>
+            {proforma.digital_signature?.bank_account_number && (
+              <p className="text-xs font-mono text-emerald-800/90 pl-7">
+                Bank: {proforma.digital_signature.bank_account_number}
+              </p>
+            )}
           </div>
         )}
       </div>
+
+      <ProformaSignDialog
+        open={showSignDialog}
+        onOpenChange={setShowSignDialog}
+        proforma={proforma}
+        busy={busy}
+        onConfirm={sign}
+      />
+
+      <ProformaContextSummary proforma={proforma} showTeacherName={false} />
 
       <ProformaLatestChangeBanner proforma={proforma} viewerRole="TEACHER" />
 
@@ -778,7 +764,7 @@ export default function TeacherProformaDetailPage() {
             {adminQuery.reason}
           </p>
           <p className="text-[11px] text-orange-800/80">
-            Update the sections below if needed, then Confirm again so admin can Accept.
+            Update the sections below if needed, then Confirm again and Sign.
           </p>
         </div>
       )}
@@ -807,9 +793,23 @@ export default function TeacherProformaDetailPage() {
         <div className="p-4 space-y-3">
           {!editingTeaching && !teachingPending && teachingItem && (
             <p className="text-sm text-muted-foreground">
-              {Number(teachingItem.blocks || teachingItem.multiplier || 0)} blocks × {eur(teachingItem.unit_rate)} ={" "}
-              <span className="font-mono font-semibold text-foreground">{eur(teachingItem.line_total)}</span>
-              {teachingItem.teacher_role_name ? ` · ${teachingItem.teacher_role_name}` : ""}
+              {(() => {
+                const blocks = Number(teachingItem.blocks || teachingItem.multiplier || 0);
+                const lineTotal = Number(teachingItem.line_total || 0);
+                let rate = Number(teachingItem.unit_rate || 0);
+                if (blocks > 0 && lineTotal > 0) {
+                  const implied = Math.round((lineTotal / blocks) * 100) / 100;
+                  const fromRate = Math.round(blocks * rate * 100) / 100;
+                  if (Math.abs(fromRate - lineTotal) > 0.02) rate = implied;
+                }
+                return (
+                  <>
+                    {blocks} blocks × {eur(rate)} ={" "}
+                    <span className="font-mono font-semibold text-foreground">{eur(lineTotal)}</span>
+                    {teachingItem.teacher_role_name ? ` · ${teachingItem.teacher_role_name}` : ""}
+                  </>
+                );
+              })()}
             </p>
           )}
           {teachingPending && !editingTeaching && (
@@ -887,7 +887,7 @@ export default function TeacherProformaDetailPage() {
           </div>
           <div className="px-4 pt-3">
             <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted/40">
-              {TRAVEL_TABS.map((tab) => (
+              {travelTabs.map((tab) => (
                 <button
                   key={tab.key}
                   type="button"
@@ -908,54 +908,21 @@ export default function TeacherProformaDetailPage() {
             </div>
           </div>
           <div className="p-4 space-y-3">
-            {travelTab === "WEEKEND" && (
-              <div className="text-sm text-muted-foreground space-y-2">
-                {fixedTravelLines.length > 0 ? (
-                  <>
-                    <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
-                      Fixed session travel
-                    </p>
-                    {fixedTravelLines.map((line) => (
-                      <div
-                        key={line._id}
-                        className="flex items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2"
-                      >
-                        <div>
-                          <p className="text-sm text-foreground">{line.description}</p>
-                          <p className="text-xs">
-                            {line.calculation_breakdown || eur(line.line_total)}
-                          </p>
-                          {line.session_date && (
-                            <p className="text-[11px]">
-                              {new Date(line.session_date).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                        <span className="font-mono text-sm font-semibold text-foreground">
-                          {eur(line.line_total)}
-                        </span>
-                      </div>
-                    ))}
-                  </>
-                ) : roadLine ? (
-                  <>
-                    <p>
-                      System weekend fee (road):{" "}
-                      <span className="font-mono font-semibold text-foreground">{eur(roadLine.line_total)}</span>
-                    </p>
-                    {roadLine.calculation_breakdown && (
-                      <p className="text-xs">{roadLine.calculation_breakdown}</p>
-                    )}
-                    {(roadLine.origin_address || roadLine.destination_address) && (
-                      <p className="text-xs">
-                        {[roadLine.origin_address, roadLine.destination_address].filter(Boolean).join(" → ")}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <p>No weekend-fee / road line on this invoice. Use Rail or Air to add tickets.</p>
-                )}
-              </div>
+            {travelTab === "FIXED" && (
+              fixedTravelLines.length > 0 ? (
+                <ProformaTravelFixedCard items={fixedTravelLines} />
+              ) : (
+                <p className="text-sm text-muted-foreground">No fixed session travel on this invoice.</p>
+              )
+            )}
+            {travelTab === "ROAD" && (
+              roadLine ? (
+                <ProformaTravelRoadCard item={roadLine} editable={false} />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No road travel line on this invoice. Use Rail or Air to add tickets.
+                </p>
+              )
             )}
             {(travelTab === "RAIL" || travelTab === "FLIGHT") && (
               <>

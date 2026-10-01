@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useGetFinanceQueue, useUpdateProformaStatus } from "@/store/useProformaStore";
 import { CheckCircle, XCircle, Clock, Eye, Search, AlertCircle, Send } from "lucide-react";
+import { proformaTeacherName } from "@/utils/proformaCourseLabel";
 
 export default function ProformaFinanceQueue({ onViewInvoice }) {
   const [statusFilter, setStatusFilter] = useState("TEACHER_SIGNED_APPROVED");
@@ -134,7 +135,7 @@ export default function ProformaFinanceQueue({ onViewInvoice }) {
                 <tr key={inv._id} className="hover:bg-slate-50/80 transition">
                   <td className="py-3.5 px-4 font-semibold text-slate-900">{inv.proforma_number}</td>
                   <td className="py-3.5 px-4 font-medium text-slate-800">
-                    {inv.teacher_id?.full_name || inv.teacher_id?.name || "Teacher"}
+                    {proformaTeacherName(inv.teacher_id)}
                     <span className="block text-xs text-slate-400 font-normal">{inv.teacher_id?.email}</span>
                   </td>
                   <td className="py-3.5 px-4 text-slate-600">{inv.region_snapshot_name}</td>

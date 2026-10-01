@@ -35,7 +35,7 @@ export default function TeacherProformaListPage() {
       icon: AlertCircle,
     },
     TEACHER_SIGNED_APPROVED: {
-      label: "Signed — awaiting admin",
+      label: "Signed — awaiting finance",
       bg: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300",
       icon: CheckCircle2,
     },
@@ -161,7 +161,7 @@ export default function TeacherProformaListPage() {
               invoices.map((inv) => {
                 const badge = getStatusBadge(inv);
                 const BadgeIcon = badge.icon;
-                const { title, subtitle } = coursePlanningLabel(inv);
+                const { title, subtitle, locationLines } = coursePlanningLabel(inv);
 
                 return (
                   <TableRow key={inv._id} className="hover:bg-muted/40 transition">
@@ -170,6 +170,11 @@ export default function TeacherProformaListPage() {
                       {title}
                       {subtitle && (
                         <span className="block text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</span>
+                      )}
+                      {locationLines.length > 0 && (
+                        <span className="block text-xs text-muted-foreground font-normal mt-0.5">
+                          {locationLines.join(" · ")}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground font-medium text-xs">
