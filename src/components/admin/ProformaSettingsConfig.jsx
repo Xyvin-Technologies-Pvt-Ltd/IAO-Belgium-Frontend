@@ -37,6 +37,7 @@ import {
 import { useGetTeacherRole } from "@/store/useTeacherRoleStore";
 import { useGetAllCities } from "@/store/useDropdownStore";
 import { toast } from "sonner";
+import { Pencil } from "lucide-react";
 
 const DEFAULT_TRAVEL_RULES = [
   {
@@ -247,7 +248,9 @@ export default function ProformaSettingsConfig() {
     cities: [],
     is_active: true,
     blocks_per_module: "",
+    travel_pricing_mode: "PER_KM",
     travel_rate: "",
+    travel_fixed_session_rate: "",
     food_rate: "",
     stay_rate: "",
   });
@@ -290,13 +293,16 @@ export default function ProformaSettingsConfig() {
   const handleOpenEditRegion = (region) => {
     setSelectedRegion(region);
     const assignedCityIds = (region.cities || []).map((c) => c._id || c);
+    const mode = region.travel?.pricing_mode === "FIXED_PER_SESSION" ? "FIXED_PER_SESSION" : "PER_KM";
     setEditRegionForm({
       name: region.name || "",
       code: region.code || "",
       cities: assignedCityIds,
       is_active: region.is_active !== false,
       blocks_per_module: region.blocks_per_module ?? "",
+      travel_pricing_mode: mode,
       travel_rate: region.travel?.rate_per_km ?? "",
+      travel_fixed_session_rate: region.travel?.fixed_session_rate ?? "",
       food_rate: region.food?.daily_rate ?? "",
       stay_rate: region.stay?.max_nightly_rate ?? "",
     });
@@ -305,6 +311,18 @@ export default function ProformaSettingsConfig() {
 
   const handleUpdateRegionSubmit = () => {
     if (!selectedRegion) return;
+    const travelPayload = {
+      pricing_mode: editRegionForm.travel_pricing_mode || "PER_KM",
+    };
+    if (editRegionForm.travel_pricing_mode === "FIXED_PER_SESSION") {
+      travelPayload.fixed_session_rate =
+        editRegionForm.travel_fixed_session_rate !== ""
+          ? parseFloat(editRegionForm.travel_fixed_session_rate)
+          : null;
+    } else if (editRegionForm.travel_rate !== "") {
+      travelPayload.rate_per_km = parseFloat(editRegionForm.travel_rate);
+    }
+
     updateRegionMutation.mutate(
       {
         id: selectedRegion._id,
@@ -315,9 +333,7 @@ export default function ProformaSettingsConfig() {
           is_active: editRegionForm.is_active,
           blocks_per_module:
             editRegionForm.blocks_per_module !== "" ? parseInt(editRegionForm.blocks_per_module, 10) : null,
-          ...(editRegionForm.travel_rate !== ""
-            ? { travel: { rate_per_km: parseFloat(editRegionForm.travel_rate) } }
-            : {}),
+          travel: travelPayload,
           ...(editRegionForm.food_rate !== ""
             ? { food: { daily_rate: parseFloat(editRegionForm.food_rate) } }
             : {}),
@@ -810,11 +826,11 @@ export default function ProformaSettingsConfig() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 w-6 p-0 hover:bg-muted text-xs"
-                              title="Configure Region Settings"
+                              className="h-6 w-6 p-0 hover:bg-muted text-muted-foreground"
+                              title="Edit region"
                               onClick={() => handleOpenEditRegion(region)}
                             >
-                              ⚙️
+                              <Pencil className="w-3.5 h-3.5" />
                             </Button>
                           </div>
                           {region.is_active === false && (
@@ -1124,17 +1140,64 @@ export default function ProformaSettingsConfig() {
                   />
                 </div>
 
-                <div>
-                  <Label className="text-[11px] text-muted-foreground">Travel Rate per km (€) [Baseline: €0.4326]</Label>
-                  <Input
-                    type="number"
-                    step="0.0001"
-                    placeholder="Inherit Global (€0.4326/km)"
-                    value={editRegionForm.travel_rate}
-                    onChange={(e) => setEditRegionForm({ ...editRegionForm, travel_rate: e.target.value })}
-                    className="font-mono text-xs mt-1"
-                  />
+                <div className="space-y-2">
+                  <Label className="text-[11px] font-semibold text-foreground">Travel pricing</Label>
+                  <Select
+                    value={editRegionForm.travel_pricing_mode || "PER_KM"}
+                    onValueChange={(val) =>
+                      setEditRegionForm({ ...editRegionForm, travel_pricing_mode: val })
+                    }
+                  >
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PER_KM">Per km (distance formula)</SelectItem>
+                      <SelectItem value="FIXED_PER_SESSION">Fixed rate per session</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {editRegionForm.travel_pricing_mode === "FIXED_PER_SESSION" ? (
+                  <div>
+                    <Label className="text-[11px] text-muted-foreground">
+                      Fixed rate per session (€)
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="e.g. 50.00"
+                      value={editRegionForm.travel_fixed_session_rate}
+                      onChange={(e) =>
+                        setEditRegionForm({
+                          ...editRegionForm,
+                          travel_fixed_session_rate: e.target.value,
+                        })
+                      }
+                      className="font-mono text-xs mt-1"
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Charged once per teaching session (no km calculation).
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <Label className="text-[11px] text-muted-foreground">
+                      Travel Rate per km (€) [Baseline: €0.4326]
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.0001"
+                      placeholder="Inherit Global (€0.4326/km)"
+                      value={editRegionForm.travel_rate}
+                      onChange={(e) =>
+                        setEditRegionForm({ ...editRegionForm, travel_rate: e.target.value })
+                      }
+                      className="font-mono text-xs mt-1"
+                    />
+                  </div>
+                )}
 
                 <div>
                   <Label className="text-[11px] text-muted-foreground">Food Daily Rate (€) [Baseline: €25.00]</Label>

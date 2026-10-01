@@ -137,6 +137,9 @@ export default function TeacherProformaDetailPage() {
   const mealItems = (itemsByType.FOOD || []).filter((i) => Number(i.line_total) > 0);
 
   const roadLine = (itemsByType.TRAVEL || []).find((i) => (i.travel_mode || "ROAD") === "ROAD");
+  const fixedTravelLines = (itemsByType.TRAVEL || []).filter(
+    (i) => String(i.travel_mode || "").toUpperCase() === "FIXED"
+  );
   const railTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "RAIL");
   const airTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "FLIGHT");
 
@@ -906,8 +909,35 @@ export default function TeacherProformaDetailPage() {
           </div>
           <div className="p-4 space-y-3">
             {travelTab === "WEEKEND" && (
-              <div className="text-sm text-muted-foreground space-y-1">
-                {roadLine ? (
+              <div className="text-sm text-muted-foreground space-y-2">
+                {fixedTravelLines.length > 0 ? (
+                  <>
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                      Fixed session travel
+                    </p>
+                    {fixedTravelLines.map((line) => (
+                      <div
+                        key={line._id}
+                        className="flex items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2"
+                      >
+                        <div>
+                          <p className="text-sm text-foreground">{line.description}</p>
+                          <p className="text-xs">
+                            {line.calculation_breakdown || eur(line.line_total)}
+                          </p>
+                          {line.session_date && (
+                            <p className="text-[11px]">
+                              {new Date(line.session_date).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <span className="font-mono text-sm font-semibold text-foreground">
+                          {eur(line.line_total)}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                ) : roadLine ? (
                   <>
                     <p>
                       System weekend fee (road):{" "}
