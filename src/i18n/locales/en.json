@@ -641,7 +641,10 @@
       "endTimeLabel": "End Time",
       "venuesLabel": "Venues",
       "venueLabel": "Venue",
-      "searchCountries": "Search countries..."
+      "venueAddress": "Venue Address (Optional)",
+      "searchCountries": "Search countries...",
+      "paymentWindowAlwaysOpen": "Payment window always open",
+      "paymentWindowAlwaysOpenHint": "When enabled, students can pay anytime (no 30-day wait before first session)."
     }
   },
   "roleManagement": {

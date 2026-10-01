@@ -15,6 +15,8 @@ import PracticalExamDetail from "@/pages/teacher/exam/PracticalExamDetail";
 import ExamDetail from "@/pages/teacher/exam/ExamDetail";
 import TeacherNotifications from "@/pages/teacher/notification";
 import TeacherNotificationDetail from "@/pages/teacher/notification/NotificationDetail";
+import TeacherProformaListPage from "@/pages/teacher/invoices/TeacherProformaListPage";
+import TeacherProformaDetailPage from "@/pages/teacher/invoices/TeacherProformaDetailPage";
 
 export const teacherRoutes = [
   {
@@ -37,4 +39,6 @@ export const teacherRoutes = [
   { path: "/teacher/exams/$exam_id/$planning_id", component: ExamDetail },
   { path: "/teacher/notifications", component: TeacherNotifications },
   { path: "/teacher/notifications/$id", component: TeacherNotificationDetail },
+  { path: "/teacher/proforma-invoices", component: TeacherProformaListPage },
+  { path: "/teacher/proforma-invoices/$id", component: TeacherProformaDetailPage },
 ];
