@@ -18,25 +18,29 @@ function teacherFullAddress(teacher = {}) {
     .join(", ");
 }
 
-function courseName(planning = {}) {
+function programName(planning = {}, courseMeta = {}) {
   return (
+    courseMeta?.program_name ||
     planning?.component?.program?.name ||
     planning?.batch?.intake?.program?.name ||
-    planning?.description ||
-    planning?.venue ||
-    "Course"
+    null
   );
 }
 
-function programmeType(planning = {}) {
-  return planning?.component?.program?.type || planning?.batch?.intake?.program?.type || "—";
+function moduleName(planning = {}, courseMeta = {}) {
+  return (
+    courseMeta?.module_name ||
+    planning?.component?.name ||
+    planning?.description ||
+    null
+  );
 }
 
 function itemLabel(item) {
   if (item.item_type === "TEACHING") return "Teaching fee";
   if (item.item_type === "TRAVEL") {
     const mode = String(item.travel_mode || "ROAD").toUpperCase();
-    if (mode === "FIXED") return "Travel (fixed session)";
+    if (mode === "FIXED") return "Travel (fixed module)";
     return `Travel (${mode.toLowerCase()})`;
   }
   if (item.item_type === "FOOD") return "Meal allowance";
@@ -78,7 +82,7 @@ function itemCalculation(item) {
   if (item.item_type === "TRAVEL") {
     const mode = String(item.travel_mode || "ROAD").toUpperCase();
     if (mode === "FIXED") {
-      return `1 session × €${Number(item.line_total || item.unit_rate || 0).toFixed(2)}`;
+      return `1 module × €${Number(item.line_total || item.unit_rate || 0).toFixed(2)}`;
     }
     if (mode === "RAIL" || mode === "FLIGHT") {
       return `Actual cost · €${Number(item.unit_rate || item.line_total || 0).toFixed(2)}`;
@@ -117,6 +121,9 @@ export function ProformaInvoiceDocument({ proforma }) {
 
   const teacher = proforma.teacher_id || {};
   const planning = proforma.planning_id || {};
+  const courseMeta = proforma.course_meta || {};
+  const programLabel = programName(planning, courseMeta) || "—";
+  const moduleLabel = moduleName(planning, courseMeta) || "—";
   const items = (proforma.items || []).filter((i) => Number(i.line_total || 0) > 0);
   const signature = proforma.digital_signature || {};
   const payoutBank =
@@ -210,16 +217,18 @@ export function ProformaInvoiceDocument({ proforma }) {
             )}
           </div>
           <div>
-            <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">Course</p>
-            <p className="m-0 mb-0.5 text-sm font-bold text-[#0f172a]">{courseName(planning)}</p>
+            <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">Program</p>
+            <p className="m-0 mb-0.5 text-sm font-bold text-[#0f172a]">{programLabel}</p>
             <p className="m-0 text-xs text-[#6b7280]">
-              Programme: <span className="text-[#374151]">{programmeType(planning)}</span>
+              Module: <span className="text-[#374151]">{moduleLabel}</span>
             </p>
             <p className="m-0 text-xs text-[#6b7280]">
-              Venue: <span className="text-[#374151]">{planning.venue || "—"}</span>
+              Venue: <span className="text-[#374151]">{planning.venue || courseMeta.venue || "—"}</span>
             </p>
-            {planning.venue_address && (
-              <p className="m-0 text-xs text-[#6b7280]">{planning.venue_address}</p>
+            {(planning.venue_address || courseMeta.venue_address) && (
+              <p className="m-0 text-xs text-[#6b7280]">
+                {planning.venue_address || courseMeta.venue_address}
+              </p>
             )}
             {sessionDates.length > 0 && (
               <p className="m-0 mt-1 text-xs text-[#6b7280]">

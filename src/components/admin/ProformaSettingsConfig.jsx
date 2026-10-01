@@ -111,8 +111,8 @@ export default function ProformaSettingsConfig() {
       key: "food",
       name: "Food",
       calc: "Fixed per day",
-      amount: "25,00 € / day",
-      daily_rate: 25.0,
+      amount: "0,00 € / day",
+      daily_rate: 0,
       min_hours: 4.0,
       cap: "—",
       proof_required: true,
@@ -200,7 +200,7 @@ export default function ProformaSettingsConfig() {
       },
     ]);
 
-    const foodRate = globalDefaults.food?.daily_rate ?? 25;
+    const foodRate = Number(globalDefaults.food?.daily_rate) || 0;
     const stayCap = globalDefaults.stay?.max_nightly_rate ?? 120;
     setStayRules([
       {
@@ -250,7 +250,7 @@ export default function ProformaSettingsConfig() {
     blocks_per_module: "",
     travel_pricing_mode: "PER_KM",
     travel_rate: "",
-    travel_fixed_session_rate: "",
+    travel_fixed_module_rate: "",
     food_rate: "",
     stay_rate: "",
   });
@@ -263,7 +263,7 @@ export default function ProformaSettingsConfig() {
     rate_per_km: 0.4326,
     multiplier: 2,
     rounding: "NEAREST_KM",
-    daily_rate: 25.0,
+    daily_rate: 0,
     max_nightly_rate: 120.0,
     proof_required: false,
   });
@@ -293,7 +293,11 @@ export default function ProformaSettingsConfig() {
   const handleOpenEditRegion = (region) => {
     setSelectedRegion(region);
     const assignedCityIds = (region.cities || []).map((c) => c._id || c);
-    const mode = region.travel?.pricing_mode === "FIXED_PER_SESSION" ? "FIXED_PER_SESSION" : "PER_KM";
+    const rawMode = region.travel?.pricing_mode;
+    const mode =
+      rawMode === "FIXED_PER_MODULE" || rawMode === "FIXED_PER_SESSION"
+        ? "FIXED_PER_MODULE"
+        : "PER_KM";
     setEditRegionForm({
       name: region.name || "",
       code: region.code || "",
@@ -302,7 +306,8 @@ export default function ProformaSettingsConfig() {
       blocks_per_module: region.blocks_per_module ?? "",
       travel_pricing_mode: mode,
       travel_rate: region.travel?.rate_per_km ?? "",
-      travel_fixed_session_rate: region.travel?.fixed_session_rate ?? "",
+      travel_fixed_module_rate:
+        region.travel?.fixed_module_rate ?? region.travel?.fixed_session_rate ?? "",
       food_rate: region.food?.daily_rate ?? "",
       stay_rate: region.stay?.max_nightly_rate ?? "",
     });
@@ -314,11 +319,13 @@ export default function ProformaSettingsConfig() {
     const travelPayload = {
       pricing_mode: editRegionForm.travel_pricing_mode || "PER_KM",
     };
-    if (editRegionForm.travel_pricing_mode === "FIXED_PER_SESSION") {
-      travelPayload.fixed_session_rate =
-        editRegionForm.travel_fixed_session_rate !== ""
-          ? parseFloat(editRegionForm.travel_fixed_session_rate)
+    if (editRegionForm.travel_pricing_mode === "FIXED_PER_MODULE") {
+      const rate =
+        editRegionForm.travel_fixed_module_rate !== ""
+          ? parseFloat(editRegionForm.travel_fixed_module_rate)
           : null;
+      travelPayload.fixed_module_rate = rate;
+      travelPayload.fixed_session_rate = rate;
     } else if (editRegionForm.travel_rate !== "") {
       travelPayload.rate_per_km = parseFloat(editRegionForm.travel_rate);
     }
@@ -382,8 +389,8 @@ export default function ProformaSettingsConfig() {
       rate_per_km: rule.rate_per_km ?? 0.4326,
       multiplier: rule.multiplier ?? 2,
       rounding: rule.rounding || "NEAREST_KM",
-      // Use nullish coalescing so 0 is preserved (0 || 25 was forcing 25)
-      daily_rate: rule.daily_rate ?? 25.0,
+      // Preserve 0 from global/region (no hard-coded €25 fallback)
+      daily_rate: rule.daily_rate ?? 0,
       max_nightly_rate: rule.max_nightly_rate ?? 120.0,
       proof_required: Boolean(rule.proof_required),
     });
@@ -1153,32 +1160,32 @@ export default function ProformaSettingsConfig() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="PER_KM">Per km (distance formula)</SelectItem>
-                      <SelectItem value="FIXED_PER_SESSION">Fixed rate per session</SelectItem>
+                      <SelectItem value="FIXED_PER_MODULE">Fixed rate per module</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {editRegionForm.travel_pricing_mode === "FIXED_PER_SESSION" ? (
+                {editRegionForm.travel_pricing_mode === "FIXED_PER_MODULE" ? (
                   <div>
                     <Label className="text-[11px] text-muted-foreground">
-                      Fixed rate per session (€)
+                      Fixed rate per module (€)
                     </Label>
                     <Input
                       type="number"
                       step="0.01"
                       min="0"
                       placeholder="e.g. 50.00"
-                      value={editRegionForm.travel_fixed_session_rate}
+                      value={editRegionForm.travel_fixed_module_rate}
                       onChange={(e) =>
                         setEditRegionForm({
                           ...editRegionForm,
-                          travel_fixed_session_rate: e.target.value,
+                          travel_fixed_module_rate: e.target.value,
                         })
                       }
                       className="font-mono text-xs mt-1"
                     />
                     <p className="text-[10px] text-muted-foreground mt-1">
-                      Charged once per teaching session (no km calculation).
+                      Charged once per module / planning (no km calculation).
                     </p>
                   </div>
                 ) : (
@@ -1200,11 +1207,20 @@ export default function ProformaSettingsConfig() {
                 )}
 
                 <div>
-                  <Label className="text-[11px] text-muted-foreground">Food Daily Rate (€) [Baseline: €25.00]</Label>
+                  <Label className="text-[11px] text-muted-foreground">
+                    Food Daily Rate (€)
+                    {globalDefaults?.food?.daily_rate != null
+                      ? ` [Global: €${Number(globalDefaults.food.daily_rate).toFixed(2)}]`
+                      : ""}
+                  </Label>
                   <Input
                     type="number"
                     step="1"
-                    placeholder="Inherit Global (€25.00/day)"
+                    placeholder={
+                      globalDefaults?.food?.daily_rate != null
+                        ? `Inherit Global (€${Number(globalDefaults.food.daily_rate).toFixed(2)}/day)`
+                        : "Inherit Global"
+                    }
                     value={editRegionForm.food_rate}
                     onChange={(e) => setEditRegionForm({ ...editRegionForm, food_rate: e.target.value })}
                     className="font-mono text-xs mt-1"

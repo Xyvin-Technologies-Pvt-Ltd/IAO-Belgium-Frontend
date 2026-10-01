@@ -5,6 +5,8 @@ import {
   useUpdateProformaStatus,
   useAddSectionComment,
   useUpdateSectionItems,
+  useUpdateSectionApproval,
+  useUpdateProformaLineItem,
 } from "@/store/useProformaStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,7 @@ import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/pr
 import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard";
 import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCard";
 import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
+import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClaimRow";
 import { openProformaInvoiceTab } from "@/components/admin/ProformaInvoiceDocument";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
@@ -116,12 +119,15 @@ export default function ProformaInvoiceDetailPage() {
   const updateStatusMutation = useUpdateProformaStatus();
   const addCommentMutation = useAddSectionComment();
   const updateItemsMutation = useUpdateSectionItems();
+  const updateApprovalMutation = useUpdateSectionApproval();
+  const updateLineItemMutation = useUpdateProformaLineItem();
 
   const [notes, setNotes] = useState({});
   const [draft, setDraft] = useState({});
   const [savingSection, setSavingSection] = useState(null);
   const [adjustingTravel, setAdjustingTravel] = useState(false);
   const [travelOneWay, setTravelOneWay] = useState("");
+  const [lineBusy, setLineBusy] = useState(false);
 
   useEffect(() => {
     if (proforma?.proforma_number) {
@@ -453,7 +459,6 @@ export default function ProformaInvoiceDetailPage() {
               ? items.filter((i) => ["RAIL", "FLIGHT"].includes(String(i.travel_mode || "").toUpperCase()))
               : [];
           const item = sec.key === "TRAVEL" ? roadItem || fixedTravelItems[0] || items[0] : items[0];
-          const docs = items.flatMap((i) => i.attachments || []);
           const comments = (proforma.section_comments || []).filter((c) => c.section === sec.key);
           const form = formFor(sec.key);
           const dirty = isDirty(sec.key);
@@ -480,7 +485,7 @@ export default function ProformaInvoiceDetailPage() {
                   {sec.key === "TRAVEL" && (
                     <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-amber-200 text-amber-900 bg-amber-50">
                       {fixedTravelItems.length > 0
-                        ? `Fixed · ${fixedTravelItems.length} session(s)`
+                        ? `Fixed · module`
                         : roadItem
                           ? "Road"
                           : "Tickets"}
@@ -537,9 +542,9 @@ export default function ProformaInvoiceDetailPage() {
               <CardContent className="p-0">
                 <div className="p-5 space-y-4">
                   {pendingChange && (
-                    <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm space-y-1">
+                    <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm space-y-2">
                       <p className="font-semibold text-amber-950 text-xs uppercase tracking-wide">
-                        Teacher update
+                        Teacher update request
                       </p>
                       {pendingChange.before != null && pendingChange.after != null && (
                         <p className="text-sm text-amber-950">
@@ -551,15 +556,42 @@ export default function ProformaInvoiceDetailPage() {
                                 {Number(pendingChange.after?.line_total || 0).toFixed(2)})
                               </span>
                             </>
+                          ) : sec.key === "FOOD" ? (
+                            <>
+                              Days {pendingChange.before?.days ?? pendingChange.before?.multiplier ?? "—"} →{" "}
+                              {pendingChange.after?.days ?? pendingChange.after?.multiplier ?? "—"}
+                              <span className="font-mono text-xs ml-2 text-amber-900/80">
+                                (€{Number(pendingChange.before?.line_total || pendingChange.before?.amount || 0).toFixed(2)} → €
+                                {Number(pendingChange.after?.line_total || pendingChange.after?.amount || 0).toFixed(2)})
+                              </span>
+                            </>
                           ) : (
                             <span className="font-mono text-xs">
-                              {JSON.stringify(pendingChange.before)} → {JSON.stringify(pendingChange.after)}
+                              €{Number(pendingChange.before?.amount ?? pendingChange.before?.line_total ?? 0).toFixed(2)} → €
+                              {Number(pendingChange.after?.amount ?? pendingChange.after?.line_total ?? 0).toFixed(2)}
                             </span>
                           )}
                         </p>
                       )}
                       {pendingChange.note && (
                         <p className="text-xs text-amber-900/90">Note: {pendingChange.note}</p>
+                      )}
+                      {!inFinance && (
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                          disabled={updateApprovalMutation.isPending}
+                          onClick={() =>
+                            updateApprovalMutation.mutate({
+                              id: proforma._id,
+                              section: sec.key,
+                              action: "APPROVE",
+                              notes: "Admin accepted teacher update request",
+                            })
+                          }
+                        >
+                          <Check className="w-3.5 h-3.5 mr-1" /> Accept update
+                        </Button>
                       )}
                     </div>
                   )}
@@ -606,49 +638,39 @@ export default function ProformaInvoiceDetailPage() {
                       }}
                     />
                   ) : sec.key === "TRAVEL" && fixedTravelItems.length > 0 ? (
-                    <ProformaTravelFixedCard items={fixedTravelItems} />
+                    <ProformaTravelFixedCard
+                      items={fixedTravelItems}
+                      editable={!inFinance}
+                      busy={lineBusy}
+                      onSaveRate={async (rate) => {
+                        setLineBusy(true);
+                        try {
+                          for (const line of fixedTravelItems) {
+                            await updateLineItemMutation.mutateAsync({
+                              id: proforma._id,
+                              itemId: line._id,
+                              data: { amount: rate },
+                              silent: true,
+                            });
+                          }
+                          toast.success("Fixed travel rate updated");
+                        } finally {
+                          setLineBusy(false);
+                        }
+                      }}
+                    />
                   ) : sec.key === "TRAVEL" && !roadItem && ticketItems.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No travel lines.</p>
                   ) : sec.key === "STAY" && items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No accommodation claimed yet — €0.00. Teacher can add hotel/stay items with receipts.
                     </p>
-                  ) : sec.key === "FOOD" && items.filter((i) => Number(i.line_total) > 0).length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No meal items claimed yet — €0.00. Teacher can add meal items with receipts.
-                    </p>
                   ) : sec.key === "MISCELLANEOUS" && items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No miscellaneous claims yet — €0.00.
                     </p>
-                  ) : sec.key === "FOOD" ? (
+                  ) : sec.key === "STAY" || sec.key === "MISCELLANEOUS" ? (
                     null
-                  ) : sec.key === "MISCELLANEOUS" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2">
-                      <Label className="text-xs uppercase font-semibold">Description</Label>
-                      <Input
-                        value={form.description}
-                        disabled={inFinance}
-                        onChange={(e) => setField(sec.key, "description", e.target.value)}
-                        className="mt-1 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs uppercase font-semibold">Amount (€)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={form.unit_rate}
-                        disabled={inFinance}
-                        onChange={(e) => {
-                          setFields(sec.key, { unit_rate: e.target.value, multiplier: 1 });
-                        }}
-                        className="font-mono text-sm mt-1"
-                      />
-                    </div>
-                  </div>
                   ) : sec.key !== "TRAVEL" ? (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="sm:col-span-3">
@@ -694,100 +716,43 @@ export default function ProformaInvoiceDetailPage() {
                   </div>
                   ) : null}
 
-                  {/* Extra claim / ticket lines */}
+                  {/* Tickets + Stay/Misc claim lines (with attachments) */}
                   {(ticketItems.length > 0 ||
-                    (["FOOD", "STAY", "MISCELLANEOUS"].includes(sec.key) &&
-                      items.filter((i) => Number(i.line_total) > 0).length > (sec.key === "FOOD" ? 0 : 1))) && (
+                    (["STAY", "MISCELLANEOUS"].includes(sec.key) && items.length > 0)) && (
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-foreground uppercase tracking-wide">
                         {sec.key === "TRAVEL"
                           ? "Rail / Air tickets"
-                          : sec.key === "FOOD"
-                            ? "Meal items"
-                            : "Additional lines"}
+                          : sec.key === "STAY"
+                            ? "Stay claims"
+                            : "Miscellaneous claims"}
                       </p>
-                      {(sec.key === "TRAVEL"
-                        ? ticketItems
-                        : sec.key === "FOOD"
-                          ? items.filter((i) => Number(i.line_total) > 0)
-                          : items.slice(1)
-                      ).map((line) => (
-                        <div
+                      {(sec.key === "TRAVEL" ? ticketItems : items).map((line) => (
+                        <ProformaEditableClaimRow
                           key={line._id}
-                          className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
-                        >
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium">
-                              {sec.key === "TRAVEL" && (
-                                <span className="uppercase text-[10px] font-bold text-muted-foreground mr-2">
-                                  {line.travel_mode}
-                                </span>
-                              )}
-                              {line.description}
-                            </p>
-                            <p className="text-xs font-mono text-muted-foreground">
-                              €{Number(line.line_total || 0).toFixed(2)}
-                            </p>
-                            {(line.attachments || []).length > 0 && (
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {line.attachments.map((doc, idx) => (
-                                  <a
-                                    key={doc._id || doc.file_url || idx}
-                                    href={doc.file_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-[11px] text-indigo-600 hover:underline inline-flex items-center gap-1"
-                                  >
-                                    <Paperclip className="w-3 h-3" />
-                                    {doc.file_name}
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          line={line}
+                          editable={!inFinance}
+                          busy={lineBusy}
+                          modeBadge={sec.key === "TRAVEL" ? line.travel_mode : undefined}
+                          onSave={async (data) => {
+                            setLineBusy(true);
+                            try {
+                              await updateLineItemMutation.mutateAsync({
+                                id: proforma._id,
+                                itemId: line._id,
+                                data,
+                                silent: true,
+                              });
+                              toast.success("Line updated");
+                            } finally {
+                              setLineBusy(false);
+                            }
+                          }}
+                        />
                       ))}
                     </div>
                   )}
 
-                  <div>
-                    <p className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
-                      <Paperclip className="w-3.5 h-3.5 text-indigo-600" /> Teacher documents
-                      {sectionNeedsDocument(proforma, sec.key, itemsByType) && active && (
-                        <span
-                          className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${
-                            sectionHasDocuments(itemsByType, sec.key)
-                              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                              : "bg-rose-50 text-rose-800 border-rose-200"
-                          }`}
-                        >
-                          {sectionHasDocuments(itemsByType, sec.key) ? "Provided" : "Required"}
-                        </span>
-                      )}
-                    </p>
-                    {docs.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {docs.map((doc, idx) => (
-                          <a
-                            key={doc._id || doc.file_url || idx}
-                            href={doc.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 p-2 rounded-lg bg-muted/40 border border-border text-xs font-medium hover:border-indigo-400 transition-colors"
-                          >
-                            <Paperclip className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                            <span className="truncate">{doc.file_name || `Document #${idx + 1}`}</span>
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground italic">
-                        {sectionNeedsDocument(proforma, sec.key, itemsByType) && active
-                          ? "No documents uploaded yet — receipt/proof is required for this section."
-                          : "No documents uploaded yet."}
-                      </p>
-                    )}
-                  </div>
                 </div>
 
                 {dirty && !inFinance && (
