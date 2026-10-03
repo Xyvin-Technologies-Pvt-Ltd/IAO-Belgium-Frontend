@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useGetProformaById } from "@/store/useProformaStore";
 import {
   ProformaInvoiceDocument,
+  downloadProformaInvoicePdf,
   printProformaInvoicePdf,
 } from "@/components/admin/ProformaInvoiceDocument";
-import { FileCheck, Printer } from "lucide-react";
+import { Download, FileCheck, Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProformaInvoicePrintPage() {
   const params = useParams({ strict: false });
   const id = params?.id || params?.["$id"];
+  const [downloading, setDownloading] = useState(false);
 
   const { data: responseData, isLoading, isError, error } = useGetProformaById(id, {
     enabled: Boolean(id),
@@ -20,6 +22,18 @@ export default function ProformaInvoicePrintPage() {
   const handlePrint = () => {
     const ok = printProformaInvoicePdf(proforma);
     if (!ok) toast.error("Could not open print dialog");
+  };
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      const ok = await downloadProformaInvoicePdf(proforma);
+      if (!ok) toast.error("Could not prepare PDF");
+    } catch (err) {
+      toast.error(err?.message || "Could not download PDF");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   if (isLoading) {
@@ -53,14 +67,29 @@ export default function ProformaInvoicePrintPage() {
             <p className="text-[11px] text-slate-300 font-mono truncate">{proforma.proforma_number}</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handlePrint}
-          className="flex items-center gap-1.5 px-3 py-2 bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold rounded-lg transition-colors"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Print</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-xs font-semibold rounded-lg transition-colors"
+          >
+            {downloading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            <span>Download PDF</span>
+          </button>
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold rounded-lg transition-colors"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print</span>
+          </button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto my-6 print:my-0 print:max-w-none bg-white shadow-lg print:shadow-none">

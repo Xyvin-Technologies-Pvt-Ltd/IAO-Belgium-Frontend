@@ -28,7 +28,8 @@
       "evaluations": "Beoordelingen",
       "exams": "Examens",
       "otherExams": "Overige examens",
-      "practicalExams": "Praktijkexamens"
+      "practicalExams": "Praktijkexamens",
+      "proformaInvoices": "Mijn proforma-facturen"
     },
     "admin": {
       "title": "Beheerdersportaal",
@@ -69,7 +70,9 @@
       "questionBanks": "Vragenbanken",
       "exams": "Examens",
       "results": "Resultaten",
-      "createInvoice": "Factuur aanmaken"
+      "createInvoice": "Factuur aanmaken",
+      "proformaInvoices": "Proforma-facturen docenten",
+      "proformaSettings": "Proforma-tarieven & instellingen"
     },
     "user": {
       "loading": "Laden...",
@@ -205,7 +208,6 @@
     "total": "Totaal",
     "noTimes": "Geen tijden",
     "noVenues": "Geen locaties",
-    "search": "Zoeken...",
     "currency": "Valuta",
     "processing": "Verwerken...",
     "city": "Stad",
@@ -572,36 +574,120 @@
     "search": "Zoeken...",
     "create": "Contracttype aanmaken",
     "entity": "Contracttype",
-    "table": { "name": "Naam", "status": "Status", "action": "Actie", "noItems": "Geen contracttypes gevonden" },
-    "messages": { "loadFailed": "Laden van contracttypes mislukt", "created": "Contracttype succesvol aangemaakt", "updated": "Contracttype succesvol bijgewerkt", "deleted": "Contracttype succesvol verwijderd", "createFailed": "Aanmaken van contracttype mislukt", "updateFailed": "Bijwerken van contracttype mislukt", "deleteFailed": "Verwijderen van contracttype mislukt" },
-    "modal": { "createTitle": "Nieuw contracttype aanmaken", "editTitle": "Contracttype bewerken", "createSubtitle": "Maak een nieuw contracttype aan", "editSubtitle": "Contracttypegegevens bijwerken", "nameLabel": "Naam contracttype", "namePlaceholder": "Naam contracttype invoeren", "nameRequired": "Naam is verplicht" }
+    "table": {
+      "name": "Naam",
+      "status": "Status",
+      "action": "Actie",
+      "noItems": "Geen contracttypes gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van contracttypes mislukt",
+      "created": "Contracttype succesvol aangemaakt",
+      "updated": "Contracttype succesvol bijgewerkt",
+      "deleted": "Contracttype succesvol verwijderd",
+      "createFailed": "Aanmaken van contracttype mislukt",
+      "updateFailed": "Bijwerken van contracttype mislukt",
+      "deleteFailed": "Verwijderen van contracttype mislukt"
+    },
+    "modal": {
+      "createTitle": "Nieuw contracttype aanmaken",
+      "editTitle": "Contracttype bewerken",
+      "createSubtitle": "Maak een nieuw contracttype aan",
+      "editSubtitle": "Contracttypegegevens bijwerken",
+      "nameLabel": "Naam contracttype",
+      "namePlaceholder": "Naam contracttype invoeren",
+      "nameRequired": "Naam is verplicht"
+    }
   },
   "departmentManagement": {
     "title": "Afdelingen",
     "search": "Zoeken...",
     "create": "Afdeling aanmaken",
     "entity": "Afdeling",
-    "table": { "name": "Naam", "status": "Status", "action": "Actie", "noItems": "Geen afdelingen gevonden" },
-    "messages": { "loadFailed": "Laden van afdelingen mislukt", "created": "Afdeling succesvol aangemaakt", "updated": "Afdeling succesvol bijgewerkt", "deleted": "Afdeling succesvol verwijderd", "createFailed": "Aanmaken van afdeling mislukt", "updateFailed": "Bijwerken van afdeling mislukt", "deleteFailed": "Verwijderen van afdeling mislukt" },
-    "modal": { "createTitle": "Nieuwe afdeling aanmaken", "editTitle": "Afdeling bewerken", "createSubtitle": "Maak een nieuwe afdeling aan", "editSubtitle": "Afdelingsgegevens bijwerken", "nameLabel": "Naam afdeling", "namePlaceholder": "Naam afdeling invoeren", "nameRequired": "Naam is verplicht" }
+    "table": {
+      "name": "Naam",
+      "status": "Status",
+      "action": "Actie",
+      "noItems": "Geen afdelingen gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van afdelingen mislukt",
+      "created": "Afdeling succesvol aangemaakt",
+      "updated": "Afdeling succesvol bijgewerkt",
+      "deleted": "Afdeling succesvol verwijderd",
+      "createFailed": "Aanmaken van afdeling mislukt",
+      "updateFailed": "Bijwerken van afdeling mislukt",
+      "deleteFailed": "Verwijderen van afdeling mislukt"
+    },
+    "modal": {
+      "createTitle": "Nieuwe afdeling aanmaken",
+      "editTitle": "Afdeling bewerken",
+      "createSubtitle": "Maak een nieuwe afdeling aan",
+      "editSubtitle": "Afdelingsgegevens bijwerken",
+      "nameLabel": "Naam afdeling",
+      "namePlaceholder": "Naam afdeling invoeren",
+      "nameRequired": "Naam is verplicht"
+    }
   },
   "regionManagement": {
     "title": "Regio's",
     "search": "Zoeken...",
     "create": "Regio aanmaken",
     "entity": "Regio",
-    "table": { "name": "Naam", "status": "Status", "action": "Actie", "noItems": "Geen regio's gevonden" },
-    "messages": { "loadFailed": "Laden van regio's mislukt", "created": "Regio succesvol aangemaakt", "updated": "Regio succesvol bijgewerkt", "deleted": "Regio succesvol verwijderd", "createFailed": "Aanmaken van regio mislukt", "updateFailed": "Bijwerken van regio mislukt", "deleteFailed": "Verwijderen van regio mislukt" },
-    "modal": { "createTitle": "Nieuwe regio aanmaken", "editTitle": "Regio bewerken", "createSubtitle": "Maak een nieuwe regio aan", "editSubtitle": "Regiogegevens bijwerken", "nameLabel": "Naam regio", "namePlaceholder": "Naam regio invoeren", "nameRequired": "Naam is verplicht" }
+    "table": {
+      "name": "Naam",
+      "status": "Status",
+      "action": "Actie",
+      "noItems": "Geen regio's gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van regio's mislukt",
+      "created": "Regio succesvol aangemaakt",
+      "updated": "Regio succesvol bijgewerkt",
+      "deleted": "Regio succesvol verwijderd",
+      "createFailed": "Aanmaken van regio mislukt",
+      "updateFailed": "Bijwerken van regio mislukt",
+      "deleteFailed": "Verwijderen van regio mislukt"
+    },
+    "modal": {
+      "createTitle": "Nieuwe regio aanmaken",
+      "editTitle": "Regio bewerken",
+      "createSubtitle": "Maak een nieuwe regio aan",
+      "editSubtitle": "Regiogegevens bijwerken",
+      "nameLabel": "Naam regio",
+      "namePlaceholder": "Naam regio invoeren",
+      "nameRequired": "Naam is verplicht"
+    }
   },
   "teachingRegionManagement": {
     "title": "Lesregio's",
     "search": "Zoeken...",
     "create": "Lesregio aanmaken",
     "entity": "Lesregio",
-    "table": { "name": "Naam", "status": "Status", "action": "Actie", "noItems": "Geen lesregio's gevonden" },
-    "messages": { "loadFailed": "Laden van lesregio's mislukt", "created": "Lesregio succesvol aangemaakt", "updated": "Lesregio succesvol bijgewerkt", "deleted": "Lesregio succesvol verwijderd", "createFailed": "Aanmaken van lesregio mislukt", "updateFailed": "Bijwerken van lesregio mislukt", "deleteFailed": "Verwijderen van lesregio mislukt" },
-    "modal": { "createTitle": "Nieuwe lesregio aanmaken", "editTitle": "Lesregio bewerken", "createSubtitle": "Maak een nieuwe lesregio aan", "editSubtitle": "Lesregiogegevens bijwerken", "nameLabel": "Naam lesregio", "namePlaceholder": "Naam lesregio invoeren", "nameRequired": "Naam is verplicht" }
+    "table": {
+      "name": "Naam",
+      "status": "Status",
+      "action": "Actie",
+      "noItems": "Geen lesregio's gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van lesregio's mislukt",
+      "created": "Lesregio succesvol aangemaakt",
+      "updated": "Lesregio succesvol bijgewerkt",
+      "deleted": "Lesregio succesvol verwijderd",
+      "createFailed": "Aanmaken van lesregio mislukt",
+      "updateFailed": "Bijwerken van lesregio mislukt",
+      "deleteFailed": "Verwijderen van lesregio mislukt"
+    },
+    "modal": {
+      "createTitle": "Nieuwe lesregio aanmaken",
+      "editTitle": "Lesregio bewerken",
+      "createSubtitle": "Maak een nieuwe lesregio aan",
+      "editSubtitle": "Lesregiogegevens bijwerken",
+      "nameLabel": "Naam lesregio",
+      "namePlaceholder": "Naam lesregio invoeren",
+      "nameRequired": "Naam is verplicht"
+    }
   },
   "programManagement": {
     "title": "Opleidingen",
@@ -2279,5 +2365,113 @@
         "noModules": "Geen modules geselecteerd"
       }
     }
+  },
+  "proforma": {
+    "title": "Proforma-facturen",
+    "myInvoices": "Mijn proforma-facturen",
+    "teacherInvoices": "Proforma-facturen docenten",
+    "settings": "Proforma-tarieven & instellingen",
+    "financeCardDescription": "Volg verzonden, bijgewerkte en ondertekende proforma-facturen van docenten",
+    "backToList": "Terug naar facturen",
+    "backToQueue": "Terug naar proforma-wachtrij",
+    "loading": "Proforma-factuur laden...",
+    "loadingDetails": "Proforma-factuurdetails laden...",
+    "loadFailed": "Proforma-factuur laden mislukt",
+    "notFound": "Factuur niet gevonden",
+    "previewAndSign": "Voorbeeld en ondertekenen",
+    "downloadPdf": "PDF downloaden",
+    "viewInvoice": "Factuur bekijken",
+    "print": "Afdrukken",
+    "sendToFinance": "Naar financiën sturen",
+    "sending": "Verzenden...",
+    "inFinanceQueue": "In de financiële wachtrij",
+    "signedBy": "Ondertekend door {{name}}",
+    "digitallySignedBy": "Digitaal ondertekend door {{name}}",
+    "bank": "Bank",
+    "bankAccount": "Bankrekening",
+    "bankAccountProfile": "Bankrekening (profiel)",
+    "iban": "IBAN",
+    "company": "Bedrijf",
+    "invoiceCompany": "Factuurbedrijf",
+    "companyAddress": "Bedrijfsadres",
+    "confirmSectionsHint": "Bevestig elke sectie met een bedrag, bekijk daarna het voorbeeld en onderteken.",
+    "attachReceiptsHint": "Voeg vereiste bonnen toe vóór ondertekening: {{items}}.",
+    "activityLog": "Activiteitenlogboek",
+    "noActivity": "Nog geen activiteit geregistreerd.",
+    "context": {
+      "teacher": "Docent",
+      "homeAddress": "Thuisadres",
+      "planningAddress": "Planningsadres",
+      "module": "Module"
+    },
+    "status": {
+      "needsConfirmSign": "Bevestiging & handtekening nodig",
+      "updateInProgress": "Update bezig",
+      "awaitingYourAction": "Wacht op jouw actie",
+      "awaitingAdminReview": "Wacht op adminbeoordeling",
+      "awaitingTeacher": "Wacht op docent",
+      "awaitingAdmin": "Wacht op admin",
+      "signedAwaitingFinance": "Ondertekend — wacht op financiën",
+      "signedReadyForFinance": "Ondertekend — klaar voor financiën",
+      "signedAwaitingAdmin": "Ondertekend — wacht op admin",
+      "inFinance": "Bij financiën",
+      "inFinanceQueue": "In financiële wachtrij",
+      "paid": "Betaald",
+      "needsConfirmSignShort": "Bevestigen & ondertekenen",
+      "open": "Open"
+    },
+    "sign": {
+      "invoiceDetails": "Factuurgegevens",
+      "previewInvoiceTitle": "Factuurvoorbeeld",
+      "invoiceSigned": "Factuur ondertekend",
+      "stepOf": "Stap {{step}} van 2 · {{number}} · €{{amount}}",
+      "infoBanner": "De factuur wordt op deze gegevens uitgereikt. Wijzig ze hieronder als ze anders moeten zijn.",
+      "noAddress": "Geen adres bekend",
+      "bankAccountIban": "Bankrekening (IBAN)",
+      "bankPlaceholder": "bijv. NL91ABNA0417164300",
+      "differentDetails": "Factuur op andere gegevens uitreiken",
+      "companyName": "Bedrijfsnaam",
+      "companyNamePlaceholder": "Bedrijfsnaam",
+      "address": "Adres",
+      "addressPlaceholder": "Straat, postcode, plaats, land",
+      "companyBankIban": "Bankrekeningnummer (IBAN)",
+      "companyBankPlaceholder": "bijv. NL20INGB0001234567",
+      "cancel": "Annuleren",
+      "previewInvoice": "Factuurvoorbeeld",
+      "edit": "Bewerken",
+      "sign": "Ondertekenen",
+      "close": "Sluiten",
+      "downloadPdf": "PDF downloaden",
+      "teacherNameMissing": "Docentennaam ontbreekt op je profiel",
+      "companyNameRequired": "Bedrijfsnaam is verplicht",
+      "addressRequired": "Adres is verplicht",
+      "bankRequired": "Bankrekeningnummer is verplicht",
+      "bankMin": "Minimaal 8 tekens",
+      "bankMax": "Maximaal 34 tekens",
+      "bankChars": "Alleen letters en cijfers (geen spaties of symbolen)",
+      "couldNotSign": "Ondertekenen mislukt",
+      "couldNotPreparePdf": "PDF kon niet worden voorbereid",
+      "couldNotDownloadPdf": "PDF downloaden mislukt",
+      "adminMustAccept": "Admin moet je wijzigingsverzoeken eerst accepteren voordat je kunt ondertekenen",
+      "confirmAllFirst": "Bevestig eerst alle secties met bedragen",
+      "attachReceiptsFor": "Voeg bonnen toe voor: {{items}}",
+      "profileLabel": "Vanuit je profiel",
+      "fullName": "Volledige wettelijke naam",
+      "fullNamePlaceholder": "Zoals op je identiteitsbewijs",
+      "nameRequired": "Volledige wettelijke naam is verplicht",
+      "nameMin": "Voer minstens 2 tekens in"
+    },
+    "list": {
+      "allStatuses": "Alle statussen",
+      "proformaNo": "Proforma nr.",
+      "course": "Cursus",
+      "total": "Totaal",
+      "status": "Status",
+      "updated": "Bijgewerkt",
+      "actions": "Acties",
+      "view": "Bekijken",
+      "empty": "Geen proforma-facturen gevonden."
+    },
+    "signedByLabel": "Ondertekend door"
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma } from "@/store/useProformaStore";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 
 export default function ProformaAdminManagement({ onViewInvoice }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const retryMutation = useRetryPlanningProforma();
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -115,7 +117,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-dashboard-text dark:text-white">
-            Teacher Proforma Invoices
+            {t("proforma.teacherInvoices")}
           </h1>
         </div>
 

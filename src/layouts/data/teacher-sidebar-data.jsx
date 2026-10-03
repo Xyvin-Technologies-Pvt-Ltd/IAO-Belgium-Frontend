@@ -35,7 +35,7 @@ export const getTeacherSidebarData = (t) => ({
           icon: Calendars,
         },
         {
-          title: "My Proforma Invoices",
+          title: t("sidebar.teacher.proformaInvoices"),
           url: "/teacher/proforma-invoices",
           icon: Receipt,
         },

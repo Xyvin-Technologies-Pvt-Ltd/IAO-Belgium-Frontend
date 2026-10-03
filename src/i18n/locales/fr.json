@@ -28,7 +28,8 @@
       "evaluations": "Évaluations",
       "exams": "Examens",
       "otherExams": "Autres examens",
-      "practicalExams": "Examens pratiques"
+      "practicalExams": "Examens pratiques",
+      "proformaInvoices": "Mes factures pro forma"
     },
     "admin": {
       "title": "Portail administrateur",
@@ -69,7 +70,9 @@
       "questionBanks": "Banques de questions",
       "exams": "Examens",
       "results": "Résultats",
-      "createInvoice": "Créer une facture"
+      "createInvoice": "Créer une facture",
+      "proformaInvoices": "Factures pro forma enseignants",
+      "proformaSettings": "Tarifs & paramètres pro forma"
     },
     "user": {
       "loading": "Chargement...",
@@ -204,7 +207,6 @@
     "total": "Total",
     "noTimes": "Aucun horaire",
     "noVenues": "Aucun lieu",
-    "search": "Rechercher...",
     "currency": "Devise",
     "processing": "Traitement en cours...",
     "city": "Ville",
@@ -571,36 +573,120 @@
     "search": "Rechercher...",
     "create": "Créer un type de contrat",
     "entity": "Type de contrat",
-    "table": { "name": "Nom", "status": "Statut", "action": "Action", "noItems": "Aucun type de contrat trouvé" },
-    "messages": { "loadFailed": "Échec du chargement des types de contrat", "created": "Type de contrat créé avec succès", "updated": "Type de contrat mis à jour avec succès", "deleted": "Type de contrat supprimé avec succès", "createFailed": "Échec de la création du type de contrat", "updateFailed": "Échec de la mise à jour du type de contrat", "deleteFailed": "Échec de la suppression du type de contrat" },
-    "modal": { "createTitle": "Créer un nouveau type de contrat", "editTitle": "Modifier le type de contrat", "createSubtitle": "Créons un nouveau type de contrat", "editSubtitle": "Mettre à jour les détails du type de contrat", "nameLabel": "Nom du type de contrat", "namePlaceholder": "Saisir le nom du type de contrat", "nameRequired": "Le nom est obligatoire" }
+    "table": {
+      "name": "Nom",
+      "status": "Statut",
+      "action": "Action",
+      "noItems": "Aucun type de contrat trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des types de contrat",
+      "created": "Type de contrat créé avec succès",
+      "updated": "Type de contrat mis à jour avec succès",
+      "deleted": "Type de contrat supprimé avec succès",
+      "createFailed": "Échec de la création du type de contrat",
+      "updateFailed": "Échec de la mise à jour du type de contrat",
+      "deleteFailed": "Échec de la suppression du type de contrat"
+    },
+    "modal": {
+      "createTitle": "Créer un nouveau type de contrat",
+      "editTitle": "Modifier le type de contrat",
+      "createSubtitle": "Créons un nouveau type de contrat",
+      "editSubtitle": "Mettre à jour les détails du type de contrat",
+      "nameLabel": "Nom du type de contrat",
+      "namePlaceholder": "Saisir le nom du type de contrat",
+      "nameRequired": "Le nom est obligatoire"
+    }
   },
   "departmentManagement": {
     "title": "Départements",
     "search": "Rechercher...",
     "create": "Créer un département",
     "entity": "Département",
-    "table": { "name": "Nom", "status": "Statut", "action": "Action", "noItems": "Aucun département trouvé" },
-    "messages": { "loadFailed": "Échec du chargement des départements", "created": "Département créé avec succès", "updated": "Département mis à jour avec succès", "deleted": "Département supprimé avec succès", "createFailed": "Échec de la création du département", "updateFailed": "Échec de la mise à jour du département", "deleteFailed": "Échec de la suppression du département" },
-    "modal": { "createTitle": "Créer un nouveau département", "editTitle": "Modifier le département", "createSubtitle": "Créons un nouveau département", "editSubtitle": "Mettre à jour les détails du département", "nameLabel": "Nom du département", "namePlaceholder": "Saisir le nom du département", "nameRequired": "Le nom est obligatoire" }
+    "table": {
+      "name": "Nom",
+      "status": "Statut",
+      "action": "Action",
+      "noItems": "Aucun département trouvé"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des départements",
+      "created": "Département créé avec succès",
+      "updated": "Département mis à jour avec succès",
+      "deleted": "Département supprimé avec succès",
+      "createFailed": "Échec de la création du département",
+      "updateFailed": "Échec de la mise à jour du département",
+      "deleteFailed": "Échec de la suppression du département"
+    },
+    "modal": {
+      "createTitle": "Créer un nouveau département",
+      "editTitle": "Modifier le département",
+      "createSubtitle": "Créons un nouveau département",
+      "editSubtitle": "Mettre à jour les détails du département",
+      "nameLabel": "Nom du département",
+      "namePlaceholder": "Saisir le nom du département",
+      "nameRequired": "Le nom est obligatoire"
+    }
   },
   "regionManagement": {
     "title": "Régions",
     "search": "Rechercher...",
     "create": "Créer une région",
     "entity": "Région",
-    "table": { "name": "Nom", "status": "Statut", "action": "Action", "noItems": "Aucune région trouvée" },
-    "messages": { "loadFailed": "Échec du chargement des régions", "created": "Région créée avec succès", "updated": "Région mise à jour avec succès", "deleted": "Région supprimée avec succès", "createFailed": "Échec de la création de la région", "updateFailed": "Échec de la mise à jour de la région", "deleteFailed": "Échec de la suppression de la région" },
-    "modal": { "createTitle": "Créer une nouvelle région", "editTitle": "Modifier la région", "createSubtitle": "Créons une nouvelle région", "editSubtitle": "Mettre à jour les détails de la région", "nameLabel": "Nom de la région", "namePlaceholder": "Saisir le nom de la région", "nameRequired": "Le nom est obligatoire" }
+    "table": {
+      "name": "Nom",
+      "status": "Statut",
+      "action": "Action",
+      "noItems": "Aucune région trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des régions",
+      "created": "Région créée avec succès",
+      "updated": "Région mise à jour avec succès",
+      "deleted": "Région supprimée avec succès",
+      "createFailed": "Échec de la création de la région",
+      "updateFailed": "Échec de la mise à jour de la région",
+      "deleteFailed": "Échec de la suppression de la région"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle région",
+      "editTitle": "Modifier la région",
+      "createSubtitle": "Créons une nouvelle région",
+      "editSubtitle": "Mettre à jour les détails de la région",
+      "nameLabel": "Nom de la région",
+      "namePlaceholder": "Saisir le nom de la région",
+      "nameRequired": "Le nom est obligatoire"
+    }
   },
   "teachingRegionManagement": {
     "title": "Régions d'enseignement",
     "search": "Rechercher...",
     "create": "Créer une région d'enseignement",
     "entity": "Région d'enseignement",
-    "table": { "name": "Nom", "status": "Statut", "action": "Action", "noItems": "Aucune région d'enseignement trouvée" },
-    "messages": { "loadFailed": "Échec du chargement des régions d'enseignement", "created": "Région d'enseignement créée avec succès", "updated": "Région d'enseignement mise à jour avec succès", "deleted": "Région d'enseignement supprimée avec succès", "createFailed": "Échec de la création de la région d'enseignement", "updateFailed": "Échec de la mise à jour de la région d'enseignement", "deleteFailed": "Échec de la suppression de la région d'enseignement" },
-    "modal": { "createTitle": "Créer une nouvelle région d'enseignement", "editTitle": "Modifier la région d'enseignement", "createSubtitle": "Créons une nouvelle région d'enseignement", "editSubtitle": "Mettre à jour les détails de la région d'enseignement", "nameLabel": "Nom de la région d'enseignement", "namePlaceholder": "Saisir le nom de la région d'enseignement", "nameRequired": "Le nom est obligatoire" }
+    "table": {
+      "name": "Nom",
+      "status": "Statut",
+      "action": "Action",
+      "noItems": "Aucune région d'enseignement trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des régions d'enseignement",
+      "created": "Région d'enseignement créée avec succès",
+      "updated": "Région d'enseignement mise à jour avec succès",
+      "deleted": "Région d'enseignement supprimée avec succès",
+      "createFailed": "Échec de la création de la région d'enseignement",
+      "updateFailed": "Échec de la mise à jour de la région d'enseignement",
+      "deleteFailed": "Échec de la suppression de la région d'enseignement"
+    },
+    "modal": {
+      "createTitle": "Créer une nouvelle région d'enseignement",
+      "editTitle": "Modifier la région d'enseignement",
+      "createSubtitle": "Créons une nouvelle région d'enseignement",
+      "editSubtitle": "Mettre à jour les détails de la région d'enseignement",
+      "nameLabel": "Nom de la région d'enseignement",
+      "namePlaceholder": "Saisir le nom de la région d'enseignement",
+      "nameRequired": "Le nom est obligatoire"
+    }
   },
   "programManagement": {
     "title": "Formations",
@@ -2259,5 +2345,113 @@
         "noModules": "Aucun module sélectionné"
       }
     }
+  },
+  "proforma": {
+    "title": "Factures pro forma",
+    "myInvoices": "Mes factures pro forma",
+    "teacherInvoices": "Factures pro forma enseignants",
+    "settings": "Tarifs & paramètres pro forma",
+    "financeCardDescription": "Suivre les factures pro forma enseignants envoyées, mises à jour et signées",
+    "backToList": "Retour aux factures",
+    "backToQueue": "Retour à la file pro forma",
+    "loading": "Chargement de la facture pro forma...",
+    "loadingDetails": "Chargement des détails de la facture pro forma...",
+    "loadFailed": "Échec du chargement de la facture pro forma",
+    "notFound": "Facture introuvable",
+    "previewAndSign": "Aperçu et signature",
+    "downloadPdf": "Télécharger le PDF",
+    "viewInvoice": "Voir la facture",
+    "print": "Imprimer",
+    "sendToFinance": "Envoyer à la finance",
+    "sending": "Envoi...",
+    "inFinanceQueue": "Dans la file finance",
+    "signedBy": "Signé par {{name}}",
+    "digitallySignedBy": "Signé électroniquement par {{name}}",
+    "bank": "Banque",
+    "bankAccount": "Compte bancaire",
+    "bankAccountProfile": "Compte bancaire (profil)",
+    "iban": "IBAN",
+    "company": "Société",
+    "invoiceCompany": "Société facturée",
+    "companyAddress": "Adresse de la société",
+    "confirmSectionsHint": "Confirmez chaque section avec un montant, puis prévisualisez et signez.",
+    "attachReceiptsHint": "Joignez les justificatifs requis avant de signer : {{items}}.",
+    "activityLog": "Journal d'activité",
+    "noActivity": "Aucune activité enregistrée pour le moment.",
+    "context": {
+      "teacher": "Enseignant",
+      "homeAddress": "Adresse personnelle",
+      "planningAddress": "Adresse de planning",
+      "module": "Module"
+    },
+    "status": {
+      "needsConfirmSign": "Confirmation et signature requises",
+      "updateInProgress": "Mise à jour en cours",
+      "awaitingYourAction": "En attente de votre action",
+      "awaitingAdminReview": "En attente de l'admin",
+      "awaitingTeacher": "En attente de l'enseignant",
+      "awaitingAdmin": "En attente de l'admin",
+      "signedAwaitingFinance": "Signé — en attente finance",
+      "signedReadyForFinance": "Signé — prêt pour la finance",
+      "signedAwaitingAdmin": "Signé — en attente admin",
+      "inFinance": "En finance",
+      "inFinanceQueue": "Dans la file finance",
+      "paid": "Payé",
+      "needsConfirmSignShort": "Confirmer et signer",
+      "open": "Ouvert"
+    },
+    "sign": {
+      "invoiceDetails": "Détails de la facture",
+      "previewInvoiceTitle": "Aperçu de la facture",
+      "invoiceSigned": "Facture signée",
+      "stepOf": "Étape {{step}} sur 2 · {{number}} · €{{amount}}",
+      "infoBanner": "La facture sera émise avec ces informations. Modifiez-les ci-dessous si nécessaire.",
+      "noAddress": "Aucune adresse enregistrée",
+      "bankAccountIban": "Compte bancaire (IBAN)",
+      "bankPlaceholder": "ex. NL91ABNA0417164300",
+      "differentDetails": "Émettre la facture avec d'autres informations",
+      "companyName": "Nom de la société",
+      "companyNamePlaceholder": "Nom de la société",
+      "address": "Adresse",
+      "addressPlaceholder": "Rue, code postal, ville, pays",
+      "companyBankIban": "Numéro de compte bancaire (IBAN)",
+      "companyBankPlaceholder": "ex. NL20INGB0001234567",
+      "cancel": "Annuler",
+      "previewInvoice": "Aperçu de la facture",
+      "edit": "Modifier",
+      "sign": "Signer",
+      "close": "Fermer",
+      "downloadPdf": "Télécharger le PDF",
+      "teacherNameMissing": "Le nom de l'enseignant est manquant sur votre profil",
+      "companyNameRequired": "Le nom de la société est obligatoire",
+      "addressRequired": "L'adresse est obligatoire",
+      "bankRequired": "Le numéro de compte bancaire est obligatoire",
+      "bankMin": "Au moins 8 caractères",
+      "bankMax": "Au plus 34 caractères",
+      "bankChars": "Lettres et chiffres uniquement (sans espaces ni symboles)",
+      "couldNotSign": "Impossible de signer",
+      "couldNotPreparePdf": "Impossible de préparer le PDF",
+      "couldNotDownloadPdf": "Impossible de télécharger le PDF",
+      "adminMustAccept": "L'admin doit accepter vos demandes de mise à jour avant la signature",
+      "confirmAllFirst": "Confirmez d'abord toutes les sections avec montants",
+      "attachReceiptsFor": "Joignez les justificatifs pour : {{items}}",
+      "profileLabel": "Depuis votre profil",
+      "fullName": "Nom legal complet",
+      "fullNamePlaceholder": "Comme sur votre piece d identite",
+      "nameRequired": "Le nom legal complet est obligatoire",
+      "nameMin": "Saisissez au moins 2 caracteres"
+    },
+    "list": {
+      "allStatuses": "Tous les statuts",
+      "proformaNo": "N° pro forma",
+      "course": "Cours",
+      "total": "Total",
+      "status": "Statut",
+      "updated": "Mis à jour",
+      "actions": "Actions",
+      "view": "Voir",
+      "empty": "Aucune facture pro forma trouvée."
+    },
+    "signedByLabel": "Signé par"
   }
 }

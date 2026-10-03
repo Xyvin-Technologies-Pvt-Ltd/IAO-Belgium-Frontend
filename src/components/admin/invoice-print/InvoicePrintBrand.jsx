@@ -2,25 +2,18 @@
  * Mirrors IAO email/invoice Handlebars partials:
  * - IAO-LMS-backend/src/modules/email/templates/partials/header.hbs
  * - IAO-LMS-backend/src/modules/email/templates/partials/footer.hbs
+ *
+ * Brand assets live in lms-frontend/public/images so invoice preview/PDF
+ * are same-origin (avoids CORS when html2canvas captures the document).
  */
 
-function getAppBaseUrl() {
-  const api = import.meta.env.VITE_APP_API_URL || "";
-  const base = String(api)
-    .replace(/\/api\/v1\/?$/i, "")
-    .replace(/\/$/, "");
-  return base || "http://localhost:3005";
-}
-
 export function getInvoiceBrandAssets() {
-  const appUrl = getAppBaseUrl();
   return {
-    appUrl,
-    logoUrl: `${appUrl}/public/images/iao%201.png`,
-    globeUrl: `${appUrl}/public/images/Globe.png`,
-    phoneUrl: `${appUrl}/public/images/Vector.png`,
-    emailUrl: `${appUrl}/public/images/Email.png`,
-    pinUrl: `${appUrl}/public/images/Pin.png`,
+    logoUrl: "/images/iao-logo.png",
+    globeUrl: "/images/Globe.png",
+    phoneUrl: "/images/Vector.png",
+    emailUrl: "/images/Email.png",
+    pinUrl: "/images/Pin.png",
   };
 }
 
@@ -75,7 +68,11 @@ export function InvoicePrintFooter() {
   const { logoUrl, globeUrl, phoneUrl, emailUrl, pinUrl } = getInvoiceBrandAssets();
 
   return (
-    <div className="bg-white px-6 pb-9 pt-5 print:px-6">
+    <div
+      data-invoice-footer="true"
+      className="bg-white px-6 pb-9 pt-5 print:px-6"
+      style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
+    >
       <div className="rounded-xl px-[18px] py-[22px]" style={{ background: "#D5E6EF" }}>
         <div className="flex gap-3.5 items-start">
           <div className="shrink-0" style={{ width: 60, paddingRight: 14 }}>
@@ -87,7 +84,10 @@ export function InvoicePrintFooter() {
               style={{ display: "block" }}
             />
           </div>
-          <div className="w-px self-stretch shrink-0" style={{ background: "#b6c2cf" }} />
+          <div
+            className="shrink-0"
+            style={{ width: 1, alignSelf: "stretch", background: "#b6c2cf", minHeight: 120 }}
+          />
           <div className="min-w-0 pl-3.5">
             <p
               className="m-0 mb-3.5 text-[13px] font-bold uppercase text-black leading-snug"

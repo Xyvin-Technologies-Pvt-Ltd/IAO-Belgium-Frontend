@@ -28,7 +28,8 @@
       "evaluations": "Beurteilungen",
       "exams": "Prüfungen",
       "otherExams": "Andere Prüfungen",
-      "practicalExams": "Praktische Prüfungen"
+      "practicalExams": "Praktische Prüfungen",
+      "proformaInvoices": "Meine Proforma-Rechnungen"
     },
     "admin": {
       "title": "Verwaltungsportal",
@@ -68,7 +69,9 @@
       "questionBanks": "Fragenbanken",
       "exams": "Prüfungen",
       "results": "Ergebnisse",
-      "createInvoice": "Rechnung erstellen"
+      "createInvoice": "Rechnung erstellen",
+      "proformaInvoices": "Proforma-Rechnungen Dozenten",
+      "proformaSettings": "Proforma-Tarife & Einstellungen"
     },
     "user": {
       "loading": "Wird geladen...",
@@ -203,7 +206,6 @@
     "total": "Gesamt",
     "noTimes": "Keine Zeiten",
     "noVenues": "Keine Veranstaltungsorte",
-    "search": "Suchen...",
     "currency": "Währung",
     "processing": "Wird verarbeitet...",
     "welcome": {
@@ -597,36 +599,120 @@
     "search": "Suchen...",
     "create": "Vertragsart erstellen",
     "entity": "Vertragsart",
-    "table": { "name": "Name", "status": "Status", "action": "Aktion", "noItems": "Keine Vertragsarten gefunden" },
-    "messages": { "loadFailed": "Vertragsarten konnten nicht geladen werden", "created": "Vertragsart erfolgreich erstellt", "updated": "Vertragsart erfolgreich aktualisiert", "deleted": "Vertragsart erfolgreich gelöscht", "createFailed": "Vertragsart konnte nicht erstellt werden", "updateFailed": "Vertragsart konnte nicht aktualisiert werden", "deleteFailed": "Vertragsart konnte nicht gelöscht werden" },
-    "modal": { "createTitle": "Neue Vertragsart erstellen", "editTitle": "Vertragsart bearbeiten", "createSubtitle": "Erstellen Sie eine neue Vertragsart", "editSubtitle": "Vertragsartdetails aktualisieren", "nameLabel": "Name der Vertragsart", "namePlaceholder": "Name der Vertragsart eingeben", "nameRequired": "Name ist erforderlich" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "noItems": "Keine Vertragsarten gefunden"
+    },
+    "messages": {
+      "loadFailed": "Vertragsarten konnten nicht geladen werden",
+      "created": "Vertragsart erfolgreich erstellt",
+      "updated": "Vertragsart erfolgreich aktualisiert",
+      "deleted": "Vertragsart erfolgreich gelöscht",
+      "createFailed": "Vertragsart konnte nicht erstellt werden",
+      "updateFailed": "Vertragsart konnte nicht aktualisiert werden",
+      "deleteFailed": "Vertragsart konnte nicht gelöscht werden"
+    },
+    "modal": {
+      "createTitle": "Neue Vertragsart erstellen",
+      "editTitle": "Vertragsart bearbeiten",
+      "createSubtitle": "Erstellen Sie eine neue Vertragsart",
+      "editSubtitle": "Vertragsartdetails aktualisieren",
+      "nameLabel": "Name der Vertragsart",
+      "namePlaceholder": "Name der Vertragsart eingeben",
+      "nameRequired": "Name ist erforderlich"
+    }
   },
   "departmentManagement": {
     "title": "Abteilungen",
     "search": "Suchen...",
     "create": "Abteilung erstellen",
     "entity": "Abteilung",
-    "table": { "name": "Name", "status": "Status", "action": "Aktion", "noItems": "Keine Abteilungen gefunden" },
-    "messages": { "loadFailed": "Abteilungen konnten nicht geladen werden", "created": "Abteilung erfolgreich erstellt", "updated": "Abteilung erfolgreich aktualisiert", "deleted": "Abteilung erfolgreich gelöscht", "createFailed": "Abteilung konnte nicht erstellt werden", "updateFailed": "Abteilung konnte nicht aktualisiert werden", "deleteFailed": "Abteilung konnte nicht gelöscht werden" },
-    "modal": { "createTitle": "Neue Abteilung erstellen", "editTitle": "Abteilung bearbeiten", "createSubtitle": "Erstellen Sie eine neue Abteilung", "editSubtitle": "Abteilungsdetails aktualisieren", "nameLabel": "Name der Abteilung", "namePlaceholder": "Name der Abteilung eingeben", "nameRequired": "Name ist erforderlich" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "noItems": "Keine Abteilungen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Abteilungen konnten nicht geladen werden",
+      "created": "Abteilung erfolgreich erstellt",
+      "updated": "Abteilung erfolgreich aktualisiert",
+      "deleted": "Abteilung erfolgreich gelöscht",
+      "createFailed": "Abteilung konnte nicht erstellt werden",
+      "updateFailed": "Abteilung konnte nicht aktualisiert werden",
+      "deleteFailed": "Abteilung konnte nicht gelöscht werden"
+    },
+    "modal": {
+      "createTitle": "Neue Abteilung erstellen",
+      "editTitle": "Abteilung bearbeiten",
+      "createSubtitle": "Erstellen Sie eine neue Abteilung",
+      "editSubtitle": "Abteilungsdetails aktualisieren",
+      "nameLabel": "Name der Abteilung",
+      "namePlaceholder": "Name der Abteilung eingeben",
+      "nameRequired": "Name ist erforderlich"
+    }
   },
   "regionManagement": {
     "title": "Regionen",
     "search": "Suchen...",
     "create": "Region erstellen",
     "entity": "Region",
-    "table": { "name": "Name", "status": "Status", "action": "Aktion", "noItems": "Keine Regionen gefunden" },
-    "messages": { "loadFailed": "Regionen konnten nicht geladen werden", "created": "Region erfolgreich erstellt", "updated": "Region erfolgreich aktualisiert", "deleted": "Region erfolgreich gelöscht", "createFailed": "Region konnte nicht erstellt werden", "updateFailed": "Region konnte nicht aktualisiert werden", "deleteFailed": "Region konnte nicht gelöscht werden" },
-    "modal": { "createTitle": "Neue Region erstellen", "editTitle": "Region bearbeiten", "createSubtitle": "Erstellen Sie eine neue Region", "editSubtitle": "Regiondetails aktualisieren", "nameLabel": "Name der Region", "namePlaceholder": "Name der Region eingeben", "nameRequired": "Name ist erforderlich" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "noItems": "Keine Regionen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Regionen konnten nicht geladen werden",
+      "created": "Region erfolgreich erstellt",
+      "updated": "Region erfolgreich aktualisiert",
+      "deleted": "Region erfolgreich gelöscht",
+      "createFailed": "Region konnte nicht erstellt werden",
+      "updateFailed": "Region konnte nicht aktualisiert werden",
+      "deleteFailed": "Region konnte nicht gelöscht werden"
+    },
+    "modal": {
+      "createTitle": "Neue Region erstellen",
+      "editTitle": "Region bearbeiten",
+      "createSubtitle": "Erstellen Sie eine neue Region",
+      "editSubtitle": "Regiondetails aktualisieren",
+      "nameLabel": "Name der Region",
+      "namePlaceholder": "Name der Region eingeben",
+      "nameRequired": "Name ist erforderlich"
+    }
   },
   "teachingRegionManagement": {
     "title": "Unterrichtsregionen",
     "search": "Suchen...",
     "create": "Unterrichtsregion erstellen",
     "entity": "Unterrichtsregion",
-    "table": { "name": "Name", "status": "Status", "action": "Aktion", "noItems": "Keine Unterrichtsregionen gefunden" },
-    "messages": { "loadFailed": "Unterrichtsregionen konnten nicht geladen werden", "created": "Unterrichtsregion erfolgreich erstellt", "updated": "Unterrichtsregion erfolgreich aktualisiert", "deleted": "Unterrichtsregion erfolgreich gelöscht", "createFailed": "Unterrichtsregion konnte nicht erstellt werden", "updateFailed": "Unterrichtsregion konnte nicht aktualisiert werden", "deleteFailed": "Unterrichtsregion konnte nicht gelöscht werden" },
-    "modal": { "createTitle": "Neue Unterrichtsregion erstellen", "editTitle": "Unterrichtsregion bearbeiten", "createSubtitle": "Erstellen Sie eine neue Unterrichtsregion", "editSubtitle": "Unterrichtsregiondetails aktualisieren", "nameLabel": "Name der Unterrichtsregion", "namePlaceholder": "Name der Unterrichtsregion eingeben", "nameRequired": "Name ist erforderlich" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Aktion",
+      "noItems": "Keine Unterrichtsregionen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Unterrichtsregionen konnten nicht geladen werden",
+      "created": "Unterrichtsregion erfolgreich erstellt",
+      "updated": "Unterrichtsregion erfolgreich aktualisiert",
+      "deleted": "Unterrichtsregion erfolgreich gelöscht",
+      "createFailed": "Unterrichtsregion konnte nicht erstellt werden",
+      "updateFailed": "Unterrichtsregion konnte nicht aktualisiert werden",
+      "deleteFailed": "Unterrichtsregion konnte nicht gelöscht werden"
+    },
+    "modal": {
+      "createTitle": "Neue Unterrichtsregion erstellen",
+      "editTitle": "Unterrichtsregion bearbeiten",
+      "createSubtitle": "Erstellen Sie eine neue Unterrichtsregion",
+      "editSubtitle": "Unterrichtsregiondetails aktualisieren",
+      "nameLabel": "Name der Unterrichtsregion",
+      "namePlaceholder": "Name der Unterrichtsregion eingeben",
+      "nameRequired": "Name ist erforderlich"
+    }
   },
   "programManagement": {
     "title": "Ausbildungen",
@@ -2283,5 +2369,113 @@
         "noModules": "Keine Module ausgewählt"
       }
     }
+  },
+  "proforma": {
+    "title": "Proforma-Rechnungen",
+    "myInvoices": "Meine Proforma-Rechnungen",
+    "teacherInvoices": "Proforma-Rechnungen Dozenten",
+    "settings": "Proforma-Tarife & Einstellungen",
+    "financeCardDescription": "Gesendete, aktualisierte und unterzeichnete Proforma-Rechnungen von Dozenten verfolgen",
+    "backToList": "Zurueck zu Rechnungen",
+    "backToQueue": "Zurueck zur Proforma-Warteschlange",
+    "loading": "Proforma-Rechnung wird geladen...",
+    "loadingDetails": "Proforma-Rechnungsdetails werden geladen...",
+    "loadFailed": "Proforma-Rechnung konnte nicht geladen werden",
+    "notFound": "Rechnung nicht gefunden",
+    "previewAndSign": "Vorschau und unterschreiben",
+    "downloadPdf": "PDF herunterladen",
+    "viewInvoice": "Rechnung ansehen",
+    "print": "Drucken",
+    "sendToFinance": "An Finanzen senden",
+    "sending": "Wird gesendet...",
+    "inFinanceQueue": "In der Finanzwarteschlange",
+    "signedBy": "Unterschrieben von {{name}}",
+    "digitallySignedBy": "Elektronisch unterschrieben von {{name}}",
+    "bank": "Bank",
+    "bankAccount": "Bankkonto",
+    "bankAccountProfile": "Bankkonto (Profil)",
+    "iban": "IBAN",
+    "company": "Firma",
+    "invoiceCompany": "Rechnungsfirma",
+    "companyAddress": "Firmenadresse",
+    "confirmSectionsHint": "Bestaetigen Sie jeden Abschnitt mit einem Betrag, dann Vorschau und Unterschrift.",
+    "attachReceiptsHint": "Fuegen Sie vor der Unterschrift die erforderlichen Belege hinzu: {{items}}.",
+    "activityLog": "Aktivitaetsprotokoll",
+    "noActivity": "Noch keine Aktivitaet erfasst.",
+    "context": {
+      "teacher": "Dozent",
+      "homeAddress": "Privatadresse",
+      "planningAddress": "Planungsadresse",
+      "module": "Modul"
+    },
+    "status": {
+      "needsConfirmSign": "Bestaetigung & Unterschrift erforderlich",
+      "updateInProgress": "Aktualisierung laeuft",
+      "awaitingYourAction": "Wartet auf Ihre Aktion",
+      "awaitingAdminReview": "Wartet auf Admin-Pruefung",
+      "awaitingTeacher": "Wartet auf Dozent",
+      "awaitingAdmin": "Wartet auf Admin",
+      "signedAwaitingFinance": "Unterschrieben — wartet auf Finanzen",
+      "signedReadyForFinance": "Unterschrieben — bereit fuer Finanzen",
+      "signedAwaitingAdmin": "Unterschrieben — wartet auf Admin",
+      "inFinance": "Bei Finanzen",
+      "inFinanceQueue": "In Finanzwarteschlange",
+      "paid": "Bezahlt",
+      "needsConfirmSignShort": "Bestaetigen & unterschreiben",
+      "open": "Offen"
+    },
+    "sign": {
+      "invoiceDetails": "Rechnungsdetails",
+      "previewInvoiceTitle": "Rechnungsvorschau",
+      "invoiceSigned": "Rechnung unterschrieben",
+      "stepOf": "Schritt {{step}} von 2 · {{number}} · €{{amount}}",
+      "infoBanner": "Die Rechnung wird mit diesen Angaben ausgestellt. Aendern Sie sie unten, falls noetig.",
+      "noAddress": "Keine Adresse hinterlegt",
+      "bankAccountIban": "Bankkonto (IBAN)",
+      "bankPlaceholder": "z. B. NL91ABNA0417164300",
+      "differentDetails": "Rechnung auf andere Angaben ausstellen",
+      "companyName": "Firmenname",
+      "companyNamePlaceholder": "Firmenname",
+      "address": "Adresse",
+      "addressPlaceholder": "Strasse, PLZ, Ort, Land",
+      "companyBankIban": "Bankkontonummer (IBAN)",
+      "companyBankPlaceholder": "z. B. NL20INGB0001234567",
+      "cancel": "Abbrechen",
+      "previewInvoice": "Rechnungsvorschau",
+      "edit": "Bearbeiten",
+      "sign": "Unterschreiben",
+      "close": "Schliessen",
+      "downloadPdf": "PDF herunterladen",
+      "teacherNameMissing": "Dozentenname fehlt in Ihrem Profil",
+      "companyNameRequired": "Firmenname ist erforderlich",
+      "addressRequired": "Adresse ist erforderlich",
+      "bankRequired": "Bankkontonummer ist erforderlich",
+      "bankMin": "Mindestens 8 Zeichen",
+      "bankMax": "Hoechstens 34 Zeichen",
+      "bankChars": "Nur Buchstaben und Zahlen (keine Leerzeichen oder Symbole)",
+      "couldNotSign": "Unterschrift fehlgeschlagen",
+      "couldNotPreparePdf": "PDF konnte nicht vorbereitet werden",
+      "couldNotDownloadPdf": "PDF-Download fehlgeschlagen",
+      "adminMustAccept": "Admin muss Ihre Aenderungsanfragen akzeptieren, bevor Sie unterschreiben koennen",
+      "confirmAllFirst": "Bestaetigen Sie zuerst alle Abschnitte mit Betraegen",
+      "attachReceiptsFor": "Belege anhaengen fuer: {{items}}",
+      "profileLabel": "Aus Ihrem Profil",
+      "fullName": "Vollstaendiger Rechtsname",
+      "fullNamePlaceholder": "Wie auf Ihrem Ausweis",
+      "nameRequired": "Vollstaendiger Rechtsname ist erforderlich",
+      "nameMin": "Mindestens 2 Zeichen eingeben"
+    },
+    "list": {
+      "allStatuses": "Alle Status",
+      "proformaNo": "Proforma-Nr.",
+      "course": "Kurs",
+      "total": "Gesamt",
+      "status": "Status",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen",
+      "view": "Ansehen",
+      "empty": "Keine Proforma-Rechnungen gefunden."
+    },
+    "signedByLabel": "Unterschrieben von"
   }
 }
