@@ -103,11 +103,6 @@ function itemSource(item) {
   return "";
 }
 
-function statusLabel(status, t) {
-  if (!status) return t.draft;
-  return String(status).replace(/_/g, " ");
-}
-
 function resolvePartyDisplay(proforma, previewParty) {
   const teacher = proforma.teacher_id || {};
   const signature = proforma.digital_signature || {};
@@ -171,7 +166,6 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
         .filter(Boolean)
     ),
   ];
-  const internalRef = String(proforma._id || "").slice(-8).toUpperCase() || "—";
   const approvedForFinance =
     proforma.status === "MOVED_TO_FINANCE" || proforma.status === "PAID";
   const showSigned = Boolean(signature.is_signed) && !previewParty?.forceUnsigned;
@@ -210,22 +204,6 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
                   <span className="text-[11px] text-[#6b7280]">{t.date}</span>
                   <span className="text-[13px] text-[#0f172a]">
                     {moment(proforma.createdAt).format("DD MMMM YYYY")}
-                  </span>
-                </div>
-                <div className="flex justify-between gap-4 mb-2">
-                  <span className="text-[11px] text-[#6b7280]">{t.internalRef}</span>
-                  <span className="text-[13px] text-[#0f172a]">{internalRef}</span>
-                </div>
-                <div className="flex justify-between gap-4 items-center mt-3">
-                  <span className="text-[11px] text-[#6b7280]">{t.status}</span>
-                  <span
-                    className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-full"
-                    style={{
-                      background: approvedForFinance ? "#e6f4ea" : "#eef2f7",
-                      color: approvedForFinance ? "#137333" : "#374151",
-                    }}
-                  >
-                    {statusLabel(proforma.status, t)}
                   </span>
                 </div>
               </div>
