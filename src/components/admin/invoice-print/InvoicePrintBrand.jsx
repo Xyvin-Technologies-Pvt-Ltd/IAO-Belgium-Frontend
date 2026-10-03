@@ -50,12 +50,12 @@ export function InvoicePrintHeader() {
   const { logoUrl } = getInvoiceBrandAssets();
 
   return (
-    <div className="bg-white px-10 pt-10 pb-6 border border-[#e2e8f0] border-b-0 print:border-0">
-      <img src={logoUrl} alt="IAO Logo" width={80} style={{ display: "block" }} />
-      <div style={{ height: 20 }} />
+    <div className="bg-white px-7 pt-7 pb-4 border border-[#e2e8f0] border-b-0 print:border-0">
+      <img src={logoUrl} alt="IAO Logo" width={64} style={{ display: "block" }} />
+      <div style={{ height: 14 }} />
       <p
-        className="m-0 text-lg font-semibold text-black leading-snug"
-        style={{ fontSize: 18, fontWeight: 600 }}
+        className="m-0 font-semibold text-black leading-snug"
+        style={{ fontSize: 14, fontWeight: 600 }}
       >
         THE INTERNATIONAL ACADEMY OF OSTEOPATHY
       </p>
@@ -70,27 +70,27 @@ export function InvoicePrintFooter() {
   return (
     <div
       data-invoice-footer="true"
-      className="bg-white px-6 pb-9 pt-5 print:px-6"
+      className="bg-white px-5 pb-6 pt-3"
       style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
     >
-      <div className="rounded-xl px-[18px] py-[22px]" style={{ background: "#D5E6EF" }}>
-        <div className="flex gap-3.5 items-start">
-          <div className="shrink-0" style={{ width: 60, paddingRight: 14 }}>
+      <div className="rounded-xl px-3.5 py-4" style={{ background: "#D5E6EF" }}>
+        <div className="flex gap-3 items-start">
+          <div className="shrink-0" style={{ width: 48, paddingRight: 10 }}>
             <img
               src={logoUrl}
               alt="IAO"
-              width={55}
-              height={55}
+              width={44}
+              height={44}
               style={{ display: "block" }}
             />
           </div>
           <div
             className="shrink-0"
-            style={{ width: 1, alignSelf: "stretch", background: "#b6c2cf", minHeight: 120 }}
+            style={{ width: 1, alignSelf: "stretch", background: "#b6c2cf", minHeight: 96 }}
           />
-          <div className="min-w-0 pl-3.5">
+          <div className="min-w-0 pl-2.5">
             <p
-              className="m-0 mb-3.5 text-[13px] font-bold uppercase text-black leading-snug"
+              className="m-0 mb-2.5 text-[11px] font-bold uppercase text-black leading-snug"
               style={{ textTransform: "uppercase" }}
             >
               THE INTERNATIONAL ACADEMY OF OSTEOPATHY IAO VZW
