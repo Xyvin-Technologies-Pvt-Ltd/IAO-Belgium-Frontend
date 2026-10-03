@@ -18,9 +18,10 @@ import {
   submitTeacherUpdate,
   sendBackToTeacher,
   addProformaLineItem,
+  setActiveTravelMode,
   updateProformaLineItem,
   removeProformaLineItem,
-  triggerPlanningProformaTest,
+  retryPlanningProforma,
 } from "@/api/proformaApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -279,6 +280,23 @@ export const useAddProformaLineItem = () => {
   });
 };
 
+export const useSetActiveTravelMode = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, travel_mode }) => setActiveTravelMode({ id, travel_mode }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
+      if (!variables?.silent) {
+        toast.success(response?.message || "Travel mode updated");
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update travel mode");
+    },
+  });
+};
+
 export const useUpdateProformaLineItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -323,11 +341,11 @@ export const useSendBackToTeacher = () => {
   });
 };
 
-export const useTriggerPlanningProformaTest = () => {
+export const useRetryPlanningProforma = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (planning_id) => triggerPlanningProformaTest(planning_id),
+    mutationFn: (planning_id) => retryPlanningProforma(planning_id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
       queryClient.invalidateQueries({ queryKey: ["proforma-errors"] });

@@ -8,9 +8,11 @@ import {
   useAddProformaLineItem,
   useUpdateProformaLineItem,
   useRemoveProformaLineItem,
+  useSetActiveTravelMode,
   useAddSectionComment,
   useAddSectionAttachment,
 } from "@/store/useProformaStore";
+import { getActiveTravelMode, activeTravelModeLabel } from "@/utils/proformaTravelMode";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +83,7 @@ export default function TeacherProformaDetailPage() {
   const addItemMutation = useAddProformaLineItem();
   const updateItemMutation = useUpdateProformaLineItem();
   const removeItemMutation = useRemoveProformaLineItem();
+  const setTravelModeMutation = useSetActiveTravelMode();
   const addCommentMutation = useAddSectionComment();
   const addAttachmentMutation = useAddSectionAttachment();
 
@@ -136,6 +139,13 @@ export default function TeacherProformaDetailPage() {
   );
   const railTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "RAIL");
   const airTickets = (itemsByType.TRAVEL || []).filter((i) => i.travel_mode === "FLIGHT");
+  const activeTravelMode = useMemo(
+    () => getActiveTravelMode(itemsByType.TRAVEL || []),
+    [itemsByType.TRAVEL]
+  );
+  const primaryTravelKey = fixedTravelLines.length > 0 ? "FIXED" : "ROAD";
+  const ticketsActive = activeTravelMode === "RAIL" || activeTravelMode === "FLIGHT";
+  const roadSuperseded = ticketsActive && Boolean(roadLine);
 
   const travelTabs = useMemo(() => {
     const primary =
@@ -145,12 +155,57 @@ export default function TeacherProformaDetailPage() {
     return [primary, { key: "RAIL", label: "Rail" }, { key: "FLIGHT", label: "Air" }];
   }, [fixedTravelLines.length]);
 
+  const usePrimaryTravelAllowance = () => {
+    if (signed) return;
+    setBusy(true);
+    setTravelModeMutation.mutate(
+      { id: proforma._id, travel_mode: primaryTravelKey, silent: true },
+      {
+        onSettled: () => setBusy(false),
+        onSuccess: () => {
+          setTravelTab(primaryTravelKey);
+          toast.success(
+            `Switched to ${primaryTravelKey === "FIXED" ? "fixed module" : "road"} allowance — tickets removed`
+          );
+        },
+      }
+    );
+  };
+
+  // Land on the billed travel mode whenever it changes (invoice load / mode switch)
+  useEffect(() => {
+    if (!proforma?._id || !activeTravelMode) return;
+    setTravelTab(activeTravelMode);
+    setShowTicketForm(false);
+  }, [proforma?._id, activeTravelMode]);
+
   useEffect(() => {
     const primaryKey = fixedTravelLines.length > 0 ? "FIXED" : "ROAD";
-    if (travelTab === "WEEKEND" || (travelTab === "FIXED" && fixedTravelLines.length === 0) || (travelTab === "ROAD" && !roadLine && fixedTravelLines.length > 0)) {
+    if (
+      travelTab === "WEEKEND" ||
+      (travelTab === "FIXED" && fixedTravelLines.length === 0) ||
+      (travelTab === "ROAD" && !roadLine && fixedTravelLines.length > 0)
+    ) {
       setTravelTab(primaryKey);
     }
   }, [fixedTravelLines.length, roadLine, travelTab]);
+
+  const roadReferenceTotal = useMemo(() => {
+    if (!roadLine) return 0;
+    const snap = Number(roadLine.road_calculated_total) || 0;
+    if (snap > 0) return snap;
+    const oneWay = Number(roadLine.road_one_way_km) || 0;
+    const trip = Number(roadLine.road_multiplier) || 2;
+    const rate = Number(roadLine.road_unit_rate ?? roadLine.unit_rate) || 0;
+    return Math.round(oneWay * trip * rate * 100) / 100;
+  }, [roadLine]);
+
+  const fixedReferenceTotal = useMemo(() => {
+    return fixedTravelLines.reduce(
+      (acc, line) => acc + (Number(line.road_calculated_total) || Number(line.line_total) || 0),
+      0
+    );
+  }, [fixedTravelLines]);
 
   const sectionIsActive = (sec) => {
     const totals = {
@@ -911,7 +966,7 @@ export default function TeacherProformaDetailPage() {
               <SectionConfirmControls section="TRAVEL" />
             </div>
           </div>
-          <div className="px-4 pt-3">
+          <div className="px-4 pt-3 flex flex-wrap items-center gap-2">
             <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted/40">
               {travelTabs.map((tab) => (
                 <button
@@ -932,18 +987,51 @@ export default function TeacherProformaDetailPage() {
                 </button>
               ))}
             </div>
+            <span className="px-2 py-1 text-[11px] rounded-full font-semibold border border-primary/30 bg-primary/10 text-foreground">
+              Billed: {activeTravelModeLabel(activeTravelMode)}
+            </span>
           </div>
           <div className="p-4 space-y-3">
             {travelTab === "FIXED" && (
               fixedTravelLines.length > 0 ? (
-                <ProformaTravelFixedCard items={fixedTravelLines} />
+                ticketsActive ? (
+                  <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                    <p className="text-sm font-semibold text-foreground">Fixed module not selected</p>
+                    <p className="text-xs text-muted-foreground">
+                      Estimated {eur(fixedReferenceTotal)} (reference only).{" "}
+                      {activeTravelModeLabel(activeTravelMode)} is currently billed.
+                    </p>
+                    {!signed && (
+                      <Button size="sm" disabled={busy} onClick={usePrimaryTravelAllowance}>
+                        Switch to fixed module
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <ProformaTravelFixedCard items={fixedTravelLines} />
+                )
               ) : (
                 <p className="text-sm text-muted-foreground">No fixed module travel on this invoice.</p>
               )
             )}
             {travelTab === "ROAD" && (
               roadLine ? (
-                <ProformaTravelRoadCard item={roadLine} editable={false} />
+                roadSuperseded ? (
+                  <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                    <p className="text-sm font-semibold text-foreground">Road allowance not selected</p>
+                    <p className="text-xs text-muted-foreground">
+                      Estimated {eur(roadReferenceTotal)} (reference only).{" "}
+                      {activeTravelModeLabel(activeTravelMode)} is currently billed.
+                    </p>
+                    {!signed && (
+                      <Button size="sm" disabled={busy} onClick={usePrimaryTravelAllowance}>
+                        Switch to road
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <ProformaTravelRoadCard item={roadLine} editable={false} />
+                )
               ) : (
                 <p className="text-sm text-muted-foreground">
                   No road travel line on this invoice. Use Rail or Air to add tickets.
