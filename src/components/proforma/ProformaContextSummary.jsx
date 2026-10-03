@@ -55,6 +55,18 @@ export default function ProformaContextSummary({ proforma, showTeacherName = tru
     if (party.address) {
       rows.push({ label: t("proforma.companyAddress"), value: party.address });
     }
+    if (String(party.additional_info_1 || "").trim()) {
+      rows.push({
+        label: t("proforma.additionalInfo1"),
+        value: String(party.additional_info_1).trim(),
+      });
+    }
+    if (String(party.additional_info_2 || "").trim()) {
+      rows.push({
+        label: t("proforma.additionalInfo2"),
+        value: String(party.additional_info_2).trim(),
+      });
+    }
   }
 
   if (bank) {

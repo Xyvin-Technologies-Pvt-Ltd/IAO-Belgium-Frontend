@@ -112,6 +112,9 @@ function resolvePartyDisplay(proforma, previewParty) {
     {};
   const useDifferent = Boolean(party.use_different_details);
 
+  const additionalInfo1 = String(party.additional_info_1 || "").trim() || null;
+  const additionalInfo2 = String(party.additional_info_2 || "").trim() || null;
+
   if (useDifferent) {
     return {
       useDifferent: true,
@@ -119,6 +122,8 @@ function resolvePartyDisplay(proforma, previewParty) {
       contactName: party.contact_person_name || signature.signed_by_name || null,
       email: teacher.email || null,
       address: party.address || "—",
+      additionalInfo1,
+      additionalInfo2,
       bank:
         previewParty?.bank_account_number ||
         signature.bank_account_number ||
@@ -134,6 +139,8 @@ function resolvePartyDisplay(proforma, previewParty) {
     contactName: null,
     email: teacher.email || null,
     address: teacherFullAddress(teacher) || "—",
+    additionalInfo1: null,
+    additionalInfo2: null,
     bank:
       previewParty?.bank_account_number ||
       signature.bank_account_number ||
@@ -174,35 +181,42 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
   return (
     <div
       id="printable-proforma-invoice"
-      className="bg-white text-[#1a202c] print:p-0"
-      style={{ fontFamily: "Arial, Helvetica, sans-serif", fontSize: 13, lineHeight: 1.5 }}
+      className="bg-white text-[#1a202c] print:p-0 w-full"
+      style={{
+        fontFamily: "Arial, Helvetica, sans-serif",
+        fontSize: 12,
+        lineHeight: 1.45,
+        boxSizing: "border-box",
+      }}
     >
       <InvoicePrintHeader />
 
-      <div className="px-9 sm:px-10 print:px-10 pb-4 pt-2">
-        <div className="mb-7 rounded-[14px] px-7 py-5" style={{ background: "#F2F5F9" }}>
-          <div className="flex flex-col md:flex-row md:justify-between gap-6">
-            <div className="md:w-1/2">
-              <p className="m-0 mb-3.5 text-2xl font-bold text-black">{t.title}</p>
-              <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">{t.issuedBy}</p>
-              <p className="m-0 mb-1 text-sm font-bold text-[#0f172a]">
+      <div className="px-7 pb-3 pt-1">
+        <div className="mb-5 rounded-[12px] px-5 py-4" style={{ background: "#F2F5F9" }}>
+          <div className="flex flex-row justify-between gap-5">
+            <div className="w-1/2 min-w-0">
+              <p className="m-0 mb-2 text-lg font-bold text-black" style={{ fontSize: 18 }}>
+                {t.title}
+              </p>
+              <p className="m-0 mb-1 text-[10px] uppercase tracking-wide text-[#6b7280]">{t.issuedBy}</p>
+              <p className="m-0 mb-1 text-[13px] font-bold text-[#0f172a]">
                 The International Academy of Osteopathy
               </p>
-              <p className="m-0 text-xs text-[#6b7280] leading-relaxed">
+              <p className="m-0 text-[11px] text-[#6b7280] leading-relaxed">
                 IAO VZW, Bollebergen 2B, Bus 15, 9052 Ghent (Zwijnaarde), Belgium
                 <br />
                 info@osteopathy.eu
               </p>
             </div>
-            <div className="md:w-1/2 md:text-right">
-              <div className="inline-block md:ml-auto text-left">
-                <div className="flex justify-between gap-4 mb-2">
-                  <span className="text-[11px] text-[#6b7280]">{t.proformaNo}</span>
-                  <span className="text-sm font-bold text-[#0f172a]">{proforma.proforma_number}</span>
+            <div className="w-1/2 text-right min-w-0">
+              <div className="inline-block ml-auto text-left">
+                <div className="flex justify-between gap-4 mb-1.5">
+                  <span className="text-[10px] text-[#6b7280]">{t.proformaNo}</span>
+                  <span className="text-[13px] font-bold text-[#0f172a]">{proforma.proforma_number}</span>
                 </div>
-                <div className="flex justify-between gap-4 mb-2">
-                  <span className="text-[11px] text-[#6b7280]">{t.date}</span>
-                  <span className="text-[13px] text-[#0f172a]">
+                <div className="flex justify-between gap-4 mb-1.5">
+                  <span className="text-[10px] text-[#6b7280]">{t.date}</span>
+                  <span className="text-[12px] text-[#0f172a]">
                     {moment(proforma.createdAt).format("DD MMMM YYYY")}
                   </span>
                 </div>
@@ -211,76 +225,88 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">{t.lecturer}</p>
-            <p className="m-0 mb-0.5 text-sm font-bold text-[#0f172a]">{party.primaryName}</p>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="min-w-0">
+            <p className="m-0 mb-1 text-[10px] uppercase tracking-wide text-[#6b7280]">{t.lecturer}</p>
+            <p className="m-0 mb-0.5 text-[13px] font-bold text-[#0f172a]">{party.primaryName}</p>
             {party.useDifferent && party.contactName && (
-              <p className="m-0 text-xs text-[#6b7280]">
+              <p className="m-0 text-[11px] text-[#6b7280]">
                 {t.contact}: <span className="text-[#374151] font-semibold">{party.contactName}</span>
               </p>
             )}
-            {party.email && <p className="m-0 text-xs text-[#6b7280]">{party.email}</p>}
-            <p className="m-0 mt-1 text-xs text-[#6b7280] whitespace-pre-line">
+            {party.email && <p className="m-0 text-[11px] text-[#6b7280]">{party.email}</p>}
+            <p className="m-0 mt-1 text-[11px] text-[#6b7280] whitespace-pre-line">
               {party.address || "—"}
             </p>
-            <p className="m-0 mt-2 text-xs text-[#6b7280]">
+            <p className="m-0 mt-1.5 text-[11px] text-[#6b7280]">
               {t.role}: <span className="text-[#374151] font-semibold">{roleName}</span>
             </p>
             {party.bank && (
-              <p className="m-0 mt-1 text-xs text-[#6b7280]">
+              <p className="m-0 mt-1 text-[11px] text-[#6b7280]">
                 {t.bankAccount}:{" "}
                 <span className="text-[#374151] font-semibold font-mono">{party.bank}</span>
               </p>
             )}
+            {party.additionalInfo1 && (
+              <p className="m-0 mt-1 text-[11px] text-[#6b7280]">
+                {t.additionalInfo1}:{" "}
+                <span className="text-[#374151] font-semibold">{party.additionalInfo1}</span>
+              </p>
+            )}
+            {party.additionalInfo2 && (
+              <p className="m-0 mt-1 text-[11px] text-[#6b7280]">
+                {t.additionalInfo2}:{" "}
+                <span className="text-[#374151] font-semibold">{party.additionalInfo2}</span>
+              </p>
+            )}
           </div>
-          <div>
-            <p className="m-0 mb-1 text-[11px] uppercase tracking-wide text-[#6b7280]">{t.program}</p>
-            <p className="m-0 mb-0.5 text-sm font-bold text-[#0f172a]">{programLabel}</p>
-            <p className="m-0 text-xs text-[#6b7280]">
+          <div className="min-w-0">
+            <p className="m-0 mb-1 text-[10px] uppercase tracking-wide text-[#6b7280]">{t.program}</p>
+            <p className="m-0 mb-0.5 text-[13px] font-bold text-[#0f172a]">{programLabel}</p>
+            <p className="m-0 text-[11px] text-[#6b7280]">
               {t.module}: <span className="text-[#374151]">{moduleLabel}</span>
             </p>
-            <p className="m-0 text-xs text-[#6b7280]">
+            <p className="m-0 text-[11px] text-[#6b7280]">
               {t.venue}:{" "}
               <span className="text-[#374151]">{planning.venue || courseMeta.venue || "—"}</span>
             </p>
             {(planning.venue_address || courseMeta.venue_address) && (
-              <p className="m-0 text-xs text-[#6b7280]">
+              <p className="m-0 text-[11px] text-[#6b7280]">
                 {planning.venue_address || courseMeta.venue_address}
               </p>
             )}
             {sessionDates.length > 0 && (
-              <p className="m-0 mt-1 text-xs text-[#6b7280]">
+              <p className="m-0 mt-1 text-[11px] text-[#6b7280]">
                 {t.dates}: <span className="text-[#374151]">{sessionDates.join(", ")}</span>
               </p>
             )}
-            <p className="m-0 mt-1 text-xs text-[#6b7280]">
+            <p className="m-0 mt-1 text-[11px] text-[#6b7280]">
               {t.region}:{" "}
               <span className="text-[#374151]">{proforma.region_snapshot_name || "—"}</span>
             </p>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="flex justify-between items-end mb-2">
-            <p className="m-0 text-sm font-bold text-[#0f172a]">{t.items}</p>
-            <p className="m-0 text-[11px] uppercase tracking-wide text-[#6b7280]">{t.amount}</p>
+        <div className="mb-5">
+          <div className="flex justify-between items-end mb-1.5">
+            <p className="m-0 text-[13px] font-bold text-[#0f172a]">{t.items}</p>
+            <p className="m-0 text-[10px] uppercase tracking-wide text-[#6b7280]">{t.amount}</p>
           </div>
           <div className="border-t-2 border-[#1a202c]" />
           <table className="w-full border-collapse">
             <tbody>
               {items.map((item, idx) => (
                 <tr key={item._id || idx}>
-                  <td className="py-3.5 pr-4 align-top">
-                    <p className="m-0 text-[13px] font-semibold text-[#0f172a]">
+                  <td className="py-2.5 pr-3 align-top">
+                    <p className="m-0 text-[12px] font-semibold text-[#0f172a]">
                       {localizedItemLabel(item, t)}
                     </p>
-                    <p className="m-0 mt-0.5 text-[13px] text-[#374151]">{itemCalculation(item)}</p>
+                    <p className="m-0 mt-0.5 text-[12px] text-[#374151]">{itemCalculation(item)}</p>
                     {itemSource(item) ? (
-                      <p className="m-0 mt-0.5 text-[11px] text-[#6b7280]">{itemSource(item)}</p>
+                      <p className="m-0 mt-0.5 text-[10px] text-[#6b7280]">{itemSource(item)}</p>
                     ) : null}
                   </td>
-                  <td className="py-3.5 text-right align-top whitespace-nowrap text-[13px] text-[#374151] font-medium">
+                  <td className="py-2.5 text-right align-top whitespace-nowrap text-[12px] text-[#374151] font-medium">
                     €{Number(item.line_total || 0).toFixed(2)}
                   </td>
                 </tr>
@@ -290,43 +316,43 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
           <div className="border-t border-[#e5e7eb] mt-1" />
         </div>
 
-        <div className="flex justify-end mb-10">
+        <div className="flex justify-end mb-7">
           <div
-            className="w-full max-w-[280px] rounded-xl flex justify-between items-center px-[18px] py-3.5"
+            className="w-full max-w-[240px] rounded-lg flex justify-between items-center px-4 py-2.5"
             style={{ background: "#F2F5F9" }}
           >
-            <span className="text-[13px] font-bold text-[#374151]">{t.total}</span>
-            <span className="text-xl font-bold text-[#0f172a] whitespace-nowrap">
+            <span className="text-[12px] font-bold text-[#374151]">{t.total}</span>
+            <span className="text-[16px] font-bold text-[#0f172a] whitespace-nowrap">
               €{Number(proforma.grand_total || 0).toFixed(2)}
             </span>
           </div>
         </div>
 
-        <div className="border-t border-[#e5e7eb] pt-6 mb-6">
-          <p className="m-0 mb-2 text-[11px] uppercase tracking-wide text-[#6b7280]">{t.signature}</p>
+        <div className="border-t border-[#e5e7eb] pt-4 mb-4">
+          <p className="m-0 mb-1.5 text-[10px] uppercase tracking-wide text-[#6b7280]">{t.signature}</p>
           {showSigned ? (
             <div>
               <p
-                className="m-0 text-base italic font-bold text-[#0f172a]"
+                className="m-0 text-[14px] italic font-bold text-[#0f172a]"
                 style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
               >
                 {signature.signed_by_name || previewSignedName}
               </p>
               {(signature.bank_account_number || party.bank) && (
-                <p className="m-0 mt-1 text-xs font-mono text-[#374151]">
+                <p className="m-0 mt-1 text-[11px] font-mono text-[#374151]">
                   {t.bankAccount}: {signature.bank_account_number || party.bank}
                 </p>
               )}
-              <p className="m-0 mt-1 text-[11px] font-medium text-[#137333] flex items-center gap-1">
+              <p className="m-0 mt-1 text-[10px] font-medium text-[#137333] flex items-center gap-1">
                 <CheckCircle className="w-3.5 h-3.5" />
                 {t.signedOn} {moment(signature.signed_at).format("DD MMM YYYY, HH:mm")}
               </p>
             </div>
           ) : (
-            <p className="m-0 text-xs italic text-amber-700">{t.signaturePending}</p>
+            <p className="m-0 text-[11px] italic text-amber-700">{t.signaturePending}</p>
           )}
           {approvedForFinance && (
-            <p className="m-0 mt-3 text-[11px] text-[#6b7280] flex items-center gap-1.5">
+            <p className="m-0 mt-2 text-[10px] text-[#6b7280] flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               {t.approvedForFinance}
               {proforma.updatedAt ? ` · ${moment(proforma.updatedAt).format("DD MMM YYYY")}` : ""}
@@ -431,8 +457,11 @@ function addCanvasPagesToPdf(pdf, canvas, sourceEl, marginMm = 8) {
   });
 }
 
+/** A4 width at 96dpi — keep PDF scale independent of dialog/viewport width. */
+const A4_CAPTURE_WIDTH_PX = 794;
+
 /**
- * Direct .pdf download of the on-screen invoice document (same layout).
+ * Direct .pdf download of the invoice at a fixed A4 layout width.
  * Uses html2canvas-pro (oklch/Tailwind v4 safe) + jsPDF.
  */
 export async function downloadProformaInvoicePdf(proforma) {
@@ -441,22 +470,61 @@ export async function downloadProformaInvoicePdf(proforma) {
   if (!el) return false;
 
   const filename = `${proforma?.proforma_number || "proforma-invoice"}.pdf`;
-  const canvas = await html2canvas(el, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: false,
-    logging: false,
-    backgroundColor: "#ffffff",
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: el.scrollWidth,
-    windowHeight: el.scrollHeight,
+  const host = document.createElement("div");
+  host.setAttribute("data-proforma-pdf-host", "true");
+  Object.assign(host.style, {
+    position: "fixed",
+    left: "-10000px",
+    top: "0",
+    width: `${A4_CAPTURE_WIDTH_PX}px`,
+    background: "#ffffff",
+    pointerEvents: "none",
+    zIndex: "-1",
   });
 
-  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  addCanvasPagesToPdf(pdf, canvas, el, 8);
-  pdf.save(filename);
-  return true;
+  const clone = el.cloneNode(true);
+  clone.removeAttribute("id");
+  clone.setAttribute("data-proforma-pdf-clone", "true");
+  Object.assign(clone.style, {
+    width: `${A4_CAPTURE_WIDTH_PX}px`,
+    maxWidth: `${A4_CAPTURE_WIDTH_PX}px`,
+    boxSizing: "border-box",
+  });
+  host.appendChild(clone);
+  document.body.appendChild(host);
+
+  try {
+    const imgs = Array.from(clone.querySelectorAll("img"));
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            })
+      )
+    );
+
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      backgroundColor: "#ffffff",
+      width: A4_CAPTURE_WIDTH_PX,
+      windowWidth: A4_CAPTURE_WIDTH_PX,
+      scrollX: 0,
+      scrollY: 0,
+    });
+
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    addCanvasPagesToPdf(pdf, canvas, clone, 10);
+    pdf.save(filename);
+    return true;
+  } finally {
+    host.remove();
+  }
 }
 
 /** @deprecated Use printProformaInvoicePdf */

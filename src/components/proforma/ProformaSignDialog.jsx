@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  ArrowLeft,
   Download,
   Eye,
   Info,
   Loader2,
   PenTool,
-  Pencil,
 } from "lucide-react";
 import { ProformaInvoiceDocument, downloadProformaInvoicePdf } from "@/components/admin/ProformaInvoiceDocument";
 import { proformaTeacherName } from "@/utils/proformaCourseLabel";
@@ -49,6 +49,8 @@ function validateDetailsForm(
     companyName,
     companyAddress,
     companyBank,
+    additionalInfo1,
+    additionalInfo2,
   },
   t
 ) {
@@ -65,6 +67,12 @@ function validateDetailsForm(
     if (!String(companyAddress || "").trim()) errors.address = t("proforma.sign.addressRequired");
     const bankErr = validateBank(normalizeBank(companyBank), t);
     if (bankErr) errors.company_bank = bankErr;
+    if (String(additionalInfo1 || "").trim().length > 200) {
+      errors.additional_info_1 = t("proforma.sign.additionalInfoMax");
+    }
+    if (String(additionalInfo2 || "").trim().length > 200) {
+      errors.additional_info_2 = t("proforma.sign.additionalInfoMax");
+    }
   }
   return { errors, valid: Object.keys(errors).length === 0 };
 }
@@ -87,7 +95,10 @@ export default function ProformaSignDialog({
   const [companyName, setCompanyName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [companyBank, setCompanyBank] = useState("");
+  const [additionalInfo1, setAdditionalInfo1] = useState("");
+  const [additionalInfo2, setAdditionalInfo2] = useState("");
   const [errors, setErrors] = useState({});
+  const [detailsConfirmed, setDetailsConfirmed] = useState(false);
   const [signed, setSigned] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [signedProforma, setSignedProforma] = useState(null);
@@ -105,7 +116,10 @@ export default function ProformaSignDialog({
     setCompanyName("");
     setCompanyAddress("");
     setCompanyBank("");
+    setAdditionalInfo1("");
+    setAdditionalInfo2("");
     setErrors({});
+    setDetailsConfirmed(false);
     setSigned(false);
     setSignedProforma(null);
     setDownloading(false);
@@ -116,6 +130,8 @@ export default function ProformaSignDialog({
     const bank = useDifferentDetails
       ? normalizeBank(companyBank)
       : normalizeBank(bankAccount);
+    const info1 = String(additionalInfo1 || "").trim();
+    const info2 = String(additionalInfo2 || "").trim();
     return {
       signed_by_name: String(signedByName || "").trim(),
       bank_account_number: bank,
@@ -125,6 +141,8 @@ export default function ProformaSignDialog({
             company_name: String(companyName || "").trim(),
             contact_person_name: String(signedByName || "").trim(),
             address: String(companyAddress || "").trim(),
+            additional_info_1: info1 || undefined,
+            additional_info_2: info2 || undefined,
           }
         : { use_different_details: false },
     };
@@ -135,6 +153,8 @@ export default function ProformaSignDialog({
     signedByName,
     companyName,
     companyAddress,
+    additionalInfo1,
+    additionalInfo2,
   ]);
 
   const previewParty = useMemo(
@@ -146,6 +166,8 @@ export default function ProformaSignDialog({
       company_name: draftPayload.invoice_party.company_name,
       contact_person_name: draftPayload.invoice_party.contact_person_name,
       address: draftPayload.invoice_party.address,
+      additional_info_1: draftPayload.invoice_party.additional_info_1,
+      additional_info_2: draftPayload.invoice_party.additional_info_2,
     }),
     [draftPayload, signed]
   );
@@ -161,11 +183,14 @@ export default function ProformaSignDialog({
         companyName,
         companyAddress,
         companyBank,
+        additionalInfo1,
+        additionalInfo2,
       },
       t
     );
     setErrors(nextErrors);
     if (!valid) return;
+    setDetailsConfirmed(false);
     setStep(2);
   };
 
@@ -292,11 +317,11 @@ export default function ProformaSignDialog({
                   const on = Boolean(v);
                   setUseDifferentDetails(on);
                   setErrors({});
-                  if (on) {
-                    setCompanyName("");
-                    setCompanyAddress("");
-                    setCompanyBank("");
-                  }
+                  setCompanyName("");
+                  setCompanyAddress("");
+                  setCompanyBank("");
+                  setAdditionalInfo1("");
+                  setAdditionalInfo2("");
                 }}
                 disabled={busy}
               />
@@ -364,6 +389,63 @@ export default function ProformaSignDialog({
                     <p className="text-xs text-destructive mt-1">{errors.company_bank}</p>
                   )}
                 </div>
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="additional-info-1" className="text-xs font-semibold">
+                      {t("proforma.sign.additionalInfo1")}
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">
+                      {t("proforma.sign.optional")}
+                    </span>
+                  </div>
+                  <Input
+                    id="additional-info-1"
+                    className="mt-1.5"
+                    value={additionalInfo1}
+                    onChange={(e) => {
+                      setAdditionalInfo1(e.target.value);
+                      if (errors.additional_info_1) {
+                        setErrors((p) => ({ ...p, additional_info_1: undefined }));
+                      }
+                    }}
+                    placeholder={t("proforma.sign.additionalInfoPlaceholder")}
+                    disabled={busy}
+                    maxLength={200}
+                  />
+                  {errors.additional_info_1 && (
+                    <p className="text-xs text-destructive mt-1">{errors.additional_info_1}</p>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="additional-info-2" className="text-xs font-semibold">
+                      {t("proforma.sign.additionalInfo2")}
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">
+                      {t("proforma.sign.optional")}
+                    </span>
+                  </div>
+                  <Input
+                    id="additional-info-2"
+                    className="mt-1.5"
+                    value={additionalInfo2}
+                    onChange={(e) => {
+                      setAdditionalInfo2(e.target.value);
+                      if (errors.additional_info_2) {
+                        setErrors((p) => ({ ...p, additional_info_2: undefined }));
+                      }
+                    }}
+                    placeholder={t("proforma.sign.additionalInfoPlaceholder")}
+                    disabled={busy}
+                    maxLength={200}
+                  />
+                  {errors.additional_info_2 && (
+                    <p className="text-xs text-destructive mt-1">{errors.additional_info_2}</p>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  {t("proforma.sign.additionalInfoHelp")}
+                </p>
               </div>
             )}
           </div>
@@ -371,16 +453,32 @@ export default function ProformaSignDialog({
 
         {step === 2 && displayProforma && (
           <div className="space-y-3 py-1">
-            <div className="rounded-lg border border-border overflow-hidden bg-muted/20 max-h-[55vh] overflow-y-auto">
-              <ProformaInvoiceDocument
-                proforma={displayProforma}
-                previewParty={signed ? null : previewParty}
-              />
+            <div className="rounded-lg border border-border bg-muted/20 max-h-[55vh] overflow-auto">
+              <div className="mx-auto w-full max-w-[794px] min-w-[640px]">
+                <ProformaInvoiceDocument
+                  proforma={displayProforma}
+                  previewParty={signed ? null : previewParty}
+                />
+              </div>
             </div>
+
+            {!signed && (
+              <label className="flex items-start gap-3 rounded-lg border border-border bg-background px-3.5 py-3 cursor-pointer select-none">
+                <Checkbox
+                  checked={detailsConfirmed}
+                  onCheckedChange={(v) => setDetailsConfirmed(Boolean(v))}
+                  disabled={busy}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-foreground leading-snug">
+                  {t("proforma.sign.confirmCheckedDetails")}
+                </span>
+              </label>
+            )}
           </div>
         )}
 
-        <DialogFooter className="gap-3 sm:justify-end">
+        <DialogFooter className="gap-3 sm:justify-between">
           {step === 1 && (
             <>
               <Button
@@ -409,15 +507,18 @@ export default function ProformaSignDialog({
                 type="button"
                 variant="outline"
                 disabled={busy}
-                onClick={() => setStep(1)}
+                onClick={() => {
+                  setDetailsConfirmed(false);
+                  setStep(1);
+                }}
               >
-                <Pencil className="w-4 h-4 mr-2" />
-                {t("proforma.sign.edit")}
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t("proforma.sign.editDetails")}
               </Button>
               <Button
                 type="button"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                disabled={busy}
+                disabled={busy || !detailsConfirmed}
                 onClick={handleSign}
               >
                 {busy ? (
@@ -425,7 +526,7 @@ export default function ProformaSignDialog({
                 ) : (
                   <PenTool className="w-4 h-4 mr-2" />
                 )}
-                {t("proforma.sign.sign")}
+                {t("proforma.sign.approveAndSign")}
               </Button>
             </>
           )}
