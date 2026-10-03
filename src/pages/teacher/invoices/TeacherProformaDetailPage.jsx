@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import {
   useGetProformaById,
@@ -21,10 +22,10 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
   Check,
-  CheckCircle2,
   Clock,
   Loader2,
   Paperclip,
+  Download,
   PenTool,
   Plus,
   X,
@@ -38,6 +39,10 @@ import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCa
 import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
 import ProformaSignDialog from "@/components/proforma/ProformaSignDialog";
 import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClaimRow";
+import {
+  ProformaInvoiceDocument,
+  downloadProformaInvoicePdf,
+} from "@/components/admin/ProformaInvoiceDocument";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
@@ -67,6 +72,7 @@ const statusBadge = (p) => {
 };
 
 export default function TeacherProformaDetailPage() {
+  const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params?.id || params?.["$id"];
   const navigate = useNavigate();
@@ -88,6 +94,7 @@ export default function TeacherProformaDetailPage() {
   const addAttachmentMutation = useAddSectionAttachment();
 
   const [showSignDialog, setShowSignDialog] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [travelTab, setTravelTab] = useState("ROAD");
   const [editingTeaching, setEditingTeaching] = useState(false);
   const [teachingBlocks, setTeachingBlocks] = useState("");
@@ -130,6 +137,37 @@ export default function TeacherProformaDetailPage() {
   const foodLine = (itemsByType.FOOD || [])[0];
   const hasPendingFor = (section) => pendingChanges.some((c) => c.section === section);
   const hasAnyPending = pendingChanges.length > 0;
+  const latestRejectedFor = (section) => {
+    const rejected = (proforma?.pending_teacher_changes || [])
+      .filter((c) => c.section === section && c.status === "REJECTED")
+      .sort(
+        (a, b) =>
+          new Date(b.resolved_at || b.requested_at || 0) - new Date(a.resolved_at || a.requested_at || 0)
+      );
+    const latest = rejected[0];
+    if (!latest) return null;
+    // Only surface if this section was part of the latest admin action
+    if (
+      Array.isArray(proforma?.last_revision?.sections) &&
+      !proforma.last_revision.sections.includes(section)
+    ) {
+      return null;
+    }
+    return latest;
+  };
+
+  const RejectedUpdateBanner = ({ section }) => {
+    if (hasPendingFor(section)) return null;
+    const rejected = latestRejectedFor(section);
+    if (!rejected) return null;
+    const reason = rejected.reject_reason || rejected.note || "";
+    return (
+      <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-900 space-y-0.5">
+        <p className="font-semibold">Admin rejected your update</p>
+        {reason ? <p className="text-rose-800/90">Reason: {reason.replace(/^Rejected:\s*/i, "")}</p> : null}
+      </div>
+    );
+  };
   /** Any teacher save that changes amounts is a Request for update until admin Accepts */
   const requestUpdateLabel = () => "Request for update";
 
@@ -570,19 +608,34 @@ export default function TeacherProformaDetailPage() {
     setShowSignDialog(true);
   };
 
-  const sign = async ({ signed_by_name, bank_account_number }) => {
+  const sign = async (payload) => {
     try {
       setBusy(true);
       await confirmAllAndPrepareSign();
-      await signMutation.mutateAsync({
+      const response = await signMutation.mutateAsync({
         id: proforma._id,
-        data: { signed_by_name, bank_account_number },
+        data: payload,
       });
-      setShowSignDialog(false);
+      return response?.data || response;
     } catch (err) {
       toast.error(err?.message || "Could not sign");
+      return false;
     } finally {
       setBusy(false);
+    }
+  };
+
+  const downloadSignedPdf = async () => {
+    try {
+      setDownloadingPdf(true);
+      // Allow mount of printable document before capture
+      await new Promise((r) => requestAnimationFrame(() => r()));
+      const ok = await downloadProformaInvoicePdf(proforma);
+      if (!ok) toast.error("Could not prepare PDF");
+    } catch (err) {
+      toast.error(err?.message || "Could not download PDF");
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
@@ -787,11 +840,11 @@ export default function TeacherProformaDetailPage() {
               ) : (
                 <PenTool className="w-4 h-4 mr-2" />
               )}
-              Sign &amp; approve
+              {t("proforma.previewAndSign")}
             </Button>
             {!allConfirmed && (
               <p className="text-[11px] text-muted-foreground text-right max-w-xs">
-                Confirm each section with an amount, then sign.
+                Confirm each section with an amount, then preview and sign.
               </p>
             )}
             {allConfirmed && missingReceipts.length > 0 && (
@@ -802,19 +855,31 @@ export default function TeacherProformaDetailPage() {
           </div>
         )}
         {signed && (
-          <div className="text-sm text-emerald-700 space-y-0.5">
-            <p className="font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 shrink-0" />
-              Signed by {proforma.digital_signature?.signed_by_name}
-            </p>
-            {proforma.digital_signature?.bank_account_number && (
-              <p className="text-xs font-mono text-emerald-800/90 pl-7">
-                Bank: {proforma.digital_signature.bank_account_number}
-              </p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="font-semibold"
+            disabled={downloadingPdf}
+            onClick={downloadSignedPdf}
+          >
+            {downloadingPdf ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4 mr-2" />
             )}
-          </div>
+            {t("proforma.downloadPdf")}
+          </Button>
         )}
       </div>
+
+      {signed && !showSignDialog && (
+        <div
+          aria-hidden
+          className="fixed left-[-10000px] top-0 w-[794px] pointer-events-none"
+        >
+          <ProformaInvoiceDocument proforma={proforma} />
+        </div>
+      )}
 
       <ProformaSignDialog
         open={showSignDialog}
@@ -872,6 +937,7 @@ export default function TeacherProformaDetailPage() {
           </div>
         </div>
         <div className="p-4 space-y-3">
+          <RejectedUpdateBanner section="TEACHING" />
           {!editingTeaching && !teachingPending && teachingItem && (
             <p className="text-sm text-muted-foreground">
               {(() => {
@@ -992,6 +1058,7 @@ export default function TeacherProformaDetailPage() {
             </span>
           </div>
           <div className="p-4 space-y-3">
+            <RejectedUpdateBanner section="TRAVEL" />
             {travelTab === "FIXED" && (
               fixedTravelLines.length > 0 ? (
                 ticketsActive ? (
@@ -1134,6 +1201,7 @@ export default function TeacherProformaDetailPage() {
             </div>
           </div>
           <div className="p-4 space-y-3">
+            <RejectedUpdateBanner section="FOOD" />
             {editingFood ? (
               <div className="rounded-lg border border-dashed border-border p-3 space-y-3 max-w-md">
                 <div className="grid grid-cols-2 gap-3">
@@ -1245,7 +1313,10 @@ export default function TeacherProformaDetailPage() {
               <SectionConfirmControls section="STAY" />
             </div>
           </div>
-          <div className="p-4">{renderClaimList("STAY", itemsByType.STAY || [])}</div>
+          <div className="p-4 space-y-3">
+            <RejectedUpdateBanner section="STAY" />
+            {renderClaimList("STAY", itemsByType.STAY || [])}
+          </div>
           {renderSectionNotes("STAY")}
         </section>
       )}
@@ -1263,7 +1334,10 @@ export default function TeacherProformaDetailPage() {
               <SectionConfirmControls section="MISCELLANEOUS" />
             </div>
           </div>
-          <div className="p-4">{renderClaimList("MISCELLANEOUS", itemsByType.MISCELLANEOUS || [])}</div>
+          <div className="p-4 space-y-3">
+            <RejectedUpdateBanner section="MISCELLANEOUS" />
+            {renderClaimList("MISCELLANEOUS", itemsByType.MISCELLANEOUS || [])}
+          </div>
           {renderSectionNotes("MISCELLANEOUS")}
         </section>
       )}

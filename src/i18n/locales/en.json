@@ -28,7 +28,8 @@
       "evaluations": "Assessments",
       "exams": "Exams",
       "otherExams": "Other Exams",
-      "practicalExams": "Practical Exams"
+      "practicalExams": "Practical Exams",
+      "proformaInvoices": "My Proforma Invoices"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -70,7 +71,9 @@
       "exams": "Exams",
       "resitPlanning": "Resit planning",
       "results": "Results",
-      "createInvoice": "Create Custom Invoice"
+      "createInvoice": "Create Custom Invoice",
+      "proformaInvoices": "Teacher Proforma Invoices",
+      "proformaSettings": "Proforma Tariffs & Settings"
     },
     "user": {
       "loading": "Loading...",
@@ -206,7 +209,6 @@
     "total": "Total",
     "noTimes": "No times",
     "noVenues": "No venues",
-    "search": "Search...",
     "currency": "Currency",
     "processing": "Processing...",
     "city": "City",
@@ -441,9 +443,9 @@
         "notChecked": "Not checked",
         "verify": "Verify",
         "verifyPage": "Verify page",
-        "verifying": "Verifying\u2026",
+        "verifying": "Verifying…",
         "export": "Export CSV",
-        "exporting": "Exporting\u2026",
+        "exporting": "Exporting…",
         "exported": "Reconciliation exported",
         "exportFailed": "Failed to export reconciliation",
         "loadFailed": "Failed to load reconciliation data",
@@ -737,36 +739,120 @@
     "search": "Search...",
     "create": "Create Contract Type",
     "entity": "Contract Type",
-    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No contract types found" },
-    "messages": { "loadFailed": "Failed to load contract types", "created": "Contract type created successfully", "updated": "Contract type updated successfully", "deleted": "Contract type deleted successfully", "createFailed": "Failed to create contract type", "updateFailed": "Failed to update contract type", "deleteFailed": "Failed to delete contract type" },
-    "modal": { "createTitle": "Create a new contract type", "editTitle": "Edit Contract Type", "createSubtitle": "Let's create a new contract type", "editSubtitle": "Update the contract type details", "nameLabel": "Contract Type Name", "namePlaceholder": "Enter contract type name", "nameRequired": "Name is required" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "noItems": "No contract types found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load contract types",
+      "created": "Contract type created successfully",
+      "updated": "Contract type updated successfully",
+      "deleted": "Contract type deleted successfully",
+      "createFailed": "Failed to create contract type",
+      "updateFailed": "Failed to update contract type",
+      "deleteFailed": "Failed to delete contract type"
+    },
+    "modal": {
+      "createTitle": "Create a new contract type",
+      "editTitle": "Edit Contract Type",
+      "createSubtitle": "Let's create a new contract type",
+      "editSubtitle": "Update the contract type details",
+      "nameLabel": "Contract Type Name",
+      "namePlaceholder": "Enter contract type name",
+      "nameRequired": "Name is required"
+    }
   },
   "departmentManagement": {
     "title": "Departments",
     "search": "Search...",
     "create": "Create Department",
     "entity": "Department",
-    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No departments found" },
-    "messages": { "loadFailed": "Failed to load departments", "created": "Department created successfully", "updated": "Department updated successfully", "deleted": "Department deleted successfully", "createFailed": "Failed to create department", "updateFailed": "Failed to update department", "deleteFailed": "Failed to delete department" },
-    "modal": { "createTitle": "Create a new department", "editTitle": "Edit Department", "createSubtitle": "Let's create a new department", "editSubtitle": "Update the department details", "nameLabel": "Department Name", "namePlaceholder": "Enter department name", "nameRequired": "Name is required" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "noItems": "No departments found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load departments",
+      "created": "Department created successfully",
+      "updated": "Department updated successfully",
+      "deleted": "Department deleted successfully",
+      "createFailed": "Failed to create department",
+      "updateFailed": "Failed to update department",
+      "deleteFailed": "Failed to delete department"
+    },
+    "modal": {
+      "createTitle": "Create a new department",
+      "editTitle": "Edit Department",
+      "createSubtitle": "Let's create a new department",
+      "editSubtitle": "Update the department details",
+      "nameLabel": "Department Name",
+      "namePlaceholder": "Enter department name",
+      "nameRequired": "Name is required"
+    }
   },
   "regionManagement": {
     "title": "Regions",
     "search": "Search...",
     "create": "Create Region",
     "entity": "Region",
-    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No regions found" },
-    "messages": { "loadFailed": "Failed to load regions", "created": "Region created successfully", "updated": "Region updated successfully", "deleted": "Region deleted successfully", "createFailed": "Failed to create region", "updateFailed": "Failed to update region", "deleteFailed": "Failed to delete region" },
-    "modal": { "createTitle": "Create a new region", "editTitle": "Edit Region", "createSubtitle": "Let's create a new region", "editSubtitle": "Update the region details", "nameLabel": "Region Name", "namePlaceholder": "Enter region name", "nameRequired": "Name is required" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "noItems": "No regions found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load regions",
+      "created": "Region created successfully",
+      "updated": "Region updated successfully",
+      "deleted": "Region deleted successfully",
+      "createFailed": "Failed to create region",
+      "updateFailed": "Failed to update region",
+      "deleteFailed": "Failed to delete region"
+    },
+    "modal": {
+      "createTitle": "Create a new region",
+      "editTitle": "Edit Region",
+      "createSubtitle": "Let's create a new region",
+      "editSubtitle": "Update the region details",
+      "nameLabel": "Region Name",
+      "namePlaceholder": "Enter region name",
+      "nameRequired": "Name is required"
+    }
   },
   "teachingRegionManagement": {
     "title": "Teaching Regions",
     "search": "Search...",
     "create": "Create Teaching Region",
     "entity": "Teaching Region",
-    "table": { "name": "Name", "status": "Status", "action": "Action", "noItems": "No teaching regions found" },
-    "messages": { "loadFailed": "Failed to load teaching regions", "created": "Teaching region created successfully", "updated": "Teaching region updated successfully", "deleted": "Teaching region deleted successfully", "createFailed": "Failed to create teaching region", "updateFailed": "Failed to update teaching region", "deleteFailed": "Failed to delete teaching region" },
-    "modal": { "createTitle": "Create a new teaching region", "editTitle": "Edit Teaching Region", "createSubtitle": "Let's create a new teaching region", "editSubtitle": "Update the teaching region details", "nameLabel": "Teaching Region Name", "namePlaceholder": "Enter teaching region name", "nameRequired": "Name is required" }
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "action": "Action",
+      "noItems": "No teaching regions found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load teaching regions",
+      "created": "Teaching region created successfully",
+      "updated": "Teaching region updated successfully",
+      "deleted": "Teaching region deleted successfully",
+      "createFailed": "Failed to create teaching region",
+      "updateFailed": "Failed to update teaching region",
+      "deleteFailed": "Failed to delete teaching region"
+    },
+    "modal": {
+      "createTitle": "Create a new teaching region",
+      "editTitle": "Edit Teaching Region",
+      "createSubtitle": "Let's create a new teaching region",
+      "editSubtitle": "Update the teaching region details",
+      "nameLabel": "Teaching Region Name",
+      "namePlaceholder": "Enter teaching region name",
+      "nameRequired": "Name is required"
+    }
   },
   "programManagement": {
     "title": "Programmes",
@@ -1196,7 +1282,7 @@
     "title": "Student Management",
     "search": "Search students...",
     "exportCsv": "Export CSV",
-    "exporting": "Preparing CSV export...",
+    "exporting": "Exporting...",
     "exportEmpty": "No students to export.",
     "exportSuccess": "Students exported successfully!",
     "exportFailed": "Failed to export students.",
@@ -1302,7 +1388,6 @@
       "apply": "Apply Filters"
     },
     "exportExcel": "Export Excel",
-    "exporting": "Exporting...",
     "paymentMethods": {
       "ideal": "iDEAL",
       "creditCard": "Credit Card",
@@ -2635,5 +2720,113 @@
         "noModules": "No modules selected"
       }
     }
+  },
+  "proforma": {
+    "title": "Proforma invoices",
+    "myInvoices": "My Proforma Invoices",
+    "teacherInvoices": "Teacher Proforma Invoices",
+    "settings": "Proforma Tariffs & Settings",
+    "financeCardDescription": "Track sent, updated, and signed teacher proforma invoices",
+    "backToList": "Back to invoices",
+    "backToQueue": "Back to Proforma Queue",
+    "loading": "Loading proforma invoice...",
+    "loadingDetails": "Loading proforma invoice details...",
+    "loadFailed": "Failed to load proforma invoice",
+    "notFound": "Invoice not found",
+    "previewAndSign": "Preview and sign",
+    "downloadPdf": "Download PDF",
+    "viewInvoice": "View invoice",
+    "print": "Print",
+    "sendToFinance": "Send to finance",
+    "sending": "Sending...",
+    "inFinanceQueue": "In Finance Queue",
+    "signedBy": "Signed by {{name}}",
+    "digitallySignedBy": "Digitally signed by {{name}}",
+    "bank": "Bank",
+    "bankAccount": "Bank account",
+    "bankAccountProfile": "Bank account (profile)",
+    "iban": "IBAN",
+    "company": "Company",
+    "invoiceCompany": "Invoice company",
+    "companyAddress": "Company address",
+    "confirmSectionsHint": "Confirm each section with an amount, then preview and sign.",
+    "attachReceiptsHint": "Attach required receipts before signing: {{items}}.",
+    "activityLog": "Activity log",
+    "noActivity": "No activity recorded yet.",
+    "context": {
+      "teacher": "Teacher",
+      "homeAddress": "Home address",
+      "planningAddress": "Planning address",
+      "module": "Module"
+    },
+    "status": {
+      "needsConfirmSign": "Needs your confirm & sign",
+      "updateInProgress": "Update in progress",
+      "awaitingYourAction": "Awaiting your action",
+      "awaitingAdminReview": "Awaiting admin review",
+      "awaitingTeacher": "Awaiting teacher",
+      "awaitingAdmin": "Awaiting admin",
+      "signedAwaitingFinance": "Signed — awaiting finance",
+      "signedReadyForFinance": "Signed — ready for finance",
+      "signedAwaitingAdmin": "Signed — awaiting admin",
+      "inFinance": "In finance",
+      "inFinanceQueue": "In finance queue",
+      "paid": "Paid",
+      "needsConfirmSignShort": "Needs confirm & sign",
+      "open": "Open"
+    },
+    "sign": {
+      "invoiceDetails": "Invoice details",
+      "previewInvoiceTitle": "Preview invoice",
+      "invoiceSigned": "Invoice signed",
+      "stepOf": "Step {{step}} of 2 · {{number}} · €{{amount}}",
+      "infoBanner": "The invoice will be issued to these details. If they need to be different, edit them below.",
+      "noAddress": "No address on file",
+      "bankAccountIban": "Bank account (IBAN)",
+      "bankPlaceholder": "e.g. NL91ABNA0417164300",
+      "differentDetails": "Issue the invoice to different details",
+      "companyName": "Company name",
+      "companyNamePlaceholder": "Company name",
+      "address": "Address",
+      "addressPlaceholder": "Street, postcode, city, country",
+      "companyBankIban": "Bank account number (IBAN)",
+      "companyBankPlaceholder": "e.g. NL20INGB0001234567",
+      "cancel": "Cancel",
+      "previewInvoice": "Preview invoice",
+      "edit": "Edit",
+      "sign": "Sign",
+      "close": "Close",
+      "downloadPdf": "Download PDF",
+      "teacherNameMissing": "Teacher name is missing on your profile",
+      "companyNameRequired": "Company name is required",
+      "addressRequired": "Address is required",
+      "bankRequired": "Bank account number is required",
+      "bankMin": "Must be at least 8 characters",
+      "bankMax": "Must be at most 34 characters",
+      "bankChars": "Letters and numbers only (no spaces or symbols)",
+      "couldNotSign": "Could not sign",
+      "couldNotPreparePdf": "Could not prepare PDF",
+      "couldNotDownloadPdf": "Could not download PDF",
+      "adminMustAccept": "Admin must accept your update requests before you can sign",
+      "confirmAllFirst": "Confirm all sections with amounts first",
+      "attachReceiptsFor": "Attach receipts for: {{items}}",
+      "profileLabel": "From your profile",
+      "fullName": "Full legal name",
+      "fullNamePlaceholder": "As it appears on your ID",
+      "nameRequired": "Full legal name is required",
+      "nameMin": "Enter at least 2 characters"
+    },
+    "list": {
+      "allStatuses": "All statuses",
+      "proformaNo": "Proforma No.",
+      "course": "Course",
+      "total": "Total",
+      "status": "Status",
+      "updated": "Updated",
+      "actions": "Actions",
+      "view": "View",
+      "empty": "No proforma invoices found."
+    },
+    "signedByLabel": "Signed by"
   }
 }

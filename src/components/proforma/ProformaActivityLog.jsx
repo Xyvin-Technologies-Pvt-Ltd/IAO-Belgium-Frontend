@@ -26,6 +26,12 @@ const ACTION_LABELS = {
   SECTION_EDITED: "Admin edited section",
   SECTION_APPROVED: "Section confirmed",
   SECTION_UNAPPROVED: "Section unconfirmed",
+  SECTION_APPROVAL_UPDATED: "Section approval updated",
+  ADMIN_REJECTED_TEACHER_UPDATE: "Admin rejected teacher update",
+  TEACHER_ADDED_LINE_ITEM: "Teacher added line item",
+  TEACHER_REMOVED_LINE_ITEM: "Teacher removed line item",
+  TEACHER_UPDATED_LINE_ITEM: "Teacher updated line item",
+  TRAVEL_MODE_SET: "Travel mode updated",
   TEACHER_SIGNED: "Teacher signed",
   STATUS_CHANGED: "Status changed",
   ATTACHMENT_ADDED: "Document attached",
@@ -40,6 +46,20 @@ const ACTION_LABELS = {
 export function formatAuditAction(action) {
   if (!action) return "Update";
   return ACTION_LABELS[action] || action.replace(/_/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+}
+
+const OBJECT_ID_RE = /^[a-f0-9]{24}$/i;
+
+/** Skip objects, JSON dumps, and internal IDs — notes + action label are enough. */
+function formatAuditDisplayValue(value) {
+  if (value == null || value === "") return null;
+  if (typeof value === "object") return null;
+  const text = String(value).trim();
+  if (!text) return null;
+  if (OBJECT_ID_RE.test(text)) return null;
+  if ((text.startsWith("{") || text.startsWith("[")) && text.length > 24) return null;
+  if (text.length > 100) return null;
+  return text;
 }
 
 /** Who changed what last — visible to teacher and admin */
@@ -168,20 +188,27 @@ export default function ProformaActivityLog({ logs = [], emptyText = "No activit
                     </span>
                   </div>
 
-                  {(log.old_value || log.new_value) && (
-                    <p className="font-mono text-[11px] text-muted-foreground break-all">
-                      {log.field_changed && (
-                        <span className="text-foreground/70">{String(log.field_changed).replace(/_/g, " ")}: </span>
-                      )}
-                      {log.old_value != null && <span>{String(log.old_value)}</span>}
-                      {log.old_value != null && log.new_value != null && (
-                        <span className="mx-1 text-amber-700">→</span>
-                      )}
-                      {log.new_value != null && (
-                        <span className="text-foreground font-semibold">{String(log.new_value)}</span>
-                      )}
-                    </p>
-                  )}
+                  {(() => {
+                    const oldDisplay = formatAuditDisplayValue(log.old_value);
+                    const newDisplay = formatAuditDisplayValue(log.new_value);
+                    if (!oldDisplay && !newDisplay) return null;
+                    return (
+                      <p className="text-[11px] text-muted-foreground break-words">
+                        {log.field_changed && (
+                          <span className="text-foreground/70">
+                            {String(log.field_changed).replace(/_/g, " ")}:{" "}
+                          </span>
+                        )}
+                        {oldDisplay && <span>{oldDisplay}</span>}
+                        {oldDisplay && newDisplay && (
+                          <span className="mx-1 text-amber-700">→</span>
+                        )}
+                        {newDisplay && (
+                          <span className="text-foreground font-semibold">{newDisplay}</span>
+                        )}
+                      </p>
+                    );
+                  })()}
 
                   {log.notes && (
                     <p className="text-muted-foreground leading-relaxed">{log.notes}</p>

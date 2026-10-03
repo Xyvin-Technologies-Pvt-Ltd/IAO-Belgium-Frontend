@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGetFinanceQueue } from "@/store/useProformaStore";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { FileText, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 import { coursePlanningLabel } from "@/utils/proformaCourseLabel";
 
 export default function TeacherProformaListPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
@@ -76,7 +78,7 @@ export default function TeacherProformaListPage() {
       <div>
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
           <FileText className="w-5 h-5 text-amber-600" />
-          My Proforma Invoices
+          {t("proforma.myInvoices")}
         </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           Review, digitally sign, and manage your course proforma invoices and claim reimbursements

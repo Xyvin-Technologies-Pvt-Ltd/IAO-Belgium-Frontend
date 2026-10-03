@@ -163,7 +163,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: NotebookText,
           },
           {
-            title: "Teacher Proforma Invoices",
+            title: t("sidebar.admin.proformaInvoices"),
             url: "/admin/proforma-invoices",
             icon: FileText,
           },
@@ -173,7 +173,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
         title: t("sidebar.admin.masterData"),
         items: [
           {
-            title: "Proforma Tariffs & Settings",
+            title: t("sidebar.admin.proformaSettings"),
             url: "/admin/proforma-settings",
             icon: Calculator,
           },
