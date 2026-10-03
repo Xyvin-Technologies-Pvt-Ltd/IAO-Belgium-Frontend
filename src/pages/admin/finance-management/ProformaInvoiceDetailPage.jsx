@@ -7,6 +7,7 @@ import {
   useUpdateSectionItems,
   useUpdateSectionApproval,
   useUpdateProformaLineItem,
+  useSetActiveTravelMode,
 } from "@/store/useProformaStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCa
 import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
 import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClaimRow";
 import { openProformaInvoiceTab } from "@/components/admin/ProformaInvoiceDocument";
+import { getActiveTravelMode, activeTravelModeLabel } from "@/utils/proformaTravelMode";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
@@ -121,6 +123,7 @@ export default function ProformaInvoiceDetailPage() {
   const updateItemsMutation = useUpdateSectionItems();
   const updateApprovalMutation = useUpdateSectionApproval();
   const updateLineItemMutation = useUpdateProformaLineItem();
+  const setTravelModeMutation = useSetActiveTravelMode();
 
   const [notes, setNotes] = useState({});
   const [draft, setDraft] = useState({});
@@ -128,6 +131,7 @@ export default function ProformaInvoiceDetailPage() {
   const [adjustingTravel, setAdjustingTravel] = useState(false);
   const [travelOneWay, setTravelOneWay] = useState("");
   const [lineBusy, setLineBusy] = useState(false);
+  const [travelTab, setTravelTab] = useState("ROAD");
 
   useEffect(() => {
     if (proforma?.proforma_number) {
@@ -147,6 +151,27 @@ export default function ProformaInvoiceDetailPage() {
     });
     return map;
   }, [proforma]);
+
+  const travelItems = itemsByType.TRAVEL || [];
+  const pageActiveTravelMode = useMemo(
+    () => getActiveTravelMode(travelItems),
+    [travelItems]
+  );
+  const hasFixedTravel = travelItems.some(
+    (i) => String(i.travel_mode || "").toUpperCase() === "FIXED"
+  );
+  const adminTravelTabs = useMemo(() => {
+    const primary = hasFixedTravel
+      ? { key: "FIXED", label: "Fixed module" }
+      : { key: "ROAD", label: "Road" };
+    return [primary, { key: "RAIL", label: "Rail" }, { key: "FLIGHT", label: "Air" }];
+  }, [hasFixedTravel]);
+
+  useEffect(() => {
+    if (!proforma?._id || !pageActiveTravelMode) return;
+    setTravelTab(pageActiveTravelMode);
+    setAdjustingTravel(false);
+  }, [proforma?._id, pageActiveTravelMode]);
 
   const dual = proforma?.dual_section_approvals || {};
 
@@ -284,6 +309,10 @@ export default function ProformaInvoiceDetailPage() {
       delete next[sec];
       return next;
     });
+    if (sec === "TRAVEL") {
+      setAdjustingTravel(false);
+      setTravelOneWay("");
+    }
   };
 
   const save = (sec) => {
@@ -322,7 +351,7 @@ export default function ProformaInvoiceDetailPage() {
         ...(sec === "TRAVEL"
           ? {
               travel_mode: travelMode,
-              ...(travelMode === "ROAD" && adjustingTravel && travelOneWay !== ""
+              ...(travelMode === "ROAD" && travelOneWay !== ""
                 ? { road_one_way_km: parseFloat(travelOneWay) || 0 }
                 : {}),
             }
@@ -348,7 +377,13 @@ export default function ProformaInvoiceDetailPage() {
       },
       {
         onSettled: () => setSavingSection(null),
-        onSuccess: () => discard(sec),
+        onSuccess: () => {
+          discard(sec);
+          if (sec === "TRAVEL") {
+            setAdjustingTravel(false);
+            setTravelOneWay("");
+          }
+        },
       }
     );
   };
@@ -458,6 +493,34 @@ export default function ProformaInvoiceDetailPage() {
             sec.key === "TRAVEL"
               ? items.filter((i) => ["RAIL", "FLIGHT"].includes(String(i.travel_mode || "").toUpperCase()))
               : [];
+          const activeTravelMode =
+            sec.key === "TRAVEL" ? getActiveTravelMode(items) : null;
+          const ticketsActive =
+            sec.key === "TRAVEL" &&
+            (activeTravelMode === "RAIL" || activeTravelMode === "FLIGHT");
+          const roadSuperseded = Boolean(roadItem) && ticketsActive;
+          const fixedSuperseded = fixedTravelItems.length > 0 && ticketsActive;
+          const roadReferenceTotal = roadItem
+            ? Number(roadItem.road_calculated_total) > 0
+              ? Number(roadItem.road_calculated_total)
+              : Math.round(
+                  (Number(roadItem.road_one_way_km) || 0) *
+                    (Number(roadItem.road_multiplier) || 2) *
+                    (Number(roadItem.road_unit_rate ?? roadItem.unit_rate) || 0) *
+                    100
+                ) / 100
+            : 0;
+          const fixedReferenceTotal = fixedTravelItems.reduce(
+            (acc, line) =>
+              acc + (Number(line.road_calculated_total) || Number(line.line_total) || 0),
+            0
+          );
+          const activeTicketItems =
+            sec.key === "TRAVEL"
+              ? ticketItems.filter(
+                  (t) => String(t.travel_mode || "").toUpperCase() === activeTravelMode
+                )
+              : [];
           const item = sec.key === "TRAVEL" ? roadItem || fixedTravelItems[0] || items[0] : items[0];
           const comments = (proforma.section_comments || []).filter((c) => c.section === sec.key);
           const form = formFor(sec.key);
@@ -482,16 +545,6 @@ export default function ProformaInvoiceDetailPage() {
                   <span className="font-mono text-xs font-bold text-foreground bg-background px-2.5 py-0.5 rounded border">
                     €{Number(proforma[sec.totalKey] || 0).toFixed(2)}
                   </span>
-                  {sec.key === "TRAVEL" && (
-                    <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-amber-200 text-amber-900 bg-amber-50">
-                      {fixedTravelItems.length > 0
-                        ? `Fixed · module`
-                        : roadItem
-                          ? "Road"
-                          : "Tickets"}
-                      {ticketItems.length > 0 ? ` · ${ticketItems.length} ticket(s)` : ""}
-                    </span>
-                  )}
                   {pendingChange && (
                     <span className="px-2 py-0.5 text-[11px] rounded-full font-semibold border border-amber-400 text-amber-800 bg-amber-50">
                       Teacher update
@@ -596,71 +649,213 @@ export default function ProformaInvoiceDetailPage() {
                     </div>
                   )}
 
-                  {sec.key === "TRAVEL" && roadItem ? (
-                    <ProformaTravelRoadCard
-                      item={roadItem}
-                      editable={!inFinance}
-                      adjusting={adjustingTravel}
-                      dirty={dirty}
-                      oneWayKm={
-                        adjustingTravel
-                          ? travelOneWay
-                          : roadItem.road_one_way_km ??
-                            (Number(form.multiplier) && Number(roadItem.road_multiplier || 2)
-                              ? Number(form.multiplier) / Number(roadItem.road_multiplier || 2)
-                              : 0)
-                      }
-                      ratePerKm={form.unit_rate}
-                      onToggleAdjust={(on) => {
-                        if (on) {
-                          const trip = Number(roadItem.road_multiplier || 2) || 2;
-                          const ow =
-                            roadItem.road_one_way_km != null
-                              ? Number(roadItem.road_one_way_km)
-                              : Number(form.multiplier || 0) / trip;
-                          setTravelOneWay(String(ow));
-                          setAdjustingTravel(true);
-                        } else {
-                          setAdjustingTravel(false);
-                          discard(sec.key);
-                        }
-                      }}
-                      onOneWayChange={(v) => {
-                        setTravelOneWay(v);
-                        const trip = Number(roadItem.road_multiplier || 2) || 2;
-                        const billable = Math.round(Number(v || 0) * trip * 1000) / 1000;
-                        setFields(sec.key, { multiplier: billable });
-                      }}
-                      onRateChange={(v) => setField(sec.key, "unit_rate", v)}
-                      onSaveAdjust={() => {
-                        save(sec.key);
-                        setAdjustingTravel(false);
-                      }}
-                    />
-                  ) : sec.key === "TRAVEL" && fixedTravelItems.length > 0 ? (
-                    <ProformaTravelFixedCard
-                      items={fixedTravelItems}
-                      editable={!inFinance}
-                      busy={lineBusy}
-                      onSaveRate={async (rate) => {
-                        setLineBusy(true);
-                        try {
-                          for (const line of fixedTravelItems) {
-                            await updateLineItemMutation.mutateAsync({
-                              id: proforma._id,
-                              itemId: line._id,
-                              data: { amount: rate },
-                              silent: true,
-                            });
-                          }
-                          toast.success("Fixed travel rate updated");
-                        } finally {
-                          setLineBusy(false);
-                        }
-                      }}
-                    />
-                  ) : sec.key === "TRAVEL" && !roadItem && ticketItems.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No travel lines.</p>
+                  {sec.key === "TRAVEL" ? (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted/40">
+                          {adminTravelTabs.map((tab) => (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              onClick={() => {
+                                setTravelTab(tab.key);
+                                setAdjustingTravel(false);
+                              }}
+                              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                                travelTab === tab.key
+                                  ? "bg-background text-foreground shadow-sm"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
+                        <span className="px-2 py-1 text-[11px] rounded-full font-semibold border border-primary/30 bg-primary/10 text-foreground">
+                          Billed: {activeTravelModeLabel(activeTravelMode)}
+                          {ticketsActive ? ` · ${activeTicketItems.length} ticket(s)` : ""}
+                        </span>
+                      </div>
+
+                      {travelTab === "FIXED" &&
+                        (fixedTravelItems.length > 0 ? (
+                          fixedSuperseded ? (
+                            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                              <p className="text-sm font-semibold text-foreground">
+                                Fixed module not selected
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Estimated €{fixedReferenceTotal.toFixed(2)} (reference only).{" "}
+                                {activeTravelModeLabel(activeTravelMode)} is currently billed.
+                              </p>
+                              {!inFinance && (
+                                <Button
+                                  size="sm"
+                                  disabled={setTravelModeMutation.isPending}
+                                  onClick={() =>
+                                    setTravelModeMutation.mutate({
+                                      id: proforma._id,
+                                      travel_mode: "FIXED",
+                                    })
+                                  }
+                                >
+                                  {setTravelModeMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                                  ) : null}
+                                  Switch to fixed module
+                                </Button>
+                              )}
+                            </div>
+                          ) : (
+                            <ProformaTravelFixedCard
+                              items={fixedTravelItems}
+                              editable={!inFinance}
+                              busy={lineBusy}
+                              onSaveRate={async (rate) => {
+                                setLineBusy(true);
+                                try {
+                                  for (const line of fixedTravelItems) {
+                                    await updateLineItemMutation.mutateAsync({
+                                      id: proforma._id,
+                                      itemId: line._id,
+                                      data: { amount: rate },
+                                      silent: true,
+                                    });
+                                  }
+                                  toast.success("Fixed travel rate updated");
+                                } finally {
+                                  setLineBusy(false);
+                                }
+                              }}
+                            />
+                          )
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No fixed module travel on this invoice.
+                          </p>
+                        ))}
+
+                      {travelTab === "ROAD" &&
+                        (roadItem ? (
+                          roadSuperseded ? (
+                            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                              <p className="text-sm font-semibold text-foreground">
+                                Road allowance not selected
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Estimated €{roadReferenceTotal.toFixed(2)} (reference only).{" "}
+                                {activeTravelModeLabel(activeTravelMode)} is currently billed.
+                              </p>
+                              {!inFinance && (
+                                <Button
+                                  size="sm"
+                                  disabled={setTravelModeMutation.isPending}
+                                  onClick={() =>
+                                    setTravelModeMutation.mutate({
+                                      id: proforma._id,
+                                      travel_mode: "ROAD",
+                                    })
+                                  }
+                                >
+                                  {setTravelModeMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                                  ) : null}
+                                  Switch to road
+                                </Button>
+                              )}
+                            </div>
+                          ) : (
+                            <ProformaTravelRoadCard
+                              item={roadItem}
+                              editable={!inFinance}
+                              adjusting={adjustingTravel}
+                              dirty={dirty}
+                              oneWayKm={
+                                adjustingTravel
+                                  ? travelOneWay
+                                  : roadItem.road_one_way_km ??
+                                    (Number(form.multiplier) &&
+                                    Number(roadItem.road_multiplier || 2)
+                                      ? Number(form.multiplier) /
+                                        Number(roadItem.road_multiplier || 2)
+                                      : 0)
+                              }
+                              ratePerKm={form.unit_rate}
+                              onToggleAdjust={(on) => {
+                                if (on) {
+                                  const trip = Number(roadItem.road_multiplier || 2) || 2;
+                                  const ow =
+                                    roadItem.road_one_way_km != null
+                                      ? Number(roadItem.road_one_way_km)
+                                      : Number(form.multiplier || 0) / trip;
+                                  setTravelOneWay(String(ow));
+                                  setAdjustingTravel(true);
+                                } else {
+                                  setAdjustingTravel(false);
+                                  discard(sec.key);
+                                }
+                              }}
+                              onOneWayChange={(v) => {
+                                setTravelOneWay(v);
+                                const trip = Number(roadItem.road_multiplier || 2) || 2;
+                                const billable =
+                                  Math.round(Number(v || 0) * trip * 1000) / 1000;
+                                setFields(sec.key, { multiplier: billable });
+                              }}
+                              onRateChange={(v) => setField(sec.key, "unit_rate", v)}
+                            />
+                          )
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No road travel line on this invoice.
+                          </p>
+                        ))}
+
+                      {(travelTab === "RAIL" || travelTab === "FLIGHT") && (
+                        <div className="space-y-2">
+                          {ticketItems
+                            .filter(
+                              (t) => String(t.travel_mode || "").toUpperCase() === travelTab
+                            )
+                            .map((line) => (
+                              <ProformaEditableClaimRow
+                                key={line._id}
+                                line={line}
+                                editable={!inFinance}
+                                busy={lineBusy}
+                                modeBadge={line.travel_mode}
+                                onSave={async (data) => {
+                                  setLineBusy(true);
+                                  try {
+                                    await updateLineItemMutation.mutateAsync({
+                                      id: proforma._id,
+                                      itemId: line._id,
+                                      data,
+                                      silent: true,
+                                    });
+                                    toast.success("Line updated");
+                                  } finally {
+                                    setLineBusy(false);
+                                  }
+                                }}
+                              />
+                            ))}
+                          {ticketItems.filter(
+                            (t) => String(t.travel_mode || "").toUpperCase() === travelTab
+                          ).length === 0 && (
+                            <p className="text-sm text-muted-foreground">
+                              No {travelTab === "RAIL" ? "rail" : "flight"} tickets on this invoice.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {!roadItem &&
+                        fixedTravelItems.length === 0 &&
+                        ticketItems.length === 0 && (
+                          <p className="text-sm text-muted-foreground">No travel lines.</p>
+                        )}
+                    </div>
                   ) : sec.key === "STAY" && items.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No accommodation claimed yet — €0.00. Teacher can add hotel/stay items with receipts.
@@ -670,8 +865,34 @@ export default function ProformaInvoiceDetailPage() {
                       No miscellaneous claims yet — €0.00.
                     </p>
                   ) : sec.key === "STAY" || sec.key === "MISCELLANEOUS" ? (
-                    null
-                  ) : sec.key !== "TRAVEL" ? (
+                    <div className="space-y-2">
+                      <p className="text-xs font-bold text-foreground uppercase tracking-wide">
+                        {sec.key === "STAY" ? "Stay claims" : "Miscellaneous claims"}
+                      </p>
+                      {items.map((line) => (
+                        <ProformaEditableClaimRow
+                          key={line._id}
+                          line={line}
+                          editable={!inFinance}
+                          busy={lineBusy}
+                          onSave={async (data) => {
+                            setLineBusy(true);
+                            try {
+                              await updateLineItemMutation.mutateAsync({
+                                id: proforma._id,
+                                itemId: line._id,
+                                data,
+                                silent: true,
+                              });
+                              toast.success("Line updated");
+                            } finally {
+                              setLineBusy(false);
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="sm:col-span-3">
                       <Label className="text-xs uppercase font-semibold">Description</Label>
@@ -714,43 +935,6 @@ export default function ProformaInvoiceDetailPage() {
                       />
                     </div>
                   </div>
-                  ) : null}
-
-                  {/* Tickets + Stay/Misc claim lines (with attachments) */}
-                  {(ticketItems.length > 0 ||
-                    (["STAY", "MISCELLANEOUS"].includes(sec.key) && items.length > 0)) && (
-                    <div className="space-y-2">
-                      <p className="text-xs font-bold text-foreground uppercase tracking-wide">
-                        {sec.key === "TRAVEL"
-                          ? "Rail / Air tickets"
-                          : sec.key === "STAY"
-                            ? "Stay claims"
-                            : "Miscellaneous claims"}
-                      </p>
-                      {(sec.key === "TRAVEL" ? ticketItems : items).map((line) => (
-                        <ProformaEditableClaimRow
-                          key={line._id}
-                          line={line}
-                          editable={!inFinance}
-                          busy={lineBusy}
-                          modeBadge={sec.key === "TRAVEL" ? line.travel_mode : undefined}
-                          onSave={async (data) => {
-                            setLineBusy(true);
-                            try {
-                              await updateLineItemMutation.mutateAsync({
-                                id: proforma._id,
-                                itemId: line._id,
-                                data,
-                                silent: true,
-                              });
-                              toast.success("Line updated");
-                            } finally {
-                              setLineBusy(false);
-                            }
-                          }}
-                        />
-                      ))}
-                    </div>
                   )}
 
                 </div>

@@ -196,6 +196,17 @@ export const addProformaLineItem = async ({ id, data }) => {
   }
 };
 
+export const setActiveTravelMode = async ({ id, travel_mode }) => {
+  try {
+    const response = await axiosInstance.post(`/proforma-invoice/invoices/${id}/travel-mode`, {
+      travel_mode,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const updateProformaLineItem = async ({ id, itemId, data }) => {
   try {
     const response = await axiosInstance.put(`/proforma-invoice/invoices/${id}/items/${itemId}`, data);
@@ -224,10 +235,10 @@ export const sendBackToTeacher = async ({ id, data }) => {
   }
 };
 
-// Temporary Test Trigger API
-export const triggerPlanningProformaTest = async (planning_id) => {
+// Retry proforma calculation for a planning
+export const retryPlanningProforma = async (planning_id) => {
   try {
-    const response = await axiosInstance.post(`/proforma-invoice/test-trigger`, { planning_id });
+    const response = await axiosInstance.post(`/proforma-invoice/retry-planning`, { planning_id });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

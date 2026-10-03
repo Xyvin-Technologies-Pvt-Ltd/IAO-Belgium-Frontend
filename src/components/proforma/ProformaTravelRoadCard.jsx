@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -12,15 +12,15 @@ export default function ProformaTravelRoadCard({
   ratePerKm,
   onOneWayChange,
   onRateChange,
-  onSaveAdjust,
   adjusting = false,
   onToggleAdjust,
   dirty = false,
+  superseded = false,
 }) {
   const origin = item?.origin_address || "—";
   const destination = item?.destination_address || "—";
   const tripMult = Number(item?.road_multiplier || 2);
-  const oneWay =
+  const oneWayDisplay =
     oneWayKm != null && oneWayKm !== ""
       ? Number(oneWayKm)
       : Number(item?.road_one_way_km ?? 0);
@@ -28,11 +28,36 @@ export default function ProformaTravelRoadCard({
     ratePerKm != null && ratePerKm !== ""
       ? Number(ratePerKm)
       : Number(item?.road_unit_rate ?? item?.unit_rate ?? 0);
-  const billable = Math.round(oneWay * tripMult * 1000) / 1000;
-  const total = Math.round(billable * rate * 100) / 100;
+  const billable = Math.round(oneWayDisplay * tripMult * 1000) / 1000;
+  const formulaTotal = Math.round(billable * rate * 100) / 100;
+  const snapTotal = Number(item?.road_calculated_total) || 0;
+  const total =
+    superseded && snapTotal > 0
+      ? snapTotal
+      : Number(item?.line_total) > 0
+        ? Number(item.line_total)
+        : formulaTotal;
+  const oneWayInputValue =
+    adjusting && oneWayKm != null && oneWayKm !== ""
+      ? String(oneWayKm)
+      : oneWayDisplay > 0
+        ? String(oneWayDisplay)
+        : "";
+  const rateInputValue =
+    ratePerKm != null && ratePerKm !== ""
+      ? String(ratePerKm)
+      : rate > 0
+        ? String(rate)
+        : "";
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${superseded ? "opacity-70" : ""}`}>
+      {superseded && (
+        <p className="text-xs rounded-md border border-amber-200 bg-amber-50 text-amber-900 px-3 py-2">
+          Not included in total — another travel option (Rail or Flight) is active. Only one travel
+          option can be claimed.
+        </p>
+      )}
       <div className="space-y-2 text-sm">
         <div className="flex flex-col sm:flex-row sm:gap-6 gap-1">
           <span className="text-muted-foreground sm:w-36 shrink-0">Home address</span>
@@ -50,7 +75,7 @@ export default function ProformaTravelRoadCard({
                 type="number"
                 step="0.1"
                 min="0"
-                value={oneWay}
+                value={oneWayInputValue}
                 onChange={(e) => onOneWayChange?.(e.target.value)}
                 className="h-8 w-28 font-mono text-sm"
               />
@@ -58,7 +83,7 @@ export default function ProformaTravelRoadCard({
             </div>
           ) : (
             <span className="text-foreground font-medium font-mono">
-              {oneWay > 0 ? `${oneWay} km` : "—"}
+              {oneWayDisplay > 0 ? `${oneWayDisplay} km` : "—"}
             </span>
           )}
         </div>
@@ -66,7 +91,7 @@ export default function ProformaTravelRoadCard({
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <FormulaBox
-          value={oneWay > 0 ? String(oneWay) : "—"}
+          value={oneWayDisplay > 0 ? String(oneWayDisplay) : "—"}
           unit="km"
           label="one way"
           editing={adjusting && editable}
@@ -80,7 +105,7 @@ export default function ProformaTravelRoadCard({
               type="number"
               step="0.0001"
               min="0"
-              value={rate}
+              value={rateInputValue}
               onChange={(e) => onRateChange?.(e.target.value)}
               className="h-7 font-mono text-sm font-bold px-1 border-0 bg-transparent shadow-none focus-visible:ring-0"
             />
@@ -95,22 +120,17 @@ export default function ProformaTravelRoadCard({
         <span className="text-muted-foreground font-semibold text-sm">=</span>
         <FormulaBox
           value={`€${total.toFixed(2)}`}
-          label="travel allowance"
+          label={superseded ? "not billed" : "travel allowance"}
           highlight
           dirty={dirty}
         />
 
-        {editable && (
+        {editable && !superseded && (
           <div className="ml-auto flex items-center gap-2">
             {adjusting ? (
-              <>
-                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => onToggleAdjust?.(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" className="h-8 text-xs" onClick={onSaveAdjust} disabled={!dirty}>
-                  Save distance
-                </Button>
-              </>
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => onToggleAdjust?.(false)}>
+                Cancel
+              </Button>
             ) : (
               <Button
                 size="sm"
