@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import {
   useGetProformaById,
@@ -13,6 +14,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   ArrowLeft,
@@ -22,7 +24,7 @@ import {
   Paperclip,
   Loader2,
   ArrowRight,
-  CheckCircle2,
+  Download,
   Printer,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -32,7 +34,11 @@ import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard
 import ProformaTravelFixedCard from "@/components/proforma/ProformaTravelFixedCard";
 import ProformaContextSummary from "@/components/proforma/ProformaContextSummary";
 import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClaimRow";
-import { openProformaInvoiceTab } from "@/components/admin/ProformaInvoiceDocument";
+import {
+  ProformaInvoiceDocument,
+  downloadProformaInvoicePdf,
+  openProformaInvoiceTab,
+} from "@/components/admin/ProformaInvoiceDocument";
 import { getActiveTravelMode, activeTravelModeLabel } from "@/utils/proformaTravelMode";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
@@ -108,6 +114,7 @@ function sectionHasDocuments(itemsByType, sec) {
 }
 
 export default function ProformaInvoiceDetailPage() {
+  const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params?.id || params?.["$id"];
   const navigate = useNavigate();
@@ -132,6 +139,9 @@ export default function ProformaInvoiceDetailPage() {
   const [travelOneWay, setTravelOneWay] = useState("");
   const [lineBusy, setLineBusy] = useState(false);
   const [travelTab, setTravelTab] = useState("ROAD");
+  const [rejectReasons, setRejectReasons] = useState({});
+  const [rejectingSection, setRejectingSection] = useState(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   useEffect(() => {
     if (proforma?.proforma_number) {
@@ -399,6 +409,19 @@ export default function ProformaInvoiceDetailPage() {
     });
   };
 
+  const downloadSignedPdf = async () => {
+    try {
+      setDownloadingPdf(true);
+      await new Promise((r) => requestAnimationFrame(() => r()));
+      const ok = await downloadProformaInvoicePdf(proforma);
+      if (!ok) toast.error("Could not prepare PDF");
+    } catch (err) {
+      toast.error(err?.message || "Could not download PDF");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-6 mt-4 pb-12 w-full max-w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
@@ -413,23 +436,26 @@ export default function ProformaInvoiceDetailPage() {
                 €{Number(proforma.grand_total || 0).toFixed(2)}
               </span>
             </div>
-            {proforma.teacher_id?.IBAN && !proforma.digital_signature?.bank_account_number && (
-              <p className="text-xs font-mono text-muted-foreground mt-1">
-                IBAN: <span className="font-semibold text-foreground">{proforma.teacher_id.IBAN}</span>
-              </p>
-            )}
-            {proforma.digital_signature?.bank_account_number && (
-              <p className="text-xs font-mono text-muted-foreground mt-1">
-                Bank:{" "}
-                <span className="font-semibold text-foreground">
-                  {proforma.digital_signature.bank_account_number}
-                </span>
-              </p>
-            )}
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap justify-end">
+          {isSigned && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs font-semibold flex items-center gap-1.5"
+              disabled={downloadingPdf}
+              onClick={downloadSignedPdf}
+            >
+              {downloadingPdf ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              {t("proforma.downloadPdf")}
+            </Button>
+          )}
           {inFinance && (
             <Button
               size="sm"
@@ -438,7 +464,7 @@ export default function ProformaInvoiceDetailPage() {
               onClick={() => openProformaInvoiceTab(proforma._id)}
             >
               <Printer className="w-4 h-4" />
-              View invoice
+              {t("proforma.viewInvoice")}
             </Button>
           )}
           {!inFinance ? (
@@ -460,23 +486,18 @@ export default function ProformaInvoiceDetailPage() {
         </div>
       </div>
 
+      {isSigned && (
+        <div
+          aria-hidden
+          className="fixed left-[-10000px] top-0 w-[794px] pointer-events-none"
+        >
+          <ProformaInvoiceDocument proforma={proforma} />
+        </div>
+      )}
+
       <ProformaContextSummary proforma={proforma} showTeacherName />
 
       <ProformaLatestChangeBanner proforma={proforma} viewerRole="ADMIN" />
-
-      {isSigned && (
-        <div className="text-sm text-emerald-700 px-1 space-y-0.5">
-          <p className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            Digitally signed by {proforma.digital_signature?.signed_by_name}
-          </p>
-          {proforma.digital_signature?.bank_account_number && (
-            <p className="text-xs font-mono text-emerald-800/90 pl-6">
-              Bank: {proforma.digital_signature.bank_account_number}
-            </p>
-          )}
-        </div>
-      )}
 
       <div className="space-y-6">
         {visibleSections.map((sec) => {
@@ -601,27 +622,36 @@ export default function ProformaInvoiceDetailPage() {
                       </p>
                       {pendingChange.before != null && pendingChange.after != null && (
                         <p className="text-sm text-amber-950">
-                          {sec.key === "TEACHING" ? (
+                          {sec.key === "TEACHING" && pendingChange.after?.blocks != null ? (
                             <>
                               Blocks {pendingChange.before?.blocks ?? "—"} → {pendingChange.after?.blocks ?? "—"}
                               <span className="font-mono text-xs ml-2 text-amber-900/80">
-                                (€{Number(pendingChange.before?.line_total || 0).toFixed(2)} → €
+                                (€{Number(pendingChange.before?.line_total || pendingChange.before?.section_total || 0).toFixed(2)} → €
                                 {Number(pendingChange.after?.line_total || 0).toFixed(2)})
                               </span>
                             </>
-                          ) : sec.key === "FOOD" ? (
+                          ) : sec.key === "FOOD" &&
+                            (pendingChange.after?.days != null || pendingChange.after?.multiplier != null) ? (
                             <>
                               Days {pendingChange.before?.days ?? pendingChange.before?.multiplier ?? "—"} →{" "}
                               {pendingChange.after?.days ?? pendingChange.after?.multiplier ?? "—"}
                               <span className="font-mono text-xs ml-2 text-amber-900/80">
-                                (€{Number(pendingChange.before?.line_total || pendingChange.before?.amount || 0).toFixed(2)} → €
+                                (€{Number(pendingChange.before?.line_total || pendingChange.before?.section_total || pendingChange.before?.amount || 0).toFixed(2)} → €
                                 {Number(pendingChange.after?.line_total || pendingChange.after?.amount || 0).toFixed(2)})
                               </span>
                             </>
                           ) : (
                             <span className="font-mono text-xs">
-                              €{Number(pendingChange.before?.amount ?? pendingChange.before?.line_total ?? 0).toFixed(2)} → €
-                              {Number(pendingChange.after?.amount ?? pendingChange.after?.line_total ?? 0).toFixed(2)}
+                              Previous total €
+                              {Number(
+                                pendingChange.before?.section_total ??
+                                  pendingChange.before?.amount ??
+                                  pendingChange.before?.line_total ??
+                                  0
+                              ).toFixed(2)}
+                              {pendingChange.after?.amount != null || pendingChange.after?.line_total != null
+                                ? ` → €${Number(pendingChange.after?.amount ?? pendingChange.after?.line_total ?? 0).toFixed(2)}`
+                                : " (will restore on reject)"}
                             </span>
                           )}
                         </p>
@@ -630,21 +660,94 @@ export default function ProformaInvoiceDetailPage() {
                         <p className="text-xs text-amber-900/90">Note: {pendingChange.note}</p>
                       )}
                       {!inFinance && (
-                        <Button
-                          size="sm"
-                          className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                          disabled={updateApprovalMutation.isPending}
-                          onClick={() =>
-                            updateApprovalMutation.mutate({
-                              id: proforma._id,
-                              section: sec.key,
-                              action: "APPROVE",
-                              notes: "Admin accepted teacher update request",
-                            })
-                          }
-                        >
-                          <Check className="w-3.5 h-3.5 mr-1" /> Accept update
-                        </Button>
+                        <div className="space-y-2 pt-1">
+                          {rejectingSection === sec.key ? (
+                            <>
+                              <Textarea
+                                value={rejectReasons[sec.key] || ""}
+                                onChange={(e) =>
+                                  setRejectReasons((prev) => ({ ...prev, [sec.key]: e.target.value }))
+                                }
+                                placeholder="Reason for rejecting (required)"
+                                className="min-h-[72px] text-sm bg-background"
+                              />
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="h-8 text-xs"
+                                  disabled={updateApprovalMutation.isPending}
+                                  onClick={() => {
+                                    const reason = String(rejectReasons[sec.key] || "").trim();
+                                    if (reason.length < 3) {
+                                      toast.error("Reject reason is required (min 3 characters)");
+                                      return;
+                                    }
+                                    updateApprovalMutation.mutate(
+                                      {
+                                        id: proforma._id,
+                                        section: sec.key,
+                                        action: "REJECT_UPDATE",
+                                        notes: reason,
+                                      },
+                                      {
+                                        onSuccess: () => {
+                                          setRejectingSection(null);
+                                          setRejectReasons((prev) => {
+                                            const next = { ...prev };
+                                            delete next[sec.key];
+                                            return next;
+                                          });
+                                        },
+                                      }
+                                    );
+                                  }}
+                                >
+                                  {updateApprovalMutation.isPending ? (
+                                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                                  ) : null}
+                                  Confirm reject
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8 text-xs"
+                                  disabled={updateApprovalMutation.isPending}
+                                  onClick={() => setRejectingSection(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                size="sm"
+                                className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                                disabled={updateApprovalMutation.isPending}
+                                onClick={() =>
+                                  updateApprovalMutation.mutate({
+                                    id: proforma._id,
+                                    section: sec.key,
+                                    action: "APPROVE",
+                                    notes: "Admin accepted teacher update request",
+                                  })
+                                }
+                              >
+                                <Check className="w-3.5 h-3.5 mr-1" /> Accept update
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-xs border-rose-300 text-rose-700 hover:bg-rose-50"
+                                disabled={updateApprovalMutation.isPending}
+                                onClick={() => setRejectingSection(sec.key)}
+                              >
+                                Reject update
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}

@@ -116,8 +116,8 @@ const REPORT_CARDS = [
   },
   {
     key: "proforma_invoices",
-    titleKey: "Teacher Proforma Invoices",
-    descriptionKey: "Track sent, updated, and signed teacher proforma invoices",
+    titleKey: "proforma.teacherInvoices",
+    descriptionKey: "proforma.financeCardDescription",
     icon: FileText,
     iconColor: "#10b981",
     bgColor: "rgba(16,185,129,0.08)",
