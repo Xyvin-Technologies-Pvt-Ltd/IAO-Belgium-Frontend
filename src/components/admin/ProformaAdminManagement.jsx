@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useGetFinanceQueue, useGetProformaErrors, useTriggerPlanningProformaTest } from "@/store/useProformaStore";
+import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma } from "@/store/useProformaStore";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
-import TemporaryProformaTestTrigger from "./TemporaryProformaTestTrigger";
 import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
 import ProformaInvoicesFilterDrawer, {
   EMPTY_PROFORMA_FILTERS,
@@ -24,7 +23,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 
 export default function ProformaAdminManagement({ onViewInvoice }) {
   const navigate = useNavigate();
-  const triggerTestMutation = useTriggerPlanningProformaTest();
+  const retryMutation = useRetryPlanningProforma();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -139,14 +138,6 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
           />
         </div>
       </div>
-
-      {/* Temporary Test Tool (Separate File) */}
-      <TemporaryProformaTestTrigger
-        onTriggerSuccess={() => {
-          refetchQueue?.();
-          refetchErrors?.();
-        }}
-      />
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap border-b border-border gap-4 text-sm font-medium">
@@ -263,15 +254,15 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                         <Button
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-                          disabled={triggerTestMutation.isPending}
+                          disabled={retryMutation.isPending}
                           onClick={() => {
                             const pId = err.planning_id?._id || err.planning_id;
                             if (pId) {
-                              triggerTestMutation.mutate(pId);
+                              retryMutation.mutate(pId);
                             }
                           }}
                         >
-                          {triggerTestMutation.isPending ? "Retrying..." : "Retry Invoice"}
+                          {retryMutation.isPending ? "Retrying..." : "Retry Invoice"}
                         </Button>
                         <Button
                           size="sm"
