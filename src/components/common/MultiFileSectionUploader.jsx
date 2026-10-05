@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Upload, X, FileText, CheckCircle2, Loader2, Trash2, Paperclip, Eye } from "lucide-react";
 import { uploadFile } from "@/api/uploadApi";
 import { toast } from "sonner";
+import { openSecureFile } from "@/utils/secureFile";
 
 export default function MultiFileSectionUploader({
   sectionKey,
@@ -188,15 +189,20 @@ export default function MultiFileSectionUploader({
                   </span>
                 </div>
                 <div className="flex items-center space-x-1 shrink-0">
-                  <a
-                    href={doc.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await openSecureFile(doc.file_url || doc.key, doc.file_name);
+                      } catch (err) {
+                        toast.error(err?.message || "Could not open file");
+                      }
+                    }}
                     className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
                     title="View Document"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                  </a>
+                  </button>
                   {!disabled && onRemoveAttachment && (
                     <button
                       type="button"
