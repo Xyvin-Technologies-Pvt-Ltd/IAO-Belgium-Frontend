@@ -1,9 +1,11 @@
 import React from "react";
+import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 /**
- * Road travel display: addresses + one-way × return × rate formula (matches product mock).
+ * Road travel display: ((one_way × return) − free_km) × rate × sessions
+ * (sessions forced to 1 when hotel/STAY claimed).
  */
 export default function ProformaTravelRoadCard({
   item,
@@ -16,10 +18,16 @@ export default function ProformaTravelRoadCard({
   onToggleAdjust,
   dirty = false,
   superseded = false,
+  hasHotel = false,
 }) {
   const origin = item?.origin_address || "—";
   const destination = item?.destination_address || "—";
-  const tripMult = Number(item?.road_multiplier || 2);
+  const tripMult = Number(item?.road_multiplier || 2) || 2;
+  const freeKm =
+    item?.road_free_km_threshold != null ? Number(item.road_free_km_threshold) : 100;
+  const sessionCount = Math.max(1, Number(item?.road_session_count) || 1);
+  const sessionsApplied = hasHotel ? 1 : sessionCount;
+
   const oneWayDisplay =
     oneWayKm != null && oneWayKm !== ""
       ? Number(oneWayKm)
@@ -28,15 +36,25 @@ export default function ProformaTravelRoadCard({
     ratePerKm != null && ratePerKm !== ""
       ? Number(ratePerKm)
       : Number(item?.road_unit_rate ?? item?.unit_rate ?? 0);
-  const billable = Math.round(oneWayDisplay * tripMult * 1000) / 1000;
-  const formulaTotal = Math.round(billable * rate * 100) / 100;
+
+  const roundTrip = Math.round(oneWayDisplay * tripMult * 1000) / 1000;
+  const rawBillable = Math.round((roundTrip - freeKm) * 1000) / 1000;
+  const billable = Math.max(0, rawBillable);
+  const formulaTotal = Math.round(billable * rate * sessionsApplied * 100) / 100;
+
+  // Prefer live formula while adjusting; otherwise show billed / snapshot totals
   const snapTotal = Number(item?.road_calculated_total) || 0;
   const total =
-    superseded && snapTotal > 0
-      ? snapTotal
-      : Number(item?.line_total) > 0
-        ? Number(item.line_total)
-        : formulaTotal;
+    adjusting || dirty
+      ? formulaTotal
+      : superseded && snapTotal >= 0
+        ? snapTotal > 0
+          ? snapTotal
+          : formulaTotal
+        : Number(item?.line_total) >= 0 && item?.line_total != null && !dirty
+          ? Number(item.line_total)
+          : formulaTotal;
+
   const oneWayInputValue =
     adjusting && oneWayKm != null && oneWayKm !== ""
       ? String(oneWayKm)
@@ -49,6 +67,15 @@ export default function ProformaTravelRoadCard({
       : rate > 0
         ? String(rate)
         : "";
+
+  const hotelNote = hasHotel ? " (stay claimed: one return trip)" : "";
+  const sessionLabel = hasHotel ? "1 session" : `${sessionsApplied} sessions`;
+  const breakdown =
+    oneWayDisplay > 0
+      ? `((${oneWayDisplay} × ${tripMult}) − ${freeKm}) × €${rate.toFixed(4)} × ${sessionLabel} = ${rawBillable} km × €${rate.toFixed(4)} × ${sessionsApplied} → €${formulaTotal.toFixed(2)}${hotelNote}`
+      : item?.calculation_breakdown || "";
+
+  const showZeroWarning = oneWayDisplay > 0 && formulaTotal <= 0;
 
   return (
     <div className={`space-y-4 ${superseded ? "opacity-70" : ""}`}>
@@ -87,6 +114,17 @@ export default function ProformaTravelRoadCard({
             </span>
           )}
         </div>
+        <div className="flex flex-col sm:flex-row sm:gap-6 gap-1">
+          <span className="text-muted-foreground sm:w-36 shrink-0">Number of sessions</span>
+          <span className="text-foreground font-medium font-mono">
+            {sessionCount}
+            {hasHotel ? (
+              <span className="text-muted-foreground font-normal ml-2 text-xs">
+                (×1 applied — stay claimed)
+              </span>
+            ) : null}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -98,6 +136,8 @@ export default function ProformaTravelRoadCard({
         />
         <span className="text-muted-foreground font-semibold text-sm">×</span>
         <FormulaBox value={String(tripMult)} label="return trip" />
+        <span className="text-muted-foreground font-semibold text-sm">−</span>
+        <FormulaBox value={`${freeKm} km`} label="not reimbursed" />
         <span className="text-muted-foreground font-semibold text-sm">×</span>
         {adjusting && editable ? (
           <div className="rounded-lg border border-border bg-muted/40 px-3 py-2 min-w-[5.5rem]">
@@ -112,14 +152,16 @@ export default function ProformaTravelRoadCard({
             <p className="text-[10px] text-muted-foreground mt-0.5">per km</p>
           </div>
         ) : (
-          <FormulaBox
-            value={rate > 0 ? `€${rate.toFixed(4)}` : "—"}
-            label="per km"
-          />
+          <FormulaBox value={rate > 0 ? `€${rate.toFixed(4)}` : "—"} label="per km" />
         )}
+        <span className="text-muted-foreground font-semibold text-sm">×</span>
+        <FormulaBox
+          value={String(sessionsApplied)}
+          label={hasHotel ? "session (hotel)" : sessionsApplied === 1 ? "session" : "sessions"}
+        />
         <span className="text-muted-foreground font-semibold text-sm">=</span>
         <FormulaBox
-          value={`€${total.toFixed(2)}`}
+          value={`€${Number(total || 0).toFixed(2)}`}
           label={superseded ? "not billed" : "travel allowance"}
           highlight
           dirty={dirty}
@@ -128,14 +170,19 @@ export default function ProformaTravelRoadCard({
         {editable && !superseded && (
           <div className="ml-auto flex items-center gap-2">
             {adjusting ? (
-              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => onToggleAdjust?.(false)}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs"
+                onClick={() => onToggleAdjust?.(false)}
+              >
                 Cancel
               </Button>
             ) : (
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 text-xs"
+                className="h-8 text-xs border-orange-400 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
                 onClick={() => onToggleAdjust?.(true)}
               >
                 Adjust distance
@@ -144,6 +191,21 @@ export default function ProformaTravelRoadCard({
           </div>
         )}
       </div>
+
+      {breakdown ? (
+        <p className="text-xs text-muted-foreground font-mono leading-relaxed break-words">
+          {breakdown}
+        </p>
+      ) : null}
+
+      {showZeroWarning ? (
+        <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <span>
+            Result is €0 or less — no travel reimbursement. First {freeKm} km not reimbursed.
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

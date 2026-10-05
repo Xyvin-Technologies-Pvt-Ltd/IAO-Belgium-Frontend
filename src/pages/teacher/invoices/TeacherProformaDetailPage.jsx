@@ -1097,7 +1097,15 @@ export default function TeacherProformaDetailPage() {
                     )}
                   </div>
                 ) : (
-                  <ProformaTravelRoadCard item={roadLine} editable={false} />
+                  <ProformaTravelRoadCard
+                    item={roadLine}
+                    editable={false}
+                    hasHotel={(proforma?.items || []).some(
+                      (i) =>
+                        i.item_type === "STAY" &&
+                        (Number(i.line_total) > 0 || Number(i.multiplier) > 0)
+                    )}
+                  />
                 )
               ) : (
                 <p className="text-sm text-muted-foreground">

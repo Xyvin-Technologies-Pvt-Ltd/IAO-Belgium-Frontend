@@ -43,7 +43,7 @@ const DEFAULT_TRAVEL_RULES = [
   {
     key: "road",
     name: "Road",
-    calc: "Travel Formula (€0.4326/km, Return x2, nearest km)",
+    calc: "((km×2)−100) × €0.4326 × sessions (×1 if hotel)",
     rate_per_km: 0.4326,
     multiplier: 2,
     rounding: "NEAREST_KM",
@@ -166,12 +166,13 @@ export default function ProformaSettingsConfig() {
     const t = globalDefaults.travel || {};
     const rate = t.rate_per_km ?? 0.4326;
     const mult = t.trip_multiplier ?? 2;
+    const freeKm = t.free_km_threshold ?? 100;
     const rounding = t.rounding || "NEAREST_KM";
     setTravelRules([
       {
         key: "road",
         name: "Road",
-        calc: `Travel Formula (€${rate}/km, Return x${mult}, ${String(rounding).toLowerCase().replace(/_/g, " ")})`,
+        calc: `((km×${mult})−${freeKm}) × €${rate}/km × sessions (×1 if hotel)`,
         rate_per_km: rate,
         multiplier: mult,
         rounding,
@@ -908,7 +909,11 @@ export default function ProformaSettingsConfig() {
               <>
                 <div>
                   <Label className="text-xs uppercase font-semibold">Calculation</Label>
-                  <Input value="Travel Formula (€ / km)" disabled className="bg-muted mt-1" />
+                  <Input
+                    value="((one-way × return) − 100 km) × €/km × sessions; ×1 if hotel"
+                    disabled
+                    className="bg-muted mt-1"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs uppercase font-semibold">Rate per km (€)</Label>
