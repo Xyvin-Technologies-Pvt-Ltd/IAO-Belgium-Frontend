@@ -95,7 +95,7 @@ const REPORT_CARDS = [
   {
     key: "third_party",
     titleKey: "Third-Party Payments",
-    descriptionKey: "Manage student pay-via-third-party invoice arrangements",
+    descriptionKey: "finance.hub.thirdPartyDesc",
     icon: CreditCard,
     iconColor: "#4f46e5",
     bgColor: "rgba(79,70,229,0.08)",

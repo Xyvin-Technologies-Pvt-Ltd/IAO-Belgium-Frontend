@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "@tanstack/react-router";
 import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -11,12 +12,12 @@ import ResultsTab from "./tabs/ResultsTab";
 import AttendanceTab from "./tabs/AttendanceTab";
 import InvoicesTab from "./tabs/InvoicesTab";
 
-const TABS = [
+const BASE_TABS = [
   { key: "overview", label: "Overview" },
   { key: "enrolments", label: "Opleidingsvragen", sub: "Enrolments" },
   { key: "results", label: "Resultaten", sub: "Results" },
   { key: "attendance", label: "Aanwezigheid", sub: "Attendance" },
-  { key: "invoices", label: "Facturen", sub: "Invoices" },
+  { key: "invoices", labelKey: "archive.invoices.plural" },
 ];
 
 const StatCard = ({ label, value, tone = "" }) => (
@@ -61,7 +62,13 @@ const ArchiveStudentView = () => {
 };
 
 const StudentContent = ({ data, id, activeTab, setActiveTab }) => {
+  const { t } = useTranslation();
   const { person, placement, counts, categories } = data;
+  const tabs = BASE_TABS.map((tab) =>
+    tab.labelKey
+      ? { ...tab, label: t(tab.labelKey) }
+      : tab
+  );
 
   return (
     <div className="space-y-6 mt-4">
@@ -118,7 +125,7 @@ const StudentContent = ({ data, id, activeTab, setActiveTab }) => {
           />
           <StatCard label="Results recorded" value={counts.results} />
           <StatCard
-            label="Invoices"
+            label={t("archive.invoices.plural")}
             value={`${counts.invoices_paid + counts.invoices_open} (${counts.invoices_open} open)`}
             tone={counts.invoices_open > 0 ? "text-amber-600" : ""}
           />
@@ -143,7 +150,7 @@ const StudentContent = ({ data, id, activeTab, setActiveTab }) => {
 
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}

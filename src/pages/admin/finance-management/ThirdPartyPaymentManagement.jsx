@@ -319,7 +319,7 @@ const ThirdPartyPaymentManagement = () => {
             <TableHead>{t("Batch")}</TableHead>
             <TableHead>{t("Purpose")}</TableHead>
             <TableHead>{t("Subject")}</TableHead>
-            <TableHead>{t("Invoice")}</TableHead>
+            <TableHead>{t("common.invoice")}</TableHead>
             <TableHead>{t("Amount")}</TableHead>
             <TableHead>{t("Status")}</TableHead>
             <TableHead>{t("Created")}</TableHead>
@@ -511,7 +511,7 @@ const ThirdPartyPaymentManagement = () => {
                   <span className="font-bold uppercase text-right">{selectedApp.status.replace("_", " ")}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Invoice Reference")}</span>
+                  <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("common.invoiceReference")}</span>
                   <span className="font-mono font-bold text-right">{selectedApp.invoice_id?.uid || "-"}</span>
                 </div>
               </div>

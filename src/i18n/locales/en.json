@@ -6,7 +6,7 @@
       "dashboard": "Dashboard",
       "myCourses": "My Programmes",
       "myApp": "My APP",
-      "invoices": "Invoices",
+      "invoices": "Expense Notes",
       "assessment": "Assessment"
     },
     "dropdown": {
@@ -29,7 +29,7 @@
       "exams": "Exams",
       "otherExams": "Other Exams",
       "practicalExams": "Practical Exams",
-      "proformaInvoices": "My Proforma Invoices"
+      "proformaInvoices": "My Proforma Expense Notes"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -59,7 +59,7 @@
       "teacherManagement": "Lecturer Management",
       "studentManagement": "Student Management",
       "financeReports": "Finance Reports",
-      "customInvoices": "Custom Invoices",
+      "customInvoices": "Custom Expense Notes",
       "fkf": "Fachkursförderung",
       "adminManagement": "Admin Management",
       "roleManagement": "Role Management",
@@ -71,14 +71,18 @@
       "exams": "Exams",
       "resitPlanning": "Resit planning",
       "results": "Results",
-      "createInvoice": "Create Custom Invoice",
-      "proformaInvoices": "Teacher Proforma Invoices",
-      "proformaSettings": "Proforma Tariffs & Settings"
+      "createInvoice": "Create Custom Expense Note",
+      "proformaInvoices": "Teacher Proforma Expense Notes",
+      "proformaSettings": "Proforma Tariffs & Settings",
+      "archiveInvoices": "Expense Notes"
     },
     "user": {
       "loading": "Loading...",
       "noRole": "No role",
       "signOut": "Sign out"
+    },
+    "student": {
+      "invoices": "Expense Notes"
     }
   },
   "languages": {
@@ -183,7 +187,7 @@
     "searchTitles": "Search academic degrees...",
     "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
-    "invoiceId": "Invoice ID",
+    "invoiceId": "Expense Note ID",
     "receiptId": "Receipt ID",
     "downloadReceipt": "Download receipt",
     "studentName": "Student Name",
@@ -237,7 +241,9 @@
     "confirm": "Confirm",
     "close": "Close",
     "back": "Back",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "invoice": "Expense Note",
+    "invoiceReference": "Expense Note Reference"
   },
   "finance": {
     "title": "Finance Management",
@@ -269,7 +275,7 @@
       "admissionFee": "Admission Fee",
       "modulePurchase": "Module Purchase",
       "locationSwitch": "Location Switch",
-      "customInvoice": "Custom Invoice",
+      "customInvoice": "Custom Expense Note",
       "resitPurchase": "Resit Exam",
       "other": "Other"
     },
@@ -280,7 +286,7 @@
       "noPaymentAnalyticsFound": "No payment analytics found",
       "loadingAnalytics": "Loading analytics data...",
       "loadAnalyticsFailed": "Failed to load analytics data",
-      "noCustomInvoicesFound": "No custom invoices found."
+      "noCustomInvoicesFound": "No custom expense notes found."
     },
     "reports": {
       "all": {
@@ -304,15 +310,15 @@
         "description": "Payment analytics by student"
       },
       "createInvoice": {
-        "title": "Create Custom Invoice",
+        "title": "Create Custom Expense Note",
         "student": "Select Student",
         "searchStudent": "Search for a student...",
-        "invoiceTitle": "Invoice Title / Description",
+        "invoiceTitle": "Expense Note Title / Description",
         "titlePlaceholder": "e.g., Semester Fee, Scholarship Adjustment",
-        "submit": "Create custom invoice"
+        "submit": "Create custom expense note"
       },
       "customInvoices": {
-        "title": "Custom Invoices"
+        "title": "Custom Expense Notes"
       },
       "transactions": {
         "title": "Transaction Logs",
@@ -324,13 +330,13 @@
       },
       "fkf": {
         "title": "Fachkursförderung",
-        "description": "Create subsidized module invoices for eligible students"
+        "description": "Create subsidized module expense notes for eligible students"
       }
     },
     "fkf": {
       "title": "Fachkursförderung",
-      "subtitle": "Eligible students, subsidized invoices, and postal eligibility config.",
-      "createTab": "Create Invoice",
+      "subtitle": "Eligible students, subsidized expense notes, and postal eligibility config.",
+      "createTab": "Create Expense Note",
       "studentsTab": "Eligible Students",
       "configTab": "Config",
       "student": "Student",
@@ -346,11 +352,40 @@
       "catalogFee": "Catalog fee",
       "pendingHint": "A pending FKF payment already exists for this module.",
       "subsidizedAmount": "Subsidized amount",
-      "createButton": "Create FKF Invoice",
-      "sendInvoice": "Send FKF Invoice",
+      "createButton": "Create FKF Expense Note",
+      "sendInvoice": "Send FKF Expense Note",
       "noEligibleStudents": "No eligible students found.",
       "postalCodes": "Eligible postal codes (comma-separated)",
-      "programActive": "Program active (annual L-Bank selection)"
+      "programActive": "Program active (annual L-Bank selection)",
+      "previewInvoices": "Preview expense notes",
+      "sendNInvoices": "Send {{count}} expense notes",
+      "invoice": "Expense Note",
+      "bulkSendConfirm": "Send {{count}} expense notes",
+      "noInvoicesSent": "No FKF expense notes sent yet.",
+      "cancelHint": "This voids the unpaid subsidy expense note. The student will no longer see this offer. Paid subsidies cannot be cancelled.",
+      "toasts": {
+        "created": "FKF expense note created and email sent",
+        "createFailed": "Failed to create FKF expense note",
+        "previewFailed": "Failed to preview FKF expense notes",
+        "bulkFailed": "Failed to bulk-create FKF expense notes",
+        "bulkPartialFailed": "{{failed}} of {{total}} expense notes failed"
+      }
+    },
+    "noCustomInvoicesFound": "No custom expense notes found.",
+    "createInvoice": {
+      "title": "Create Custom Expense Note",
+      "invoiceTitle": "Expense Note Title / Description",
+      "submit": "Create custom expense note"
+    },
+    "customInvoices": {
+      "title": "Custom Expense Notes"
+    },
+    "hub": {
+      "thirdPartyDesc": "Manage student pay-via-third-party expense note arrangements"
+    },
+    "toasts": {
+      "manualCreated": "Manual expense note created!",
+      "createFailed": "Failed to create expense note"
     }
   },
   "integrations": {
@@ -399,7 +434,7 @@
         "type": "Type",
         "source": "Source",
         "document": "Document",
-        "invoice": "Invoice",
+        "invoice": "Expense Note",
         "transactionId": "Transaction ID",
         "yourRef": "Your ref",
         "program": "Programme",
@@ -414,22 +449,22 @@
       "sources": {
         "payment": "Payment",
         "credit_note": "Credit note",
-        "invoice": "Invoice"
+        "invoice": "Expense Note"
       },
       "types": {
         "module_purchase": "Module purchase",
         "admission_fee": "Admission fee",
         "credit_note": "Credit note",
-        "switch_invoice": "Switch invoice",
+        "switch_invoice": "Switch expense note",
         "switch_invoice_fee": "Switch fee",
-        "invoice": "Invoice",
+        "invoice": "Expense Note",
         "revenue_recognition": "Revenue recognition"
       },
       "reconciliation": {
-        "searchPlaceholder": "Search invoice, transaction ID, or email",
+        "searchPlaceholder": "Search expense note, transaction ID, or email",
         "recordType": "Record type",
         "allRecords": "All records",
-        "typeInvoice": "Invoice",
+        "typeInvoice": "Expense Note",
         "typeEntry": "Entry",
         "from": "From",
         "to": "To",
@@ -438,7 +473,7 @@
         "student": "Student",
         "company": "Company",
         "method": "Method",
-        "exactInvoiceNo": "Exact invoice #",
+        "exactInvoiceNo": "Exact expense note #",
         "match": "Match",
         "notChecked": "Not checked",
         "verify": "Verify",
@@ -463,13 +498,19 @@
           "exact_error": "Exact lookup failed",
           "error": "Error"
         },
-        "convertToInvoice": "Convert to invoice",
+        "convertToInvoice": "Convert to expense note",
         "converting": "Converting…",
         "convertTitle": "Convert this entry to a real invoice?",
         "convertDescription": "This reverses the existing Sales Entry in Exact with a negative entry, then posts a new Sales Invoice with a document for the same amount. Net effect on the ledger is zero — revenue is not double-counted. This cannot be undone from here.",
         "convertConfirm": "Reverse & convert",
-        "convertCancel": "Cancel"
-      }
+        "convertCancel": "Cancel",
+        "switch_invoice": "Switch expense note"
+      },
+      "switch_invoice": "Switch expense note",
+      "searchPlaceholder": "Search expense note, transaction ID, or email",
+      "exactInvoiceNo": "Exact expense note #",
+      "convertToInvoice": "Convert to expense note",
+      "typeInvoice": "Expense Note"
     }
   },
   "queues": {
@@ -1202,12 +1243,12 @@
     "loadingHistory": "Loading pre-migration history...",
     "noHistoryForYear": "No CoachView history recorded for this year.",
     "attendanceAllYears": "Showing this student's complete CoachView attendance history, not limited to this year.",
-    "invoicesAllYears": "CoachView invoices have no study-year attribution — showing the student's complete invoice history.",
+    "invoicesAllYears": "CoachView expense notes have no study-year attribution — showing the student's complete expense note history.",
     "subTabs": {
       "enrolments": "Enrolments",
       "results": "Results",
       "attendance": "Attendance",
-      "invoices": "Invoices"
+      "invoices": "Expense Notes"
     },
     "filters": {
       "allLevels": "All levels",
@@ -1290,7 +1331,8 @@
       "progress": "Academic Progress",
       "general": "Module Selection",
       "payments": "Payments",
-      "notesAndAttachments": "Notes & Attachments"
+      "notesAndAttachments": "Notes & Attachments",
+      "invoices": "Expense Notes"
     },
     "details": {
       "assignedModules": "Assigned Modules",
@@ -1314,8 +1356,8 @@
       "missed": "Missed",
       "unmarked": "Unmarked",
       "billingMethod": "Billing",
-      "viewInvoice": "View invoice",
-      "downloadInvoice": "Download invoice",
+      "viewInvoice": "View expense note",
+      "downloadInvoice": "Download expense note",
       "specialExceptions": "Special Exceptions",
       "configureExceptions": "Configure",
       "noExceptions": "No exceptions configured. Default exam settings apply.",
@@ -1323,7 +1365,9 @@
       "noAttendanceRecords": "No attendance records found for this year.",
       "attendanceLoadFailed": "Failed to load attendance",
       "configureExceptionsTitle": "Configure Special Exceptions",
-      "configureExceptionsHint": "Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams."
+      "configureExceptionsHint": "Select all special medical conditions or learning difficulties that apply to this student. The system will automatically apply the maximum extra minutes to their exams.",
+      "outstandingInvoices": "Outstanding expense notes",
+      "noInvoices": "No expense notes found"
     },
     "billing": {
       "personal": "Personal",
@@ -1379,7 +1423,7 @@
       "idCard": "ID Card Uploaded",
       "qualificationCert": "Qualification Certificate",
       "flags": "Flags",
-      "outstandingInvoices": "Outstanding invoices",
+      "outstandingInvoices": "Outstanding expense notes",
       "missedModules": "Missed modules (absent or unpurchased)",
       "unpurchasedModules": "Unpurchased modules only",
       "fachkursfoerderung": "Eligible for Fachkursförderung",
@@ -2722,20 +2766,25 @@
     }
   },
   "proforma": {
-    "title": "Proforma invoices",
-    "myInvoices": "My Proforma Invoices",
-    "teacherInvoices": "Teacher Proforma Invoices",
-    "settings": "Proforma Tariffs & Settings",
-    "financeCardDescription": "Track sent, updated, and signed teacher proforma invoices",
-    "backToList": "Back to invoices",
+    "title": "Proforma expense notes",
+    "myInvoices": "My Proforma Expense Notes",
+    "teacherInvoices": "Teacher Proforma Expense Notes",
+    "settings": {
+      "includedOn": "Included on expense notes",
+      "excludedFrom": "Excluded from expense notes",
+      "masterTitle": "Proforma Expense Note Master Settings",
+      "disabledRegions": "Disabled regions block expense note generation"
+    },
+    "financeCardDescription": "Track sent, updated, and signed teacher proforma expense notes",
+    "backToList": "Back to expense notes",
     "backToQueue": "Back to Proforma Queue",
-    "loading": "Loading proforma invoice...",
-    "loadingDetails": "Loading proforma invoice details...",
-    "loadFailed": "Failed to load proforma invoice",
-    "notFound": "Invoice not found",
+    "loading": "Loading pro forma expense note...",
+    "loadingDetails": "Loading pro forma expense note details...",
+    "loadFailed": "Failed to load pro forma expense note",
+    "notFound": "Expense Note not found",
     "previewAndSign": "Preview and sign",
     "downloadPdf": "Download PDF",
-    "viewInvoice": "View invoice",
+    "viewInvoice": "View expense note",
     "print": "Print",
     "sendToFinance": "Send to finance",
     "sending": "Sending...",
@@ -2747,10 +2796,10 @@
     "bankAccountProfile": "Bank account (profile)",
     "iban": "IBAN",
     "company": "Company",
-      "invoiceCompany": "Invoice company",
-      "companyAddress": "Company address",
-      "additionalInfo1": "Additional info 1",
-      "additionalInfo2": "Additional info 2",
+    "invoiceCompany": "Expense Note company",
+    "companyAddress": "Company address",
+    "additionalInfo1": "Additional info 1",
+    "additionalInfo2": "Additional info 2",
     "confirmSectionsHint": "Confirm each section with an amount, then preview and sign.",
     "attachReceiptsHint": "Attach required receipts before signing: {{items}}.",
     "activityLog": "Activity log",
@@ -2778,15 +2827,15 @@
       "open": "Open"
     },
     "sign": {
-      "invoiceDetails": "Invoice details",
-      "previewInvoiceTitle": "Preview invoice",
-      "invoiceSigned": "Invoice signed",
+      "invoiceDetails": "Expense Note details",
+      "previewInvoiceTitle": "Preview expense note",
+      "invoiceSigned": "Expense Note signed",
       "stepOf": "Step {{step}} of 2 · {{number}} · €{{amount}}",
-      "infoBanner": "The invoice will be issued to these details. If they need to be different, edit them below.",
+      "infoBanner": "The expense note will be issued to these details. If they need to be different, edit them below.",
       "noAddress": "No address on file",
       "bankAccountIban": "Bank account (IBAN)",
       "bankPlaceholder": "e.g. NL91ABNA0417164300",
-      "differentDetails": "Issue the invoice to different details",
+      "differentDetails": "Issue the expense note to different details",
       "companyName": "Company name",
       "companyNamePlaceholder": "Company name",
       "address": "Address",
@@ -2797,15 +2846,15 @@
       "additionalInfo2": "Additional info 2",
       "optional": "Optional",
       "additionalInfoPlaceholder": "e.g. VAT ID, registration number, contact email",
-      "additionalInfoHelp": "Free text. Letters, numbers and special characters such as @ are allowed. Shown on the invoice only if filled in.",
+      "additionalInfoHelp": "…Shown on the expense note only if filled in.",
       "additionalInfoMax": "Must be at most 200 characters",
       "cancel": "Cancel",
-      "previewInvoice": "Preview invoice",
+      "previewInvoice": "Preview expense note",
       "edit": "Edit",
       "editDetails": "Edit details",
       "sign": "Sign",
       "approveAndSign": "Approve & sign",
-      "confirmCheckedDetails": "I have checked all details. Once I approve and sign this invoice, no changes can be made.",
+      "confirmCheckedDetails": "I have checked all details. Once I approve and sign this expense note, no changes can be made.",
       "close": "Close",
       "downloadPdf": "Download PDF",
       "teacherNameMissing": "Teacher name is missing on your profile",
@@ -2825,7 +2874,9 @@
       "fullName": "Full legal name",
       "fullNamePlaceholder": "As it appears on your ID",
       "nameRequired": "Full legal name is required",
-      "nameMin": "Enter at least 2 characters"
+      "nameMin": "Enter at least 2 characters",
+      "signInvoice": "Sign Expense Note",
+      "signByTyping": "Sign Expense Note by Typing Legal Name"
     },
     "list": {
       "allStatuses": "All statuses",
@@ -2836,8 +2887,39 @@
       "updated": "Updated",
       "actions": "Actions",
       "view": "View",
-      "empty": "No proforma invoices found."
+      "empty": "No pro forma expense notes found.",
+      "all": "All Expense Notes",
+      "number": "Expense Note #",
+      "viewAndSign": "View & Sign Expense Note",
+      "search": "Search expense note…",
+      "retry": "Retry Expense Note"
     },
-    "signedByLabel": "Signed by"
+    "signedByLabel": "Signed by",
+    "toasts": {
+      "signFailed": "Failed to sign pro forma expense note",
+      "signed": "Expense note digitally signed and approved successfully!",
+      "draftSaved": "Draft saved",
+      "pdfFailed": "Could not generate PDF",
+      "statusUpdated": "Expense note status updated successfully!",
+      "recalcSuccess": "Expense note calculation re-run successfully!",
+      "recalcFailed": "Failed to re-run expense note calculation"
+    },
+    "backToMyInvoices": "Back to My Expense Notes",
+    "myInvoicesShort": "My Expense Notes",
+    "detail": {
+      "noFixedTravel": "No fixed module travel on this expense note.",
+      "noRoadTravel": "No road travel line on this expense note.",
+      "noTickets": "No {{mode}} tickets on this expense note.",
+      "noRoadTravelHint": "No road travel line on this expense note. Use Rail or Air to add tickets."
+    },
+    "loadingYour": "Loading your pro forma expense note..."
+  },
+  "archive": {
+    "invoices": {
+      "singular": "Expense Note",
+      "plural": "Expense Notes",
+      "empty": "No expense notes found",
+      "loading": "Loading expense note..."
+    }
   }
 }

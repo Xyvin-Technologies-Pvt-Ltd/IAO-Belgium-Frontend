@@ -14,6 +14,7 @@ import {
 } from "@/api/paymentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import i18n from "@/i18n/config";
 
 export const useGetPayments = (filter, options = {}) => {
   return useQuery({
@@ -110,11 +111,11 @@ export const useCreatePayment = () => {
   return useMutation({
     mutationFn: createPayment,
     onSuccess: () => {
-      toast.success("Manual Invoice created!");
+      toast.success(i18n.t("finance.toasts.manualCreated"));
       queryClient.invalidateQueries({ queryKey: ["payments"] });
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to create invoice");
+      toast.error(error?.message || i18n.t("finance.toasts.createFailed"));
     },
   });
 };

@@ -66,13 +66,14 @@ function savedQty(item) {
   if (item.item_type === "TRAVEL") {
     const mode = String(item.travel_mode || "ROAD").toUpperCase();
     if (mode === "RAIL" || mode === "FLIGHT" || mode === "FIXED") return Number(item.multiplier ?? 1);
-    const billable =
-      item.distance_km ??
-      (item.road_one_way_km != null && item.road_multiplier != null
-        ? Number(item.road_one_way_km) * Number(item.road_multiplier)
-        : null) ??
-      item.multiplier;
-    return Number(billable ?? 0);
+    if (item.road_billable_km != null) return Number(item.road_billable_km);
+    if (item.road_one_way_km != null) {
+      const trip = Number(item.road_multiplier) || 2;
+      const freeKm =
+        item.road_free_km_threshold != null ? Number(item.road_free_km_threshold) : 100;
+      return Math.max(0, Number(item.road_one_way_km) * trip - freeKm);
+    }
+    return Number(item.distance_km ?? item.multiplier ?? 0);
   }
   if (item.item_type === "FOOD" || item.item_type === "STAY") {
     // Preserve explicit 0 (teacher has not claimed yet)
@@ -146,13 +147,13 @@ export default function ProformaInvoiceDetailPage() {
   useEffect(() => {
     if (proforma?.proforma_number) {
       updateBreadcrumbs([
-        { label: "Finance Management", path: "/admin/finance-reports", navigable: true },
-        { label: "Teacher Proforma Invoices", path: "/admin/proforma-invoices", navigable: true },
+        { label: t("finance.title"), path: "/admin/finance-reports", navigable: true },
+        { label: t("proforma.teacherInvoices"), path: "/admin/proforma-invoices", navigable: true },
         { label: proforma.proforma_number },
       ]);
     }
     return () => updateBreadcrumbs([]);
-  }, [proforma, updateBreadcrumbs]);
+  }, [proforma, updateBreadcrumbs, t]);
 
   const itemsByType = useMemo(() => {
     const map = {};
@@ -235,7 +236,7 @@ export default function ProformaInvoiceDetailPage() {
     return (
       <div className="py-24 text-center space-y-3">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-muted-foreground font-medium">Loading proforma invoice details...</p>
+        <p className="text-sm text-muted-foreground font-medium">{t("proforma.loadingDetails")}</p>
       </div>
     );
   }
@@ -244,10 +245,10 @@ export default function ProformaInvoiceDetailPage() {
     return (
       <div className="space-y-4 mt-6">
         <Button variant="outline" size="sm" onClick={() => navigate({ to: "/admin/proforma-invoices" })}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Proforma Queue
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t("proforma.backToList")}
         </Button>
         <div className="p-8 border border-destructive/20 bg-destructive/10 rounded-2xl text-center text-destructive">
-          Failed to load proforma invoice: {error?.message || "Invoice not found"}
+          {t("proforma.loadFailed")}: {error?.message || t("proforma.notFound")}
         </div>
       </div>
     );
@@ -521,15 +522,28 @@ export default function ProformaInvoiceDetailPage() {
             (activeTravelMode === "RAIL" || activeTravelMode === "FLIGHT");
           const roadSuperseded = Boolean(roadItem) && ticketsActive;
           const fixedSuperseded = fixedTravelItems.length > 0 && ticketsActive;
+          const stayClaimed = (proforma?.items || []).some(
+            (i) =>
+              i.item_type === "STAY" &&
+              (Number(i.line_total) > 0 || Number(i.multiplier) > 0)
+          );
           const roadReferenceTotal = roadItem
             ? Number(roadItem.road_calculated_total) > 0
               ? Number(roadItem.road_calculated_total)
-              : Math.round(
-                  (Number(roadItem.road_one_way_km) || 0) *
-                    (Number(roadItem.road_multiplier) || 2) *
-                    (Number(roadItem.road_unit_rate ?? roadItem.unit_rate) || 0) *
-                    100
-                ) / 100
+              : (() => {
+                  const oneWay = Number(roadItem.road_one_way_km) || 0;
+                  const trip = Number(roadItem.road_multiplier) || 2;
+                  const freeKm =
+                    roadItem.road_free_km_threshold != null
+                      ? Number(roadItem.road_free_km_threshold)
+                      : 100;
+                  const rate = Number(roadItem.road_unit_rate ?? roadItem.unit_rate) || 0;
+                  const sessions = stayClaimed
+                    ? 1
+                    : Math.max(1, Number(roadItem.road_session_count) || 1);
+                  const billable = Math.max(0, oneWay * trip - freeKm);
+                  return Math.round(billable * rate * sessions * 100) / 100;
+                })()
             : 0;
           const fixedReferenceTotal = fixedTravelItems.reduce(
             (acc, line) =>
@@ -834,7 +848,7 @@ export default function ProformaInvoiceDetailPage() {
                           )
                         ) : (
                           <p className="text-sm text-muted-foreground">
-                            No fixed module travel on this invoice.
+                            {t("proforma.detail.noFixedTravel")}
                           </p>
                         ))}
 
@@ -872,7 +886,8 @@ export default function ProformaInvoiceDetailPage() {
                               item={roadItem}
                               editable={!inFinance}
                               adjusting={adjustingTravel}
-                              dirty={dirty}
+                              dirty={dirty || adjustingTravel}
+                              hasHotel={stayClaimed}
                               oneWayKm={
                                 adjustingTravel
                                   ? travelOneWay
@@ -886,12 +901,11 @@ export default function ProformaInvoiceDetailPage() {
                               ratePerKm={form.unit_rate}
                               onToggleAdjust={(on) => {
                                 if (on) {
-                                  const trip = Number(roadItem.road_multiplier || 2) || 2;
                                   const ow =
                                     roadItem.road_one_way_km != null
                                       ? Number(roadItem.road_one_way_km)
-                                      : Number(form.multiplier || 0) / trip;
-                                  setTravelOneWay(String(ow));
+                                      : 0;
+                                  setTravelOneWay(String(ow || ""));
                                   setAdjustingTravel(true);
                                 } else {
                                   setAdjustingTravel(false);
@@ -901,16 +915,26 @@ export default function ProformaInvoiceDetailPage() {
                               onOneWayChange={(v) => {
                                 setTravelOneWay(v);
                                 const trip = Number(roadItem.road_multiplier || 2) || 2;
-                                const billable =
-                                  Math.round(Number(v || 0) * trip * 1000) / 1000;
-                                setFields(sec.key, { multiplier: billable });
+                                const freeKm =
+                                  roadItem.road_free_km_threshold != null
+                                    ? Number(roadItem.road_free_km_threshold)
+                                    : 100;
+                                const sessions = stayClaimed
+                                  ? 1
+                                  : Math.max(1, Number(roadItem.road_session_count) || 1);
+                                const oneWay = Number(v || 0);
+                                const billableKm = Math.max(0, oneWay * trip - freeKm);
+                                // multiplier stores billable×sessions for dirty tracking; save sends road_one_way_km
+                                setFields(sec.key, {
+                                  multiplier: Math.round(billableKm * sessions * 1000) / 1000,
+                                });
                               }}
                               onRateChange={(v) => setField(sec.key, "unit_rate", v)}
                             />
                           )
                         ) : (
                           <p className="text-sm text-muted-foreground">
-                            No road travel line on this invoice.
+                            {t("proforma.detail.noRoadTravel")}
                           </p>
                         ))}
 
@@ -947,7 +971,9 @@ export default function ProformaInvoiceDetailPage() {
                             (t) => String(t.travel_mode || "").toUpperCase() === travelTab
                           ).length === 0 && (
                             <p className="text-sm text-muted-foreground">
-                              No {travelTab === "RAIL" ? "rail" : "flight"} tickets on this invoice.
+                              {t("proforma.detail.noTickets", {
+                                mode: travelTab === "RAIL" ? "rail" : "flight",
+                              })}
                             </p>
                           )}
                         </div>

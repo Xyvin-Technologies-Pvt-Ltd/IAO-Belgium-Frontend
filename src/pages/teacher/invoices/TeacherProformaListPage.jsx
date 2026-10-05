@@ -204,7 +204,9 @@ export default function TeacherProformaListPage() {
                         variant={inv.status === "SENT_TO_TEACHER" ? "default" : "outline"}
                         onClick={() => navigate({ to: `/teacher/proforma-invoices/${inv._id}` })}
                       >
-                        {inv.status === "SENT_TO_TEACHER" ? "View & Sign Invoice" : "View Details"}
+                        {inv.status === "SENT_TO_TEACHER"
+                          ? t("proforma.list.viewAndSign")
+                          : t("common.viewDetails", { defaultValue: "View Details" })}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -213,7 +215,7 @@ export default function TeacherProformaListPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center p-8 text-muted-foreground">
-                  No proforma invoices found.
+                  {t("proforma.list.empty")}
                 </TableCell>
               </TableRow>
             )}

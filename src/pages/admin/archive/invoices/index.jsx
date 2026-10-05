@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import ArchiveGate from "../components/ArchiveGate";
 import InvoicesFilterDrawer, { INVOICES_FILTER_DEFAULTS } from "./InvoicesFilterDrawer";
 
 const ArchiveInvoices = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -68,7 +70,7 @@ const ArchiveInvoices = () => {
       const response = await getArchiveInvoices({ ...filterParams, export: true });
       const rows = response?.data || [];
       if (rows.length === 0) {
-        toast.error("No invoices to export matching applied filters.", { id: toastId });
+        toast.error("No expense notes to export matching applied filters.", { id: toastId });
         return;
       }
       const csv = buildCsv(
@@ -77,9 +79,9 @@ const ArchiveInvoices = () => {
         (r) => [r.nummer, r.person_name, r.datum, r.line_total, r.betaald ? "Paid" : "Open", r.omschrijving],
       );
       downloadCsv(csv, "coachview_archive_invoices");
-      toast.success("Invoices exported successfully!", { id: toastId });
+      toast.success("Expense notes exported successfully!", { id: toastId });
     } catch (err) {
-      toast.error(err?.message || "Failed to export invoices.", { id: toastId });
+      toast.error(err?.message || "Failed to export expense notes.", { id: toastId });
     }
   };
 
@@ -89,7 +91,8 @@ const ArchiveInvoices = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-              Facturen <span className="text-sm font-normal text-gray-400">(Invoices — CoachView archive)</span>
+              {t("archive.invoices.plural")}{" "}
+              <span className="text-sm font-normal text-gray-400">(CoachView archive)</span>
             </h2>
             <p className="text-sm text-gray-500 dark:text-white/60">
               "Open" reflects the payment status as of the snapshot date, not necessarily today.
@@ -103,7 +106,7 @@ const ArchiveInvoices = () => {
 
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Search by invoice number or student name..."
+            placeholder={t("proforma.list.search")}
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -142,7 +145,7 @@ const ArchiveInvoices = () => {
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center p-8">
-                  <ErrorMessage message={error?.message || "Failed to load invoices"} onRetry={refetch} variant="inline" />
+                  <ErrorMessage message={error?.message || "Failed to load expense notes"} onRetry={refetch} variant="inline" />
                 </TableCell>
               </TableRow>
             ) : invoices.length > 0 ? (
@@ -173,7 +176,7 @@ const ArchiveInvoices = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-gray-400">
-                  No invoices found.
+                  {t("archive.invoices.empty")}
                 </TableCell>
               </TableRow>
             )}

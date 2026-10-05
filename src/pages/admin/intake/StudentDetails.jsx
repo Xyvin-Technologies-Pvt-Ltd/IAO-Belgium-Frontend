@@ -279,7 +279,7 @@ const StudentDetails = () => {
   const formatDocType = (docType) => {
     switch (docType) {
       case "invoice":
-        return t("common.invoice", "Invoice");
+        return t("common.invoice");
       case "credit_note":
         return t("common.creditNote", "Credit Note");
       case "refund":
@@ -937,10 +937,7 @@ const StudentDetails = () => {
                               type="button"
                               onClick={() => handleDownloadDocument(item)}
                               className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                              title={t(
-                                "studentManagement.details.downloadInvoice",
-                                "Download invoice",
-                              )}
+                              title={t("studentManagement.details.downloadInvoice")}
                             >
                               <Download size={14} />
                               {item.doc_type === "credit_note"
@@ -948,10 +945,7 @@ const StudentDetails = () => {
                                     "studentManagement.details.viewCreditNote",
                                     "View credit note",
                                   )
-                                : t(
-                                    "studentManagement.details.viewInvoice",
-                                    "View invoice",
-                                  )}
+                                : t("studentManagement.details.viewInvoice")}
                             </button>
                           ) : null}
                         </TableCell>
@@ -963,10 +957,7 @@ const StudentDetails = () => {
                         colSpan={9}
                         className="text-center text-muted-foreground"
                       >
-                        {t(
-                          "studentManagement.details.noInvoices",
-                          "No invoices found",
-                        )}
+                        {t("studentManagement.details.noInvoices")}
                       </TableCell>
                     </TableRow>
                   )}
@@ -1046,16 +1037,10 @@ const StudentDetails = () => {
                               type="button"
                               onClick={() => handleDownloadDocument(payment)}
                               className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                              title={t(
-                                "studentManagement.details.downloadInvoice",
-                                "Download invoice",
-                              )}
+                              title={t("studentManagement.details.downloadInvoice")}
                             >
                               <Download size={14} />
-                              {t(
-                                "studentManagement.details.viewInvoice",
-                                "View invoice",
-                              )}
+                              {t("studentManagement.details.viewInvoice")}
                             </button>
                           ) : null}
                         </TableCell>

@@ -2,7 +2,7 @@ const SUPPORTED = ["en", "nl", "fr", "de"];
 
 const LABELS = {
   en: {
-    title: "Pro-forma Invoice",
+    title: "Expense Note",
     issuedBy: "Issued By",
     proformaNo: "Pro-forma No.",
     date: "Date",
@@ -32,7 +32,7 @@ const LABELS = {
     miscellaneous: "Miscellaneous",
   },
   nl: {
-    title: "Pro-forma factuur",
+    title: "Onkostennota",
     issuedBy: "Uitgegeven door",
     proformaNo: "Pro-forma nr.",
     date: "Datum",
@@ -62,7 +62,7 @@ const LABELS = {
     miscellaneous: "Diversen",
   },
   fr: {
-    title: "Facture pro forma",
+    title: "Note de frais",
     issuedBy: "Émise par",
     proformaNo: "N° pro forma",
     date: "Date",
@@ -92,7 +92,7 @@ const LABELS = {
     miscellaneous: "Divers",
   },
   de: {
-    title: "Proforma-Rechnung",
+    title: "Kostenaufstellung",
     issuedBy: "Ausgestellt von",
     proformaNo: "Proforma-Nr.",
     date: "Datum",

@@ -16,6 +16,7 @@ import {
   updateFkfConfig,
 } from "@/api/fkfApi";
 import { toast } from "sonner";
+import i18n from "@/i18n/config";
 
 export const useGetFkfConfig = (options = {}) =>
   useQuery({
@@ -130,7 +131,7 @@ export const useCreateFkfInvoice = () => {
     mutationFn: createFkfInvoice,
     onSuccess: (data) => {
       toast.success(
-        data?.message || "FKF invoice created and email sent",
+        data?.message || i18n.t("finance.fkf.toasts.created"),
       );
       queryClient.invalidateQueries({ queryKey: ["fkf-student-modules"] });
       queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
@@ -138,7 +139,7 @@ export const useCreateFkfInvoice = () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to create FKF invoice");
+      toast.error(error?.message || i18n.t("finance.fkf.toasts.createFailed"));
     },
   });
 };
@@ -163,7 +164,7 @@ export const usePreviewFkfBulkInvoices = () =>
   useMutation({
     mutationFn: previewFkfBulkInvoices,
     onError: (error) => {
-      toast.error(error?.message || "Failed to preview FKF invoices");
+      toast.error(error?.message || i18n.t("finance.fkf.toasts.previewFailed"));
     },
   });
 
@@ -179,7 +180,10 @@ export const useCreateFkfBulkInvoices = () => {
       );
       if (payload?.failed_count > 0) {
         toast.warning(
-          `${payload.failed_count} of ${payload.total} invoices failed`,
+          i18n.t("finance.fkf.toasts.bulkPartialFailed", {
+            failed: payload.failed_count,
+            total: payload.total,
+          }),
         );
       }
       queryClient.invalidateQueries({ queryKey: ["fkf-eligible-students"] });
@@ -188,7 +192,7 @@ export const useCreateFkfBulkInvoices = () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to bulk-create FKF invoices");
+      toast.error(error?.message || i18n.t("finance.fkf.toasts.bulkFailed"));
     },
   });
 };

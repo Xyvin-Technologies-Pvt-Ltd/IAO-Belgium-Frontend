@@ -111,12 +111,12 @@ export default function TeacherProformaDetailPage() {
   useEffect(() => {
     if (proforma?.proforma_number) {
       updateBreadcrumbs([
-        { label: "My Invoices", path: "/teacher/proforma-invoices", navigable: true },
+        { label: t("proforma.myInvoicesShort"), path: "/teacher/proforma-invoices", navigable: true },
         { label: proforma.proforma_number },
       ]);
     }
     return () => updateBreadcrumbs([]);
-  }, [proforma, updateBreadcrumbs]);
+  }, [proforma, updateBreadcrumbs, t]);
 
   const signed =
     proforma?.digital_signature?.is_signed ||
@@ -364,7 +364,7 @@ export default function TeacherProformaDetailPage() {
     return (
       <div className="py-24 text-center space-y-3">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-muted-foreground font-medium">Loading your proforma invoice...</p>
+        <p className="text-sm text-muted-foreground font-medium">{t("proforma.loadingYour")}</p>
       </div>
     );
   }
@@ -373,10 +373,10 @@ export default function TeacherProformaDetailPage() {
     return (
       <div className="space-y-4 mt-6">
         <Button variant="outline" size="sm" onClick={() => navigate({ to: "/teacher/proforma-invoices" })}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to My Invoices
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t("proforma.backToMyInvoices")}
         </Button>
         <div className="p-8 border border-destructive/20 bg-destructive/10 rounded-2xl text-center text-destructive">
-          Failed to load proforma invoice: {error?.message || "Invoice not found"}
+          {t("proforma.loadFailed")}: {error?.message || t("proforma.notFound")}
         </div>
       </div>
     );
@@ -1078,7 +1078,7 @@ export default function TeacherProformaDetailPage() {
                   <ProformaTravelFixedCard items={fixedTravelLines} />
                 )
               ) : (
-                <p className="text-sm text-muted-foreground">No fixed module travel on this invoice.</p>
+                <p className="text-sm text-muted-foreground">{t("proforma.detail.noFixedTravel")}</p>
               )
             )}
             {travelTab === "ROAD" && (
@@ -1097,11 +1097,19 @@ export default function TeacherProformaDetailPage() {
                     )}
                   </div>
                 ) : (
-                  <ProformaTravelRoadCard item={roadLine} editable={false} />
+                  <ProformaTravelRoadCard
+                    item={roadLine}
+                    editable={false}
+                    hasHotel={(proforma?.items || []).some(
+                      (i) =>
+                        i.item_type === "STAY" &&
+                        (Number(i.line_total) > 0 || Number(i.multiplier) > 0)
+                    )}
+                  />
                 )
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  No road travel line on this invoice. Use Rail or Air to add tickets.
+                  {t("proforma.detail.noRoadTravelHint")}
                 </p>
               )
             )}
