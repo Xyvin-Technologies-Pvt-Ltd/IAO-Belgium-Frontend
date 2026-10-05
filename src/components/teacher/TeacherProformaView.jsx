@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   CheckCircle, AlertCircle, FileText, ShieldCheck, 
   Plus, Paperclip, Clock, X, DollarSign, MapPin 
@@ -6,6 +7,7 @@ import {
 import { useSignProforma, useAddMiscellaneousClaim } from "@/store/useProformaStore";
 
 export default function TeacherProformaView({ proformaData }) {
+  const { t } = useTranslation();
   const [showSignModal, setShowSignModal] = useState(false);
   const [showMiscModal, setShowMiscModal] = useState(false);
   const [showAuditDrawer, setShowAuditDrawer] = useState(false);
@@ -98,7 +100,7 @@ export default function TeacherProformaView({ proformaData }) {
                 className="px-5 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition"
               >
                 <ShieldCheck className="w-4 h-4" />
-                Sign Invoice
+                {t("proforma.sign.signInvoice")}
               </button>
             </>
           )}
@@ -204,7 +206,7 @@ export default function TeacherProformaView({ proformaData }) {
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-5">
             <div className="flex justify-between items-center border-b pb-3">
-              <h2 className="text-lg font-bold text-slate-900">Sign Invoice by Typing Legal Name</h2>
+              <h2 className="text-lg font-bold text-slate-900">{t("proforma.sign.signByTyping")}</h2>
               <button onClick={() => setShowSignModal(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>

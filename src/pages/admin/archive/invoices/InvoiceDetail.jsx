@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import LoadingState from "@/components/common/LoadingState";
@@ -17,6 +18,7 @@ import { useArchiveInvoice } from "@/store/useArchiveStore";
 import ArchiveGate from "../components/ArchiveGate";
 
 const InvoiceDetail = () => {
+  const { t } = useTranslation();
   const params = useParams({ strict: false });
   const navigate = useNavigate();
   const id = params.id;
@@ -27,23 +29,23 @@ const InvoiceDetail = () => {
     if (data?.data) {
       updateBreadcrumbs([
         { label: "CoachView Archive", path: "/admin/archive/invoices", navigable: true },
-        { label: "Invoices", path: "/admin/archive/invoices", navigable: true },
+        { label: t("archive.invoices.plural"), path: "/admin/archive/invoices", navigable: true },
         { label: data.data.invoice.nummer, path: "/admin/archive/invoices", navigable: false },
       ]);
     }
     return () => updateBreadcrumbs([]);
-  }, [data?.data, id]);
+  }, [data?.data, id, t, updateBreadcrumbs]);
 
   return (
     <ArchiveGate>
       {isLoading ? (
-        <LoadingState text="Loading invoice..." fullHeight />
+        <LoadingState text={t("archive.invoices.loading")} fullHeight />
       ) : error ? (
         <div className="p-6">
-          <ErrorMessage message={error?.message || "Failed to load invoice"} onRetry={refetch} variant="card" />
+          <ErrorMessage message={error?.message || t("proforma.loadFailed")} onRetry={refetch} variant="card" />
         </div>
       ) : !data?.data ? null : (
-        <Content data={data.data} navigate={navigate} />
+        <Content data={data.data} navigate={navigate} t={t} />
       )}
     </ArchiveGate>
   );
@@ -57,7 +59,7 @@ const LINE_ACCESSORS = {
   vat: (l) => l.btw_percentage,
 };
 
-const Content = ({ data, navigate }) => {
+const Content = ({ data, navigate, t }) => {
   const { invoice, lines } = data;
   const lineSort = useClientTableSort(lines, { defaultKey: "description", accessors: LINE_ACCESSORS });
 
@@ -66,7 +68,9 @@ const Content = ({ data, navigate }) => {
       <div className="rounded-xl border border-sidebar-border bg-sidebar p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-dashboard-text dark:text-white">Factuur {invoice.nummer}</h2>
+            <h2 className="text-lg font-semibold text-dashboard-text dark:text-white">
+              {t("archive.invoices.singular")} {invoice.nummer}
+            </h2>
             <p
               className="text-sm text-gray-500 dark:text-white/60 cursor-pointer hover:underline"
               onClick={() =>

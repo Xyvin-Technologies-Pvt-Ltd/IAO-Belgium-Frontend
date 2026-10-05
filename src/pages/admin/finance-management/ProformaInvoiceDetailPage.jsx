@@ -147,13 +147,13 @@ export default function ProformaInvoiceDetailPage() {
   useEffect(() => {
     if (proforma?.proforma_number) {
       updateBreadcrumbs([
-        { label: "Finance Management", path: "/admin/finance-reports", navigable: true },
-        { label: "Teacher Proforma Invoices", path: "/admin/proforma-invoices", navigable: true },
+        { label: t("finance.title"), path: "/admin/finance-reports", navigable: true },
+        { label: t("proforma.teacherInvoices"), path: "/admin/proforma-invoices", navigable: true },
         { label: proforma.proforma_number },
       ]);
     }
     return () => updateBreadcrumbs([]);
-  }, [proforma, updateBreadcrumbs]);
+  }, [proforma, updateBreadcrumbs, t]);
 
   const itemsByType = useMemo(() => {
     const map = {};
@@ -236,7 +236,7 @@ export default function ProformaInvoiceDetailPage() {
     return (
       <div className="py-24 text-center space-y-3">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-muted-foreground font-medium">Loading proforma invoice details...</p>
+        <p className="text-sm text-muted-foreground font-medium">{t("proforma.loadingDetails")}</p>
       </div>
     );
   }
@@ -245,10 +245,10 @@ export default function ProformaInvoiceDetailPage() {
     return (
       <div className="space-y-4 mt-6">
         <Button variant="outline" size="sm" onClick={() => navigate({ to: "/admin/proforma-invoices" })}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Proforma Queue
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t("proforma.backToList")}
         </Button>
         <div className="p-8 border border-destructive/20 bg-destructive/10 rounded-2xl text-center text-destructive">
-          Failed to load proforma invoice: {error?.message || "Invoice not found"}
+          {t("proforma.loadFailed")}: {error?.message || t("proforma.notFound")}
         </div>
       </div>
     );
@@ -848,7 +848,7 @@ export default function ProformaInvoiceDetailPage() {
                           )
                         ) : (
                           <p className="text-sm text-muted-foreground">
-                            No fixed module travel on this invoice.
+                            {t("proforma.detail.noFixedTravel")}
                           </p>
                         ))}
 
@@ -934,7 +934,7 @@ export default function ProformaInvoiceDetailPage() {
                           )
                         ) : (
                           <p className="text-sm text-muted-foreground">
-                            No road travel line on this invoice.
+                            {t("proforma.detail.noRoadTravel")}
                           </p>
                         ))}
 
@@ -971,7 +971,9 @@ export default function ProformaInvoiceDetailPage() {
                             (t) => String(t.travel_mode || "").toUpperCase() === travelTab
                           ).length === 0 && (
                             <p className="text-sm text-muted-foreground">
-                              No {travelTab === "RAIL" ? "rail" : "flight"} tickets on this invoice.
+                              {t("proforma.detail.noTickets", {
+                                mode: travelTab === "RAIL" ? "rail" : "flight",
+                              })}
                             </p>
                           )}
                         </div>

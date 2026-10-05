@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Select,
@@ -24,6 +25,7 @@ import { useTableSort } from "@/hooks/useTableSort";
 import { useArchivePersonInvoices } from "@/store/useArchiveStore";
 
 const InvoicesTab = ({ personId }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -70,7 +72,9 @@ const InvoicesTab = ({ personId }) => {
         </Select>
         <Input type="date" className="w-40" value={from} onChange={(e) => setFrom(e.target.value)} />
         <Input type="date" className="w-40" value={to} onChange={(e) => setTo(e.target.value)} />
-        <span className="text-sm text-gray-400">{totalRows} invoices</span>
+        <span className="text-sm text-gray-400">
+          {totalRows} {t("archive.invoices.plural").toLowerCase()}
+        </span>
       </div>
 
       <Table>
@@ -100,7 +104,7 @@ const InvoicesTab = ({ personId }) => {
           ) : error ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center p-8">
-                <ErrorMessage message={error?.message || "Failed to load invoices"} onRetry={refetch} variant="inline" />
+                <ErrorMessage message={error?.message || "Failed to load expense notes"} onRetry={refetch} variant="inline" />
               </TableCell>
             </TableRow>
           ) : invoices.length > 0 ? (
@@ -133,7 +137,7 @@ const InvoicesTab = ({ personId }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-8 text-gray-400">
-                No invoices found for this student.
+                {t("archive.invoices.empty")}
               </TableCell>
             </TableRow>
           )}

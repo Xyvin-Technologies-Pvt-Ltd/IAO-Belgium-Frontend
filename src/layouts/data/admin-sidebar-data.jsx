@@ -272,7 +272,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: Archive,
           },
           {
-            title: t("sidebar.admin.archiveInvoices", { defaultValue: "Invoices" }),
+            title: t("sidebar.admin.archiveInvoices"),
             url: "/admin/archive/invoices",
             icon: Archive,
           },

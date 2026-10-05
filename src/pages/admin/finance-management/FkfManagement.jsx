@@ -597,7 +597,7 @@ const FkfManagement = () => {
         <p className="text-sm text-muted-foreground mt-1">
           {t(
             "finance.fkf.subtitle",
-            "Postal students, mark eligible, send subsidized invoices, and manage config.",
+            "Postal students, mark eligible, send subsidized expense notes, and manage config.",
           )}
         </p>
       </div>
@@ -1024,10 +1024,7 @@ const FkfManagement = () => {
                                 disabled={!canModify}
                                 onClick={() => openSendInvoice(student)}
                               >
-                                {t(
-                                  "finance.fkf.sendInvoice",
-                                  "Send FKF Invoice",
-                                )}
+                                {t("finance.fkf.sendInvoice")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1171,7 +1168,7 @@ const FkfManagement = () => {
                     {t("finance.fkf.catalogFee", "Catalog fee")}
                   </TableHead>
                   <TableHead>
-                    {t("finance.fkf.invoice", "Invoice")}
+                    {t("finance.fkf.invoice")}
                   </TableHead>
                   <TableHead>{t("common.status", "Status")}</TableHead>
                   <TableHead>
@@ -1214,10 +1211,7 @@ const FkfManagement = () => {
                       colSpan={canModify ? 9 : 8}
                       className="text-center text-muted-foreground py-10"
                     >
-                      {t(
-                        "finance.fkf.noHistory",
-                        "No FKF invoices sent yet.",
-                      )}
+                      {t("finance.fkf.noInvoicesSent")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -1357,10 +1351,7 @@ const FkfManagement = () => {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            {t(
-              "finance.fkf.cancelSubsidyConfirm",
-              "This voids the unpaid subsidy invoice. The student will no longer see this offer. Paid subsidies cannot be cancelled.",
-            )}
+            {t("finance.fkf.cancelHint")}
           </p>
           {cancelTarget ? (
             <div className="rounded-lg bg-muted/40 p-3 text-sm space-y-1">
@@ -1381,7 +1372,7 @@ const FkfManagement = () => {
               </p>
               <p>
                 <span className="text-muted-foreground">
-                  {t("finance.fkf.invoice", "Invoice")}:{" "}
+                  {t("finance.fkf.invoice")}:{" "}
                 </span>
                 <strong>
                   {cancelTarget.invoice?.uid ||
@@ -1429,7 +1420,7 @@ const FkfManagement = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {t("finance.fkf.sendInvoice", "Send FKF Invoice")}
+              {t("finance.fkf.sendInvoice")}
             </DialogTitle>
           </DialogHeader>
 
@@ -1512,7 +1503,7 @@ const FkfManagement = () => {
               >
                 {createInvoice.isPending
                   ? t("common.processing", "Processing…")
-                  : t("finance.fkf.createButton", "Create FKF Invoice")}
+                  : t("finance.fkf.createButton")}
               </Button>
             </DialogFooter>
           </form>
@@ -1529,7 +1520,7 @@ const FkfManagement = () => {
           <DialogHeader>
             <DialogTitle>
               {bulkStep === "preview"
-                ? t("finance.fkf.previewInvoices", "Preview invoices")
+                ? t("finance.fkf.previewInvoices")
                 : t("finance.fkf.addModule", "Add module")}
             </DialogTitle>
           </DialogHeader>
@@ -1798,10 +1789,7 @@ const FkfManagement = () => {
                   >
                     {createBulk.isPending
                       ? t("common.processing", "Processing…")
-                      : t("finance.fkf.bulkSendConfirm", {
-                          count: bulkPreview?.ready_count || 0,
-                          defaultValue: `Send ${bulkPreview?.ready_count || 0} invoices`,
-                        })}
+                      : t("finance.fkf.bulkSendConfirm", { count: bulkPreview?.ready_count || 0 })}
                   </Button>
                 </div>
               </DialogFooter>
