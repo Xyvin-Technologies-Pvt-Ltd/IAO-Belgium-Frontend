@@ -43,6 +43,7 @@ import {
   ProformaInvoiceDocument,
   downloadProformaInvoicePdf,
 } from "@/components/admin/ProformaInvoiceDocument";
+import { openSecureFile } from "@/utils/secureFile";
 
 const SECTION_KEYS = ["TEACHING", "TRAVEL", "FOOD", "STAY", "MISCELLANEOUS"];
 
@@ -1290,16 +1291,21 @@ export default function TeacherProformaDetailPage() {
             {signed && (foodLine?.attachments || []).length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {foodLine.attachments.map((a, idx) => (
-                  <a
+                  <button
+                    type="button"
                     key={a._id || a.file_url || idx}
-                    href={a.file_url}
-                    target="_blank"
-                    rel="noreferrer"
                     className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:underline"
+                    onClick={async () => {
+                      try {
+                        await openSecureFile(a.file_url || a.key, a.file_name);
+                      } catch (err) {
+                        toast.error(err?.message || "Could not open file");
+                      }
+                    }}
                   >
                     <Paperclip className="w-3 h-3" />
                     {a.file_name}
-                  </a>
+                  </button>
                 ))}
               </div>
             )}
