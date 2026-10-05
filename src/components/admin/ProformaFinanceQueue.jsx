@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useGetFinanceQueue, useUpdateProformaStatus } from "@/store/useProformaStore";
 import { CheckCircle, XCircle, Clock, Eye, Search, AlertCircle, Send } from "lucide-react";
 import { proformaTeacherName } from "@/utils/proformaCourseLabel";
 
 export default function ProformaFinanceQueue({ onViewInvoice }) {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState("TEACHER_SIGNED_APPROVED");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -45,7 +47,7 @@ export default function ProformaFinanceQueue({ onViewInvoice }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search invoice # or region..."
+            placeholder={t("proforma.list.search")}
             className="pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
           />
         </div>

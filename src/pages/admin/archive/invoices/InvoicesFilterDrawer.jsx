@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,6 +23,7 @@ import FilterSection from "../components/FilterSection";
 const DEFAULTS = { betaald: "all", from: "", to: "", amount_min: "", amount_max: "" };
 
 const InvoicesFilterDrawer = ({ draftFilters, setDraftFilters, appliedFilters, setAppliedFilters, setPage }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const activeFiltersCount = Object.entries(appliedFilters).filter(
@@ -68,9 +70,11 @@ const InvoicesFilterDrawer = ({ draftFilters, setDraftFilters, appliedFilters, s
             </div>
             <div>
               <SheetTitle className="text-base font-semibold text-sidebar-foreground">
-                Filter Facturen (Invoices)
+                {t("archive.invoices.plural")}
               </SheetTitle>
-              <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>Narrow down the invoices list</p>
+              <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
+                Narrow down the {t("archive.invoices.plural").toLowerCase()} list
+              </p>
             </div>
           </div>
         </SheetHeader>

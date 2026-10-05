@@ -25,6 +25,7 @@ import {
 } from "@/api/proformaApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import i18n from "@/i18n/config";
 
 export const useGetGlobalDefaults = (options = {}) => {
   return useQuery({
@@ -146,10 +147,10 @@ export const useSignProforma = () => {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
-      toast.success(response?.message || "Invoice digitally signed and approved successfully!");
+      toast.success(response?.message || i18n.t("proforma.toasts.signed"));
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to sign proforma invoice");
+      toast.error(error?.message || i18n.t("proforma.toasts.signFailed"));
     },
   });
 };
@@ -177,7 +178,7 @@ export const useUpdateProformaStatus = () => {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
-      toast.success(response?.message || "Invoice status updated successfully!");
+      toast.success(response?.message || i18n.t("proforma.toasts.statusUpdated"));
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update proforma status");
@@ -349,10 +350,10 @@ export const useRetryPlanningProforma = () => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
       queryClient.invalidateQueries({ queryKey: ["proforma-errors"] });
-      toast.success(response?.message || "Invoice calculation re-run successfully!");
+      toast.success(response?.message || i18n.t("proforma.toasts.recalcSuccess"));
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to re-run invoice calculation");
+      toast.error(error?.message || i18n.t("proforma.toasts.recalcFailed"));
     },
   });
 };

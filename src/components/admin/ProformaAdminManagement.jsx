@@ -135,7 +135,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search invoice number or region..."
+            placeholder={t("proforma.list.search")}
             className="w-72"
           />
         </div>
@@ -151,7 +151,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
               : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          All Invoices
+          {t("proforma.list.all")}
         </button>
 
         <button
@@ -264,7 +264,9 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                             }
                           }}
                         >
-                          {retryMutation.isPending ? "Retrying..." : "Retry Invoice"}
+                          {retryMutation.isPending
+                            ? t("common.retrying", { defaultValue: "Retrying..." })
+                            : t("proforma.list.retry")}
                         </Button>
                         <Button
                           size="sm"
@@ -281,7 +283,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center p-8 text-muted-foreground">
-                    No invoice generation errors found. All plannings were processed cleanly.
+                    No expense note generation errors found. All plannings were processed cleanly.
                   </TableCell>
                 </TableRow>
               )}
@@ -291,7 +293,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>Invoice #</TableHead>
+                <TableHead>{t("proforma.list.number")}</TableHead>
                 <TableHead>Teacher Name & Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Course Planning</TableHead>
@@ -365,7 +367,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           {(inv.status === "MOVED_TO_FINANCE" || inv.status === "PAID") && (
                             <button
                               type="button"
-                              title="View invoice"
+                              title={t("proforma.viewInvoice")}
                               onClick={() => openProformaInvoiceTab(inv._id)}
                               className="p-1.5 rounded-md text-muted-foreground hover:text-indigo-600 hover:bg-indigo-500/10 transition-colors"
                             >

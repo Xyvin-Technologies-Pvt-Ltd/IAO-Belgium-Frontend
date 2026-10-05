@@ -6,7 +6,7 @@
       "dashboard": "Tableau de bord",
       "myCourses": "Mes formations",
       "myApp": "Mon APP",
-      "invoices": "Factures",
+      "invoices": "Notes de frais",
       "assessment": "Évaluation"
     },
     "dropdown": {
@@ -29,7 +29,7 @@
       "exams": "Examens",
       "otherExams": "Autres examens",
       "practicalExams": "Examens pratiques",
-      "proformaInvoices": "Mes factures pro forma"
+      "proformaInvoices": "Mes notes de frais pro forma"
     },
     "admin": {
       "title": "Portail administrateur",
@@ -59,7 +59,7 @@
       "teacherManagement": "Gestion des enseignants",
       "studentManagement": "Gestion des étudiants",
       "financeReports": "Rapports financiers",
-      "customInvoices": "Factures personnalisées",
+      "customInvoices": "Notes de frais personnalisées",
       "fkf": "Fachkursförderung",
       "adminManagement": "Gestion des administrateurs",
       "roleManagement": "Gestion des rôles",
@@ -70,14 +70,18 @@
       "questionBanks": "Banques de questions",
       "exams": "Examens",
       "results": "Résultats",
-      "createInvoice": "Créer une facture",
-      "proformaInvoices": "Factures pro forma enseignants",
-      "proformaSettings": "Tarifs & paramètres pro forma"
+      "createInvoice": "Créer une note de frais personnalisée",
+      "proformaInvoices": "Notes de frais pro forma des enseignants",
+      "proformaSettings": "Tarifs & paramètres pro forma",
+      "archiveInvoices": "Notes de frais"
     },
     "user": {
       "loading": "Chargement...",
       "noRole": "Aucun rôle attribué",
       "signOut": "Se déconnecter"
+    },
+    "student": {
+      "invoices": "Notes de frais"
     }
   },
   "languages": {
@@ -181,7 +185,7 @@
     "searchTitles": "Rechercher des grades académiques...",
     "searchRoles": "Rechercher des rôles enseignants...",
     "paymentId": "ID de paiement",
-    "invoiceId": "ID de facture",
+    "invoiceId": "ID de la note de frais",
     "receiptId": "ID de reçu",
     "downloadReceipt": "Télécharger le reçu",
     "studentName": "Nom de l'étudiant",
@@ -230,7 +234,9 @@
       "send": "Envoyer",
       "sending": "Envoi en cours...",
       "cancel": "Annuler"
-    }
+    },
+    "invoice": "Note de frais",
+    "invoiceReference": "Référence de la note de frais"
   },
   "finance": {
     "title": "Gestion financière",
@@ -262,7 +268,7 @@
       "admissionFee": "Frais d'inscription",
       "modulePurchase": "Achat de module",
       "locationSwitch": "Changement de lieu",
-      "customInvoice": "Facture personnalisée",
+      "customInvoice": "Note de frais personnalisée",
       "resitPurchase": "Examen de rattrapage",
       "other": "Autre"
     },
@@ -273,7 +279,7 @@
       "noPaymentAnalyticsFound": "Aucune analyse de paiement trouvée",
       "loadingAnalytics": "Chargement des données d'analyse...",
       "loadAnalyticsFailed": "Échec du chargement des données d'analyse",
-      "noCustomInvoicesFound": "Aucune facture personnalisée trouvée."
+      "noCustomInvoicesFound": "Aucune note de frais personnalisée trouvée."
     },
     "reports": {
       "all": {
@@ -297,16 +303,54 @@
         "description": "Analyse des paiements par étudiant"
       },
       "createInvoice": {
-        "title": "Créer une facture personnalisée",
+        "title": "Créer une note de frais personnalisée",
         "student": "Sélectionner un étudiant",
         "searchStudent": "Rechercher un étudiant...",
-        "invoiceTitle": "Titre / description de la facture",
+        "invoiceTitle": "Titre / description de la note de frais",
         "titlePlaceholder": "ex. Frais de semestre, Ajustement de bourse",
-        "submit": "Créer une facture personnalisée"
+        "submit": "Créer une note de frais personnalisée"
       },
       "customInvoices": {
-        "title": "Factures personnalisées"
+        "title": "Notes de frais personnalisées"
+      },
+      "fkf": {
+        "description": "Créer des notes de frais de module subventionnées pour les étudiants éligibles"
       }
+    },
+    "noCustomInvoicesFound": "Aucune note de frais personnalisée trouvée.",
+    "createInvoice": {
+      "title": "Créer une note de frais personnalisée",
+      "invoiceTitle": "Titre / description de la note de frais",
+      "submit": "Créer une note de frais personnalisée"
+    },
+    "customInvoices": {
+      "title": "Notes de frais personnalisées"
+    },
+    "fkf": {
+      "createTab": "Créer une note de frais",
+      "createButton": "Créer une note de frais FKF",
+      "sendInvoice": "Envoyer une note de frais FKF",
+      "previewInvoices": "Aperçu des notes de frais",
+      "sendNInvoices": "Envoyer {{count}} notes de frais",
+      "invoice": "Note de frais",
+      "bulkSendConfirm": "Envoyer {{count}} notes de frais",
+      "noInvoicesSent": "Aucune note de frais FKF envoyée pour le moment.",
+      "cancelHint": "Ceci annule la note de frais de subvention non payée. L’étudiant ne verra plus cette offre. Les subventions payées ne peuvent pas être annulées.",
+      "toasts": {
+        "created": "Note de frais FKF créée et e-mail envoyé",
+        "createFailed": "Échec de la création de la note de frais FKF",
+        "previewFailed": "Échec de l’aperçu des notes de frais FKF",
+        "bulkFailed": "Échec de la création en masse des notes de frais FKF",
+        "bulkPartialFailed": "{{failed}} notes de frais sur {{total}} ont échoué"
+      },
+      "subtitle": "Étudiants éligibles, notes de frais subventionnées et configuration postale."
+    },
+    "hub": {
+      "thirdPartyDesc": "Gérer les modalités de paiement par un tiers des notes de frais des étudiants"
+    },
+    "toasts": {
+      "manualCreated": "Note de frais manuelle créée !",
+      "createFailed": "Échec de la création de la note de frais"
     }
   },
   "queues": {
@@ -998,7 +1042,8 @@
       "progress": "Progrès académique",
       "general": "Sélection de module",
       "payments": "Paiements",
-      "notesAndAttachments": "Notes et pièces jointes"
+      "notesAndAttachments": "Notes et pièces jointes",
+      "invoices": "Notes de frais"
     },
     "details": {
       "assignedModules": "Modules assignés",
@@ -1022,8 +1067,8 @@
       "missed": "Absent",
       "unmarked": "Non marqué",
       "billingMethod": "Facturation",
-      "viewInvoice": "Voir la facture",
-      "downloadInvoice": "Télécharger la facture",
+      "viewInvoice": "Voir la note de frais",
+      "downloadInvoice": "Télécharger la note de frais",
       "specialExceptions": "Exceptions spéciales",
       "configureExceptions": "Configurer",
       "noExceptions": "Aucune exception configurée. Les paramètres d'examen par défaut s'appliquent.",
@@ -1031,7 +1076,9 @@
       "noAttendanceRecords": "Aucun enregistrement de présence pour cette année.",
       "attendanceLoadFailed": "Échec du chargement de la présence",
       "configureExceptionsTitle": "Configurer les exceptions spéciales",
-      "configureExceptionsHint": "Sélectionnez toutes les conditions médicales ou difficultés d'apprentissage qui s'appliquent à cet étudiant. Le système appliquera automatiquement le maximum de minutes supplémentaires à ses examens."
+      "configureExceptionsHint": "Sélectionnez toutes les conditions médicales ou difficultés d'apprentissage qui s'appliquent à cet étudiant. Le système appliquera automatiquement le maximum de minutes supplémentaires à ses examens.",
+      "outstandingInvoices": "Notes de frais impayées",
+      "noInvoices": "Aucune note de frais trouvée"
     },
     "billing": {
       "personal": "Personnel",
@@ -1084,7 +1131,7 @@
       "idCard": "Carte d'identité téléchargée",
       "qualificationCert": "Certificat de qualification",
       "flags": "Indicateurs",
-      "outstandingInvoices": "Factures impayées",
+      "outstandingInvoices": "Notes de frais impayées",
       "missedModules": "Modules manqués (absent ou non acheté)",
       "unpurchasedModules": "Modules non achetés uniquement",
       "fachkursfoerderung": "Éligible à la Fachkursförderung",
@@ -2347,20 +2394,25 @@
     }
   },
   "proforma": {
-    "title": "Factures pro forma",
-    "myInvoices": "Mes factures pro forma",
-    "teacherInvoices": "Factures pro forma enseignants",
-    "settings": "Tarifs & paramètres pro forma",
-    "financeCardDescription": "Suivre les factures pro forma enseignants envoyées, mises à jour et signées",
-    "backToList": "Retour aux factures",
+    "title": "Notes de frais pro forma",
+    "myInvoices": "Mes notes de frais pro forma",
+    "teacherInvoices": "Notes de frais pro forma des enseignants",
+    "settings": {
+      "includedOn": "Inclus dans les notes de frais",
+      "excludedFrom": "Exclus des notes de frais",
+      "masterTitle": "Paramètres principaux des notes de frais pro forma",
+      "disabledRegions": "Les régions désactivées bloquent la génération des notes de frais"
+    },
+    "financeCardDescription": "Suivre les notes de frais pro forma des enseignants envoyées, mises à jour et signées",
+    "backToList": "Retour aux notes de frais",
     "backToQueue": "Retour à la file pro forma",
-    "loading": "Chargement de la facture pro forma...",
-    "loadingDetails": "Chargement des détails de la facture pro forma...",
-    "loadFailed": "Échec du chargement de la facture pro forma",
-    "notFound": "Facture introuvable",
+    "loading": "Chargement de la note de frais pro forma...",
+    "loadingDetails": "Chargement des détails de la note de frais pro forma...",
+    "loadFailed": "Échec du chargement de la note de frais pro forma",
+    "notFound": "Note de frais introuvable",
     "previewAndSign": "Aperçu et signature",
     "downloadPdf": "Télécharger le PDF",
-    "viewInvoice": "Voir la facture",
+    "viewInvoice": "Voir la note de frais",
     "print": "Imprimer",
     "sendToFinance": "Envoyer à la finance",
     "sending": "Envoi...",
@@ -2372,11 +2424,11 @@
     "bankAccountProfile": "Compte bancaire (profil)",
     "iban": "IBAN",
     "company": "Société",
-      "invoiceCompany": "Société facturée",
-      "companyAddress": "Adresse de la société",
-      "additionalInfo1": "Info supplémentaire 1",
-      "additionalInfo2": "Info supplémentaire 2",
-      "confirmSectionsHint": "Confirmez chaque section avec un montant, puis prévisualisez et signez.",
+    "invoiceCompany": "Société figurant sur la note de frais",
+    "companyAddress": "Adresse de la société",
+    "additionalInfo1": "Info supplémentaire 1",
+    "additionalInfo2": "Info supplémentaire 2",
+    "confirmSectionsHint": "Confirmez chaque section avec un montant, puis prévisualisez et signez.",
     "attachReceiptsHint": "Joignez les justificatifs requis avant de signer : {{items}}.",
     "activityLog": "Journal d'activité",
     "noActivity": "Aucune activité enregistrée pour le moment.",
@@ -2403,15 +2455,15 @@
       "open": "Ouvert"
     },
     "sign": {
-      "invoiceDetails": "Détails de la facture",
-      "previewInvoiceTitle": "Aperçu de la facture",
-      "invoiceSigned": "Facture signée",
+      "invoiceDetails": "Détails de la note de frais",
+      "previewInvoiceTitle": "Aperçu de la note de frais",
+      "invoiceSigned": "Note de frais signée",
       "stepOf": "Étape {{step}} sur 2 · {{number}} · €{{amount}}",
-      "infoBanner": "La facture sera émise avec ces informations. Modifiez-les ci-dessous si nécessaire.",
+      "infoBanner": "La note de frais sera établie sur la base de ces informations. Modifiez-les ci-dessous si nécessaire.",
       "noAddress": "Aucune adresse enregistrée",
       "bankAccountIban": "Compte bancaire (IBAN)",
       "bankPlaceholder": "ex. NL91ABNA0417164300",
-      "differentDetails": "Émettre la facture avec d'autres informations",
+      "differentDetails": "Établir la note de frais avec d’autres informations",
       "companyName": "Nom de la société",
       "companyNamePlaceholder": "Nom de la société",
       "address": "Adresse",
@@ -2422,15 +2474,15 @@
       "additionalInfo2": "Info supplémentaire 2",
       "optional": "Facultatif",
       "additionalInfoPlaceholder": "ex. n° TVA, n° d'immatriculation, e-mail de contact",
-      "additionalInfoHelp": "Texte libre. Lettres, chiffres et caractères spéciaux tels que @ sont autorisés. Affiché sur la facture uniquement s'il est renseigné.",
+      "additionalInfoHelp": "…S’affiche sur la note de frais uniquement si ce champ est renseigné.",
       "additionalInfoMax": "200 caractères maximum",
       "cancel": "Annuler",
-      "previewInvoice": "Aperçu de la facture",
+      "previewInvoice": "Aperçu de la note de frais",
       "edit": "Modifier",
       "editDetails": "Modifier les détails",
       "sign": "Signer",
       "approveAndSign": "Approuver et signer",
-      "confirmCheckedDetails": "J'ai vérifié tous les détails. Une fois que j'approuve et signe cette facture, aucune modification ne pourra être apportée.",
+      "confirmCheckedDetails": "J’ai vérifié toutes les informations. Une fois cette note de frais approuvée et signée, aucune modification ne pourra plus être apportée.",
       "close": "Fermer",
       "downloadPdf": "Télécharger le PDF",
       "teacherNameMissing": "Le nom de l'enseignant est manquant sur votre profil",
@@ -2450,7 +2502,9 @@
       "fullName": "Nom legal complet",
       "fullNamePlaceholder": "Comme sur votre piece d identite",
       "nameRequired": "Le nom legal complet est obligatoire",
-      "nameMin": "Saisissez au moins 2 caracteres"
+      "nameMin": "Saisissez au moins 2 caracteres",
+      "signInvoice": "Signer la note de frais",
+      "signByTyping": "Signer la note de frais en saisissant le nom légal"
     },
     "list": {
       "allStatuses": "Tous les statuts",
@@ -2461,8 +2515,71 @@
       "updated": "Mis à jour",
       "actions": "Actions",
       "view": "Voir",
-      "empty": "Aucune facture pro forma trouvée."
+      "empty": "Aucune note de frais pro forma trouvée.",
+      "all": "Toutes les notes de frais",
+      "number": "Note de frais n°",
+      "viewAndSign": "Afficher et signer la note de frais",
+      "search": "Rechercher une note de frais…",
+      "retry": "Réessayer la note de frais"
     },
-    "signedByLabel": "Signé par"
+    "signedByLabel": "Signé par",
+    "toasts": {
+      "signFailed": "Échec de la signature de la note de frais pro forma",
+      "signed": "Note de frais signée numériquement et approuvée !",
+      "draftSaved": "Brouillon enregistré",
+      "pdfFailed": "Impossible de générer le PDF",
+      "statusUpdated": "Statut de la note de frais mis à jour !",
+      "recalcSuccess": "Recalcul de la note de frais effectué !",
+      "recalcFailed": "Échec du recalcul de la note de frais"
+    },
+    "backToMyInvoices": "Retour à mes notes de frais",
+    "myInvoicesShort": "Mes notes de frais",
+    "detail": {
+      "noFixedTravel": "Aucun déplacement de module fixe sur cette note de frais.",
+      "noRoadTravel": "Aucune ligne de déplacement routier sur cette note de frais.",
+      "noTickets": "Aucun billet {{mode}} sur cette note de frais.",
+      "noRoadTravelHint": "Aucune ligne de déplacement routier sur cette note de frais. Utilisez le train ou l’avion pour ajouter des billets."
+    },
+    "loadingYour": "Chargement de votre note de frais pro forma..."
+  },
+  "integrations": {
+    "exact": {
+      "switch_invoice": "Changer de note de frais",
+      "searchPlaceholder": "Rechercher une note de frais, un ID de transaction ou une adresse e-mail",
+      "exactInvoiceNo": "N° de la note de frais dans Exact",
+      "convertToInvoice": "Convertir en note de frais",
+      "typeInvoice": "Note de frais",
+      "table": {
+        "invoice": "Note de frais"
+      },
+      "reconciliation": {
+        "typeInvoice": "Note de frais",
+        "exactInvoiceNo": "N° de la note de frais dans Exact",
+        "convertToInvoice": "Convertir en note de frais",
+        "switch_invoice": "Changer de note de frais",
+        "searchPlaceholder": "Rechercher une note de frais, un ID de transaction ou une adresse e-mail"
+      },
+      "sources": {
+        "invoice": "Note de frais"
+      },
+      "types": {
+        "invoice": "Note de frais",
+        "switch_invoice": "Changer de note de frais"
+      }
+    }
+  },
+  "archive": {
+    "invoices": {
+      "singular": "Note de frais",
+      "plural": "Notes de frais",
+      "empty": "Aucune note de frais trouvée",
+      "loading": "Chargement de la note de frais..."
+    }
+  },
+  "coachviewImport": {
+    "subTabs": {
+      "invoices": "Notes de frais"
+    },
+    "invoicesAllYears": "Les notes de frais CoachView n’ont pas d’attribution d’année d’études — historique complet des notes de frais de l’étudiant."
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,6 +74,7 @@ const DEFAULT_TRAVEL_RULES = [
 ];
 
 export default function ProformaSettingsConfig() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("claimable_costs");
 
   const { data: defaultsRes } = useGetGlobalDefaults();
@@ -508,7 +510,7 @@ export default function ProformaSettingsConfig() {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-dashboard-text dark:text-white">
-          Proforma Invoice Master Settings
+          {t("proforma.settings.masterTitle")}
         </h1>
       </div>
 
@@ -582,7 +584,9 @@ export default function ProformaSettingsConfig() {
                   <div>
                     <p className="text-sm font-semibold text-foreground">Travel Expenses</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {toggles.travel_enabled ? "Included on invoices" : "Excluded from invoices"}
+                      {toggles.travel_enabled
+                        ? t("proforma.settings.includedOn")
+                        : t("proforma.settings.excludedFrom")}
                     </p>
                   </div>
                   <Switch
@@ -595,7 +599,9 @@ export default function ProformaSettingsConfig() {
                   <div>
                     <p className="text-sm font-semibold text-foreground">Food / Meal Allowance</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {toggles.food_enabled ? "Included on invoices" : "Excluded from invoices"}
+                      {toggles.food_enabled
+                        ? t("proforma.settings.includedOn")
+                        : t("proforma.settings.excludedFrom")}
                     </p>
                   </div>
                   <Switch
@@ -608,7 +614,9 @@ export default function ProformaSettingsConfig() {
                   <div>
                     <p className="text-sm font-semibold text-foreground">Stay / Accommodation</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {toggles.stay_enabled ? "Included on invoices" : "Excluded from invoices"}
+                      {toggles.stay_enabled
+                        ? t("proforma.settings.includedOn")
+                        : t("proforma.settings.excludedFrom")}
                     </p>
                   </div>
                   <Switch
@@ -621,7 +629,9 @@ export default function ProformaSettingsConfig() {
                   <div>
                     <p className="text-sm font-semibold text-foreground">Miscellaneous Claims</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {toggles.miscellaneous_enabled ? "Included on invoices" : "Excluded from invoices"}
+                      {toggles.miscellaneous_enabled
+                        ? t("proforma.settings.includedOn")
+                        : t("proforma.settings.excludedFrom")}
                     </p>
                   </div>
                   <Switch
@@ -1125,7 +1135,7 @@ export default function ProformaSettingsConfig() {
                 <div className="flex items-center justify-between p-3.5 bg-sidebar rounded-xl border border-border">
                   <div>
                     <p className="text-sm font-semibold">Region Active Status</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Disabled regions block invoice generation</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{t("proforma.settings.disabledRegions")}</p>
                   </div>
                   <Switch
                     checked={editRegionForm.is_active}

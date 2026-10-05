@@ -741,10 +741,7 @@ const StudentFilterDrawer = ({
                   }))
                 }
               />
-              {t(
-                "studentManagement.filters.outstandingInvoices",
-                "Outstanding invoices",
-              )}
+              {t("studentManagement.details.outstandingInvoices")}
             </label>
             <label className="flex items-center gap-2 text-sm">
               <Checkbox

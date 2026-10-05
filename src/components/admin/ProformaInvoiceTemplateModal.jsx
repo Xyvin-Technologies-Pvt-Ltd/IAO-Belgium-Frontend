@@ -4,9 +4,11 @@ import {
   printProformaInvoicePdf,
 } from "@/components/admin/ProformaInvoiceDocument";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 /** @deprecated Prefer opening /admin/proforma-invoices/:id/print in a new tab */
 export default function ProformaInvoiceTemplateModal({ open, onClose, proforma }) {
+  const { t } = useTranslation();
   if (!open || !proforma) return null;
 
   const handlePrint = () => {
@@ -20,7 +22,7 @@ export default function ProformaInvoiceTemplateModal({ open, onClose, proforma }
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white print:hidden">
           <div className="flex items-center space-x-2">
             <FileCheck className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base font-semibold">Pro-forma invoice</h2>
+            <h2 className="text-base font-semibold">{t("proforma.title")}</h2>
           </div>
           <div className="flex items-center space-x-3">
             <button

@@ -6,7 +6,7 @@
       "dashboard": "Dashboard",
       "myCourses": "Mijn opleidingen",
       "myApp": "Mijn APP",
-      "invoices": "Facturen",
+      "invoices": "Onkostennota’s",
       "assessment": "Toetsing"
     },
     "dropdown": {
@@ -29,7 +29,7 @@
       "exams": "Examens",
       "otherExams": "Overige examens",
       "practicalExams": "Praktijkexamens",
-      "proformaInvoices": "Mijn proforma-facturen"
+      "proformaInvoices": "Mijn pro-formaonkostennota’s"
     },
     "admin": {
       "title": "Beheerdersportaal",
@@ -59,7 +59,7 @@
       "teacherManagement": "Docentenbeheer",
       "studentManagement": "Studentenbeheer",
       "financeReports": "Financiële rapporten",
-      "customInvoices": "Aangepaste facturen",
+      "customInvoices": "Aangepaste onkostennota’s",
       "fkf": "Fachkursförderung",
       "adminManagement": "Beheerdersbeheer",
       "roleManagement": "Rolbeheer",
@@ -70,14 +70,18 @@
       "questionBanks": "Vragenbanken",
       "exams": "Examens",
       "results": "Resultaten",
-      "createInvoice": "Factuur aanmaken",
-      "proformaInvoices": "Proforma-facturen docenten",
-      "proformaSettings": "Proforma-tarieven & instellingen"
+      "createInvoice": "Aangepaste onkostennota aanmaken",
+      "proformaInvoices": "Pro-formaonkostennota’s voor docenten",
+      "proformaSettings": "Proforma-tarieven & instellingen",
+      "archiveInvoices": "Onkostennota’s"
     },
     "user": {
       "loading": "Laden...",
       "noRole": "Geen rol toegewezen",
       "signOut": "Afmelden"
+    },
+    "student": {
+      "invoices": "Onkostennota’s"
     }
   },
   "languages": {
@@ -182,7 +186,7 @@
     "searchTitles": "Academische graden zoeken...",
     "searchRoles": "Docentrollen zoeken...",
     "paymentId": "Betalings-ID",
-    "invoiceId": "Factuur-ID",
+    "invoiceId": "ID van de onkostennota",
     "receiptId": "Ontvangstbewijs-ID",
     "downloadReceipt": "Ontvangstbewijs downloaden",
     "studentName": "Naam student",
@@ -231,7 +235,9 @@
       "send": "Versturen",
       "sending": "Versturen...",
       "cancel": "Annuleren"
-    }
+    },
+    "invoice": "Onkostennota",
+    "invoiceReference": "Referentie van de onkostennota"
   },
   "finance": {
     "title": "Financieel beheer",
@@ -263,7 +269,7 @@
       "admissionFee": "Inschrijvingsgeld",
       "modulePurchase": "Module-aankoop",
       "locationSwitch": "Locatiewissel",
-      "customInvoice": "Aangepaste factuur",
+      "customInvoice": "Aangepaste onkostennota",
       "resitPurchase": "Herhalingsexamen",
       "other": "Overig"
     },
@@ -274,7 +280,7 @@
       "noPaymentAnalyticsFound": "Geen betalingsanalyse gevonden",
       "loadingAnalytics": "Analysegegevens laden...",
       "loadAnalyticsFailed": "Laden van analysegegevens mislukt",
-      "noCustomInvoicesFound": "Geen aangepaste facturen gevonden."
+      "noCustomInvoicesFound": "Geen aangepaste onkostennota’s gevonden."
     },
     "reports": {
       "all": {
@@ -298,16 +304,54 @@
         "description": "Betalingsanalyse per student"
       },
       "createInvoice": {
-        "title": "Aangepaste factuur aanmaken",
+        "title": "Aangepaste onkostennota aanmaken",
         "student": "Student selecteren",
         "searchStudent": "Zoeken naar een student...",
-        "invoiceTitle": "Factuurtitel / omschrijving",
+        "invoiceTitle": "Titel / omschrijving van de onkostennota",
         "titlePlaceholder": "bijv. Semester Fee, Scholarship Adjustment",
-        "submit": "Aangepaste factuur aanmaken"
+        "submit": "Aangepaste onkostennota aanmaken"
       },
       "customInvoices": {
-        "title": "Aangepaste facturen"
+        "title": "Aangepaste onkostennota’s"
+      },
+      "fkf": {
+        "description": "Gesubsidieerde module-onkostennota’s aanmaken voor in aanmerking komende studenten"
       }
+    },
+    "noCustomInvoicesFound": "Geen aangepaste onkostennota’s gevonden.",
+    "createInvoice": {
+      "title": "Aangepaste onkostennota aanmaken",
+      "invoiceTitle": "Titel / omschrijving van de onkostennota",
+      "submit": "Aangepaste onkostennota aanmaken"
+    },
+    "customInvoices": {
+      "title": "Aangepaste onkostennota’s"
+    },
+    "fkf": {
+      "createTab": "Onkostennota aanmaken",
+      "createButton": "FKF-onkostennota aanmaken",
+      "sendInvoice": "FKF-onkostennota verzenden",
+      "previewInvoices": "Voorbeeld van onkostennota’s",
+      "sendNInvoices": "{{count}} onkostennota’s verzenden",
+      "invoice": "Onkostennota",
+      "bulkSendConfirm": "{{count}} onkostennota’s verzenden",
+      "noInvoicesSent": "Nog geen FKF-onkostennota’s verzonden.",
+      "cancelHint": "Dit annuleert de onbetaalde subsidie-onkostennota. De student ziet dit aanbod niet meer. Betaalde subsidies kunnen niet worden geannuleerd.",
+      "toasts": {
+        "created": "FKF-onkostennota aangemaakt en e-mail verzonden",
+        "createFailed": "Aanmaken van FKF-onkostennota mislukt",
+        "previewFailed": "Voorbeeld van FKF-onkostennota’s mislukt",
+        "bulkFailed": "Bulkaanmaak van FKF-onkostennota’s mislukt",
+        "bulkPartialFailed": "{{failed}} van {{total}} onkostennota’s mislukt"
+      },
+      "subtitle": "In aanmerking komende studenten, gesubsidieerde onkostennota’s en postconfiguratie."
+    },
+    "hub": {
+      "thirdPartyDesc": "Regelingen beheren waarbij onkostennota’s van studenten door een derde worden betaald"
+    },
+    "toasts": {
+      "manualCreated": "Handmatige onkostennota aangemaakt!",
+      "createFailed": "Aanmaken van onkostennota mislukt"
     }
   },
   "queues": {
@@ -1009,7 +1053,8 @@
       "progress": "Academische voortgang",
       "general": "Module selectie",
       "payments": "Betalingen",
-      "notesAndAttachments": "Notities & Bijlagen"
+      "notesAndAttachments": "Notities & Bijlagen",
+      "invoices": "Onkostennota’s"
     },
     "details": {
       "assignedModules": "Toegewezen modules",
@@ -1033,8 +1078,8 @@
       "missed": "Afwezig",
       "unmarked": "Niet gemarkeerd",
       "billingMethod": "Facturering",
-      "viewInvoice": "Factuur bekijken",
-      "downloadInvoice": "Factuur downloaden",
+      "viewInvoice": "Onkostennota bekijken",
+      "downloadInvoice": "Onkostennota downloaden",
       "specialExceptions": "Speciale uitzonderingen",
       "configureExceptions": "Configureren",
       "noExceptions": "Geen uitzonderingen geconfigureerd. Standaard exameninstellingen zijn van toepassing.",
@@ -1042,7 +1087,9 @@
       "noAttendanceRecords": "Geen aanwezigheidsgegevens gevonden voor dit jaar.",
       "attendanceLoadFailed": "Laden van aanwezigheid mislukt",
       "configureExceptionsTitle": "Speciale uitzonderingen configureren",
-      "configureExceptionsHint": "Selecteer alle medische aandoeningen of leerproblemen die op deze student van toepassing zijn. Het systeem past automatisch het maximum aan extra minuten toe op hun examens."
+      "configureExceptionsHint": "Selecteer alle medische aandoeningen of leerproblemen die op deze student van toepassing zijn. Het systeem past automatisch het maximum aan extra minuten toe op hun examens.",
+      "outstandingInvoices": "Openstaande onkostennota’s",
+      "noInvoices": "Geen onkostennota’s gevonden"
     },
     "billing": {
       "personal": "Persoonlijk",
@@ -1096,7 +1143,7 @@
       "idCard": "ID-kaart geüpload",
       "qualificationCert": "Kwalificatiecertificaat",
       "flags": "Markeringen",
-      "outstandingInvoices": "Openstaande facturen",
+      "outstandingInvoices": "Openstaande onkostennota’s",
       "missedModules": "Gemiste modules (afwezig of niet gekocht)",
       "unpurchasedModules": "Alleen niet gekochte modules",
       "fachkursfoerderung": "In aanmerking voor Fachkursförderung",
@@ -2367,20 +2414,25 @@
     }
   },
   "proforma": {
-    "title": "Proforma-facturen",
-    "myInvoices": "Mijn proforma-facturen",
-    "teacherInvoices": "Proforma-facturen docenten",
-    "settings": "Proforma-tarieven & instellingen",
-    "financeCardDescription": "Volg verzonden, bijgewerkte en ondertekende proforma-facturen van docenten",
-    "backToList": "Terug naar facturen",
+    "title": "Pro-formaonkostennota’s",
+    "myInvoices": "Mijn pro-formaonkostennota’s",
+    "teacherInvoices": "Pro-formaonkostennota’s voor docenten",
+    "settings": {
+      "includedOn": "Opgenomen in onkostennota’s",
+      "excludedFrom": "Uitgesloten van onkostennota’s",
+      "masterTitle": "Hoofdinstellingen pro-formaonkostennota",
+      "disabledRegions": "Uitgeschakelde regio’s blokkeren het genereren van onkostennota’s"
+    },
+    "financeCardDescription": "Verzonden, bijgewerkte en ondertekende pro-formaonkostennota’s van docenten opvolgen",
+    "backToList": "Terug naar onkostennota’s",
     "backToQueue": "Terug naar proforma-wachtrij",
-    "loading": "Proforma-factuur laden...",
-    "loadingDetails": "Proforma-factuurdetails laden...",
-    "loadFailed": "Proforma-factuur laden mislukt",
-    "notFound": "Factuur niet gevonden",
+    "loading": "Pro-formaonkostennota laden...",
+    "loadingDetails": "Details van pro-formaonkostennota laden...",
+    "loadFailed": "Laden van pro-formaonkostennota mislukt",
+    "notFound": "Onkostennota niet gevonden",
     "previewAndSign": "Voorbeeld en ondertekenen",
     "downloadPdf": "PDF downloaden",
-    "viewInvoice": "Factuur bekijken",
+    "viewInvoice": "Onkostennota bekijken",
     "print": "Afdrukken",
     "sendToFinance": "Naar financiën sturen",
     "sending": "Verzenden...",
@@ -2392,11 +2444,11 @@
     "bankAccountProfile": "Bankrekening (profiel)",
     "iban": "IBAN",
     "company": "Bedrijf",
-      "invoiceCompany": "Factuurbedrijf",
-      "companyAddress": "Bedrijfsadres",
-      "additionalInfo1": "Extra info 1",
-      "additionalInfo2": "Extra info 2",
-      "confirmSectionsHint": "Bevestig elke sectie met een bedrag, bekijk daarna het voorbeeld en onderteken.",
+    "invoiceCompany": "Bedrijfsgegevens voor de onkostennota",
+    "companyAddress": "Bedrijfsadres",
+    "additionalInfo1": "Extra info 1",
+    "additionalInfo2": "Extra info 2",
+    "confirmSectionsHint": "Bevestig elke sectie met een bedrag, bekijk daarna het voorbeeld en onderteken.",
     "attachReceiptsHint": "Voeg vereiste bonnen toe vóór ondertekening: {{items}}.",
     "activityLog": "Activiteitenlogboek",
     "noActivity": "Nog geen activiteit geregistreerd.",
@@ -2423,15 +2475,15 @@
       "open": "Open"
     },
     "sign": {
-      "invoiceDetails": "Factuurgegevens",
-      "previewInvoiceTitle": "Factuurvoorbeeld",
-      "invoiceSigned": "Factuur ondertekend",
+      "invoiceDetails": "Gegevens van de onkostennota",
+      "previewInvoiceTitle": "Voorbeeld van de onkostennota",
+      "invoiceSigned": "Onkostennota ondertekend",
       "stepOf": "Stap {{step}} van 2 · {{number}} · €{{amount}}",
-      "infoBanner": "De factuur wordt op deze gegevens uitgereikt. Wijzig ze hieronder als ze anders moeten zijn.",
+      "infoBanner": "De onkostennota wordt op basis van deze gegevens opgesteld. Pas ze hieronder aan indien nodig.",
       "noAddress": "Geen adres bekend",
       "bankAccountIban": "Bankrekening (IBAN)",
       "bankPlaceholder": "bijv. NL91ABNA0417164300",
-      "differentDetails": "Factuur op andere gegevens uitreiken",
+      "differentDetails": "Onkostennota met andere gegevens opstellen",
       "companyName": "Bedrijfsnaam",
       "companyNamePlaceholder": "Bedrijfsnaam",
       "address": "Adres",
@@ -2442,15 +2494,15 @@
       "additionalInfo2": "Extra info 2",
       "optional": "Optioneel",
       "additionalInfoPlaceholder": "bijv. btw-nummer, KvK-nummer, contact-e-mail",
-      "additionalInfoHelp": "Vrije tekst. Letters, cijfers en speciale tekens zoals @ zijn toegestaan. Alleen zichtbaar op de factuur als ingevuld.",
+      "additionalInfoHelp": "…Wordt alleen op de onkostennota weergegeven als dit veld is ingevuld.",
       "additionalInfoMax": "Maximaal 200 tekens",
       "cancel": "Annuleren",
-      "previewInvoice": "Factuurvoorbeeld",
+      "previewInvoice": "Voorbeeld van de onkostennota",
       "edit": "Bewerken",
       "editDetails": "Gegevens bewerken",
       "sign": "Ondertekenen",
       "approveAndSign": "Goedkeuren & ondertekenen",
-      "confirmCheckedDetails": "Ik heb alle gegevens gecontroleerd. Zodra ik deze factuur goedkeur en onderteken, zijn geen wijzigingen meer mogelijk.",
+      "confirmCheckedDetails": "Ik heb alle gegevens gecontroleerd. Zodra ik deze onkostennota goedkeur en onderteken, kunnen er geen wijzigingen meer worden aangebracht.",
       "close": "Sluiten",
       "downloadPdf": "PDF downloaden",
       "teacherNameMissing": "Docentennaam ontbreekt op je profiel",
@@ -2470,7 +2522,9 @@
       "fullName": "Volledige wettelijke naam",
       "fullNamePlaceholder": "Zoals op je identiteitsbewijs",
       "nameRequired": "Volledige wettelijke naam is verplicht",
-      "nameMin": "Voer minstens 2 tekens in"
+      "nameMin": "Voer minstens 2 tekens in",
+      "signInvoice": "Onkostennota ondertekenen",
+      "signByTyping": "Onkostennota ondertekenen door wettelijke naam te typen"
     },
     "list": {
       "allStatuses": "Alle statussen",
@@ -2481,8 +2535,71 @@
       "updated": "Bijgewerkt",
       "actions": "Acties",
       "view": "Bekijken",
-      "empty": "Geen proforma-facturen gevonden."
+      "empty": "Geen pro-formaonkostennota’s gevonden.",
+      "all": "Alle onkostennota’s",
+      "number": "Onkostennota nr.",
+      "viewAndSign": "Onkostennota bekijken en ondertekenen",
+      "search": "Onkostennota zoeken…",
+      "retry": "Onkostennota opnieuw proberen"
     },
-    "signedByLabel": "Ondertekend door"
+    "signedByLabel": "Ondertekend door",
+    "toasts": {
+      "signFailed": "Ondertekenen van de pro-formaonkostennota mislukt",
+      "signed": "Onkostennota digitaal ondertekend en goedgekeurd!",
+      "draftSaved": "Concept opgeslagen",
+      "pdfFailed": "PDF kon niet worden gegenereerd",
+      "statusUpdated": "Status van de onkostennota bijgewerkt!",
+      "recalcSuccess": "Berekening van de onkostennota opnieuw uitgevoerd!",
+      "recalcFailed": "Opnieuw berekenen van de onkostennota mislukt"
+    },
+    "backToMyInvoices": "Terug naar mijn onkostennota’s",
+    "myInvoicesShort": "Mijn onkostennota’s",
+    "detail": {
+      "noFixedTravel": "Geen vaste moduleverplaatsing op deze onkostennota.",
+      "noRoadTravel": "Geen wegverplaatsingsregel op deze onkostennota.",
+      "noTickets": "Geen {{mode}}-tickets op deze onkostennota.",
+      "noRoadTravelHint": "Geen wegverplaatsingsregel op deze onkostennota. Gebruik trein of vliegtuig om tickets toe te voegen."
+    },
+    "loadingYour": "Uw pro-formaonkostennota wordt geladen..."
+  },
+  "integrations": {
+    "exact": {
+      "switch_invoice": "Van onkostennota wisselen",
+      "searchPlaceholder": "Zoek op onkostennota, transactie-ID of e-mailadres",
+      "exactInvoiceNo": "Exact-nummer van de onkostennota",
+      "convertToInvoice": "Omzetten naar onkostennota",
+      "typeInvoice": "Onkostennota",
+      "table": {
+        "invoice": "Onkostennota"
+      },
+      "reconciliation": {
+        "typeInvoice": "Onkostennota",
+        "exactInvoiceNo": "Exact-nummer van de onkostennota",
+        "convertToInvoice": "Omzetten naar onkostennota",
+        "switch_invoice": "Van onkostennota wisselen",
+        "searchPlaceholder": "Zoek op onkostennota, transactie-ID of e-mailadres"
+      },
+      "sources": {
+        "invoice": "Onkostennota"
+      },
+      "types": {
+        "invoice": "Onkostennota",
+        "switch_invoice": "Van onkostennota wisselen"
+      }
+    }
+  },
+  "archive": {
+    "invoices": {
+      "singular": "Onkostennota",
+      "plural": "Onkostennota’s",
+      "empty": "Geen onkostennota’s gevonden",
+      "loading": "Onkostennota laden..."
+    }
+  },
+  "coachviewImport": {
+    "subTabs": {
+      "invoices": "Onkostennota’s"
+    },
+    "invoicesAllYears": "CoachView-onkostennota’s hebben geen studiejaar-toewijzing — de volledige geschiedenis van onkostennota’s van de student wordt getoond."
   }
 }
