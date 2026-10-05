@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Paperclip, Pencil, Trash2 } from "lucide-react";
+import { openSecureFile } from "@/utils/secureFile";
+import { toast } from "sonner";
 
 const eur = (n) => `€${Number(n || 0).toFixed(2)}`;
 
@@ -90,16 +92,21 @@ export default function ProformaEditableClaimRow({
         {(line.attachments || []).length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1">
             {line.attachments.map((a, idx) => (
-              <a
+              <button
+                type="button"
                 key={a._id || a.file_url || idx}
-                href={a.file_url}
-                target="_blank"
-                rel="noreferrer"
                 className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:underline"
+                onClick={async () => {
+                  try {
+                    await openSecureFile(a.file_url || a.key, a.file_name);
+                  } catch (err) {
+                    toast.error(err?.message || "Could not open file");
+                  }
+                }}
               >
                 <Paperclip className="w-3 h-3" />
                 {a.file_name}
-              </a>
+              </button>
             ))}
           </div>
         )}
