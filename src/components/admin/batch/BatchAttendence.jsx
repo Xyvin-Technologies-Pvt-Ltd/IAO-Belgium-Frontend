@@ -61,19 +61,11 @@ const BatchAttendence = () => {
           </div>
         </div>
       );
-    } else if (status === "location_changed") {
+    } else if (status === "location_changed" || status === "completed_elsewhere") {
       return (
         <div className="flex items-center justify-center" title="Location changed">
           <div className="w-4 h-4 rounded-full bg-orange-400 flex items-center justify-center">
             <MapPin className="w-2 h-2 text-white stroke-3" />
-          </div>
-        </div>
-      );
-    } else if (status === "completed_elsewhere") {
-      return (
-        <div className="flex items-center justify-center" title="Completed in another batch">
-          <div className="w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center">
-            <Check className="w-2 h-2 text-white stroke-3" />
           </div>
         </div>
       );
@@ -195,8 +187,12 @@ const BatchAttendence = () => {
                         key={`${module.module_id}-no-session`}
                         className="text-center border-l py-2"
                       >
-                        {student.availability_statuses?.[module.module_id] === "completed" ? (
-                          <div className="flex items-center justify-center" title="Completed in another batch">
+                        {student.availability_statuses?.[module.module_id] ===
+                        "location_changed" ? (
+                          getAttendanceIcon("location_changed")
+                        ) : student.availability_statuses?.[module.module_id] ===
+                          "completed" ? (
+                          <div className="flex items-center justify-center" title="Completed">
                             <Check className="w-4 h-4 text-emerald-600 stroke-3" />
                           </div>
                         ) : (
