@@ -1364,6 +1364,10 @@
   },
   "studentManagement": {
     "title": "Student Management",
+    "changeLocation": "Change Location",
+    "changeLocationDescription": "Select a student and a target module slot. Only modules that have not started yet can change location.",
+    "changeLocationModulesHint": "Only modules that have not started yet are listed. Modules that are in progress, completed, or failed cannot change location.",
+    "changeLocationNoModules": "No modules available for location change. This student has no modules that are still available (not started). In progress, completed, and failed modules are excluded.",
     "search": "Search students...",
     "exportCsv": "Export CSV",
     "exporting": "Exporting...",

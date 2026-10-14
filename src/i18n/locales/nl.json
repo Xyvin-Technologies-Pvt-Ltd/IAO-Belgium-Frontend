@@ -1057,6 +1057,10 @@
   },
   "studentManagement": {
     "title": "Studentenbeheer",
+    "changeLocation": "Locatie wijzigen",
+    "changeLocationDescription": "Selecteer een student en een doelslot. Alleen modules die nog niet gestart zijn, kunnen van locatie wisselen.",
+    "changeLocationModulesHint": "Alleen modules die nog niet gestart zijn, worden getoond. Modules die bezig, voltooid of mislukt zijn, kunnen geen locatie wijzigen.",
+    "changeLocationNoModules": "Geen modules beschikbaar voor locatiewijziging. Deze student heeft geen modules die nog beschikbaar zijn (niet gestart). Modules die bezig, voltooid of mislukt zijn, worden uitgesloten.",
     "search": "Studenten zoeken...",
     "tabs": {
       "progress": "Academische voortgang",
