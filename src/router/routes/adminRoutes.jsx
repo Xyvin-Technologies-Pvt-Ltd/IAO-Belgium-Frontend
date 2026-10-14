@@ -1,6 +1,7 @@
 import { Navigate } from "@tanstack/react-router";
 import Programs from "@/pages/admin/program";
 import Submissions from "@/pages/admin/submission";
+import ModuleReattemptsPage from "@/pages/admin/module-reattempts";
 import ProgramDetail from "@/pages/admin/program/ProgramDetail";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
@@ -315,6 +316,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       Submissions,
       "/admin/submissions",
+    ),
+  },
+  {
+    path: "/admin/module-reattempts",
+    component: withPermissionProtection(
+      ModuleReattemptsPage,
+      "/admin/module-reattempts",
     ),
   },
   {

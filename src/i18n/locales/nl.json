@@ -1025,6 +1025,15 @@
       "noLogs": "Geen jaarafsluitingslogs gevonden voor deze groep."
     }
   },
+  "yearCompletion": {
+    "title": "Jaarafsluiting berekenen",
+    "calculate": "Jaarafsluiting berekenen",
+    "promote": "Promoveren",
+    "demote": "Degraderen",
+    "assignGroup": "Groep toewijzen",
+    "reattemptQueue": "Module herkansingen",
+    "requestReattempt": "Herkansing aanvragen"
+  },
   "studentImport": {
     "title": "Studenten bulk uploaden",
     "description": "Selecteer het programma en de batch en upload vervolgens een Excel-/CSV-bestand. Studenten worden aangemaakt met volledige toegang en zonder inschrijfgeld. Voer eerst een voorbeeld uit voordat u importeert.",
