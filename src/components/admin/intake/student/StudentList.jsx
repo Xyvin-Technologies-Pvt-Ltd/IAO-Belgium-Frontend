@@ -29,6 +29,7 @@ import MoveStudentDialog from "./MoveStudentDialog";
 import ReEnrollStudentDialog from "./ReEnrollStudentDialog";
 import PauseStopEnrollmentDialog from "@/components/admin/batch/PauseStopEnrollmentDialog";
 import ResumeEnrollmentDialog from "@/components/admin/batch/ResumeEnrollmentDialog";
+import YearCompletionDialog from "@/components/admin/batch/YearCompletionDialog";
 
 const StudentList = () => {
   const params = useParams({ strict: false });
@@ -44,6 +45,7 @@ const StudentList = () => {
   const [reEnrollDialogOpen, setReEnrollDialogOpen] = useState(false);
   const [holdDialog, setHoldDialog] = useState({ open: false, mode: "pause", student: null });
   const [resumeDialogOpen, setResumeDialogOpen] = useState(false);
+  const [yearCompletionStudent, setYearCompletionStudent] = useState(null);
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
@@ -166,6 +168,20 @@ const StudentList = () => {
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <RowActionMenu
                     actions={[
+                      ...(i.year_status === "active" || i.year_status === "completed"
+                        ? [
+                            {
+                              label: t(
+                                "yearCompletion.calculate",
+                                "Calculate year completion",
+                              ),
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                setYearCompletionStudent(i);
+                              },
+                            },
+                          ]
+                        : []),
                       ...(i.year_status === "active"
                         ? [
                             {
@@ -278,6 +294,19 @@ const StudentList = () => {
         onOpenChange={setResumeDialogOpen}
         student={selectedStudent}
         batchId={selectedStudent?.batch_id || selectedStudent?.previous_batch}
+      />
+
+      <YearCompletionDialog
+        open={!!yearCompletionStudent}
+        onOpenChange={(open) => !open && setYearCompletionStudent(null)}
+        applicationId={yearCompletionStudent?._id}
+        studentName={[
+          yearCompletionStudent?.last_name,
+          yearCompletionStudent?.first_name,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onDone={refetch}
       />
     </div>
   );

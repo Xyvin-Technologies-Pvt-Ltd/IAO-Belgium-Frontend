@@ -164,7 +164,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
           <DialogDescription className="break-words">
             {t(
               "studentManagement.changeLocationDescription",
-              "Select a student and target module slot. Admin can switch unpaid modules for free. Paid modules requiring payment must go through the student portal.",
+              "Select a student and target module slot.",
             )}
           </DialogDescription>
         </DialogHeader>
@@ -296,7 +296,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
               <p className="font-medium">
                 {t("studentManagement.paymentSummary", "Payment summary")}
               </p>
-              {!quote.is_paid && canSwitch ? (
+              {!quote.is_paid ? (
                 quote.direct_switch ? (
                   <p className="text-emerald-700 dark:text-emerald-400 break-words">
                     {t(
@@ -312,32 +312,33 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                     )}
                   </p>
                 )
-              ) : quote.is_paid && !canSwitch ? (
+              ) : Number(quote.payable_amount) > 0 ? (
                 <>
-                  {Number(quote.payable_amount) > 0 && (
-                    <p className="text-amber-700 dark:text-amber-400 break-words">
-                      {t("studentManagement.paymentRequired", "Payment required")}:{" "}
-                      {quote.payable_amount} {quote.new_session_currency || "EUR"}
-                    </p>
-                  )}
                   <p className="text-amber-700 dark:text-amber-400 break-words">
                     {t(
-                      "studentManagement.paidModuleBlocked",
-                      "Paid module — admin cannot switch. Student must use portal.",
+                      "studentManagement.remainingToPay",
+                      "Remaining to pay: {{payable}}",
+                      {
+                        payable: `${quote.payable_amount} ${quote.new_session_currency || "EUR"}`,
+                      },
                     )}
                   </p>
+                  {Number(quote.paid_amount) > 0 && (
+                    <p className="text-xs text-muted-foreground break-words">
+                      {t(
+                        "studentManagement.paidCreditApplied",
+                        "Already paid {{paid}} — new price {{newPrice}}",
+                        {
+                          paid: `${quote.paid_amount} ${quote.new_session_currency || "EUR"}`,
+                          newPrice: `${quote.new_session_amount} ${quote.new_session_currency || "EUR"}`,
+                        },
+                      )}
+                    </p>
+                  )}
                 </>
-              ) : canSwitch ? (
+              ) : (
                 <p className="text-muted-foreground break-words">
                   {t("studentManagement.noPaymentDue", "No payment due")}
-                </p>
-              ) : null}
-              {!canSwitch && quote.is_paid && (
-                <p className="text-xs text-muted-foreground break-words">
-                  {t(
-                    "studentManagement.adminSwitchBlocked",
-                    "Switch is disabled — payment must be handled via student portal.",
-                  )}
                 </p>
               )}
             </div>

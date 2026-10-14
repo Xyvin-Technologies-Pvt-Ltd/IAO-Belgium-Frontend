@@ -25,7 +25,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import { toast } from "sonner";
-import { UserPlus, UserMinus, Download, Pause, Ban, Play } from "lucide-react";
+import { UserPlus, UserMinus, Download, Pause, Ban, Play, Calculator } from "lucide-react";
 import {
   useGetBatchesById,
   useGetStudentsByBatch,
@@ -38,6 +38,7 @@ import RemoveStudentFromBatchDialog from "./RemoveStudentFromBatchDialog";
 import PauseStopEnrollmentDialog from "./PauseStopEnrollmentDialog";
 import ResumeEnrollmentDialog from "./ResumeEnrollmentDialog";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
+import YearCompletionDialog from "@/components/admin/batch/YearCompletionDialog";
 
 const BatchStudentList = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const BatchStudentList = () => {
   const [removingStudent, setRemovingStudent] = useState(null);
   const [holdDialog, setHoldDialog] = useState({ open: false, mode: "pause", student: null });
   const [resumeStudent, setResumeStudent] = useState(null);
+  const [yearCompletionStudent, setYearCompletionStudent] = useState(null);
 
   useEffect(() => {
     setPage(1);
@@ -146,6 +148,16 @@ const BatchStudentList = () => {
     // In-group / active
     return (
       <div className="flex items-center justify-end gap-1">
+        {(yearStatus === "active" || yearStatus === "completed") && (
+          <Button
+            variant="ghost"
+            size="icon"
+            title={t("yearCompletion.calculate", "Calculate year completion")}
+            onClick={() => setYearCompletionStudent(student)}
+          >
+            <Calculator className="h-4 w-4 text-primary" />
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon"
@@ -324,6 +336,19 @@ const BatchStudentList = () => {
           />
         </>
       )}
+
+      <YearCompletionDialog
+        open={!!yearCompletionStudent}
+        onOpenChange={(open) => !open && setYearCompletionStudent(null)}
+        applicationId={yearCompletionStudent?._id}
+        studentName={[
+          yearCompletionStudent?.last_name,
+          yearCompletionStudent?.first_name,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onDone={refetch}
+      />
     </div>
   );
 };

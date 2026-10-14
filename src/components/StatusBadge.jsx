@@ -40,10 +40,16 @@ const statusVariants = {
   validation_check: "text-blue-600",
   validation_failed: "text-red-600",
   year_promoted: "text-green-600",
+  year_demoted: "text-amber-600",
   manual_override: "text-purple-600",
   year_marked_failed: "text-red-600",
   year_re_enrolled: "text-blue-600",
   course_completed: "text-green-600",
+  planning_ended: "text-amber-600",
+  student_request: "text-blue-600",
+  leftover: "text-amber-600",
+  completed_reattempt: "text-indigo-600",
+  assigned: "text-green-600",
 
   // Submission statuses
   submitted: "text-blue-600",

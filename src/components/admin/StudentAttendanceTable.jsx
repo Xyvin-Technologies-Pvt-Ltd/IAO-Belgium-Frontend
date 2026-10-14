@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
@@ -40,8 +40,10 @@ const getAttendanceIcon = (status) => {
 };
 
 const getAttendanceLabel = (status, t) => {
-  if (status === "present") return t("studentManagement.details.attended", "Attended");
-  if (status === "absent") return t("studentManagement.details.missed", "Missed");
+  if (status === "present")
+    return t("studentManagement.details.attended", "Attended");
+  if (status === "absent")
+    return t("studentManagement.details.missed", "Missed");
   return t("studentManagement.details.unmarked", "Unmarked");
 };
 
@@ -54,6 +56,41 @@ const StudentAttendanceTable = ({
   compact = false,
 }) => {
   const { t } = useTranslation();
+
+  const displayModules = useMemo(() => {
+    const rows = [];
+    modules.forEach((module) => {
+      const previous = module.previous_sessions || [];
+      const current = module.sessions || [];
+      if (previous.length > 0) {
+        const groupLabel = module.previous_group_name
+          ? t("studentManagement.details.previousGroupNamed", "Previous group ({{name}})", {
+              name: module.previous_group_name,
+            })
+          : t("studentManagement.details.previousGroup", "Previous group");
+        rows.push({
+          ...module,
+          key: `${module.uid || module.name}-prev`,
+          displayName: module.name,
+          groupLabel,
+          sessions: previous,
+          isPrevious: true,
+        });
+      }
+      rows.push({
+        ...module,
+        key: `${module.uid || module.name}-curr`,
+        displayName: module.name,
+        groupLabel:
+          previous.length > 0
+            ? t("studentManagement.details.currentGroup", "Current group")
+            : null,
+        sessions: current,
+        isPrevious: false,
+      });
+    });
+    return rows;
+  }, [modules, t]);
 
   return (
     <Table className="border-collapse">
@@ -85,20 +122,46 @@ const StudentAttendanceTable = ({
           <TableRow>
             <TableCell colSpan={compact ? 4 : 5} className="text-center p-6">
               <ErrorMessage
-                message={error?.message || t("studentManagement.details.attendanceLoadFailed", "Failed to load attendance")}
+                message={
+                  error?.message ||
+                  t(
+                    "studentManagement.details.attendanceLoadFailed",
+                    "Failed to load attendance",
+                  )
+                }
                 onRetry={refetch}
                 variant="inline"
               />
             </TableCell>
           </TableRow>
-        ) : modules.length > 0 ? (
-          modules.map((module, mIdx) => (
-            <React.Fragment key={mIdx}>
+        ) : displayModules.length > 0 ? (
+          displayModules.map((module) => (
+            <React.Fragment key={module.key}>
+              {module.groupLabel && (
+                <TableRow
+                  className={
+                    module.isPrevious
+                      ? "bg-amber-50/60 dark:bg-amber-950/20"
+                      : "bg-muted/30"
+                  }
+                >
+                  <TableCell
+                    colSpan={compact ? 4 : 5}
+                    className="py-2 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  >
+                    {module.displayName}
+                    {" · "}
+                    {module.groupLabel}
+                  </TableCell>
+                </TableRow>
+              )}
               {module.sessions?.length > 0 ? (
                 module.sessions.map((session, sIdx) => (
                   <TableRow
-                    key={`${mIdx}-${sIdx}`}
-                    className="hover:bg-muted/10 border-b transition-colors"
+                    key={`${module.key}-${sIdx}`}
+                    className={`hover:bg-muted/10 border-b transition-colors ${
+                      module.isPrevious ? "bg-amber-50/30 dark:bg-amber-950/10" : ""
+                    }`}
                   >
                     {sIdx === 0 && (
                       <>
@@ -113,7 +176,7 @@ const StudentAttendanceTable = ({
                           className="align-top py-3 px-3 font-bold text-sm text-foreground/90 max-w-[200px]"
                         >
                           <div className="leading-tight whitespace-normal break-words">
-                            {module.name}
+                            {module.displayName}
                           </div>
                         </TableCell>
                       </>
@@ -141,23 +204,28 @@ const StudentAttendanceTable = ({
                   </TableRow>
                 ))
               ) : (
-                <TableRow className="hover:bg-muted/10 transition-colors">
-                  <TableCell className="py-3 px-3 font-medium text-sm text-foreground/80">
-                    {module.uid}
-                  </TableCell>
-                  <TableCell className="py-3 px-3 font-bold text-sm text-foreground/90">
-                    {module.name}
-                  </TableCell>
-                  <TableCell
-                    colSpan={compact ? 1 : 2}
-                    className="py-3 px-3 text-sm text-muted-foreground italic"
-                  >
-                    {t("studentManagement.details.noSessionsPlanned", "No sessions planned")}
-                  </TableCell>
-                  <TableCell className="py-3 px-3 text-center">
-                    {getAttendanceIcon("pending")}
-                  </TableCell>
-                </TableRow>
+                !module.isPrevious && (
+                  <TableRow className="hover:bg-muted/10 transition-colors">
+                    <TableCell className="py-3 px-3 font-medium text-sm text-foreground/80">
+                      {module.uid}
+                    </TableCell>
+                    <TableCell className="py-3 px-3 font-bold text-sm text-foreground/90">
+                      {module.displayName}
+                    </TableCell>
+                    <TableCell
+                      colSpan={compact ? 1 : 2}
+                      className="py-3 px-3 text-sm text-muted-foreground italic"
+                    >
+                      {t(
+                        "studentManagement.details.noSessionsPlanned",
+                        "No sessions planned",
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3 px-3 text-center">
+                      {getAttendanceIcon("pending")}
+                    </TableCell>
+                  </TableRow>
+                )
               )}
             </React.Fragment>
           ))
@@ -167,7 +235,10 @@ const StudentAttendanceTable = ({
               colSpan={compact ? 4 : 5}
               className="text-center p-6 text-muted-foreground italic text-sm"
             >
-              {t("studentManagement.details.noAttendanceRecords", "No attendance records found for this year.")}
+              {t(
+                "studentManagement.details.noAttendanceRecords",
+                "No attendance records found for this year.",
+              )}
             </TableCell>
           </TableRow>
         )}

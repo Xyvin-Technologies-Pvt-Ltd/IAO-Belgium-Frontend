@@ -14,7 +14,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
-import { Check, X } from "lucide-react";
+import { Check, X, MapPin } from "lucide-react";
 import {
   useGetStudentsByComponent,
 } from "@/store/useComponentStore";
@@ -171,12 +171,42 @@ const SessionAttendence = () => {
             </TableRow>
           ) : students?.length > 0 ? (
             students?.map((student) => {
-              const currentStatus = student.attendance_status;
+              const leftGroup =
+                student.left_group ||
+                student.attendance_status === "location_changed";
+              const priorStatus = student.prior_attendance_status;
+              const currentStatus = leftGroup
+                ? priorStatus
+                : student.attendance_status;
+              const actionsDisabled =
+                markAttendanceMutation.isPending ||
+                isAttendanceLocked ||
+                leftGroup;
               return (
                 <TableRow key={student.application_id}>
                   <TableCell className={"capitalize"}>
-                    {`${student.last_name || ""} ${student.first_name || ""}`.trim() ||
-                      "N/A"}
+                    <div className="flex flex-col gap-1">
+                      <span>
+                        {`${student.last_name || ""} ${student.first_name || ""}`.trim() ||
+                          "N/A"}
+                      </span>
+                      {leftGroup && (
+                        <span className="inline-flex items-center gap-1 w-fit px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                          <MapPin className="h-3 w-3" />
+                          {t(
+                            "attendance.leftGroup",
+                            "Left group",
+                          )}
+                          {priorStatus
+                            ? ` · ${
+                                priorStatus === "present"
+                                  ? t("attendance.wasPresent", "Was present")
+                                  : t("attendance.wasAbsent", "Was absent")
+                              }`
+                            : ""}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {student.purchased ? (
@@ -202,16 +232,14 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "present" && (markAttendanceMutation.isPending || isAttendanceLocked)
+                          currentStatus === "present" && actionsDisabled
                             ? { backgroundColor: "#49BA6C", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
                         onClick={() =>
                           handleAttendanceUpdate(student.application_id, "present")
                         }
-                        disabled={
-                          markAttendanceMutation.isPending || isAttendanceLocked
-                        }
+                        disabled={actionsDisabled}
                       >
                         <Check className="h-4 w-4 mr-1" />
                         Present
@@ -227,16 +255,14 @@ const SessionAttendence = () => {
                             : "text-muted-foreground bg-[#808080]/10 hover:bg-gray-200 border-gray-300"
                         }
                         style={
-                          currentStatus === "absent" && (markAttendanceMutation.isPending || isAttendanceLocked)
+                          currentStatus === "absent" && actionsDisabled
                             ? { backgroundColor: "#E7000B", color: "#ffffff", opacity: 0.7 }
                             : {}
                         }
                         onClick={() =>
                           handleAttendanceUpdate(student.application_id, "absent")
                         }
-                        disabled={
-                          markAttendanceMutation.isPending || isAttendanceLocked
-                        }
+                        disabled={actionsDisabled}
                       >
                         <X className="h-4 w-4 mr-1" />
                         Absent

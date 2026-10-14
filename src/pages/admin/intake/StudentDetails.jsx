@@ -35,6 +35,8 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
+import ModuleReattemptDialog from "@/components/admin/batch/ModuleReattemptDialog";
+import { Button } from "@/components/ui/button";
 
 
 const formatSubmissionType = (type) =>
@@ -75,6 +77,7 @@ const StudentDetails = () => {
 
   const [activeTab, setActiveTab] = useState("progress");
   const [filter, setFilter] = useState({ year: 1 });
+  const [reattemptModule, setReattemptModule] = useState(null);
   const [paymentsPage, setPaymentsPage] = useState(1);
   const [paymentsRowsPerPage, setPaymentsRowsPerPage] = useState(10);
   const [transactionsPage, setTransactionsPage] = useState(1);
@@ -515,9 +518,11 @@ const StudentDetails = () => {
             ) : (
               <>
             <div className="col-span-12">
-              <h3 className="font-semibold mb-4">
-                {t("studentManagement.details.assignedModules", "Assigned Modules")}
-              </h3>
+              <div className="mb-4">
+                <h3 className="font-semibold">
+                  {t("studentManagement.details.assignedModules", "Assigned Modules")}
+                </h3>
+              </div>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -533,6 +538,9 @@ const StudentDetails = () => {
                     <TableHead>
                       {t("studentManagement.details.payment", "Payment")}
                     </TableHead>
+                    <TableHead className="text-right">
+                      {t("common.actions", "Actions")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -547,12 +555,31 @@ const StudentDetails = () => {
                         <TableCell>
                           <StatusBadge status={m.payment_status || "unpaid"} />
                         </TableCell>
+                        <TableCell className="text-right">
+                          {m.status !== "locked" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                setReattemptModule({
+                                  componentId: m._id || m.component_id,
+                                  name: m.name,
+                                })
+                              }
+                            >
+                              {t(
+                                "yearCompletion.assignGroup",
+                                "Assign group",
+                              )}
+                            </Button>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={4}
+                        colSpan={5}
                         className="text-center text-muted-foreground"
                       >
                         {t(
@@ -1312,6 +1339,15 @@ const StudentDetails = () => {
           studentData={studentData}
         />
       )}
+
+      <ModuleReattemptDialog
+        open={!!reattemptModule}
+        onOpenChange={(open) => !open && setReattemptModule(null)}
+        applicationId={studentData?._id}
+        componentId={reattemptModule?.componentId}
+        moduleName={reattemptModule?.name}
+        onDone={refetch}
+      />
 
       {(() => {
         if (
