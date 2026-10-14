@@ -510,7 +510,43 @@
       "searchPlaceholder": "Search expense note, transaction ID, or email",
       "exactInvoiceNo": "Exact expense note #",
       "convertToInvoice": "Convert to expense note",
-      "typeInvoice": "Expense Note"
+      "typeInvoice": "Expense Note",
+      "mollieRef": {
+        "title": "Mollie ↔ Exact matching (xCore)",
+        "hint": "Writes the Mollie transaction ID (tr_…) into Your Reference on past Exact records, so xCore can match Mollie payouts. Only Your Reference changes — never amounts or lines. Start with a dry run.",
+        "dryRun": "Dry run",
+        "applyOne": "Apply to 1 (test)",
+        "applyAll": "Apply to all",
+        "confirmApplyAll": "Write the Mollie transaction ID into Your Reference on all matching Exact records? Run a dry run and a 1-record test first.",
+        "running": "Running…",
+        "state": {
+          "idle": "Not run yet",
+          "running": "Running",
+          "done": "Finished",
+          "failed": "Failed"
+        },
+        "modeDryRun": "Dry run",
+        "modeApply": "Applied",
+        "progress": "{{done}} / {{total}} transactions checked",
+        "updated": "Updated",
+        "wouldUpdate": "Would update",
+        "alreadySet": "Already set",
+        "skipped": "Skipped",
+        "failed": "Failed",
+        "startedAt": "Started {{date}}",
+        "finishedAt": "Finished {{date}}",
+        "issues": "Skipped / failed records (match these by hand in xCore)",
+        "table": {
+          "record": "IAO record",
+          "transaction": "Mollie transaction",
+          "reason": "Reason"
+        },
+        "reasons": {
+          "multiple_exact_records_for_transaction": "One Mollie payment links to more than one Exact record (e.g. location switch)",
+          "invoice_amount_differs_from_payment": "Invoice amount differs from the Mollie payment amount",
+          "transaction_id_already_used_as_yourref_on_another_exact_record": "Another Exact record already has this transaction ID"
+        }
+      }
     }
   },
   "queues": {
