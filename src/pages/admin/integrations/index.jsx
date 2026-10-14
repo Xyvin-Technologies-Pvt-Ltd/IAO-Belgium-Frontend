@@ -26,6 +26,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
 import ReconciliationTab from "./ReconciliationTab";
+import MollieRefBackfillCard from "./MollieRefBackfillCard";
 
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
@@ -605,12 +606,15 @@ const IntegrationsPage = () => {
             )}
           </>
         ) : (
-          <ReconciliationTab
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-          />
+          <div className="space-y-6">
+            <MollieRefBackfillCard isConnected={isConnected} canModify={canModify} />
+            <ReconciliationTab
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+            />
+          </div>
         )}
       </div>
     </div>
