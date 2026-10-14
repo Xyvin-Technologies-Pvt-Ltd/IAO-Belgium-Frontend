@@ -164,7 +164,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
           <DialogDescription className="break-words">
             {t(
               "studentManagement.changeLocationDescription",
-              "Select a student and target module slot.",
+              "Select a student and a target module slot. Only modules that have not started yet can change location.",
             )}
           </DialogDescription>
         </DialogHeader>
@@ -218,6 +218,21 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                   ))}
                 </SelectContent>
               </Select>
+              {!modulesLoading && modules.length === 0 ? (
+                <p className="text-sm text-amber-700 dark:text-amber-400 break-words">
+                  {t(
+                    "studentManagement.changeLocationNoModules",
+                    "No modules available for location change. This student has no modules that are still available (not started). In progress, completed, and failed modules are excluded.",
+                  )}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground break-words">
+                  {t(
+                    "studentManagement.changeLocationModulesHint",
+                    "Only modules that have not started yet are listed. Modules that are in progress, completed, or failed cannot change location.",
+                  )}
+                </p>
+              )}
             </div>
           )}
 
