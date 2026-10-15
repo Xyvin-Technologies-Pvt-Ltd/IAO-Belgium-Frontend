@@ -149,12 +149,6 @@ const AllReports = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("finance.reports.all.title")}
         </h2>
-        {reportTotal != null && (
-          <p className="text-sm text-dashboard-text/70 dark:text-white/70">
-            {t("finance.reports.all.reportTotal", "Report total")}: EUR{" "}
-            {reportTotal.toFixed(2)}
-          </p>
-        )}
       </div>
 
       <div className="space-y-4">
