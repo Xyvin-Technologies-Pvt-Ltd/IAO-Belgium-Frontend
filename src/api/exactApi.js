@@ -54,6 +54,24 @@ export const backfillExactContacts = async () => {
   }
 };
 
+export const startMollieRefBackfill = async (body = {}) => {
+  try {
+    const response = await axiosInstance.post("/exact/backfill-mollie-ref", body);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getMollieRefBackfillStatus = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/backfill-mollie-ref/status");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const disconnectExact = async () => {
   try {
     const response = await axiosInstance.delete("/exact/disconnect");

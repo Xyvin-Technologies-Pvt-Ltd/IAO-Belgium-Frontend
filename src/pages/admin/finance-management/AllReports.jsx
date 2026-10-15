@@ -14,9 +14,10 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import StatusBadge from "@/components/StatusBadge";
-import { useGetPayments } from "@/store/usePaymentStore";
+import { useGetPayments, useExportInvoicesCsv } from "@/store/usePaymentStore";
 import moment from "moment";
 import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getInvoicePrintHtml } from "@/api/paymentApi";
 import AllReportsFilterDrawer from "./AllReportsFilterDrawer";
 import {
@@ -30,13 +31,13 @@ const AllReports = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [appliedFilters, setAppliedFilters] = useState({
-    status: "all",
+    status: "paid",
     purpose: "all",
     from: "",
     to: "",
   });
   const [draftFilters, setDraftFilters] = useState({
-    status: "all",
+    status: "paid",
     purpose: "all",
     from: "",
     to: "",
@@ -48,9 +49,7 @@ const AllReports = () => {
     setPage(1);
   }, [debouncedSearch, appliedFilters]);
 
-  const { data, isLoading, error, refetch, isFetching } = useGetPayments({
-    page,
-    limit: rowsPerPage,
+  const listFilters = {
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
@@ -60,10 +59,20 @@ const AllReports = () => {
       : {}),
     ...(appliedFilters.from ? { from: appliedFilters.from } : {}),
     ...(appliedFilters.to ? { to: appliedFilters.to } : {}),
+  };
+
+  const { data, isLoading, error, refetch, isFetching } = useGetPayments({
+    page,
+    limit: rowsPerPage,
+    ...listFilters,
   });
+
+  const exportCsv = useExportInvoicesCsv();
 
   const payments = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const reportTotal =
+    data?.report_total != null ? Number(data.report_total) : null;
   const handleDownloadReceipt = async (payment) => {
     try {
       const html = await getInvoicePrintHtml(payment._id);
@@ -86,7 +95,15 @@ const AllReports = () => {
     }
   };
 
-  const getActualAmount = (payment) => getPaymentModuleAmount(payment);
+  const getActualAmount = (payment) => {
+    if (payment?.report_amount != null) {
+      return Number(payment.report_amount);
+    }
+    if (payment?.total_amount != null) {
+      return Number(payment.total_amount);
+    }
+    return getPaymentModuleAmount(payment);
+  };
 
   const getPurposeColor = (purpose) => {
     switch (purpose) {
@@ -128,10 +145,16 @@ const AllReports = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("finance.reports.all.title")}
         </h2>
+        {reportTotal != null && (
+          <p className="text-sm text-dashboard-text/70 dark:text-white/70">
+            {t("finance.reports.all.reportTotal", "Report total")}: EUR{" "}
+            {reportTotal.toFixed(2)}
+          </p>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -145,14 +168,27 @@ const AllReports = () => {
               setPage(1);
             }}
           />
-          <AllReportsFilterDrawer
-            draftFilters={draftFilters}
-            setDraftFilters={setDraftFilters}
-            appliedFilters={appliedFilters}
-            setAppliedFilters={setAppliedFilters}
-            setPage={setPage}
-            isInvoiceReports={true}
-          />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              disabled={exportCsv.isPending}
+              onClick={() => exportCsv.mutate(listFilters)}
+            >
+              <Download className="h-4 w-4" />
+              {exportCsv.isPending
+                ? t("common.exporting", "Exporting…")
+                : t("common.exportCsv", "Export CSV")}
+            </Button>
+            <AllReportsFilterDrawer
+              draftFilters={draftFilters}
+              setDraftFilters={setDraftFilters}
+              appliedFilters={appliedFilters}
+              setAppliedFilters={setAppliedFilters}
+              setPage={setPage}
+              isInvoiceReports={true}
+            />
+          </div>
         </div>
 
         <Table>

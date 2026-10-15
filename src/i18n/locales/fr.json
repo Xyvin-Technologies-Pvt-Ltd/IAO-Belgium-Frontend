@@ -185,6 +185,7 @@
     "searchTitles": "Rechercher des grades académiques...",
     "searchRoles": "Rechercher des rôles enseignants...",
     "paymentId": "ID de paiement",
+    "transactionId": "ID de transaction",
     "invoiceId": "ID de la note de frais",
     "receiptId": "ID de reçu",
     "downloadReceipt": "Télécharger le reçu",

@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import {
   useGetAnalyticsByCity,
   useGetAnalyticsByCityList,
+  useExportAnalyticsCityCsv,
 } from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
-const defaultFilters = { status: "all", purpose: "all", from: "", to: "" };
+const defaultFilters = { status: "paid", purpose: "all", from: "", to: "" };
 
 const buildQueryFilters = (filters) => {
   const query = {};
@@ -47,6 +50,8 @@ const CityReports = () => {
   const { data: tableDataFull, isLoading: isLoadingTable, error: errorTable } =
     useGetAnalyticsByCityList({ ...queryFilters, page, limit });
 
+  const exportCsv = useExportAnalyticsCityCsv();
+
   const chartData = chartDataFull?.data;
   const listAvailable = !errorTable && Array.isArray(tableDataFull?.data);
   const tableRows = listAvailable
@@ -62,12 +67,25 @@ const CityReports = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("common.cityReports")}
         </h2>
-        <CityReportsFilterDrawer
-          draftFilters={draftFilters}
-          setDraftFilters={setDraftFilters}
-          appliedFilters={appliedFilters}
-          setAppliedFilters={setAppliedFilters}
-        />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            disabled={exportCsv.isPending}
+            onClick={() => exportCsv.mutate(queryFilters)}
+          >
+            <Download className="h-4 w-4" />
+            {exportCsv.isPending
+              ? t("common.exporting", "Exporting…")
+              : t("common.exportCsv", "Export CSV")}
+          </Button>
+          <CityReportsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+          />
+        </div>
       </div>
       <AnalyticsChartView
         data={chartData}

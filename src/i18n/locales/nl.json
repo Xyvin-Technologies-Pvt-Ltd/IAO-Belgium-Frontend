@@ -186,6 +186,7 @@
     "searchTitles": "Academische graden zoeken...",
     "searchRoles": "Docentrollen zoeken...",
     "paymentId": "Betalings-ID",
+    "transactionId": "Transactie-ID",
     "invoiceId": "ID van de onkostennota",
     "receiptId": "Ontvangstbewijs-ID",
     "downloadReceipt": "Ontvangstbewijs downloaden",

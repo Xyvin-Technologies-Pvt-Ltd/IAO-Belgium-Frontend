@@ -7,6 +7,8 @@ import {
   reconcileExact,
   reconcileExactPayment,
   backfillExactContacts,
+  startMollieRefBackfill,
+  getMollieRefBackfillStatus,
   disconnectExact,
   getExactReconciliation,
   verifyExactReconciliation,
@@ -135,6 +137,29 @@ export const useBackfillExactContacts = () => {
     },
     onError: (err) =>
       toast.error(err?.message || "Failed to backfill Exact contacts & your ref"),
+  });
+};
+
+/** Polls every 3s while a Mollie reference backfill is running. */
+export const useGetMollieRefBackfillStatus = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-mollie-ref-backfill"],
+    queryFn: getMollieRefBackfillStatus,
+    refetchInterval: (query) =>
+      query.state.data?.data?.state === "running" ? 3000 : false,
+    ...options,
+  });
+
+export const useStartMollieRefBackfill = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: startMollieRefBackfill,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Started");
+      queryClient.invalidateQueries({ queryKey: ["exact-mollie-ref-backfill"] });
+    },
+    onError: (err) =>
+      toast.error(err?.message || "Failed to start the Mollie reference backfill"),
   });
 };
 
