@@ -99,6 +99,54 @@ export const getAnalyticsByStudent = async (filter) => {
   }
 };
 
+export const exportAnalyticsCityCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(
+      `/payment/analytics/city/export-csv`,
+      { params: filter, responseType: "blob" },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportAnalyticsProgramCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(
+      `/payment/analytics/program/export-csv`,
+      { params: filter, responseType: "blob" },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportAnalyticsBatchCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(
+      `/payment/analytics/batch/export-csv`,
+      { params: filter, responseType: "blob" },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportInvoicesCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/invoice/export-csv`, {
+      params: filter,
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getInvoiceHtml = async (id) => {
   try {
     const response = await axiosInstance.get(`/payment/invoice/${id}`, { responseType: "text" });

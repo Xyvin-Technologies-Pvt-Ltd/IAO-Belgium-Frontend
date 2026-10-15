@@ -187,6 +187,7 @@
     "searchTitles": "Search academic degrees...",
     "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
+    "transactionId": "Transaction ID",
     "invoiceId": "Expense Note ID",
     "receiptId": "Receipt ID",
     "downloadReceipt": "Download receipt",
