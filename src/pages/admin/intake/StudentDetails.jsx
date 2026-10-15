@@ -913,7 +913,9 @@ const StudentDetails = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("common.type", "Type")}</TableHead>
-                    <TableHead>{t("common.id", "ID")}</TableHead>
+                    <TableHead>
+                      {t("common.transactionId", "Transaction ID")}
+                    </TableHead>
                     <TableHead>{t("common.purpose", "Purpose")}</TableHead>
                     <TableHead>{t("common.component", "Component")}</TableHead>
                     <TableHead>{t("common.amount", "Amount")}</TableHead>
@@ -938,7 +940,7 @@ const StudentDetails = () => {
                             {formatDocType(item.doc_type)}
                           </span>
                         </TableCell>
-                        <TableCell>{item.uid || "-"}</TableCell>
+                        <TableCell>{item.transaction_id || "—"}</TableCell>
                         <TableCell>{formatPurpose(item)}</TableCell>
                         <TableCell>
                           {item.component_name || t("common.notAvailable")}
@@ -1020,7 +1022,9 @@ const StudentDetails = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t("common.paymentId", "Payment ID")}</TableHead>
+                    <TableHead>
+                      {t("common.transactionId", "Transaction ID")}
+                    </TableHead>
                     <TableHead>{t("common.purpose", "Purpose")}</TableHead>
                     <TableHead>{t("common.component", "Component")}</TableHead>
                     <TableHead>{t("common.amount", "Amount")}</TableHead>
@@ -1038,7 +1042,7 @@ const StudentDetails = () => {
                   {transactions.length > 0 ? (
                     transactions.map((payment) => (
                       <TableRow key={payment._id}>
-                        <TableCell>{payment.uid || "-"}</TableCell>
+                        <TableCell>{payment.transaction_id || "—"}</TableCell>
                         <TableCell>{formatPurpose(payment.purpose)}</TableCell>
                         <TableCell>
                           {payment.component_name || t("common.notAvailable")}

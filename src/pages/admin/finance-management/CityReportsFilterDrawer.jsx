@@ -37,7 +37,7 @@ const CityReportsFilterDrawer = ({ draftFilters, setDraftFilters, appliedFilters
   ).length;
 
   const handleClearAll = () => {
-    const reset = { status: "all", purpose: "all", from: "", to: "" };
+    const reset = { status: "paid", purpose: "all", from: "", to: "" };
     setDraftFilters(reset);
     setAppliedFilters(reset);
   };

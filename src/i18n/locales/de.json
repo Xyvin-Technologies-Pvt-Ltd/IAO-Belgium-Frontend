@@ -184,6 +184,7 @@
     "searchTitles": "Akademische Grade suchen...",
     "searchRoles": "Dozentenrollen suchen...",
     "paymentId": "Zahlungs-ID",
+    "transactionId": "Transaktions-ID",
     "invoiceId": "ID der Kostenaufstellung",
     "receiptId": "Quittungs-ID",
     "downloadReceipt": "Quittung herunterladen",

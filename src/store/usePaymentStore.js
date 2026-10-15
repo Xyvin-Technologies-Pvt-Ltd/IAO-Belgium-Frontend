@@ -7,6 +7,10 @@ import {
   getAnalyticsByBatch,
   getAnalyticsByBatchList,
   getAnalyticsByStudent,
+  exportAnalyticsCityCsv,
+  exportAnalyticsProgramCsv,
+  exportAnalyticsBatchCsv,
+  exportInvoicesCsv,
   createPayment,
   getTransactionLogs,
   getKmoApplications,
@@ -15,6 +19,17 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import i18n from "@/i18n/config";
+
+const triggerBlobDownload = (blobData, filename) => {
+  const url = window.URL.createObjectURL(new Blob([blobData]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
 
 export const useGetPayments = (filter, options = {}) => {
   return useQuery({
@@ -189,6 +204,78 @@ export const useAdminReconcileThirdParty = () => {
     onError: (error) => {
       toast.error(
         error?.message || "Failed to sync payment from Mollie",
+      );
+    },
+  });
+};
+
+export const useExportAnalyticsCityCsv = () => {
+  return useMutation({
+    mutationFn: exportAnalyticsCityCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `city-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+      );
+    },
+  });
+};
+
+export const useExportAnalyticsProgramCsv = () => {
+  return useMutation({
+    mutationFn: exportAnalyticsProgramCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `program-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+      );
+    },
+  });
+};
+
+export const useExportAnalyticsBatchCsv = () => {
+  return useMutation({
+    mutationFn: exportAnalyticsBatchCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `batch-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+      );
+    },
+  });
+};
+
+export const useExportInvoicesCsv = () => {
+  return useMutation({
+    mutationFn: exportInvoicesCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `all-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
       );
     },
   });
