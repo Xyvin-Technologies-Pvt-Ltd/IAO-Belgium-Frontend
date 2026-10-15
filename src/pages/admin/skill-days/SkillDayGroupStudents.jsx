@@ -163,7 +163,7 @@ const SkillDayGroupStudents = () => {
         <DashboardCard
           title="TOTAL STUDENTS"
           value={totalStudents}
-          subtitle="Enrolled in Group"
+          subtitle="Opted-in enrollments"
           icon={Users}
         />
         <DashboardCard
@@ -222,12 +222,12 @@ const SkillDayGroupStudents = () => {
                 colSpan={6}
                 className="px-6 py-8 text-center text-sm text-muted-foreground"
               >
-                No students found for this group attachment.
+                No enrolled students yet. Students appear here after they enroll.
               </TableCell>
             </TableRow>
           ) : (
             students.map((s) => {
-              const canMark = s.can_mark_attendance || s.is_enrolled;
+              const canMark = Boolean(s.can_mark_attendance);
               const isPresent = s.attendance_status === "present";
               const isAbsent = s.attendance_status === "absent";
               const isPending =
