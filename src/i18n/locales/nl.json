@@ -301,7 +301,8 @@
       },
       "student": {
         "title": "Studentrapporten",
-        "description": "Betalingsanalyse per student"
+        "description": "Betalingsanalyse per student",
+        "amountHint": "Totalen gebruiken het rapportbedrag (zelfde als Stad/Programma/Groep): gecrediteerde facturen tellen alleen de fee; balance-due top-ups worden niet dubbel geteld met de locatiewissel-factuur."
       },
       "createInvoice": {
         "title": "Aangepaste onkostennota aanmaken",

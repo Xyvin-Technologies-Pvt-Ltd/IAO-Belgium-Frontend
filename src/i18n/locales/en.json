@@ -307,7 +307,8 @@
       },
       "student": {
         "title": "Student Reports",
-        "description": "Payment analytics by student"
+        "description": "Payment analytics by student",
+        "amountHint": "Totals use report amount (same as City/Programme/Batch): credited invoices count fee only; balance-due top-ups are not double-counted with the location-switch invoice."
       },
       "createInvoice": {
         "title": "Create Custom Expense Note",
