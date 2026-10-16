@@ -53,13 +53,3 @@ export const assignModuleReattempt = async (payload) => {
   }
 };
 
-export const getModuleReattempts = async (params = {}) => {
-  try {
-    const response = await axiosInstance.get(`/student/modules/reattempts`, {
-      params,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};

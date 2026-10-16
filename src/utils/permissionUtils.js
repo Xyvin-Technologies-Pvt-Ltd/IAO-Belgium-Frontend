@@ -120,10 +120,6 @@ const SIDEBAR_PERMISSIONS = {
     "operations_management_view",
     "operations_management_modify",
   ],
-  "/admin/module-reattempts": [
-    "operations_management_view",
-    "operations_management_modify",
-  ],
   "/admin/results": ["operations_management_view", "operations_management_modify"],
   "/admin/examination/assignments": [
     "operations_management_view",

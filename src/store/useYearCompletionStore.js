@@ -4,7 +4,6 @@ import {
   assignModuleReattempt,
   demoteYearCompletion,
   evaluateYearCompletion,
-  getModuleReattempts,
   getReattemptBatches,
   promoteYearCompletion,
 } from "@/api/yearCompletionApi";
@@ -64,20 +63,12 @@ export const useAssignModuleReattempt = () => {
   return useMutation({
     mutationFn: assignModuleReattempt,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["module-reattempts"] });
       queryClient.invalidateQueries({ queryKey: ["student"] });
+      queryClient.invalidateQueries({ queryKey: ["enrolled-students"] });
       toast.success(response?.message || "Student assigned to group");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to assign group");
     },
-  });
-};
-
-export const useModuleReattempts = (params = {}, options = {}) => {
-  return useQuery({
-    queryKey: ["module-reattempts", params],
-    queryFn: () => getModuleReattempts(params),
-    ...options,
   });
 };
