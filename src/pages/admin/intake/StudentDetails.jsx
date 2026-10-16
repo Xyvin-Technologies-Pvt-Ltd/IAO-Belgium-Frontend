@@ -1,5 +1,5 @@
 import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
-import { Pencil, Download } from "lucide-react";
+import { Pencil, Download, RotateCcw } from "lucide-react";
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
@@ -548,7 +548,16 @@ const StudentDetails = () => {
                     modules.map((m) => (
                       <TableRow key={m._id}>
                         <TableCell>{m.uid}</TableCell>
-                        <TableCell>{m.name}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span>{m.name}</span>
+                            {m.is_reattempt && (
+                              <span className="inline-flex items-center rounded-full bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-900/20 dark:text-indigo-300 dark:ring-indigo-300/10">
+                                {t("yearCompletion.reattempt", "Reattempt")}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <StatusBadge status={m.status} />
                         </TableCell>
@@ -556,20 +565,28 @@ const StudentDetails = () => {
                           <StatusBadge status={m.payment_status || "unpaid"} />
                         </TableCell>
                         <TableCell className="text-right">
-                          {m.status !== "locked" && (
+                          {(m.status === "failed" ||
+                            m.status === "completed") && (
                             <Button
                               size="sm"
-                              variant="ghost"
+                              variant="outline"
+                              className="gap-1.5"
+                              title={t(
+                                "yearCompletion.reattemptHint",
+                                "Assign to another group. Student must repurchase the full module price.",
+                              )}
                               onClick={() =>
                                 setReattemptModule({
                                   componentId: m._id || m.component_id,
+                                  systemId: m.system_id,
                                   name: m.name,
                                 })
                               }
                             >
+                              <RotateCcw className="h-3.5 w-3.5" />
                               {t(
-                                "yearCompletion.assignGroup",
-                                "Assign group",
+                                "yearCompletion.reattempt",
+                                "Reattempt",
                               )}
                             </Button>
                           )}
@@ -1347,8 +1364,10 @@ const StudentDetails = () => {
       <ModuleReattemptDialog
         open={!!reattemptModule}
         onOpenChange={(open) => !open && setReattemptModule(null)}
-        applicationId={studentData?._id}
+        studentId={studentData?._id}
+        applicationId={studentData?.application_id}
         componentId={reattemptModule?.componentId}
+        systemId={reattemptModule?.systemId}
         moduleName={reattemptModule?.name}
         onDone={refetch}
       />

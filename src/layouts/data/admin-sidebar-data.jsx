@@ -23,7 +23,6 @@ import {
   Landmark,
   Archive,
   Calculator,
-  RefreshCw,
 } from "lucide-react";
 import { filterSidebarByPermissions } from "@/utils/permissionUtils";
 
@@ -67,13 +66,6 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             title: t("sidebar.admin.submissions", { defaultValue: "Submissions" }),
             url: "/admin/submissions",
             icon: FileText,
-          },
-          {
-            title: t("sidebar.admin.moduleReattempts", {
-              defaultValue: "Module reattempts",
-            }),
-            url: "/admin/module-reattempts",
-            icon: RefreshCw,
           },
           {
             title: t("sidebar.admin.planning"),

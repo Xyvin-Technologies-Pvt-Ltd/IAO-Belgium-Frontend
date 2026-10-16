@@ -50,7 +50,7 @@ const LocationChanges = () => {
   const locationOverrides = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const columnCount = 5;
+  const columnCount = 6;
 
   return (
     <div className="space-y-6 mt-4">
@@ -97,6 +97,9 @@ const LocationChanges = () => {
                     {t("studentManagement.module", "Module")}
                   </TableHead>
                   <TableHead className="font-semibold text-dashboard-text/80 dark:text-white/80">
+                    {t("studentManagement.changeType", "Type")}
+                  </TableHead>
+                  <TableHead className="font-semibold text-dashboard-text/80 dark:text-white/80">
                     {t("studentManagement.originalBatch", "Original Batch")}
                   </TableHead>
                   <TableHead className="font-semibold text-dashboard-text/80 dark:text-white/80">
@@ -124,9 +127,15 @@ const LocationChanges = () => {
                     const originalCity = override.original_batch?.city?.name || "";
                     const switchedBatchName = override.switched_batch?.name || "-";
                     const switchedCity = override.switched_batch?.city?.name || "";
+                    const hopType = override.type || "location";
+                    const isReattempt = hopType === "reattempt";
+                    const switchDate = override.switch_date || override.createdAt;
 
                     return (
-                      <TableRow key={override._id} className="hover:bg-muted/50 cursor-pointer">
+                      <TableRow
+                        key={override.row_id || `${override._id}-${hopType}`}
+                        className="hover:bg-muted/50 cursor-pointer"
+                      >
                         <TableCell>
                           <div className="font-medium text-dashboard-text dark:text-white">
                             {student.first_name} {student.last_name}
@@ -135,6 +144,19 @@ const LocationChanges = () => {
                         </TableCell>
                         <TableCell className="text-dashboard-text dark:text-white">
                           {moduleName}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={
+                              isReattempt
+                                ? "inline-flex items-center rounded-full bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-900/20 dark:text-indigo-300 dark:ring-indigo-300/10"
+                                : "inline-flex items-center rounded-full bg-slate-50 px-1.5 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-700/10 dark:bg-slate-900/20 dark:text-slate-300 dark:ring-slate-300/10"
+                            }
+                          >
+                            {isReattempt
+                              ? t("studentManagement.changeTypeReattempt", "Reattempt")
+                              : t("studentManagement.changeTypeLocation", "Location")}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <div className="text-dashboard-text dark:text-white">{originalBatchName}</div>
@@ -153,7 +175,7 @@ const LocationChanges = () => {
                           )}
                         </TableCell>
                         <TableCell className="text-dashboard-text dark:text-white">
-                          {override.createdAt ? moment(override.createdAt).format("DD-MM-YYYY HH:mm") : "-"}
+                          {switchDate ? moment(switchDate).format("DD-MM-YYYY HH:mm") : "-"}
                         </TableCell>
                       </TableRow>
                     );
