@@ -71,6 +71,10 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
   const students = data?.data?.students || [];
   const attendanceSessions = data?.data?.sessions || [];
   const totalRows = data?.total_count || 0;
+  const liveCount = data?.data?.live_count ?? null;
+  const historicalCount = data?.data?.historical_count ?? 0;
+  const displayStudentCount =
+    liveCount != null ? liveCount + historicalCount : planningData?.student_count || 0;
 
   const handleMarkAttendance = (applicationId, sessionId, status) => {
     setPendingCell({ applicationId, sessionId });
@@ -167,7 +171,18 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
             )}
             <InfoItem
               label={t("planningManagement.view.studentsLabel")}
-              value={planningData?.student_count || 0}
+              value={
+                historicalCount > 0
+                  ? t(
+                      "planningManagement.view.studentsCountWithHistorical",
+                      "{{total}} ({{historical}} previously attended)",
+                      {
+                        total: displayStudentCount,
+                        historical: historicalCount,
+                      },
+                    )
+                  : displayStudentCount
+              }
             />
             {planningData?.description && (
               <InfoItem
@@ -267,6 +282,9 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                       const name =
                         `${student.last_name || ""} ${student.first_name || ""}`.trim() ||
                         "—";
+                      const isHistorical = Boolean(student.is_historical);
+                      const canMarkThisStudent =
+                        canMarkAttendance && !isHistorical;
                       const locationTitle = student.home_batch?.name
                         ? t("planningManagement.view.locationChangedFrom", {
                             batch: student.home_batch.name,
@@ -275,7 +293,25 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
 
                       return (
                         <TableRow key={student.application_id}>
-                          <TableCell className="font-medium">{name}</TableCell>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span>{name}</span>
+                              {isHistorical && (
+                                <span
+                                  className="inline-flex items-center rounded-full bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-700/10 dark:bg-slate-800/60 dark:text-slate-300 dark:ring-slate-400/20"
+                                  title={t(
+                                    "planningManagement.view.previouslyAttendedHint",
+                                    "Left this group after location switch or reattempt. Attendance is read-only.",
+                                  )}
+                                >
+                                  {t(
+                                    "planningManagement.view.previouslyAttendedBadge",
+                                    "Previously attended",
+                                  )}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
                           <TableCell>
                             {student.location_override ? (
                               <div
@@ -310,7 +346,11 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                               pendingCell?.applicationId === student.application_id &&
                               pendingCell?.sessionId === session._id;
 
-                            const tooltipTitle = markedByName
+                            const tooltipTitle = isHistorical
+                              ? markedByName
+                                ? `Previously attended (read-only)\nStatus: ${currentStatus || "Not marked"}\nMarked by: ${markedByName} (${markedByRole})`
+                                : `Previously attended (read-only)\nStatus: ${currentStatus || "Not marked"}`
+                              : markedByName
                               ? `Status: ${currentStatus || "Not marked"}\nMarked by: ${markedByName} (${markedByRole})`
                               : currentStatus
                               ? `Status: ${currentStatus}`
@@ -319,7 +359,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                             const cellContent = (
                               <div
                                 className={`flex flex-col items-center justify-center p-1.5 rounded transition-all ${
-                                  canMarkAttendance
+                                  canMarkThisStudent
                                     ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800/80"
                                     : ""
                                 }`}
@@ -340,7 +380,7 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
 
                             return (
                               <TableCell key={session._id} className="text-center">
-                                {canMarkAttendance ? (
+                                {canMarkThisStudent ? (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       {cellContent}
