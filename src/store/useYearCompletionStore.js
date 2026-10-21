@@ -64,6 +64,7 @@ export const useAssignModuleReattempt = () => {
     mutationFn: assignModuleReattempt,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["student"] });
+      queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
       queryClient.invalidateQueries({ queryKey: ["enrolled-students"] });
       toast.success(response?.message || "Student assigned to group");
     },

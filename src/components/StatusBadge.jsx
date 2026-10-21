@@ -63,6 +63,7 @@ const statusVariants = {
   // Payment statuses
   paid: "text-green-600 dark:text-green-400",
   unpaid: "text-red-600 dark:text-red-400",
+  marked_paid: "text-teal-600 dark:text-teal-400",
   free: "text-blue-600 dark:text-blue-400",
   paid_kmo: "text-green-600 dark:text-green-400",
   waiting_kmo: "text-amber-600 dark:text-amber-400",
@@ -173,6 +174,8 @@ const StatusBadge = ({ status }) => {
     displayText = "Free";
   } else if (status === "unpaid") {
     displayText = "Unpaid";
+  } else if (status === "marked_paid") {
+    displayText = "Marked paid";
   } else if (status === "paid_kmo") {
     displayText = "Paid (KMO)";
   } else if (status === "waiting_kmo") {

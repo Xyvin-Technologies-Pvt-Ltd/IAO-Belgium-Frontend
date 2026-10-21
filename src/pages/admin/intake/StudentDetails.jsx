@@ -1,9 +1,10 @@
 import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
-import { Pencil, Download, RotateCcw } from "lucide-react";
+import { Pencil, Download } from "lucide-react";
 import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import AssignedModulesSection from "@/components/admin/student/AssignedModulesSection";
 import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -517,98 +518,19 @@ const StudentDetails = () => {
               </div>
             ) : (
               <>
-            <div className="col-span-12">
-              <div className="mb-4">
-                <h3 className="font-semibold">
-                  {t("studentManagement.details.assignedModules", "Assigned Modules")}
-                </h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>
-                      {t("studentManagement.details.moduleId", "Module ID")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.moduleName", "Module Name")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.table.status", "Status")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.payment", "Payment")}
-                    </TableHead>
-                    <TableHead className="text-right">
-                      {t("common.actions", "Actions")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {modules.length > 0 ? (
-                    modules.map((m) => (
-                      <TableRow key={m._id}>
-                        <TableCell>{m.uid}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span>{m.name}</span>
-                            {m.is_reattempt && (
-                              <span className="inline-flex items-center rounded-full bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10 dark:bg-indigo-900/20 dark:text-indigo-300 dark:ring-indigo-300/10">
-                                {t("yearCompletion.reattempt", "Reattempt")}
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={m.status} />
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={m.payment_status || "unpaid"} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {(m.status === "failed" ||
-                            m.status === "completed") && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-1.5"
-                              title={t(
-                                "yearCompletion.reattemptHint",
-                                "Assign to another group. Student must repurchase the full module price.",
-                              )}
-                              onClick={() =>
-                                setReattemptModule({
-                                  componentId: m._id || m.component_id,
-                                  systemId: m.system_id,
-                                  name: m.name,
-                                })
-                              }
-                            >
-                              <RotateCcw className="h-3.5 w-3.5" />
-                              {t(
-                                "yearCompletion.reattempt",
-                                "Reattempt",
-                              )}
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center text-muted-foreground"
-                      >
-                        {t(
-                          "studentManagement.details.noAssignedModules",
-                          "No modules assigned",
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <AssignedModulesSection
+              modules={modules}
+              applicationId={studentData?.application_id}
+              studentId={studentData?._id}
+              totalYears={totalYears}
+              currentYear={studentData?.current_year || filter?.year || 1}
+              durationUnit={studentData?.duration_unit || "years"}
+              onReattempt={setReattemptModule}
+              onDone={() => {
+                refetch();
+                refetchAttendance();
+              }}
+            />
 
             <div className="col-span-12">
               <h3 className="font-semibold mb-4">
@@ -1369,7 +1291,10 @@ const StudentDetails = () => {
         componentId={reattemptModule?.componentId}
         systemId={reattemptModule?.systemId}
         moduleName={reattemptModule?.name}
-        onDone={refetch}
+        onDone={() => {
+          refetch();
+          refetchAttendance();
+        }}
       />
 
       {(() => {
