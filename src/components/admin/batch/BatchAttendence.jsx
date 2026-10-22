@@ -184,8 +184,23 @@ const BatchAttendence = () => {
                       )}
                     </div>
                   </TableCell>
-                  {modules.map((module) =>
-                    module.sessions.length > 0 ? (
+                  {modules.map((module) => {
+                    const moduleExcluded = (student.excluded_module_ids || []).some(
+                      (id) => String(id) === String(module.module_id),
+                    );
+                    if (moduleExcluded) {
+                      const cells =
+                        module.sessions.length > 0 ? module.sessions : [null];
+                      return cells.map((session) => (
+                        <TableCell
+                          key={session ? String(session.session_id) : `${module.module_id}-excluded`}
+                          className="text-center border-l py-2"
+                        >
+                          <span className="text-muted-foreground italic">{t("common.dash")}</span>
+                        </TableCell>
+                      ));
+                    }
+                    return module.sessions.length > 0 ? (
                       module.sessions.map((session) => {
                         const sid = String(session.session_id);
                         const attendance = student.attendance?.[sid];
@@ -215,8 +230,8 @@ const BatchAttendence = () => {
                           <span className="text-muted-foreground italic">{t("common.dash")}</span>
                         )}
                       </TableCell>
-                    ),
-                  )}
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (
