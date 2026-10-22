@@ -157,6 +157,7 @@ const AnalyticsChartView = ({
   labelKey,
   labelFn,
   title,
+  view = "both",
 }) => {
   const { t } = useTranslation();
 
@@ -219,10 +220,14 @@ const AnalyticsChartView = ({
   const pieColors = [...COLORS, PIE_OTHERS_COLOR];
 
   const displayTableData = tableData || data;
+  const showCharts = view !== "table";
+  const showTable = view !== "chart";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
+      {showCharts && (
+      <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
 
         <div style={{
@@ -351,7 +356,10 @@ const AnalyticsChartView = ({
           </CardContent>
         </Card>
       </div>
+      </>
+      )}
 
+      {showTable && (
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">{t("finance.fields.detailedData")}</h3>
         <Table>
@@ -408,6 +416,7 @@ const AnalyticsChartView = ({
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };
