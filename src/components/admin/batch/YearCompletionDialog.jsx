@@ -9,12 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import StatusBadge from "@/components/StatusBadge";
 import {
-  useDemoteYearCompletion,
   useEvaluateYearCompletion,
   usePromoteYearCompletion,
 } from "@/store/useYearCompletionStore";
+import { useMarkStudentAsFailed } from "@/store/useBatchStore";
 import { Loader2 } from "lucide-react";
 
 const MetBadge = ({ met, t }) => (
@@ -39,14 +41,18 @@ const YearCompletionDialog = ({
   const { t } = useTranslation();
   const evaluateMutation = useEvaluateYearCompletion();
   const promoteMutation = usePromoteYearCompletion();
-  const demoteMutation = useDemoteYearCompletion();
+  const markFailedMutation = useMarkStudentAsFailed();
   const [report, setReport] = useState(null);
   const [confirmPromote, setConfirmPromote] = useState(false);
+  const [confirmFailed, setConfirmFailed] = useState(false);
+  const [failReason, setFailReason] = useState("");
 
   useEffect(() => {
     if (!open || !applicationId) return;
     setReport(null);
     setConfirmPromote(false);
+    setConfirmFailed(false);
+    setFailReason("");
     evaluateMutation.mutate(applicationId, {
       onSuccess: (res) => setReport(res?.data || res),
     });
@@ -56,11 +62,16 @@ const YearCompletionDialog = ({
   const busy =
     evaluateMutation.isPending ||
     promoteMutation.isPending ||
-    demoteMutation.isPending;
+    markFailedMutation.isPending;
+
+  const canMarkFailed =
+    !!report &&
+    (report.can_mark_failed === true || report.year_status === "active");
 
   const handlePromote = () => {
     if (!report?.met && !confirmPromote) {
       setConfirmPromote(true);
+      setConfirmFailed(false);
       return;
     }
     promoteMutation.mutate(applicationId, {
@@ -71,13 +82,25 @@ const YearCompletionDialog = ({
     });
   };
 
-  const handleDemote = () => {
-    demoteMutation.mutate(applicationId, {
-      onSuccess: () => {
-        onOpenChange(false);
-        onDone?.();
+  const handleMarkFailedClick = () => {
+    if (!confirmFailed) {
+      setConfirmFailed(true);
+      setConfirmPromote(false);
+      return;
+    }
+    markFailedMutation.mutate(
+      {
+        applicationId,
+        reason: failReason || undefined,
+        force: true,
       },
-    });
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          onDone?.();
+        },
+      },
+    );
   };
 
   return (
@@ -94,7 +117,7 @@ const YearCompletionDialog = ({
                 })
               : t(
                   "yearCompletion.description",
-                  "Review ProgramConfig criteria, then promote or demote.",
+                  "Review ProgramConfig criteria, then promote or mark as failed. Failed students can be re-enrolled into another batch.",
                 )}
           </DialogDescription>
         </DialogHeader>
@@ -208,6 +231,35 @@ const YearCompletionDialog = ({
                 )}
               </p>
             )}
+
+            {confirmFailed && (
+              <div className="space-y-2 border border-red-200 bg-red-50 rounded p-3">
+                <p className="text-red-800">
+                  {t(
+                    "yearCompletion.markFailedConfirm",
+                    "This marks the student as failed for the current year. They can then be re-enrolled into a different batch to repeat the year. This does not move them back a year in the same batch.",
+                  )}
+                </p>
+                <div>
+                  <Label>
+                    {t(
+                      "batchManagement.yearLog.markFailedReason",
+                      "Reason (optional)",
+                    )}
+                  </Label>
+                  <Textarea
+                    className="mt-1"
+                    rows={2}
+                    value={failReason}
+                    onChange={(e) => setFailReason(e.target.value)}
+                    placeholder={t(
+                      "batchManagement.yearLog.markFailedReasonPlaceholder",
+                      "Optional reason…",
+                    )}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -220,11 +272,16 @@ const YearCompletionDialog = ({
             {t("common.cancel", "Cancel")}
           </Button>
           <Button
-            variant="secondary"
-            onClick={handleDemote}
-            disabled={busy || !report?.can_demote}
+            variant="destructive"
+            onClick={handleMarkFailedClick}
+            disabled={busy || !canMarkFailed}
           >
-            {t("yearCompletion.demote", "Demote")}
+            {confirmFailed
+              ? t(
+                  "yearCompletion.confirmMarkFailed",
+                  "Confirm mark as failed",
+                )
+              : t("yearCompletion.markFailed", "Mark as Failed")}
           </Button>
           <Button
             onClick={handlePromote}
