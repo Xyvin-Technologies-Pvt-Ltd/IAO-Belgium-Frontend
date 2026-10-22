@@ -431,6 +431,14 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                   {t("studentManagement.noPaymentDue", "No payment due")}
                 </p>
               )}
+              {quote.offline_marked_paid ? (
+                <p className="text-xs text-muted-foreground break-words">
+                  {t(
+                    "studentManagement.offlineMarkedPaidSwitch",
+                    "Original payment was offline. No credit note will be issued in the LMS. Any refund is handled outside the LMS.",
+                  )}
+                </p>
+              ) : null}
             </div>
           )}
 
