@@ -463,7 +463,7 @@ const ProgramConfigDrawer = ({ programId }) => {
                       {t("programConfig.requirements.skillDays.required", "Skill days required")}
                     </Label>
                     <p className="text-xs text-dashboard-text-secondary mt-1">
-                      {t("programConfig.requirements.skillDays.hint", "When enabled, students must enroll in one standalone module for this year and attend it (present) to complete year progression.")}
+                      {t("programConfig.requirements.skillDays.hint", "When enabled, students must enroll in at least one standalone module for this year and be marked present at every standalone module they enroll in to complete year progression.")}
                     </p>
                   </div>
                   <Switch
