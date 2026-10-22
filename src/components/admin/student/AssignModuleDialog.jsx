@@ -183,14 +183,14 @@ const AssignModuleDialog = ({
     onOpenChange(false);
   };
 
-  //* Module + counts_for_year required; planning required when any plannings exist.
+  //* Module, study year, and a planning group are required.
   const assignEnabled =
     !!selectedId &&
     !!countsForYear &&
+    !!planningId &&
     !!applicationId &&
     !assignMutation.isPending &&
-    (!studentId || !slotLookupId || slotsReady) &&
-    (!hasAnyPlannings || !!planningId);
+    (!studentId || !slotLookupId || slotsReady);
 
   const handleAssign = async () => {
     if (!assignEnabled) return;
@@ -199,7 +199,7 @@ const AssignModuleDialog = ({
         application_id: applicationId,
         component_id: selectedId,
         counts_for_year: Number(countsForYear),
-        ...(planningId ? { planning_id: planningId } : {}),
+        planning_id: planningId,
         reason: reason || undefined,
       });
       onDone?.();
@@ -404,7 +404,7 @@ const AssignModuleDialog = ({
                 <p className="text-sm text-muted-foreground border rounded-md p-3 break-words">
                   {t(
                     "studentManagement.moduleOverride.noPlannings",
-                    "No planning groups for this module. Assign will use the student’s home batch.",
+                    "No planning groups for this module. Choose a module that has a planning group.",
                   )}
                 </p>
               )}
