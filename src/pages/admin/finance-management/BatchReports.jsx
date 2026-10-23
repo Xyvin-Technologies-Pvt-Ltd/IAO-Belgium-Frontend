@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   useGetAnalyticsByBatch,
-  useGetAnalyticsByBatchList,
   useExportAnalyticsBatchCsv,
 } from "@/store/usePaymentStore";
 import AnalyticsChartView from "./AnalyticsChartView";
@@ -9,7 +8,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, List } from "lucide-react";
 
 const defaultFilters = { status: "paid", purpose: "all", from: "", to: "" };
 
@@ -27,6 +26,7 @@ const BatchReports = () => {
   const { updateBreadcrumbs } = useBreadcrumb();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [view, setView] = useState("chart");
   const [draftFilters, setDraftFilters] = useState(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState(defaultFilters);
 
@@ -38,15 +38,20 @@ const BatchReports = () => {
     return () => updateBreadcrumbs([]);
   }, [t]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [appliedFilters]);
+
   const queryFilters = buildQueryFilters(appliedFilters);
 
   const { data: chartDataFull, isLoading: isLoadingChart, error: errorChart } =
     useGetAnalyticsByBatch(queryFilters);
 
-  const { data: tableDataFull, isLoading: isLoadingTable, error: errorTable } =
-    useGetAnalyticsByBatchList({ ...queryFilters, page, limit });
-
   const exportCsv = useExportAnalyticsBatchCsv();
+  const chartRows = chartDataFull?.data;
+  const tableRows = Array.isArray(chartRows)
+    ? chartRows.slice((page - 1) * limit, page * limit)
+    : [];
 
   return (
     <div className="space-y-6 mt-4">
@@ -55,6 +60,16 @@ const BatchReports = () => {
           {t("common.batchReports")}
         </h2>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={t("common.list", "List")}
+            aria-pressed={view === "table"}
+            className={view === "table" ? "bg-[#ff8904]/10" : ""}
+            onClick={() => setView((current) => (current === "table" ? "chart" : "table"))}
+          >
+            <List className="h-4 w-4" />
+          </Button>
           <Button
             variant="outline"
             className="gap-2"
@@ -75,18 +90,19 @@ const BatchReports = () => {
         </div>
       </div>
       <AnalyticsChartView
-        data={chartDataFull?.data}
-        tableData={tableDataFull?.data}
+        view={view}
+        data={chartRows}
+        tableData={tableRows}
         totalCount={{
           ...chartDataFull?.total_count,
-          total: tableDataFull?.total_count,
+          total: chartRows?.length ?? 0,
         }}
         page={page}
         limit={limit}
         onPageChange={setPage}
         setLimit={setLimit}
-        isLoading={isLoadingChart || isLoadingTable}
-        error={errorChart || errorTable}
+        isChartLoading={isLoadingChart}
+        chartError={errorChart}
         labelKey="batch_name"
         title={t("common.batch")}
       />
