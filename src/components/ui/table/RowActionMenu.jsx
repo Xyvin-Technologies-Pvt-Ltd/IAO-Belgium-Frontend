@@ -22,11 +22,13 @@ const RowActionMenu = ({ actions = [] }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {actions.map(({ label, icon: Icon, onClick, className }, idx) => (
+        {actions.map(({ label, icon: Icon, onClick, className, disabled }, idx) => (
           <DropdownMenuItem 
             key={idx} 
+            disabled={disabled}
             onClick={(e) => {
               e.stopPropagation();
+              if (disabled) return;
               onClick?.(e);
             }} 
             className={className}

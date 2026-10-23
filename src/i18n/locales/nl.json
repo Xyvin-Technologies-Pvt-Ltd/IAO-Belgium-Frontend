@@ -41,6 +41,7 @@
       "settings": "Instellingen",
       "dashboard": "Dashboard",
       "programAdministration": "Opleidingsbeheer",
+      "thesis": "Thesis",
       "locations": "Locaties",
       "languages": "Talen",
       "contractTypes": "Contracttypes",
@@ -733,6 +734,75 @@
       "nameLabel": "Naam lesregio",
       "namePlaceholder": "Naam lesregio invoeren",
       "nameRequired": "Naam is verplicht"
+    }
+  },
+  "thesisManagement": {
+    "title": "Thesis Catalogus",
+    "search": "Zoeken op thesisnaam...",
+    "createThesis": "Thesis aanmaken",
+    "table": {
+      "uid": "UID",
+      "name": "Thesisnaam",
+      "academic": "Academiejaar",
+      "program": "Opleiding",
+      "price": "Prijs",
+      "status": "Status",
+      "action": "Actie",
+      "edit": "Bewerken",
+      "deactivate": "Deactiveren",
+      "activate": "Activeren",
+      "noTheses": "Geen thesissen gevonden"
+    },
+    "messages": {
+      "loadFailed": "Laden van thesissen mislukt"
+    },
+    "modal": {
+      "createTitle": "Thesis aanmaken",
+      "editTitle": "Thesis bewerken",
+      "createSubtitle": "Voeg een nieuwe thesis toe aan de catalogus",
+      "editSubtitle": "Werk de thesisgegevens bij",
+      "nameLabel": "Thesisnaam",
+      "namePlaceholder": "Voer thesisnaam in",
+      "academicLabel": "Academiejaar",
+      "academicPlaceholder": "Selecteer academiejaar",
+      "searchAcademic": "Zoek academiejaren...",
+      "programTypeLabel": "Opleidingstype",
+      "programTypePlaceholder": "Selecteer eerst het opleidingstype",
+      "programLabel": "Opleiding",
+      "programPlaceholder": "Selecteer opleiding",
+      "searchProgram": "Zoek opleidingen...",
+      "selectTypeFirst": "Selecteer eerst een opleidingstype",
+      "priceLabel": "Prijs (€ EUR)",
+      "descriptionLabel": "Beschrijving",
+      "descriptionPlaceholder": "Voer thesisbeschrijving en overzicht in...",
+      "statusLabel": "Status",
+      "activeNotice": "Actief — zichtbaar en beschikbaar voor inschrijvingen",
+      "inactiveNotice": "Inactief — inschrijvingen worden geblokkeerd",
+      "create": "Thesis aanmaken",
+      "update": "Thesis bijwerken"
+    },
+    "deactivateModal": {
+      "title": "Thesis deactiveren",
+      "message": "Weet u zeker dat u \"{{name}}\" wilt deactiveren?",
+      "notice": "Deze thesis blijft zichtbaar in de catalogus, maar nieuwe inschrijvingen worden geblokkeerd.",
+      "confirm": "Deactiveren",
+      "deactivating": "Deactiveren..."
+    },
+    "detail": {
+      "title": "Thesisdetails",
+      "loading": "Thesisdetails laden...",
+      "loadFailed": "Laden van thesisdetails mislukt",
+      "moduleDetails": "Modulegegevens",
+      "stepsLaterPhase": "Stappen (Later fase)",
+      "deadlinesLaterPhase": "Deadlines (Later fase)",
+      "markingSchemeLaterPhase": "Beoordelingsschema (Later fase)",
+      "exactOnlineLaterPhase": "Exact Online (Later fase)",
+      "uid": "UID",
+      "academicYear": "Academiejaar",
+      "programme": "Opleiding",
+      "price": "Prijs",
+      "description": "Beschrijving",
+      "noDescription": "Geen beschrijving opgegeven voor deze thesis."
     }
   },
   "programManagement": {

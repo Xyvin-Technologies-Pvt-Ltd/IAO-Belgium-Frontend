@@ -1,7 +1,12 @@
 import { Navigate } from "@tanstack/react-router";
 import Programs from "@/pages/admin/program";
-import Submissions from "@/pages/admin/submission";
 import ProgramDetail from "@/pages/admin/program/ProgramDetail";
+import ThesisList from "@/pages/admin/thesis";
+import ThesisDetail from "@/pages/admin/thesis/ThesisDetail";
+import ThesisTeachers from "@/pages/admin/thesis/ThesisTeachers";
+import ThesisSteps from "@/pages/admin/thesis/ThesisSteps";
+import ThesisDeadlines from "@/pages/admin/thesis/ThesisDeadlines";
+import Submissions from "@/pages/admin/submission";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
@@ -100,6 +105,26 @@ export const adminRoutes = [
   {
     path: "/admin/program/$id",
     component: withPermissionProtection(ProgramDetail, "/admin/program"),
+  },
+  {
+    path: "/admin/thesis",
+    component: withPermissionProtection(ThesisList, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id",
+    component: withPermissionProtection(ThesisDetail, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/teachers",
+    component: withPermissionProtection(ThesisTeachers, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/steps",
+    component: withPermissionProtection(ThesisSteps, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/deadlines",
+    component: withPermissionProtection(ThesisDeadlines, "/admin/thesis"),
   },
   {
     path: "/admin/planning",

@@ -41,6 +41,7 @@
       "settings": "Settings",
       "dashboard": "Dashboard",
       "programAdministration": "Program Administration",
+      "thesis": "Thesis",
       "locations": "Locations",
       "languages": "Languages",
       "contractTypes": "Contract Types",
@@ -931,6 +932,75 @@
       "nameLabel": "Teaching Region Name",
       "namePlaceholder": "Enter teaching region name",
       "nameRequired": "Name is required"
+    }
+  },
+  "thesisManagement": {
+    "title": "Thesis Catalog",
+    "search": "Search by thesis name...",
+    "createThesis": "Create Thesis",
+    "table": {
+      "uid": "UID",
+      "name": "Thesis Name",
+      "academic": "Academic Year",
+      "program": "Programme",
+      "price": "Price",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "noTheses": "No theses found"
+    },
+    "messages": {
+      "loadFailed": "Failed to load theses"
+    },
+    "modal": {
+      "createTitle": "Create Thesis",
+      "editTitle": "Edit Thesis",
+      "createSubtitle": "Add a new thesis to the catalog",
+      "editSubtitle": "Update the thesis details",
+      "nameLabel": "Thesis Name",
+      "namePlaceholder": "Enter thesis name",
+      "academicLabel": "Academic Year",
+      "academicPlaceholder": "Select academic year",
+      "searchAcademic": "Search academic years...",
+      "programTypeLabel": "Programme Type",
+      "programTypePlaceholder": "Select programme type first",
+      "programLabel": "Programme",
+      "programPlaceholder": "Select programme",
+      "searchProgram": "Search programmes...",
+      "selectTypeFirst": "Please select programme type first",
+      "priceLabel": "Price (€ EUR)",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter thesis description and overview...",
+      "statusLabel": "Status",
+      "activeNotice": "Active — visible and available for enrolments",
+      "inactiveNotice": "Inactive — enrolments will be blocked",
+      "create": "Create Thesis",
+      "update": "Update Thesis"
+    },
+    "deactivateModal": {
+      "title": "Deactivate Thesis",
+      "message": "Are you sure you want to deactivate \"{{name}}\"?",
+      "notice": "This thesis will remain visible in the catalog, but new enrolments will be blocked.",
+      "confirm": "Deactivate",
+      "deactivating": "Deactivating..."
+    },
+    "detail": {
+      "title": "Thesis Details",
+      "loading": "Loading thesis details...",
+      "loadFailed": "Failed to load thesis details",
+      "moduleDetails": "Module details",
+      "stepsLaterPhase": "Steps (Later phase)",
+      "deadlinesLaterPhase": "Deadlines (Later phase)",
+      "markingSchemeLaterPhase": "Marking scheme (Later phase)",
+      "exactOnlineLaterPhase": "Exact Online (Later phase)",
+      "uid": "UID",
+      "academicYear": "Academic Year",
+      "programme": "Programme",
+      "price": "Price",
+      "description": "Description",
+      "noDescription": "No description provided for this thesis."
     }
   },
   "programManagement": {
