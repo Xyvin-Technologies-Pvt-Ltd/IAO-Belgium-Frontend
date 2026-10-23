@@ -26,6 +26,20 @@ const roleBadgeClass = {
     "bg-violet-50 text-violet-700 ring-violet-600/10 dark:bg-violet-950/40 dark:text-violet-300 dark:ring-violet-400/20",
 };
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  const unit = (durationUnit || "years").toLowerCase();
+  const label = unit.startsWith("semester")
+    ? t("common.semester", "Semester")
+    : unit.startsWith("month")
+      ? t("common.durationUnits.month", "Month")
+      : unit.startsWith("week")
+        ? t("common.durationUnits.week", "Week")
+        : unit.startsWith("day")
+          ? t("common.durationUnits.day", "Day")
+          : t("common.durationUnits.year", "Year");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
 const AssignedModulesSection = ({
   modules = [],
   applicationId,
@@ -195,8 +209,11 @@ const AssignedModulesSection = ({
                             {m.counts_for_year != null
                               ? t(
                                   "studentManagement.moduleOverride.extraYear",
-                                  "Extra · Y{{year}}",
-                                  { year: m.counts_for_year },
+                                  "Extra · {{unit}} {{year}}",
+                                  {
+                                    unit: getDurationUnitLabel(durationUnit, t),
+                                    year: m.counts_for_year,
+                                  },
                                 )
                               : t(
                                   "studentManagement.moduleOverride.extra",

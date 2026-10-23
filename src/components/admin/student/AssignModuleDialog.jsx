@@ -29,6 +29,20 @@ import { useGetAdminStudentComponentSlots } from "@/store/useStudentStore";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { getMoment } from "@/utils/dateUtils";
 
+const getDurationUnitLabel = (durationUnit, t) => {
+  const unit = (durationUnit || "years").toLowerCase();
+  const label = unit.startsWith("semester")
+    ? t("common.semester", "Semester")
+    : unit.startsWith("month")
+      ? t("common.durationUnits.month", "Month")
+      : unit.startsWith("week")
+        ? t("common.durationUnits.week", "Week")
+        : unit.startsWith("day")
+          ? t("common.durationUnits.day", "Day")
+          : t("common.durationUnits.year", "Year");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
 const formatProgramLabel = (program) => {
   const parts = [program.name];
   if (program.city?.name) parts.push(program.city.name);
@@ -60,9 +74,7 @@ const AssignModuleDialog = ({
     [totalYears],
   );
 
-  const yearLabel = durationUnit === "semesters"
-    ? t("common.semester", "Semester")
-    : t("common.year", "Year");
+  const yearLabel = getDurationUnitLabel(durationUnit, t);
 
   const { data: programsData, isLoading: programsLoading } = useGetAllPrograms(
     { ...(programSearch && { search: programSearch }) },
@@ -343,7 +355,8 @@ const AssignModuleDialog = ({
               <p className="text-xs text-muted-foreground break-words">
                 {t(
                   "studentManagement.moduleOverride.countsForYearHint",
-                  "Extra (cross-program) modules must be completed before this study year can be finished.",
+                  "Extra (cross-program) modules must be completed before this study {{unit}} can be finished.",
+                  { unit: yearLabel.toLowerCase() },
                 )}
               </p>
             </div>
