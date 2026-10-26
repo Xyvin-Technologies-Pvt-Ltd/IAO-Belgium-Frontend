@@ -68,6 +68,17 @@ export const getFinanceQueue = async (filter) => {
   }
 };
 
+export const getProformaFilterOptions = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/proforma-invoice/filter-options`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 // Generation Errors / Unprocessed Exceptions
 export const getProformaErrors = async (filter) => {
   try {
