@@ -6,6 +6,7 @@ import {
   updateProformaRegion,
   deleteProformaRegion,
   getFinanceQueue,
+  getProformaFilterOptions,
   getProformaErrors,
   getProformaById,
   signProforma,
@@ -106,6 +107,15 @@ export const useDeleteProformaRegion = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to delete proforma region");
     },
+  });
+};
+
+export const useGetProformaFilterOptions = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["proforma-filter-options", filter],
+    queryFn: () => getProformaFilterOptions(filter),
+    staleTime: 30000,
+    ...options,
   });
 };
 

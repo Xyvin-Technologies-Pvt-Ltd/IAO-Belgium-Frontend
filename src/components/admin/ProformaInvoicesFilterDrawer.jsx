@@ -16,17 +16,112 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SlidersHorizontal } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PROGRAM_TYPES } from "@/constants/programTypes";
+import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import { useGetProformaFilterOptions } from "@/store/useProformaStore";
 
-const FilterSection = ({ label, children }) => (
+const OPTION_LIMIT = 20;
+
+function NoteFilterSelect({
+  field,
+  value,
+  selectedLabel,
+  onChange,
+  placeholder,
+  searchPlaceholder,
+  programType,
+  programId,
+  enabled,
+}) {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [items, setItems] = useState([]);
+
+  const query = {
+    field,
+    page,
+    limit: OPTION_LIMIT,
+    ...(search ? { search } : {}),
+    ...(field === "program" || field === "module"
+      ? {
+          ...(programType && programType !== "all" ? { program_type: programType } : {}),
+          ...(field === "module" && programId && programId !== "all" ? { program_id: programId } : {}),
+        }
+      : {}),
+  };
+
+  const { data, isFetching } = useGetProformaFilterOptions(query, { enabled });
+
+  useEffect(() => {
+    setPage(1);
+    setItems([]);
+  }, [search, field, programType, programId]);
+
+  useEffect(() => {
+    if (!data || Number(data.page) !== page) return;
+    const rows = data.data || [];
+    setItems((prev) => {
+      if (page === 1) return rows;
+      const seen = new Set(prev.map((item) => String(item._id)));
+      return [...prev, ...rows.filter((item) => !seen.has(String(item._id)))];
+    });
+  }, [data, page]);
+
+  const total = Number(data?.total_count || 0);
+  const hasMore = Number(data?.page) === page && page * OPTION_LIMIT < total;
+  const chosen = value && value !== "all" ? String(value) : "";
+  const displayItems =
+    chosen && !items.some((item) => String(item._id) === chosen)
+      ? [{ _id: chosen, name: selectedLabel || chosen }, ...items]
+      : items;
+
+  const handleSearch = useCallback((term) => {
+    const next = term || "";
+    setSearch((current) => (current === next ? current : next));
+  }, []);
+
+  return (
+    <SearchableSelect
+      className="w-full"
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      items={displayItems}
+      value={chosen}
+      onChange={(next) => {
+        const match = displayItems.find((item) => String(item._id) === String(next));
+        onChange(next || "all", match?.name || "");
+      }}
+      onSearch={handleSearch}
+      onLoadMore={() => {
+        if (!isFetching && hasMore) setPage((current) => current + 1);
+      }}
+      hasMore={hasMore}
+      isFetchingMore={isFetching && page > 1}
+      isLoading={isFetching && items.length === 0}
+    />
+  );
+}
+
+const FilterSection = ({ label, onReset, children }) => (
   <div className="space-y-2">
-    <label
-      className="text-xs font-semibold uppercase tracking-wider"
-      style={{ color: "#94a3b8" }}
-    >
-      {label}
-    </label>
+    <div className="flex items-center justify-between gap-2">
+      <label
+        className="text-xs font-semibold uppercase tracking-wider"
+        style={{ color: "#94a3b8" }}
+      >
+        {label}
+      </label>
+      {onReset && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-xs font-medium text-primary hover:underline"
+        >
+          Reset
+        </button>
+      )}
+    </div>
     {children}
   </div>
 );
@@ -35,6 +130,10 @@ const EMPTY = {
   program_type: "all",
   program_id: "all",
   component_id: "all",
+  role: "all",
+  location: "all",
+  region: "all",
+  payment_status: "all",
 };
 
 export default function ProformaInvoicesFilterDrawer({
@@ -43,35 +142,44 @@ export default function ProformaInvoicesFilterDrawer({
   appliedFilters,
   setAppliedFilters,
   setPage,
-  filterOptions = { programs: [], modules: [] },
+  showPaymentFilter = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedLabels, setSelectedLabels] = useState({});
 
-  const activeFiltersCount = Object.values(appliedFilters || {}).filter(
-    (val) => val && val !== "all"
-  ).length;
+  const activeFiltersCount = Object.entries(appliedFilters || {}).filter(([key, val]) => {
+    if (!showPaymentFilter && key === "payment_status") return false;
+    return val && val !== "all";
+  }).length;
 
-  const programs = useMemo(() => {
-    const list = filterOptions.programs || [];
-    if (draftFilters.program_type === "all") return list;
-    return list.filter((p) => p.program_type === draftFilters.program_type);
-  }, [filterOptions.programs, draftFilters.program_type]);
+  const rememberLabel = (key, value, name) => {
+    setSelectedLabels((prev) => ({
+      ...prev,
+      [key]: value && value !== "all" ? name || value : "",
+    }));
+  };
 
-  const modules = useMemo(() => {
-    const list = filterOptions.modules || [];
-    if (draftFilters.program_id !== "all") {
-      return list.filter((m) => String(m.program_id) === String(draftFilters.program_id));
-    }
-    if (draftFilters.program_type !== "all") {
-      const programIds = new Set(programs.map((p) => String(p._id)));
-      return list.filter((m) => programIds.has(String(m.program_id)));
-    }
-    return list;
-  }, [filterOptions.modules, draftFilters.program_id, draftFilters.program_type, programs]);
+  const isSet = (key) =>
+    (draftFilters?.[key] && draftFilters[key] !== "all") ||
+    (appliedFilters?.[key] && appliedFilters[key] !== "all");
+
+  const applyPatch = (patch) => {
+    setDraftFilters((prev) => ({ ...prev, ...patch }));
+    setAppliedFilters((prev) => ({ ...prev, ...patch }));
+    setSelectedLabels((prev) => {
+      const next = { ...prev };
+      Object.keys(patch).forEach((key) => {
+        if (!patch[key] || patch[key] === "all") next[key] = "";
+      });
+      return next;
+    });
+    setPage?.(1);
+  };
 
   const handleClearAll = () => {
     setDraftFilters({ ...EMPTY });
     setAppliedFilters({ ...EMPTY });
+    setSelectedLabels({});
     setPage?.(1);
   };
 
@@ -143,7 +251,7 @@ export default function ProformaInvoicesFilterDrawer({
                 Filter invoices
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Program type, program, and module
+                Program, role, location, and region
               </p>
             </div>
           </div>
@@ -151,17 +259,54 @@ export default function ProformaInvoicesFilterDrawer({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label="Program Type">
+            {showPaymentFilter && (
+              <FilterSection
+                label="Payment status"
+                onReset={isSet("payment_status") ? () => applyPatch({ payment_status: "all" }) : null}
+              >
+                <Select
+                  value={draftFilters.payment_status || "all"}
+                  onValueChange={(val) =>
+                    setDraftFilters((prev) => ({ ...prev, payment_status: val }))
+                  }
+                >
+                  <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="unpaid">Unpaid</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FilterSection>
+            )}
+
+            <FilterSection
+              label="Program Type"
+              onReset={
+                isSet("program_type")
+                  ? () =>
+                      applyPatch({
+                        program_type: "all",
+                        program_id: "all",
+                        component_id: "all",
+                      })
+                  : null
+              }
+            >
               <Select
                 value={draftFilters.program_type}
-                onValueChange={(val) =>
+                onValueChange={(val) => {
                   setDraftFilters((prev) => ({
                     ...prev,
                     program_type: val,
                     program_id: "all",
                     component_id: "all",
-                  }))
-                }
+                  }));
+                  rememberLabel("program_id", "all", "");
+                  rememberLabel("component_id", "all", "");
+                }}
               >
                 <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
                   <SelectValue placeholder="All types" />
@@ -177,50 +322,106 @@ export default function ProformaInvoicesFilterDrawer({
               </Select>
             </FilterSection>
 
-            <FilterSection label="Program">
-              <Select
+            <FilterSection
+              label="Program"
+              onReset={
+                isSet("program_id")
+                  ? () => applyPatch({ program_id: "all", component_id: "all" })
+                  : null
+              }
+            >
+              <NoteFilterSelect
+                field="program"
                 value={draftFilters.program_id}
-                onValueChange={(val) =>
+                selectedLabel={selectedLabels.program_id}
+                placeholder="All programs"
+                searchPlaceholder="Search programs..."
+                programType={draftFilters.program_type}
+                enabled={isOpen}
+                onChange={(val, name) => {
                   setDraftFilters((prev) => ({
                     ...prev,
                     program_id: val,
                     component_id: "all",
-                  }))
-                }
-              >
-                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All programs" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All programs</SelectItem>
-                  {programs.map((p) => (
-                    <SelectItem key={p._id} value={p._id}>
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  }));
+                  rememberLabel("program_id", val, name);
+                  rememberLabel("component_id", "all", "");
+                }}
+              />
             </FilterSection>
 
-            <FilterSection label="Module">
-              <Select
+            <FilterSection
+              label="Module"
+              onReset={isSet("component_id") ? () => applyPatch({ component_id: "all" }) : null}
+            >
+              <NoteFilterSelect
+                field="module"
                 value={draftFilters.component_id}
-                onValueChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, component_id: val }))
-                }
-              >
-                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue placeholder="All modules" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All modules</SelectItem>
-                  {modules.map((m) => (
-                    <SelectItem key={m._id} value={m._id}>
-                      {m.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                selectedLabel={selectedLabels.component_id}
+                placeholder="All modules"
+                searchPlaceholder="Search modules..."
+                programType={draftFilters.program_type}
+                programId={draftFilters.program_id}
+                enabled={isOpen}
+                onChange={(val, name) => {
+                  setDraftFilters((prev) => ({ ...prev, component_id: val }));
+                  rememberLabel("component_id", val, name);
+                }}
+              />
+            </FilterSection>
+
+            <FilterSection
+              label="Role"
+              onReset={isSet("role") ? () => applyPatch({ role: "all" }) : null}
+            >
+              <NoteFilterSelect
+                field="role"
+                value={draftFilters.role}
+                selectedLabel={selectedLabels.role}
+                placeholder="All roles"
+                searchPlaceholder="Search roles..."
+                enabled={isOpen}
+                onChange={(val, name) => {
+                  setDraftFilters((prev) => ({ ...prev, role: val }));
+                  rememberLabel("role", val, name);
+                }}
+              />
+            </FilterSection>
+
+            <FilterSection
+              label="Location"
+              onReset={isSet("location") ? () => applyPatch({ location: "all" }) : null}
+            >
+              <NoteFilterSelect
+                field="location"
+                value={draftFilters.location}
+                selectedLabel={selectedLabels.location}
+                placeholder="All locations"
+                searchPlaceholder="Search locations..."
+                enabled={isOpen}
+                onChange={(val, name) => {
+                  setDraftFilters((prev) => ({ ...prev, location: val }));
+                  rememberLabel("location", val, name);
+                }}
+              />
+            </FilterSection>
+
+            <FilterSection
+              label="Region"
+              onReset={isSet("region") ? () => applyPatch({ region: "all" }) : null}
+            >
+              <NoteFilterSelect
+                field="region"
+                value={draftFilters.region}
+                selectedLabel={selectedLabels.region}
+                placeholder="All regions"
+                searchPlaceholder="Search regions..."
+                enabled={isOpen}
+                onChange={(val, name) => {
+                  setDraftFilters((prev) => ({ ...prev, region: val }));
+                  rememberLabel("region", val, name);
+                }}
+              />
             </FilterSection>
           </div>
         </div>
