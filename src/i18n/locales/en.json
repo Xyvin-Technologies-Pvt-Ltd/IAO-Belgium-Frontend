@@ -2976,7 +2976,7 @@
       "all": "All Expense Notes",
       "number": "Expense Note #",
       "viewAndSign": "View & Sign Expense Note",
-      "search": "Search expense note…",
+      "search": "Search note number, teacher name, or email",
       "retry": "Retry Expense Note"
     },
     "signedByLabel": "Signed by",

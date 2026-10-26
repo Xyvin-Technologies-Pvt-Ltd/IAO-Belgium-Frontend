@@ -9,6 +9,17 @@ export function proformaTeacherName(teacher, fallback = "Teacher") {
   return parts.length ? parts.join(" ") : fallback;
 }
 
+export function formatProformaPaidAt(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 /**
  * Teacher role from invoice snapshot / populated user.
  */
