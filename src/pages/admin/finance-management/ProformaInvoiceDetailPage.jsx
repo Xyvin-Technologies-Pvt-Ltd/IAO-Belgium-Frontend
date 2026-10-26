@@ -20,7 +20,6 @@ import {
   ArrowLeft,
   Check,
   Clock,
-  ShieldCheck,
   Paperclip,
   Loader2,
   ArrowRight,
@@ -28,6 +27,7 @@ import {
   Printer,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MarkProformaPaidDialog, ProformaPaidNote } from "@/components/admin/ProformaPaidActions";
 import ProformaSectionNotes from "@/components/proforma/ProformaSectionNotes";
 import ProformaActivityLog, { ProformaLatestChangeBanner } from "@/components/proforma/ProformaActivityLog";
 import ProformaTravelRoadCard from "@/components/proforma/ProformaTravelRoadCard";
@@ -143,6 +143,7 @@ export default function ProformaInvoiceDetailPage() {
   const [rejectReasons, setRejectReasons] = useState({});
   const [rejectingSection, setRejectingSection] = useState(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
 
   useEffect(() => {
     if (proforma?.proforma_number) {
@@ -410,6 +411,16 @@ export default function ProformaInvoiceDetailPage() {
     });
   };
 
+  const confirmMarkPaid = () => {
+    updateStatusMutation.mutate(
+      {
+        id: proforma._id,
+        data: { status: "PAID", notes: "Marked as paid" },
+      },
+      { onSuccess: () => setPayOpen(false) }
+    );
+  };
+
   const downloadSignedPdf = async () => {
     try {
       setDownloadingPdf(true);
@@ -437,6 +448,9 @@ export default function ProformaInvoiceDetailPage() {
                 €{Number(proforma.grand_total || 0).toFixed(2)}
               </span>
             </div>
+            {proforma.status === "PAID" && (
+              <ProformaPaidNote paidAt={proforma.paid_at} paidByName={proforma.paid_by_name} />
+            )}
           </div>
         </div>
 
@@ -479,11 +493,16 @@ export default function ProformaInvoiceDetailPage() {
               <ArrowRight className="w-4 h-4" />
               {updateStatusMutation.isPending ? "Sending..." : "Send to finance"}
             </Button>
-          ) : (
-            <span className="bg-purple-600 text-white px-3 py-1.5 text-xs font-bold rounded-md flex items-center gap-1">
-              <ShieldCheck className="w-4 h-4" /> In Finance Queue
-            </span>
-          )}
+          ) : proforma.status === "MOVED_TO_FINANCE" ? (
+            <Button
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
+              onClick={() => setPayOpen(true)}
+              disabled={updateStatusMutation.isPending}
+            >
+              Mark as paid
+            </Button>
+          ) : null}
         </div>
       </div>
 
@@ -1124,6 +1143,14 @@ export default function ProformaInvoiceDetailPage() {
       </div>
 
       <ProformaActivityLog logs={proforma.audit_logs} />
+
+      <MarkProformaPaidDialog
+        invoice={proforma}
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        onConfirm={confirmMarkPaid}
+        pending={updateStatusMutation.isPending}
+      />
     </div>
   );
 }
