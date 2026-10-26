@@ -2606,7 +2606,7 @@
       "all": "Alle Kostenaufstellungen",
       "number": "Kostenaufstellung Nr.",
       "viewAndSign": "Kostenaufstellung anzeigen und unterzeichnen",
-      "search": "Kostenaufstellung suchen…",
+      "search": "Nach Notanummer, Dozentenname oder E-Mail suchen",
       "retry": "Kostenaufstellung erneut versuchen"
     },
     "signedByLabel": "Unterschrieben von",

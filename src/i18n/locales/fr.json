@@ -2590,7 +2590,7 @@
       "all": "Toutes les notes de frais",
       "number": "Note de frais n°",
       "viewAndSign": "Afficher et signer la note de frais",
-      "search": "Rechercher une note de frais…",
+      "search": "Rechercher par numéro, nom ou e-mail",
       "retry": "Réessayer la note de frais"
     },
     "signedByLabel": "Signé par",

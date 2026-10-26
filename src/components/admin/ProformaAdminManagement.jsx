@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma } from "@/store/useProformaStore";
+import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma, useUpdateProformaStatus } from "@/store/useProformaStore";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
@@ -9,8 +10,10 @@ import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
 import ProformaInvoicesFilterDrawer, {
   EMPTY_PROFORMA_FILTERS,
 } from "./ProformaInvoicesFilterDrawer";
+import { MarkProformaPaidDialog, ProformaPaidBadge } from "./ProformaPaidActions";
 import { coursePlanningLabel, proformaTeacherName, proformaTeacherRole } from "@/utils/proformaCourseLabel";
 import { Eye, FileText } from "lucide-react";
+import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import {
   Table,
   TableBody,
@@ -26,37 +29,48 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const retryMutation = useRetryPlanningProforma();
+  const updateStatusMutation = useUpdateProformaStatus();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [draftFilters, setDraftFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
   const [appliedFilters, setAppliedFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
+  const [payTarget, setPayTarget] = useState(null);
+  const { sortBy, sortOrder, handleSort } = useTableSort("updatedAt", "desc", { setPage });
 
   const debouncedSearch = useDebounce(search, 500);
+  const isFinanceTab = statusFilter === "MOVED_TO_FINANCE";
 
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, statusFilter, appliedFilters]);
 
   const queueFilter = useMemo(() => {
+    let status = statusFilter;
+    if (isFinanceTab) {
+      const payment = appliedFilters.payment_status || "all";
+      if (payment === "paid") status = "PAID";
+      else if (payment === "unpaid") status = "MOVED_TO_FINANCE";
+      else status = "MOVED_TO_FINANCE,PAID";
+    }
     const f = {
       page,
       limit: rowsPerPage,
-      status: statusFilter,
+      status,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
     };
-    if (appliedFilters.program_type && appliedFilters.program_type !== "all") {
-      f.program_type = appliedFilters.program_type;
+    if (isFinanceTab) {
+      f.sort_by = sortBy;
+      f.sort_order = sortOrder;
     }
-    if (appliedFilters.program_id && appliedFilters.program_id !== "all") {
-      f.program_id = appliedFilters.program_id;
-    }
-    if (appliedFilters.component_id && appliedFilters.component_id !== "all") {
-      f.component_id = appliedFilters.component_id;
-    }
+    ["program_type", "program_id", "component_id", "role", "location", "region"].forEach((key) => {
+      if (appliedFilters[key] && appliedFilters[key] !== "all") {
+        f[key] = appliedFilters[key];
+      }
+    });
     return f;
-  }, [page, rowsPerPage, statusFilter, debouncedSearch, appliedFilters]);
+  }, [page, rowsPerPage, statusFilter, isFinanceTab, debouncedSearch, appliedFilters, sortBy, sortOrder]);
 
   const { data: queueData, isLoading: loadingQueue, isFetching: fetchingQueue, refetch: refetchQueue } = useGetFinanceQueue(
     queueFilter,
@@ -75,7 +89,16 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const invoices = queueData?.data || [];
   const errorsList = errorsData?.data || [];
   const totalRows = isErrorsTab ? (errorsData?.total_count || 0) : (queueData?.total_count || 0);
-  const filterOptions = queueData?.filter_options || { programs: [], modules: [] };
+  const confirmMarkPaid = () => {
+    if (!payTarget?._id) return;
+    updateStatusMutation.mutate(
+      {
+        id: payTarget._id,
+        data: { status: "PAID", notes: "Marked as paid" },
+      },
+      { onSuccess: () => setPayTarget(null) }
+    );
+  };
 
   const statusBadges = {
     SENT_TO_TEACHER: {
@@ -129,7 +152,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
             appliedFilters={appliedFilters}
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
-            filterOptions={filterOptions}
+            showPaymentFilter={isFinanceTab}
           />
           <Input
             type="text"
@@ -293,7 +316,19 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>{t("proforma.list.number")}</TableHead>
+                {isFinanceTab ? (
+                  <SortableTableHead
+                    sortKey="proforma_number"
+                    activeKey={sortBy}
+                    order={sortOrder}
+                    onSort={handleSort}
+                    defaultOrder="asc"
+                  >
+                    {t("proforma.list.number")}
+                  </SortableTableHead>
+                ) : (
+                  <TableHead>{t("proforma.list.number")}</TableHead>
+                )}
                 <TableHead>Teacher Name & Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Course Planning</TableHead>
@@ -301,7 +336,19 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                 <TableHead>Region</TableHead>
                 <TableHead className="text-right">Grand Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Last Updated</TableHead>
+                {isFinanceTab ? (
+                  <SortableTableHead
+                    sortKey="updatedAt"
+                    activeKey={sortBy}
+                    order={sortOrder}
+                    onSort={handleSort}
+                    defaultOrder="desc"
+                  >
+                    Last Updated
+                  </SortableTableHead>
+                ) : (
+                  <TableHead className="text-center">Last Updated</TableHead>
+                )}
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -354,10 +401,14 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                       <TableCell className="text-right font-mono font-bold text-foreground">
                         €{inv.grand_total?.toFixed(2)}
                       </TableCell>
-                      <TableCell className="text-center whitespace-nowrap">
-                        <span className={`px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}>
-                          {badge.label}
-                        </span>
+                      <TableCell className="text-center align-middle whitespace-nowrap">
+                        {inv.status === "PAID" ? (
+                          <ProformaPaidBadge paidAt={inv.paid_at} paidByName={inv.paid_by_name} />
+                        ) : (
+                          <span className={`px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}>
+                            {badge.label}
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
                         {new Date(inv.updatedAt).toLocaleDateString()}
@@ -388,6 +439,16 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          {isFinanceTab && inv.status === "MOVED_TO_FINANCE" && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => setPayTarget(inv)}
+                            >
+                              Mark as paid
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -412,6 +473,16 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
+      />
+
+      <MarkProformaPaidDialog
+        invoice={payTarget}
+        open={Boolean(payTarget)}
+        onOpenChange={(open) => {
+          if (!open) setPayTarget(null);
+        }}
+        onConfirm={confirmMarkPaid}
+        pending={updateStatusMutation.isPending}
       />
     </div>
   );
