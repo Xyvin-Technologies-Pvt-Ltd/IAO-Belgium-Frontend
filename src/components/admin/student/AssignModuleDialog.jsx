@@ -115,40 +115,16 @@ const AssignModuleDialog = ({
     enabled: open && !!studentId && !!slotLookupId,
   });
 
-  const hasUpcomingSession = (slot) => {
-    if (!slot.sessions || slot.sessions.length === 0) return true;
-    return slot.sessions.some((s) => {
-      if (!s?.session_date) return false;
-      return getMoment(s.end_time || s.session_date).isSameOrAfter(
-        getMoment(),
-        "day",
-      );
-    });
-  };
-
   const rawSlots = slotsResponse?.data || [];
+  //* Include past plannings (admin may assign them to mark attendance).
   const availableSlots = useMemo(() => {
-    return (slotsResponse?.data || []).filter((slot) => {
-      if ((slot.available_seats || 0) <= 0) return false;
-      if (slot.sessions && slot.sessions.length > 0) {
-        return slot.sessions.some((s) => {
-          if (!s?.session_date) return false;
-          return getMoment(s.end_time || s.session_date).isSameOrAfter(
-            getMoment(),
-            "day",
-          );
-        });
-      }
-      return true;
-    });
+    return (slotsResponse?.data || []).filter(
+      (slot) => (slot.available_seats || 0) > 0,
+    );
   }, [slotsResponse?.data]);
 
   const hasAnyPlannings = rawSlots.length > 0;
   const hasSlotOptions = availableSlots.length > 0;
-  //* Prefer past-sessions message when seat-bearing slots were dropped only for dates
-  const hasSeatBearingPastOnly = rawSlots.some(
-    (slot) => (slot.available_seats || 0) > 0 && !hasUpcomingSession(slot),
-  );
   const slotsReady = !slotsLoading && !slotsFetching;
 
   useEffect(() => {
@@ -421,13 +397,6 @@ const AssignModuleDialog = ({
                     ))}
                   </SelectContent>
                 </Select>
-              ) : hasAnyPlannings && hasSeatBearingPastOnly ? (
-                <p className="text-sm text-muted-foreground border rounded-md p-3 break-words">
-                  {t(
-                    "studentManagement.moduleOverride.noUpcomingPlannings",
-                    "No upcoming planning groups for this module. Past sessions cannot be assigned.",
-                  )}
-                </p>
               ) : hasAnyPlannings ? (
                 <p className="text-sm text-muted-foreground border rounded-md p-3 break-words">
                   {t(
