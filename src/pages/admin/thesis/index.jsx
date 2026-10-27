@@ -161,7 +161,14 @@ const ThesesList = () => {
               >
                 <TableCell className="font-medium">{i?.uid}</TableCell>
                 <TableCell>
-                  <span className="font-medium text-foreground">{i?.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-foreground">{i?.name}</span>
+                    {i?.current_year && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 shrink-0">
+                        Year {i.current_year}
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {Array.isArray(i?.academic) && i.academic.length > 0 ? (

@@ -94,6 +94,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
       academic: [],
       program_type: "",
       program: [],
+      current_year: "",
       price: "",
       description: "",
       status: true,
@@ -101,6 +102,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
   });
 
   const selectedProgramType = watch("program_type");
+  const selectedStudyYear = watch("current_year");
   const watchedAcademics = watch("academic");
   const watchedPrograms = watch("program");
   const statusValue = watch("status");
@@ -154,6 +156,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
       city: p.city,
       language: p.language,
       program_type: p.program_type,
+      year: Number(p.year) || 1,
     }));
 
     // If editing or selected programmes exist for this type, ensure they are present in items list
@@ -167,6 +170,35 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
 
     return formatted;
   }, [programsData?.data, selectedPrograms]);
+
+  // Calculate highest program.year among selected programmes
+  const maxStudyYear = useMemo(() => {
+    if (!selectedPrograms.length) return 0;
+    let max = 1;
+    const allKnownPrograms = [
+      ...(programsData?.data || []),
+      ...(Array.isArray(thesisData?.program) ? thesisData.program : []),
+    ];
+    for (const sp of selectedPrograms) {
+      const spId = String(toId(sp));
+      const match = allKnownPrograms.find((p) => String(toId(p)) === spId);
+      const yr = Number(match?.year || sp?.year || 1);
+      if (yr > max) max = yr;
+    }
+    return max;
+  }, [selectedPrograms, programsData?.data, thesisData?.program]);
+
+  const studyYearOptions = useMemo(() => {
+    if (maxStudyYear < 1) return [];
+    return Array.from({ length: maxStudyYear }, (_, i) => i + 1);
+  }, [maxStudyYear]);
+
+  // Adjust study year if selected exceeds max
+  useEffect(() => {
+    if (selectedStudyYear && maxStudyYear > 0 && Number(selectedStudyYear) > maxStudyYear) {
+      setValue("current_year", String(maxStudyYear), { shouldValidate: true });
+    }
+  }, [maxStudyYear, selectedStudyYear, setValue]);
 
   useEffect(() => {
     if (open) {
@@ -197,6 +229,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
           _id: String(toId(p)),
           name: formatProgramOption(p) || p?.name || toId(p),
           program_type: p?.program_type || "",
+          year: Number(p?.year) || 1,
         }));
 
         const progType =
@@ -209,6 +242,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
           academic: normalizedAcademics,
           program_type: progType,
           program: normalizedPrograms,
+          current_year: thesisData.current_year != null ? String(thesisData.current_year) : "",
           price: thesisData.price != null ? String(thesisData.price) : "",
           description: thesisData.description || "",
           status: thesisData.status ?? true,
@@ -220,6 +254,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
           academic: [],
           program_type: "",
           program: [],
+          current_year: "",
           price: "",
           description: "",
           status: true,
@@ -234,6 +269,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
     setValue("program_type", newType, { shouldValidate: true });
     // Changing type clears the programme list and program search term
     setValue("program", [], { shouldValidate: true });
+    setValue("current_year", "", { shouldValidate: true });
     setProgramSearchTerm("");
   };
 
@@ -243,6 +279,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
       academic: [],
       program_type: "",
       program: [],
+      current_year: "",
       price: "",
       description: "",
       status: true,
@@ -258,6 +295,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
       name: formData.name.trim(),
       academic: (formData.academic || []).map((a) => a._id || a),
       program: (formData.program || []).map((p) => p._id || p),
+      current_year: Number(formData.current_year),
       price: Number(formData.price) || 0,
       description: descriptionContent || "",
     };
@@ -404,6 +442,52 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
               disabled={!selectedProgramType}
               isLoading={programsLoading}
             />
+
+            {/* Study Year */}
+            <div className="space-y-2">
+              <Label>
+                {t("thesisManagement.modal.studyYearLabel", "Study Year")}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                key={selectedStudyYear ? `year-${selectedStudyYear}` : "empty-year"}
+                value={selectedStudyYear ? String(selectedStudyYear) : ""}
+                onValueChange={(val) =>
+                  setValue("current_year", val, { shouldValidate: true })
+                }
+                disabled={!selectedPrograms.length}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      !selectedPrograms.length
+                        ? t(
+                            "thesisManagement.modal.selectProgramFirst",
+                            "Please select programme(s) first"
+                          )
+                        : t(
+                            "thesisManagement.modal.studyYearPlaceholder",
+                            "Select study year..."
+                          )
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {studyYearOptions.map((yr) => (
+                    <SelectItem key={yr} value={String(yr)}>
+                      {t("thesisManagement.modal.yearOption", `Year ${yr}`, {
+                        year: yr,
+                      })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.current_year && (
+                <p className="text-red-500 text-sm">
+                  {errors.current_year.message}
+                </p>
+              )}
+            </div>
 
             {/* Price (EUR) - type="text" to prevent scroll wheel changing the number */}
             <FormField

@@ -18,6 +18,15 @@ import {
   deleteTrajectory,
   getThesisDeadlines,
   saveThesisDeadlines,
+  getTrajectoryStudents,
+  getTrajectoryStudentDetail,
+  updateTrajectoryStudentReader,
+  updateTrajectoryStudentSupervisor,
+  updateTrajectoryStudentAttemptStatus,
+  updateTrajectoryStudentStepDeadline,
+  uploadStaffThesisDocument,
+  renameStaffThesisDocument,
+  deleteStaffThesisDocument,
 } from "@/api/thesisApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -310,5 +319,215 @@ export const useSaveThesisDeadlines = () => {
     },
   });
 };
+
+export const useGetTrajectoryStudents = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  return useQuery({
+    queryKey: ["thesis-trajectory-students", thesisId, trajectoryId, params],
+    queryFn: () => getTrajectoryStudents(thesisId, trajectoryId, params),
+    enabled: !!thesisId && !!trajectoryId,
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetTrajectoryStudentDetail = (
+  thesisId,
+  trajectoryId,
+  userId,
+  options = {}
+) => {
+  return useQuery({
+    queryKey: ["thesis-trajectory-student-detail", thesisId, trajectoryId, userId],
+    queryFn: () => getTrajectoryStudentDetail(thesisId, trajectoryId, userId),
+    enabled: !!thesisId && !!trajectoryId && !!userId,
+    staleTime: 10000,
+    ...options,
+  });
+};
+
+export const useUpdateTrajectoryStudentReader = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, reader }) =>
+      updateTrajectoryStudentReader(thesisId, trajectoryId, userId, { reader }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+      });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update reader");
+    },
+  });
+};
+
+export const useUpdateTrajectoryStudentSupervisor = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, supervisor, status }) =>
+      updateTrajectoryStudentSupervisor(thesisId, trajectoryId, userId, { supervisor, status }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+      });
+      toast.success(
+        variables.supervisor
+          ? "Supervisor updated successfully"
+          : "Supervisor cleared successfully"
+      );
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update supervisor");
+    },
+  });
+};
+
+export const useUpdateTrajectoryStudentAttemptStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, status, reason }) =>
+      updateTrajectoryStudentAttemptStatus(thesisId, trajectoryId, userId, {
+        status,
+        reason,
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+      });
+      toast.success(response?.message || `Marked as ${variables.status}`);
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update attempt status");
+    },
+  });
+};
+
+export const useUpdateTrajectoryStudentStepDeadline = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, stepId, deadline_date }) =>
+      updateTrajectoryStudentStepDeadline(
+        thesisId,
+        trajectoryId,
+        userId,
+        stepId,
+        { deadline_date }
+      ),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+      });
+      toast.success(response?.message || "Deadline updated");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update deadline");
+    },
+  });
+};
+
+export const useUploadStaffThesisDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, stepId, data }) =>
+      uploadStaffThesisDocument(thesisId, trajectoryId, userId, stepId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success("Document uploaded successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to upload document");
+    },
+  });
+};
+
+export const useRenameStaffThesisDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, stepId, documentId, name }) =>
+      renameStaffThesisDocument(thesisId, trajectoryId, userId, stepId, documentId, { name }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success("Document renamed successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to rename document");
+    },
+  });
+};
+
+export const useDeleteStaffThesisDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, stepId, documentId }) =>
+      deleteStaffThesisDocument(thesisId, trajectoryId, userId, stepId, documentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success("Document deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete document");
+    },
+  });
+};
+
 
 

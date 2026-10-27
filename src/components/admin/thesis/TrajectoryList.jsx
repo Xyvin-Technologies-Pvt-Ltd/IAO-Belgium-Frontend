@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
   Compass,
@@ -8,6 +9,7 @@ import {
   Edit,
   Trash2,
   AlertTriangle,
+  ChevronRight,
 } from "lucide-react";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import {
 
 const TrajectoryList = ({ thesisId, canModify }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const {
     data: trajectoriesResponse,
@@ -137,7 +140,13 @@ const TrajectoryList = ({ thesisId, canModify }) => {
           {trajectories.map((traj) => (
             <div
               key={traj._id}
-              className="group bg-muted/20 hover:bg-muted/40 border border-border/70 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between gap-3 shadow-2xs"
+              onClick={() =>
+                navigate({
+                  to: "/admin/thesis/$id/trajectories/$trajectoryId",
+                  params: { id: thesisId, trajectoryId: traj._id },
+                })
+              }
+              className="group bg-muted/20 hover:bg-muted/40 border border-border/70 hover:border-primary/50 rounded-xl p-4 transition-all duration-200 flex flex-col justify-between gap-3 shadow-2xs cursor-pointer hover:shadow-xs"
             >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -149,7 +158,10 @@ const TrajectoryList = ({ thesisId, canModify }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleOpenEdit(traj)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(traj);
+                        }}
                         className="h-7 w-7 text-muted-foreground hover:text-foreground"
                       >
                         <Edit className="w-3.5 h-3.5" />
@@ -157,7 +169,10 @@ const TrajectoryList = ({ thesisId, canModify }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleOpenDelete(traj)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDelete(traj);
+                        }}
                         className="h-7 w-7 text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

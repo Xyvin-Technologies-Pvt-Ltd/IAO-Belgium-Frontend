@@ -43,7 +43,7 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
   const [type, setType] = useState("document_upload");
   const [deadlineMode, setDeadlineMode] = useState("none");
   const [required, setRequired] = useState(true);
-  const [studentUploadsDocument, setStudentUploadsDocument] = useState(false);
+  const [studentUploadsDocument, setStudentUploadsDocument] = useState(true);
   const [lockedUntilSupervisor, setLockedUntilSupervisor] = useState(false);
   const [instruction, setInstruction] = useState("");
   const [resources, setResources] = useState([]);
@@ -57,7 +57,11 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       setRequired(
         initialData.required !== undefined ? initialData.required : true
       );
-      setStudentUploadsDocument(Boolean(initialData.student_uploads_document));
+      setStudentUploadsDocument(
+        initialData.student_uploads_document !== undefined
+          ? Boolean(initialData.student_uploads_document)
+          : true
+      );
       setLockedUntilSupervisor(Boolean(initialData.locked_until_supervisor));
       setInstruction(initialData.instruction || "");
       setResources(
@@ -73,7 +77,7 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       setType("document_upload");
       setDeadlineMode("none");
       setRequired(true);
-      setStudentUploadsDocument(false);
+      setStudentUploadsDocument(true);
       setLockedUntilSupervisor(false);
       setInstruction("");
       setResources([]);
@@ -210,6 +214,9 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
                 setType(val);
                 if (val !== "information_only" && deadlineMode === "event_date") {
                   setDeadlineMode("none");
+                }
+                if (val === "document_upload" && !initialData) {
+                  setStudentUploadsDocument(true);
                 }
               }}
             >

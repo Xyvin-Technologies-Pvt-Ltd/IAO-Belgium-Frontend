@@ -6,6 +6,8 @@ import ThesisDetail from "@/pages/admin/thesis/ThesisDetail";
 import ThesisTeachers from "@/pages/admin/thesis/ThesisTeachers";
 import ThesisSteps from "@/pages/admin/thesis/ThesisSteps";
 import ThesisDeadlines from "@/pages/admin/thesis/ThesisDeadlines";
+import TrajectoryDetails from "@/pages/admin/thesis/TrajectoryDetails";
+import TrajectoryStudentDetail from "@/pages/admin/thesis/TrajectoryStudentDetail";
 import Submissions from "@/pages/admin/submission";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
@@ -125,6 +127,14 @@ export const adminRoutes = [
   {
     path: "/admin/thesis/$id/deadlines",
     component: withPermissionProtection(ThesisDeadlines, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/trajectories/$trajectoryId",
+    component: withPermissionProtection(TrajectoryDetails, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/trajectories/$trajectoryId/students/$userId",
+    component: withPermissionProtection(TrajectoryStudentDetail, "/admin/thesis"),
   },
   {
     path: "/admin/planning",

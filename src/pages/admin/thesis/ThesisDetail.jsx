@@ -195,7 +195,7 @@ const ThesisDetail = () => {
       </div>
 
       {/* Overview Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Programme Type */}
         <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
           <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
@@ -268,6 +268,21 @@ const ThesisDetail = () => {
                 {thesis.program?.name || "-"}
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Study Year */}
+        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+            <Award className="w-5 h-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+              {t("thesisManagement.detail.studyYear", "Study Year")}
+            </p>
+            <p className="text-sm font-semibold text-foreground mt-0.5 truncate">
+              {thesis.current_year ? `Year ${thesis.current_year}` : "-"}
+            </p>
           </div>
         </div>
 

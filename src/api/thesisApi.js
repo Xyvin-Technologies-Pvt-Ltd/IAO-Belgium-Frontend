@@ -185,4 +185,153 @@ export const saveThesisDeadlines = async (thesisId, data) => {
   }
 };
 
+export const getTrajectoryStudents = async (thesisId, trajectoryId, params = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getTrajectoryStudentDetail = async (thesisId, trajectoryId, userId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateTrajectoryStudentReader = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateTrajectoryStudentSupervisor = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/supervisor`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateTrajectoryStudentAttemptStatus = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/status`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateTrajectoryStudentStepDeadline = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/deadline`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
+export const uploadStaffThesisDocument = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/documents`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const renameStaffThesisDocument = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  documentId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/documents/${documentId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteStaffThesisDocument = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  documentId
+) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/documents/${documentId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
+
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Fragment } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -295,17 +295,20 @@ const ThesisTeachers = () => {
                     {t("thesisManagement.teachers.table.email", "Email")}
                   </TableHead>
 
-                  {/* One column per role */}
+                  {/* One switch column + one count column per role */}
                   {roles.map((role) => (
-                    <TableHead
-                      key={role._id}
-                      className="text-center min-w-[130px] font-semibold"
-                    >
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span>{role.name}</span>
-                      </div>
-                    </TableHead>
+                    <Fragment key={role._id}>
+                      <TableHead className="text-center min-w-[110px] font-semibold">
+                        {role.name}
+                      </TableHead>
+                      <TableHead className="text-center min-w-[100px] font-semibold">
+                        {role.key === "supervisor"
+                          ? t("thesisManagement.teachers.table.supervising", "Supervising")
+                          : role.key === "reader"
+                            ? t("thesisManagement.teachers.table.reading", "Reading")
+                            : `${role.name}`}
+                      </TableHead>
+                    </Fragment>
                   ))}
 
                   {canModify && (
@@ -342,31 +345,47 @@ const ThesisTeachers = () => {
                         {teacher?.email || "-"}
                       </TableCell>
 
-                      {/* Role switches */}
+                      {/* One switch column + one count column per role */}
                       {roles.map((role) => {
                         const roleAssignment = (assignment.roles || []).find(
                           (r) =>
                             String(r.role?._id || r.role) === String(role._id)
                         );
                         const isEnabled = Boolean(roleAssignment?.enabled);
+                        const studentCount =
+                          roleAssignment?.assigned_students_count ??
+                          (role.key === "supervisor"
+                            ? assignment.assigned_students_count?.supervisor
+                            : role.key === "reader"
+                              ? assignment.assigned_students_count?.reader
+                              : 0) ??
+                          0;
 
                         return (
-                          <TableCell key={role._id} className="text-center">
-                            <div className="flex justify-center items-center">
-                              <Switch
-                                checked={isEnabled}
-                                onCheckedChange={() =>
-                                  handleToggleRole(
-                                    assignment._id,
-                                    role._id,
-                                    isEnabled
-                                  )
-                                }
-                                disabled={!canModify || updateRole.isPending}
-                                aria-label={`${role.name} for ${fullName}`}
-                              />
-                            </div>
-                          </TableCell>
+                          <Fragment key={role._id}>
+                            {/* Role Switch */}
+                            <TableCell className="text-center">
+                              <div className="flex justify-center items-center">
+                                <Switch
+                                  checked={isEnabled}
+                                  onCheckedChange={() =>
+                                    handleToggleRole(
+                                      assignment._id,
+                                      role._id,
+                                      isEnabled
+                                    )
+                                  }
+                                  disabled={!canModify || updateRole.isPending}
+                                  aria-label={`${role.name} for ${fullName}`}
+                                />
+                              </div>
+                            </TableCell>
+
+                            {/* Assigned Student Count */}
+                            <TableCell className="text-center font-medium text-sm text-foreground tabular-nums">
+                              {studentCount}
+                            </TableCell>
+                          </Fragment>
                         );
                       })}
 
