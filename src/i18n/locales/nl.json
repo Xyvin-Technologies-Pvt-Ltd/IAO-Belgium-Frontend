@@ -302,7 +302,8 @@
       },
       "student": {
         "title": "Studentrapporten",
-        "description": "Betalingsanalyse per student"
+        "description": "Betalingsanalyse per student",
+        "amountHint": "Totalen gebruiken het rapportbedrag (zelfde als Stad/Programma/Groep): gecrediteerde facturen tellen alleen de fee; balance-due top-ups worden niet dubbel geteld met de locatiewissel-factuur."
       },
       "createInvoice": {
         "title": "Aangepaste onkostennota aanmaken",
@@ -1026,6 +1027,15 @@
       "noLogs": "Geen jaarafsluitingslogs gevonden voor deze groep."
     }
   },
+  "yearCompletion": {
+    "title": "Jaarafsluiting berekenen",
+    "calculate": "Jaarafsluiting berekenen",
+    "promote": "Promoveren",
+    "demote": "Degraderen",
+    "assignGroup": "Groep toewijzen",
+    "reattemptQueue": "Module herkansingen",
+    "requestReattempt": "Herkansing aanvragen"
+  },
   "studentImport": {
     "title": "Studenten bulk uploaden",
     "description": "Selecteer het programma en de batch en upload vervolgens een Excel-/CSV-bestand. Studenten worden aangemaakt met volledige toegang en zonder inschrijfgeld. Voer eerst een voorbeeld uit voordat u importeert.",
@@ -1049,6 +1059,10 @@
   },
   "studentManagement": {
     "title": "Studentenbeheer",
+    "changeLocation": "Locatie wijzigen",
+    "changeLocationDescription": "Selecteer een student en een doelslot. Alleen modules die nog niet gestart zijn, kunnen van locatie wisselen.",
+    "changeLocationModulesHint": "Alleen modules die nog niet gestart zijn, worden getoond. Modules die bezig, voltooid of mislukt zijn, kunnen geen locatie wijzigen.",
+    "changeLocationNoModules": "Geen modules beschikbaar voor locatiewijziging. Deze student heeft geen modules die nog beschikbaar zijn (niet gestart). Modules die bezig, voltooid of mislukt zijn, worden uitgesloten.",
     "search": "Studenten zoeken...",
     "tabs": {
       "progress": "Academische voortgang",

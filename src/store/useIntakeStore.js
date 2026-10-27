@@ -151,12 +151,16 @@ export const useMarkStudentAsFailed = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ applicationId, reason }) =>
-      markStudentAsFailed(applicationId, { reason }),
+    mutationFn: ({ applicationId, reason, force }) =>
+      markStudentAsFailed(applicationId, {
+        reason,
+        ...(force ? { force: true } : {}),
+      }),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["batches"] });
       queryClient.invalidateQueries({ queryKey: ["batch-year-log"] });
+      queryClient.invalidateQueries({ queryKey: ["student"] });
       toast.success(response?.message || "Student marked as failed successfully!");
     },
     onError: (error) => {

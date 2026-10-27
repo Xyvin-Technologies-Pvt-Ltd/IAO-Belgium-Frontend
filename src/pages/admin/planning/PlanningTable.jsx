@@ -483,7 +483,7 @@ const PlanningTable = ({ activeCity }) => {
                   <div className="flex items-center gap-1.5 justify-center">
                     <Users size={14} className="text-sidebar-foreground/40" />
                     <span className="font-semibold text-sidebar-foreground/80">
-                      {i?.student_count || 0}
+                      {(i?.student_count || 0) + (i?.historical_count || 0)}
                     </span>
                   </div>
                 </TableCell>

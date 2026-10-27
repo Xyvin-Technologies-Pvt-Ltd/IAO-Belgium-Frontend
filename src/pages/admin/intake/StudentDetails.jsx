@@ -4,6 +4,7 @@ import UserCard from "@/components/admin/UserCard";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
+import AssignedModulesSection from "@/components/admin/student/AssignedModulesSection";
 import { useMigratedYearHistory } from "@/store/useArchiveStore";
 import { ErrorMessage, LoadingState } from "@/components/common";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -35,6 +36,8 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
+import ModuleReattemptDialog from "@/components/admin/batch/ModuleReattemptDialog";
+import { Button } from "@/components/ui/button";
 
 
 const formatSubmissionType = (type) =>
@@ -75,6 +78,7 @@ const StudentDetails = () => {
 
   const [activeTab, setActiveTab] = useState("progress");
   const [filter, setFilter] = useState({ year: 1 });
+  const [reattemptModule, setReattemptModule] = useState(null);
   const [paymentsPage, setPaymentsPage] = useState(1);
   const [paymentsRowsPerPage, setPaymentsRowsPerPage] = useState(10);
   const [transactionsPage, setTransactionsPage] = useState(1);
@@ -514,57 +518,19 @@ const StudentDetails = () => {
               </div>
             ) : (
               <>
-            <div className="col-span-12">
-              <h3 className="font-semibold mb-4">
-                {t("studentManagement.details.assignedModules", "Assigned Modules")}
-              </h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>
-                      {t("studentManagement.details.moduleId", "Module ID")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.moduleName", "Module Name")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.table.status", "Status")}
-                    </TableHead>
-                    <TableHead>
-                      {t("studentManagement.details.payment", "Payment")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {modules.length > 0 ? (
-                    modules.map((m) => (
-                      <TableRow key={m._id}>
-                        <TableCell>{m.uid}</TableCell>
-                        <TableCell>{m.name}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={m.status} />
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={m.payment_status || "unpaid"} />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="text-center text-muted-foreground"
-                      >
-                        {t(
-                          "studentManagement.details.noAssignedModules",
-                          "No modules assigned",
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <AssignedModulesSection
+              modules={modules}
+              applicationId={studentData?.application_id}
+              studentId={studentData?._id}
+              totalYears={totalYears}
+              currentYear={studentData?.current_year || filter?.year || 1}
+              durationUnit={studentData?.duration_unit || "years"}
+              onReattempt={setReattemptModule}
+              onDone={() => {
+                refetch();
+                refetchAttendance();
+              }}
+            />
 
             <div className="col-span-12">
               <h3 className="font-semibold mb-4">
@@ -1316,6 +1282,20 @@ const StudentDetails = () => {
           studentData={studentData}
         />
       )}
+
+      <ModuleReattemptDialog
+        open={!!reattemptModule}
+        onOpenChange={(open) => !open && setReattemptModule(null)}
+        studentId={studentData?._id}
+        applicationId={studentData?.application_id}
+        componentId={reattemptModule?.componentId}
+        systemId={reattemptModule?.systemId}
+        moduleName={reattemptModule?.name}
+        onDone={() => {
+          refetch();
+          refetchAttendance();
+        }}
+      />
 
       {(() => {
         if (

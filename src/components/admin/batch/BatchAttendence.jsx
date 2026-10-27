@@ -165,11 +165,42 @@ const BatchAttendence = () => {
             ) : students?.length > 0 ? (
               students.map((student) => (
                 <TableRow key={student._id} className="hover:bg-muted/30">
-                  <TableCell className="sticky left-0 z-10 border-r w-45 truncate bg-background shadow-[1px_0_0_0_hsl(var(--border))]">
-                    {student.student_name}
+                  <TableCell className="sticky left-0 z-10 border-r w-45 bg-background shadow-[1px_0_0_0_hsl(var(--border))]">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate">{student.student_name}</span>
+                      {student.is_historical && (
+                        <span
+                          className="inline-flex items-center rounded-full bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-700/10 dark:bg-slate-800/60 dark:text-slate-300 dark:ring-slate-400/20"
+                          title={t(
+                            "planningManagement.view.previouslyAttendedHint",
+                            "Left this group after location switch or reattempt. Attendance is read-only.",
+                          )}
+                        >
+                          {t(
+                            "planningManagement.view.previouslyAttendedBadge",
+                            "Previously attended",
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
-                  {modules.map((module) =>
-                    module.sessions.length > 0 ? (
+                  {modules.map((module) => {
+                    const moduleExcluded = (student.excluded_module_ids || []).some(
+                      (id) => String(id) === String(module.module_id),
+                    );
+                    if (moduleExcluded) {
+                      const cells =
+                        module.sessions.length > 0 ? module.sessions : [null];
+                      return cells.map((session) => (
+                        <TableCell
+                          key={session ? String(session.session_id) : `${module.module_id}-excluded`}
+                          className="text-center border-l py-2"
+                        >
+                          <span className="text-muted-foreground italic">{t("common.dash")}</span>
+                        </TableCell>
+                      ));
+                    }
+                    return module.sessions.length > 0 ? (
                       module.sessions.map((session) => {
                         const sid = String(session.session_id);
                         const attendance = student.attendance?.[sid];
@@ -199,8 +230,8 @@ const BatchAttendence = () => {
                           <span className="text-muted-foreground italic">{t("common.dash")}</span>
                         )}
                       </TableCell>
-                    ),
-                  )}
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

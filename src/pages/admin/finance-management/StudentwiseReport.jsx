@@ -70,10 +70,11 @@ const StudentwiseReport = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-1">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("common.studentReports")}
         </h2>
+    
       </div>
 
       <div className="space-y-4">

@@ -298,7 +298,8 @@
       },
       "student": {
         "title": "Studentenberichte",
-        "description": "Zahlungsanalyse nach Student/in"
+        "description": "Zahlungsanalyse nach Student/in",
+        "amountHint": "Summen nutzen den Report-Betrag (wie Stadt/Programm/Gruppe): gutgeschriebene Rechnungen zählen nur die Gebühr; Balance-Due-Aufzahlungen werden nicht doppelt mit der Standortwechsel-Rechnung gezählt."
       },
       "createInvoice": {
         "title": "Benutzerdefinierte Kostenaufstellung erstellen",

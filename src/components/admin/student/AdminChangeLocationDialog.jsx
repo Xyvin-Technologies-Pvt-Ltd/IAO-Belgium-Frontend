@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getMoment } from "@/utils/dateUtils";
 import { useGetUsers } from "@/store/useDropdownStore";
 import {
   useGetModulesForLocationSwitch,
@@ -70,10 +71,27 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
     selectedModule?.planning_id?.toString() ||
     "";
 
-  const alternativeSlots = slots.filter(
-    (slot) =>
-      slot.planning_id?.toString() !== currentPlanningId &&
-      (slot.available_seats || 0) > 0,
+  const alternativeSlots = slots.filter((slot) => {
+    if (slot.planning_id?.toString() === currentPlanningId) return false;
+    if ((slot.available_seats || 0) <= 0) return false;
+
+    // Filter out slots where all sessions have ended in the past (matching student side)
+    if (slot.sessions && slot.sessions.length > 0) {
+      return slot.sessions.some((s) => {
+        if (!s?.session_date) return false;
+        return getMoment(s.end_time || s.session_date).isSameOrAfter(
+          getMoment(),
+          "day",
+        );
+      });
+    }
+
+    // Keep slots with no sessions scheduled yet (TBA)
+    return true;
+  });
+
+  const selectedTargetSlot = alternativeSlots.find(
+    (slot) => slot.planning_id?.toString() === newPlanningId,
   );
 
   const { data: quoteResponse, isLoading: quoteLoading } =
@@ -146,12 +164,53 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
     const batch = slot.batch_name ? `${slot.batch_name} — ` : "";
     const venue = slot.venue || t("studentManagement.tba", "TBA");
     const seats = slot.available_seats ?? 0;
-    return `${batch}${venue} (${seats} ${t("studentManagement.seats", "seats")})`;
+
+    let dateStr = "";
+    if (slot.sessions && slot.sessions.length > 0) {
+      const sortedDates = [...slot.sessions]
+        .map((s) => s.session_date)
+        .filter(Boolean)
+        .sort((a, b) => getMoment(a).diff(getMoment(b)));
+
+      if (sortedDates.length > 0) {
+        const firstDate = getMoment(sortedDates[0]).format("DD MMM YYYY");
+        const lastDate = getMoment(
+          sortedDates[sortedDates.length - 1],
+        ).format("DD MMM YYYY");
+        dateStr =
+          firstDate === lastDate
+            ? ` (${firstDate})`
+            : ` (${firstDate} – ${lastDate})`;
+      }
+    }
+
+    return `${batch}${venue}${dateStr} (${seats} ${t("studentManagement.seats", "seats")})`;
   };
 
-  const formatBookingLabel = (batchName, venue) => {
+  const formatBookingLabel = (batchName, venue, sessions) => {
     const parts = [batchName, venue].filter(Boolean);
-    return parts.length > 0 ? parts.join(" — ") : t("studentManagement.tba", "TBA");
+    let label = parts.length > 0 ? parts.join(" — ") : t("studentManagement.tba", "TBA");
+
+    if (sessions && sessions.length > 0) {
+      const sortedDates = [...sessions]
+        .map((s) => s.session_date)
+        .filter(Boolean)
+        .sort((a, b) => getMoment(a).diff(getMoment(b)));
+
+      if (sortedDates.length > 0) {
+        const firstDate = getMoment(sortedDates[0]).format("DD MMM YYYY");
+        const lastDate = getMoment(
+          sortedDates[sortedDates.length - 1],
+        ).format("DD MMM YYYY");
+        const dateRange =
+          firstDate === lastDate
+            ? firstDate
+            : `${firstDate} – ${lastDate}`;
+        label += ` · ${dateRange}`;
+      }
+    }
+
+    return label;
   };
 
   return (
@@ -164,7 +223,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
           <DialogDescription className="break-words">
             {t(
               "studentManagement.changeLocationDescription",
-              "Select a student and target module slot. Admin can switch unpaid modules for free. Paid modules requiring payment must go through the student portal.",
+              "Select a student and a target module slot. Only modules that have not started yet can change location.",
             )}
           </DialogDescription>
         </DialogHeader>
@@ -218,6 +277,21 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                   ))}
                 </SelectContent>
               </Select>
+              {!modulesLoading && modules.length === 0 ? (
+                <p className="text-sm text-amber-700 dark:text-amber-400 break-words">
+                  {t(
+                    "studentManagement.changeLocationNoModules",
+                    "No modules available for location change. This student has no modules that are still available (not started). In progress, completed, and failed modules are excluded.",
+                  )}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground break-words">
+                  {t(
+                    "studentManagement.changeLocationModulesHint",
+                    "Only modules that have not started yet are listed. Modules that are in progress, completed, or failed cannot change location.",
+                  )}
+                </p>
+              )}
             </div>
           )}
 
@@ -230,6 +304,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                 {formatBookingLabel(
                   currentSlot?.batch_name || selectedModule.batch_name,
                   currentSlot?.venue || selectedModule.venue,
+                  currentSlot?.sessions,
                 )}
               </p>
             </div>
@@ -279,6 +354,21 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                   ))}
                 </SelectContent>
               </Select>
+
+              {selectedTargetSlot && (
+                <div className="min-w-0 rounded-md border border-border bg-muted/40 p-3 text-sm">
+                  <p className="font-medium text-dashboard-text dark:text-white">
+                    {t("studentManagement.targetSchedule", "Target schedule")}
+                  </p>
+                  <p className="text-muted-foreground mt-1 break-words">
+                    {formatBookingLabel(
+                      selectedTargetSlot.batch_name,
+                      selectedTargetSlot.venue,
+                      selectedTargetSlot.sessions,
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -296,7 +386,7 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
               <p className="font-medium">
                 {t("studentManagement.paymentSummary", "Payment summary")}
               </p>
-              {!quote.is_paid && canSwitch ? (
+              {!quote.is_paid ? (
                 quote.direct_switch ? (
                   <p className="text-emerald-700 dark:text-emerald-400 break-words">
                     {t(
@@ -312,34 +402,43 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
                     )}
                   </p>
                 )
-              ) : quote.is_paid && !canSwitch ? (
+              ) : Number(quote.payable_amount) > 0 ? (
                 <>
-                  {Number(quote.payable_amount) > 0 && (
-                    <p className="text-amber-700 dark:text-amber-400 break-words">
-                      {t("studentManagement.paymentRequired", "Payment required")}:{" "}
-                      {quote.payable_amount} {quote.new_session_currency || "EUR"}
-                    </p>
-                  )}
                   <p className="text-amber-700 dark:text-amber-400 break-words">
                     {t(
-                      "studentManagement.paidModuleBlocked",
-                      "Paid module — admin cannot switch. Student must use portal.",
+                      "studentManagement.remainingToPay",
+                      "Remaining to pay: {{payable}}",
+                      {
+                        payable: `${quote.payable_amount} ${quote.new_session_currency || "EUR"}`,
+                      },
                     )}
                   </p>
+                  {Number(quote.paid_amount) > 0 && (
+                    <p className="text-xs text-muted-foreground break-words">
+                      {t(
+                        "studentManagement.paidCreditApplied",
+                        "Already paid {{paid}} — new price {{newPrice}}",
+                        {
+                          paid: `${quote.paid_amount} ${quote.new_session_currency || "EUR"}`,
+                          newPrice: `${quote.new_session_amount} ${quote.new_session_currency || "EUR"}`,
+                        },
+                      )}
+                    </p>
+                  )}
                 </>
-              ) : canSwitch ? (
+              ) : (
                 <p className="text-muted-foreground break-words">
                   {t("studentManagement.noPaymentDue", "No payment due")}
                 </p>
-              ) : null}
-              {!canSwitch && quote.is_paid && (
+              )}
+              {quote.offline_marked_paid ? (
                 <p className="text-xs text-muted-foreground break-words">
                   {t(
-                    "studentManagement.adminSwitchBlocked",
-                    "Switch is disabled — payment must be handled via student portal.",
+                    "studentManagement.offlineMarkedPaidSwitch",
+                    "Original payment was offline. No credit note will be issued in the LMS. Any refund is handled outside the LMS.",
                   )}
                 </p>
-              )}
+              ) : null}
             </div>
           )}
 
