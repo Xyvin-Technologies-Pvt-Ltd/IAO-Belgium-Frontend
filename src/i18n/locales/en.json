@@ -944,13 +944,32 @@
       "name": "Thesis Name",
       "academic": "Academic Year",
       "program": "Programme",
+      "trajectories": "Trajectories",
+      "enrolled": "Enrolled",
       "price": "Price",
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
       "deactivate": "Deactivate",
       "activate": "Activate",
-      "noTheses": "No theses found"
+      "noTheses": "No theses found",
+      "studentUid": "Student UID",
+      "studentName": "Student Name",
+      "group": "Group",
+      "supervisor": "Supervisor",
+      "reader": "Reader",
+      "attempt": "Attempt",
+      "attention": "Attention"
+    },
+    "filters": {
+      "title": "Filter Theses",
+      "allAcademicYears": "All Academic Years",
+      "studyYear": "Study Year",
+      "allStudyYears": "All Study Years",
+      "studentFiltersTitle": "Filter Enrolled Students",
+      "allGroups": "All Groups",
+      "allSupervisors": "All Supervisors",
+      "allReaders": "All Readers"
     },
     "messages": {
       "loadFailed": "Failed to load theses"
@@ -3073,5 +3092,69 @@
       "empty": "No expense notes found",
       "loading": "Loading expense note..."
     }
+  },
+  "thesisManagement": {
+    "title": "Thesis Catalog",
+    "search": "Search by thesis name...",
+    "createThesis": "Create Thesis",
+    "nextDeadline": "Next",
+    "noUpcomingDeadlines": "No upcoming deadlines",
+    "table": {
+      "uid": "UID",
+      "name": "Thesis Name",
+      "academic": "Academic Year",
+      "studyYear": "Study Year",
+      "trajectories": "Cohort Trajectories",
+      "enrolled": "Enrolled",
+      "price": "Price",
+      "status": "Status",
+      "action": "Action",
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "noTheses": "No theses found",
+      "studentUid": "Student UID",
+      "studentName": "Student Name",
+      "group": "Group",
+      "supervisor": "Supervisor",
+      "reader": "Reader",
+      "step": "Current Step",
+      "attention": "Attention"
+    },
+    "filters": {
+      "title": "Filter Theses",
+      "subtitle": "Narrow down the theses list",
+      "studentFiltersTitle": "Filter Enrolled Students",
+      "studentFiltersSubtitle": "Narrow down the student cohort",
+      "studyYear": "Study Year",
+      "allStudyYears": "All Study Years",
+      "allAcademicYears": "All Academic Years",
+      "allGroups": "All Groups",
+      "allSupervisors": "All Supervisors",
+      "allReaders": "All Readers",
+      "assignmentSection": "Cohort & Assignment",
+      "statusSection": "Status & Attention"
+    },
+    "trajectories": {
+      "trajectory": "Cohort Trajectory",
+      "trajectoryName": "Cohort Name",
+      "startsOn": "Start Date",
+      "finalDeadline": "Final Deadline",
+      "enrolledStudents": "Enrolled Students",
+      "editTrajectory": "Edit Trajectory",
+      "notFound": "Trajectory not found",
+      "noStudentsEnrolled": "No students have enrolled in this trajectory cohort yet."
+    },
+    "attempt": {
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "passed": "Passed",
+      "failed": "Failed",
+      "allAttention": "All attention",
+      "suggestFail": "Overdue — review fail",
+      "suggestPass": "Ready for pass",
+      "none": "In progress"
+    }
   }
 }
+

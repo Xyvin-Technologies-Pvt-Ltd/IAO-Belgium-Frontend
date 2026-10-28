@@ -477,10 +477,17 @@ export const useUploadStaffThesisDocument = () => {
           variables.userId,
         ],
       });
-      toast.success("Document uploaded successfully");
+      const isLink = variables?.data?.kind === "link";
+      toast.success(
+        isLink ? "Link added successfully" : "Document uploaded successfully"
+      );
     },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to upload document");
+    onError: (error, variables) => {
+      const isLink = variables?.data?.kind === "link";
+      toast.error(
+        error?.message ||
+          (isLink ? "Failed to add link" : "Failed to upload document")
+      );
     },
   });
 };

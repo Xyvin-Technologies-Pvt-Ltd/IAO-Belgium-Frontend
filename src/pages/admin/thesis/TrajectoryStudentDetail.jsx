@@ -26,6 +26,8 @@ import {
   GraduationCap,
   Search,
   ChevronDown,
+  Link2,
+  ExternalLink,
 } from "lucide-react";
 
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -132,11 +134,18 @@ const formatActionLabel = (action) => {
 };
 
 const getActionMeta = (action) => {
-  if (action?.includes("document_deleted")) {
+  if (action?.includes("document_deleted") || action?.includes("link_deleted")) {
     return {
       icon: Trash2,
       colorClass: "bg-red-500/10 text-red-600 border-red-500/20",
       badgeClass: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+    };
+  }
+  if (action?.includes("link")) {
+    return {
+      icon: Link2,
+      colorClass: "bg-sky-500/10 text-sky-600 border-sky-500/20",
+      badgeClass: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20",
     };
   }
   if (action?.includes("document")) {
@@ -180,8 +189,9 @@ export default function TrajectoryStudentDetail() {
 
   // Staff document dialog states
   const [uploadDraft, setUploadDraft] = useState(null); // { stepId, name, file }
-  const [renameDraft, setRenameDraft] = useState(null); // { stepId, documentId, name }
-  const [deleteDraft, setDeleteDraft] = useState(null); // { stepId, documentId, name }
+  const [linkDraft, setLinkDraft] = useState(null); // { stepId, name, url }
+  const [renameDraft, setRenameDraft] = useState(null); // { stepId, documentId, name, kind }
+  const [deleteDraft, setDeleteDraft] = useState(null); // { stepId, documentId, name, kind }
   const [isUploading, setIsUploading] = useState(false);
 
   // Supervisor editor modal state
@@ -390,9 +400,43 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const handleStaffAddLinkSubmit = async () => {
+    const name = linkDraft?.name?.trim();
+    const url = linkDraft?.url?.trim();
+    if (!name) {
+      toast.error(t("thesis.enterLinkTitle", "Please enter a link title"));
+      return;
+    }
+    if (!url) {
+      toast.error(t("thesis.enterLinkUrl", "Please enter a link URL"));
+      return;
+    }
+
+    try {
+      await uploadDocMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        stepId: linkDraft.stepId,
+        data: {
+          kind: "link",
+          name,
+          url,
+        },
+      });
+      setLinkDraft(null);
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
   const handleStaffRenameSubmit = async () => {
     if (!renameDraft?.name?.trim()) {
-      toast.error(t("thesis.enterDocName", "Please enter a document name"));
+      toast.error(
+        renameDraft?.kind === "link"
+          ? t("thesis.enterLinkTitle", "Please enter a link title")
+          : t("thesis.enterDocName", "Please enter a document name")
+      );
       return;
     }
 
@@ -867,21 +911,30 @@ export default function TrajectoryStudentDetail() {
                             {t("thesis.uploadedDocuments", "Submissions & Files")}
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            {step.documents.map((doc) => (
+                            {step.documents.map((doc) => {
+                              const isLink = doc.kind === "link";
+                              return (
                               <div
                                 key={doc._id}
                                 className="flex items-center justify-between p-3 rounded-xl border border-border bg-muted/20 gap-3"
                               >
                                 <div className="flex items-center gap-2.5 min-w-0">
                                   <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                                    <FileText className="w-4 h-4" />
+                                    {isLink ? (
+                                      <Link2 className="w-4 h-4" />
+                                    ) : (
+                                      <FileText className="w-4 h-4" />
+                                    )}
                                   </div>
                                   <div className="min-w-0">
                                     <p className="text-xs font-semibold text-foreground truncate" title={doc.name}>
-                                      {doc.name || "Document"}
+                                      {doc.name || (isLink ? "Link" : "Document")}
                                     </p>
                                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground flex-wrap">
                                       <span>{moment(doc.uploaded_at).format("DD/MM/YYYY")}</span>
+                                      {isLink && (
+                                        <span>• {t("thesis.linkLabel", "Link")}</span>
+                                      )}
                                       {doc.uploaded_by && (
                                         <span>
                                           • {doc.source === "backoffice" ? "Staff:" : "Student:"}{" "}
@@ -893,26 +946,42 @@ export default function TrajectoryStudentDetail() {
                                 </div>
 
                                 <div className="flex items-center gap-1 shrink-0">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                    onClick={() => openSecureFile(doc.url)}
-                                    title={t("thesis.viewFile", "View")}
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                    onClick={() =>
-                                      downloadSecureFile(doc.url, doc.file_name || doc.name)
-                                    }
-                                    title={t("thesis.downloadFile", "Download")}
-                                  >
-                                    <Download className="w-4 h-4" />
-                                  </Button>
+                                  {isLink ? (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                      onClick={() =>
+                                        window.open(doc.url, "_blank", "noopener,noreferrer")
+                                      }
+                                      title={t("thesis.openLink", "Open link")}
+                                    >
+                                      <ExternalLink className="w-4 h-4" />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        onClick={() => openSecureFile(doc.url)}
+                                        title={t("thesis.viewFile", "View")}
+                                      >
+                                        <Eye className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        onClick={() =>
+                                          downloadSecureFile(doc.url, doc.file_name || doc.name)
+                                        }
+                                        title={t("thesis.downloadFile", "Download")}
+                                      >
+                                        <Download className="w-4 h-4" />
+                                      </Button>
+                                    </>
+                                  )}
                                   {canModify && (
                                     <>
                                       <Button
@@ -924,6 +993,7 @@ export default function TrajectoryStudentDetail() {
                                             stepId: step._id,
                                             documentId: doc._id,
                                             name: doc.name || "",
+                                            kind: doc.kind || "file",
                                           })
                                         }
                                         title={t("thesis.renameDocument", "Rename")}
@@ -939,9 +1009,14 @@ export default function TrajectoryStudentDetail() {
                                             stepId: step._id,
                                             documentId: doc._id,
                                             name: doc.name || "",
+                                            kind: doc.kind || "file",
                                           })
                                         }
-                                        title={t("thesis.deleteDocument", "Delete")}
+                                        title={
+                                          isLink
+                                            ? t("thesis.deleteLink", "Delete link")
+                                            : t("thesis.deleteDocument", "Delete")
+                                        }
                                       >
                                         <Trash2 className="w-4 h-4" />
                                       </Button>
@@ -949,14 +1024,15 @@ export default function TrajectoryStudentDetail() {
                                   )}
                                 </div>
                               </div>
-                            ))}
+                            );
+                            })}
                           </div>
                         </div>
                       )}
 
-                      {/* Upload Document Button */}
+                      {/* Upload Document / Add Link */}
                       {canModify && (
-                        <div className="pt-1">
+                        <div className="pt-1 flex flex-wrap gap-2">
                           <Button
                             type="button"
                             variant="outline"
@@ -968,6 +1044,18 @@ export default function TrajectoryStudentDetail() {
                           >
                             <Upload className="w-3.5 h-3.5 text-primary" />
                             {t("thesis.uploadDocument", "Upload Document")}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-xs"
+                            onClick={() =>
+                              setLinkDraft({ stepId: step._id, name: "", url: "" })
+                            }
+                          >
+                            <Link2 className="w-3.5 h-3.5 text-primary" />
+                            {t("thesis.addLink", "Add Link")}
                           </Button>
                         </div>
                       )}
@@ -1394,18 +1482,107 @@ export default function TrajectoryStudentDetail() {
         </DialogContent>
       </Dialog>
 
+      {/* Add Link Modal */}
+      <Dialog
+        open={!!linkDraft}
+        onOpenChange={(open) => {
+          if (!open && !uploadDocMutation.isPending) setLinkDraft(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <Link2 className="w-4 h-4 text-primary" />
+              {t("thesis.addLink", "Add Link")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-1">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                {t("thesis.linkTitle", "Link Title")}
+                <span className="text-destructive ml-1">*</span>
+              </label>
+              <Input
+                type="text"
+                placeholder={t("thesis.linkTitlePlaceholder", "e.g., Draft Google Drive folder")}
+                value={linkDraft?.name || ""}
+                onChange={(e) =>
+                  setLinkDraft((prev) => (prev ? { ...prev, name: e.target.value } : prev))
+                }
+                className="h-10 text-xs sm:text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                {t("thesis.linkUrl", "URL")}
+                <span className="text-destructive ml-1">*</span>
+              </label>
+              <Input
+                type="text"
+                placeholder="https://"
+                value={linkDraft?.url || ""}
+                onChange={(e) =>
+                  setLinkDraft((prev) => (prev ? { ...prev, url: e.target.value } : prev))
+                }
+                className="h-10 text-xs sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setLinkDraft(null)}
+              disabled={uploadDocMutation.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleStaffAddLinkSubmit}
+              disabled={
+                uploadDocMutation.isPending ||
+                !linkDraft?.name?.trim() ||
+                !linkDraft?.url?.trim()
+              }
+              className="gap-2"
+            >
+              {uploadDocMutation.isPending ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  {t("common.saving", "Saving...")}
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-3.5 h-3.5" />
+                  {t("thesis.addLink", "Add Link")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Rename Document Modal */}
       <Dialog open={!!renameDraft} onOpenChange={(open) => !open && setRenameDraft(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold">
-              {t("thesis.renameDocument", "Rename Document")}
+              {renameDraft?.kind === "link"
+                ? t("thesis.renameLink", "Rename Link")
+                : t("thesis.renameDocument", "Rename Document")}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-2 py-2">
             <label className="text-xs font-semibold text-muted-foreground">
-              {t("thesis.documentDisplayName", "Document Display Name")}
+              {renameDraft?.kind === "link"
+                ? t("thesis.linkTitle", "Link Title")
+                : t("thesis.documentDisplayName", "Document Display Name")}
             </label>
             <Input
               type="text"
@@ -1447,15 +1624,22 @@ export default function TrajectoryStudentDetail() {
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-destructive flex items-center gap-2">
               <Trash2 className="w-4 h-4" />
-              {t("thesis.deleteDocument", "Delete Document")}
+              {deleteDraft?.kind === "link"
+                ? t("thesis.deleteLink", "Delete Link")
+                : t("thesis.deleteDocument", "Delete Document")}
             </DialogTitle>
           </DialogHeader>
 
           <p className="text-xs text-muted-foreground">
-            {t(
-              "thesis.confirmDeleteDoc",
-              "Are you sure you want to permanently delete this document?"
-            )}{" "}
+            {deleteDraft?.kind === "link"
+              ? t(
+                  "thesis.confirmDeleteLink",
+                  "Are you sure you want to permanently delete this link?"
+                )
+              : t(
+                  "thesis.confirmDeleteDoc",
+                  "Are you sure you want to permanently delete this document?"
+                )}{" "}
             <span className="font-semibold text-foreground">"{deleteDraft?.name}"</span>
           </p>
 

@@ -188,7 +188,7 @@ const ExamDetail = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             {exam.batch && (
               <div>
-                <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.batchLabel", "Group / Batch")}</p>
+                <p className="text-xs text-muted-foreground font-medium">{t("planningManagement.modal.batchLabel", "Group")}</p>
                 <p className="font-semibold text-foreground">{exam.batch?.name || exam.batch || "N/A"}</p>
               </div>
             )}
