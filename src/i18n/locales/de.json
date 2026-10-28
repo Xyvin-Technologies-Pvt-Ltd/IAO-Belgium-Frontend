@@ -269,6 +269,7 @@
       "locationSwitch": "Standortwechsel",
       "customInvoice": "Benutzerdefinierte Kostenaufstellung",
       "resitPurchase": "Wiederholungsprüfung",
+      "thesisPurchase": "Thesis-Kauf",
       "other": "Sonstiges"
     },
     "messages": {
@@ -809,10 +810,6 @@
       "loading": "Thesis-Details werden geladen...",
       "loadFailed": "Fehler beim Laden der Thesis-Details",
       "moduleDetails": "Moduldetails",
-      "stepsLaterPhase": "Schritte (Spätere Phase)",
-      "deadlinesLaterPhase": "Fristen (Spätere Phase)",
-      "markingSchemeLaterPhase": "Bewertungsschema (Spätere Phase)",
-      "exactOnlineLaterPhase": "Exact Online (Spätere Phase)",
       "uid": "UID",
       "academicYear": "Akademisches Jahr",
       "programme": "Ausbildungsprogramm",

@@ -272,6 +272,7 @@
       "locationSwitch": "Changement de lieu",
       "customInvoice": "Note de frais personnalisée",
       "resitPurchase": "Examen de rattrapage",
+      "thesisPurchase": "Achat de thèse",
       "other": "Autre"
     },
     "messages": {
@@ -791,10 +792,6 @@
       "loading": "Chargement des détails de la thèse...",
       "loadFailed": "Échec du chargement des détails de la thèse",
       "moduleDetails": "Détails du module",
-      "stepsLaterPhase": "Étapes (Phase ultérieure)",
-      "deadlinesLaterPhase": "Délais (Phase ultérieure)",
-      "markingSchemeLaterPhase": "Grille de notation (Phase ultérieure)",
-      "exactOnlineLaterPhase": "Exact Online (Phase ultérieure)",
       "uid": "UID",
       "academicYear": "Année académique",
       "programme": "Programme",

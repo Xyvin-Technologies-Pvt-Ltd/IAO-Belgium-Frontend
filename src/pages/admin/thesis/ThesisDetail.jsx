@@ -148,7 +148,7 @@ const ThesisDetail = () => {
         }),
     },
     {
-      label: t("thesisManagement.detail.markingSchemeLaterPhase", "Marking scheme (Later phase)"),
+      label: t("thesisManagement.detail.markingSchemeLaterPhase", "Marking scheme"),
       icon: Award,
       disabled: true,
     },

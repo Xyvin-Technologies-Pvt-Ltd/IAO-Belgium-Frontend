@@ -139,6 +139,8 @@ const ThirdPartyPaymentManagement = () => {
         return t("Module Purchase");
       case "resit-purchase":
         return t("finance.purposes.resitPurchase", "Resit Exam");
+      case "thesis-purchase":
+        return t("finance.purposes.thesisPurchase", "Thesis Purchase");
       default:
         return purpose || t("Module Purchase");
     }
@@ -163,6 +165,15 @@ const ThirdPartyPaymentManagement = () => {
       return {
         title: app.module_id?.name || app.component_id?.name || t("Resit Exam"),
         subtitle: app.module_id?.code || t("Resit exam fee"),
+      };
+    }
+    if (app.purpose === "thesis-purchase") {
+      return {
+        title:
+          app.module_id?.name ||
+          app.payment_id?.meta?.thesis_name ||
+          t("finance.purposes.thesisPurchase", "Thesis Purchase"),
+        subtitle: t("finance.purposes.thesisPurchase", "Thesis Purchase"),
       };
     }
     return {
@@ -250,6 +261,7 @@ const ThirdPartyPaymentManagement = () => {
               <SelectItem value="module-purchase">Module Purchase</SelectItem>
               <SelectItem value="location-switch">Location Switch</SelectItem>
               <SelectItem value="resit-purchase">Resit Exam</SelectItem>
+              <SelectItem value="thesis-purchase">Thesis Purchase</SelectItem>
             </SelectContent>
           </Select>
 

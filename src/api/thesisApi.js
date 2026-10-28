@@ -332,6 +332,47 @@ export const deleteStaffThesisDocument = async (
   }
 };
 
+export const getTeacherThesisApprovalRequests = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get(`/thesis/teacher/approval-requests`, {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
+export const respondTeacherThesisApprovalRequest = async (requestId, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/teacher/approval-requests/${requestId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
+export const getTeacherThesisContactCard = async () => {
+  try {
+    const response = await axiosInstance.get(`/thesis/teacher/contact-card`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const saveTeacherThesisContactCard = async (data) => {
+  try {
+    const response = await axiosInstance.put(
+      `/thesis/teacher/contact-card`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 

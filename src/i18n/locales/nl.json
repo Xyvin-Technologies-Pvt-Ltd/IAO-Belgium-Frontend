@@ -273,6 +273,7 @@
       "locationSwitch": "Locatiewissel",
       "customInvoice": "Aangepaste onkostennota",
       "resitPurchase": "Herhalingsexamen",
+      "thesisPurchase": "Thesis aankoop",
       "other": "Overig"
     },
     "messages": {
@@ -793,10 +794,6 @@
       "loading": "Thesisdetails laden...",
       "loadFailed": "Laden van thesisdetails mislukt",
       "moduleDetails": "Modulegegevens",
-      "stepsLaterPhase": "Stappen (Later fase)",
-      "deadlinesLaterPhase": "Deadlines (Later fase)",
-      "markingSchemeLaterPhase": "Beoordelingsschema (Later fase)",
-      "exactOnlineLaterPhase": "Exact Online (Later fase)",
       "uid": "UID",
       "academicYear": "Academiejaar",
       "programme": "Opleiding",

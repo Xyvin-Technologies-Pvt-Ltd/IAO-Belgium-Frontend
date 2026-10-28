@@ -279,6 +279,7 @@
       "locationSwitch": "Location Switch",
       "customInvoice": "Custom Expense Note",
       "resitPurchase": "Resit Exam",
+      "thesisPurchase": "Thesis Purchase",
       "other": "Other"
     },
     "messages": {
@@ -991,10 +992,6 @@
       "loading": "Loading thesis details...",
       "loadFailed": "Failed to load thesis details",
       "moduleDetails": "Module details",
-      "stepsLaterPhase": "Steps (Later phase)",
-      "deadlinesLaterPhase": "Deadlines (Later phase)",
-      "markingSchemeLaterPhase": "Marking scheme (Later phase)",
-      "exactOnlineLaterPhase": "Exact Online (Later phase)",
       "uid": "UID",
       "academicYear": "Academic Year",
       "programme": "Programme",
