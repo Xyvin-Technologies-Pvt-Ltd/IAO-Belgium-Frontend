@@ -35,7 +35,7 @@ const RemoveThesisTeacherConfirm = ({
             <p className="font-medium text-amber-600 dark:text-amber-400">
               {t(
                 "thesisManagement.teachers.removeConfirmNotice",
-                "The teacher will no longer be assigned to this thesis, but their LMS teacher account remains completely untouched."
+                "The teacher will no longer be assigned to this thesis."
               )}
             </p>
           </DialogDescription>
