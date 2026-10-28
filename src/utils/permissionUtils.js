@@ -2,6 +2,7 @@ const SIDEBAR_PERMISSIONS = {
   // Admin routes
   "/admin/dashboard": [],
   "/admin/program": ["operations_management_view", "operations_management_modify"],
+  "/admin/thesis": ["operations_management_view", "operations_management_modify"],
   "/admin/admission-administration/application-review": [
     "operations_management_view",
     "operations_management_modify",

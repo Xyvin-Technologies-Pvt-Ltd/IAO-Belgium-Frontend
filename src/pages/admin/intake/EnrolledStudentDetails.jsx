@@ -258,6 +258,8 @@ const EnrolledStudentDetails = () => {
         return t("finance.purposes.locationSwitch", "Location Switch");
       case "resit-purchase":
         return t("finance.purposes.resitPurchase", "Resit Exam");
+      case "thesis-purchase":
+        return t("finance.purposes.thesisPurchase", "Thesis Purchase");
       default:
         return purpose
           .split("-")

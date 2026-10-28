@@ -7,6 +7,7 @@ import {
   ClipboardCheck,
   Bell,
   Receipt,
+  GraduationCap,
 } from "lucide-react";
 
 export const getTeacherSidebarData = (t) => ({
@@ -43,6 +44,11 @@ export const getTeacherSidebarData = (t) => ({
           title: t("sidebar.teacher.evaluations"),
           url: "/teacher/evaluations",
           icon: BookOpenCheck,
+        },
+        {
+          title: t("sidebar.teacher.thesis", { defaultValue: "Thesis" }),
+          url: "/teacher/thesis",
+          icon: GraduationCap,
         },
         {
           title: t("sidebar.teacher.exams"),

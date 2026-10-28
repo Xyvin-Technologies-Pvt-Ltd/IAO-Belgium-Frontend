@@ -41,6 +41,7 @@
       "settings": "Einstellungen",
       "dashboard": "Dashboard",
       "programAdministration": "Ausbildungsverwaltung",
+      "thesis": "Thesis",
       "locations": "Standorte",
       "languages": "Sprachen",
       "contractTypes": "Vertragsarten",
@@ -268,6 +269,7 @@
       "locationSwitch": "Standortwechsel",
       "customInvoice": "Benutzerdefinierte Kostenaufstellung",
       "resitPurchase": "Wiederholungsprüfung",
+      "thesisPurchase": "Thesis-Kauf",
       "other": "Sonstiges"
     },
     "messages": {
@@ -749,6 +751,71 @@
       "nameLabel": "Name der Unterrichtsregion",
       "namePlaceholder": "Name der Unterrichtsregion eingeben",
       "nameRequired": "Name ist erforderlich"
+    }
+  },
+  "thesisManagement": {
+    "title": "Thesis-Katalog",
+    "search": "Nach Thesis-Name suchen...",
+    "createThesis": "Thesis erstellen",
+    "table": {
+      "uid": "UID",
+      "name": "Thesis-Name",
+      "academic": "Akademisches Jahr",
+      "program": "Ausbildungsprogramm",
+      "price": "Preis",
+      "status": "Status",
+      "action": "Aktion",
+      "edit": "Bearbeiten",
+      "deactivate": "Deaktivieren",
+      "activate": "Aktivieren",
+      "noTheses": "Keine Thesen gefunden"
+    },
+    "messages": {
+      "loadFailed": "Fehler beim Laden der Thesen"
+    },
+    "modal": {
+      "createTitle": "Thesis erstellen",
+      "editTitle": "Thesis bearbeiten",
+      "createSubtitle": "Eine neue Thesis zum Katalog hinzufügen",
+      "editSubtitle": "Thesis-Details aktualisieren",
+      "nameLabel": "Thesis-Name",
+      "namePlaceholder": "Thesis-Name eingeben",
+      "academicLabel": "Akademisches Jahr",
+      "academicPlaceholder": "Akademisches Jahr auswählen",
+      "searchAcademic": "Akademische Jahre suchen...",
+      "programTypeLabel": "Ausbildungstyp",
+      "programTypePlaceholder": "Zuerst Ausbildungstyp auswählen",
+      "programLabel": "Ausbildungsprogramm",
+      "programPlaceholder": "Ausbildungsprogramm auswählen",
+      "searchProgram": "Programme suchen...",
+      "selectTypeFirst": "Bitte zuerst den Ausbildungstyp auswählen",
+      "priceLabel": "Preis (€ EUR)",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Thesis-Beschreibung und Übersicht eingeben...",
+      "statusLabel": "Status",
+      "activeNotice": "Aktiv — sichtbar und für Einschreibungen verfügbar",
+      "inactiveNotice": "Inaktiv — Einschreibungen werden blockiert",
+      "create": "Thesis erstellen",
+      "update": "Thesis aktualisieren"
+    },
+    "deactivateModal": {
+      "title": "Thesis deaktivieren",
+      "message": "Sind Sie sicher, dass Sie „{{name}}“ deaktivieren möchten?",
+      "notice": "Diese Thesis bleibt im Katalog sichtbar, aber neue Einschreibungen werden blockiert.",
+      "confirm": "Deaktivieren",
+      "deactivating": "Deaktivierung..."
+    },
+    "detail": {
+      "title": "Thesis-Details",
+      "loading": "Thesis-Details werden geladen...",
+      "loadFailed": "Fehler beim Laden der Thesis-Details",
+      "moduleDetails": "Moduldetails",
+      "uid": "UID",
+      "academicYear": "Akademisches Jahr",
+      "programme": "Ausbildungsprogramm",
+      "price": "Preis",
+      "description": "Beschreibung",
+      "noDescription": "Keine Beschreibung für diese Thesis vorhanden."
     }
   },
   "programManagement": {

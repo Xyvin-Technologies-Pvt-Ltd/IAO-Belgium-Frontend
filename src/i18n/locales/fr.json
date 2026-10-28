@@ -41,6 +41,7 @@
       "settings": "Paramètres",
       "dashboard": "Tableau de bord",
       "programAdministration": "Administration des formations",
+      "thesis": "Thèse",
       "locations": "Lieux",
       "languages": "Langues",
       "contractTypes": "Types de contrat",
@@ -271,6 +272,7 @@
       "locationSwitch": "Changement de lieu",
       "customInvoice": "Note de frais personnalisée",
       "resitPurchase": "Examen de rattrapage",
+      "thesisPurchase": "Achat de thèse",
       "other": "Autre"
     },
     "messages": {
@@ -731,6 +733,71 @@
       "nameLabel": "Nom de la région d'enseignement",
       "namePlaceholder": "Saisir le nom de la région d'enseignement",
       "nameRequired": "Le nom est obligatoire"
+    }
+  },
+  "thesisManagement": {
+    "title": "Catalogue des thèses",
+    "search": "Rechercher par nom de thèse...",
+    "createThesis": "Créer une thèse",
+    "table": {
+      "uid": "UID",
+      "name": "Nom de la thèse",
+      "academic": "Année académique",
+      "program": "Programme",
+      "price": "Prix",
+      "status": "Statut",
+      "action": "Action",
+      "edit": "Modifier",
+      "deactivate": "Désactiver",
+      "activate": "Activer",
+      "noTheses": "Aucune thèse trouvée"
+    },
+    "messages": {
+      "loadFailed": "Échec du chargement des thèses"
+    },
+    "modal": {
+      "createTitle": "Créer une thèse",
+      "editTitle": "Modifier la thèse",
+      "createSubtitle": "Ajouter une nouvelle thèse au catalogue",
+      "editSubtitle": "Mettre à jour les détails de la thèse",
+      "nameLabel": "Nom de la thèse",
+      "namePlaceholder": "Entrez le nom de la thèse",
+      "academicLabel": "Année académique",
+      "academicPlaceholder": "Sélectionnez l'année académique",
+      "searchAcademic": "Rechercher des années académiques...",
+      "programTypeLabel": "Type de programme",
+      "programTypePlaceholder": "Sélectionnez d'abord le type de programme",
+      "programLabel": "Programme",
+      "programPlaceholder": "Sélectionnez le programme",
+      "searchProgram": "Rechercher des programmes...",
+      "selectTypeFirst": "Veuillez d'abord sélectionner le type de programme",
+      "priceLabel": "Prix (€ EUR)",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Entrez la description et la vue d'ensemble de la thèse...",
+      "statusLabel": "Statut",
+      "activeNotice": "Actif — visible et disponible pour les inscriptions",
+      "inactiveNotice": "Inactif — les inscriptions seront bloquées",
+      "create": "Créer la thèse",
+      "update": "Mettre à jour la thèse"
+    },
+    "deactivateModal": {
+      "title": "Désactiver la thèse",
+      "message": "Êtes-vous sûr de vouloir désactiver « {{name}} » ?",
+      "notice": "Cette thèse restera visible dans le catalogue, mais les nouvelles inscriptions seront bloquées.",
+      "confirm": "Désactiver",
+      "deactivating": "Désactivation..."
+    },
+    "detail": {
+      "title": "Détails de la thèse",
+      "loading": "Chargement des détails de la thèse...",
+      "loadFailed": "Échec du chargement des détails de la thèse",
+      "moduleDetails": "Détails du module",
+      "uid": "UID",
+      "academicYear": "Année académique",
+      "programme": "Programme",
+      "price": "Prix",
+      "description": "Description",
+      "noDescription": "Aucune description fournie pour cette thèse."
     }
   },
   "programManagement": {

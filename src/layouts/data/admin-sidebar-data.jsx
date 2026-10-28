@@ -49,6 +49,11 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: NotebookText,
           },
           {
+            title: t("sidebar.admin.thesis", "Thesis"),
+            url: "/admin/thesis",
+            icon: GraduationCap,
+          },
+          {
             title: t("sidebar.admin.admissionAdministration"),
             icon: BookUser,
             items: [

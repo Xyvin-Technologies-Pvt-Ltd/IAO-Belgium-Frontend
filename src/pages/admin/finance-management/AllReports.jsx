@@ -117,6 +117,8 @@ const AllReports = () => {
         return "text-purple-600 dark:text-purple-400";
       case "resit-purchase":
         return "text-orange-600 dark:text-orange-400";
+      case "thesis-purchase":
+        return "text-teal-600 dark:text-teal-400";
       default:
         return "text-gray-600 dark:text-gray-400";
     }
@@ -135,6 +137,8 @@ const AllReports = () => {
         return t("finance.purposes.customInvoice");
       case "resit-purchase":
         return t("finance.purposes.resitPurchase", "Resit Exam");
+      case "thesis-purchase":
+        return t("finance.purposes.thesisPurchase", "Thesis Purchase");
       default:
         return purpose
           .split("-")
