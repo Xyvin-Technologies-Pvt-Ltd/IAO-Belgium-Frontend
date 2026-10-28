@@ -22,6 +22,7 @@ import { useCanModify } from "@/hooks/useCanModify";
 import { useGetTheses, useUpdateThesisStatus } from "@/store/useThesisStore";
 import CreateThesis from "@/components/admin/thesis/CreateThesis";
 import DeactivateThesisConfirm from "@/components/admin/thesis/DeactivateThesisConfirm";
+import ThesesFilterDrawer from "@/components/admin/thesis/ThesesFilterDrawer";
 
 const ThesesList = () => {
   const navigate = useNavigate();
@@ -31,6 +32,14 @@ const ThesesList = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState({
+    academic: "all",
+    current_year: "all",
+  });
+  const [draftFilters, setDraftFilters] = useState({
+    academic: "all",
+    current_year: "all",
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedThesis, setSelectedThesis] = useState(null);
@@ -48,6 +57,12 @@ const ThesesList = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.academic !== "all"
+      ? { academic: appliedFilters.academic }
+      : {}),
+    ...(appliedFilters.current_year !== "all"
+      ? { current_year: Number(appliedFilters.current_year) }
+      : {}),
   });
 
   const updateThesisStatus = useUpdateThesisStatus();
@@ -104,14 +119,21 @@ const ThesesList = () => {
         {t("thesisManagement.title", "Thesis Catalog")}
       </h2>
 
-      {/* Top Bar: Search & Action Buttons */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Top Bar: Search, Filters & Action Buttons */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex-1 flex items-center gap-2">
           <Input
             placeholder={t("thesisManagement.search", "Search by thesis name...")}
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+          <ThesesFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
           />
         </div>
         <div className="flex gap-2">
@@ -131,6 +153,8 @@ const ThesesList = () => {
             <TableHead>{t("thesisManagement.table.name", "Thesis Name")}</TableHead>
             <TableHead>{t("thesisManagement.table.academic", "Academic Year")}</TableHead>
             <TableHead>{t("thesisManagement.table.program", "Programme")}</TableHead>
+            <TableHead>{t("thesisManagement.table.trajectories", "Trajectories")}</TableHead>
+            <TableHead>{t("thesisManagement.table.enrolled", "Enrolled")}</TableHead>
             <TableHead>{t("thesisManagement.table.price", "Price")}</TableHead>
             <TableHead>{t("thesisManagement.table.status", "Status")}</TableHead>
             <TableHead>{t("thesisManagement.table.action", "Action")}</TableHead>
@@ -138,10 +162,10 @@ const ThesesList = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={7} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message ||
@@ -212,6 +236,16 @@ const ThesesList = () => {
                   )}
                 </TableCell>
                 <TableCell>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-foreground">
+                    {i?.trajectory_count ?? 0}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                    {i?.enrollment_count ?? 0}
+                  </span>
+                </TableCell>
+                <TableCell>
                   €{Number(i?.price ?? 0).toFixed(2)}
                 </TableCell>
                 <TableCell>
@@ -247,7 +281,7 @@ const ThesesList = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center p-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center p-8 text-muted-foreground">
                 {t("thesisManagement.table.noTheses", "No theses found")}
               </TableCell>
             </TableRow>

@@ -18,13 +18,6 @@ import { LoadingState, ErrorMessage } from "@/components/common";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
 import {
   Table,
@@ -37,6 +30,7 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
+import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
@@ -55,22 +49,24 @@ export default function TrajectoryDetails() {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [attentionFilter, setAttentionFilter] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState({
+    batch: "all",
+    supervisor: "all",
+    reader: "all",
+    status: "all",
+    attention: "all",
+  });
+  const [draftFilters, setDraftFilters] = useState({
+    batch: "all",
+    supervisor: "all",
+    reader: "all",
+    status: "all",
+    attention: "all",
+  });
   const debouncedSearch = useDebounce(search, 400);
 
   // Modals state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  const handleStatusChange = (val) => {
-    setStatusFilter(val === "all" ? "" : val);
-    setPage(1);
-  };
-
-  const handleAttentionChange = (val) => {
-    setAttentionFilter(val === "all" ? "" : val);
-    setPage(1);
-  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -88,8 +84,15 @@ export default function TrajectoryDetails() {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(statusFilter ? { status: statusFilter } : {}),
-    ...(attentionFilter ? { attention: attentionFilter } : {}),
+    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
+    ...(appliedFilters.supervisor !== "all"
+      ? { supervisor: appliedFilters.supervisor }
+      : {}),
+    ...(appliedFilters.reader !== "all" ? { reader: appliedFilters.reader } : {}),
+    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
+    ...(appliedFilters.attention !== "all"
+      ? { attention: appliedFilters.attention }
+      : {}),
   };
 
   const {
@@ -227,35 +230,6 @@ export default function TrajectoryDetails() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-            <Select
-              value={statusFilter || "all"}
-              onValueChange={handleStatusChange}
-            >
-              <SelectTrigger className="w-full sm:w-36 h-9 text-xs sm:text-sm bg-background">
-                <SelectValue placeholder={t("thesisManagement.attempt.allStatuses", "All statuses")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("thesisManagement.attempt.allStatuses", "All statuses")}</SelectItem>
-                <SelectItem value="active">{t("thesisManagement.attempt.active", "Active")}</SelectItem>
-                <SelectItem value="passed">{t("thesisManagement.attempt.passed", "Passed")}</SelectItem>
-                <SelectItem value="failed">{t("thesisManagement.attempt.failed", "Failed")}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={attentionFilter || "all"}
-              onValueChange={handleAttentionChange}
-            >
-              <SelectTrigger className="w-full sm:w-48 h-9 text-xs sm:text-sm bg-background">
-                <SelectValue placeholder={t("thesisManagement.attempt.allAttention", "All attention")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("thesisManagement.attempt.allAttention", "All attention")}</SelectItem>
-                <SelectItem value="suggest_fail">{t("thesisManagement.attempt.suggestFail", "Overdue — review fail")}</SelectItem>
-                <SelectItem value="suggest_pass">{t("thesisManagement.attempt.suggestPass", "Ready for pass")}</SelectItem>
-                <SelectItem value="none">{t("thesisManagement.attempt.none", "In progress")}</SelectItem>
-              </SelectContent>
-            </Select>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -265,6 +239,14 @@ export default function TrajectoryDetails() {
                 className="pl-9 h-9 text-xs sm:text-sm"
               />
             </div>
+            <TrajectoryStudentsFilterDrawer
+              filterOptions={trajectoryData?.filter_options}
+              draftFilters={draftFilters}
+              setDraftFilters={setDraftFilters}
+              appliedFilters={appliedFilters}
+              setAppliedFilters={setAppliedFilters}
+              setPage={setPage}
+            />
           </div>
         </div>
 
@@ -274,6 +256,9 @@ export default function TrajectoryDetails() {
             <TableRow>
               <TableHead>{t("thesisManagement.table.studentUid", "Student UID")}</TableHead>
               <TableHead>{t("thesisManagement.table.studentName", "Student Name")}</TableHead>
+              <TableHead>{t("thesisManagement.table.group", "Group")}</TableHead>
+              <TableHead>{t("thesisManagement.table.supervisor", "Supervisor")}</TableHead>
+              <TableHead>{t("thesisManagement.table.reader", "Reader")}</TableHead>
               <TableHead>{t("thesisManagement.table.attempt", "Attempt")}</TableHead>
               <TableHead>{t("thesisManagement.table.status", "Status")}</TableHead>
               <TableHead>{t("thesisManagement.table.attention", "Attention")}</TableHead>
@@ -281,10 +266,10 @@ export default function TrajectoryDetails() {
           </TableHeader>
           <TableBody className={isTrajectoryFetching ? "opacity-50 pointer-events-none" : ""}>
             {isTrajectoryLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={5} />
+              <TableSkeleton rows={rowsPerPage} columns={8} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center p-8">
+                <TableCell colSpan={8} className="text-center p-8">
                   <ErrorMessage
                     message={error?.message || t("common.failedToLoad", "Failed to load data")}
                     onRetry={refetch}
@@ -326,6 +311,9 @@ export default function TrajectoryDetails() {
                   >
                     <TableCell className="font-medium text-primary hover:underline">{student?.uid || "—"}</TableCell>
                     <TableCell className="font-medium">{studentName}</TableCell>
+                    <TableCell className="text-muted-foreground">{row.batch?.name || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{row.supervisor?.name || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{row.reader?.name || "—"}</TableCell>
                     <TableCell>{row.attempt?.attempt_number ?? "—"}</TableCell>
                     <TableCell>
                       <StatusBadge status={attemptStatus} />
@@ -348,8 +336,11 @@ export default function TrajectoryDetails() {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                  {search || statusFilter || attentionFilter
+                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
+                  {search ||
+                  Object.values(appliedFilters).some(
+                    (val) => val !== "all" && val !== undefined && val !== ""
+                  )
                     ? t("common.noResultsFound", "No students match your search query.")
                     : t(
                         "thesisManagement.trajectories.noStudentsEnrolled",
