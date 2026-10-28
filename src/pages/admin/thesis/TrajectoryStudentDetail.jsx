@@ -1190,9 +1190,6 @@ export default function TrajectoryStudentDetail() {
                     {allLogs.length}
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground">
-                  {t("thesisManagement.allLogsDescShort", "Chronological audit trail")}
-                </p>
               </div>
             </div>
           </div>
