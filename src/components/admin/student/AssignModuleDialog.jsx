@@ -116,20 +116,11 @@ const AssignModuleDialog = ({
   });
 
   const rawSlots = slotsResponse?.data || [];
+  //* Include past plannings (admin may assign them to mark attendance).
   const availableSlots = useMemo(() => {
-    return (slotsResponse?.data || []).filter((slot) => {
-      if ((slot.available_seats || 0) <= 0) return false;
-      if (slot.sessions && slot.sessions.length > 0) {
-        return slot.sessions.some((s) => {
-          if (!s?.session_date) return false;
-          return getMoment(s.end_time || s.session_date).isSameOrAfter(
-            getMoment(),
-            "day",
-          );
-        });
-      }
-      return true;
-    });
+    return (slotsResponse?.data || []).filter(
+      (slot) => (slot.available_seats || 0) > 0,
+    );
   }, [slotsResponse?.data]);
 
   const hasAnyPlannings = rawSlots.length > 0;
