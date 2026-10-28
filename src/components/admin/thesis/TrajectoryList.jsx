@@ -196,9 +196,9 @@ const TrajectoryList = ({ thesisId, canModify }) => {
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" />
                   {t(
-                    "thesisManagement.trajectories.enrolledStudents",
+                    "thesisManagement.trajectories.enrolledStudentsCount",
                     "{{count}} Enrolled",
-                    { count: traj.enrolled_count || 0 }
+                    { count: traj.enrolled_count ?? 0 }
                   )}
                 </span>
                 <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">

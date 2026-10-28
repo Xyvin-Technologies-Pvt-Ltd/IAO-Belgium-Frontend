@@ -3141,6 +3141,7 @@
       "startsOn": "Start Date",
       "finalDeadline": "Final Deadline",
       "enrolledStudents": "Enrolled Students",
+      "enrolledStudentsCount": "{{count}} Enrolled",
       "editTrajectory": "Edit Trajectory",
       "notFound": "Trajectory not found",
       "noStudentsEnrolled": "No students have enrolled in this trajectory cohort yet."
