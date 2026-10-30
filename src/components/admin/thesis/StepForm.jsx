@@ -50,7 +50,19 @@ const DEADLINE_MODES = [
   { value: "event_date", label: "Event date (information only)" },
 ];
 
-const StepForm = ({ open, onClose, onSave, initialData }) => {
+const STEP_TYPE_HINT = {
+  document_upload: "document upload",
+  teacher_approval: "teacher approval",
+};
+
+const StepForm = ({
+  open,
+  onClose,
+  onSave,
+  initialData,
+  siblingSteps = [],
+  editingIndex = -1,
+}) => {
   const { t } = useTranslation();
 
   const { data: rolesResponse, isLoading: isRolesLoading } = useGetThesisRoles({
@@ -61,12 +73,36 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
     return Array.isArray(list) ? list : [];
   }, [rolesResponse?.data]);
 
+  const lockOptions = useMemo(() => {
+    return (siblingSteps || [])
+      .map((s, idx) => ({ step: s, idx }))
+      .filter(({ step, idx }) => {
+        if (editingIndex >= 0 && idx === editingIndex) return false;
+        if (initialData?._id && step._id && String(step._id) === String(initialData._id)) {
+          return false;
+        }
+        return step.type === "document_upload" || step.type === "teacher_approval";
+      })
+      .map(({ step, idx }) => {
+        const mongoId =
+          step._id && /^[0-9a-fA-F]{24}$/.test(String(step._id))
+            ? String(step._id)
+            : null;
+        const value = mongoId || `__idx__:${idx}`;
+        const typeHint = STEP_TYPE_HINT[step.type] || step.type;
+        return {
+          value,
+          label: `${idx + 1}. ${step.name || "Untitled"} (${typeHint})`,
+        };
+      });
+  }, [siblingSteps, editingIndex, initialData]);
+
   const [name, setName] = useState("");
   const [type, setType] = useState("document_upload");
   const [deadlineMode, setDeadlineMode] = useState("none");
   const [required, setRequired] = useState(true);
   const [studentUploadsDocument, setStudentUploadsDocument] = useState(true);
-  const [lockedUntilSupervisor, setLockedUntilSupervisor] = useState(false);
+  const [lockedUntilStep, setLockedUntilStep] = useState("NONE");
   const [instruction, setInstruction] = useState("");
   const [resources, setResources] = useState([]);
   const [attachments, setAttachments] = useState([]);
@@ -89,7 +125,21 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
           ? Boolean(initialData.student_uploads_document)
           : true
       );
-      setLockedUntilSupervisor(Boolean(initialData.locked_until_supervisor));
+      let lockValue = "NONE";
+      const rawLock = initialData.locked_until_step;
+      if (rawLock) {
+        const rawStr = String(
+          typeof rawLock === "object" && rawLock?._id ? rawLock._id : rawLock
+        );
+        const match = lockOptions.find((o) => o.value === rawStr);
+        if (match) lockValue = match.value;
+      } else if (initialData.locked_until_supervisor) {
+        const firstApproval = lockOptions.find((o) =>
+          o.label.includes("(teacher approval)")
+        );
+        if (firstApproval) lockValue = firstApproval.value;
+      }
+      setLockedUntilStep(lockValue);
       setInstruction(initialData.instruction || "");
       setResources(
         Array.isArray(initialData.resources) && initialData.resources.length > 0
@@ -129,7 +179,7 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       setDeadlineMode("none");
       setRequired(true);
       setStudentUploadsDocument(true);
-      setLockedUntilSupervisor(false);
+      setLockedUntilStep("NONE");
       setInstruction("");
       setResources([]);
       setAttachments([]);
@@ -138,7 +188,7 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       setSelectedRoles([]);
     }
     setErrors({});
-  }, [initialData, open, availableRoles]);
+  }, [initialData, open, availableRoles, lockOptions]);
 
   // Synchronize role display names if availableRoles finishes loading after initialData
   useEffect(() => {
@@ -271,7 +321,9 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       deadline_date: null,
       required,
       student_uploads_document: studentUploadsDocument,
-      locked_until_supervisor: lockedUntilSupervisor,
+      locked_until_supervisor: false,
+      locked_until_step:
+        lockedUntilStep && lockedUntilStep !== "NONE" ? lockedUntilStep : null,
       approval_roles:
         type === "teacher_approval" ? selectedRoles.map((r) => r._id) : [],
       instruction,
@@ -345,6 +397,10 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
                 if (val === "document_upload" && !initialData) {
                   setStudentUploadsDocument(true);
                 }
+                // New info-only steps default off so they don't inflate progress
+                if (!initialData && val === "information_only") {
+                  setRequired(false);
+                }
               }}
             >
               <SelectTrigger className="w-full">
@@ -401,66 +457,88 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
             </div>
           </div>
 
-          {/* Conditional Type Flags & Switches */}
-          {type !== "information_only" && (
-            <div className="bg-muted/30 border border-border/60 rounded-lg p-4 space-y-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {t("thesisManagement.steps.form.workflowRules", "Workflow & Rules")}
-              </h4>
+          {/* Workflow & Rules (all step types, including information_only) */}
+          <div className="bg-muted/30 border border-border/60 rounded-lg p-4 space-y-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("thesisManagement.steps.form.workflowRules", "Workflow & Rules")}
+            </h4>
 
-              <div className="space-y-3">
-                {/* Required Flag */}
-                <div className="flex items-center justify-between gap-3">
-                  <Label htmlFor="step-required" className="text-sm font-medium cursor-pointer">
-                    {t("thesisManagement.steps.form.mandatoryStep", "Mandatory Step")}
-                  </Label>
-                  <Switch
-                    id="step-required"
-                    checked={required}
-                    onCheckedChange={setRequired}
-                  />
-                </div>
+            <div className="space-y-3">
+              {/* Required Flag */}
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="step-required" className="text-sm font-medium cursor-pointer">
+                  {t("thesisManagement.steps.form.mandatoryStep", "Mandatory Step")}
+                </Label>
+                <Switch
+                  id="step-required"
+                  checked={required}
+                  onCheckedChange={setRequired}
+                />
+              </div>
 
-                {/* Student document upload (Only for document_upload) */}
-                {type === "document_upload" && (
-                  <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/40">
-                    <Label
-                      htmlFor="step-student-upload"
-                      className="text-sm font-medium cursor-pointer"
-                    >
-                      {t(
-                        "thesisManagement.steps.form.studentUploads",
-                        "Student Uploads Document"
-                      )}
-                    </Label>
-                    <Switch
-                      id="step-student-upload"
-                      checked={studentUploadsDocument}
-                      onCheckedChange={setStudentUploadsDocument}
-                    />
-                  </div>
-                )}
-
-                {/* Locked until supervisor */}
+              {/* Student document upload (Only for document_upload) */}
+              {type === "document_upload" && (
                 <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/40">
                   <Label
-                    htmlFor="step-locked-supervisor"
+                    htmlFor="step-student-upload"
                     className="text-sm font-medium cursor-pointer"
                   >
                     {t(
-                      "thesisManagement.steps.form.lockedSupervisor",
-                      "Locked Until Supervisor Approves"
+                      "thesisManagement.steps.form.studentUploads",
+                      "Student Uploads Document"
                     )}
                   </Label>
                   <Switch
-                    id="step-locked-supervisor"
-                    checked={lockedUntilSupervisor}
-                    onCheckedChange={setLockedUntilSupervisor}
+                    id="step-student-upload"
+                    checked={studentUploadsDocument}
+                    onCheckedChange={setStudentUploadsDocument}
                   />
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Locked until prerequisite step (any step type) */}
+          <div className="bg-muted/30 border border-border/60 rounded-lg p-4 space-y-1.5">
+            <Label htmlFor="step-locked-until">
+              {t(
+                "thesisManagement.steps.form.lockedUntilStep",
+                "Locked until this step is complete"
+              )}
+            </Label>
+            <Select
+              value={lockedUntilStep}
+              onValueChange={setLockedUntilStep}
+            >
+              <SelectTrigger id="step-locked-until">
+                <SelectValue
+                  placeholder={t(
+                    "thesisManagement.steps.form.lockedUntilNone",
+                    "None"
+                  )}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NONE">
+                  {t(
+                    "thesisManagement.steps.form.lockedUntilNone",
+                    "None"
+                  )}
+                </SelectItem>
+                {lockOptions.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              {t(
+                "thesisManagement.steps.form.lockedUntilHint",
+                "Student must complete the selected earlier step before this one unlocks."
+              )}
+            </p>
+          </div>
 
           {/* Instructions Rich Text */}
           <div className="space-y-1.5">

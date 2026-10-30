@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -33,12 +34,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatTZ } from "@/utils/dateUtils";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
+  getTeacherThesisStudents,
   getTeacherThesisApprovalRequests,
   respondTeacherThesisApprovalRequest,
   getTeacherThesisContactCard,
   saveTeacherThesisContactCard,
 } from "@/api/thesisApi";
+
+const formatRoleLabel = (role) => {
+  if (role === "supervisor") return "Supervisor";
+  if (role === "reader") return "Reader";
+  return role
+    ? String(role)
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    : "—";
+};
 
 const MAX_CONTACT_FIELDS = 20;
 
@@ -83,6 +96,9 @@ const RequestsTab = () => {
       setNote("");
       queryClient.invalidateQueries({
         queryKey: ["teacher-thesis-approval-requests"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["teacher-thesis-students"],
       });
     },
     onError: (err) => {
@@ -449,6 +465,179 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
   );
 };
 
+const StudentsTab = () => {
+  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: [
+      "teacher-thesis-students",
+      page,
+      rowsPerPage,
+      debouncedSearch,
+    ],
+    queryFn: () =>
+      getTeacherThesisStudents({
+        page,
+        limit: rowsPerPage,
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      }),
+  });
+
+  const rows = data?.data || [];
+  const totalRows = data?.total_count || 0;
+
+  const studentName = (student) => {
+    if (!student) return "—";
+    const name = `${student.first_name || ""} ${student.last_name || ""}`.trim();
+    return name || student.email || student.uid || "—";
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          Showing {rows.length} of {totalRows}{" "}
+          {totalRows === 1 ? "student" : "students"}
+        </p>
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by student name..."
+            className="pl-9 h-9 bg-background"
+          />
+        </div>
+      </div>
+
+      <div className="w-full">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Student</TableHead>
+              <TableHead>Thesis</TableHead>
+              <TableHead>Trajectory</TableHead>
+              <TableHead>Role</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody
+            className={isFetching ? "opacity-50 pointer-events-none" : ""}
+          >
+            {isLoading ? (
+              <TableSkeleton rows={rowsPerPage} columns={4} />
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center p-8">
+                  <ErrorMessage
+                    message={error?.message || "Failed to load students"}
+                    onRetry={refetch}
+                    variant="inline"
+                  />
+                </TableCell>
+              </TableRow>
+            ) : rows.length > 0 ? (
+              rows.map((row) => {
+                const key = `${row.application?._id || ""}-${row.thesis?._id || ""}-${row.trajectory?._id || ""}`;
+                return (
+                  <TableRow
+                    key={key}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (
+                        !row.thesis?._id ||
+                        !row.trajectory?._id ||
+                        !row.student?._id
+                      ) {
+                        return;
+                      }
+                      navigate({
+                        to: "/teacher/thesis/$thesisId/trajectories/$trajectoryId/students/$userId",
+                        params: {
+                          thesisId: row.thesis._id,
+                          trajectoryId: row.trajectory._id,
+                          userId: row.student._id,
+                        },
+                      });
+                    }}
+                  >
+                    <TableCell className="capitalize">
+                      <div className="space-y-0.5">
+                        <div className="font-medium">
+                          {studentName(row.student)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {row.student?.uid || row.application?.uid || ""}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap"
+                      title={row.thesis?.name}
+                    >
+                      {row.thesis?.name || "-"}
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap"
+                      title={row.trajectory?.name}
+                    >
+                      {row.trajectory?.name || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(row.roles || []).length > 0 ? (
+                          row.roles.map((role) => (
+                            <span
+                              key={role}
+                              className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20"
+                            >
+                              {formatRoleLabel(role)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-center p-8 text-muted-foreground"
+                >
+                  {debouncedSearch
+                    ? "No students match your search."
+                    : "No assigned students yet. Accepted supervisor requests and reader assignments appear here."}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        {totalRows > 0 && (
+          <Pagination
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            totalRows={totalRows}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ContactInfoTab = () => {
   const queryClient = useQueryClient();
 
@@ -515,6 +704,7 @@ const TeacherThesis = () => {
 
   const tabs = [
     { id: "requests", label: "Requests" },
+    { id: "students", label: "Students" },
     { id: "contact", label: "My contact info" },
   ];
 
@@ -525,13 +715,13 @@ const TeacherThesis = () => {
       </h2>
 
       <div className="border-b border-border">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-primary text-primary font-semibold"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border/80"
@@ -544,7 +734,9 @@ const TeacherThesis = () => {
       </div>
 
       <div className="mt-6">
-        {activeTab === "requests" ? <RequestsTab /> : <ContactInfoTab />}
+        {activeTab === "requests" && <RequestsTab />}
+        {activeTab === "students" && <StudentsTab />}
+        {activeTab === "contact" && <ContactInfoTab />}
       </div>
     </div>
   );

@@ -34,9 +34,46 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+const resolveLockTargetLabel = (step, allSteps, t) => {
+  const raw = step.locked_until_step;
+  if (!raw && !step.locked_until_supervisor) return null;
+
+  if (raw) {
+    const rawStr = String(typeof raw === "object" && raw?._id ? raw._id : raw);
+    if (rawStr.startsWith("__idx__:")) {
+      const idx = Number(rawStr.slice("__idx__:".length));
+      const target = allSteps[idx];
+      if (target) {
+        return `${idx + 1}. ${target.name || "Untitled"}`;
+      }
+    } else {
+      const targetIdx = allSteps.findIndex(
+        (s) => s._id && String(s._id) === rawStr
+      );
+      if (targetIdx >= 0) {
+        return `${targetIdx + 1}. ${allSteps[targetIdx].name || "Untitled"}`;
+      }
+    }
+  }
+
+  if (step.locked_until_supervisor) {
+    const targetIdx = allSteps.findIndex(
+      (s) =>
+        s.type === "teacher_approval" &&
+        (!step._id || String(s._id) !== String(step._id))
+    );
+    if (targetIdx >= 0) {
+      return `${targetIdx + 1}. ${allSteps[targetIdx].name || "Untitled"}`;
+    }
+  }
+
+  return t("thesisManagement.steps.tags.prerequisiteGate", "Prerequisite");
+};
+
 const SortableStepItem = ({
   step,
   index,
+  allSteps = [],
   onEdit,
   onDelete,
   canModify,
@@ -187,15 +224,19 @@ const SortableStepItem = ({
           </span>
         )}
 
-        {/* Supervisor Gate */}
-        {step.locked_until_supervisor && (
+        {/* Prerequisite lock gate */}
+        {(step.locked_until_step || step.locked_until_supervisor) && (
           <span
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
-            title={t("thesisManagement.steps.tags.supervisorGate", "Supervisor Gate")}
+            title={
+              resolveLockTargetLabel(step, allSteps, t) ||
+              t("thesisManagement.steps.tags.prerequisiteGate", "Prerequisite")
+            }
           >
             <Lock className="w-3 h-3" />
-            <span className="hidden sm:inline">
-              {t("thesisManagement.steps.tags.supervisorGate", "Supervisor Gate")}
+            <span className="hidden sm:inline max-w-[10rem] truncate">
+              {t("thesisManagement.steps.tags.afterStep", "After")}:{" "}
+              {resolveLockTargetLabel(step, allSteps, t)}
             </span>
           </span>
         )}
@@ -339,6 +380,7 @@ const StepList = ({
               key={step._id || `step-draft-${index}-${step.name}`}
               step={step}
               index={index}
+              allSteps={steps}
               onEdit={onEdit}
               onDelete={onDelete}
               canModify={canModify}

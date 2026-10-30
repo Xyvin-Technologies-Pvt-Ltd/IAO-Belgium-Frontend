@@ -111,6 +111,14 @@ const ThesisSteps = () => {
     setOpenForm(true);
   };
 
+  const editingIndex = useMemo(() => {
+    if (!editingStep) return -1;
+    return draftSteps.findIndex((s) => {
+      if (editingStep._id) return s._id === editingStep._id;
+      return s === editingStep;
+    });
+  }, [editingStep, draftSteps]);
+
   const handleSaveStepToDraft = (stepData) => {
     if (editingStep) {
       setDraftSteps((prev) =>
@@ -156,15 +164,43 @@ const ThesisSteps = () => {
   const handleSaveChanges = async () => {
     if (!id || !canModify) return;
 
-    const cleanedSteps = draftSteps.map((s) => {
+    const cleanedSteps = draftSteps.map((s, index) => {
       const isValidMongoId = s._id && /^[0-9a-fA-F]{24}$/.test(String(s._id));
+
+      let lockedUntilStep = s.locked_until_step || null;
+      if (lockedUntilStep && typeof lockedUntilStep === "object") {
+        lockedUntilStep = lockedUntilStep._id || null;
+      }
+      if (lockedUntilStep) {
+        const lockStr = String(lockedUntilStep);
+        if (!/^[0-9a-fA-F]{24}$/.test(lockStr) && !lockStr.startsWith("__idx__:")) {
+          const targetIdx = draftSteps.findIndex(
+            (other) => other._id && String(other._id) === lockStr
+          );
+          lockedUntilStep = targetIdx >= 0 ? `__idx__:${targetIdx}` : null;
+        }
+      } else if (s.locked_until_supervisor) {
+        const firstApprovalIdx = draftSteps.findIndex(
+          (other, otherIdx) =>
+            otherIdx !== index && other.type === "teacher_approval"
+        );
+        if (firstApprovalIdx >= 0) {
+          const target = draftSteps[firstApprovalIdx];
+          lockedUntilStep =
+            target._id && /^[0-9a-fA-F]{24}$/.test(String(target._id))
+              ? String(target._id)
+              : `__idx__:${firstApprovalIdx}`;
+        }
+      }
+
       const stepItem = {
         name: s.name,
         type: s.type,
         deadline_mode: s.deadline_mode || "none",
         required: s.required !== undefined ? s.required : true,
         student_uploads_document: Boolean(s.student_uploads_document),
-        locked_until_supervisor: Boolean(s.locked_until_supervisor),
+        locked_until_supervisor: false,
+        locked_until_step: lockedUntilStep || null,
         approval_roles: Array.isArray(s.approval_roles) ? s.approval_roles : [],
         instruction: s.instruction || "",
         resources: (s.resources || []).map((r) => ({
@@ -313,6 +349,8 @@ const ThesisSteps = () => {
         onClose={() => setOpenForm(false)}
         onSave={handleSaveStepToDraft}
         initialData={editingStep}
+        siblingSteps={draftSteps}
+        editingIndex={editingIndex}
       />
 
       {/* Remove Confirmation Dialog */}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { toast } from "sonner";
@@ -68,10 +68,12 @@ import {
   useUpdateTrajectoryStudentReader,
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
+  useReenrollTrajectoryStudent,
   useUpdateTrajectoryStudentStepDeadline,
   useUploadStaffThesisDocument,
   useRenameStaffThesisDocument,
   useDeleteStaffThesisDocument,
+  useGetThesisTrajectories,
 } from "@/store/useThesisStore";
 
 const RichHtml = ({ html, className = "" }) => {
@@ -179,6 +181,7 @@ const getActionMeta = (action) => {
 
 export default function TrajectoryStudentDetail() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("operations");
   const params = useParams({ strict: false });
 
@@ -203,6 +206,8 @@ export default function TrajectoryStudentDetail() {
   // Attempt status decision modal
   const [statusDraft, setStatusDraft] = useState(null); // { status: 'passed'|'failed', reason: '' }
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
+  const [reenrollOpen, setReenrollOpen] = useState(false);
+  const [reenrollTrajectoryId, setReenrollTrajectoryId] = useState("");
 
   // Queries & Mutations
   const {
@@ -211,10 +216,14 @@ export default function TrajectoryStudentDetail() {
     error,
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
+  const { data: trajectoriesResponse } = useGetThesisTrajectories(thesisId, {
+    enabled: Boolean(thesisId) && reenrollOpen,
+  });
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
+  const reenrollMutation = useReenrollTrajectoryStudent();
   const updateStepDeadlineMutation = useUpdateTrajectoryStudentStepDeadline();
   const uploadDocMutation = useUploadStaffThesisDocument();
   const renameDocMutation = useRenameStaffThesisDocument();
@@ -241,6 +250,16 @@ export default function TrajectoryStudentDetail() {
   const failReasons = detail?.fail_reasons || [];
   const suggestPass = detail?.suggest_pass;
   const suggestFail = detail?.suggest_fail;
+  const reenrollTargets = useMemo(() => {
+    const list = trajectoriesResponse?.data || trajectoriesResponse || [];
+    const rows = Array.isArray(list) ? list : list?.trajectories || [];
+    return rows.filter(
+      (traj) =>
+        traj &&
+        !traj.removed &&
+        String(traj._id) !== String(trajectoryId)
+    );
+  }, [trajectoriesResponse, trajectoryId]);
 
   // Activity log timeline state
   const [logSearch, setLogSearch] = useState("");
@@ -492,6 +511,43 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const handleReenrollSubmit = async () => {
+    if (!reenrollTrajectoryId) {
+      toast.error(
+        t(
+          "thesisManagement.attempt.selectTrajectory",
+          "Select a target trajectory"
+        )
+      );
+      return;
+    }
+    try {
+      const response = await reenrollMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        targetTrajectoryId: reenrollTrajectoryId,
+      });
+      setReenrollOpen(false);
+      setReenrollTrajectoryId("");
+      const nextTrajId = response?.data?.trajectory?._id;
+      if (nextTrajId) {
+        navigate({
+          to: "/admin/thesis/$id/trajectories/$trajectoryId/students/$userId",
+          params: {
+            id: thesisId,
+            trajectoryId: String(nextTrajId),
+            userId,
+          },
+        });
+      } else {
+        refetch();
+      }
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
   const handleDeadlineSubmit = async () => {
     if (!deadlineDraft?.stepId) return;
     try {
@@ -568,7 +624,13 @@ export default function TrajectoryStudentDetail() {
     switch (status) {
       case "locked":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border"
+            title={t(
+              "thesis.status.lockedHint",
+              "Waiting for the required earlier step"
+            )}
+          >
             <Lock className="w-3.5 h-3.5" />
             {t("thesis.status.locked", "Locked")}
           </span>
@@ -685,6 +747,23 @@ export default function TrajectoryStudentDetail() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {canModify && attemptStatus !== "passed" && (
+            <Button
+              variant="outline"
+              size="default"
+              className="gap-2 font-semibold shadow-xs"
+              onClick={() => {
+                setReenrollTrajectoryId("");
+                setReenrollOpen(true);
+              }}
+            >
+              <Compass className="w-4 h-4" />
+              {t(
+                "thesisManagement.attempt.reenrollTrajectory",
+                "Re-enrol trajectory"
+              )}
+            </Button>
+          )}
           {renderAttemptDecisionButton("default", "default")}
         </div>
       </div>
@@ -911,6 +990,23 @@ export default function TrajectoryStudentDetail() {
 
                 {/* Instruction & Resources */}
                 <div className="pl-0 sm:pl-8 space-y-3">
+                  {step.status === "locked" && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 shrink-0" />
+                      <span>
+                        {step.lock_prerequisite_name
+                          ? t(
+                              "thesis.status.lockedWaitingNamed",
+                              "Waiting for “{{step}}” to be completed.",
+                              { step: step.lock_prerequisite_name }
+                            )
+                          : t(
+                              "thesis.status.lockedWaiting",
+                              "Waiting for the required earlier step to be completed."
+                            )}
+                      </span>
+                    </div>
+                  )}
                   <RichHtml html={step.instruction} className="text-xs sm:text-sm text-muted-foreground" />
 
                   {step.resources && step.resources.length > 0 && (
@@ -1750,6 +1846,89 @@ export default function TrajectoryStudentDetail() {
             >
               {deleteDocMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               {t("common.delete", "Delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin re-enrol to another trajectory */}
+      <Dialog
+        open={reenrollOpen}
+        onOpenChange={(open) => {
+          if (!open && !reenrollMutation.isPending) {
+            setReenrollOpen(false);
+            setReenrollTrajectoryId("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold">
+              {t(
+                "thesisManagement.attempt.reenrollTrajectory",
+                "Re-enrol trajectory"
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t(
+                  "thesisManagement.attempt.targetTrajectory",
+                  "Target trajectory"
+                )}
+              </label>
+              <Select
+                value={reenrollTrajectoryId}
+                onValueChange={setReenrollTrajectoryId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t(
+                      "thesisManagement.attempt.selectTrajectory",
+                      "Select a trajectory"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {reenrollTargets.map((traj) => (
+                    <SelectItem key={traj._id} value={String(traj._id)}>
+                      {traj.name || String(traj._id)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {reenrollTargets.length === 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.attempt.noOtherTrajectories",
+                    "No other trajectories available for this thesis."
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setReenrollOpen(false)}
+              disabled={reenrollMutation.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleReenrollSubmit}
+              disabled={reenrollMutation.isPending || !reenrollTrajectoryId}
+              className="gap-2"
+            >
+              {reenrollMutation.isPending && (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              )}
+              {t("thesisManagement.attempt.confirmReenroll", "Re-enrol")}
             </Button>
           </DialogFooter>
         </DialogContent>

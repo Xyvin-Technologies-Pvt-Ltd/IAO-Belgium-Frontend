@@ -310,6 +310,23 @@ export const updateTrajectoryStudentAttemptStatus = async (
   }
 };
 
+export const reenrollTrajectoryStudent = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/reenroll`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const updateTrajectoryStudentStepDeadline = async (
   thesisId,
   trajectoryId,
@@ -376,6 +393,32 @@ export const deleteStaffThesisDocument = async (
   try {
     const response = await axiosInstance.delete(
       `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/documents/${documentId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getTeacherThesisStudents = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get(`/thesis/teacher/students`, {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getTeacherThesisStudentDetail = async (
+  thesisId,
+  trajectoryId,
+  userId
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/teacher/theses/${thesisId}/trajectories/${trajectoryId}/students/${userId}`
     );
     return response.data;
   } catch (error) {

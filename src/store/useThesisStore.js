@@ -27,6 +27,7 @@ import {
   updateTrajectoryStudentReader,
   updateTrajectoryStudentSupervisor,
   updateTrajectoryStudentAttemptStatus,
+  reenrollTrajectoryStudent,
   updateTrajectoryStudentStepDeadline,
   uploadStaffThesisDocument,
   renameStaffThesisDocument,
@@ -506,6 +507,43 @@ export const useUpdateTrajectoryStudentAttemptStatus = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update attempt status");
+    },
+  });
+};
+
+export const useReenrollTrajectoryStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, targetTrajectoryId }) =>
+      reenrollTrajectoryStudent(thesisId, trajectoryId, userId, {
+        trajectory_id: targetTrajectoryId,
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+      });
+      if (response?.data?.trajectory?._id) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            "thesis-trajectory-students",
+            variables.thesisId,
+            String(response.data.trajectory._id),
+          ],
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ["thesis-trajectories", variables.thesisId] });
+      toast.success(response?.message || "Student re-enrolled on trajectory");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to re-enrol student");
     },
   });
 };
