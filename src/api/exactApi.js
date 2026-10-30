@@ -113,14 +113,61 @@ export const verifyExactReconciliation = async (ids = []) => {
   }
 };
 
-//* Single row only — reverses the old bare Sales Entry and reposts it as a real
-//* Sales Invoice + Document. No bulk variant on purpose: accountant clicks one
-//* row at a time. rowId is the reconciliation row's own id ("pay-…" / "inv-…").
-export const resyncExactReconciliationRow = async (rowId) => {
+// ─── Manual / automatic sending (Sales Entries) ──────────────────────────────
+
+export const getExactSendMode = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/send-mode");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const setExactSendMode = async (mode) => {
+  try {
+    const response = await axiosInstance.put("/exact/send-mode", { mode });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactToSend = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/to-send", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactToSendPreview = async (jobId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/exact/to-send/${encodeURIComponent(jobId)}/preview`,
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const sendExactJob = async (jobId) => {
   try {
     const response = await axiosInstance.post(
-      `/exact/reconciliation/${rowId}/resync`,
+      `/exact/to-send/${encodeURIComponent(jobId)}/send`,
     );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Read-only: can the Exact app attach the IAO PDF (documents permission)?
+export const getExactDocumentTypes = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/document-types");
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
