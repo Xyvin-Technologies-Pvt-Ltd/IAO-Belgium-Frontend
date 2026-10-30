@@ -33,7 +33,6 @@ const TrajectoryList = ({ thesisId, canModify }) => {
   const {
     data: trajectoriesResponse,
     isLoading,
-    refetch,
   } = useGetThesisTrajectories(thesisId);
 
   const deleteTrajectory = useDeleteThesisTrajectory();
@@ -186,10 +185,38 @@ const TrajectoryList = ({ thesisId, canModify }) => {
                   <span>
                     {t("thesisManagement.trajectories.startsOn", "Starts:")}{" "}
                     <strong className="text-foreground font-medium">
-                      {moment(traj.start_date).format("DD/MM/YYYY")}
+                      {traj.start_date
+                        ? moment(traj.start_date).format("DD/MM/YYYY")
+                        : "—"}
                     </strong>
                   </span>
                 </div>
+
+                {Array.isArray(traj.step_deadlines) && traj.step_deadlines.length > 0 && (
+                  <div className="pt-2 border-t border-border/40 space-y-1.5">
+                    <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                      {t("thesisManagement.trajectories.stepDeadlines", "Step Deadlines")}
+                    </span>
+                    <div className="space-y-1 max-h-36 overflow-y-auto pr-0.5">
+                      {traj.step_deadlines.map((sd, sIdx) => (
+                        <div
+                          key={sd.step_id || sIdx}
+                          className="flex items-center justify-between text-xs py-0.5 gap-2"
+                        >
+                          <span
+                            className="truncate text-foreground/85 font-medium"
+                            title={sd.step_name}
+                          >
+                            {sd.sequence ? `${sd.sequence}. ` : ""}{sd.step_name}
+                          </span>
+                          <span className="font-semibold text-foreground shrink-0 text-[11px]">
+                            {moment(sd.deadline_date).format("DD/MM/YYYY")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">

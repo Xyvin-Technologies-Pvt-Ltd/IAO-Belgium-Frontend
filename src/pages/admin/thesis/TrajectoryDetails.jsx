@@ -194,7 +194,11 @@ export default function TrajectoryDetails() {
 
         <DashboardCard
           title={t("thesisManagement.trajectories.startsOn", "Start Date")}
-          value={moment(trajectory.start_date).format("DD/MM/YYYY")}
+          value={
+            trajectory.start_date
+              ? moment(trajectory.start_date).format("DD/MM/YYYY")
+              : "—"
+          }
           icon={Calendar}
         />
 
@@ -309,12 +313,12 @@ export default function TrajectoryDetails() {
                       }
                     }}
                   >
-                    <TableCell className="font-medium text-primary hover:underline">{student?.uid || "—"}</TableCell>
-                    <TableCell className="font-medium">{studentName}</TableCell>
-                    <TableCell className="text-muted-foreground">{row.batch?.name || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{row.supervisor?.name || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{row.reader?.name || "—"}</TableCell>
-                    <TableCell>{row.attempt?.attempt_number ?? "—"}</TableCell>
+                    <TableCell>{student?.uid || "-"}</TableCell>
+                    <TableCell>{studentName}</TableCell>
+                    <TableCell>{row.batch?.name || "-"}</TableCell>
+                    <TableCell>{row.supervisor?.name || "-"}</TableCell>
+                    <TableCell>{row.reader?.name || "-"}</TableCell>
+                    <TableCell>{row.attempt?.attempt_number ?? "-"}</TableCell>
                     <TableCell>
                       <StatusBadge status={attemptStatus} />
                     </TableCell>
@@ -324,7 +328,7 @@ export default function TrajectoryDetails() {
                           row.attention === "suggest_fail"
                             ? "text-destructive"
                             : row.attention === "suggest_pass"
-                              ? "text-emerald-700"
+                              ? "text-emerald-600 dark:text-emerald-400"
                               : "text-muted-foreground"
                         }`}
                       >

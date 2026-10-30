@@ -997,7 +997,25 @@
       "activeNotice": "Active — visible and available for enrolments",
       "inactiveNotice": "Inactive — enrolments will be blocked",
       "create": "Create Thesis",
-      "update": "Update Thesis"
+      "update": "Update Thesis",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "attachmentsLabel": "Documents",
+      "documentsLabel": "Documents",
+      "documentsHint": "Upload documents, guidelines, or materials visible to students.",
+      "docNameLabel": "Document Name",
+      "docNamePlaceholder": "e.g. Thesis Guidelines",
+      "selectFileLabel": "File",
+      "chooseFile": "Choose file...",
+      "attachmentsSubtitle": "Upload guidelines, templates, or instructions for students",
+      "uploadFile": "Upload File",
+      "uploading": "Uploading...",
+      "noAttachments": "No files uploaded yet.",
+      "fileUploaded": "File uploaded successfully",
+      "attachmentsHint": "Upload documents, guidelines, or materials visible to students.",
+      "uploadPrompt": "Click to upload files or documents",
+      "uploadSuccess": "File(s) uploaded successfully",
+      "uploadFailed": "Failed to upload file"
     },
     "deactivateModal": {
       "title": "Deactivate Thesis",
@@ -1016,7 +1034,10 @@
       "programme": "Programme",
       "price": "Price",
       "description": "Description",
-      "noDescription": "No description provided for this thesis."
+      "noDescription": "No description provided for this thesis.",
+      "documents": "Documents",
+      "attachments": "Documents",
+      "noAttachments": "No documents provided for this thesis."
     }
   },
   "programManagement": {
@@ -3155,6 +3176,18 @@
       "suggestFail": "Overdue — review fail",
       "suggestPass": "Ready for pass",
       "none": "In progress"
+    },
+    "personalNotes": {
+      "title": "Personal Notes",
+      "subtitle": "Notes visible to this student",
+      "addNote": "Add Note",
+      "empty": "No personal notes added yet.",
+      "emptyDesc": "Notes added here will be visible on the student's thesis page.",
+      "staffMember": "Staff",
+      "modalTitle": "Add Personal Note",
+      "modalDesc": "This note will be visible to the student on their thesis details page.",
+      "placeholder": "Type your personal note here...",
+      "saveNote": "Save Note"
     }
   }
 }

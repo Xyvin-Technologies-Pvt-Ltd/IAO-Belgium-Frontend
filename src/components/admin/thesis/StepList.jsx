@@ -29,13 +29,51 @@ import {
   Plus,
   Lock,
   Upload,
+  Users,
+  Paperclip,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+
+const resolveLockTargetLabel = (step, allSteps, t) => {
+  const raw = step.locked_until_step;
+  if (!raw && !step.locked_until_supervisor) return null;
+
+  if (raw) {
+    const rawStr = String(typeof raw === "object" && raw?._id ? raw._id : raw);
+    if (rawStr.startsWith("__idx__:")) {
+      const idx = Number(rawStr.slice("__idx__:".length));
+      const target = allSteps[idx];
+      if (target) {
+        return `${idx + 1}. ${target.name || "Untitled"}`;
+      }
+    } else {
+      const targetIdx = allSteps.findIndex(
+        (s) => s._id && String(s._id) === rawStr
+      );
+      if (targetIdx >= 0) {
+        return `${targetIdx + 1}. ${allSteps[targetIdx].name || "Untitled"}`;
+      }
+    }
+  }
+
+  if (step.locked_until_supervisor) {
+    const targetIdx = allSteps.findIndex(
+      (s) =>
+        s.type === "teacher_approval" &&
+        (!step._id || String(s._id) !== String(step._id))
+    );
+    if (targetIdx >= 0) {
+      return `${targetIdx + 1}. ${allSteps[targetIdx].name || "Untitled"}`;
+    }
+  }
+
+  return t("thesisManagement.steps.tags.prerequisiteGate", "Prerequisite");
+};
 
 const SortableStepItem = ({
   step,
   index,
+  allSteps = [],
   onEdit,
   onDelete,
   canModify,
@@ -102,6 +140,14 @@ const SortableStepItem = ({
     };
   }, [step.deadline_mode, t]);
 
+  const approvalRolesText = useMemo(() => {
+    if (step.type !== "teacher_approval") return null;
+    if (Array.isArray(step.approval_roles) && step.approval_roles.length > 0) {
+      return step.approval_roles.map((r) => r.name || r.key || r).join(", ");
+    }
+    return null;
+  }, [step.type, step.approval_roles]);
+
   return (
     <div
       ref={setNodeRef}
@@ -143,6 +189,26 @@ const SortableStepItem = ({
             <TypeIcon className="w-3 h-3" />
             {typeConfig.label}
           </span>
+
+          {step.type === "teacher_approval" && (
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                approvalRolesText
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20"
+              }`}
+              title={
+                approvalRolesText ||
+                t("thesisManagement.steps.noRolesAssigned", "No roles configured")
+              }
+            >
+              <Users className="w-3 h-3" />
+              <span className="max-w-[160px] truncate">
+                {approvalRolesText ||
+                  t("thesisManagement.steps.noRolesAssigned", "No roles configured")}
+              </span>
+            </span>
+          )}
         </div>
       </div>
 
@@ -158,15 +224,19 @@ const SortableStepItem = ({
           </span>
         )}
 
-        {/* Supervisor Gate */}
-        {step.locked_until_supervisor && (
+        {/* Prerequisite lock gate */}
+        {(step.locked_until_step || step.locked_until_supervisor) && (
           <span
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
-            title={t("thesisManagement.steps.tags.supervisorGate", "Supervisor Gate")}
+            title={
+              resolveLockTargetLabel(step, allSteps, t) ||
+              t("thesisManagement.steps.tags.prerequisiteGate", "Prerequisite")
+            }
           >
             <Lock className="w-3 h-3" />
-            <span className="hidden sm:inline">
-              {t("thesisManagement.steps.tags.supervisorGate", "Supervisor Gate")}
+            <span className="hidden sm:inline max-w-[10rem] truncate">
+              {t("thesisManagement.steps.tags.afterStep", "After")}:{" "}
+              {resolveLockTargetLabel(step, allSteps, t)}
             </span>
           </span>
         )}
@@ -194,6 +264,19 @@ const SortableStepItem = ({
           >
             <LinkIcon className="w-3 h-3 text-primary" />
             <span>{step.resources.length}</span>
+          </span>
+        )}
+
+        {/* Attachments indicator */}
+        {Array.isArray(step.attachments) && step.attachments.length > 0 && (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border"
+            title={t("thesisManagement.steps.tags.attachmentsCount", "{{count}} file(s)", {
+              count: step.attachments.length,
+            })}
+          >
+            <Paperclip className="w-3 h-3 text-primary" />
+            <span>{step.attachments.length}</span>
           </span>
         )}
 
@@ -297,6 +380,7 @@ const StepList = ({
               key={step._id || `step-draft-${index}-${step.name}`}
               step={step}
               index={index}
+              allSteps={steps}
               onEdit={onEdit}
               onDelete={onDelete}
               canModify={canModify}

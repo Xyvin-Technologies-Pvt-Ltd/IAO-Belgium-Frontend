@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ import { uploadFile } from "@/api/uploadApi";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import DocumentUploadArea from "@/components/common/DocumentUploadArea";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
+import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,10 +68,12 @@ import {
   useUpdateTrajectoryStudentReader,
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
+  useReenrollTrajectoryStudent,
   useUpdateTrajectoryStudentStepDeadline,
   useUploadStaffThesisDocument,
   useRenameStaffThesisDocument,
   useDeleteStaffThesisDocument,
+  useGetThesisTrajectories,
 } from "@/store/useThesisStore";
 
 const RichHtml = ({ html, className = "" }) => {
@@ -178,6 +181,7 @@ const getActionMeta = (action) => {
 
 export default function TrajectoryStudentDetail() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("operations");
   const params = useParams({ strict: false });
 
@@ -202,6 +206,8 @@ export default function TrajectoryStudentDetail() {
   // Attempt status decision modal
   const [statusDraft, setStatusDraft] = useState(null); // { status: 'passed'|'failed', reason: '' }
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
+  const [reenrollOpen, setReenrollOpen] = useState(false);
+  const [reenrollTrajectoryId, setReenrollTrajectoryId] = useState("");
 
   // Queries & Mutations
   const {
@@ -210,10 +216,14 @@ export default function TrajectoryStudentDetail() {
     error,
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
+  const { data: trajectoriesResponse } = useGetThesisTrajectories(thesisId, {
+    enabled: Boolean(thesisId) && reenrollOpen,
+  });
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
+  const reenrollMutation = useReenrollTrajectoryStudent();
   const updateStepDeadlineMutation = useUpdateTrajectoryStudentStepDeadline();
   const uploadDocMutation = useUploadStaffThesisDocument();
   const renameDocMutation = useRenameStaffThesisDocument();
@@ -231,11 +241,25 @@ export default function TrajectoryStudentDetail() {
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
   const allLogs = useMemo(() => detail?.logs || [], [detail?.logs]);
+  const personalNotes = useMemo(
+    () => detail?.personal_notes || detail?.notes || [],
+    [detail?.personal_notes, detail?.notes]
+  );
   const attempt = detail?.attempt;
   const attemptStatus = attempt?.status || "active";
   const failReasons = detail?.fail_reasons || [];
   const suggestPass = detail?.suggest_pass;
   const suggestFail = detail?.suggest_fail;
+  const reenrollTargets = useMemo(() => {
+    const list = trajectoriesResponse?.data || trajectoriesResponse || [];
+    const rows = Array.isArray(list) ? list : list?.trajectories || [];
+    return rows.filter(
+      (traj) =>
+        traj &&
+        !traj.removed &&
+        String(traj._id) !== String(trajectoryId)
+    );
+  }, [trajectoriesResponse, trajectoryId]);
 
   // Activity log timeline state
   const [logSearch, setLogSearch] = useState("");
@@ -487,6 +511,43 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const handleReenrollSubmit = async () => {
+    if (!reenrollTrajectoryId) {
+      toast.error(
+        t(
+          "thesisManagement.attempt.selectTrajectory",
+          "Select a target trajectory"
+        )
+      );
+      return;
+    }
+    try {
+      const response = await reenrollMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        targetTrajectoryId: reenrollTrajectoryId,
+      });
+      setReenrollOpen(false);
+      setReenrollTrajectoryId("");
+      const nextTrajId = response?.data?.trajectory?._id;
+      if (nextTrajId) {
+        navigate({
+          to: "/admin/thesis/$id/trajectories/$trajectoryId/students/$userId",
+          params: {
+            id: thesisId,
+            trajectoryId: String(nextTrajId),
+            userId,
+          },
+        });
+      } else {
+        refetch();
+      }
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
   const handleDeadlineSubmit = async () => {
     if (!deadlineDraft?.stepId) return;
     try {
@@ -532,11 +593,44 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const getDeadlineModeBadge = (mode) => {
+    switch (mode) {
+      case "required":
+        return {
+          label: t("thesisManagement.steps.deadline.required", "Deadline Required"),
+          className: "bg-primary/15 text-primary border-primary/25 font-semibold",
+        };
+      case "optional":
+        return {
+          label: t("thesisManagement.steps.deadline.optional", "Deadline Optional"),
+          className: "bg-muted text-muted-foreground border-border font-medium",
+        };
+      case "event_date":
+      case "event":
+        return {
+          label: t("thesisManagement.steps.deadline.event", "Event Date"),
+          className: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 font-medium",
+        };
+      case "none":
+      default:
+        return {
+          label: t("thesisManagement.steps.deadline.none", "No Deadline"),
+          className: "bg-muted text-muted-foreground border-border font-medium",
+        };
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "locked":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border"
+            title={t(
+              "thesis.status.lockedHint",
+              "Waiting for the required earlier step"
+            )}
+          >
             <Lock className="w-3.5 h-3.5" />
             {t("thesis.status.locked", "Locked")}
           </span>
@@ -653,6 +747,23 @@ export default function TrajectoryStudentDetail() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {canModify && attemptStatus !== "passed" && (
+            <Button
+              variant="outline"
+              size="default"
+              className="gap-2 font-semibold shadow-xs"
+              onClick={() => {
+                setReenrollTrajectoryId("");
+                setReenrollOpen(true);
+              }}
+            >
+              <Compass className="w-4 h-4" />
+              {t(
+                "thesisManagement.attempt.reenrollTrajectory",
+                "Re-enrol trajectory"
+              )}
+            </Button>
+          )}
           {renderAttemptDecisionButton("default", "default")}
         </div>
       </div>
@@ -798,15 +909,16 @@ export default function TrajectoryStudentDetail() {
                       <span className="font-medium px-2 py-0.5 rounded bg-muted">
                         {getStepTypeLabel(step.type)}
                       </span>
-                      {step.required ? (
-                        <span className="font-semibold px-2.5 py-0.5 rounded-full text-xs bg-primary/15 text-primary border border-primary/25">
-                          {t("thesis.required", "Required")}
-                        </span>
-                      ) : (
-                        <span className="font-medium px-2.5 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
-                          {t("thesis.optional", "Optional")}
-                        </span>
-                      )}
+                      {(() => {
+                        const dm = getDeadlineModeBadge(step.deadline_mode);
+                        return (
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-xs border ${dm.className}`}
+                          >
+                            {dm.label}
+                          </span>
+                        );
+                      })()}
                       {step.type === "document_upload" && step.student_uploads_document === false && (
                         <span className="font-medium px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                           {t("thesis.staffUploadOnly", "Staff upload only")}
@@ -878,6 +990,23 @@ export default function TrajectoryStudentDetail() {
 
                 {/* Instruction & Resources */}
                 <div className="pl-0 sm:pl-8 space-y-3">
+                  {step.status === "locked" && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                      <Lock className="w-3.5 h-3.5 shrink-0" />
+                      <span>
+                        {step.lock_prerequisite_name
+                          ? t(
+                              "thesis.status.lockedWaitingNamed",
+                              "Waiting for “{{step}}” to be completed.",
+                              { step: step.lock_prerequisite_name }
+                            )
+                          : t(
+                              "thesis.status.lockedWaiting",
+                              "Waiting for the required earlier step to be completed."
+                            )}
+                      </span>
+                    </div>
+                  )}
                   <RichHtml html={step.instruction} className="text-xs sm:text-sm text-muted-foreground" />
 
                   {step.resources && step.resources.length > 0 && (
@@ -896,6 +1025,54 @@ export default function TrajectoryStudentDetail() {
                           >
                             {res.label || res.url}
                           </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {step.attachments && step.attachments.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
+                        {t("thesis.documents", "Documents")}
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {step.attachments.map((att, aIdx) => (
+                          <div
+                            key={att.file_url || aIdx}
+                            className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card/60 hover:bg-muted/30 transition-colors gap-2"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <FileText className="w-4 h-4 text-primary shrink-0" />
+                              <span
+                                className="text-xs font-medium text-foreground truncate"
+                                title={att.name}
+                              >
+                                {att.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs gap-1 cursor-pointer"
+                                onClick={() => openSecureFile(att.file_url, att.name)}
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                {t("common.view", "View")}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs gap-1 cursor-pointer"
+                                onClick={() => downloadSecureFile(att.file_url, att.name)}
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                {t("common.download", "Download")}
+                              </Button>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1098,9 +1275,9 @@ export default function TrajectoryStudentDetail() {
                               {t("thesis.approved", "Approved")}
                             </span>
                           )}
-                          {step.approval_request?.status === "changes_requested" && (
+                          {step.approval_request?.status === "rejected" && (
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-                              {t("thesis.changesRequested", "Changes Requested")}
+                              {t("thesis.rejected", "Rejected")}
                             </span>
                           )}
                           {canModify && (
@@ -1173,6 +1350,15 @@ export default function TrajectoryStudentDetail() {
             </Select>
           </div>
         </div>
+
+        {/* Student Personal Notes Card */}
+        <StudentPersonalNotesCard
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          userId={userId}
+          notes={personalNotes}
+          canModify={canModify}
+        />
 
         {/* Activity Log Card (Timeline View) */}
         <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-4">
@@ -1360,8 +1546,8 @@ export default function TrajectoryStudentDetail() {
                     <SelectItem value="pending" className="text-xs">
                       {t("thesis.pendingApproval", "Pending Review")}
                     </SelectItem>
-                    <SelectItem value="changes_requested" className="text-xs">
-                      {t("thesis.changesRequested", "Changes Requested")}
+                    <SelectItem value="rejected" className="text-xs">
+                      {t("thesis.rejected", "Rejected")}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -1660,6 +1846,89 @@ export default function TrajectoryStudentDetail() {
             >
               {deleteDocMutation.isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               {t("common.delete", "Delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin re-enrol to another trajectory */}
+      <Dialog
+        open={reenrollOpen}
+        onOpenChange={(open) => {
+          if (!open && !reenrollMutation.isPending) {
+            setReenrollOpen(false);
+            setReenrollTrajectoryId("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold">
+              {t(
+                "thesisManagement.attempt.reenrollTrajectory",
+                "Re-enrol trajectory"
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t(
+                  "thesisManagement.attempt.targetTrajectory",
+                  "Target trajectory"
+                )}
+              </label>
+              <Select
+                value={reenrollTrajectoryId}
+                onValueChange={setReenrollTrajectoryId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t(
+                      "thesisManagement.attempt.selectTrajectory",
+                      "Select a trajectory"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {reenrollTargets.map((traj) => (
+                    <SelectItem key={traj._id} value={String(traj._id)}>
+                      {traj.name || String(traj._id)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {reenrollTargets.length === 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.attempt.noOtherTrajectories",
+                    "No other trajectories available for this thesis."
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setReenrollOpen(false)}
+              disabled={reenrollMutation.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleReenrollSubmit}
+              disabled={reenrollMutation.isPending || !reenrollTrajectoryId}
+              className="gap-2"
+            >
+              {reenrollMutation.isPending && (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              )}
+              {t("thesisManagement.attempt.confirmReenroll", "Re-enrol")}
             </Button>
           </DialogFooter>
         </DialogContent>
