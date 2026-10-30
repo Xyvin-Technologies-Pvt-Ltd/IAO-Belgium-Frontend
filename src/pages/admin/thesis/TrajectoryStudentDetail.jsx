@@ -38,6 +38,7 @@ import { uploadFile } from "@/api/uploadApi";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import DocumentUploadArea from "@/components/common/DocumentUploadArea";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
+import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -231,6 +232,10 @@ export default function TrajectoryStudentDetail() {
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
   const allLogs = useMemo(() => detail?.logs || [], [detail?.logs]);
+  const personalNotes = useMemo(
+    () => detail?.personal_notes || detail?.notes || [],
+    [detail?.personal_notes, detail?.notes]
+  );
   const attempt = detail?.attempt;
   const attemptStatus = attempt?.status || "active";
   const failReasons = detail?.fail_reasons || [];
@@ -532,6 +537,33 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const getDeadlineModeBadge = (mode) => {
+    switch (mode) {
+      case "required":
+        return {
+          label: t("thesisManagement.steps.deadline.required", "Deadline Required"),
+          className: "bg-primary/15 text-primary border-primary/25 font-semibold",
+        };
+      case "optional":
+        return {
+          label: t("thesisManagement.steps.deadline.optional", "Deadline Optional"),
+          className: "bg-muted text-muted-foreground border-border font-medium",
+        };
+      case "event_date":
+      case "event":
+        return {
+          label: t("thesisManagement.steps.deadline.event", "Event Date"),
+          className: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 font-medium",
+        };
+      case "none":
+      default:
+        return {
+          label: t("thesisManagement.steps.deadline.none", "No Deadline"),
+          className: "bg-muted text-muted-foreground border-border font-medium",
+        };
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "locked":
@@ -798,15 +830,16 @@ export default function TrajectoryStudentDetail() {
                       <span className="font-medium px-2 py-0.5 rounded bg-muted">
                         {getStepTypeLabel(step.type)}
                       </span>
-                      {step.required ? (
-                        <span className="font-semibold px-2.5 py-0.5 rounded-full text-xs bg-primary/15 text-primary border border-primary/25">
-                          {t("thesis.required", "Required")}
-                        </span>
-                      ) : (
-                        <span className="font-medium px-2.5 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
-                          {t("thesis.optional", "Optional")}
-                        </span>
-                      )}
+                      {(() => {
+                        const dm = getDeadlineModeBadge(step.deadline_mode);
+                        return (
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-xs border ${dm.className}`}
+                          >
+                            {dm.label}
+                          </span>
+                        );
+                      })()}
                       {step.type === "document_upload" && step.student_uploads_document === false && (
                         <span className="font-medium px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                           {t("thesis.staffUploadOnly", "Staff upload only")}
@@ -896,6 +929,54 @@ export default function TrajectoryStudentDetail() {
                           >
                             {res.label || res.url}
                           </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {step.attachments && step.attachments.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
+                        {t("thesis.documents", "Documents")}
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {step.attachments.map((att, aIdx) => (
+                          <div
+                            key={att.file_url || aIdx}
+                            className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card/60 hover:bg-muted/30 transition-colors gap-2"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <FileText className="w-4 h-4 text-primary shrink-0" />
+                              <span
+                                className="text-xs font-medium text-foreground truncate"
+                                title={att.name}
+                              >
+                                {att.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs gap-1 cursor-pointer"
+                                onClick={() => openSecureFile(att.file_url, att.name)}
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                {t("common.view", "View")}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2 text-xs gap-1 cursor-pointer"
+                                onClick={() => downloadSecureFile(att.file_url, att.name)}
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                {t("common.download", "Download")}
+                              </Button>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1098,9 +1179,9 @@ export default function TrajectoryStudentDetail() {
                               {t("thesis.approved", "Approved")}
                             </span>
                           )}
-                          {step.approval_request?.status === "changes_requested" && (
+                          {step.approval_request?.status === "rejected" && (
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-                              {t("thesis.changesRequested", "Changes Requested")}
+                              {t("thesis.rejected", "Rejected")}
                             </span>
                           )}
                           {canModify && (
@@ -1173,6 +1254,15 @@ export default function TrajectoryStudentDetail() {
             </Select>
           </div>
         </div>
+
+        {/* Student Personal Notes Card */}
+        <StudentPersonalNotesCard
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          userId={userId}
+          notes={personalNotes}
+          canModify={canModify}
+        />
 
         {/* Activity Log Card (Timeline View) */}
         <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-4">
@@ -1360,8 +1450,8 @@ export default function TrajectoryStudentDetail() {
                     <SelectItem value="pending" className="text-xs">
                       {t("thesis.pendingApproval", "Pending Review")}
                     </SelectItem>
-                    <SelectItem value="changes_requested" className="text-xs">
-                      {t("thesis.changesRequested", "Changes Requested")}
+                    <SelectItem value="rejected" className="text-xs">
+                      {t("thesis.rejected", "Rejected")}
                     </SelectItem>
                   </SelectContent>
                 </Select>

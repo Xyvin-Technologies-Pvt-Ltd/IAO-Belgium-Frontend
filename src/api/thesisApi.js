@@ -47,9 +47,9 @@ export const updateThesisStatus = async (id, status) => {
   }
 };
 
-export const getThesisRoles = async () => {
+export const getThesisRoles = async (params = {}) => {
   try {
-    const response = await axiosInstance.get(`/thesis/roles`);
+    const response = await axiosInstance.get(`/thesis/roles`, { params });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -65,11 +65,62 @@ export const createThesisRole = async (data) => {
   }
 };
 
+export const getThesisRoleById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/thesis/roles/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateThesisRole = async (id, data) => {
+  try {
+    const response = await axiosInstance.patch(`/thesis/roles/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const deleteThesisRole = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/thesis/roles/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getThesisTeachers = async (thesisId, filter = {}) => {
   try {
     const response = await axiosInstance.get(`/thesis/${thesisId}/teachers`, {
       params: filter,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const createExternalThesisTeacher = async (thesisId, data) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/teachers/external`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateExternalThesisTeacher = async (thesisId, assignmentId, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/teachers/${assignmentId}/external`,
+      data
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -375,4 +426,33 @@ export const saveTeacherThesisContactCard = async (data) => {
     throw error.response?.data || error;
   }
 };
+
+export const getStudentPersonalNotes = async (thesisId, trajectoryId, userId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/notes`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const createStudentPersonalNote = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/notes`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 

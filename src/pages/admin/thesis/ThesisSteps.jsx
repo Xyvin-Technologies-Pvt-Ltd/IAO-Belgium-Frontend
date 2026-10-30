@@ -165,10 +165,15 @@ const ThesisSteps = () => {
         required: s.required !== undefined ? s.required : true,
         student_uploads_document: Boolean(s.student_uploads_document),
         locked_until_supervisor: Boolean(s.locked_until_supervisor),
+        approval_roles: Array.isArray(s.approval_roles) ? s.approval_roles : [],
         instruction: s.instruction || "",
         resources: (s.resources || []).map((r) => ({
           label: r.label,
           url: r.url,
+        })),
+        attachments: (s.attachments || []).map((a) => ({
+          name: a.name,
+          file_url: a.file_url,
         })),
         sequence: s.sequence,
       };

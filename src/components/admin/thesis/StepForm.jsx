@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,9 +17,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import RichTextEditor from "@/components/ui/RichTextEditor";
-import { Plus, Trash2, Link as LinkIcon, AlertCircle } from "lucide-react";
+import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
+import {
+  Plus,
+  Trash2,
+  Link as LinkIcon,
+  AlertCircle,
+  Upload,
+  Eye,
+  FileText,
+  Loader2,
+  Paperclip,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+import { useGetThesisRoles } from "@/store/useThesisStore";
+import { uploadFile } from "@/api/uploadApi";
+import { openSecureFile } from "@/utils/secureFile";
+import { toast } from "sonner";
 
 const URL_PATTERN = /^https?:\/\/.+/i;
 
@@ -39,6 +53,14 @@ const DEADLINE_MODES = [
 const StepForm = ({ open, onClose, onSave, initialData }) => {
   const { t } = useTranslation();
 
+  const { data: rolesResponse, isLoading: isRolesLoading } = useGetThesisRoles({
+    status: true,
+  });
+  const availableRoles = useMemo(() => {
+    const list = rolesResponse?.data || [];
+    return Array.isArray(list) ? list : [];
+  }, [rolesResponse?.data]);
+
   const [name, setName] = useState("");
   const [type, setType] = useState("document_upload");
   const [deadlineMode, setDeadlineMode] = useState("none");
@@ -47,6 +69,11 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
   const [lockedUntilSupervisor, setLockedUntilSupervisor] = useState(false);
   const [instruction, setInstruction] = useState("");
   const [resources, setResources] = useState([]);
+  const [attachments, setAttachments] = useState([]);
+  const [pendingFile, setPendingFile] = useState(null);
+  const [newDocName, setNewDocName] = useState("");
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -72,6 +99,30 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
             }))
           : []
       );
+      setAttachments(
+        Array.isArray(initialData.attachments) && initialData.attachments.length > 0
+          ? initialData.attachments.map((a) => ({
+              name: a.name || "",
+              file_url: a.file_url || "",
+            }))
+          : []
+      );
+      setPendingFile(null);
+      setNewDocName("");
+      const rawRoles = Array.isArray(initialData.approval_roles)
+        ? initialData.approval_roles
+        : [];
+      const roleIds = rawRoles.map((r) =>
+        typeof r === "object" && r?._id ? r._id : String(r)
+      );
+      const matched = availableRoles.filter((r) => roleIds.includes(String(r._id)));
+      if (matched.length > 0) {
+        setSelectedRoles(matched);
+      } else if (rawRoles.length > 0 && typeof rawRoles[0] === "object") {
+        setSelectedRoles(rawRoles);
+      } else {
+        setSelectedRoles(roleIds.map((id) => ({ _id: id, name: id })));
+      }
     } else {
       setName("");
       setType("document_upload");
@@ -81,9 +132,25 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       setLockedUntilSupervisor(false);
       setInstruction("");
       setResources([]);
+      setAttachments([]);
+      setPendingFile(null);
+      setNewDocName("");
+      setSelectedRoles([]);
     }
     setErrors({});
-  }, [initialData, open]);
+  }, [initialData, open, availableRoles]);
+
+  // Synchronize role display names if availableRoles finishes loading after initialData
+  useEffect(() => {
+    if (availableRoles.length > 0 && selectedRoles.length > 0) {
+      setSelectedRoles((prev) =>
+        prev.map((sel) => {
+          const match = availableRoles.find((r) => String(r._id) === String(sel._id));
+          return match ? match : sel;
+        })
+      );
+    }
+  }, [availableRoles]);
 
   const handleAddResource = () => {
     setResources((prev) => [...prev, { label: "", url: "" }]);
@@ -97,6 +164,59 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
 
   const handleRemoveResource = (index) => {
     setResources((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileChosen = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPendingFile(file);
+      if (!newDocName.trim()) {
+        const baseName = file.name.replace(/\.[^/.]+$/, "");
+        setNewDocName(baseName);
+      }
+    }
+  };
+
+  const handleAddDocument = async () => {
+    if (!pendingFile) return;
+    const docName = newDocName.trim() || pendingFile.name;
+    setIsUploadingAttachment(true);
+    try {
+      const res = await uploadFile(pendingFile);
+      const fileUrl =
+        res?.data?.url || res?.url || res?.data?.file_url || res?.file_url;
+      if (!fileUrl) {
+        throw new Error("File URL not returned from server");
+      }
+      const newAttachment = {
+        name: docName,
+        file_url: fileUrl,
+      };
+      setAttachments((prev) => [...prev, newAttachment]);
+      setPendingFile(null);
+      setNewDocName("");
+      toast.success(
+        t("thesisManagement.modal.uploadSuccess", "Document added successfully")
+      );
+    } catch (err) {
+      console.error("Failed to upload document", err);
+      toast.error(
+        err?.message ||
+          t("thesisManagement.modal.uploadFailed", "Failed to upload file")
+      );
+    } finally {
+      setIsUploadingAttachment(false);
+    }
+  };
+
+  const handleUpdateDocName = (index, value) => {
+    setAttachments((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, name: value } : item))
+    );
+  };
+
+  const handleRemoveAttachment = (indexToRemove) => {
+    setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const validate = () => {
@@ -139,6 +259,10 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       .map((r) => ({ label: r.label.trim(), url: r.url.trim() }))
       .filter((r) => r.label && r.url);
 
+    const validAttachments = attachments
+      .map((a) => ({ name: a.name.trim(), file_url: a.file_url.trim() }))
+      .filter((a) => a.name && a.file_url);
+
     const stepPayload = {
       ...(initialData?._id ? { _id: initialData._id } : {}),
       name: name.trim(),
@@ -148,8 +272,11 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
       required,
       student_uploads_document: studentUploadsDocument,
       locked_until_supervisor: lockedUntilSupervisor,
+      approval_roles:
+        type === "teacher_approval" ? selectedRoles.map((r) => r._id) : [],
       instruction,
       resources: validResources,
+      attachments: validAttachments,
       sequence: initialData?.sequence || 0,
     };
 
@@ -164,7 +291,7 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full sm:max-w-2xl max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {initialData
@@ -232,6 +359,25 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Teacher Select for teacher_approval */}
+          {type === "teacher_approval" && (
+            <SearchableMultiSelect
+              label={t("thesisManagement.steps.form.teacherSelect", "Teacher Select")}
+              placeholder={t(
+                "thesisManagement.steps.form.selectTeacherRolesPlaceholder",
+                "Select teacher roles..."
+              )}
+              searchPlaceholder={t(
+                "thesisManagement.steps.form.searchRolesPlaceholder",
+                "Search roles..."
+              )}
+              items={availableRoles}
+              selected={selectedRoles}
+              onChange={setSelectedRoles}
+              isLoading={isRolesLoading}
+            />
+          )}
 
           {/* Deadlines Section */}
           <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
@@ -393,6 +539,132 @@ const StepForm = ({ open, onClose, onSave, initialData }) => {
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Step Attachments (Documents) */}
+          <div className="space-y-3 pt-2 border-t border-border/50">
+            <div>
+              <Label className="text-sm font-medium">
+                {t(
+                  "thesisManagement.steps.form.attachmentsLabel",
+                  "Step Files & Templates"
+                )}
+              </Label>
+            </div>
+
+            {/* Upload Control Box */}
+            <div className="p-3 bg-muted/20 border border-border/60 rounded-lg space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-foreground">
+                    {t(
+                      "thesisManagement.steps.form.docNameLabel",
+                      "Document Name"
+                    )}
+                  </Label>
+                  <Input
+                    placeholder={t(
+                      "thesisManagement.steps.form.docNamePlaceholder",
+                      "e.g. Thesis Guidelines"
+                    )}
+                    value={newDocName}
+                    onChange={(e) => setNewDocName(e.target.value)}
+                    disabled={isUploadingAttachment}
+                    className="h-9 text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-medium text-foreground">
+                    {t("thesisManagement.modal.selectFileLabel", "File")}
+                  </Label>
+                  <div className="flex gap-2">
+                    <label className="flex-1 flex items-center justify-between px-3 h-9 rounded-md border border-input bg-background hover:bg-muted text-xs cursor-pointer truncate">
+                      <span className="truncate text-muted-foreground">
+                        {pendingFile
+                          ? pendingFile.name
+                          : t(
+                              "thesisManagement.steps.form.chooseFile",
+                              "Choose file..."
+                            )}
+                      </span>
+                      <Upload className="w-3.5 h-3.5 text-primary shrink-0 ml-1.5" />
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileChosen}
+                        disabled={isUploadingAttachment}
+                      />
+                    </label>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAddDocument}
+                      disabled={!pendingFile || isUploadingAttachment}
+                      className="h-9 px-3 shrink-0 cursor-pointer"
+                    >
+                      {isUploadingAttachment ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        t("common.add", "Add")
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Attached Files List */}
+            {attachments.length > 0 && (
+              <div className="space-y-2 pt-1 max-h-56 overflow-y-auto pr-1">
+                {attachments.map((file, idx) => (
+                  <div
+                    key={file.file_url || idx}
+                    className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card/60 hover:bg-muted/40 transition-colors gap-2"
+                  >
+                    <div className="p-1.5 rounded-md bg-primary/10 text-primary shrink-0">
+                      <FileText className="w-4 h-4" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <Input
+                        value={file.name ?? ""}
+                        onChange={(e) => handleUpdateDocName(idx, e.target.value)}
+                        placeholder={t(
+                          "thesisManagement.steps.form.docNameLabel",
+                          "Document Name"
+                        )}
+                        className="h-8 text-xs sm:text-sm font-medium"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                        title={t("common.view", "View")}
+                        onClick={() => openSecureFile(file.file_url, file.name)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
+                        title={t("common.delete", "Delete")}
+                        onClick={() => handleRemoveAttachment(idx)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -6,8 +6,12 @@ import {
   updateThesisStatus,
   getThesisRoles,
   createThesisRole,
+  updateThesisRole,
+  deleteThesisRole,
   getThesisTeachers,
   assignThesisTeacher,
+  createExternalThesisTeacher,
+  updateExternalThesisTeacher,
   updateThesisTeacherRole,
   removeThesisTeacher,
   getThesisSteps,
@@ -27,7 +31,10 @@ import {
   uploadStaffThesisDocument,
   renameStaffThesisDocument,
   deleteStaffThesisDocument,
+  createStudentPersonalNote,
+  getStudentPersonalNotes,
 } from "@/api/thesisApi";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -99,10 +106,10 @@ export const useUpdateThesisStatus = () => {
   });
 };
 
-export const useGetThesisRoles = (options = {}) => {
+export const useGetThesisRoles = (params = {}, options = {}) => {
   return useQuery({
-    queryKey: ["thesis-roles"],
-    queryFn: () => getThesisRoles(),
+    queryKey: ["thesis-roles", params],
+    queryFn: () => getThesisRoles(params),
     staleTime: 60000,
     ...options,
   });
@@ -124,6 +131,38 @@ export const useCreateThesisRole = () => {
   });
 };
 
+export const useUpdateThesisRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...data }) => updateThesisRole(id, data),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["thesis-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["thesis-teachers"] });
+      toast.success(response?.message || "Role updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update role");
+    },
+  });
+};
+
+export const useDeleteThesisRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => deleteThesisRole(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["thesis-roles"] });
+      queryClient.invalidateQueries({ queryKey: ["thesis-teachers"] });
+      toast.success(response?.message || "Role deactivated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to deactivate role");
+    },
+  });
+};
+
 export const useGetThesisTeachers = (thesisId, filter = {}, options = {}) => {
   return useQuery({
     queryKey: ["thesis-teachers", thesisId, filter],
@@ -139,8 +178,11 @@ export const useAssignThesisTeacher = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ thesisId, teacherId }) =>
-      assignThesisTeacher(thesisId, { teacher: teacherId }),
+    mutationFn: ({ thesisId, teacherId, teacherIds }) =>
+      assignThesisTeacher(thesisId, {
+        ...(teacherIds ? { teachers: teacherIds } : {}),
+        ...(teacherId ? { teacher: teacherId } : {}),
+      }),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["thesis-teachers", variables.thesisId],
@@ -149,6 +191,42 @@ export const useAssignThesisTeacher = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to assign teacher");
+    },
+  });
+};
+
+export const useCreateExternalThesisTeacher = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ thesisId, ...data }) =>
+      createExternalThesisTeacher(thesisId, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-teachers", variables.thesisId],
+      });
+      toast.success(response?.message || "External teacher added successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add external teacher");
+    },
+  });
+};
+
+export const useUpdateExternalThesisTeacher = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ thesisId, assignmentId, ...data }) =>
+      updateExternalThesisTeacher(thesisId, assignmentId, data),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-teachers", variables.thesisId],
+      });
+      toast.success(response?.message || "External teacher updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update external teacher");
     },
   });
 };
@@ -535,6 +613,38 @@ export const useDeleteStaffThesisDocument = () => {
     },
   });
 };
+
+export const useGetStudentPersonalNotes = (thesisId, trajectoryId, userId, options = {}) => {
+  return useQuery({
+    queryKey: ["thesis-student-personal-notes", thesisId, trajectoryId, userId],
+    queryFn: () => getStudentPersonalNotes(thesisId, trajectoryId, userId),
+    enabled: !!(thesisId && trajectoryId && userId),
+    ...options,
+  });
+};
+
+export const useCreateStudentPersonalNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, note }) =>
+      createStudentPersonalNote(thesisId, trajectoryId, userId, { note }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success("Note added successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add note");
+    },
+  });
+};
+
 
 
 

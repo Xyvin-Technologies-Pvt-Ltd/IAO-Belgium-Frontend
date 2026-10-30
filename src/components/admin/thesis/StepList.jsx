@@ -29,9 +29,10 @@ import {
   Plus,
   Lock,
   Upload,
+  Users,
+  Paperclip,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
 
 const SortableStepItem = ({
   step,
@@ -102,6 +103,14 @@ const SortableStepItem = ({
     };
   }, [step.deadline_mode, t]);
 
+  const approvalRolesText = useMemo(() => {
+    if (step.type !== "teacher_approval") return null;
+    if (Array.isArray(step.approval_roles) && step.approval_roles.length > 0) {
+      return step.approval_roles.map((r) => r.name || r.key || r).join(", ");
+    }
+    return null;
+  }, [step.type, step.approval_roles]);
+
   return (
     <div
       ref={setNodeRef}
@@ -143,6 +152,26 @@ const SortableStepItem = ({
             <TypeIcon className="w-3 h-3" />
             {typeConfig.label}
           </span>
+
+          {step.type === "teacher_approval" && (
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                approvalRolesText
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20"
+              }`}
+              title={
+                approvalRolesText ||
+                t("thesisManagement.steps.noRolesAssigned", "No roles configured")
+              }
+            >
+              <Users className="w-3 h-3" />
+              <span className="max-w-[160px] truncate">
+                {approvalRolesText ||
+                  t("thesisManagement.steps.noRolesAssigned", "No roles configured")}
+              </span>
+            </span>
+          )}
         </div>
       </div>
 
@@ -194,6 +223,19 @@ const SortableStepItem = ({
           >
             <LinkIcon className="w-3 h-3 text-primary" />
             <span>{step.resources.length}</span>
+          </span>
+        )}
+
+        {/* Attachments indicator */}
+        {Array.isArray(step.attachments) && step.attachments.length > 0 && (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border"
+            title={t("thesisManagement.steps.tags.attachmentsCount", "{{count}} file(s)", {
+              count: step.attachments.length,
+            })}
+          >
+            <Paperclip className="w-3 h-3 text-primary" />
+            <span>{step.attachments.length}</span>
           </span>
         )}
 

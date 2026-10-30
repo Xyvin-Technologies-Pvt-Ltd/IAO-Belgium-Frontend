@@ -189,7 +189,9 @@ const ThesesList = () => {
                     <span className="font-medium text-foreground">{i?.name}</span>
                     {i?.current_year && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 shrink-0">
-                        Year {i.current_year}
+                        {Array.isArray(i.current_year)
+                          ? `Year ${i.current_year.join(", ")}`
+                          : `Year ${i.current_year}`}
                       </span>
                     )}
                   </div>

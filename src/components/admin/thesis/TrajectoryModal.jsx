@@ -27,6 +27,7 @@ const TrajectoryModal = ({ open, onClose, thesisId, initialData }) => {
 
   const isPending = createTrajectory.isPending || updateTrajectory.isPending;
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || "");
@@ -41,14 +42,12 @@ const TrajectoryModal = ({ open, onClose, thesisId, initialData }) => {
     }
     setErrors({});
   }, [initialData, open]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const validate = () => {
     const errs = {};
     if (!name.trim()) {
       errs.name = t("thesisManagement.trajectories.nameRequired", "Trajectory name is required");
-    }
-    if (!startDate) {
-      errs.startDate = t("thesisManagement.trajectories.startDateRequired", "Start date is required");
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -60,7 +59,7 @@ const TrajectoryModal = ({ open, onClose, thesisId, initialData }) => {
 
     const payload = {
       name: name.trim(),
-      start_date: new Date(startDate).toISOString(),
+      start_date: startDate ? new Date(startDate).toISOString() : null,
     };
 
     try {
@@ -126,8 +125,7 @@ const TrajectoryModal = ({ open, onClose, thesisId, initialData }) => {
           {/* Start Date */}
           <div className="space-y-1.5">
             <Label htmlFor="trajectory-start-date">
-              {t("thesisManagement.trajectories.startDate", "Start Date")}{" "}
-              <span className="text-destructive">*</span>
+              {t("thesisManagement.trajectories.startDate", "Start Date")}
             </Label>
             <Input
               id="trajectory-start-date"

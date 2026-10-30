@@ -3,6 +3,7 @@ import { useParams } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
   Plus,
+  Pencil,
   Search,
   Trash2,
   UserPlus,
@@ -25,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Pagination } from "@/components/ui/table/Pagination";
+import { Badge } from "@/components/ui/badge";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   useGetThesisById,
@@ -33,8 +35,9 @@ import {
   useUpdateThesisTeacherRole,
   useRemoveThesisTeacher,
 } from "@/store/useThesisStore";
-import AddThesisRoleModal from "@/components/admin/thesis/AddThesisRoleModal";
+import ManageThesisRolesModal from "@/components/admin/thesis/ManageThesisRolesModal";
 import AssignThesisTeacherModal from "@/components/admin/thesis/AssignThesisTeacherModal";
+import EditExternalTeacherModal from "@/components/admin/thesis/EditExternalTeacherModal";
 import RemoveThesisTeacherConfirm from "@/components/admin/thesis/RemoveThesisTeacherConfirm";
 
 const ThesisTeachers = () => {
@@ -47,15 +50,17 @@ const ThesisTeachers = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [openAddRole, setOpenAddRole] = useState(false);
+  const [teacherType, setTeacherType] = useState("all");
+  const [openManageRoles, setOpenManageRoles] = useState(false);
   const [openAssignTeacher, setOpenAssignTeacher] = useState(false);
+  const [teacherToEdit, setTeacherToEdit] = useState(null);
   const [teacherToRemove, setTeacherToRemove] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, teacherType]);
 
   // Queries
   const {
@@ -82,6 +87,7 @@ const ThesisTeachers = () => {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(teacherType !== "all" ? { teacher_type: teacherType } : {}),
   });
 
   // Mutations
@@ -93,13 +99,14 @@ const ThesisTeachers = () => {
     const rawRoles = rolesResponse?.data || [];
     const seen = new Set();
     return rawRoles.filter((r) => {
+      if (r.status === false) return false;
       const key = r.key || r.name;
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
     });
   }, [rolesResponse?.data]);
-  const assignments = teachersResponse?.data || [];
+  const assignments = useMemo(() => teachersResponse?.data || [], [teachersResponse?.data]);
   const totalRows = teachersResponse?.total_count || 0;
 
   // Breadcrumbs
@@ -199,18 +206,18 @@ const ThesisTeachers = () => {
           {canModify && (
             <div className="flex items-center gap-2 self-start md:self-center flex-wrap">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                onClick={() => setOpenAddRole(true)}
-                className="gap-1.5"
+                onClick={() => setOpenManageRoles(true)}
+                className="gap-1.5 shadow-2xs"
               >
-                <Plus className="h-4 w-4" />
-                {t("thesisManagement.teachers.addRole", "Add Role")}
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                {t("thesisManagement.teachers.manageRoles", "Manage Roles")}
               </Button>
               <Button
                 size="sm"
                 onClick={() => setOpenAssignTeacher(true)}
-                className="gap-1.5"
+                className="gap-1.5 shadow-2xs"
               >
                 <UserPlus className="h-4 w-4" />
                 {t("thesisManagement.teachers.assignTeacher", "Assign Teacher")}
@@ -220,7 +227,7 @@ const ThesisTeachers = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
+      {/* Search Bar & Type Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative max-w-sm w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -233,6 +240,33 @@ const ThesisTeachers = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
+        </div>
+
+        {/* Type Filter Tabs */}
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg text-xs font-medium self-start sm:self-center">
+          {[
+            { key: "all", label: t("common.all", "All") },
+            {
+              key: "internal",
+              label: t("thesisManagement.teachers.internal", "Internal"),
+            },
+            {
+              key: "external",
+              label: t("thesisManagement.teachers.external", "External"),
+            },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setTeacherType(tab.key)}
+              className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${teacherType === tab.key
+                  ? "bg-background text-foreground shadow-xs font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -272,7 +306,7 @@ const ThesisTeachers = () => {
               <Button
                 size="sm"
                 onClick={() => setOpenAssignTeacher(true)}
-                className="gap-1.5"
+                className="gap-1.5 shadow-2xs"
               >
                 <UserPlus className="h-4 w-4" />
                 {t("thesisManagement.teachers.assignTeacher", "Assign Teacher")}
@@ -327,9 +361,14 @@ const ThesisTeachers = () => {
                 }
               >
                 {assignments.map((assignment) => {
+                  const isExternal = assignment.teacher_type === "external";
                   const teacher = assignment.teacher;
-                  const fullName =
-                    `${teacher?.first_name || ""} ${teacher?.last_name || ""}`.trim() ||
+                  const extProfile = assignment.external_profile;
+                  const fullName = isExternal
+                    ? `${extProfile?.first_name || ""} ${extProfile?.last_name || ""}`.trim() ||
+                    extProfile?.email ||
+                    t("thesisManagement.teachers.external", "External Teacher")
+                    : `${teacher?.first_name || ""} ${teacher?.last_name || ""}`.trim() ||
                     teacher?.email ||
                     "-";
 
@@ -337,12 +376,29 @@ const ThesisTeachers = () => {
                     <TableRow key={assignment._id} className="hover:bg-muted/40">
                       {/* Teacher info */}
                       <TableCell className="font-medium text-sm text-foreground">
-                        {fullName}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span>{fullName}</span>
+                          {isExternal ? (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 font-normal"
+                            >
+                              {t("thesisManagement.teachers.external", "External")}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0 font-normal text-muted-foreground"
+                            >
+                              {t("thesisManagement.teachers.internal", "Internal")}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
 
                       {/* Email */}
                       <TableCell className="text-sm text-muted-foreground">
-                        {teacher?.email || "-"}
+                        {isExternal ? extProfile?.email || "-" : teacher?.email || "-"}
                       </TableCell>
 
                       {/* One switch column + one count column per role */}
@@ -389,21 +445,37 @@ const ThesisTeachers = () => {
                         );
                       })}
 
-                      {/* Remove Action */}
+                      {/* Actions */}
                       {canModify && (
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setTeacherToRemove(assignment)}
-                            className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                            title={t(
-                              "thesisManagement.teachers.removeTooltip",
-                              "Remove teacher from thesis"
+                          <div className="flex items-center justify-end gap-1">
+                            {isExternal && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setTeacherToEdit(assignment)}
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                title={t(
+                                  "thesisManagement.teachers.editExternalTooltip",
+                                  "Edit external teacher details"
+                                )}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
                             )}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setTeacherToRemove(assignment)}
+                              className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                              title={t(
+                                "thesisManagement.teachers.removeTooltip",
+                                "Remove teacher from thesis"
+                              )}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       )}
                     </TableRow>
@@ -426,10 +498,10 @@ const ThesisTeachers = () => {
         />
       )}
 
-      {/* Add Role Modal */}
-      <AddThesisRoleModal
-        open={openAddRole}
-        onClose={() => setOpenAddRole(false)}
+      {/* Manage Roles Modal */}
+      <ManageThesisRolesModal
+        open={openManageRoles}
+        onClose={() => setOpenManageRoles(false)}
       />
 
       {/* Assign Teacher Modal */}
@@ -440,6 +512,16 @@ const ThesisTeachers = () => {
         assignedTeacherIds={activeTeacherIds}
       />
 
+      {/* Edit External Teacher Modal */}
+      {teacherToEdit && (
+        <EditExternalTeacherModal
+          open={!!teacherToEdit}
+          onClose={() => setTeacherToEdit(null)}
+          thesisId={id}
+          assignment={teacherToEdit}
+        />
+      )}
+
       {/* Remove Confirmation Dialog */}
       <RemoveThesisTeacherConfirm
         open={!!teacherToRemove}
@@ -447,7 +529,11 @@ const ThesisTeachers = () => {
         onConfirm={handleConfirmRemove}
         teacherName={
           teacherToRemove
-            ? `${teacherToRemove.teacher?.first_name || ""} ${teacherToRemove.teacher?.last_name || ""}`.trim() ||
+            ? teacherToRemove.teacher_type === "external"
+              ? `${teacherToRemove.external_profile?.first_name || ""} ${teacherToRemove.external_profile?.last_name || ""}`.trim() ||
+              teacherToRemove.external_profile?.email ||
+              "External Teacher"
+              : `${teacherToRemove.teacher?.first_name || ""} ${teacherToRemove.teacher?.last_name || ""}`.trim() ||
               teacherToRemove.teacher?.email
             : ""
         }
