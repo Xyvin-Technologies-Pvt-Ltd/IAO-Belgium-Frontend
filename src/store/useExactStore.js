@@ -12,7 +12,12 @@ import {
   disconnectExact,
   getExactReconciliation,
   verifyExactReconciliation,
-  resyncExactReconciliationRow,
+  getExactSendMode,
+  setExactSendMode,
+  getExactToSend,
+  getExactToSendPreview,
+  sendExactJob,
+  getExactDocumentTypes,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -163,33 +168,72 @@ export const useStartMollieRefBackfill = () => {
   });
 };
 
-/**
- * Single-row conversion: reverse the old bare Sales Entry and repost it as a
- * real Sales Invoice + Document. No bulk variant — the accountant reviews and
- * clicks one row at a time, then watches it flip from Entry to Invoice.
- */
-export const useResyncExactReconciliationRow = () => {
+// ─── Manual / automatic sending (Sales Entries) ──────────────────────────────
+
+export const useGetExactSendMode = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-send-mode"],
+    queryFn: getExactSendMode,
+    staleTime: 15000,
+    ...options,
+  });
+
+export const useSetExactSendMode = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: resyncExactReconciliationRow,
+    mutationFn: setExactSendMode,
     onSuccess: (res) => {
-      const data = res?.data || {};
-      if (data.skipped) {
-        toast.info(res?.message || "Row already has an Exact invoice");
-      } else {
-        toast.success(
-          data.invoice_number
-            ? `Converted — Exact invoice ${data.invoice_number} created`
-            : res?.message || "Converted to a Sales Invoice with a document",
-        );
-      }
-      queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
-      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+      toast.success(res?.message || "Send mode saved");
+      queryClient.invalidateQueries({ queryKey: ["exact-send-mode"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
     },
-    onError: (err) =>
-      toast.error(err?.message || "Failed to convert this row to an invoice"),
+    onError: (err) => toast.error(err?.message || "Failed to change the send mode"),
   });
 };
+
+/** Held, failed and in-progress Exact jobs. Polls while anything is sending. */
+export const useGetExactToSend = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-to-send", params],
+    queryFn: () => getExactToSend(params),
+    staleTime: 5000,
+    refetchInterval: (query) => (query.state.data?.counts?.sending ? 4000 : false),
+    ...options,
+  });
+
+export const useGetExactToSendPreview = (jobId, options = {}) =>
+  useQuery({
+    queryKey: ["exact-to-send-preview", jobId],
+    queryFn: () => getExactToSendPreview(jobId),
+    enabled: Boolean(jobId),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    ...options,
+  });
+
+export const useSendExactJob = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendExactJob,
+    onSuccess: () => {
+      //* The worker posts asynchronously; refresh now and again shortly after.
+      const refresh = () => {
+        queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+      };
+      refresh();
+      setTimeout(refresh, 6000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send this record to Exact"),
+  });
+};
+
+/** Read-only PDF permission check; the caller shows the result. */
+export const useCheckExactDocumentTypes = () =>
+  useMutation({ mutationFn: getExactDocumentTypes });
 
 export const useDisconnectExact = () => {
   const queryClient = useQueryClient();
