@@ -65,7 +65,13 @@ const formatProgramOption = (p) => {
   return details ? `${p.name} - ${details}` : p.name;
 };
 
-const CreateThesis = ({ open, onClose, thesisData }) => {
+const CreateThesis = ({
+  open,
+  onClose,
+  thesisData,
+  thesisType = "do",
+  basePath = "/admin/thesis",
+}) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isEdit = !!thesisData;
@@ -482,6 +488,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
 
     if (!isEdit) {
       payload.status = formData.status ?? true;
+      payload.type = thesisType === "master" ? "master" : "do";
     }
 
     if (isEdit) {
@@ -499,7 +506,7 @@ const CreateThesis = ({ open, onClose, thesisData }) => {
           handleClose();
           if (response?.data?._id) {
             navigate({
-              to: "/admin/thesis/$id",
+              to: `${basePath}/$id`,
               params: { id: response.data._id },
             });
           }

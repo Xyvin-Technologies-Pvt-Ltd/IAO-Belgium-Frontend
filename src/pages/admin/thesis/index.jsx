@@ -23,11 +23,13 @@ import { useGetTheses, useUpdateThesisStatus } from "@/store/useThesisStore";
 import CreateThesis from "@/components/admin/thesis/CreateThesis";
 import DeactivateThesisConfirm from "@/components/admin/thesis/DeactivateThesisConfirm";
 import ThesesFilterDrawer from "@/components/admin/thesis/ThesesFilterDrawer";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesesList = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const canModify = useCanModify("operations");
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -56,6 +58,7 @@ const ThesesList = () => {
   const { data, isLoading, error, refetch, isFetching } = useGetTheses({
     page,
     limit: rowsPerPage,
+    type: thesisType,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(appliedFilters.academic !== "all"
       ? { academic: appliedFilters.academic }
@@ -107,7 +110,7 @@ const ThesesList = () => {
 
   const handleRowClick = (id) => {
     navigate({
-      to: "/admin/thesis/$id",
+      to: `${basePath}/$id`,
       params: { id },
     });
   };
@@ -116,7 +119,9 @@ const ThesesList = () => {
     <div className="space-y-6 mt-4">
       {/* Title */}
       <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
-        {t("thesisManagement.title", "Thesis Catalog")}
+        {t("thesisManagement.titleNamed", "{{kind}} Catalog", {
+          kind: kindLabel,
+        })}
       </h2>
 
       {/* Top Bar: Search, Filters & Action Buttons */}
@@ -305,6 +310,8 @@ const ThesesList = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         thesisData={selectedThesis}
+        thesisType={thesisType}
+        basePath={basePath}
       />
 
       {/* Deactivate Confirmation Dialog */}

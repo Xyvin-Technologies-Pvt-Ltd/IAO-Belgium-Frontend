@@ -39,13 +39,15 @@ import ManageThesisRolesModal from "@/components/admin/thesis/ManageThesisRolesM
 import AssignThesisTeacherModal from "@/components/admin/thesis/AssignThesisTeacherModal";
 import EditExternalTeacherModal from "@/components/admin/thesis/EditExternalTeacherModal";
 import RemoveThesisTeacherConfirm from "@/components/admin/thesis/RemoveThesisTeacherConfirm";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisTeachers = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
-  const canModify = useCanModify("operations");
   const { updateBreadcrumbs } = useBreadcrumb();
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -68,7 +70,7 @@ const ThesisTeachers = () => {
     isLoading: isThesisLoading,
     error: thesisError,
     refetch: refetchThesis,
-  } = useGetThesisById(id);
+  } = useGetThesisById(id, { type: thesisType });
 
   const {
     data: rolesResponse,
@@ -114,18 +116,18 @@ const ThesisTeachers = () => {
     if (thesis) {
       updateBreadcrumbs([
         {
-          label: t("sidebar.admin.thesis", "Thesis"),
-          path: "/admin/thesis",
+          label: kindLabel,
+          path: basePath,
           navigable: true,
         },
         {
           label: thesis.name || t("thesisManagement.detail.title", "Thesis Details"),
-          path: `/admin/thesis/${id}`,
+          path: `${basePath}/${id}`,
           navigable: true,
         },
         {
           label: t("thesisManagement.teachers.title", "Teachers"),
-          path: `/admin/thesis/${id}/teachers`,
+          path: `${basePath}/${id}/teachers`,
           navigable: false,
         },
       ]);
@@ -133,7 +135,7 @@ const ThesisTeachers = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [thesis, id, updateBreadcrumbs, t]);
+  }, [thesis, id, updateBreadcrumbs, t, basePath, kindLabel]);
 
   const activeTeacherIds = useMemo(() => {
     return assignments

@@ -21,13 +21,15 @@ import {
 import StepList from "@/components/admin/thesis/StepList";
 import StepForm from "@/components/admin/thesis/StepForm";
 import DeleteConfirm from "@/components/DeleteConfirm";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisSteps = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
   const id = params.id;
-  const canModify = useCanModify("operations");
   const { updateBreadcrumbs } = useBreadcrumb();
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   // Queries
   const {
@@ -35,7 +37,7 @@ const ThesisSteps = () => {
     isLoading: isThesisLoading,
     error: thesisError,
     refetch: refetchThesis,
-  } = useGetThesisById(id);
+  } = useGetThesisById(id, { type: thesisType });
 
   const {
     data: stepsResponse,
@@ -70,18 +72,18 @@ const ThesisSteps = () => {
     if (thesis) {
       updateBreadcrumbs([
         {
-          label: t("sidebar.admin.thesis", "Thesis"),
-          path: "/admin/thesis",
+          label: kindLabel,
+          path: basePath,
           navigable: true,
         },
         {
           label: thesis.name || t("thesisManagement.detail.title", "Thesis Details"),
-          path: `/admin/thesis/${id}`,
+          path: `${basePath}/${id}`,
           navigable: true,
         },
         {
           label: t("thesisManagement.steps.title", "Steps"),
-          path: `/admin/thesis/${id}/steps`,
+          path: `${basePath}/${id}/steps`,
           navigable: false,
         },
       ]);
@@ -89,7 +91,7 @@ const ThesisSteps = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [thesis, id, updateBreadcrumbs, t]);
+  }, [thesis, id, updateBreadcrumbs, t, basePath, kindLabel]);
 
   // Check if draft has unsaved changes compared to server
   const isDirty = useMemo(() => {
@@ -211,6 +213,16 @@ const ThesisSteps = () => {
           name: a.name,
           file_url: a.file_url,
         })),
+        videos: (s.videos || [])
+          .map((v) => ({
+            name: v.name,
+            url: v.url || v.file_url,
+          }))
+          .filter((v) => v.name && v.url),
+        form_schema:
+          s.type === "form"
+            ? s.form_schema || { sections: [] }
+            : { sections: [] },
         sequence: s.sequence,
       };
 

@@ -49,10 +49,16 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             icon: NotebookText,
           },
           {
-            title: t("sidebar.admin.thesis", "Thesis"),
+            title: t("sidebar.admin.doThesis", "DO Thesis"),
             url: "/admin/thesis",
             icon: GraduationCap,
           },
+          // Hidden for now — re-enable Master Thesis in backoffice later
+          // {
+          //   title: t("sidebar.admin.masterThesis", "Master Thesis"),
+          //   url: "/admin/master-thesis",
+          //   icon: GraduationCap,
+          // },
           {
             title: t("sidebar.admin.admissionAdministration"),
             icon: BookUser,

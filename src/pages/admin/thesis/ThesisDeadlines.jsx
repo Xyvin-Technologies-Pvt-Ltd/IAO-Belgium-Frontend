@@ -24,14 +24,16 @@ import {
   useGetThesisDeadlines,
   useSaveThesisDeadlines,
 } from "@/store/useThesisStore";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisDeadlines = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const id = params.id;
-  const canModify = useCanModify("operations");
   const { updateBreadcrumbs } = useBreadcrumb();
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   // Queries
   const {
@@ -39,7 +41,7 @@ const ThesisDeadlines = () => {
     isLoading: isThesisLoading,
     error: thesisError,
     refetch: refetchThesis,
-  } = useGetThesisById(id);
+  } = useGetThesisById(id, { type: thesisType });
 
   const {
     data: deadlinesResponse,
@@ -90,18 +92,18 @@ const ThesisDeadlines = () => {
     if (thesis) {
       updateBreadcrumbs([
         {
-          label: t("sidebar.admin.thesis", "Thesis"),
-          path: "/admin/thesis",
+          label: kindLabel,
+          path: basePath,
           navigable: true,
         },
         {
           label: thesis.name || t("thesisManagement.detail.title", "Thesis Details"),
-          path: `/admin/thesis/${id}`,
+          path: `${basePath}/${id}`,
           navigable: true,
         },
         {
           label: t("thesisManagement.deadlines.title", "Deadlines"),
-          path: `/admin/thesis/${id}/deadlines`,
+          path: `${basePath}/${id}/deadlines`,
           navigable: false,
         },
       ]);
@@ -109,7 +111,7 @@ const ThesisDeadlines = () => {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [thesis, id, updateBreadcrumbs, t]);
+  }, [thesis, id, updateBreadcrumbs, t, basePath, kindLabel]);
 
   // Detect dirty state
   const isDirty = useMemo(() => {
@@ -306,7 +308,7 @@ const ThesisDeadlines = () => {
             size="sm"
             onClick={() =>
               navigate({
-                to: "/admin/thesis/$id/steps",
+                to: `${basePath}/$id/steps`,
                 params: { id },
               })
             }
@@ -340,7 +342,7 @@ const ThesisDeadlines = () => {
             size="sm"
             onClick={() =>
               navigate({
-                to: "/admin/thesis/$id",
+                to: `${basePath}/$id`,
                 params: { id },
               })
             }
@@ -398,7 +400,9 @@ const ThesisDeadlines = () => {
                   {trajectories.map((traj) => (
                     <td key={traj._id} className="p-4">
                       <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-primary/10 text-primary font-semibold text-xs border border-primary/20">
-                        {moment(traj.start_date).format("DD/MM/YYYY")}
+                        {traj.start_date
+                          ? moment(traj.start_date).format("DD/MM/YYYY")
+                          : "—"}
                       </span>
                     </td>
                   ))}

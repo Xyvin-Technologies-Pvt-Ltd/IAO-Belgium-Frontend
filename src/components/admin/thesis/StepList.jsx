@@ -31,6 +31,8 @@ import {
   Upload,
   Users,
   Paperclip,
+  Video,
+  ListChecks,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -110,6 +112,11 @@ const SortableStepItem = ({
       label: t("thesisManagement.steps.type.informationOnly", "Information Only"),
       icon: Info,
       className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    },
+    form: {
+      label: t("thesisManagement.steps.type.form", "Form"),
+      icon: ListChecks,
+      className: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
     },
   }[step.type] || {
     label: step.type,
@@ -277,6 +284,19 @@ const SortableStepItem = ({
           >
             <Paperclip className="w-3 h-3 text-primary" />
             <span>{step.attachments.length}</span>
+          </span>
+        )}
+
+        {/* Videos indicator */}
+        {Array.isArray(step.videos) && step.videos.length > 0 && (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-muted text-muted-foreground border border-border"
+            title={t("thesisManagement.steps.tags.videosCount", "{{count}} video(s)", {
+              count: step.videos.length,
+            })}
+          >
+            <Video className="w-3 h-3 text-primary" />
+            <span>{step.videos.length}</span>
           </span>
         )}
 

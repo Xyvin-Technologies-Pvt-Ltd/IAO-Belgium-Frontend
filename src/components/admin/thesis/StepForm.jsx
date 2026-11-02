@@ -18,6 +18,10 @@ import {
 } from "@/components/ui/select";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
+import ThesisFormBuilder, {
+  createEmptySection,
+  normalizeFormSchema,
+} from "@/components/admin/thesis/ThesisFormBuilder";
 import {
   Plus,
   Trash2,
@@ -36,11 +40,15 @@ import { openSecureFile } from "@/utils/secureFile";
 import { toast } from "sonner";
 
 const URL_PATTERN = /^https?:\/\/.+/i;
+const YOUTUBE_URL_PATTERN =
+  /^https?:\/\/(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/).+/i;
 
 const STEP_TYPES = [
   { value: "document_upload", label: "Document upload" },
   { value: "teacher_approval", label: "Teacher approval" },
   { value: "information_only", label: "Information only" },
+  // Hidden for now — re-enable Form (questions) step type later
+  // { value: "form", label: "Form (questions)" },
 ];
 
 const DEADLINE_MODES = [
@@ -53,6 +61,7 @@ const DEADLINE_MODES = [
 const STEP_TYPE_HINT = {
   document_upload: "document upload",
   teacher_approval: "teacher approval",
+  form: "form",
 };
 
 const StepForm = ({
@@ -81,7 +90,11 @@ const StepForm = ({
         if (initialData?._id && step._id && String(step._id) === String(initialData._id)) {
           return false;
         }
-        return step.type === "document_upload" || step.type === "teacher_approval";
+        return (
+          step.type === "document_upload" ||
+          step.type === "teacher_approval" ||
+          step.type === "form"
+        );
       })
       .map(({ step, idx }) => {
         const mongoId =
@@ -106,6 +119,10 @@ const StepForm = ({
   const [instruction, setInstruction] = useState("");
   const [resources, setResources] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [formSchema, setFormSchema] = useState({
+    sections: [createEmptySection()],
+  });
   const [pendingFile, setPendingFile] = useState(null);
   const [newDocName, setNewDocName] = useState("");
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
@@ -157,6 +174,15 @@ const StepForm = ({
             }))
           : []
       );
+      setVideos(
+        Array.isArray(initialData.videos) && initialData.videos.length > 0
+          ? initialData.videos.map((v) => ({
+              name: v.name || "",
+              url: v.url || v.file_url || "",
+            }))
+          : []
+      );
+      setFormSchema(normalizeFormSchema(initialData.form_schema));
       setPendingFile(null);
       setNewDocName("");
       const rawRoles = Array.isArray(initialData.approval_roles)
@@ -183,6 +209,8 @@ const StepForm = ({
       setInstruction("");
       setResources([]);
       setAttachments([]);
+      setVideos([]);
+      setFormSchema({ sections: [createEmptySection()] });
       setPendingFile(null);
       setNewDocName("");
       setSelectedRoles([]);
@@ -269,6 +297,20 @@ const StepForm = ({
     setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  const handleAddVideo = () => {
+    setVideos((prev) => [...prev, { name: "", url: "" }]);
+  };
+
+  const handleUpdateVideo = (index, field, value) => {
+    setVideos((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const handleRemoveVideo = (indexToRemove) => {
+    setVideos((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const validate = () => {
     const errs = {};
     if (!name.trim()) {
@@ -297,6 +339,63 @@ const StepForm = ({
       }
     });
 
+    videos.forEach((v, idx) => {
+      if (v.name || v.url) {
+        if (!v.name.trim()) {
+          errs[`video_name_${idx}`] = t(
+            "thesisManagement.steps.form.videoNameRequired",
+            "Video name required"
+          );
+        }
+        if (!v.url.trim()) {
+          errs[`video_url_${idx}`] = t(
+            "thesisManagement.steps.form.videoUrlRequired",
+            "YouTube URL required"
+          );
+        } else if (!YOUTUBE_URL_PATTERN.test(v.url.trim())) {
+          errs[`video_url_${idx}`] = t(
+            "thesisManagement.steps.form.invalidYoutubeUrl",
+            "Must be a valid YouTube URL"
+          );
+        }
+      }
+    });
+
+    if (type === "form") {
+      const sections = formSchema?.sections || [];
+      let questionCount = 0;
+      sections.forEach((sec, sIdx) => {
+        (sec.questions || []).forEach((q, qIdx) => {
+          questionCount += 1;
+          if (!String(q.label || "").trim()) {
+            errs.form_schema = t(
+              "thesisManagement.steps.form.questionLabelRequired",
+              "Every question needs a label"
+            );
+          }
+          if (q.type === "multiple_choice") {
+            const opts = (q.options || []).filter((o) =>
+              String(o.label || "").trim()
+            );
+            if (!opts.length) {
+              errs.form_schema = t(
+                "thesisManagement.steps.form.mcOptionsRequired",
+                "Multiple choice questions need at least one option"
+              );
+            }
+          }
+          void sIdx;
+          void qIdx;
+        });
+      });
+      if (questionCount === 0) {
+        errs.form_schema = t(
+          "thesisManagement.steps.form.formNeedsQuestion",
+          "Add at least one question"
+        );
+      }
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -312,6 +411,37 @@ const StepForm = ({
     const validAttachments = attachments
       .map((a) => ({ name: a.name.trim(), file_url: a.file_url.trim() }))
       .filter((a) => a.name && a.file_url);
+
+    const validVideos = videos
+      .map((v) => ({ name: v.name.trim(), url: v.url.trim() }))
+      .filter((v) => v.name && v.url);
+
+    const cleanedFormSchema =
+      type === "form"
+        ? {
+            sections: (formSchema.sections || []).map((sec, sIdx) => ({
+              id: sec.id,
+              title: String(sec.title || "").trim(),
+              sequence: sIdx,
+              questions: (sec.questions || []).map((q, qIdx) => ({
+                id: q.id,
+                label: String(q.label || "").trim(),
+                type: q.type,
+                required: Boolean(q.required),
+                sequence: qIdx,
+                options:
+                  q.type === "multiple_choice"
+                    ? (q.options || [])
+                        .filter((o) => String(o.label || "").trim())
+                        .map((o) => ({
+                          id: o.id,
+                          label: String(o.label).trim(),
+                        }))
+                    : [],
+              })),
+            })),
+          }
+        : { sections: [] };
 
     const stepPayload = {
       ...(initialData?._id ? { _id: initialData._id } : {}),
@@ -329,6 +459,8 @@ const StepForm = ({
       instruction,
       resources: validResources,
       attachments: validAttachments,
+      videos: validVideos,
+      form_schema: cleanedFormSchema,
       sequence: initialData?.sequence || 0,
     };
 
@@ -401,6 +533,9 @@ const StepForm = ({
                 if (!initialData && val === "information_only") {
                   setRequired(false);
                 }
+                if (val === "form" && !(formSchema?.sections?.length)) {
+                  setFormSchema({ sections: [createEmptySection()] });
+                }
               }}
             >
               <SelectTrigger className="w-full">
@@ -432,6 +567,14 @@ const StepForm = ({
               selected={selectedRoles}
               onChange={setSelectedRoles}
               isLoading={isRolesLoading}
+            />
+          )}
+
+          {type === "form" && (
+            <ThesisFormBuilder
+              value={formSchema}
+              onChange={setFormSchema}
+              error={errors.form_schema}
             />
           )}
 
@@ -743,6 +886,86 @@ const StepForm = ({
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Step Videos (YouTube URLs) */}
+          <div className="space-y-3 pt-2 border-t border-border/50">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">
+                {t("thesisManagement.steps.form.videosLabel", "Videos (YouTube)")}
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddVideo}
+                className="gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("thesisManagement.steps.form.addVideo", "Add YouTube video")}
+              </Button>
+            </div>
+
+            {videos.length > 0 && (
+              <div className="space-y-2 pt-1">
+                {videos.map((vid, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start"
+                  >
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        value={vid.name ?? ""}
+                        onChange={(e) =>
+                          handleUpdateVideo(idx, "name", e.target.value)
+                        }
+                        placeholder={t(
+                          "thesisManagement.steps.form.videoNamePlaceholder",
+                          "e.g. Intro briefing"
+                        )}
+                        className={
+                          errors[`video_name_${idx}`] ? "border-destructive" : ""
+                        }
+                      />
+                      {errors[`video_name_${idx}`] && (
+                        <p className="text-[11px] text-destructive">
+                          {errors[`video_name_${idx}`]}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-[1.4] space-y-1">
+                      <Input
+                        value={vid.url ?? ""}
+                        onChange={(e) =>
+                          handleUpdateVideo(idx, "url", e.target.value)
+                        }
+                        placeholder={t(
+                          "thesisManagement.steps.form.youtubeUrlPlaceholder",
+                          "https://www.youtube.com/watch?v=..."
+                        )}
+                        className={
+                          errors[`video_url_${idx}`] ? "border-destructive" : ""
+                        }
+                      />
+                      {errors[`video_url_${idx}`] && (
+                        <p className="text-[11px] text-destructive">
+                          {errors[`video_url_${idx}`]}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveVideo(idx)}
+                      className="h-9 w-9 text-destructive hover:bg-destructive/10 shrink-0 self-start"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>

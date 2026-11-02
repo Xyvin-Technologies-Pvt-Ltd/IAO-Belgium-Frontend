@@ -30,6 +30,7 @@ import CreateThesis from "@/components/admin/thesis/CreateThesis";
 import DeactivateThesisConfirm from "@/components/admin/thesis/DeactivateThesisConfirm";
 import TrajectoryList from "@/components/admin/thesis/TrajectoryList";
 import { PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisDetail = () => {
   const { t } = useTranslation();
@@ -37,22 +38,31 @@ const ThesisDetail = () => {
   const id = params?.id;
   const navigate = useNavigate();
   const { updateBreadcrumbs } = useBreadcrumb();
-  const canModify = useCanModify("operations");
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [openDeactivate, setOpenDeactivate] = useState(false);
 
-  const { data: thesisResponse, isLoading, isError, error } = useGetThesisById(id);
+  const { data: thesisResponse, isLoading, isError, error } = useGetThesisById(
+    id,
+    { type: thesisType }
+  );
   const updateThesisStatus = useUpdateThesisStatus();
 
   const thesis = thesisResponse?.data;
 
   useEffect(() => {
     updateBreadcrumbs([
-      { label: t("thesisManagement.title", "Thesis Catalog"), path: "/admin/thesis" },
+      {
+        label: t("thesisManagement.titleNamed", "{{kind}} Catalog", {
+          kind: kindLabel,
+        }),
+        path: basePath,
+      },
       { label: thesis?.name || t("thesisManagement.detail.title", "Thesis Details") },
     ]);
-  }, [thesis?.name, updateBreadcrumbs, t]);
+  }, [thesis?.name, updateBreadcrumbs, t, basePath, kindLabel]);
 
   const handleToggleStatus = () => {
     if (thesis?.status) {
@@ -81,7 +91,7 @@ const ThesisDetail = () => {
     return (
       <ErrorMessage
         message={error?.message || t("thesisManagement.detail.loadFailed", "Failed to load thesis details")}
-        onRetry={() => navigate({ to: "/admin/thesis" })}
+        onRetry={() => navigate({ to: basePath })}
       />
     );
   }
@@ -101,7 +111,7 @@ const ThesisDetail = () => {
       icon: Users,
       onClick: () =>
         navigate({
-          to: "/admin/thesis/$id/teachers",
+          to: `${basePath}/$id/teachers`,
           params: { id },
         }),
     },
@@ -110,7 +120,7 @@ const ThesisDetail = () => {
       icon: Layers,
       onClick: () =>
         navigate({
-          to: "/admin/thesis/$id/steps",
+          to: `${basePath}/$id/steps`,
           params: { id },
         }),
     },
@@ -119,7 +129,7 @@ const ThesisDetail = () => {
       icon: Calendar,
       onClick: () =>
         navigate({
-          to: "/admin/thesis/$id/deadlines",
+          to: `${basePath}/$id/deadlines`,
           params: { id },
         }),
     },
@@ -358,13 +368,15 @@ const ThesisDetail = () => {
       </div>
 
       {/* Trajectories Section */}
-      <TrajectoryList thesisId={id} canModify={canModify} />
+      <TrajectoryList thesisId={id} canModify={canModify} basePath={basePath} />
 
       {/* Edit Modal */}
       <CreateThesis
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         thesisData={thesis}
+        thesisType={thesisType}
+        basePath={basePath}
       />
 
       {/* Deactivate Confirmation Dialog */}

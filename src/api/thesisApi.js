@@ -11,9 +11,11 @@ export const getTheses = async (filter) => {
   }
 };
 
-export const getThesisById = async (id) => {
+export const getThesisById = async (id, params = {}) => {
   try {
-    const response = await axiosInstance.get(`/thesis/${id}`);
+    const response = await axiosInstance.get(`/thesis/${id}`, {
+      params,
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
