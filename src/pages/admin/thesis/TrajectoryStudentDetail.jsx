@@ -34,12 +34,18 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useCanModify } from "@/hooks/useCanModify";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
+import {
+  isYouTubeUrl,
+  getYouTubeEmbedUrl,
+} from "@/utils/youtubeUtils";
+import ThesisFormAnswersView from "@/components/admin/thesis/ThesisFormAnswersView";
 import { uploadFile } from "@/api/uploadApi";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import DocumentUploadArea from "@/components/common/DocumentUploadArea";
 import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -182,8 +188,9 @@ const getActionMeta = (action) => {
 export default function TrajectoryStudentDetail() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const canModify = useCanModify("operations");
   const params = useParams({ strict: false });
+  const { basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   const thesisId = params.id;
   const trajectoryId = params.trajectoryId;
@@ -296,27 +303,27 @@ export default function TrajectoryStudentDetail() {
   useEffect(() => {
     updateBreadcrumbs([
       {
-        label: t("thesisManagement.title", "Theses"),
-        path: "/admin/thesis",
+        label: kindLabel,
+        path: basePath,
         navigable: true,
       },
       {
-        label: thesis?.name || t("thesisManagement.title", "Thesis"),
-        path: `/admin/thesis/${thesisId}`,
+        label: thesis?.name || kindLabel,
+        path: `${basePath}/${thesisId}`,
         navigable: true,
       },
       {
         label: trajectory?.name || t("thesisManagement.trajectories.trajectory", "Cohort Trajectory"),
-        path: `/admin/thesis/${thesisId}/trajectories/${trajectoryId}`,
+        path: `${basePath}/${thesisId}/trajectories/${trajectoryId}`,
         navigable: true,
       },
       {
         label: studentName,
-        path: `/admin/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}`,
+        path: `${basePath}/${thesisId}/trajectories/${trajectoryId}/students/${userId}`,
         navigable: false,
       },
     ]);
-  }, [thesis?.name, trajectory?.name, studentName, thesisId, trajectoryId, userId, updateBreadcrumbs, t]);
+  }, [thesis?.name, trajectory?.name, studentName, thesisId, trajectoryId, userId, updateBreadcrumbs, t, basePath, kindLabel]);
 
   const handleReaderChange = async (selectedReaderId) => {
     const readerValue = selectedReaderId === "NONE" ? null : selectedReaderId;
@@ -533,7 +540,7 @@ export default function TrajectoryStudentDetail() {
       const nextTrajId = response?.data?.trajectory?._id;
       if (nextTrajId) {
         navigate({
-          to: "/admin/thesis/$id/trajectories/$trajectoryId/students/$userId",
+          to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
           params: {
             id: thesisId,
             trajectoryId: String(nextTrajId),
@@ -588,6 +595,8 @@ export default function TrajectoryStudentDetail() {
         return t("thesis.types.teacherApproval", "Teacher Approval");
       case "information_only":
         return t("thesis.types.informationOnly", "Information Only");
+      case "form":
+        return t("thesis.types.form", "Form");
       default:
         return type;
     }
@@ -1075,6 +1084,71 @@ export default function TrajectoryStudentDetail() {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {step.videos && step.videos.length > 0 && (
+                    <div className="pt-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
+                        {t("thesis.videos", "Videos")}
+                      </span>
+                      <div className="grid grid-cols-1 gap-3">
+                        {step.videos.map((vid, vIdx) => {
+                          const vidUrl = vid.url || vid.file_url || "";
+                          const yt = isYouTubeUrl(vidUrl);
+                          const embedUrl = yt ? getYouTubeEmbedUrl(vidUrl) : "";
+                          return (
+                            <div
+                              key={vidUrl || vIdx}
+                              className="rounded-lg border border-border bg-card/60 overflow-hidden"
+                            >
+                              <div className="flex items-center justify-between p-2.5 gap-2">
+                                <span
+                                  className="text-xs font-medium text-foreground truncate"
+                                  title={vid.name}
+                                >
+                                  {vid.name || t("thesis.video", "Video")}
+                                </span>
+                                {vidUrl && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 px-2 text-xs gap-1 cursor-pointer shrink-0"
+                                    onClick={() => {
+                                      if (yt) {
+                                        window.open(vidUrl, "_blank", "noopener,noreferrer");
+                                      } else {
+                                        openSecureFile(vidUrl, vid.name);
+                                      }
+                                    }}
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                    {t("common.open", "Open")}
+                                  </Button>
+                                )}
+                              </div>
+                              {embedUrl && (
+                                <div className="aspect-video w-full bg-black/5">
+                                  <iframe
+                                    title={vid.name || "YouTube video"}
+                                    src={embedUrl}
+                                    className="w-full h-full"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {step.type === "form" && (
+                    <div className="pt-2">
+                      <ThesisFormAnswersView step={step} />
                     </div>
                   )}
 

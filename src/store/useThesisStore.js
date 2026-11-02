@@ -50,13 +50,14 @@ export const useGetTheses = (filter, options = {}) => {
 };
 
 export const useGetThesisById = (id, options = {}) => {
+  const { type, ...queryOptions } = options;
   return useQuery({
-    queryKey: ["thesis", id],
-    queryFn: () => getThesisById(id),
+    queryKey: ["thesis", id, type || "any"],
+    queryFn: () => getThesisById(id, type ? { type } : {}),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
     enabled: !!id,
-    ...options,
+    ...queryOptions,
   });
 };
 

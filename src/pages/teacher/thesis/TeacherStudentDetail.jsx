@@ -30,6 +30,11 @@ import {
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
+import {
+  isYouTubeUrl,
+  getYouTubeEmbedUrl,
+} from "@/utils/youtubeUtils";
+import ThesisFormAnswersView from "@/components/admin/thesis/ThesisFormAnswersView";
 import { LoadingState, ErrorMessage } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -79,6 +84,8 @@ const getStepTypeLabel = (type, t) => {
       return t("thesis.stepTypeApproval", "Teacher Approval");
     case "information_only":
       return t("thesis.stepTypeInfo", "Information Only");
+    case "form":
+      return t("thesis.stepTypeForm", "Form");
     default:
       return type || "—";
   }
@@ -384,10 +391,13 @@ const TeacherStudentDetail = () => {
               const hasStepDetails = Boolean(
                 step.instruction ||
                 (Array.isArray(step.resources) && step.resources.length > 0) ||
-                (Array.isArray(step.attachments) && step.attachments.length > 0)
+                (Array.isArray(step.attachments) && step.attachments.length > 0) ||
+                (Array.isArray(step.videos) && step.videos.length > 0) ||
+                step.type === "form"
               );
               const hasBodyContent =
                 step.type === "document_upload" ||
+                step.type === "form" ||
                 (isTeacherApproval && !isApprovedByCurrentTeacher) ||
                 hasStepDetails;
 
@@ -584,6 +594,10 @@ const TeacherStudentDetail = () => {
                           </div>
                         )}
                       </div>
+                    )}
+
+                    {step.type === "form" && (
+                      <ThesisFormAnswersView step={step} />
                     )}
 
                     {/* 1b. INITIAL / ALWAYS VISIBLE: Teacher Approval Request */}
@@ -784,6 +798,70 @@ const TeacherStudentDetail = () => {
                                               <Download className="w-3.5 h-3.5" />
                                               {t("common.download", "Download")}
                                             </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {Array.isArray(step.videos) && step.videos.length > 0 && (
+                              <div className="space-y-1.5">
+                                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                                  {t("thesis.videos", "Videos")}
+                                </span>
+                                <div className="grid grid-cols-1 gap-3">
+                                  {step.videos.map((vid, vIdx) => {
+                                    const vidName = vid.name || "Video";
+                                    const vidUrl = vid.url || vid.file_url || "";
+                                    const yt = isYouTubeUrl(vidUrl);
+                                    const embedUrl = yt ? getYouTubeEmbedUrl(vidUrl) : "";
+                                    return (
+                                      <div
+                                        key={vidUrl || vIdx}
+                                        className="rounded-lg border border-border bg-card overflow-hidden"
+                                      >
+                                        <div className="flex items-center justify-between p-2.5 gap-2">
+                                          <span
+                                            className="text-xs font-medium text-foreground truncate"
+                                            title={vidName}
+                                          >
+                                            {vidName}
+                                          </span>
+                                          {vidUrl && (
+                                            <Button
+                                              type="button"
+                                              variant="ghost"
+                                              size="sm"
+                                              className="h-7 px-2 text-xs gap-1 cursor-pointer shrink-0"
+                                              onClick={() => {
+                                                if (yt) {
+                                                  window.open(
+                                                    vidUrl,
+                                                    "_blank",
+                                                    "noopener,noreferrer"
+                                                  );
+                                                } else {
+                                                  openSecureFile(vidUrl, vidName);
+                                                }
+                                              }}
+                                            >
+                                              <ExternalLink className="w-3.5 h-3.5" />
+                                              {t("common.open", "Open")}
+                                            </Button>
+                                          )}
+                                        </div>
+                                        {embedUrl && (
+                                          <div className="aspect-video w-full bg-black/5">
+                                            <iframe
+                                              title={vidName}
+                                              src={embedUrl}
+                                              className="w-full h-full"
+                                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                              allowFullScreen
+                                            />
                                           </div>
                                         )}
                                       </div>

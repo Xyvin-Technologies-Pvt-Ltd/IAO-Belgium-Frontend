@@ -35,15 +35,17 @@ import {
   useGetThesisById,
   useGetTrajectoryStudents,
 } from "@/store/useThesisStore";
+import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 export default function TrajectoryDetails() {
   const { t } = useTranslation();
-  const canModify = useCanModify("operations");
   const params = useParams({ strict: false });
   const navigate = useNavigate();
   const thesisId = params.id;
   const trajectoryId = params.trajectoryId;
   const { updateBreadcrumbs } = useBreadcrumb();
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const canModify = useCanModify(basePath);
 
   // Pagination & Search state
   const [page, setPage] = useState(1);
@@ -78,7 +80,7 @@ export default function TrajectoryDetails() {
     data: thesisResponse,
     isLoading: isThesisLoading,
     error: thesisError,
-  } = useGetThesisById(thesisId);
+  } = useGetThesisById(thesisId, { type: thesisType });
 
   const queryParams = {
     page,
@@ -115,18 +117,18 @@ export default function TrajectoryDetails() {
   useEffect(() => {
     updateBreadcrumbs([
       {
-        label: t("thesisManagement.title", "Theses"),
-        path: "/admin/thesis",
+        label: kindLabel,
+        path: basePath,
         navigable: true,
       },
       {
-        label: thesis?.name || "Thesis",
-        path: `/admin/thesis/${thesisId}`,
+        label: thesis?.name || kindLabel,
+        path: `${basePath}/${thesisId}`,
         navigable: true,
       },
       {
         label: trajectory?.name || t("thesisManagement.trajectories.trajectory", "Cohort Trajectory"),
-        path: `/admin/thesis/${thesisId}/trajectories/${trajectoryId}`,
+        path: `${basePath}/${thesisId}/trajectories/${trajectoryId}`,
         navigable: false,
       },
     ]);
@@ -134,7 +136,7 @@ export default function TrajectoryDetails() {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [thesis?.name, trajectory?.name, thesisId, trajectoryId, updateBreadcrumbs, t]);
+  }, [thesis?.name, trajectory?.name, thesisId, trajectoryId, updateBreadcrumbs, t, basePath, kindLabel]);
 
   const isLoading = isThesisLoading || (isTrajectoryLoading && !trajectoryData);
   const error = thesisError || trajectoryError;
@@ -303,7 +305,7 @@ export default function TrajectoryDetails() {
                     onClick={() => {
                       if (student?._id) {
                         navigate({
-                          to: `/admin/thesis/$id/trajectories/$trajectoryId/students/$userId`,
+                          to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
                           params: {
                             id: thesisId,
                             trajectoryId,

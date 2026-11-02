@@ -51,6 +51,17 @@ const ViewRole = ({ open, onClose, roleData }) => {
       viewId: "logs_management_view",
       modifyId: null,
     },
+    {
+      name: t("roleManagement.permissions.doThesis", "DO Thesis"),
+      viewId: "do_thesis_view",
+      modifyId: "do_thesis_modify",
+    },
+    // Hidden for now — re-enable Master Thesis permissions later
+    // {
+    //   name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
+    //   viewId: "master_thesis_view",
+    //   modifyId: "master_thesis_modify",
+    // },
   ];
 
   if (!open || !roleData) return null;

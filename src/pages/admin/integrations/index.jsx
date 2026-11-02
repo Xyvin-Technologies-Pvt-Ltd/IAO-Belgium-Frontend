@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Plug, RefreshCw, Unplug, Users } from "lucide-react";
+import { ExternalLink, FileCheck, Plug, RefreshCw, Unplug, Users } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -22,11 +23,16 @@ import {
   useReconcileExactPayment,
   useBackfillExactContacts,
   useDisconnectExact,
+  useGetExactSendMode,
+  useSetExactSendMode,
+  useGetExactToSend,
+  useCheckExactDocumentTypes,
 } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
 import ReconciliationTab from "./ReconciliationTab";
 import MollieRefBackfillCard from "./MollieRefBackfillCard";
+import ToSendTab from "./ToSendTab";
 
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
@@ -57,7 +63,9 @@ const IntegrationsPage = () => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
   const queryClient = useQueryClient();
-  const [syncTab, setSyncTab] = useState("pending");
+  //* Sales Entry rollout: records wait in "To send" while sending is manual.
+  const [syncTab, setSyncTab] = useState("to_send");
+  const [docCheck, setDocCheck] = useState(null);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -108,6 +116,10 @@ const IntegrationsPage = () => {
   const { mutate: backfillContacts, isPending: isBackfillingContacts } =
     useBackfillExactContacts();
   const { mutate: disconnect, isPending: isDisconnecting } = useDisconnectExact();
+  const { data: sendModeResponse, error: sendModeError } = useGetExactSendMode();
+  const { mutate: setSendMode, isPending: isSavingSendMode } = useSetExactSendMode();
+  const { data: toSendResponse } = useGetExactToSend({}, { enabled: syncTab !== "to_send" });
+  const { mutate: checkDocumentTypes, isPending: isCheckingDocs } = useCheckExactDocumentTypes();
 
   const status = statusResponse?.data;
   const isConnected = Boolean(status?.connected);
@@ -116,15 +128,14 @@ const IntegrationsPage = () => {
     syncTab === "pending"
       ? (unsyncedResponse?.total_count ?? 0)
       : (unsyncedCountResponse?.total_count ?? unsyncedResponse?.total_count ?? 0);
+  const sendMode = sendModeResponse?.data?.mode === "auto" ? "auto" : "manual";
+  const toSendCounts = toSendResponse?.counts ?? {};
+  const toSendWaiting = (toSendCounts.held || 0) + (toSendCounts.failed || 0);
   const sentRows = sentResponse?.data ?? [];
   const sentCount =
     syncTab === "sent"
       ? (sentResponse?.total_count ?? 0)
       : (sentCountResponse?.total_count ?? sentResponse?.total_count ?? 0);
-
-  useEffect(() => {
-    setPage(1);
-  }, [syncTab]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -159,6 +170,47 @@ const IntegrationsPage = () => {
 
   const handleBackfillContacts = () => {
     backfillContacts();
+  };
+
+  //* Changing tab starts at page 1 (set here, not in an effect).
+  const switchTab = (tab) => {
+    setSyncTab(tab);
+    setPage(1);
+  };
+
+  const handleSendModeChange = (checked) => {
+    const next = checked ? "auto" : "manual";
+    const question =
+      next === "auto"
+        ? t("integrations.exact.sendMode.confirmAuto")
+        : t("integrations.exact.sendMode.confirmManual");
+    if (!window.confirm(question)) return;
+    setSendMode(next);
+  };
+
+  const handleCheckDocuments = () => {
+    setDocCheck(null);
+    checkDocumentTypes(undefined, {
+      onSuccess: (res) => {
+        const d = res?.data || {};
+        setDocCheck(
+          d.ok
+            ? {
+                ok: true,
+                text: t("integrations.exact.docCheck.ok", {
+                  id: d.configured_type_id,
+                  name: d.configured?.description || "",
+                }),
+              }
+            : { ok: false, text: t("integrations.exact.docCheck.notOk", { reason: res?.message || "" }) },
+        );
+      },
+      onError: (err) =>
+        setDocCheck({
+          ok: false,
+          text: t("integrations.exact.docCheck.notOk", { reason: err?.message || "" }),
+        }),
+    });
   };
 
   const handleDisconnect = () => {
@@ -267,6 +319,77 @@ const IntegrationsPage = () => {
                 {t("integrations.exact.autoSyncNote")}
               </p>
             </div>
+
+            <div className="rounded-lg border dark:border-white/10 px-4 py-3 space-y-3 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {t("integrations.exact.sendMode.title")}:{" "}
+                    <span
+                      className={
+                        sendMode === "auto"
+                          ? "text-blue-700 dark:text-blue-300"
+                          : "text-amber-700 dark:text-amber-300"
+                      }
+                    >
+                      {sendMode === "auto"
+                        ? t("integrations.exact.sendMode.auto")
+                        : t("integrations.exact.sendMode.manual")}
+                    </span>
+                  </p>
+                  <p className="text-muted-foreground">
+                    {sendMode === "auto"
+                      ? t("integrations.exact.sendMode.autoHint")
+                      : t("integrations.exact.sendMode.manualHint")}
+                  </p>
+                  {sendModeResponse?.data?.changed_at ? (
+                    <p className="text-xs text-muted-foreground">
+                      {t("integrations.exact.sendMode.changed", {
+                        when: formatDateTime(sendModeResponse.data.changed_at),
+                      })}
+                    </p>
+                  ) : null}
+                  {sendModeError ? (
+                    <p className="text-xs text-amber-700 dark:text-amber-300">
+                      {t("integrations.exact.sendMode.loadFailed")}
+                    </p>
+                  ) : null}
+                </div>
+                {canModify ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{t("integrations.exact.sendMode.manual")}</span>
+                    <Switch
+                      checked={sendMode === "auto"}
+                      onCheckedChange={handleSendModeChange}
+                      disabled={isSavingSendMode || Boolean(sendModeError)}
+                      aria-label={t("integrations.exact.sendMode.title")}
+                    />
+                    <span className="text-muted-foreground">{t("integrations.exact.sendMode.auto")}</span>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="outline" size="sm" onClick={handleCheckDocuments} disabled={isCheckingDocs}>
+                  <FileCheck className="w-4 h-4 mr-2" />
+                  {isCheckingDocs
+                    ? t("integrations.exact.docCheck.checking")
+                    : t("integrations.exact.docCheck.button")}
+                </Button>
+                {docCheck ? (
+                  <span
+                    className={
+                      docCheck.ok
+                        ? "text-emerald-700 dark:text-emerald-300"
+                        : "text-red-700 dark:text-red-300"
+                    }
+                  >
+                    {docCheck.text}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
             {canModify && (
               <Button
                 variant="destructive"
@@ -308,7 +431,19 @@ const IntegrationsPage = () => {
         <div className="flex gap-2 border-b dark:border-white/10 pb-0">
           <button
             type="button"
-            onClick={() => setSyncTab("pending")}
+            onClick={() => switchTab("to_send")}
+            className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              syncTab === "to_send"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-muted-foreground hover:text-gray-900 dark:hover:text-white"
+            }`}
+          >
+            {t("integrations.exact.tabToSend")}
+            {syncTab !== "to_send" && toSendWaiting > 0 ? ` (${toSendWaiting})` : ""}
+          </button>
+          <button
+            type="button"
+            onClick={() => switchTab("pending")}
             className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               syncTab === "pending"
                 ? "border-blue-600 text-blue-600"
@@ -320,7 +455,7 @@ const IntegrationsPage = () => {
           </button>
           <button
             type="button"
-            onClick={() => setSyncTab("sent")}
+            onClick={() => switchTab("sent")}
             className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               syncTab === "sent"
                 ? "border-blue-600 text-blue-600"
@@ -332,7 +467,7 @@ const IntegrationsPage = () => {
           </button>
           <button
             type="button"
-            onClick={() => setSyncTab("reconciliation")}
+            onClick={() => switchTab("reconciliation")}
             className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               syncTab === "reconciliation"
                 ? "border-blue-600 text-blue-600"
@@ -343,7 +478,9 @@ const IntegrationsPage = () => {
           </button>
         </div>
 
-        {syncTab === "pending" ? (
+        {syncTab === "to_send" ? (
+          <ToSendTab isConnected={isConnected} canModify={canModify} mode={sendMode} />
+        ) : syncTab === "pending" ? (
           <>
             {isUnsyncedLoading ? (
               <TableSkeleton rows={3} columns={6} />

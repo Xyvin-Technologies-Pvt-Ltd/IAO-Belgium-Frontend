@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const TrajectoryList = ({ thesisId, canModify }) => {
+const TrajectoryList = ({ thesisId, canModify, basePath = "/admin/thesis" }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -141,7 +141,7 @@ const TrajectoryList = ({ thesisId, canModify }) => {
               key={traj._id}
               onClick={() =>
                 navigate({
-                  to: "/admin/thesis/$id/trajectories/$trajectoryId",
+                  to: `${basePath}/$id/trajectories/$trajectoryId`,
                   params: { id: thesisId, trajectoryId: traj._id },
                 })
               }
