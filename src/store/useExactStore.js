@@ -197,7 +197,11 @@ export const useGetExactToSend = (params = {}, options = {}) =>
     queryKey: ["exact-to-send", params],
     queryFn: () => getExactToSend(params),
     staleTime: 5000,
-    refetchInterval: (query) => (query.state.data?.counts?.sending ? 4000 : false),
+    //* counts_all ignores the search/date filter, so a hidden "sending" row still refreshes.
+    refetchInterval: (query) => {
+      const counts = query.state.data?.counts_all ?? query.state.data?.counts;
+      return counts?.sending ? 4000 : false;
+    },
     ...options,
   });
 
