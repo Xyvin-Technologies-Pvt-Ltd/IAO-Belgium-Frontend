@@ -9,6 +9,13 @@ import {
   Users,
   Search,
   Edit,
+  Plus,
+  Video,
+  ExternalLink,
+  Eye,
+  Trash2,
+  MessageSquare,
+  FileText,
 } from "lucide-react";
 
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -31,10 +38,14 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
+import DeleteConfirm from "@/components/DeleteConfirm";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
   useGetTrajectoryEligibleStudents,
+  useGetTrajectoryQnaAnnouncements,
+  useDeleteTrajectoryQnaAnnouncement,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -72,6 +83,14 @@ export default function MasterTrajectoryDetails() {
 
   const isEnrolledTab = activeTab === "enrolled";
   const isEligibleTab = activeTab === "eligible";
+  const isQnaTab = activeTab === "qna";
+
+  const [qnaAudience, setQnaAudience] = useState("all");
+  const [isQnaModalOpen, setIsQnaModalOpen] = useState(false);
+  const [qnaModalMode, setQnaModalMode] = useState("create");
+  const [selectedQnaItem, setSelectedQnaItem] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [qnaItemToDelete, setQnaItemToDelete] = useState(null);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -137,6 +156,34 @@ export default function MasterTrajectoryDetails() {
     eligibleParams,
     { enabled: !!thesisId && !!trajectoryId && isEligibleTab }
   );
+
+  const qnaParams = {
+    audience: qnaAudience,
+    page: isQnaTab ? page : 1,
+    limit: isQnaTab ? rowsPerPage : 10,
+    ...(isQnaTab && debouncedSearch ? { search: debouncedSearch } : {}),
+  };
+
+  const {
+    data: qnaResponse,
+    isLoading: isQnaLoading,
+    isFetching: isQnaFetching,
+    error: qnaError,
+    refetch: refetchQna,
+  } = useGetTrajectoryQnaAnnouncements(thesisId, trajectoryId, qnaParams, {
+    enabled: !!thesisId && !!trajectoryId && isQnaTab,
+  });
+
+  const deleteQnaMutation = useDeleteTrajectoryQnaAnnouncement();
+
+  const qnaData = qnaResponse?.data;
+  const qnaItems = qnaData?.items || [];
+  const qnaCounts = qnaData?.counts || {
+    all: 0,
+    before_purchase: 0,
+    after_purchase: 0,
+  };
+  const qnaTotalCount = qnaResponse?.total_count ?? qnaData?.total_count ?? 0;
 
   const thesis = thesisResponse?.data;
   const enrolledData = enrolledResponse?.data;
@@ -225,6 +272,20 @@ export default function MasterTrajectoryDetails() {
       <div className="flex items-center justify-between">
         <div className="flex-1" />
         <div className="flex items-center gap-2">
+          {canModify && isQnaTab && (
+            <Button
+              size="sm"
+              onClick={() => {
+                setSelectedQnaItem(null);
+                setQnaModalMode("create");
+                setIsQnaModalOpen(true);
+              }}
+              className="gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            >
+              <Plus className="w-4 h-4" />
+              {t("thesisManagement.qna.addQna", "Add Q&A or Announcement")}
+            </Button>
+          )}
           {canModify && (
             <Button
               variant="outline"
@@ -314,6 +375,13 @@ export default function MasterTrajectoryDetails() {
                   "Eligible students"
                 ),
               },
+              {
+                id: "qna",
+                label: t(
+                  "thesisManagement.trajectories.qnaAnnouncements",
+                  "Q&A and Announcements"
+                ),
+              },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -331,7 +399,287 @@ export default function MasterTrajectoryDetails() {
           </nav>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
+        {isQnaTab ? (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  {
+                    id: "all",
+                    label: t("common.all", "All"),
+                    count: qnaCounts.all,
+                  },
+                  {
+                    id: "before_purchase",
+                    label: t(
+                      "thesisManagement.qna.beforePurchase",
+                      "Before purchase"
+                    ),
+                    count: qnaCounts.before_purchase,
+                  },
+                  {
+                    id: "after_purchase",
+                    label: t(
+                      "thesisManagement.qna.afterPurchase",
+                      "After purchase"
+                    ),
+                    count: qnaCounts.after_purchase,
+                  },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => {
+                      setQnaAudience(f.id);
+                      setPage(1);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                      qnaAudience === f.id
+                        ? "bg-primary text-primary-foreground shadow-2xs"
+                        : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border"
+                    }`}
+                  >
+                    <span>{f.label}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        qnaAudience === f.id
+                          ? "bg-white/20 text-white"
+                          : "bg-background text-foreground"
+                      }`}
+                    >
+                      {f.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t(
+                    "thesisManagement.qna.searchPlaceholder",
+                    "Search by title..."
+                  )}
+                  value={search}
+                  onChange={handleSearchChange}
+                  className="pl-9 h-9 text-xs sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    {t("thesisManagement.table.title", "Title")}
+                  </TableHead>
+                  <TableHead>
+                    {t("thesisManagement.table.typeAndDate", "Type & Date")}
+                  </TableHead>
+                  <TableHead>
+                    {t("thesisManagement.table.audience", "Audience")}
+                  </TableHead>
+                  <TableHead>
+                    {t("thesisManagement.table.callLink", "Video Call")}
+                  </TableHead>
+                  <TableHead>
+                    {t("thesisManagement.table.attachments", "Media")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("common.actions", "Actions")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody
+                className={
+                  isQnaFetching ? "opacity-50 pointer-events-none" : ""
+                }
+              >
+                {isQnaLoading ? (
+                  <TableSkeleton rows={4} columns={6} />
+                ) : qnaError ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center p-8">
+                      <ErrorMessage
+                        message={
+                          qnaError?.message ||
+                          t("common.failedToLoad", "Failed to load data")
+                        }
+                        onRetry={refetchQna}
+                        variant="inline"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : qnaItems.length > 0 ? (
+                  qnaItems.map((item) => {
+                    const totalAttachments =
+                      (item.attachments?.length || 0) +
+                      (item.videos?.length || 0) +
+                      (item.links?.length || 0);
+
+                    return (
+                      <TableRow
+                        key={item._id}
+                        className="hover:bg-muted/50 transition-colors"
+                      >
+                        <TableCell className="font-semibold text-foreground max-w-xs truncate">
+                          {item.title}
+                        </TableCell>
+                        <TableCell>
+                          {item.scheduled_at ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                              <Calendar className="w-3 h-3" />
+                              {moment(item.scheduled_at).format(
+                                "DD/MM/YYYY HH:mm"
+                              )}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+                              <MessageSquare className="w-3 h-3" />
+                              {t(
+                                "thesisManagement.qna.announcement",
+                                "Announcement"
+                              )}
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              item.audience === "before_purchase"
+                                ? "bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20"
+                                : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                            }`}
+                          >
+                            {item.audience === "before_purchase"
+                              ? t(
+                                  "thesisManagement.qna.beforePurchase",
+                                  "Before purchase"
+                                )
+                              : t(
+                                  "thesisManagement.qna.afterPurchase",
+                                  "After purchase"
+                                )}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {item.video_call_link ? (
+                            <a
+                              href={item.video_call_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline max-w-[160px] truncate"
+                            >
+                              <Video className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate">
+                                {item.video_call_link}
+                              </span>
+                              <ExternalLink className="w-3 h-3 shrink-0" />
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">
+                              —
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {totalAttachments > 0 ? (
+                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                              <FileText className="w-3.5 h-3.5" />
+                              {totalAttachments} {t("common.items", "items")}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">
+                              —
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
+                              title={t("common.view", "View")}
+                              onClick={() => {
+                                setSelectedQnaItem(item);
+                                setQnaModalMode("view");
+                                setIsQnaModalOpen(true);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            {canModify && (
+                              <>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
+                                  title={t("common.edit", "Edit")}
+                                  onClick={() => {
+                                    setSelectedQnaItem(item);
+                                    setQnaModalMode("edit");
+                                    setIsQnaModalOpen(true);
+                                  }}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-destructive hover:bg-destructive/10 cursor-pointer"
+                                  title={t("common.delete", "Delete")}
+                                  onClick={() => {
+                                    setQnaItemToDelete(item);
+                                    setIsDeleteConfirmOpen(true);
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      {search || qnaAudience !== "all"
+                        ? t(
+                            "common.noResultsFound",
+                            "No Q&A or announcements match your filter."
+                          )
+                        : t(
+                            "thesisManagement.qna.noItems",
+                            "No Q&A sessions or announcements added yet."
+                          )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+
+            {qnaTotalCount > 0 && (
+              <Pagination
+                page={page}
+                setPage={setPage}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                totalRows={qnaTotalCount}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -601,6 +949,8 @@ export default function MasterTrajectoryDetails() {
           setRowsPerPage={setRowsPerPage}
           totalRows={totalRows}
         />
+          </>
+        )}
       </div>
 
       {isEditModalOpen && (
@@ -615,6 +965,55 @@ export default function MasterTrajectoryDetails() {
           initialData={trajectory}
         />
       )}
+
+      {isQnaModalOpen && (
+        <TrajectoryQnaModal
+          open={isQnaModalOpen}
+          onClose={() => {
+            setIsQnaModalOpen(false);
+            setSelectedQnaItem(null);
+          }}
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          mode={qnaModalMode}
+          initialData={selectedQnaItem}
+          onSuccess={() => {
+            refetchQna();
+          }}
+        />
+      )}
+
+      <DeleteConfirm
+        open={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setQnaItemToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (!qnaItemToDelete?._id) return;
+          try {
+            await deleteQnaMutation.mutateAsync({
+              thesisId,
+              trajectoryId,
+              id: qnaItemToDelete._id,
+            });
+            setIsDeleteConfirmOpen(false);
+            setQnaItemToDelete(null);
+            refetchQna();
+          } catch {
+            // Error handled by store/hook toast
+          }
+        }}
+        title={t(
+          "thesisManagement.qna.deleteTitle",
+          "Delete Q&A / Announcement"
+        )}
+        message={t(
+          "thesisManagement.qna.deleteMessage",
+          "Are you sure you want to delete this entry? This action cannot be undone."
+        )}
+        isLoading={deleteQnaMutation.isPending}
+      />
     </div>
   );
 }
