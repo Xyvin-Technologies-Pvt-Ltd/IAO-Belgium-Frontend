@@ -180,12 +180,12 @@ function PreviewBody({ preview, t }) {
   );
 }
 
-const ToSendTab = ({ isConnected, canModify, mode }) => {
+const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive = false }) => {
   const { t } = useTranslation();
   const k = (key, opts) => t(`integrations.exact.toSend.${key}`, opts);
   const [previewJob, setPreviewJob] = useState(null);
 
-  const { data, isLoading, isFetching, error, refetch } = useGetExactToSend();
+  const { data, isLoading, isFetching, error, refetch } = useGetExactToSend(filters);
   const {
     data: previewResponse,
     isLoading: isPreviewLoading,
@@ -231,6 +231,10 @@ const ToSendTab = ({ isConnected, canModify, mode }) => {
         <TableSkeleton rows={3} columns={7} />
       ) : error ? (
         <ErrorMessage message={error?.message || k("loadFailed")} onRetry={refetch} variant="inline" />
+      ) : rows.length === 0 && filtersActive ? (
+        <div className="rounded-lg bg-muted/50 border dark:border-white/10 px-4 py-3 text-sm text-muted-foreground">
+          {t("integrations.exact.filters.noMatch")}
+        </div>
       ) : rows.length === 0 ? (
         <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
           {k("empty")}
