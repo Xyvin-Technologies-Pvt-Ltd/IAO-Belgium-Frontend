@@ -152,20 +152,19 @@ const CreateRole = ({ open, onClose, roleData }) => {
         },
       ],
     },
-    // Hidden for now — re-enable Master Thesis permissions later
-    // {
-    //   name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
-    //   permissions: [
-    //     {
-    //       id: "master_thesis_view",
-    //       label: t("roleManagement.modal.viewLabel"),
-    //     },
-    //     {
-    //       id: "master_thesis_modify",
-    //       label: t("roleManagement.modal.modifyLabel"),
-    //     },
-    //   ],
-    // },
+    {
+      name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
+      permissions: [
+        {
+          id: "master_thesis_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "master_thesis_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
+      ],
+    },
   ];
 
   const {

@@ -38,6 +38,11 @@ export const teacherRoutes = [
     path: "/teacher/thesis/$thesisId/trajectories/$trajectoryId/students/$userId",
     component: TeacherStudentDetail,
   },
+  { path: "/teacher/master-thesis", component: TeacherThesis },
+  {
+    path: "/teacher/master-thesis/$thesisId/trajectories/$trajectoryId/students/$userId",
+    component: TeacherStudentDetail,
+  },
   { path: "/teacher/exams", component: ExamList },
   { path: "/teacher/practical-exams", component: PracticalExamList },
   { path: "/teacher/practical-exams/$id", component: PracticalExamDetail },

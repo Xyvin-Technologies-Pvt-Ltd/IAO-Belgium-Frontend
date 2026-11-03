@@ -46,8 +46,15 @@ export const getTeacherSidebarData = (t) => ({
           icon: BookOpenCheck,
         },
         {
-          title: t("sidebar.teacher.thesis", { defaultValue: "Thesis" }),
+          title: t("sidebar.teacher.doThesis", { defaultValue: "DO Thesis" }),
           url: "/teacher/thesis",
+          icon: GraduationCap,
+        },
+        {
+          title: t("sidebar.teacher.masterThesis", {
+            defaultValue: "Master Thesis",
+          }),
+          url: "/teacher/master-thesis",
           icon: GraduationCap,
         },
         {

@@ -26,6 +26,8 @@ import {
   X,
   Loader2,
   Paperclip,
+  UserCheck,
+  Users,
 } from "lucide-react";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
@@ -51,6 +53,7 @@ import {
   respondTeacherThesisApprovalRequest,
 } from "@/api/thesisApi";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useThesisTeacherKind } from "@/hooks/useThesisTeacherKind";
 
 const RichHtml = ({ html, className = "" }) => {
   const secureHtml = useSecureHtml(html);
@@ -179,6 +182,7 @@ const TeacherStudentDetail = () => {
   const trajectoryId = params?.trajectoryId;
   const userId = params?.userId;
   const { updateBreadcrumbs } = useBreadcrumb();
+  const { type, basePath, label: kindLabel, isMaster } = useThesisTeacherKind();
 
   const currentUser = useAuthStore((state) => state.user);
   const currentProfile = useAuthStore((state) => state.profile);
@@ -190,9 +194,15 @@ const TeacherStudentDetail = () => {
   const [expandedStepIds, setExpandedStepIds] = useState(() => new Set());
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["teacher-thesis-student-detail", thesisId, trajectoryId, userId],
+    queryKey: [
+      "teacher-thesis-student-detail",
+      type,
+      thesisId,
+      trajectoryId,
+      userId,
+    ],
     queryFn: () =>
-      getTeacherThesisStudentDetail(thesisId, trajectoryId, userId),
+      getTeacherThesisStudentDetail(thesisId, trajectoryId, userId, { type }),
     enabled: Boolean(thesisId && trajectoryId && userId),
   });
 
@@ -211,7 +221,13 @@ const TeacherStudentDetail = () => {
       setApprovalModalState(null);
       setReviewNote("");
       queryClient.invalidateQueries({
-        queryKey: ["teacher-thesis-student-detail", thesisId, trajectoryId, userId],
+        queryKey: [
+          "teacher-thesis-student-detail",
+          type,
+          thesisId,
+          trajectoryId,
+          userId,
+        ],
       });
       queryClient.invalidateQueries({
         queryKey: ["teacher-thesis-approval-requests"],
@@ -234,6 +250,13 @@ const TeacherStudentDetail = () => {
   const attempt = detail?.attempt;
   const attemptStatus = attempt?.status || "active";
   const supervisor = detail?.supervisor;
+  const reader = detail?.reader;
+
+  const staffName = (person) => {
+    if (!person) return null;
+    const name = `${person.first_name || ""} ${person.last_name || ""}`.trim();
+    return name || person.email || null;
+  };
 
   useEffect(() => {
     const studentName = student
@@ -243,13 +266,17 @@ const TeacherStudentDetail = () => {
       : "Student";
 
     updateBreadcrumbs([
-      { label: t("thesisManagement.title", "Thesis"), path: "/teacher/thesis", navigable: true },
-      { label: t("thesisManagement.students", "Students"), path: "/teacher/thesis", navigable: true },
+      { label: kindLabel, path: basePath, navigable: true },
+      {
+        label: t("thesisManagement.students", "Students"),
+        path: basePath,
+        navigable: true,
+      },
       { label: studentName, navigable: false },
     ]);
 
     return () => updateBreadcrumbs([]);
-  }, [student, updateBreadcrumbs, t]);
+  }, [student, updateBreadcrumbs, t, kindLabel, basePath]);
 
   const toggleStepExpanded = (stepId) => {
     setExpandedStepIds((prev) => {
@@ -649,7 +676,7 @@ const TeacherStudentDetail = () => {
                                 </span>
                               )}
 
-                              {isPendingApproval && (
+                              {isPendingApproval && !isMaster && (
                                 <div className="flex items-center gap-2 ml-1">
                                   <Button
                                     size="sm"
@@ -884,6 +911,52 @@ const TeacherStudentDetail = () => {
 
         {/* Right Column (4 cols): Context Sidebar */}
         <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+          {isMaster &&
+            (myRoles.includes("supervisor") || myRoles.includes("reader")) && (
+            <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-border">
+                <Users className="w-4 h-4 text-primary" />
+                <div>
+                  <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
+                    {t("thesisManagement.assignedStaff", "Assigned Staff")}
+                  </h2>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {t(
+                      "thesisManagement.assignedByBackoffice",
+                      "Assigned by the backoffice"
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {myRoles.includes("supervisor") && (
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                      {t("thesisManagement.assignedSupervisor", "Assigned Supervisor")}
+                    </div>
+                    <p className="text-sm font-medium text-foreground">
+                      {staffName(supervisor) ||
+                        t("thesisManagement.noSupervisorAssigned", "Not assigned yet")}
+                    </p>
+                  </div>
+                )}
+                {myRoles.includes("reader") && (
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <UserCheck className="w-3.5 h-3.5 text-primary" />
+                      {t("thesisManagement.assignedReader", "Assigned Reader")}
+                    </div>
+                    <p className="text-sm font-medium text-foreground">
+                      {staffName(reader) ||
+                        t("thesisManagement.noReaderAssigned", "Not assigned yet")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Card 1: Thesis Overview & Resources */}
           <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-border">

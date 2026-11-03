@@ -23,6 +23,7 @@ import {
   getThesisDeadlines,
   saveThesisDeadlines,
   getTrajectoryStudents,
+  getTrajectoryEligibleStudents,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
   updateTrajectoryStudentSupervisor,
@@ -34,6 +35,11 @@ import {
   deleteStaffThesisDocument,
   createStudentPersonalNote,
   getStudentPersonalNotes,
+  getTrajectoryQnaAnnouncements,
+  getTrajectoryQnaAnnouncementById,
+  createTrajectoryQnaAnnouncement,
+  updateTrajectoryQnaAnnouncement,
+  deleteTrajectoryQnaAnnouncement,
 } from "@/api/thesisApi";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -416,6 +422,28 @@ export const useGetTrajectoryStudents = (
   });
 };
 
+export const useGetTrajectoryEligibleStudents = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-eligible-students",
+      thesisId,
+      trajectoryId,
+      params,
+    ],
+    queryFn: () =>
+      getTrajectoryEligibleStudents(thesisId, trajectoryId, params),
+    enabled: !!thesisId && !!trajectoryId,
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
 export const useGetTrajectoryStudentDetail = (
   thesisId,
   trajectoryId,
@@ -680,6 +708,117 @@ export const useCreateStudentPersonalNote = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to add note");
+    },
+  });
+};
+
+export const useGetTrajectoryQnaAnnouncements = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-qna-announcements",
+      thesisId,
+      trajectoryId,
+      params,
+    ],
+    queryFn: () =>
+      getTrajectoryQnaAnnouncements(thesisId, trajectoryId, params),
+    enabled: !!(thesisId && trajectoryId),
+    ...options,
+  });
+};
+
+export const useGetTrajectoryQnaAnnouncementById = (
+  thesisId,
+  trajectoryId,
+  itemId,
+  options = {}
+) => {
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-qna-announcement-detail",
+      thesisId,
+      trajectoryId,
+      itemId,
+    ],
+    queryFn: () =>
+      getTrajectoryQnaAnnouncementById(thesisId, trajectoryId, itemId),
+    enabled: !!(thesisId && trajectoryId && itemId),
+    ...options,
+  });
+};
+
+export const useCreateTrajectoryQnaAnnouncement = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, data }) =>
+      createTrajectoryQnaAnnouncement(thesisId, trajectoryId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-qna-announcements",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      toast.success("Created successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to create Q&A / Announcement");
+    },
+  });
+};
+
+export const useUpdateTrajectoryQnaAnnouncement = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, itemId, data }) =>
+      updateTrajectoryQnaAnnouncement(thesisId, trajectoryId, itemId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-qna-announcements",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-qna-announcement-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.itemId,
+        ],
+      });
+      toast.success("Updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update Q&A / Announcement");
+    },
+  });
+};
+
+export const useDeleteTrajectoryQnaAnnouncement = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, itemId }) =>
+      deleteTrajectoryQnaAnnouncement(thesisId, trajectoryId, itemId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-qna-announcements",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      toast.success("Deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to delete Q&A / Announcement");
     },
   });
 };

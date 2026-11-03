@@ -22,9 +22,8 @@ const VALID_PERMISSIONS = [
   "logs_management_view",
   "do_thesis_view",
   "do_thesis_modify",
-  // Hidden for now — re-enable Master Thesis permissions later
-  // "master_thesis_view",
-  // "master_thesis_modify",
+  "master_thesis_view",
+  "master_thesis_modify",
 ];
 
 export { VALID_PERMISSIONS };

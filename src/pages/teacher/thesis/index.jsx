@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { formatTZ } from "@/utils/dateUtils";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useThesisTeacherKind } from "@/hooks/useThesisTeacherKind";
 import {
   getTeacherThesisStudents,
   getTeacherThesisApprovalRequests,
@@ -59,6 +60,7 @@ const blankField = () => ({ label: "", value: "" });
 
 const RequestsTab = () => {
   const queryClient = useQueryClient();
+  const { type } = useThesisTeacherKind();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [statusFilter, setStatusFilter] = useState("pending");
@@ -68,6 +70,7 @@ const RequestsTab = () => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: [
       "teacher-thesis-approval-requests",
+      type,
       page,
       rowsPerPage,
       statusFilter,
@@ -76,6 +79,7 @@ const RequestsTab = () => {
       getTeacherThesisApprovalRequests({
         page,
         limit: rowsPerPage,
+        type,
         ...(statusFilter ? { status: statusFilter } : {}),
       }),
   });
@@ -116,11 +120,7 @@ const RequestsTab = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Showing {rows.length} of {totalRows} {totalRows === 1 ? "request" : "requests"}
-        </p>
-
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-medium text-muted-foreground">
             Status:
@@ -467,6 +467,7 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
 
 const StudentsTab = () => {
   const navigate = useNavigate();
+  const { type, basePath, isMaster } = useThesisTeacherKind();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -479,6 +480,7 @@ const StudentsTab = () => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: [
       "teacher-thesis-students",
+      type,
       page,
       rowsPerPage,
       debouncedSearch,
@@ -487,6 +489,7 @@ const StudentsTab = () => {
       getTeacherThesisStudents({
         page,
         limit: rowsPerPage,
+        type,
         ...(debouncedSearch ? { search: debouncedSearch } : {}),
       }),
   });
@@ -502,11 +505,7 @@ const StudentsTab = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Showing {rows.length} of {totalRows}{" "}
-          {totalRows === 1 ? "student" : "students"}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -559,7 +558,7 @@ const StudentsTab = () => {
                         return;
                       }
                       navigate({
-                        to: "/teacher/thesis/$thesisId/trajectories/$trajectoryId/students/$userId",
+                        to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
                         params: {
                           thesisId: row.thesis._id,
                           trajectoryId: row.trajectory._id,
@@ -617,7 +616,9 @@ const StudentsTab = () => {
                 >
                   {debouncedSearch
                     ? "No students match your search."
-                    : "No assigned students yet. Accepted supervisor requests and reader assignments appear here."}
+                    : isMaster
+                      ? "No assigned students yet. Supervisor and reader assignments from the backoffice appear here."
+                      : "No assigned students yet. Accepted supervisor requests and reader assignments appear here."}
                 </TableCell>
               </TableRow>
             )}
@@ -694,49 +695,60 @@ const ContactInfoTab = () => {
 };
 
 const TeacherThesis = () => {
+  const { type, label, isMaster, isDo } = useThesisTeacherKind();
+  const storageKey = `teacherThesisActiveTab:${type}`;
+
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("teacherThesisActiveTab") || "requests";
+    const saved = localStorage.getItem(storageKey);
+    if (isMaster) return "students";
+    return saved || "requests";
   });
 
   useEffect(() => {
-    localStorage.setItem("teacherThesisActiveTab", activeTab);
-  }, [activeTab]);
+    if (isMaster && activeTab !== "students") {
+      setActiveTab("students");
+      return;
+    }
+    localStorage.setItem(storageKey, activeTab);
+  }, [activeTab, isMaster, storageKey]);
 
-  const tabs = [
-    { id: "requests", label: "Requests" },
-    { id: "students", label: "Students" },
-    { id: "contact", label: "My contact info" },
-  ];
+  const tabs = isMaster
+    ? [{ id: "students", label: "Students" }]
+    : [
+        { id: "requests", label: "Requests" },
+        { id: "students", label: "Students" },
+        { id: "contact", label: "My contact info" },
+      ];
 
   return (
     <div className="space-y-6 mt-4">
-      <h2 className="text-xl font-bold text-foreground">
-        Thesis
-      </h2>
+      <h2 className="text-xl font-bold text-foreground">{label}</h2>
 
-      <div className="border-b border-border">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "border-primary text-primary font-semibold"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border/80"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
+      {tabs.length > 1 && (
+        <div className="border-b border-border">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "border-primary text-primary font-semibold"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border/80"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
 
-      <div className="mt-6">
-        {activeTab === "requests" && <RequestsTab />}
+      <div className={tabs.length > 1 ? "mt-6" : undefined}>
+        {isDo && activeTab === "requests" && <RequestsTab />}
         {activeTab === "students" && <StudentsTab />}
-        {activeTab === "contact" && <ContactInfoTab />}
+        {isDo && activeTab === "contact" && <ContactInfoTab />}
       </div>
     </div>
   );
