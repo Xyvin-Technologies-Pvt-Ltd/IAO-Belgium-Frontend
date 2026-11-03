@@ -250,6 +250,22 @@ export const getTrajectoryStudents = async (thesisId, trajectoryId, params = {})
   }
 };
 
+export const getTrajectoryEligibleStudents = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/eligible`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getTrajectoryStudentDetail = async (thesisId, trajectoryId, userId) => {
   try {
     const response = await axiosInstance.get(
@@ -416,11 +432,13 @@ export const getTeacherThesisStudents = async (params = {}) => {
 export const getTeacherThesisStudentDetail = async (
   thesisId,
   trajectoryId,
-  userId
+  userId,
+  params = {}
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/thesis/teacher/theses/${thesisId}/trajectories/${trajectoryId}/students/${userId}`
+      `/thesis/teacher/theses/${thesisId}/trajectories/${trajectoryId}/students/${userId}`,
+      { params }
     );
     return response.data;
   } catch (error) {

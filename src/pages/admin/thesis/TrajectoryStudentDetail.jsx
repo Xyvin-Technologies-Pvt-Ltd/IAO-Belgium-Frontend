@@ -254,6 +254,8 @@ export default function TrajectoryStudentDetail() {
   );
   const attempt = detail?.attempt;
   const attemptStatus = attempt?.status || "active";
+  const hasReenrolled = Boolean(detail?.has_reenrolled);
+  const attemptActionsDisabled = hasReenrolled;
   const failReasons = detail?.fail_reasons || [];
   const suggestPass = detail?.suggest_pass;
   const suggestFail = detail?.suggest_fail;
@@ -677,6 +679,25 @@ export default function TrajectoryStudentDetail() {
   const renderAttemptDecisionButton = (size = "default", variant = "default") => {
     if (!canModify || !attempt) return null;
 
+    if (attemptActionsDisabled) {
+      return (
+        <Button
+          variant={variant}
+          size={size}
+          disabled
+          className="gap-2 font-semibold shadow-xs"
+          title={t(
+            "thesisManagement.attempt.reenrolledActionsDisabled",
+            "This student has re-enrolled; attempt actions are unavailable on this cohort."
+          )}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>{t("thesisManagement.attempt.decision", "Attempt Decision")}</span>
+          <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+        </Button>
+      );
+    }
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -749,6 +770,14 @@ export default function TrajectoryStudentDetail() {
               {studentName}
             </h1>
             <StatusBadge status={attemptStatus} />
+            {hasReenrolled && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
+                {t(
+                  "thesisManagement.attempt.studentReenrolled",
+                  "This student re-enrolled"
+                )}
+              </span>
+            )}
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             UID: {student?.uid || "—"} • {student?.email || ""} • {trajectory?.name || "Cohort"} • {t("thesisManagement.attempt.number", "Attempt")} #{attempt?.attempt_number ?? 1}
@@ -761,7 +790,17 @@ export default function TrajectoryStudentDetail() {
               variant="outline"
               size="default"
               className="gap-2 font-semibold shadow-xs"
+              disabled={attemptActionsDisabled}
+              title={
+                attemptActionsDisabled
+                  ? t(
+                      "thesisManagement.attempt.reenrolledActionsDisabled",
+                      "This student has re-enrolled; attempt actions are unavailable on this cohort."
+                    )
+                  : undefined
+              }
               onClick={() => {
+                if (attemptActionsDisabled) return;
                 setReenrollTrajectoryId("");
                 setReenrollOpen(true);
               }}

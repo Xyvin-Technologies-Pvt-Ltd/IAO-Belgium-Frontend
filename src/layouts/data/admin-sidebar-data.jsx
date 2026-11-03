@@ -53,7 +53,7 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
             url: "/admin/thesis",
             icon: GraduationCap,
           },
-          // Hidden for now — re-enable Master Thesis in backoffice later
+          // Temporarily hidden — Master Thesis
           // {
           //   title: t("sidebar.admin.masterThesis", "Master Thesis"),
           //   url: "/admin/master-thesis",

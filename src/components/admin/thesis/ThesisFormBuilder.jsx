@@ -16,7 +16,6 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  ListChecks,
   FileQuestion,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -144,37 +143,22 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
 
   return (
     <div className="space-y-4 pt-2 border-t border-border/60">
-      {/* 1. Header Bar: Title and Counters (Single Place for Add Section is at the Bottom) */}
-      <div className="flex items-center justify-between gap-3 bg-muted/20 p-3 sm:p-3.5 rounded-xl border border-border/60">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <ListChecks className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Label className="text-sm font-bold text-foreground">
-                {t("thesisManagement.steps.form.formBuilder", "Form Builder")}
-              </Label>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                {sections.length}{" "}
-                {sections.length === 1
-                  ? t("thesisManagement.steps.form.sectionSingular", "section")
-                  : t("thesisManagement.steps.form.sectionPlural", "sections")}
-                {" • "}
-                {totalQuestions}{" "}
-                {totalQuestions === 1
-                  ? t("thesisManagement.steps.form.questionSingular", "question")
-                  : t("thesisManagement.steps.form.questionPlural", "questions")}
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              {t(
-                "thesisManagement.steps.form.builderSubtitle",
-                "Design sections, questions, and submission types for students."
-              )}
-            </p>
-          </div>
-        </div>
+      {/* 1. Header: Clean Title and Branded Counters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Label className="text-sm font-semibold text-foreground">
+          {t("thesisManagement.steps.form.formBuilder", "Form Builder")}
+        </Label>
+        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25">
+          {sections.length}{" "}
+          {sections.length === 1
+            ? t("thesisManagement.steps.form.sectionSingular", "section")
+            : t("thesisManagement.steps.form.sectionPlural", "sections")}
+          {" • "}
+          {totalQuestions}{" "}
+          {totalQuestions === 1
+            ? t("thesisManagement.steps.form.questionSingular", "question")
+            : t("thesisManagement.steps.form.questionPlural", "questions")}
+        </span>
       </div>
 
       {error && (
@@ -184,7 +168,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
       )}
 
       {/* 2. Sections List */}
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {sections.map((section, sIdx) => {
           const secId = section.id || `sec_${sIdx}`;
           const isCollapsed = collapsedSectionIds.has(secId);
@@ -193,12 +177,12 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
           return (
             <div
               key={secId}
-              className="rounded-xl border border-border/80 bg-muted/15 shadow-2xs overflow-hidden transition-all"
+              className="rounded-xl border border-border bg-card shadow-xs overflow-hidden transition-all"
             >
               {/* Section Header */}
-              <div className="bg-muted/40 px-3.5 py-3 border-b border-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/20 shrink-0">
+              <div className="bg-muted/30 px-3.5 py-2.5 border-b border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/30 shrink-0">
                     {t("thesisManagement.steps.form.sectionPrefix", "Section {{num}}", {
                       num: sIdx + 1,
                     })}
@@ -212,15 +196,15 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                       }
                       placeholder={t(
                         "thesisManagement.steps.form.sectionTitlePlaceholder",
-                        "Section title (e.g. Personal Details & Requirements)"
+                        "Section title"
                       )}
-                      className="h-8 text-xs sm:text-sm font-semibold bg-background"
+                      className="h-8 text-xs sm:text-sm font-medium bg-background border-border/80 focus-visible:ring-primary/20"
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between sm:justify-end gap-1.5 shrink-0 pl-1 sm:pl-0">
-                  <span className="text-[11px] font-medium text-muted-foreground bg-muted/80 px-2 py-0.5 rounded-full border border-border/50">
+                  <span className="text-[11px] font-medium text-muted-foreground bg-muted/80 px-2 py-0.5 rounded border border-border/50">
                     {questions.length}{" "}
                     {questions.length === 1
                       ? t("thesisManagement.steps.form.questionSingular", "question")
@@ -292,11 +276,11 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
 
               {/* Section Body (Visible when not collapsed) */}
               {!isCollapsed && (
-                <div className="p-3.5 sm:p-4 space-y-3.5">
+                <div className="p-3.5 space-y-3">
                   {/* Questions List */}
                   {questions.length === 0 ? (
-                    <div className="p-6 rounded-lg border border-dashed border-border text-center bg-card/40 space-y-2">
-                      <FileQuestion className="w-6 h-6 mx-auto text-muted-foreground/60" />
+                    <div className="p-5 rounded-md border border-dashed border-border text-center bg-card/40 space-y-1.5">
+                      <FileQuestion className="w-5 h-5 mx-auto text-muted-foreground/60" />
                       <p className="text-xs text-muted-foreground">
                         {t(
                           "thesisManagement.steps.form.noQuestions",
@@ -309,12 +293,12 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                       {questions.map((question, qIdx) => (
                         <div
                           key={question.id || qIdx}
-                          className="rounded-lg border border-border/80 bg-card p-3.5 sm:p-4 shadow-2xs space-y-3 hover:border-primary/40 transition-colors"
+                          className="rounded-xl border border-primary/30 hover:border-primary/50 bg-card p-3.5 sm:p-4 space-y-3.5 shadow-xs transition-colors"
                         >
                           {/* Question Card Top Bar: Index, Required Switch, Reorder & Delete */}
-                          <div className="flex items-center justify-between pb-2 border-b border-border/50 gap-2">
+                          <div className="flex items-center justify-between pb-2 border-b border-border/60 gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex items-center justify-center min-w-[28px] h-5 px-1.5 rounded text-[11px] font-bold bg-muted text-muted-foreground border border-border/60">
+                              <span className="inline-flex items-center justify-center min-w-[28px] h-5 px-1.5 rounded text-[11px] font-bold bg-primary/10 text-primary border border-primary/25">
                                 Q{qIdx + 1}
                               </span>
                             </div>
@@ -414,8 +398,8 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                             </div>
                           </div>
 
-                          {/* Question Input & Question Type (without icons) */}
-                          <div className="flex flex-col sm:flex-row gap-3">
+                          {/* Question Input & Question Type */}
+                          <div className="flex flex-col sm:flex-row gap-2.5">
                             <div className="flex-1 space-y-1">
                               <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
                                 {t(
@@ -432,14 +416,14 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                 }
                                 placeholder={t(
                                   "thesisManagement.steps.form.questionPlaceholder",
-                                  "e.g. Please provide a brief summary of your research objective..."
+                                  "Enter question prompt..."
                                 )}
-                                className="text-xs sm:text-sm"
+                                className="text-xs sm:text-sm bg-background border-border/80 focus-visible:ring-primary/20"
                               />
                             </div>
 
-                            <div className="sm:w-56 space-y-1 shrink-0">
-                              <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                            <div className="sm:w-52 space-y-1 shrink-0">
+                              <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
                                 {t(
                                   "thesisManagement.steps.form.questionType",
                                   "Answer Type"
@@ -464,7 +448,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                   })
                                 }
                               >
-                                <SelectTrigger className="w-full text-xs sm:text-sm font-medium">
+                                <SelectTrigger className="w-full text-xs sm:text-sm">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -486,7 +470,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                           {question.type === "multiple_choice" && (
                             <div className="space-y-2 pt-1 pl-1">
                               <div className="flex items-center justify-between">
-                                <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
                                   {t(
                                     "thesisManagement.steps.form.options",
                                     "Choices / Options"
@@ -504,9 +488,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                     key={opt.id || oIdx}
                                     className="flex items-center gap-2"
                                   >
-                                    <div className="w-3.5 h-3.5 rounded-full border-2 border-primary/40 bg-primary/5 flex items-center justify-center shrink-0">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                                    </div>
+                                    <div className="w-3.5 h-3.5 rounded-full border-2 border-primary/70 bg-primary/10 shrink-0" />
 
                                     <Input
                                       value={opt.label || ""}
@@ -524,7 +506,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                         "thesisManagement.steps.form.optionPlaceholder",
                                         `Option ${oIdx + 1}`
                                       )}
-                                      className="text-xs h-8.5"
+                                      className="text-xs h-8 bg-background border-border/80 focus-visible:ring-primary/20"
                                     />
 
                                     <Button
@@ -550,7 +532,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                               </div>
 
                               {/* Compact inline '+ Add Option' button */}
-                              <div className="pt-1">
+                              <div className="pt-0.5">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -566,7 +548,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                       ],
                                     })
                                   }
-                                  className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full border border-dashed border-primary/40 hover:border-primary/70 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-medium transition-colors cursor-pointer"
+                                  className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border border-dashed border-primary/40 hover:border-primary hover:bg-primary/5 text-primary text-xs font-semibold transition-colors cursor-pointer"
                                 >
                                   <Plus className="w-3 h-3" />
                                   <span>
@@ -588,9 +570,9 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                   <button
                     type="button"
                     onClick={() => handleAddQuestion(sIdx)}
-                    className="w-full py-2.5 px-3 rounded-lg border-2 border-dashed border-primary/25 hover:border-primary/60 bg-muted/20 hover:bg-primary/5 text-primary text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    className="w-full py-2.5 px-3 rounded-lg border border-dashed border-primary/40 hover:border-primary bg-primary/[0.02] hover:bg-primary/[0.06] text-primary text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-3.5 h-3.5 text-primary" />
                     <span>
                       {t(
                         "thesisManagement.steps.form.addQuestionToSection",
@@ -606,20 +588,18 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
         })}
       </div>
 
-      {/* 3. Bottom of Form Builder: Only place for '+ Add New Section' */}
-      <div className="pt-2">
-        <button
+      {/* 3. Bottom of Form Builder: Prominent Solid '+ Add New Section' */}
+      <div className="pt-1">
+        <Button
           type="button"
           onClick={handleAddSection}
-          className="w-full py-3.5 px-4 rounded-xl border-2 border-dashed border-primary/40 hover:border-primary bg-primary/5 hover:bg-primary/10 text-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs group"
+          className="w-full h-11 font-semibold text-xs sm:text-sm gap-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-xs cursor-pointer transition-all hover:shadow"
         >
-          <div className="w-5 h-5 rounded-full bg-primary/15 group-hover:bg-primary/25 flex items-center justify-center transition-colors">
-            <Plus className="w-3.5 h-3.5 text-primary" />
-          </div>
+          <Plus className="w-4 h-4" />
           <span>
             {t("thesisManagement.steps.form.addNewSection", "Add New Section")}
           </span>
-        </button>
+        </Button>
       </div>
     </div>
   );

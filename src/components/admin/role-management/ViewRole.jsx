@@ -56,7 +56,7 @@ const ViewRole = ({ open, onClose, roleData }) => {
       viewId: "do_thesis_view",
       modifyId: "do_thesis_modify",
     },
-    // Hidden for now — re-enable Master Thesis permissions later
+    // Temporarily hidden — Master Thesis permissions
     // {
     //   name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
     //   viewId: "master_thesis_view",

@@ -47,8 +47,7 @@ const STEP_TYPES = [
   { value: "document_upload", label: "Document upload" },
   { value: "teacher_approval", label: "Teacher approval" },
   { value: "information_only", label: "Information only" },
-  // Hidden for now — re-enable Form (questions) step type later
-  // { value: "form", label: "Form (questions)" },
+  { value: "form", label: "Form (questions)" },
 ];
 
 const DEADLINE_MODES = [

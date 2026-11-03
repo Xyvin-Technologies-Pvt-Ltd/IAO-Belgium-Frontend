@@ -23,6 +23,7 @@ import {
   getThesisDeadlines,
   saveThesisDeadlines,
   getTrajectoryStudents,
+  getTrajectoryEligibleStudents,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
   updateTrajectoryStudentSupervisor,
@@ -409,6 +410,28 @@ export const useGetTrajectoryStudents = (
   return useQuery({
     queryKey: ["thesis-trajectory-students", thesisId, trajectoryId, params],
     queryFn: () => getTrajectoryStudents(thesisId, trajectoryId, params),
+    enabled: !!thesisId && !!trajectoryId,
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...options,
+  });
+};
+
+export const useGetTrajectoryEligibleStudents = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-eligible-students",
+      thesisId,
+      trajectoryId,
+      params,
+    ],
+    queryFn: () =>
+      getTrajectoryEligibleStudents(thesisId, trajectoryId, params),
     enabled: !!thesisId && !!trajectoryId,
     placeholderData: (previousData) => previousData,
     staleTime: 30000,

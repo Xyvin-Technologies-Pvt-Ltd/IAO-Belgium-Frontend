@@ -152,7 +152,7 @@ const CreateRole = ({ open, onClose, roleData }) => {
         },
       ],
     },
-    // Hidden for now — re-enable Master Thesis permissions later
+    // Temporarily hidden — Master Thesis permissions
     // {
     //   name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
     //   permissions: [

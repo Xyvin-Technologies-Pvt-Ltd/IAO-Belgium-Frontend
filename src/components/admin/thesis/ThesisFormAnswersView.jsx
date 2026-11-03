@@ -27,12 +27,18 @@ function formatAnswer(question, value, t) {
   if (question.type === "supervisor" && typeof value === "object") {
     const name = value.name || "";
     const email = value.email || "";
+    if (value.teacher_type === "custom") {
+      if (name && email) {
+        return `${name} (${email}) · ${t("thesis.customTeacher", "Custom")}`;
+      }
+      return name || email || t("common.dash", "—");
+    }
     const typeLabel =
       value.teacher_type === "external"
         ? t("thesis.externalTeacher", "External")
         : t("thesis.internalTeacher", "Internal");
-    if (name && email) return `${name} (${email}) · ${typeLabel}`;
-    return name || email || t("common.dash", "—");
+    if (name) return `${name} · ${typeLabel}`;
+    return email || t("common.dash", "—");
   }
 
   return String(value);
