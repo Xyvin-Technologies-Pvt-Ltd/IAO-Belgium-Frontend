@@ -843,7 +843,6 @@ export default function MasterTrajectoryStudentDetail() {
               onClick={() => {
                 if (attemptActionsDisabled) return;
                 setReenrollThesisId(thesisId || "");
-                setReenrollTrajectoryId("");
                 setReenrollOpen(true);
               }}
             >
