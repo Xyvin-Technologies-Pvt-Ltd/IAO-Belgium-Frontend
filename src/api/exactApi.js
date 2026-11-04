@@ -168,3 +168,71 @@ export const addExactToOutbox = async ({ kind, id }) => {
     throw error.response?.data || error;
   }
 };
+
+// ─── Payouts (Mollie settlements ↔ Exact) ────────────────────────────────────
+
+export const getExactPayouts = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/payouts", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactPayout = async (settlementId) => {
+  try {
+    const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactPayout = async (settlementId) => {
+  try {
+    const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}/export`, {
+      responseType: "text",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const syncExactPayouts = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/payouts/sync");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactPayoutsSyncStatus = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/payouts/sync/status");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const queueExactPayoutMissing = async (settlementId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/payouts/${encodeURIComponent(settlementId)}/queue-missing`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const sendExactPayoutWaiting = async (settlementId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/payouts/${encodeURIComponent(settlementId)}/send-waiting`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

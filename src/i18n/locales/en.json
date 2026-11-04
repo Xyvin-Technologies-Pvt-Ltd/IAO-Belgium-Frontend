@@ -696,11 +696,13 @@
         "dateHint": {
           "to_send": "Dates filter on the IAO document date. Every word you type must match.",
           "missing": "Dates filter on the payment date. Every word you type must match.",
-          "history": "Dates filter on the date it was sent to Exact. Every word you type must match."
+          "history": "Dates filter on the date it was sent to Exact. Every word you type must match.",
+          "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number."
         }
       },
       "tabs": {
         "to_send": "To send",
+        "payouts": "Payouts",
         "history": "History",
         "settings": "Settings"
       },
@@ -732,6 +734,96 @@
         "pdfHint": "Checks that the Exact app may attach the IAO invoice PDF to each sales entry.",
         "connectionTitle": "Connection",
         "connectionHint": "Disconnecting stops all sending to Exact until someone authorises again."
+      },
+      "payouts": {
+        "refresh": "Refresh from Mollie",
+        "refreshing": "Refreshing…",
+        "syncRunning": "Reading payouts from Mollie…",
+        "syncDone": "Last refreshed {{when}} ({{synced}} payout(s) updated).",
+        "syncSomeFailed": "{{count}} payout(s) could not be read",
+        "syncFailed": "Last refresh failed: {{error}}",
+        "syncNever": "Not refreshed yet — click Refresh from Mollie.",
+        "notConfigured": "Mollie payouts can't be read yet: add the read-only Mollie access token (MOLLIE_ACCESS_TOKEN) on the server.",
+        "empty": "No payouts yet. Click Refresh from Mollie.",
+        "loadFailed": "Failed to load Mollie payouts",
+        "txCount": "{{payments}} payment(s), {{refunds}} refund(s)",
+        "col": {
+          "reference": "Payout",
+          "paidOut": "Paid out",
+          "net": "Paid out (net)",
+          "fees": "Mollie fees",
+          "transactions": "Transactions",
+          "inExact": "In Exact",
+          "state": "xCore",
+          "mollie": "Mollie",
+          "iao": "IAO record",
+          "name": "Student / company",
+          "amount": "Amount",
+          "date": "Date",
+          "exact": "Exact"
+        },
+        "state": {
+          "ready": "Ready",
+          "hand_match": "Match by hand",
+          "advance": "Waiting for session day",
+          "action": "Action needed",
+          "empty": "Empty"
+        },
+        "stateHint": {
+          "ready": "Every transaction is in Exact under its Mollie ID — xCore can match this payout.",
+          "hand_match": "Everything IAO can send is in Exact, but some lines (refunds, older references, unknown payments) must be matched by hand in xCore.",
+          "advance": "Advance payments in this payout are booked on the first session day; xCore holds the payout until then.",
+          "action": "Some transactions are not in Exact yet. Add the missing ones to To send, then send the waiting ones.",
+          "empty": "No transactions in this payout."
+        },
+        "mollieStatus": {
+          "open": "Open",
+          "pending": "Pending",
+          "paidout": "Paid out",
+          "failed": "Failed"
+        },
+        "line": {
+          "in_exact": "In Exact",
+          "other_ref": "Other ref.",
+          "waiting": "Waiting",
+          "sending": "Sending",
+          "failed": "Failed",
+          "missing": "Missing",
+          "advance": "Advance",
+          "not_booked": "Not booked alone",
+          "unknown": "Not in IAO",
+          "refund": "Refund",
+          "chargeback": "Chargeback"
+        },
+        "lineHint": {
+          "in_exact": "xCore matches it on the Mollie ID.",
+          "other_ref": "In Exact under another reference — match by hand in xCore.",
+          "waiting": "In To send — send it.",
+          "sending": "Being sent to Exact.",
+          "failed": "Failed in To send — open it there to see why.",
+          "missing": "Not in Exact and not queued — add it to To send.",
+          "advance": "Advance payment — booked on the first session day.",
+          "not_booked": "City switch / balance top-up — booked via credit note and switch invoice; match by hand.",
+          "unknown": "IAO has no payment with this Mollie ID.",
+          "refund": "Refunds are not matched automatically yet — match by hand in xCore.",
+          "chargeback": "Chargeback — match by hand in xCore."
+        },
+        "lineType": {
+          "payment": "Payment",
+          "refund": "Refund",
+          "chargeback": "Chargeback"
+        },
+        "yourRef": "Your ref.",
+        "detailTitle": "Payout",
+        "detailSummary": "Paid out {{date}} · {{amount}} net · fees {{fees}} · {{payments}} payment(s), {{refunds}} refund(s)",
+        "loading": "Loading payout…",
+        "queueMissing": "Add missing to To send ({{count}})",
+        "sendWaiting": "Send waiting ({{count}})",
+        "sending": "Sending…",
+        "confirmSendWaiting": "Send all {{count}} waiting record(s) of payout {{reference}} to Exact? Each is checked the same way as when you click Send on it; records with problems will fail and stay in To send.",
+        "export": "Export CSV",
+        "exporting": "Exporting…",
+        "exportFailed": "Failed to export this payout"
       }
     }
   },

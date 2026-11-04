@@ -17,6 +17,12 @@ import {
   getExactDocumentTypes,
   getExactMissing,
   addExactToOutbox,
+  getExactPayouts,
+  getExactPayout,
+  syncExactPayouts,
+  getExactPayoutsSyncStatus,
+  queueExactPayoutMissing,
+  sendExactPayoutWaiting,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -226,5 +232,78 @@ export const useAddExactToOutbox = () => {
       //* Already queued elsewhere: refresh so the row shows its To send state.
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
     },
+  });
+};
+
+// ─── Payouts (Mollie settlements ↔ Exact) ────────────────────────────────────
+
+const PAYOUT_KEYS = [["exact-payouts"], ["exact-payout"], ["exact-to-send"], ["exact-missing"]];
+
+function refreshPayouts(queryClient) {
+  for (const queryKey of PAYOUT_KEYS) queryClient.invalidateQueries({ queryKey });
+}
+
+export const useGetExactPayouts = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-payouts", params],
+    queryFn: () => getExactPayouts(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+export const useGetExactPayout = (settlementId, options = {}) =>
+  useQuery({
+    queryKey: ["exact-payout", settlementId],
+    queryFn: () => getExactPayout(settlementId),
+    enabled: Boolean(settlementId),
+    staleTime: 10000,
+    ...options,
+  });
+
+/** Polls every 3s while a refresh from Mollie is running. */
+export const useGetExactPayoutsSyncStatus = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-payouts-sync"],
+    queryFn: getExactPayoutsSyncStatus,
+    refetchInterval: (query) => (query.state.data?.data?.state === "running" ? 3000 : false),
+    ...options,
+  });
+
+export const useSyncExactPayouts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: syncExactPayouts,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Refreshing payouts from Mollie");
+      queryClient.invalidateQueries({ queryKey: ["exact-payouts-sync"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to refresh payouts from Mollie"),
+  });
+};
+
+export const useQueueExactPayoutMissing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: queueExactPayoutMissing,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Added to To send");
+      refreshPayouts(queryClient);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to add this payout's records to To send"),
+  });
+};
+
+export const useSendExactPayoutWaiting = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendExactPayoutWaiting,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sent to Exact");
+      //* The worker posts asynchronously; refresh now and again shortly after.
+      refreshPayouts(queryClient);
+      setTimeout(() => refreshPayouts(queryClient), 8000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send this payout's records"),
   });
 };

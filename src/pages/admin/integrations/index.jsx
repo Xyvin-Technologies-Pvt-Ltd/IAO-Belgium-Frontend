@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
 import ToSendTab from "./ToSendTab";
 import HistoryTab from "./HistoryTab";
+import PayoutsTab from "./PayoutsTab";
 import SettingsTab from "./SettingsTab";
 import IntegrationsFilterBar from "./IntegrationsFilterBar";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -17,8 +18,9 @@ import { useDebounce } from "@/hooks/useDebounce";
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
 //* To send: what still has to reach Exact (Waiting / Failed / Missing).
+//* Payouts: Mollie payouts and whether xCore can match them.
 //* History: what is already in Exact. Settings: send mode, checks, tools.
-const TABS = ["to_send", "history", "settings"];
+const TABS = ["to_send", "payouts", "history", "settings"];
 
 function formatExpiryDate(value) {
   if (!value) return null;
@@ -99,7 +101,7 @@ const IntegrationsPage = () => {
 
   //* Which date the filter uses, shown under the fields.
   let filterHintKey = "to_send";
-  if (tab === "history") filterHintKey = "history";
+  if (tab === "history" || tab === "payouts") filterHintKey = tab;
   else if (toSendView === "missing") filterHintKey = "missing";
 
   if (isLoading) {
@@ -221,6 +223,17 @@ const IntegrationsPage = () => {
             filtersActive={filtersActive}
             view={toSendView}
             onViewChange={setToSendView}
+          />
+        ) : tab === "payouts" ? (
+          <PayoutsTab
+            isConnected={isConnected}
+            canModify={canModify}
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            filters={filters}
+            filtersActive={filtersActive}
           />
         ) : tab === "history" ? (
           <HistoryTab
