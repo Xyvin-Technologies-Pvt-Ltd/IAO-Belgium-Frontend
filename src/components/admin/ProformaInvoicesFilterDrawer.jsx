@@ -261,7 +261,7 @@ export default function ProformaInvoicesFilterDrawer({
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
             {showPaymentFilter && (
               <FilterSection
-                label="Payment status"
+                label="Exact status"
                 onReset={isSet("payment_status") ? () => applyPatch({ payment_status: "all" }) : null}
               >
                 <Select
@@ -276,7 +276,7 @@ export default function ProformaInvoicesFilterDrawer({
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="unpaid">Unpaid</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="paid">Sent to Exact Manually</SelectItem>
                   </SelectContent>
                 </Select>
               </FilterSection>

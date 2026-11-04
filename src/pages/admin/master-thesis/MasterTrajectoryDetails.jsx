@@ -44,11 +44,9 @@ import DeleteConfirm from "@/components/DeleteConfirm";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
-  useGetTrajectoryEligibleStudents,
   useGetTrajectoryQnaAnnouncements,
   useDeleteTrajectoryQnaAnnouncement,
   useExportTrajectoryStudentsCsv,
-  useExportTrajectoryEligibleStudentsCsv,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -85,7 +83,6 @@ export default function MasterTrajectoryDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isEnrolledTab = activeTab === "enrolled";
-  const isEligibleTab = activeTab === "eligible";
   const isQnaTab = activeTab === "qna";
 
   const [qnaAudience, setQnaAudience] = useState("all");
@@ -133,12 +130,6 @@ export default function MasterTrajectoryDetails() {
       : {}),
   };
 
-  const eligibleParams = {
-    page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-  };
-
   const {
     data: enrolledResponse,
     isLoading: isEnrolledLoading,
@@ -146,19 +137,6 @@ export default function MasterTrajectoryDetails() {
     error: enrolledError,
     refetch: refetchEnrolled,
   } = useGetTrajectoryStudents(thesisId, trajectoryId, enrolledParams);
-
-  const {
-    data: eligibleResponse,
-    isLoading: isEligibleLoading,
-    isFetching: isEligibleFetching,
-    error: eligibleError,
-    refetch: refetchEligible,
-  } = useGetTrajectoryEligibleStudents(
-    thesisId,
-    trajectoryId,
-    eligibleParams,
-    { enabled: !!thesisId && !!trajectoryId && isEligibleTab }
-  );
 
   const qnaParams = {
     audience: qnaAudience,
@@ -179,21 +157,10 @@ export default function MasterTrajectoryDetails() {
 
   const deleteQnaMutation = useDeleteTrajectoryQnaAnnouncement();
   const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
-  const exportEligibleCsvMutation = useExportTrajectoryEligibleStudentsCsv();
 
-  const exportCsvPending =
-    exportEnrolledCsvMutation.isPending || exportEligibleCsvMutation.isPending;
+  const exportCsvPending = exportEnrolledCsvMutation.isPending;
 
   const handleExportCsv = () => {
-    if (isEligibleTab) {
-      const { page: _page, limit: _limit, ...exportParams } = eligibleParams;
-      exportEligibleCsvMutation.mutate({
-        thesisId,
-        trajectoryId,
-        params: exportParams,
-      });
-      return;
-    }
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
       thesisId,
@@ -213,22 +180,17 @@ export default function MasterTrajectoryDetails() {
 
   const thesis = thesisResponse?.data;
   const enrolledData = enrolledResponse?.data;
-  const eligibleData = eligibleResponse?.data;
-  const trajectory = enrolledData?.trajectory || eligibleData?.trajectory;
+  const trajectory = enrolledData?.trajectory;
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
 
-  const students = isEnrolledTab
-    ? enrolledData?.students || []
-    : eligibleData?.students || [];
-  const totalRows = isEnrolledTab
-    ? enrolledCount
-    : eligibleResponse?.total_count ?? eligibleData?.total_count ?? 0;
-  const isListLoading = isEnrolledTab ? isEnrolledLoading : isEligibleLoading;
-  const isListFetching = isEnrolledTab ? isEnrolledFetching : isEligibleFetching;
-  const listError = isEnrolledTab ? enrolledError : eligibleError;
-  const refetchList = isEnrolledTab ? refetchEnrolled : refetchEligible;
+  const students = enrolledData?.students || [];
+  const totalRows = enrolledCount;
+  const isListLoading = isEnrolledLoading;
+  const isListFetching = isEnrolledFetching;
+  const listError = enrolledError;
+  const refetchList = refetchEnrolled;
 
   useEffect(() => {
     updateBreadcrumbs([
@@ -266,7 +228,7 @@ export default function MasterTrajectoryDetails() {
   ]);
 
   const isLoading =
-    isThesisLoading || (isEnrolledLoading && !enrolledData && !eligibleData);
+    isThesisLoading || (isEnrolledLoading && !enrolledData);
   const error = thesisError || enrolledError;
 
   if (isLoading) {
@@ -392,13 +354,6 @@ export default function MasterTrajectoryDetails() {
                 label: t(
                   "thesisManagement.trajectories.enrolledStudents",
                   "Enrolled students"
-                ),
-              },
-              {
-                id: "eligible",
-                label: t(
-                  "thesisManagement.trajectories.eligibleStudents",
-                  "Eligible students"
                 ),
               },
               {
@@ -746,105 +701,6 @@ export default function MasterTrajectoryDetails() {
           </div>
         </div>
 
-        {isEligibleTab ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  {t("thesisManagement.table.studentUid", "Student UID")}
-                </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.studentName", "Student Name")}
-                </TableHead>
-                <TableHead>{t("common.email", "Email")}</TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.group", "Group")}
-                </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.purchase", "Purchase")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody
-              className={
-                isListFetching ? "opacity-50 pointer-events-none" : ""
-              }
-            >
-              {isListLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={5} />
-              ) : listError ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center p-8">
-                    <ErrorMessage
-                      message={
-                        listError?.message ||
-                        t("common.failedToLoad", "Failed to load data")
-                      }
-                      onRetry={refetchList}
-                      variant="inline"
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : students?.length > 0 ? (
-                students.map((row) => {
-                  const student = row.student;
-                  const studentName = student
-                    ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
-                      student.email
-                    : t(
-                        "thesisManagement.trajectories.unknownStudent",
-                        "Unknown Student"
-                      );
-
-                  return (
-                    <TableRow key={row.application?._id || student?._id}>
-                      <TableCell>{student?.uid || "-"}</TableCell>
-                      <TableCell>{studentName}</TableCell>
-                      <TableCell>{student?.email || "-"}</TableCell>
-                      <TableCell>{row.batch?.name || "-"}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium ${
-                            row.purchased
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {row.purchased
-                            ? t(
-                                "thesisManagement.trajectories.purchased",
-                                "Purchased"
-                              )
-                            : t(
-                                "thesisManagement.trajectories.notPurchased",
-                                "Not purchased"
-                              )}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    {search
-                      ? t(
-                          "common.noResultsFound",
-                          "No students match your search query."
-                        )
-                      : t(
-                          "thesisManagement.trajectories.noEligibleStudents",
-                          "No eligible students found for this trajectory."
-                        )}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        ) : (
           <Table>
             <TableHeader>
               <TableRow>
@@ -986,7 +842,6 @@ export default function MasterTrajectoryDetails() {
               )}
             </TableBody>
           </Table>
-        )}
 
         <Pagination
           page={page}
@@ -1005,7 +860,6 @@ export default function MasterTrajectoryDetails() {
           onClose={() => {
             setIsEditModalOpen(false);
             refetchEnrolled();
-            if (isEligibleTab) refetchEligible();
           }}
           thesisId={thesisId}
           initialData={trajectory}

@@ -37,7 +37,17 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const [draftFilters, setDraftFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
   const [appliedFilters, setAppliedFilters] = useState({ ...EMPTY_PROFORMA_FILTERS });
   const [payTarget, setPayTarget] = useState(null);
-  const { sortBy, sortOrder, handleSort } = useTableSort("updatedAt", "desc", { setPage });
+  const { sortBy, sortOrder, handleSort } = useTableSort("moved_to_finance_at", "desc", { setPage });
+
+  const formatDateOnly = (value) => {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "—";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  };
 
   const debouncedSearch = useDebounce(search, 500);
   const isFinanceTab = statusFilter === "MOVED_TO_FINANCE";
@@ -94,7 +104,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
     updateStatusMutation.mutate(
       {
         id: payTarget._id,
-        data: { status: "PAID", notes: "Marked as paid" },
+        data: { status: "PAID", notes: "Sent to Exact manually" },
       },
       { onSuccess: () => setPayTarget(null) }
     );
@@ -118,7 +128,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       bg: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400",
     },
     PAID: {
-      label: "Paid",
+      label: "Sent to Exact Manually",
       bg: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400",
     },
   };
@@ -337,17 +347,37 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                 <TableHead className="text-right">Grand Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 {isFinanceTab ? (
-                  <SortableTableHead
-                    sortKey="updatedAt"
-                    activeKey={sortBy}
-                    order={sortOrder}
-                    onSort={handleSort}
-                    defaultOrder="desc"
-                  >
-                    Last Updated
-                  </SortableTableHead>
+                  <>
+                    <SortableTableHead
+                      sortKey="createdAt"
+                      activeKey={sortBy}
+                      order={sortOrder}
+                      onSort={handleSort}
+                      defaultOrder="desc"
+                    >
+                      Date Generated
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="moved_to_finance_at"
+                      activeKey={sortBy}
+                      order={sortOrder}
+                      onSort={handleSort}
+                      defaultOrder="desc"
+                    >
+                      Date Approved
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="module_end_date"
+                      activeKey={sortBy}
+                      order={sortOrder}
+                      onSort={handleSort}
+                      defaultOrder="desc"
+                    >
+                      Last day of the module
+                    </SortableTableHead>
+                  </>
                 ) : (
-                  <TableHead className="text-center">Last Updated</TableHead>
+                  <TableHead className="text-center">Date Generated</TableHead>
                 )}
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
@@ -355,7 +385,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
             <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
               {isLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={10} />
+                <TableSkeleton rows={rowsPerPage} columns={isFinanceTab ? 12 : 10} />
               ) : invoices.length > 0 ? (
                 invoices.map((inv) => {
                   const badge = getStatusBadge(inv);
@@ -410,9 +440,23 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
-                        {new Date(inv.updatedAt).toLocaleDateString()}
-                      </TableCell>
+                      {isFinanceTab ? (
+                        <>
+                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
+                            {formatDateOnly(inv.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
+                            {formatDateOnly(inv.moved_to_finance_at)}
+                          </TableCell>
+                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
+                            {formatDateOnly(inv.module_end_date)}
+                          </TableCell>
+                        </>
+                      ) : (
+                        <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
+                          {formatDateOnly(inv.createdAt)}
+                        </TableCell>
+                      )}
                       <TableCell className="text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           {(inv.status === "MOVED_TO_FINANCE" || inv.status === "PAID") && (
@@ -446,7 +490,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                               className="h-7 px-2 text-xs"
                               onClick={() => setPayTarget(inv)}
                             >
-                              Mark as paid
+                              SEND TO EXACT MANUALLY
                             </Button>
                           )}
                         </div>

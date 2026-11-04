@@ -23,11 +23,11 @@ import {
   getThesisDeadlines,
   saveThesisDeadlines,
   getTrajectoryStudents,
-  getTrajectoryEligibleStudents,
+  getThesisEligibleStudents,
   exportTrajectoryStudentsCsv,
-  exportTrajectoryEligibleStudentsCsv,
-  addTrajectoryEligibleStudents,
-  removeTrajectoryEligibleStudent,
+  exportThesisEligibleStudentsCsv,
+  addThesisEligibleStudents,
+  removeThesisEligibleStudent,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
   updateTrajectoryStudentSupervisor,
@@ -438,27 +438,28 @@ export const useGetTrajectoryStudents = (
   });
 };
 
-export const useGetTrajectoryEligibleStudents = (
+export const useGetThesisEligibleStudents = (
   thesisId,
-  trajectoryId,
   params = {},
   options = {}
 ) => {
   return useQuery({
-    queryKey: [
-      "thesis-trajectory-eligible-students",
-      thesisId,
-      trajectoryId,
-      params,
-    ],
-    queryFn: () =>
-      getTrajectoryEligibleStudents(thesisId, trajectoryId, params),
-    enabled: !!thesisId && !!trajectoryId,
+    queryKey: ["thesis-eligible-students", thesisId, params],
+    queryFn: () => getThesisEligibleStudents(thesisId, params),
+    enabled: !!thesisId,
     placeholderData: (previousData) => previousData,
     staleTime: 30000,
     ...options,
   });
 };
+
+/** @deprecated Use useGetThesisEligibleStudents */
+export const useGetTrajectoryEligibleStudents = (
+  thesisId,
+  _trajectoryId,
+  params = {},
+  options = {}
+) => useGetThesisEligibleStudents(thesisId, params, options);
 
 export const useExportTrajectoryStudentsCsv = () => {
   return useMutation({
@@ -477,15 +478,12 @@ export const useExportTrajectoryStudentsCsv = () => {
   });
 };
 
-export const useExportTrajectoryEligibleStudentsCsv = () => {
+export const useExportThesisEligibleStudentsCsv = () => {
   return useMutation({
-    mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
-      exportTrajectoryEligibleStudentsCsv(thesisId, trajectoryId, params),
+    mutationFn: ({ thesisId, params = {} }) =>
+      exportThesisEligibleStudentsCsv(thesisId, params),
     onSuccess: (data) => {
-      triggerBlobDownload(
-        data,
-        `trajectory-eligible-${Date.now()}.csv`
-      );
+      triggerBlobDownload(data, `thesis-eligible-${Date.now()}.csv`);
       toast.success("Eligible students CSV exported successfully");
     },
     onError: (error) => {
@@ -494,18 +492,18 @@ export const useExportTrajectoryEligibleStudentsCsv = () => {
   });
 };
 
-export const useAddTrajectoryEligibleStudents = () => {
+/** @deprecated Use useExportThesisEligibleStudentsCsv */
+export const useExportTrajectoryEligibleStudentsCsv =
+  useExportThesisEligibleStudentsCsv;
+
+export const useAddThesisEligibleStudents = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, trajectoryId, userIds }) =>
-      addTrajectoryEligibleStudents(thesisId, trajectoryId, userIds),
+    mutationFn: ({ thesisId, userIds }) =>
+      addThesisEligibleStudents(thesisId, userIds),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [
-          "thesis-trajectory-eligible-students",
-          variables.thesisId,
-          variables.trajectoryId,
-        ],
+        queryKey: ["thesis-eligible-students", variables.thesisId],
       });
       toast.success(
         response?.message || "Eligible students added successfully"
@@ -517,18 +515,17 @@ export const useAddTrajectoryEligibleStudents = () => {
   });
 };
 
-export const useRemoveTrajectoryEligibleStudent = () => {
+/** @deprecated Use useAddThesisEligibleStudents */
+export const useAddTrajectoryEligibleStudents = useAddThesisEligibleStudents;
+
+export const useRemoveThesisEligibleStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, trajectoryId, userId }) =>
-      removeTrajectoryEligibleStudent(thesisId, trajectoryId, userId),
+    mutationFn: ({ thesisId, userId }) =>
+      removeThesisEligibleStudent(thesisId, userId),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [
-          "thesis-trajectory-eligible-students",
-          variables.thesisId,
-          variables.trajectoryId,
-        ],
+        queryKey: ["thesis-eligible-students", variables.thesisId],
       });
       toast.success(
         response?.message || "Eligible student removed successfully"
@@ -539,6 +536,10 @@ export const useRemoveTrajectoryEligibleStudent = () => {
     },
   });
 };
+
+/** @deprecated Use useRemoveThesisEligibleStudent */
+export const useRemoveTrajectoryEligibleStudent =
+  useRemoveThesisEligibleStudent;
 
 export const useGetTrajectoryStudentDetail = (
   thesisId,
@@ -639,15 +640,8 @@ export const useUpdateTrajectoryStudentAttemptStatus = () => {
 export const useReenrollTrajectoryStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      thesisId,
-      trajectoryId,
-      userId,
-      targetTrajectoryId,
-      targetThesisId,
-    }) =>
+    mutationFn: ({ thesisId, trajectoryId, userId, targetThesisId }) =>
       reenrollTrajectoryStudent(thesisId, trajectoryId, userId, {
-        trajectory_id: targetTrajectoryId,
         ...(targetThesisId ? { thesis_id: targetThesisId } : {}),
       }),
     onSuccess: (response, variables) => {
@@ -667,21 +661,18 @@ export const useReenrollTrajectoryStudent = () => {
         ],
       });
       const targetThesisId = variables.targetThesisId || variables.thesisId;
-      if (variables.targetTrajectoryId) {
-        queryClient.invalidateQueries({
-          queryKey: [
-            "thesis-trajectory-eligible-students",
-            targetThesisId,
-            String(variables.targetTrajectoryId),
-          ],
-        });
-      }
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-eligible-students", targetThesisId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-eligible-students", variables.thesisId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["thesis-trajectories", variables.thesisId],
       });
       toast.success(
         response?.message ||
-          "Student added as eligible on the selected trajectory"
+          "Student added as eligible on the selected thesis"
       );
     },
     onError: (error) => {
@@ -730,11 +721,7 @@ export const useMoveTrajectoryEnrolment = () => {
           ],
         });
         queryClient.invalidateQueries({
-          queryKey: [
-            "thesis-trajectory-eligible-students",
-            variables.thesisId,
-            String(variables.targetTrajectoryId),
-          ],
+          queryKey: ["thesis-eligible-students", variables.thesisId],
         });
       }
       queryClient.invalidateQueries({

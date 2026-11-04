@@ -29,6 +29,7 @@ import StatusBadge from "@/components/StatusBadge";
 import CreateThesis from "@/components/admin/thesis/CreateThesis";
 import DeactivateThesisConfirm from "@/components/admin/thesis/DeactivateThesisConfirm";
 import TrajectoryList from "@/components/admin/thesis/TrajectoryList";
+import ThesisEligibleStudentsSection from "@/components/admin/thesis/ThesisEligibleStudentsSection";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisDetail = () => {
@@ -389,6 +390,9 @@ const ThesisDetail = () => {
 
       {/* Trajectories Section */}
       <TrajectoryList thesisId={id} canModify={canModify} basePath={basePath} />
+
+      {/* Eligible students (thesis-scoped) */}
+      <ThesisEligibleStudentsSection thesisId={id} canModify={canModify} />
 
       {/* Edit Modal */}
       <CreateThesis

@@ -57,7 +57,13 @@ const CATEGORY_TOGGLE_KEY = {
 const eur = (n) => `€${Number(n || 0).toFixed(2)}`;
 
 const statusBadge = (p) => {
-  if (p?.status === "MOVED_TO_FINANCE" || p?.status === "PAID") {
+  if (p?.status === "PAID") {
+    return {
+      label: "Sent to Exact Manually",
+      className: "bg-purple-100 text-purple-800 border-purple-300",
+    };
+  }
+  if (p?.status === "MOVED_TO_FINANCE") {
     return { label: "In Finance", className: "bg-purple-100 text-purple-800 border-purple-300" };
   }
   if (p?.digital_signature?.is_signed || p?.status === "TEACHER_SIGNED_APPROVED") {

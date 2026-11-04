@@ -9,14 +9,9 @@ import { Button } from "@/components/ui/button";
 import SearchableMultiSelect from "@/components/ui/forms/SearchableMultiSelect";
 import { useTranslation } from "react-i18next";
 import { useGetUsers } from "@/store/useDropdownStore";
-import { useAddTrajectoryEligibleStudents } from "@/store/useThesisStore";
+import { useAddThesisEligibleStudents } from "@/store/useThesisStore";
 
-const AddEligibleStudentsModal = ({
-  open,
-  onClose,
-  thesisId,
-  trajectoryId,
-}) => {
+const AddEligibleStudentsModal = ({ open, onClose, thesisId }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudents, setSelectedStudents] = useState([]);
@@ -26,10 +21,10 @@ const AddEligibleStudentsModal = ({
       role: "student",
       ...(searchTerm ? { search: searchTerm } : {}),
     },
-    { enabled: open && !!thesisId && !!trajectoryId }
+    { enabled: open && !!thesisId }
   );
 
-  const addEligibleStudents = useAddTrajectoryEligibleStudents();
+  const addEligibleStudents = useAddThesisEligibleStudents();
 
   const handleClose = () => {
     setSelectedStudents([]);
@@ -58,12 +53,11 @@ const AddEligibleStudentsModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedStudents.length === 0 || !thesisId || !trajectoryId) return;
+    if (selectedStudents.length === 0 || !thesisId) return;
 
     addEligibleStudents.mutate(
       {
         thesisId,
-        trajectoryId,
         userIds: selectedStudents.map((item) => item._id),
       },
       {
