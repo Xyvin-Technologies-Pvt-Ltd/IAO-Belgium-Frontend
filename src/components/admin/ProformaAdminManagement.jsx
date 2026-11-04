@@ -104,7 +104,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
     updateStatusMutation.mutate(
       {
         id: payTarget._id,
-        data: { status: "PAID", notes: "Marked as paid" },
+        data: { status: "PAID", notes: "Sent to Exact manually" },
       },
       { onSuccess: () => setPayTarget(null) }
     );
@@ -128,7 +128,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       bg: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400",
     },
     PAID: {
-      label: "Paid",
+      label: "Sent to Exact Manually",
       bg: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400",
     },
   };
@@ -490,7 +490,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                               className="h-7 px-2 text-xs"
                               onClick={() => setPayTarget(inv)}
                             >
-                              Mark as paid
+                              SEND TO EXACT MANUALLY
                             </Button>
                           )}
                         </div>

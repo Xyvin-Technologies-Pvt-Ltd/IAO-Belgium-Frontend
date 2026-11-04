@@ -47,7 +47,7 @@ export default function TeacherProformaListPage() {
       icon: CheckCircle2,
     },
     PAID: {
-      label: "Paid",
+      label: "Sent to Exact Manually",
       bg: "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-300",
       icon: CheckCircle2,
     },

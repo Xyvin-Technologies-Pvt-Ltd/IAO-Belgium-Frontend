@@ -225,7 +225,10 @@ export default function ProformaInvoiceDetailPage() {
       label: "In finance queue",
       bg: "bg-purple-100 text-purple-800 border-purple-200",
     },
-    PAID: { label: "Paid", bg: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+    PAID: {
+      label: "Sent to Exact Manually",
+      bg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    },
     REJECTED: { label: "Rejected", bg: "bg-red-100 text-red-800 border-red-200" },
   };
   const badgeInfo = statusBadges[proforma?.status] || {
@@ -415,7 +418,7 @@ export default function ProformaInvoiceDetailPage() {
     updateStatusMutation.mutate(
       {
         id: proforma._id,
-        data: { status: "PAID", notes: "Marked as paid" },
+        data: { status: "PAID", notes: "Sent to Exact manually" },
       },
       { onSuccess: () => setPayOpen(false) }
     );
@@ -500,7 +503,7 @@ export default function ProformaInvoiceDetailPage() {
               onClick={() => setPayOpen(true)}
               disabled={updateStatusMutation.isPending}
             >
-              Mark as paid
+              SEND TO EXACT MANUALLY
             </Button>
           ) : null}
         </div>

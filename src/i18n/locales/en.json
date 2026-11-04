@@ -2997,7 +2997,7 @@
       "signedAwaitingAdmin": "Signed — awaiting admin",
       "inFinance": "In finance",
       "inFinanceQueue": "In finance queue",
-      "paid": "Paid",
+      "paid": "Sent to Exact Manually",
       "needsConfirmSignShort": "Needs confirm & sign",
       "open": "Open"
     },
