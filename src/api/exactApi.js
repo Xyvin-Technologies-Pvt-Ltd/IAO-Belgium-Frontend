@@ -9,36 +9,9 @@ export const getExactStatus = async () => {
   }
 };
 
-export const getExactUnsynced = async (params = {}) => {
-  try {
-    const response = await axiosInstance.get("/exact/unsynced", { params });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
 export const getExactSent = async (params = {}) => {
   try {
     const response = await axiosInstance.get("/exact/sent", { params });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
-export const reconcileExact = async () => {
-  try {
-    const response = await axiosInstance.post("/exact/reconcile");
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
-export const reconcileExactPayment = async (paymentId) => {
-  try {
-    const response = await axiosInstance.post(`/exact/reconcile/${paymentId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -168,6 +141,28 @@ export const sendExactJob = async (jobId) => {
 export const getExactDocumentTypes = async () => {
   try {
     const response = await axiosInstance.get("/exact/document-types");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── To send → Missing ───────────────────────────────────────────────────────
+
+//* Records that should be in Exact but aren't (payments + third-party invoices).
+export const getExactMissing = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/missing", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Queue one Missing record for To send. Never sends: an admin still previews it.
+export const addExactToOutbox = async ({ kind, id }) => {
+  try {
+    const response = await axiosInstance.post("/exact/outbox/add", { kind, id });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

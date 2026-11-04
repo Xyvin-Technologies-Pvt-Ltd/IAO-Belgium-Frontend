@@ -408,26 +408,16 @@
       "disconnecting": "Disconnecting…",
       "disconnectConfirm": "Disconnect Exact Online? Payments will no longer sync until you authorise again.",
       "syncTitle": "Accounting sync",
-      "syncDescription": "Review pending payments and everything already posted to Exact Online.",
-      "tabPending": "Pending",
-      "tabSent": "Sent to Exact",
-      "tabReconciliation": "Reconciliation",
-      "allSynced": "All payments synced to Exact Online.",
+      "syncDescription": "Send IAO records to Exact Online and review everything already posted.",
       "noSentEntries": "No Exact sales entries recorded yet.",
-      "unsyncedBanner": "{{count}} payment(s) not yet synced",
       "sentBanner": "{{count}} line(s) posted to Exact Online",
-      "syncNow": "Sync now",
-      "syncing": "Syncing…",
-      "syncRow": "Sync",
-      "syncRowHint": "Send only this payment to Exact Online, so the result can be checked before the rest.",
       "backfillContacts": "Backfill contacts & your ref",
       "backfillingContacts": "Backfilling…",
-      "backfillContactsHint": "For already-synced Exact records only: fills Contactpersoon and sets YourRef (invoice + transaction ID). Does not sync Pending payments, create documents, create new invoices, or email from Exact.",
+      "backfillContactsHint": "For records already in Exact only: fills Contactpersoon and sets YourRef (invoice + transaction ID). Does not send new records, create documents or email from Exact.",
       "authoriseFirst": "Authorise Exact Online first before syncing payments.",
       "oauthConnected": "Exact Online connected successfully",
       "oauthFailed": "Failed to connect Exact Online. Please try again.",
       "loadFailed": "Failed to load Exact Online status",
-      "unsyncedLoadFailed": "Failed to load unsynced payments",
       "sentLoadFailed": "Failed to load Exact sent history",
       "table": {
         "date": "Date",
@@ -554,7 +544,6 @@
           "transaction_id_already_used_as_yourref_on_another_exact_record": "Another Exact record already has this transaction ID"
         }
       },
-      "tabToSend": "To send",
       "sendMode": {
         "title": "Send to Exact",
         "manual": "Manual",
@@ -593,7 +582,7 @@
         "send": "Send",
         "retry": "Retry",
         "sendingNow": "Sending…",
-        "sent": "Sent to the queue — it will appear in Reconciliation when Exact confirms.",
+        "sent": "Sent to the queue — it will appear in History when Exact confirms.",
         "sendFailed": "Failed to send this record",
         "previewTitle": "Preview: what will be sent to Exact",
         "previewLoading": "Building preview…",
@@ -623,7 +612,13 @@
         "lineAmount": "Amount excl. VAT",
         "lineGl": "GL account",
         "lineVat": "VAT code",
-        "close": "Close"
+        "close": "Close",
+        "views": {
+          "waiting": "Waiting",
+          "failed": "Failed",
+          "missing": "Missing"
+        },
+        "emptyFailed": "No failed records."
       },
       "filters": {
         "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
@@ -634,10 +629,43 @@
         "noMatch": "No records match this search or date range.",
         "dateHint": {
           "to_send": "Dates filter on the IAO document date. Every word you type must match.",
-          "pending": "Dates filter on the payment date. Every word you type must match.",
-          "sent": "Dates filter on the date it was sent to Exact. Every word you type must match.",
-          "reconciliation": "Dates filter on the date it was sent to Exact. Every word you type must match."
+          "missing": "Dates filter on the payment date. Every word you type must match.",
+          "history": "Dates filter on the date it was sent to Exact. Every word you type must match."
         }
+      },
+      "tabs": {
+        "to_send": "To send",
+        "history": "History",
+        "settings": "Settings"
+      },
+      "missing": {
+        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s)), paid since {{since}}. Add one to To send, then preview and send it there.",
+        "empty": "Nothing missing in Exact since {{since}}.",
+        "loadFailed": "Failed to load records missing in Exact",
+        "paidOn": "Paid on",
+        "notQueued": "Not in To send",
+        "add": "Add to To send",
+        "adding": "Adding…",
+        "addHint": "Puts this record in To send (Waiting). Nothing is sent until you preview it and click Send there.",
+        "kind": {
+          "payment": "Payment",
+          "third_party_invoice": "Third-party invoice"
+        },
+        "queued": {
+          "held": "In To send",
+          "failed": "Failed in To send",
+          "sending": "Sending"
+        }
+      },
+      "history": {
+        "documents": "Documents",
+        "lines": "GL lines"
+      },
+      "settings": {
+        "pdfTitle": "IAO invoice PDF",
+        "pdfHint": "Checks that the Exact app may attach the IAO invoice PDF to each sales entry.",
+        "connectionTitle": "Connection",
+        "connectionHint": "Disconnecting stops all sending to Exact until someone authorises again."
       }
     }
   },
