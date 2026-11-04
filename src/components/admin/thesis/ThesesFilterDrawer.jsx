@@ -193,7 +193,7 @@ const ThesesFilterDrawer = ({
                   </SelectItem>
                   {STUDY_YEARS.map((yr) => (
                     <SelectItem key={yr} value={String(yr)}>
-                      {t("thesisManagement.modal.yearOption", `Year ${yr}`, {
+                      {t("thesisManagement.modal.yearOption", "Year {{year}}", {
                         year: yr,
                       })}
                     </SelectItem>

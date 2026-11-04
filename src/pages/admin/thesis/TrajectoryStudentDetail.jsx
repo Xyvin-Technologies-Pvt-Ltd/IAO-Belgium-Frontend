@@ -28,6 +28,7 @@ import {
   ChevronDown,
   Link2,
   ExternalLink,
+  ArrowRightLeft,
 } from "lucide-react";
 
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -75,11 +76,13 @@ import {
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
   useReenrollTrajectoryStudent,
+  useMoveTrajectoryEnrolment,
   useUpdateTrajectoryStudentStepDeadline,
   useUploadStaffThesisDocument,
   useRenameStaffThesisDocument,
   useDeleteStaffThesisDocument,
   useGetThesisTrajectories,
+  useGetTheses,
 } from "@/store/useThesisStore";
 
 const RichHtml = ({ html, className = "" }) => {
@@ -189,7 +192,13 @@ export default function TrajectoryStudentDetail() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
-  const { basePath, label: kindLabel } = useThesisAdminKind();
+  const {
+    type: thesisType,
+    basePath,
+    label: kindLabel,
+    isDo,
+    isMaster,
+  } = useThesisAdminKind();
   const canModify = useCanModify(basePath);
 
   const thesisId = params.id;
@@ -214,7 +223,10 @@ export default function TrajectoryStudentDetail() {
   const [statusDraft, setStatusDraft] = useState(null); // { status: 'passed'|'failed', reason: '' }
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
   const [reenrollOpen, setReenrollOpen] = useState(false);
+  const [reenrollThesisId, setReenrollThesisId] = useState("");
   const [reenrollTrajectoryId, setReenrollTrajectoryId] = useState("");
+  const [moveOpen, setMoveOpen] = useState(false);
+  const [moveTrajectoryId, setMoveTrajectoryId] = useState("");
 
   // Queries & Mutations
   const {
@@ -223,14 +235,28 @@ export default function TrajectoryStudentDetail() {
     error,
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
-  const { data: trajectoriesResponse } = useGetThesisTrajectories(thesisId, {
-    enabled: Boolean(thesisId) && reenrollOpen,
+
+  const selectedReenrollThesisId = reenrollThesisId || thesisId;
+
+  const { data: thesesResponse } = useGetTheses(
+    { type: thesisType, limit: 200 },
+    { enabled: Boolean(thesisId) && reenrollOpen }
+  );
+  const { data: trajectoriesResponse } = useGetThesisTrajectories(
+    selectedReenrollThesisId,
+    {
+      enabled: Boolean(selectedReenrollThesisId) && reenrollOpen,
+    }
+  );
+  const { data: moveTrajectoriesResponse } = useGetThesisTrajectories(thesisId, {
+    enabled: isDo && Boolean(thesisId) && moveOpen,
   });
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
   const reenrollMutation = useReenrollTrajectoryStudent();
+  const moveEnrolmentMutation = useMoveTrajectoryEnrolment();
   const updateStepDeadlineMutation = useUpdateTrajectoryStudentStepDeadline();
   const uploadDocMutation = useUploadStaffThesisDocument();
   const renameDocMutation = useRenameStaffThesisDocument();
@@ -259,16 +285,40 @@ export default function TrajectoryStudentDetail() {
   const failReasons = detail?.fail_reasons || [];
   const suggestPass = detail?.suggest_pass;
   const suggestFail = detail?.suggest_fail;
+
+  const reenrollThesisOptions = useMemo(() => {
+    const list = thesesResponse?.data || [];
+    return Array.isArray(list) ? list : [];
+  }, [thesesResponse]);
+
   const reenrollTargets = useMemo(() => {
     const list = trajectoriesResponse?.data || trajectoriesResponse || [];
     const rows = Array.isArray(list) ? list : list?.trajectories || [];
-    return rows.filter(
-      (traj) =>
-        traj &&
-        !traj.removed &&
-        String(traj._id) !== String(trajectoryId)
-    );
-  }, [trajectoriesResponse, trajectoryId]);
+    const isSameThesis =
+      String(selectedReenrollThesisId) === String(thesisId);
+    return rows.filter((traj) => {
+      if (!traj || traj.removed) return false;
+      if (isSameThesis && String(traj._id) === String(trajectoryId)) {
+        return false;
+      }
+      return true;
+    });
+  }, [
+    trajectoriesResponse,
+    trajectoryId,
+    selectedReenrollThesisId,
+    thesisId,
+  ]);
+
+  const moveTargets = useMemo(() => {
+    const list = moveTrajectoriesResponse?.data || moveTrajectoriesResponse || [];
+    const rows = Array.isArray(list) ? list : list?.trajectories || [];
+    return rows.filter((traj) => {
+      if (!traj || traj.removed) return false;
+      if (String(traj._id) === String(trajectoryId)) return false;
+      return true;
+    });
+  }, [moveTrajectoriesResponse, trajectoryId]);
 
   // Activity log timeline state
   const [logSearch, setLogSearch] = useState("");
@@ -521,7 +571,34 @@ export default function TrajectoryStudentDetail() {
   };
 
   const handleReenrollSubmit = async () => {
-    if (!reenrollTrajectoryId) {
+    if (!selectedReenrollThesisId || !reenrollTrajectoryId) {
+      toast.error(
+        t(
+          "thesisManagement.attempt.selectTrajectory",
+          "Select a target thesis and trajectory"
+        )
+      );
+      return;
+    }
+    try {
+      await reenrollMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        targetThesisId: selectedReenrollThesisId,
+        targetTrajectoryId: reenrollTrajectoryId,
+      });
+      setReenrollOpen(false);
+      setReenrollThesisId("");
+      setReenrollTrajectoryId("");
+      refetch();
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
+  const handleMoveEnrolmentSubmit = async () => {
+    if (!moveTrajectoryId) {
       toast.error(
         t(
           "thesisManagement.attempt.selectTrajectory",
@@ -531,27 +608,23 @@ export default function TrajectoryStudentDetail() {
       return;
     }
     try {
-      const response = await reenrollMutation.mutateAsync({
+      await moveEnrolmentMutation.mutateAsync({
         thesisId,
         trajectoryId,
         userId,
-        targetTrajectoryId: reenrollTrajectoryId,
+        targetTrajectoryId: moveTrajectoryId,
       });
-      setReenrollOpen(false);
-      setReenrollTrajectoryId("");
-      const nextTrajId = response?.data?.trajectory?._id;
-      if (nextTrajId) {
-        navigate({
-          to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
-          params: {
-            id: thesisId,
-            trajectoryId: String(nextTrajId),
-            userId,
-          },
-        });
-      } else {
-        refetch();
-      }
+      const targetId = moveTrajectoryId;
+      setMoveOpen(false);
+      setMoveTrajectoryId("");
+      navigate({
+        to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
+        params: {
+          id: thesisId,
+          trajectoryId: targetId,
+          userId,
+        },
+      });
     } catch {
       // Error handled by store hook
     }
@@ -780,12 +853,12 @@ export default function TrajectoryStudentDetail() {
             )}
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            UID: {student?.uid || "—"} • {student?.email || ""} • {trajectory?.name || "Cohort"} • {t("thesisManagement.attempt.number", "Attempt")} #{attempt?.attempt_number ?? 1}
+            UID: {student?.uid || "—"} • {student?.email || ""} • {trajectory?.name || t("thesisManagement.trajectories.cohort", "Cohort")} • {t("thesisManagement.attempt.number", "Attempt")} #{attempt?.attempt_number ?? 1}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {canModify && attemptStatus !== "passed" && (
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {isDo && canModify && attemptStatus === "active" && (
             <Button
               variant="outline"
               size="default"
@@ -801,6 +874,37 @@ export default function TrajectoryStudentDetail() {
               }
               onClick={() => {
                 if (attemptActionsDisabled) return;
+                setMoveTrajectoryId("");
+                setMoveOpen(true);
+              }}
+            >
+              <ArrowRightLeft className="w-4 h-4" />
+              {t(
+                "thesisManagement.attempt.moveEnrolment",
+                "Move enrolment"
+              )}
+            </Button>
+          )}
+          {/* DO: only after fail (Move covers active cohort changes). Master: any non-passed. */}
+          {canModify &&
+            attemptStatus !== "passed" &&
+            (isMaster || attemptStatus === "failed") && (
+            <Button
+              variant="outline"
+              size="default"
+              className="gap-2 font-semibold shadow-xs"
+              disabled={attemptActionsDisabled}
+              title={
+                attemptActionsDisabled
+                  ? t(
+                      "thesisManagement.attempt.reenrolledActionsDisabled",
+                      "This student has re-enrolled; attempt actions are unavailable on this cohort."
+                    )
+                  : undefined
+              }
+              onClick={() => {
+                if (attemptActionsDisabled) return;
+                setReenrollThesisId(thesisId || "");
                 setReenrollTrajectoryId("");
                 setReenrollOpen(true);
               }}
@@ -827,7 +931,7 @@ export default function TrajectoryStudentDetail() {
 
         <DashboardCard
           title={t("thesisManagement.trajectories.trajectory", "Cohort Trajectory")}
-          value={trajectory?.name || "Cohort"}
+          value={trajectory?.name || t("thesisManagement.trajectories.cohort", "Cohort")}
           subtitle={thesis?.name || t("thesisManagement.title", "Thesis")}
           icon={Compass}
         />
@@ -842,7 +946,7 @@ export default function TrajectoryStudentDetail() {
           subtitle={
             trajectory?.start_date
               ? `${t("thesisManagement.trajectories.startsOn", "Starts")}: ${moment(trajectory.start_date).format("DD/MM/YYYY")}`
-              : "Ongoing cohort"
+              : t("thesisManagement.trajectories.ongoingCohort", "Ongoing cohort")
           }
           icon={Clock}
         />
@@ -850,7 +954,7 @@ export default function TrajectoryStudentDetail() {
         <DashboardCard
           title={t("thesis.progress", "Required Steps Progress")}
           value={`${progress.completed} / ${progress.total}`}
-          subtitle={`${progress.percentage}% ${t("thesis.completed", "completed")} • #${attempt?.attempt_number ?? 1} (${attemptStatus})`}
+          subtitle={`${progress.percentage}% ${t("thesis.completed", "completed")} • #${attempt?.attempt_number ?? 1} (${t(`thesisManagement.attempt.statuses.${attemptStatus}`, attemptStatus)})`}
           icon={CheckCircle2}
         />
       </div>
@@ -1170,7 +1274,13 @@ export default function TrajectoryStudentDetail() {
                               {embedUrl && (
                                 <div className="aspect-video w-full bg-black/5">
                                   <iframe
-                                    title={vid.name || "YouTube video"}
+                                    title={
+                                      vid.name ||
+                                      t(
+                                        "thesisManagement.teacher.youtubeVideo",
+                                        "YouTube video"
+                                      )
+                                    }
                                     src={embedUrl}
                                     className="w-full h-full"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1227,7 +1337,9 @@ export default function TrajectoryStudentDetail() {
                                       )}
                                       {doc.uploaded_by && (
                                         <span>
-                                          • {doc.source === "backoffice" ? "Staff:" : "Student:"}{" "}
+                                          • {doc.source === "backoffice"
+                                            ? t("thesisManagement.attempt.staffPrefix", "Staff:")
+                                            : t("thesisManagement.attempt.studentPrefix", "Student:")}{" "}
                                           {`${doc.uploaded_by.first_name || ""} ${doc.uploaded_by.last_name || ""}`.trim() || doc.uploaded_by.email}
                                         </span>
                                       )}
@@ -1964,12 +2076,117 @@ export default function TrajectoryStudentDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Admin re-enrol to another trajectory */}
+      {/* DO only: remount same payment/attempt to another trajectory (never fails attempt) */}
+      <Dialog
+        open={isDo && moveOpen}
+        onOpenChange={(open) => {
+          if (!open && !moveEnrolmentMutation.isPending) {
+            setMoveOpen(false);
+            setMoveTrajectoryId("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold">
+              {t(
+                "thesisManagement.attempt.moveEnrolment",
+                "Move enrolment"
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t(
+                  "thesisManagement.attempt.targetTrajectory",
+                  "Target trajectory"
+                )}
+              </label>
+              <Select
+                value={moveTrajectoryId}
+                onValueChange={setMoveTrajectoryId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t(
+                      "thesisManagement.attempt.selectTrajectory",
+                      "Select a trajectory"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {moveTargets.map((traj) => {
+                    const startPassed =
+                      traj.start_date &&
+                      moment(traj.start_date)
+                        .startOf("day")
+                        .isBefore(moment().startOf("day"));
+                    return (
+                      <SelectItem key={traj._id} value={String(traj._id)}>
+                        {traj.name || String(traj._id)}
+                        {traj.start_date
+                          ? ` · ${moment(traj.start_date).format("DD/MM/YYYY")}`
+                          : ""}
+                        {startPassed
+                          ? ` (${t(
+                              "thesisManagement.attempt.moveStartPassed",
+                              "start date passed"
+                            )})`
+                          : ""}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              {moveTargets.length === 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.attempt.noOtherTrajectories",
+                    "No other trajectories available for this thesis."
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setMoveOpen(false)}
+              disabled={moveEnrolmentMutation.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleMoveEnrolmentSubmit}
+              disabled={
+                moveEnrolmentMutation.isPending || !moveTrajectoryId
+              }
+              className="gap-2"
+            >
+              {moveEnrolmentMutation.isPending && (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              )}
+              {t(
+                "thesisManagement.attempt.confirmMoveEnrolment",
+                "Move enrolment"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Re-enrol: fail (if still active) + add eligible. DO shows this only when already failed. */}
       <Dialog
         open={reenrollOpen}
         onOpenChange={(open) => {
           if (!open && !reenrollMutation.isPending) {
             setReenrollOpen(false);
+            setReenrollThesisId("");
             setReenrollTrajectoryId("");
           }
         }}
@@ -1984,6 +2201,40 @@ export default function TrajectoryStudentDetail() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
+            <p className="text-xs text-muted-foreground">
+              {t(
+                "thesisManagement.attempt.reenrollEligibleHint",
+                "Closes the current attempt and adds the student as eligible on the selected trajectory. They must purchase to enrol."
+              )}
+            </p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t("thesisManagement.attempt.targetThesis", "Target thesis")}
+              </label>
+              <Select
+                value={selectedReenrollThesisId}
+                onValueChange={(value) => {
+                  setReenrollThesisId(value);
+                  setReenrollTrajectoryId("");
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t(
+                      "thesisManagement.attempt.selectThesis",
+                      "Select a thesis"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {reenrollThesisOptions.map((item) => (
+                    <SelectItem key={item._id} value={String(item._id)}>
+                      {item.name || String(item._id)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">
                 {t(

@@ -24,11 +24,16 @@ import {
   saveThesisDeadlines,
   getTrajectoryStudents,
   getTrajectoryEligibleStudents,
+  exportTrajectoryStudentsCsv,
+  exportTrajectoryEligibleStudentsCsv,
+  addTrajectoryEligibleStudents,
+  removeTrajectoryEligibleStudent,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
   updateTrajectoryStudentSupervisor,
   updateTrajectoryStudentAttemptStatus,
   reenrollTrajectoryStudent,
+  moveTrajectoryEnrolment,
   updateTrajectoryStudentStepDeadline,
   uploadStaffThesisDocument,
   renameStaffThesisDocument,
@@ -44,6 +49,17 @@ import {
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+const triggerBlobDownload = (blobData, filename) => {
+  const url = window.URL.createObjectURL(new Blob([blobData]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
 
 export const useGetTheses = (filter, options = {}) => {
   return useQuery({
@@ -444,6 +460,86 @@ export const useGetTrajectoryEligibleStudents = (
   });
 };
 
+export const useExportTrajectoryStudentsCsv = () => {
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
+      exportTrajectoryStudentsCsv(thesisId, trajectoryId, params),
+    onSuccess: (data) => {
+      triggerBlobDownload(
+        data,
+        `trajectory-enrolled-${Date.now()}.csv`
+      );
+      toast.success("Enrolled students CSV exported successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to export enrolled students CSV");
+    },
+  });
+};
+
+export const useExportTrajectoryEligibleStudentsCsv = () => {
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
+      exportTrajectoryEligibleStudentsCsv(thesisId, trajectoryId, params),
+    onSuccess: (data) => {
+      triggerBlobDownload(
+        data,
+        `trajectory-eligible-${Date.now()}.csv`
+      );
+      toast.success("Eligible students CSV exported successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to export eligible students CSV");
+    },
+  });
+};
+
+export const useAddTrajectoryEligibleStudents = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userIds }) =>
+      addTrajectoryEligibleStudents(thesisId, trajectoryId, userIds),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-eligible-students",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      toast.success(
+        response?.message || "Eligible students added successfully"
+      );
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to add eligible students");
+    },
+  });
+};
+
+export const useRemoveTrajectoryEligibleStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId }) =>
+      removeTrajectoryEligibleStudent(thesisId, trajectoryId, userId),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-eligible-students",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      toast.success(
+        response?.message || "Eligible student removed successfully"
+      );
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to remove eligible student");
+    },
+  });
+};
+
 export const useGetTrajectoryStudentDetail = (
   thesisId,
   trajectoryId,
@@ -543,8 +639,62 @@ export const useUpdateTrajectoryStudentAttemptStatus = () => {
 export const useReenrollTrajectoryStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, trajectoryId, userId, targetTrajectoryId }) =>
+    mutationFn: ({
+      thesisId,
+      trajectoryId,
+      userId,
+      targetTrajectoryId,
+      targetThesisId,
+    }) =>
       reenrollTrajectoryStudent(thesisId, trajectoryId, userId, {
+        trajectory_id: targetTrajectoryId,
+        ...(targetThesisId ? { thesis_id: targetThesisId } : {}),
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-students",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      const targetThesisId = variables.targetThesisId || variables.thesisId;
+      if (variables.targetTrajectoryId) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            "thesis-trajectory-eligible-students",
+            targetThesisId,
+            String(variables.targetTrajectoryId),
+          ],
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectories", variables.thesisId],
+      });
+      toast.success(
+        response?.message ||
+          "Student added as eligible on the selected trajectory"
+      );
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to re-enrol student");
+    },
+  });
+};
+
+export const useMoveTrajectoryEnrolment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, targetTrajectoryId }) =>
+      moveTrajectoryEnrolment(thesisId, trajectoryId, userId, {
         trajectory_id: targetTrajectoryId,
       }),
     onSuccess: (response, variables) => {
@@ -557,22 +707,45 @@ export const useReenrollTrajectoryStudent = () => {
         ],
       });
       queryClient.invalidateQueries({
-        queryKey: ["thesis-trajectory-students", variables.thesisId, variables.trajectoryId],
+        queryKey: [
+          "thesis-trajectory-students",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
       });
-      if (response?.data?.trajectory?._id) {
+      if (variables.targetTrajectoryId) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            "thesis-trajectory-student-detail",
+            variables.thesisId,
+            String(variables.targetTrajectoryId),
+            variables.userId,
+          ],
+        });
         queryClient.invalidateQueries({
           queryKey: [
             "thesis-trajectory-students",
             variables.thesisId,
-            String(response.data.trajectory._id),
+            String(variables.targetTrajectoryId),
+          ],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [
+            "thesis-trajectory-eligible-students",
+            variables.thesisId,
+            String(variables.targetTrajectoryId),
           ],
         });
       }
-      queryClient.invalidateQueries({ queryKey: ["thesis-trajectories", variables.thesisId] });
-      toast.success(response?.message || "Student re-enrolled on trajectory");
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectories", variables.thesisId],
+      });
+      toast.success(
+        response?.message || "Enrolment moved to the selected trajectory"
+      );
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to re-enrol student");
+      toast.error(error?.message || "Failed to move enrolment");
     },
   });
 };

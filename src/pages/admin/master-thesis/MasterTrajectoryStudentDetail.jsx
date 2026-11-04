@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { toast } from "sonner";
@@ -81,6 +81,7 @@ import {
   useRenameStaffThesisDocument,
   useDeleteStaffThesisDocument,
   useGetThesisTrajectories,
+  useGetTheses,
 } from "@/store/useThesisStore";
 
 const staffOptionValue = (person) => {
@@ -223,9 +224,8 @@ const getActionMeta = (action) => {
  */
 export default function MasterTrajectoryStudentDetail() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const params = useParams({ strict: false });
-  const { basePath, label: kindLabel } = useThesisAdminKind();
+  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
   const canModify = useCanModify(basePath);
 
   const thesisId = params.id;
@@ -250,6 +250,7 @@ export default function MasterTrajectoryStudentDetail() {
   const [statusDraft, setStatusDraft] = useState(null); // { status: 'passed'|'failed', reason: '' }
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
   const [reenrollOpen, setReenrollOpen] = useState(false);
+  const [reenrollThesisId, setReenrollThesisId] = useState("");
   const [reenrollTrajectoryId, setReenrollTrajectoryId] = useState("");
 
   // Queries & Mutations
@@ -259,9 +260,19 @@ export default function MasterTrajectoryStudentDetail() {
     error,
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
-  const { data: trajectoriesResponse } = useGetThesisTrajectories(thesisId, {
-    enabled: Boolean(thesisId) && reenrollOpen,
-  });
+
+  const selectedReenrollThesisId = reenrollThesisId || thesisId;
+
+  const { data: thesesResponse } = useGetTheses(
+    { type: thesisType, limit: 200 },
+    { enabled: Boolean(thesisId) && reenrollOpen }
+  );
+  const { data: trajectoriesResponse } = useGetThesisTrajectories(
+    selectedReenrollThesisId,
+    {
+      enabled: Boolean(selectedReenrollThesisId) && reenrollOpen,
+    }
+  );
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
@@ -295,16 +306,30 @@ export default function MasterTrajectoryStudentDetail() {
   const failReasons = detail?.fail_reasons || [];
   const suggestPass = detail?.suggest_pass;
   const suggestFail = detail?.suggest_fail;
+
+  const reenrollThesisOptions = useMemo(() => {
+    const list = thesesResponse?.data || [];
+    return Array.isArray(list) ? list : [];
+  }, [thesesResponse]);
+
   const reenrollTargets = useMemo(() => {
     const list = trajectoriesResponse?.data || trajectoriesResponse || [];
     const rows = Array.isArray(list) ? list : list?.trajectories || [];
-    return rows.filter(
-      (traj) =>
-        traj &&
-        !traj.removed &&
-        String(traj._id) !== String(trajectoryId)
-    );
-  }, [trajectoriesResponse, trajectoryId]);
+    const isSameThesis =
+      String(selectedReenrollThesisId) === String(thesisId);
+    return rows.filter((traj) => {
+      if (!traj || traj.removed) return false;
+      if (isSameThesis && String(traj._id) === String(trajectoryId)) {
+        return false;
+      }
+      return true;
+    });
+  }, [
+    trajectoriesResponse,
+    trajectoryId,
+    selectedReenrollThesisId,
+    thesisId,
+  ]);
 
   // Activity log timeline state
   const [logSearch, setLogSearch] = useState("");
@@ -576,37 +601,27 @@ export default function MasterTrajectoryStudentDetail() {
   };
 
   const handleReenrollSubmit = async () => {
-    if (!reenrollTrajectoryId) {
+    if (!selectedReenrollThesisId || !reenrollTrajectoryId) {
       toast.error(
         t(
           "thesisManagement.attempt.selectTrajectory",
-          "Select a target trajectory"
+          "Select a target thesis and trajectory"
         )
       );
       return;
     }
     try {
-      const response = await reenrollMutation.mutateAsync({
+      await reenrollMutation.mutateAsync({
         thesisId,
         trajectoryId,
         userId,
+        targetThesisId: selectedReenrollThesisId,
         targetTrajectoryId: reenrollTrajectoryId,
       });
       setReenrollOpen(false);
+      setReenrollThesisId("");
       setReenrollTrajectoryId("");
-      const nextTrajId = response?.data?.trajectory?._id;
-      if (nextTrajId) {
-        navigate({
-          to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
-          params: {
-            id: thesisId,
-            trajectoryId: String(nextTrajId),
-            userId,
-          },
-        });
-      } else {
-        refetch();
-      }
+      refetch();
     } catch {
       // Error handled by store hook
     }
@@ -835,7 +850,7 @@ export default function MasterTrajectoryStudentDetail() {
             )}
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            UID: {student?.uid || "—"} • {student?.email || ""} • {trajectory?.name || "Cohort"} • {t("thesisManagement.attempt.number", "Attempt")} #{attempt?.attempt_number ?? 1}
+            UID: {student?.uid || "—"} • {student?.email || ""} • {trajectory?.name || t("thesisManagement.trajectories.cohort", "Cohort")} • {t("thesisManagement.attempt.number", "Attempt")} #{attempt?.attempt_number ?? 1}
           </p>
         </div>
 
@@ -856,6 +871,7 @@ export default function MasterTrajectoryStudentDetail() {
               }
               onClick={() => {
                 if (attemptActionsDisabled) return;
+                setReenrollThesisId(thesisId || "");
                 setReenrollTrajectoryId("");
                 setReenrollOpen(true);
               }}
@@ -882,7 +898,7 @@ export default function MasterTrajectoryStudentDetail() {
 
         <DashboardCard
           title={t("thesisManagement.trajectories.trajectory", "Cohort Trajectory")}
-          value={trajectory?.name || "Cohort"}
+          value={trajectory?.name || t("thesisManagement.trajectories.cohort", "Cohort")}
           subtitle={thesis?.name || t("thesisManagement.title", "Thesis")}
           icon={Compass}
         />
@@ -897,7 +913,7 @@ export default function MasterTrajectoryStudentDetail() {
           subtitle={
             trajectory?.start_date
               ? `${t("thesisManagement.trajectories.startsOn", "Starts")}: ${moment(trajectory.start_date).format("DD/MM/YYYY")}`
-              : "Ongoing cohort"
+              : t("thesisManagement.trajectories.ongoingCohort", "Ongoing cohort")
           }
           icon={Clock}
         />
@@ -905,7 +921,7 @@ export default function MasterTrajectoryStudentDetail() {
         <DashboardCard
           title={t("thesis.progress", "Required Steps Progress")}
           value={`${progress.completed} / ${progress.total}`}
-          subtitle={`${progress.percentage}% ${t("thesis.completed", "completed")} • #${attempt?.attempt_number ?? 1} (${attemptStatus})`}
+          subtitle={`${progress.percentage}% ${t("thesis.completed", "completed")} • #${attempt?.attempt_number ?? 1} (${t(`thesisManagement.attempt.statuses.${attemptStatus}`, attemptStatus)})`}
           icon={CheckCircle2}
         />
       </div>
@@ -1225,7 +1241,13 @@ export default function MasterTrajectoryStudentDetail() {
                               {embedUrl && (
                                 <div className="aspect-video w-full bg-black/5">
                                   <iframe
-                                    title={vid.name || "YouTube video"}
+                                    title={
+                                      vid.name ||
+                                      t(
+                                        "thesisManagement.teacher.youtubeVideo",
+                                        "YouTube video"
+                                      )
+                                    }
                                     src={embedUrl}
                                     className="w-full h-full"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1282,7 +1304,9 @@ export default function MasterTrajectoryStudentDetail() {
                                       )}
                                       {doc.uploaded_by && (
                                         <span>
-                                          • {doc.source === "backoffice" ? "Staff:" : "Student:"}{" "}
+                                          • {doc.source === "backoffice"
+                                            ? t("thesisManagement.attempt.staffPrefix", "Staff:")
+                                            : t("thesisManagement.attempt.studentPrefix", "Student:")}{" "}
                                           {`${doc.uploaded_by.first_name || ""} ${doc.uploaded_by.last_name || ""}`.trim() || doc.uploaded_by.email}
                                         </span>
                                       )}
@@ -2090,12 +2114,13 @@ export default function MasterTrajectoryStudentDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Admin re-enrol to another trajectory */}
+      {/* Admin re-enrol: add as eligible on another thesis/trajectory */}
       <Dialog
         open={reenrollOpen}
         onOpenChange={(open) => {
           if (!open && !reenrollMutation.isPending) {
             setReenrollOpen(false);
+            setReenrollThesisId("");
             setReenrollTrajectoryId("");
           }
         }}
@@ -2110,6 +2135,40 @@ export default function MasterTrajectoryStudentDetail() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
+            <p className="text-xs text-muted-foreground">
+              {t(
+                "thesisManagement.attempt.reenrollEligibleHint",
+                "Closes the current attempt and adds the student as eligible on the selected trajectory. They must purchase to enrol."
+              )}
+            </p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t("thesisManagement.attempt.targetThesis", "Target thesis")}
+              </label>
+              <Select
+                value={selectedReenrollThesisId}
+                onValueChange={(value) => {
+                  setReenrollThesisId(value);
+                  setReenrollTrajectoryId("");
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t(
+                      "thesisManagement.attempt.selectThesis",
+                      "Select a thesis"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {reenrollThesisOptions.map((item) => (
+                    <SelectItem key={item._id} value={String(item._id)}>
+                      {item.name || String(item._id)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">
                 {t(

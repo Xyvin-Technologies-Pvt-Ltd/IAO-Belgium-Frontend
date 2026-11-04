@@ -251,7 +251,10 @@ const TrajectoryList = ({ thesisId, canModify, basePath = "/admin/thesis" }) => 
         onClose={() => setDeletingTrajectory(null)}
         onConfirm={handleConfirmDelete}
         count={1}
-        data={deletingTrajectory?.name || "Trajectory"}
+        data={
+          deletingTrajectory?.name ||
+          t("thesisManagement.trajectories.trajectory", "Trajectory")
+        }
         isLoading={deleteTrajectory.isPending}
       />
 

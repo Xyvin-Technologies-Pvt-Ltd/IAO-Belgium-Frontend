@@ -152,7 +152,10 @@ export default function TrajectoryQnaModal({
       }
       toast.success(t("common.uploadSuccess", "File uploaded successfully"));
     } catch (err) {
-      toast.error(err?.message || "Failed to upload file");
+      toast.error(
+        err?.message ||
+          t("thesisManagement.qna.uploadFailed", "Failed to upload file")
+      );
     } finally {
       setIsUploadingAttachment(false);
     }
