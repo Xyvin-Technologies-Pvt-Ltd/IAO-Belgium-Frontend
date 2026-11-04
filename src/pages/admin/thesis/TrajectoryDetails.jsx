@@ -9,6 +9,9 @@ import {
   Users,
   Search,
   Edit,
+  Plus,
+  Trash2,
+  Download,
 } from "lucide-react";
 
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -31,9 +34,15 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import AddEligibleStudentsModal from "@/components/admin/thesis/AddEligibleStudentsModal";
+import DeleteConfirm from "@/components/DeleteConfirm";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
+  useGetTrajectoryEligibleStudents,
+  useRemoveTrajectoryEligibleStudent,
+  useExportTrajectoryStudentsCsv,
+  useExportTrajectoryEligibleStudentsCsv,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -47,7 +56,7 @@ export default function TrajectoryDetails() {
   const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
   const canModify = useCanModify(basePath);
 
-  // Pagination & Search state
+  const [activeTab, setActiveTab] = useState("enrolled");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -67,53 +76,123 @@ export default function TrajectoryDetails() {
   });
   const debouncedSearch = useDebounce(search, 400);
 
-  // Modals state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddEligibleOpen, setIsAddEligibleOpen] = useState(false);
+  const [studentToRemove, setStudentToRemove] = useState(null);
+  const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false);
+
+  const isEnrolledTab = activeTab === "enrolled";
+  const isEligibleTab = activeTab === "eligible";
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(1);
   };
 
-  // Queries
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setPage(1);
+    setSearch("");
+  };
+
   const {
     data: thesisResponse,
     isLoading: isThesisLoading,
     error: thesisError,
   } = useGetThesisById(thesisId, { type: thesisType });
 
-  const queryParams = {
-    page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
-    ...(appliedFilters.supervisor !== "all"
+  const enrolledParams = {
+    page: isEnrolledTab ? page : 1,
+    limit: isEnrolledTab ? rowsPerPage : 10,
+    ...(isEnrolledTab && debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(isEnrolledTab && appliedFilters.batch !== "all"
+      ? { batch: appliedFilters.batch }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.supervisor !== "all"
       ? { supervisor: appliedFilters.supervisor }
       : {}),
-    ...(appliedFilters.reader !== "all" ? { reader: appliedFilters.reader } : {}),
-    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
-    ...(appliedFilters.attention !== "all"
+    ...(isEnrolledTab && appliedFilters.reader !== "all"
+      ? { reader: appliedFilters.reader }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.attention !== "all"
       ? { attention: appliedFilters.attention }
       : {}),
   };
 
+  const eligibleParams = {
+    page,
+    limit: rowsPerPage,
+    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+  };
+
   const {
-    data: trajectoryResponse,
-    isLoading: isTrajectoryLoading,
-    isFetching: isTrajectoryFetching,
-    error: trajectoryError,
-    refetch,
-  } = useGetTrajectoryStudents(thesisId, trajectoryId, queryParams);
+    data: enrolledResponse,
+    isLoading: isEnrolledLoading,
+    isFetching: isEnrolledFetching,
+    error: enrolledError,
+    refetch: refetchEnrolled,
+  } = useGetTrajectoryStudents(thesisId, trajectoryId, enrolledParams);
+
+  const {
+    data: eligibleResponse,
+    isLoading: isEligibleLoading,
+    isFetching: isEligibleFetching,
+    error: eligibleError,
+    refetch: refetchEligible,
+  } = useGetTrajectoryEligibleStudents(
+    thesisId,
+    trajectoryId,
+    eligibleParams,
+    { enabled: !!thesisId && !!trajectoryId && isEligibleTab }
+  );
+
+  const removeEligibleMutation = useRemoveTrajectoryEligibleStudent();
+  const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
+  const exportEligibleCsvMutation = useExportTrajectoryEligibleStudentsCsv();
+
+  const exportCsvPending =
+    exportEnrolledCsvMutation.isPending || exportEligibleCsvMutation.isPending;
+
+  const handleExportCsv = () => {
+    if (isEligibleTab) {
+      const { page: _page, limit: _limit, ...exportParams } = eligibleParams;
+      exportEligibleCsvMutation.mutate({
+        thesisId,
+        trajectoryId,
+        params: exportParams,
+      });
+      return;
+    }
+    const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
+    exportEnrolledCsvMutation.mutate({
+      thesisId,
+      trajectoryId,
+      params: exportParams,
+    });
+  };
 
   const thesis = thesisResponse?.data;
-  const trajectoryData = trajectoryResponse?.data;
-  const trajectory = trajectoryData?.trajectory;
-  const students = trajectoryData?.students || [];
-  const nextDeadline = trajectoryData?.next_deadline;
-  const totalRows =
-    trajectoryResponse?.total_count ?? trajectoryData?.total_count ?? 0;
+  const enrolledData = enrolledResponse?.data;
+  const eligibleData = eligibleResponse?.data;
+  const trajectory = enrolledData?.trajectory || eligibleData?.trajectory;
+  const nextDeadline = enrolledData?.next_deadline;
+  const enrolledCount =
+    enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
 
-  // Breadcrumbs (handles navigation, no back button needed)
+  const students = isEnrolledTab
+    ? enrolledData?.students || []
+    : eligibleData?.students || [];
+  const totalRows = isEnrolledTab
+    ? enrolledCount
+    : eligibleResponse?.total_count ?? eligibleData?.total_count ?? 0;
+  const isListLoading = isEnrolledTab ? isEnrolledLoading : isEligibleLoading;
+  const isListFetching = isEnrolledTab ? isEnrolledFetching : isEligibleFetching;
+  const listError = isEnrolledTab ? enrolledError : eligibleError;
+  const refetchList = isEnrolledTab ? refetchEnrolled : refetchEligible;
+
   useEffect(() => {
     updateBreadcrumbs([
       {
@@ -127,7 +206,9 @@ export default function TrajectoryDetails() {
         navigable: true,
       },
       {
-        label: trajectory?.name || t("thesisManagement.trajectories.trajectory", "Cohort Trajectory"),
+        label:
+          trajectory?.name ||
+          t("thesisManagement.trajectories.trajectory", "Cohort Trajectory"),
         path: `${basePath}/${thesisId}/trajectories/${trajectoryId}`,
         navigable: false,
       },
@@ -136,10 +217,20 @@ export default function TrajectoryDetails() {
     return () => {
       updateBreadcrumbs([]);
     };
-  }, [thesis?.name, trajectory?.name, thesisId, trajectoryId, updateBreadcrumbs, t, basePath, kindLabel]);
+  }, [
+    thesis?.name,
+    trajectory?.name,
+    thesisId,
+    trajectoryId,
+    updateBreadcrumbs,
+    t,
+    basePath,
+    kindLabel,
+  ]);
 
-  const isLoading = isThesisLoading || (isTrajectoryLoading && !trajectoryData);
-  const error = thesisError || trajectoryError;
+  const isLoading =
+    isThesisLoading || (isEnrolledLoading && !enrolledData && !eligibleData);
+  const error = thesisError || enrolledError;
 
   if (isLoading) {
     return (
@@ -158,7 +249,7 @@ export default function TrajectoryDetails() {
             error?.message ||
             t("thesisManagement.trajectories.notFound", "Trajectory not found")
           }
-          onRetry={refetch}
+          onRetry={refetchEnrolled}
           variant="card"
         />
       </div>
@@ -167,10 +258,22 @@ export default function TrajectoryDetails() {
 
   return (
     <div className="space-y-6">
-      {/* Top Action Bar (matches ProgramDetail.jsx layout) */}
       <div className="flex items-center justify-between">
         <div className="flex-1" />
         <div className="flex items-center gap-2">
+          {canModify && isEligibleTab && (
+            <Button
+              size="sm"
+              onClick={() => setIsAddEligibleOpen(true)}
+              className="gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            >
+              <Plus className="w-4 h-4" />
+              {t(
+                "thesisManagement.trajectories.addStudents",
+                "Add students"
+              )}
+            </Button>
+          )}
           {canModify && (
             <Button
               variant="outline"
@@ -179,16 +282,21 @@ export default function TrajectoryDetails() {
               className="gap-1.5"
             >
               <Edit className="w-4 h-4" />
-              {t("thesisManagement.trajectories.editTrajectory", "Edit Trajectory")}
+              {t(
+                "thesisManagement.trajectories.editTrajectory",
+                "Edit Trajectory"
+              )}
             </Button>
           )}
         </div>
       </div>
 
-      {/* Dashboard Information Cards (matches ProgramDetail.jsx grid) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <DashboardCard
-          title={t("thesisManagement.trajectories.trajectoryName", "Cohort Name")}
+          title={t(
+            "thesisManagement.trajectories.trajectoryName",
+            "Cohort Name"
+          )}
           value={trajectory.name}
           subtitle={thesis?.name || t("thesisManagement.title", "Thesis")}
           icon={Compass}
@@ -205,7 +313,10 @@ export default function TrajectoryDetails() {
         />
 
         <DashboardCard
-          title={t("thesisManagement.trajectories.finalDeadline", "Final Deadline")}
+          title={t(
+            "thesisManagement.trajectories.finalDeadline",
+            "Final Deadline"
+          )}
           value={
             trajectory.end_date
               ? moment(trajectory.end_date).format("DD/MM/YYYY")
@@ -215,150 +326,388 @@ export default function TrajectoryDetails() {
         />
 
         <DashboardCard
-          title={t("thesisManagement.trajectories.enrolledStudents", "Enrolled Students")}
-          value={totalRows}
+          title={t(
+            "thesisManagement.trajectories.enrolledStudents",
+            "Enrolled Students"
+          )}
+          value={enrolledCount}
           subtitle={
             nextDeadline
-              ? `${t("thesisManagement.nextDeadline", "Next")}: ${moment(nextDeadline.date).format("DD/MM/YYYY")}`
-              : t("thesisManagement.noUpcomingDeadlines", "No upcoming deadlines")
+              ? `${t("thesisManagement.nextDeadline", "Next")}: ${moment(
+                  nextDeadline.date
+                ).format("DD/MM/YYYY")}`
+              : t(
+                  "thesisManagement.noUpcomingDeadlines",
+                  "No upcoming deadlines"
+                )
           }
           icon={Users}
         />
       </div>
 
-      {/* Enrolled Students Section */}
       <div className="space-y-4 pt-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
-              {t("thesisManagement.trajectories.enrolledStudents", "Enrolled Students")}
-            </h2>
-          </div>
+        <div className="border-b border-border">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            {[
+              {
+                id: "enrolled",
+                label: t(
+                  "thesisManagement.trajectories.enrolledStudents",
+                  "Enrolled students"
+                ),
+              },
+              {
+                id: "eligible",
+                label: t(
+                  "thesisManagement.trajectories.eligibleStudents",
+                  "Eligible students"
+                ),
+              },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${
+                  activeTab === tab.id
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder={t("common.search", "Search by student name or UID...")}
-                value={search}
-                onChange={handleSearchChange}
-                className="pl-9 h-9 text-xs sm:text-sm"
-              />
-            </div>
-            <TrajectoryStudentsFilterDrawer
-              filterOptions={trajectoryData?.filter_options}
-              draftFilters={draftFilters}
-              setDraftFilters={setDraftFilters}
-              appliedFilters={appliedFilters}
-              setAppliedFilters={setAppliedFilters}
-              setPage={setPage}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder={t(
+                "common.search",
+                "Search by student name or UID..."
+              )}
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9 h-9 text-xs sm:text-sm"
             />
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            {isEnrolledTab && (
+              <TrajectoryStudentsFilterDrawer
+                filterOptions={enrolledData?.filter_options}
+                draftFilters={draftFilters}
+                setDraftFilters={setDraftFilters}
+                appliedFilters={appliedFilters}
+                setAppliedFilters={setAppliedFilters}
+                setPage={setPage}
+              />
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportCsv}
+              disabled={exportCsvPending}
+              className="gap-2 h-9"
+            >
+              <Download className="w-4 h-4" />
+              {exportCsvPending
+                ? t("common.exporting", "Exporting...")
+                : t("common.exportCsv", "Export CSV")}
+            </Button>
           </div>
         </div>
 
-        {/* Student List Table (matches program/index.jsx format) */}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("thesisManagement.table.studentUid", "Student UID")}</TableHead>
-              <TableHead>{t("thesisManagement.table.studentName", "Student Name")}</TableHead>
-              <TableHead>{t("thesisManagement.table.group", "Group")}</TableHead>
-              <TableHead>{t("thesisManagement.table.supervisor", "Supervisor")}</TableHead>
-              <TableHead>{t("thesisManagement.table.reader", "Reader")}</TableHead>
-              <TableHead>{t("thesisManagement.table.attempt", "Attempt")}</TableHead>
-              <TableHead>{t("thesisManagement.table.status", "Status")}</TableHead>
-              <TableHead>{t("thesisManagement.table.attention", "Attention")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className={isTrajectoryFetching ? "opacity-50 pointer-events-none" : ""}>
-            {isTrajectoryLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={8} />
-            ) : error ? (
+        {isEligibleTab ? (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={8} className="text-center p-8">
-                  <ErrorMessage
-                    message={error?.message || t("common.failedToLoad", "Failed to load data")}
-                    onRetry={refetch}
-                    variant="inline"
-                  />
-                </TableCell>
+                <TableHead>
+                  {t("thesisManagement.table.studentUid", "Student UID")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.studentName", "Student Name")}
+                </TableHead>
+                <TableHead>{t("common.email", "Email")}</TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.group", "Group")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.purchase", "Purchase")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.source", "Source")}
+                </TableHead>
+                {canModify && (
+                  <TableHead className="text-right">
+                    {t("common.actions", "Actions")}
+                  </TableHead>
+                )}
               </TableRow>
-            ) : students?.length > 0 ? (
-              students.map((row) => {
-                const student = row.student;
-                const studentName = student
-                  ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
-                    student.email
-                  : "Unknown Student";
-                const attemptStatus = row.attempt?.status || "active";
-                const attentionLabel =
-                  row.attention === "suggest_fail"
-                    ? t("thesisManagement.attempt.suggestFail", "Overdue — review fail")
-                    : row.attention === "suggest_pass"
-                      ? t("thesisManagement.attempt.suggestPass", "Ready for pass")
-                      : "—";
-
-                return (
-                  <TableRow
-                    key={row.payment_id}
-                    className="hover:bg-muted/50 cursor-pointer transition-colors"
-                    onClick={() => {
-                      if (student?._id) {
-                        navigate({
-                          to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
-                          params: {
-                            id: thesisId,
-                            trajectoryId,
-                            userId: student._id,
-                          },
-                        });
-                      }
-                    }}
+            </TableHeader>
+            <TableBody
+              className={
+                isListFetching ? "opacity-50 pointer-events-none" : ""
+              }
+            >
+              {isListLoading ? (
+                <TableSkeleton rows={rowsPerPage} columns={canModify ? 7 : 6} />
+              ) : listError ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={canModify ? 7 : 6}
+                    className="text-center p-8"
                   >
-                    <TableCell>{student?.uid || "-"}</TableCell>
-                    <TableCell>{studentName}</TableCell>
-                    <TableCell>{row.batch?.name || "-"}</TableCell>
-                    <TableCell>{row.supervisor?.name || "-"}</TableCell>
-                    <TableCell>{row.reader?.name || "-"}</TableCell>
-                    <TableCell>{row.attempt?.attempt_number ?? "-"}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={attemptStatus} />
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`text-xs font-medium ${
-                          row.attention === "suggest_fail"
-                            ? "text-destructive"
-                            : row.attention === "suggest_pass"
+                    <ErrorMessage
+                      message={
+                        listError?.message ||
+                        t("common.failedToLoad", "Failed to load data")
+                      }
+                      onRetry={refetchList}
+                      variant="inline"
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : students?.length > 0 ? (
+                students.map((row) => {
+                  const student = row.student;
+                  const studentName = student
+                    ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+                      student.email
+                    : t(
+                        "thesisManagement.trajectories.unknownStudent",
+                        "Unknown Student"
+                      );
+                  const isManual = row.source === "manual";
+
+                  return (
+                    <TableRow key={row.application?._id || student?._id}>
+                      <TableCell>{student?.uid || "-"}</TableCell>
+                      <TableCell>{studentName}</TableCell>
+                      <TableCell>{student?.email || "-"}</TableCell>
+                      <TableCell>{row.batch?.name || "-"}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`text-xs font-medium ${
+                            row.purchased
                               ? "text-emerald-600 dark:text-emerald-400"
                               : "text-muted-foreground"
-                        }`}
-                      >
-                        {attentionLabel}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
-                  {search ||
-                  Object.values(appliedFilters).some(
-                    (val) => val !== "all" && val !== undefined && val !== ""
-                  )
-                    ? t("common.noResultsFound", "No students match your search query.")
-                    : t(
-                        "thesisManagement.trajectories.noStudentsEnrolled",
-                        "No students have enrolled in this trajectory cohort yet."
+                          }`}
+                        >
+                          {row.purchased
+                            ? t(
+                                "thesisManagement.trajectories.purchased",
+                                "Purchased"
+                              )
+                            : t(
+                                "thesisManagement.trajectories.notPurchased",
+                                "Not purchased"
+                              )}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {isManual
+                            ? t(
+                                "thesisManagement.trajectories.sourceManual",
+                                "Manual"
+                              )
+                            : t(
+                                "thesisManagement.trajectories.sourceRules",
+                                "Rules"
+                              )}
+                        </span>
+                      </TableCell>
+                      {canModify && (
+                        <TableCell className="text-right">
+                          {isManual ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                              onClick={() => {
+                                setStudentToRemove(student);
+                                setIsRemoveConfirmOpen(true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">
+                              —
+                            </span>
+                          )}
+                        </TableCell>
                       )}
-                </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={canModify ? 7 : 6}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    {search
+                      ? t(
+                          "common.noResultsFound",
+                          "No students match your search query."
+                        )
+                      : t(
+                          "thesisManagement.trajectories.noEligibleStudents",
+                          "No eligible students found for this trajectory."
+                        )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  {t("thesisManagement.table.studentUid", "Student UID")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.studentName", "Student Name")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.group", "Group")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.supervisor", "Supervisor")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.reader", "Reader")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.attempt", "Attempt")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.status", "Status")}
+                </TableHead>
+                <TableHead>
+                  {t("thesisManagement.table.attention", "Attention")}
+                </TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody
+              className={
+                isListFetching ? "opacity-50 pointer-events-none" : ""
+              }
+            >
+              {isListLoading ? (
+                <TableSkeleton rows={rowsPerPage} columns={8} />
+              ) : listError ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center p-8">
+                    <ErrorMessage
+                      message={
+                        listError?.message ||
+                        t("common.failedToLoad", "Failed to load data")
+                      }
+                      onRetry={refetchList}
+                      variant="inline"
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : students?.length > 0 ? (
+                students.map((row) => {
+                  const student = row.student;
+                  const studentName = student
+                    ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+                      student.email
+                    : t(
+                        "thesisManagement.trajectories.unknownStudent",
+                        "Unknown Student"
+                      );
+                  const attemptStatus = row.attempt?.status || "active";
+                  const attentionLabel =
+                    row.attention === "suggest_fail"
+                      ? t(
+                          "thesisManagement.attempt.suggestFail",
+                          "Overdue — review fail"
+                        )
+                      : row.attention === "suggest_pass"
+                        ? t(
+                            "thesisManagement.attempt.suggestPass",
+                            "Ready for pass"
+                          )
+                        : "—";
 
-        {/* Server-side Pagination controls (matching Program module pattern) */}
+                  return (
+                    <TableRow
+                      key={row.payment_id}
+                      className="hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        if (student?._id) {
+                          navigate({
+                            to: `${basePath}/$id/trajectories/$trajectoryId/students/$userId`,
+                            params: {
+                              id: thesisId,
+                              trajectoryId,
+                              userId: student._id,
+                            },
+                          });
+                        }
+                      }}
+                    >
+                      <TableCell>{student?.uid || "-"}</TableCell>
+                      <TableCell>{studentName}</TableCell>
+                      <TableCell>{row.batch?.name || "-"}</TableCell>
+                      <TableCell>{row.supervisor?.name || "-"}</TableCell>
+                      <TableCell>{row.reader?.name || "-"}</TableCell>
+                      <TableCell>
+                        {row.attempt?.attempt_number ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={attemptStatus} />
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`text-xs font-medium ${
+                            row.attention === "suggest_fail"
+                              ? "text-destructive"
+                              : row.attention === "suggest_pass"
+                                ? "text-emerald-600 dark:text-emerald-400"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {attentionLabel}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    {search ||
+                    Object.values(appliedFilters).some(
+                      (val) =>
+                        val !== "all" && val !== undefined && val !== ""
+                    )
+                      ? t(
+                          "common.noResultsFound",
+                          "No students match your search query."
+                        )
+                      : t(
+                          "thesisManagement.trajectories.noStudentsEnrolled",
+                          "No students have enrolled in this trajectory cohort yet."
+                        )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
+
         <Pagination
           page={page}
           setPage={setPage}
@@ -368,18 +717,62 @@ export default function TrajectoryDetails() {
         />
       </div>
 
-      {/* Edit Trajectory Modal */}
       {isEditModalOpen && (
         <TrajectoryModal
           open={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
-            refetch();
+            refetchEnrolled();
+            if (isEligibleTab) refetchEligible();
           }}
           thesisId={thesisId}
           initialData={trajectory}
         />
       )}
+
+      {isAddEligibleOpen && (
+        <AddEligibleStudentsModal
+          open={isAddEligibleOpen}
+          onClose={() => {
+            setIsAddEligibleOpen(false);
+            refetchEligible();
+          }}
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+        />
+      )}
+
+      <DeleteConfirm
+        open={isRemoveConfirmOpen}
+        onClose={() => {
+          setIsRemoveConfirmOpen(false);
+          setStudentToRemove(null);
+        }}
+        onConfirm={async () => {
+          if (!studentToRemove?._id) return;
+          try {
+            await removeEligibleMutation.mutateAsync({
+              thesisId,
+              trajectoryId,
+              userId: studentToRemove._id,
+            });
+            setIsRemoveConfirmOpen(false);
+            setStudentToRemove(null);
+            refetchEligible();
+          } catch {
+            // Error handled by store/hook toast
+          }
+        }}
+        count={1}
+        data={
+          studentToRemove
+            ? `${studentToRemove.first_name || ""} ${studentToRemove.last_name || ""}`.trim() ||
+              studentToRemove.email ||
+              studentToRemove.uid
+            : ""
+        }
+        isLoading={removeEligibleMutation.isPending}
+      />
     </div>
   );
 }

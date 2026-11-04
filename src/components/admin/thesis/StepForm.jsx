@@ -44,17 +44,49 @@ const YOUTUBE_URL_PATTERN =
   /^https?:\/\/(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/).+/i;
 
 const STEP_TYPES = [
-  { value: "document_upload", label: "Document upload" },
-  { value: "teacher_approval", label: "Teacher approval" },
-  { value: "information_only", label: "Information only" },
-  { value: "form", label: "Form (questions)" },
+  {
+    value: "document_upload",
+    labelKey: "thesisManagement.steps.types.documentUpload",
+    labelDefault: "Document upload",
+  },
+  {
+    value: "teacher_approval",
+    labelKey: "thesisManagement.steps.types.teacherApproval",
+    labelDefault: "Teacher approval",
+  },
+  {
+    value: "information_only",
+    labelKey: "thesisManagement.steps.types.informationOnly",
+    labelDefault: "Information only",
+  },
+  {
+    value: "form",
+    labelKey: "thesisManagement.steps.types.form",
+    labelDefault: "Form (questions)",
+  },
 ];
 
 const DEADLINE_MODES = [
-  { value: "none", label: "No deadline" },
-  { value: "optional", label: "Deadline optional" },
-  { value: "required", label: "Deadline required" },
-  { value: "event_date", label: "Event date (information only)" },
+  {
+    value: "none",
+    labelKey: "thesisManagement.steps.deadlineModes.none",
+    labelDefault: "No deadline",
+  },
+  {
+    value: "optional",
+    labelKey: "thesisManagement.steps.deadlineModes.optional",
+    labelDefault: "Deadline optional",
+  },
+  {
+    value: "required",
+    labelKey: "thesisManagement.steps.deadlineModes.required",
+    labelDefault: "Deadline required",
+  },
+  {
+    value: "event_date",
+    labelKey: "thesisManagement.steps.deadlineModes.eventDate",
+    labelDefault: "Event date (information only)",
+  },
 ];
 
 const STEP_TYPE_HINT = {
@@ -543,7 +575,7 @@ const StepForm = ({
               <SelectContent>
                 {STEP_TYPES.map((st) => (
                   <SelectItem key={st.value} value={st.value}>
-                    {st.label}
+                    {t(st.labelKey, st.labelDefault)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -591,7 +623,7 @@ const StepForm = ({
                 <SelectContent>
                   {deadlineOptions.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {t(opt.labelKey, opt.labelDefault)}
                     </SelectItem>
                   ))}
                 </SelectContent>

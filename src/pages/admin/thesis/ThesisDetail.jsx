@@ -29,7 +29,6 @@ import StatusBadge from "@/components/StatusBadge";
 import CreateThesis from "@/components/admin/thesis/CreateThesis";
 import DeactivateThesisConfirm from "@/components/admin/thesis/DeactivateThesisConfirm";
 import TrajectoryList from "@/components/admin/thesis/TrajectoryList";
-import { PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
 const ThesisDetail = () => {
@@ -38,7 +37,10 @@ const ThesisDetail = () => {
   const id = params?.id;
   const navigate = useNavigate();
   const { updateBreadcrumbs } = useBreadcrumb();
-  const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
+  const { type: thesisType, basePath, isMaster } = useThesisAdminKind();
+  const kindLabel = isMaster
+    ? t("sidebar.admin.masterThesis", "Master Thesis")
+    : t("sidebar.admin.doThesis", "DO Thesis");
   const canModify = useCanModify(basePath);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -171,7 +173,10 @@ const ThesisDetail = () => {
               <StatusBadge status={thesis.status} />
             </div>
             <p className="text-sm text-muted-foreground">
-              {t("thesisManagement.detail.moduleDetails", "Module details and configured trajectory milestones.")}
+              {t(
+                "thesisManagement.detail.subtitle",
+                "Module details and configured trajectory milestones."
+              )}
             </p>
           </div>
 
@@ -240,7 +245,14 @@ const ThesisDetail = () => {
                     </p>
                     {(p.city?.name || p.is_online || p.language?.name) && (
                       <p className="text-[11px] text-muted-foreground truncate">
-                        {[p.is_online ? "Online" : p.city?.name, p.language?.name].filter(Boolean).join(" - ")}
+                        {[
+                          p.is_online
+                            ? t("common.online", "Online")
+                            : p.city?.name,
+                          p.language?.name,
+                        ]
+                          .filter(Boolean)
+                          .join(" - ")}
                       </p>
                     )}
                   </div>
@@ -266,8 +278,16 @@ const ThesisDetail = () => {
             <p className="text-sm font-semibold text-foreground mt-0.5 truncate">
               {thesis.current_year
                 ? Array.isArray(thesis.current_year)
-                  ? thesis.current_year.map((y) => `Year ${y}`).join(", ")
-                  : `Year ${thesis.current_year}`
+                  ? thesis.current_year
+                      .map((y) =>
+                        t("thesisManagement.modal.yearOption", "Year {{year}}", {
+                          year: y,
+                        })
+                      )
+                      .join(", ")
+                  : t("thesisManagement.modal.yearOption", "Year {{year}}", {
+                      year: thesis.current_year,
+                    })
                 : "-"}
             </p>
           </div>

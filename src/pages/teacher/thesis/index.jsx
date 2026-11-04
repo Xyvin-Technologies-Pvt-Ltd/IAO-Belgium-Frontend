@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+// import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, Trash2, Search } from "lucide-react";
 import {
@@ -44,9 +45,10 @@ import {
   saveTeacherThesisContactCard,
 } from "@/api/thesisApi";
 
-const formatRoleLabel = (role) => {
-  if (role === "supervisor") return "Supervisor";
-  if (role === "reader") return "Reader";
+const formatRoleLabel = (role, t) => {
+  if (role === "supervisor")
+    return t("thesisManagement.teacher.supervisor", "Supervisor");
+  if (role === "reader") return t("thesisManagement.teacher.reader", "Reader");
   return role
     ? String(role)
         .replace(/_/g, " ")
@@ -59,6 +61,7 @@ const MAX_CONTACT_FIELDS = 20;
 const blankField = () => ({ label: "", value: "" });
 
 const RequestsTab = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { type } = useThesisTeacherKind();
   const [page, setPage] = useState(1);
@@ -93,8 +96,8 @@ const RequestsTab = () => {
     onSuccess: (_, variables) => {
       toast.success(
         variables.status === "approved"
-          ? "Request accepted"
-          : "Request rejected"
+          ? t("thesisManagement.teacher.requestAccepted", "Request accepted")
+          : t("thesisManagement.teacher.requestRejected", "Request rejected")
       );
       setActionDraft(null);
       setNote("");
@@ -106,7 +109,10 @@ const RequestsTab = () => {
       });
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to update request");
+      toast.error(
+        err?.message ||
+          t("thesisManagement.teacher.requestUpdateFailed", "Failed to update request")
+      );
     },
   });
 
@@ -123,7 +129,7 @@ const RequestsTab = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Status:
+            {t("thesisManagement.teacher.statusLabel", "Status:")}
           </span>
           <Select
             value={statusFilter || "all"}
@@ -133,13 +139,26 @@ const RequestsTab = () => {
             }}
           >
             <SelectTrigger className="w-36 h-9 bg-background">
-              <SelectValue placeholder="All statuses" />
+              <SelectValue
+                placeholder={t(
+                  "thesisManagement.teacher.allStatuses",
+                  "All statuses"
+                )}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="pending">
+                {t("thesisManagement.teacher.pending", "Pending")}
+              </SelectItem>
+              <SelectItem value="approved">
+                {t("thesisManagement.teacher.approved", "Approved")}
+              </SelectItem>
+              <SelectItem value="rejected">
+                {t("thesisManagement.teacher.rejected", "Rejected")}
+              </SelectItem>
+              <SelectItem value="all">
+                {t("thesisManagement.teacher.allStatuses", "All statuses")}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -149,13 +168,27 @@ const RequestsTab = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Thesis</TableHead>
-              <TableHead>Trajectory</TableHead>
-              <TableHead>Step</TableHead>
-              <TableHead>Requested</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.student", "Student")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.thesis", "Thesis")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.trajectory", "Trajectory")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.step", "Step")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.requested", "Requested")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.status", "Status")}
+              </TableHead>
+              <TableHead className="text-right">
+                {t("thesisManagement.teacher.actions", "Actions")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -167,7 +200,13 @@ const RequestsTab = () => {
               <TableRow>
                 <TableCell colSpan={7} className="text-center p-8">
                   <ErrorMessage
-                    message={error?.message || "Failed to load requests"}
+                    message={
+                      error?.message ||
+                      t(
+                        "thesisManagement.teacher.loadRequestsFailed",
+                        "Failed to load requests"
+                      )
+                    }
                     onRetry={refetch}
                     variant="inline"
                   />
@@ -232,7 +271,7 @@ const RequestsTab = () => {
                             className="h-8"
                             onClick={() => openAction(item, "approved")}
                           >
-                            Accept
+                            {t("thesisManagement.teacher.accept", "Accept")}
                           </Button>
                           <Button
                             size="sm"
@@ -240,7 +279,7 @@ const RequestsTab = () => {
                             className="h-8"
                             onClick={() => openAction(item, "rejected")}
                           >
-                            Reject
+                            {t("thesisManagement.teacher.reject", "Reject")}
                           </Button>
                         </div>
                       ) : (
@@ -253,7 +292,10 @@ const RequestsTab = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center p-4">
-                  No approval requests found.
+                  {t(
+                    "thesisManagement.teacher.noRequests",
+                    "No approval requests found."
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -281,26 +323,37 @@ const RequestsTab = () => {
           <DialogHeader>
             <DialogTitle>
               {actionDraft?.status === "approved"
-                ? "Accept supervisor request"
-                : "Reject supervisor request"}
+                ? t(
+                    "thesisManagement.teacher.acceptRequest",
+                    "Accept supervisor request"
+                  )
+                : t(
+                    "thesisManagement.teacher.rejectRequest",
+                    "Reject supervisor request"
+                  )}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
               {actionDraft?.request?.student
                 ? `${actionDraft.request.student.first_name || ""} ${actionDraft.request.student.last_name || ""}`.trim()
-                : "Student"}
+                : t("thesisManagement.teacher.student", "Student")}
               {actionDraft?.request?.thesis?.name
                 ? ` · ${actionDraft.request.thesis.name}`
                 : ""}
             </p>
             <div className="space-y-1.5">
-              <Label htmlFor="teacher-note">Note (optional)</Label>
+              <Label htmlFor="teacher-note">
+                {t("thesisManagement.teacher.noteOptional", "Note (optional)")}
+              </Label>
               <Textarea
                 id="teacher-note"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Short note for the student or your records"
+                placeholder={t(
+                  "thesisManagement.teacher.notePlaceholder",
+                  "Short note for the student or your records"
+                )}
                 rows={3}
               />
             </div>
@@ -314,7 +367,7 @@ const RequestsTab = () => {
               }}
               disabled={respondMutation.isPending}
             >
-              Cancel
+              {t("thesisManagement.teacher.cancel", "Cancel")}
             </Button>
             <Button
               variant={
@@ -330,10 +383,10 @@ const RequestsTab = () => {
               }
             >
               {respondMutation.isPending
-                ? "Saving..."
+                ? t("thesisManagement.teacher.saving", "Saving...")
                 : actionDraft?.status === "approved"
-                  ? "Accept"
-                  : "Reject"}
+                  ? t("thesisManagement.teacher.accept", "Accept")
+                  : t("thesisManagement.teacher.reject", "Reject")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -343,6 +396,7 @@ const RequestsTab = () => {
 };
 
 const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
+  const { t } = useTranslation();
   const [fields, setFields] = useState(() => {
     const existing = Array.isArray(initialCard?.fields)
       ? initialCard.fields.map((f) => ({
@@ -388,11 +442,16 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
       <div className="bg-card border border-border rounded-xl p-6 sm:p-7 shadow-2xs space-y-5">
         <div>
           <h3 className="text-base font-semibold text-foreground">
-            Supervisor Contact Information
+            {t(
+              "thesisManagement.teacher.contactTitle",
+              "Supervisor Contact Information"
+            )}
           </h3>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Add any fields you want students to see after you accept their
-            supervisor request. Empty rows are not shown to students.
+            {t(
+              "thesisManagement.teacher.contactDesc",
+              "Add any fields you want students to see after you accept their supervisor request. Empty rows are not shown to students."
+            )}
           </p>
         </div>
 
@@ -404,24 +463,30 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
             >
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Label
+                  {t("thesisManagement.teacher.fieldLabel", "Label")}
                 </Label>
                 <Input
                   value={field.label}
                   onChange={(e) => updateField(index, "label", e.target.value)}
-                  placeholder="e.g. Email"
+                  placeholder={t(
+                    "thesisManagement.teacher.labelPlaceholder",
+                    "e.g. Email"
+                  )}
                   className="bg-background text-foreground border-border"
                   maxLength={100}
                 />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-foreground">
-                  Value
+                  {t("thesisManagement.teacher.fieldValue", "Value")}
                 </Label>
                 <Input
                   value={field.value}
                   onChange={(e) => updateField(index, "value", e.target.value)}
-                  placeholder="e.g. you@school.be"
+                  placeholder={t(
+                    "thesisManagement.teacher.valuePlaceholder",
+                    "e.g. name@example.com"
+                  )}
                   className="bg-background text-foreground border-border"
                   maxLength={2000}
                 />
@@ -432,7 +497,10 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
                 size="icon"
                 className="h-10 w-10 shrink-0 text-muted-foreground hover:text-destructive"
                 onClick={() => removeField(index)}
-                title="Remove field"
+                title={t(
+                  "thesisManagement.teacher.removeField",
+                  "Remove field"
+                )}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -449,14 +517,19 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
               disabled={fields.length >= MAX_CONTACT_FIELDS}
             >
               <Plus className="w-4 h-4" />
-              Add field
+              {t("thesisManagement.teacher.addField", "Add field")}
             </Button>
             <Button
               type="submit"
               disabled={isSaving}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5 shadow-xs"
             >
-              {isSaving ? "Saving..." : "Save contact info"}
+              {isSaving
+                ? t("thesisManagement.teacher.saving", "Saving...")
+                : t(
+                    "thesisManagement.teacher.saveContact",
+                    "Save contact info"
+                  )}
             </Button>
           </div>
         </form>
@@ -466,8 +539,9 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
 };
 
 const StudentsTab = () => {
-  const navigate = useNavigate();
-  const { type, basePath, isMaster } = useThesisTeacherKind();
+  const { t } = useTranslation();
+  // const navigate = useNavigate();
+  const { type, isMaster } = useThesisTeacherKind(); // basePath unused while detail navigate is commented
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -511,7 +585,10 @@ const StudentsTab = () => {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by student name..."
+            placeholder={t(
+              "thesisManagement.teacher.searchStudents",
+              "Search by student name..."
+            )}
             className="pl-9 h-9 bg-background"
           />
         </div>
@@ -521,10 +598,18 @@ const StudentsTab = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Thesis</TableHead>
-              <TableHead>Trajectory</TableHead>
-              <TableHead>Role</TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.student", "Student")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.thesis", "Thesis")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.trajectory", "Trajectory")}
+              </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.role", "Role")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -536,7 +621,13 @@ const StudentsTab = () => {
               <TableRow>
                 <TableCell colSpan={4} className="text-center p-8">
                   <ErrorMessage
-                    message={error?.message || "Failed to load students"}
+                    message={
+                      error?.message ||
+                      t(
+                        "thesisManagement.teacher.loadStudentsFailed",
+                        "Failed to load students"
+                      )
+                    }
                     onRetry={refetch}
                     variant="inline"
                   />
@@ -548,24 +639,25 @@ const StudentsTab = () => {
                 return (
                   <TableRow
                     key={key}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      if (
-                        !row.thesis?._id ||
-                        !row.trajectory?._id ||
-                        !row.student?._id
-                      ) {
-                        return;
-                      }
-                      navigate({
-                        to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
-                        params: {
-                          thesisId: row.thesis._id,
-                          trajectoryId: row.trajectory._id,
-                          userId: row.student._id,
-                        },
-                      });
-                    }}
+                    // Detail navigation temporarily disabled
+                    // className="cursor-pointer"
+                    // onClick={() => {
+                    //   if (
+                    //     !row.thesis?._id ||
+                    //     !row.trajectory?._id ||
+                    //     !row.student?._id
+                    //   ) {
+                    //     return;
+                    //   }
+                    //   navigate({
+                    //     to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
+                    //     params: {
+                    //       thesisId: row.thesis._id,
+                    //       trajectoryId: row.trajectory._id,
+                    //       userId: row.student._id,
+                    //     },
+                    //   });
+                    // }}
                   >
                     <TableCell className="capitalize">
                       <div className="space-y-0.5">
@@ -597,7 +689,7 @@ const StudentsTab = () => {
                               key={role}
                               className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20"
                             >
-                              {formatRoleLabel(role)}
+                              {formatRoleLabel(role, t)}
                             </span>
                           ))
                         ) : (
@@ -615,10 +707,19 @@ const StudentsTab = () => {
                   className="text-center p-8 text-muted-foreground"
                 >
                   {debouncedSearch
-                    ? "No students match your search."
+                    ? t(
+                        "thesisManagement.teacher.noStudentsMatch",
+                        "No students match your search."
+                      )
                     : isMaster
-                      ? "No assigned students yet. Supervisor and reader assignments from the backoffice appear here."
-                      : "No assigned students yet. Accepted supervisor requests and reader assignments appear here."}
+                      ? t(
+                          "thesisManagement.teacher.noStudentsMaster",
+                          "No assigned students yet. Supervisor and reader assignments from the backoffice appear here."
+                        )
+                      : t(
+                          "thesisManagement.teacher.noStudentsDo",
+                          "No assigned students yet. Accepted supervisor requests and reader assignments appear here."
+                        )}
                 </TableCell>
               </TableRow>
             )}
@@ -640,6 +741,7 @@ const StudentsTab = () => {
 };
 
 const ContactInfoTab = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
@@ -650,13 +752,24 @@ const ContactInfoTab = () => {
   const saveMutation = useMutation({
     mutationFn: (form) => saveTeacherThesisContactCard(form),
     onSuccess: () => {
-      toast.success("Contact info saved successfully");
+      toast.success(
+        t(
+          "thesisManagement.teacher.contactSaved",
+          "Contact info saved successfully"
+        )
+      );
       queryClient.invalidateQueries({
         queryKey: ["teacher-thesis-contact-card"],
       });
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to save contact info");
+      toast.error(
+        err?.message ||
+          t(
+            "thesisManagement.teacher.contactSaveFailed",
+            "Failed to save contact info"
+          )
+      );
     },
   });
 
@@ -678,7 +791,13 @@ const ContactInfoTab = () => {
   if (error) {
     return (
       <ErrorMessage
-        message={error?.message || "Failed to load contact card"}
+        message={
+          error?.message ||
+          t(
+            "thesisManagement.teacher.loadContactFailed",
+            "Failed to load contact card"
+          )
+        }
         onRetry={refetch}
       />
     );
@@ -695,6 +814,7 @@ const ContactInfoTab = () => {
 };
 
 const TeacherThesis = () => {
+  const { t } = useTranslation();
   const { type, label, isMaster, isDo } = useThesisTeacherKind();
   const storageKey = `teacherThesisActiveTab:${type}`;
 
@@ -713,11 +833,25 @@ const TeacherThesis = () => {
   }, [activeTab, isMaster, storageKey]);
 
   const tabs = isMaster
-    ? [{ id: "students", label: "Students" }]
+    ? [
+        {
+          id: "students",
+          label: t("thesisManagement.teacher.tabStudents", "Students"),
+        },
+      ]
     : [
-        { id: "requests", label: "Requests" },
-        { id: "students", label: "Students" },
-        { id: "contact", label: "My contact info" },
+        {
+          id: "requests",
+          label: t("thesisManagement.teacher.tabRequests", "Requests"),
+        },
+        {
+          id: "students",
+          label: t("thesisManagement.teacher.tabStudents", "Students"),
+        },
+        {
+          id: "contact",
+          label: t("thesisManagement.teacher.tabContact", "My contact info"),
+        },
       ];
 
   return (

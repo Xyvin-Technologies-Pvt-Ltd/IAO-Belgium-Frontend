@@ -21,12 +21,36 @@ import {
 import { useTranslation } from "react-i18next";
 
 export const QUESTION_TYPES = [
-  { value: "short_answer", label: "Short Answer" },
-  { value: "long_answer", label: "Long Answer" },
-  { value: "multiple_choice", label: "Multiple Choice" },
-  { value: "yes_no", label: "Yes / No" },
-  { value: "confirmation", label: "Confirmation Checkbox" },
-  { value: "supervisor", label: "Supervisor Selection" },
+  {
+    value: "short_answer",
+    labelKey: "thesisManagement.steps.form.questionTypes.shortAnswer",
+    labelDefault: "Short Answer",
+  },
+  {
+    value: "long_answer",
+    labelKey: "thesisManagement.steps.form.questionTypes.longAnswer",
+    labelDefault: "Long Answer",
+  },
+  {
+    value: "multiple_choice",
+    labelKey: "thesisManagement.steps.form.questionTypes.multipleChoice",
+    labelDefault: "Multiple Choice",
+  },
+  {
+    value: "yes_no",
+    labelKey: "thesisManagement.steps.form.questionTypes.yesNo",
+    labelDefault: "Yes / No",
+  },
+  {
+    value: "confirmation",
+    labelKey: "thesisManagement.steps.form.questionTypes.confirmation",
+    labelDefault: "Confirmation Checkbox",
+  },
+  {
+    value: "supervisor",
+    labelKey: "thesisManagement.steps.form.questionTypes.supervisor",
+    labelDefault: "Supervisor Selection",
+  },
 ];
 
 export function createEmptyQuestion() {
@@ -458,7 +482,7 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                       value={qt.value}
                                       className="text-xs"
                                     >
-                                      {qt.label}
+                                      {t(qt.labelKey, qt.labelDefault)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -504,7 +528,8 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                                       }}
                                       placeholder={t(
                                         "thesisManagement.steps.form.optionPlaceholder",
-                                        `Option ${oIdx + 1}`
+                                        "Option {{n}}",
+                                        { n: oIdx + 1 }
                                       )}
                                       className="text-xs h-8 bg-background border-border/80 focus-visible:ring-primary/20"
                                     />

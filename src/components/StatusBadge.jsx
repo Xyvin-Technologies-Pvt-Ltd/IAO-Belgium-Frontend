@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const statusVariants = {
   // General statuses
   active: "text-green-600",
@@ -129,86 +131,107 @@ const statusVariants = {
 };
 
 const StatusBadge = ({ status }) => {
+  const { t } = useTranslation();
   let displayText;
+  let variantKey = status;
+
   if (status === "pending_verification") {
-    displayText = "Pending";
+    displayText = t("common.status.pending", "Pending");
   } else if (status === "on_ride") {
-    displayText = "On Ride";
+    displayText = t("common.status.onRide", "On Ride");
   } else if (status === "waitlisted") {
-    displayText = "In Progress";
+    displayText = t("common.status.inProgress", "In Progress");
   } else if (typeof status === "boolean") {
-    displayText = status ? "Active" : "Inactive";
+    displayText = status
+      ? t("common.active", "Active")
+      : t("common.inactive", "Inactive");
+    variantKey = status ? "active" : "inactive";
   } else if (status === "not_started") {
-    displayText = "Not Started";
+    displayText = t("common.status.notStarted", "Not Started");
   } else if (status === "archived") {
-    displayText = "Archived";
+    displayText = t("common.status.archived", "Archived");
   } else if (status === "validation_check") {
-    displayText = "Validation Check";
+    displayText = t("common.status.validationCheck", "Validation Check");
   } else if (status === "validation_failed") {
-    displayText = "Validation Failed";
+    displayText = t("common.status.validationFailed", "Validation Failed");
   } else if (status === "year_promoted") {
-    displayText = "Promoted";
+    displayText = t("common.status.promoted", "Promoted");
   } else if (status === "manual_override") {
-    displayText = "Manual Override";
+    displayText = t("common.status.manualOverride", "Manual Override");
   } else if (status === "year_marked_failed") {
-    displayText = "Failed";
-  } else if (status === "year_re_enrolled") {
-    displayText = "Re-enrolled";
+    displayText = t("common.status.failed", "Failed");
+  } else if (status === "year_re_enrolled" || status === "re_enrolled") {
+    displayText = t("common.status.reenrolled", "Re-enrolled");
   } else if (status === "course_completed") {
-    displayText = "Course Completed";
-  } else if (status === "re_enrolled") {
-    displayText = "Re-enrolled";
+    displayText = t("common.status.courseCompleted", "Course Completed");
   } else if (status === "paused") {
-    displayText = "Paused";
+    displayText = t("common.status.paused", "Paused");
   } else if (status === "stopped") {
-    displayText = "Stopped";
+    displayText = t("common.status.stopped", "Stopped");
   } else if (status === "removed") {
-    displayText = "Removed";
+    displayText = t("common.status.removed", "Removed");
   } else if (status === "in-progress") {
-    displayText = "In Progress";
+    displayText = t("common.status.inProgress", "In Progress");
   } else if (status === "not submitted") {
-    displayText = "Not Submitted";
+    displayText = t("common.status.notSubmitted", "Not Submitted");
   } else if (status === "overdue") {
-    displayText = "Overdue";
+    displayText = t("common.status.overdue", "Overdue");
   } else if (status === "free") {
-    displayText = "Free";
+    displayText = t("common.status.free", "Free");
   } else if (status === "unpaid") {
-    displayText = "Unpaid";
+    displayText = t("common.status.unpaid", "Unpaid");
   } else if (status === "marked_paid") {
-    displayText = "Marked paid";
+    displayText = t("common.status.markedPaid", "Marked paid");
   } else if (status === "paid_kmo") {
-    displayText = "Paid (KMO)";
+    displayText = t("common.status.paidKmo", "Paid (KMO)");
   } else if (status === "waiting_kmo") {
-    displayText = "Waiting (KMO)";
+    displayText = t("common.status.waitingKmo", "Waiting (KMO)");
   } else if (status === "submitted_kmo") {
-    displayText = "Submitted (KMO)";
+    displayText = t("common.status.submittedKmo", "Submitted (KMO)");
   } else if (status === "contribution_received_kmo") {
-    displayText = "Contribution received (KMO)";
+    displayText = t(
+      "common.status.contributionReceivedKmo",
+      "Contribution received (KMO)"
+    );
   } else if (status === "payment_released_kmo") {
-    displayText = "Payment released (KMO)";
+    displayText = t(
+      "common.status.paymentReleasedKmo",
+      "Payment released (KMO)"
+    );
   } else if (status === "waiting_third_party") {
-    displayText = "Waiting (third party)";
+    displayText = t(
+      "common.status.waitingThirdParty",
+      "Waiting (third party)"
+    );
   } else if (status === "not_completed") {
-    displayText = "Not completed";
+    displayText = t("common.status.notCompleted", "Not completed");
   } else if (status === "completed") {
-    displayText = "Completed";
+    displayText = t("common.status.completed", "Completed");
   } else if (status === "not_available") {
-    displayText = "Not available";
-  } else if (status === "not_started") {
-    displayText = "Not started";
+    displayText = t("common.status.notAvailable", "Not available");
   } else if (status === "deadline_passed") {
-    displayText = "Deadline passed";
+    displayText = t("common.status.deadlinePassed", "Deadline passed");
   } else if (status === "cooldown") {
-    displayText = "Cooldown";
+    displayText = t("common.status.cooldown", "Cooldown");
   } else if (status === "used_via_kmo") {
-    displayText = "Used via KMO";
+    displayText = t("common.status.usedViaKmo", "Used via KMO");
   } else if (status === "used_via_location_switch") {
-    displayText = "Used via location switch";
+    displayText = t(
+      "common.status.usedViaLocationSwitch",
+      "Used via location switch"
+    );
+  } else if (status === "pending") {
+    displayText = t("common.status.pending", "Pending");
+  } else if (status === "approved") {
+    displayText = t("common.status.approved", "Approved");
+  } else if (status === "rejected") {
+    displayText = t("common.status.rejected", "Rejected");
   } else {
     displayText = status;
   }
 
-  const colorClass = statusVariants[status] || "text-gray-800 dark:text-gray-200";
+  const colorClass =
+    statusVariants[variantKey] || "text-gray-800 dark:text-gray-200";
 
   return (
     <span className={`font-medium capitalize ${colorClass}`}>

@@ -16,6 +16,7 @@ import {
   Trash2,
   MessageSquare,
   FileText,
+  Download,
 } from "lucide-react";
 
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
@@ -46,6 +47,8 @@ import {
   useGetTrajectoryEligibleStudents,
   useGetTrajectoryQnaAnnouncements,
   useDeleteTrajectoryQnaAnnouncement,
+  useExportTrajectoryStudentsCsv,
+  useExportTrajectoryEligibleStudentsCsv,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -175,6 +178,29 @@ export default function MasterTrajectoryDetails() {
   });
 
   const deleteQnaMutation = useDeleteTrajectoryQnaAnnouncement();
+  const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
+  const exportEligibleCsvMutation = useExportTrajectoryEligibleStudentsCsv();
+
+  const exportCsvPending =
+    exportEnrolledCsvMutation.isPending || exportEligibleCsvMutation.isPending;
+
+  const handleExportCsv = () => {
+    if (isEligibleTab) {
+      const { page: _page, limit: _limit, ...exportParams } = eligibleParams;
+      exportEligibleCsvMutation.mutate({
+        thesisId,
+        trajectoryId,
+        params: exportParams,
+      });
+      return;
+    }
+    const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
+    exportEnrolledCsvMutation.mutate({
+      thesisId,
+      trajectoryId,
+      params: exportParams,
+    });
+  };
 
   const qnaData = qnaResponse?.data;
   const qnaItems = qnaData?.items || [];
@@ -703,6 +729,20 @@ export default function MasterTrajectoryDetails() {
                 setPage={setPage}
               />
             )}
+            {!isQnaTab && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCsv}
+                disabled={exportCsvPending}
+                className="gap-2 h-9"
+              >
+                <Download className="w-4 h-4" />
+                {exportCsvPending
+                  ? t("common.exporting", "Exporting...")
+                  : t("common.exportCsv", "Export CSV")}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -751,7 +791,10 @@ export default function MasterTrajectoryDetails() {
                   const studentName = student
                     ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
                       student.email
-                    : "Unknown Student";
+                    : t(
+                        "thesisManagement.trajectories.unknownStudent",
+                        "Unknown Student"
+                      );
 
                   return (
                     <TableRow key={row.application?._id || student?._id}>
@@ -857,7 +900,10 @@ export default function MasterTrajectoryDetails() {
                   const studentName = student
                     ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
                       student.email
-                    : "Unknown Student";
+                    : t(
+                        "thesisManagement.trajectories.unknownStudent",
+                        "Unknown Student"
+                      );
                   const attemptStatus = row.attempt?.status || "active";
                   const attentionLabel =
                     row.attention === "suggest_fail"

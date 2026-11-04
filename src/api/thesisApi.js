@@ -266,6 +266,69 @@ export const getTrajectoryEligibleStudents = async (
   }
 };
 
+export const exportTrajectoryStudentsCsv = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/export-csv`,
+      { params, responseType: "blob" }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportTrajectoryEligibleStudentsCsv = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/eligible/export-csv`,
+      { params, responseType: "blob" }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const addTrajectoryEligibleStudents = async (
+  thesisId,
+  trajectoryId,
+  userIds = []
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/eligible-students`,
+      { user_ids: userIds }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const removeTrajectoryEligibleStudent = async (
+  thesisId,
+  trajectoryId,
+  userId
+) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/eligible-students/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getTrajectoryStudentDetail = async (thesisId, trajectoryId, userId) => {
   try {
     const response = await axiosInstance.get(
@@ -337,6 +400,23 @@ export const reenrollTrajectoryStudent = async (
   try {
     const response = await axiosInstance.post(
       `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/reenroll`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const moveTrajectoryEnrolment = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/move-enrolment`,
       data
     );
     return response.data;

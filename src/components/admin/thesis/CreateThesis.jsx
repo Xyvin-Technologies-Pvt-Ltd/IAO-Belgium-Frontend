@@ -54,10 +54,12 @@ const toId = (value) => {
   return String(value);
 };
 
-const formatProgramOption = (p) => {
+const formatProgramOption = (p, t) => {
   if (!p) return "";
   const city = p.is_online
-    ? "Online"
+    ? t
+      ? t("common.online", "Online")
+      : "Online"
     : p.city?.name || (typeof p.city === "string" ? p.city : null);
   const language =
     p.language?.name || (typeof p.language === "string" ? p.language : null);
@@ -159,7 +161,7 @@ const CreateThesis = ({
     const raw = academicYearsData?.data || [];
     const list = raw.map((a) => ({
       _id: String(a._id),
-      name: a.name || "Academic Year",
+      name: a.name || t("thesisManagement.detail.academicYear", "Academic Year"),
     }));
 
     // If editing, ensure any already selected academic years are in the items list
@@ -171,14 +173,14 @@ const CreateThesis = ({
       }
     }
     return list;
-  }, [academicYearsData?.data, isEdit, selectedAcademics]);
+  }, [academicYearsData?.data, isEdit, selectedAcademics, t]);
 
   // Formatted program items from backend-filtered response
   const programItems = useMemo(() => {
     const list = programsData?.data || [];
     const formatted = list.map((p) => ({
       _id: String(p._id),
-      name: formatProgramOption(p),
+      name: formatProgramOption(p, t),
       rawName: p.name,
       city: p.city,
       language: p.language,
@@ -196,7 +198,7 @@ const CreateThesis = ({
     }
 
     return formatted;
-  }, [programsData?.data, selectedPrograms]);
+  }, [programsData?.data, selectedPrograms, t]);
 
   // Calculate highest program.year among selected programmes
   const maxStudyYear = useMemo(() => {
@@ -222,7 +224,7 @@ const CreateThesis = ({
       const yr = i + 1;
       return {
         _id: String(yr),
-        name: t("thesisManagement.modal.yearOption", `Year ${yr}`, { year: yr }),
+        name: t("thesisManagement.modal.yearOption", "Year {{year}}", { year: yr }),
         year: yr,
       };
     });
@@ -244,7 +246,9 @@ const CreateThesis = ({
             _id: id,
             name:
               item.name ||
-              t("thesisManagement.modal.yearOption", `Year ${id}`, { year: id }),
+              t("thesisManagement.modal.yearOption", "Year {{year}}", {
+                year: id,
+              }),
             year: Number(id),
           };
         }
@@ -252,7 +256,7 @@ const CreateThesis = ({
         if (isNaN(num) || num < 1) return null;
         return {
           _id: String(num),
-          name: t("thesisManagement.modal.yearOption", `Year ${num}`, {
+          name: t("thesisManagement.modal.yearOption", "Year {{year}}", {
             year: num,
           }),
           year: num,
@@ -300,7 +304,7 @@ const CreateThesis = ({
 
         const normalizedPrograms = rawPrograms.map((p) => ({
           _id: String(toId(p)),
-          name: formatProgramOption(p) || p?.name || toId(p),
+          name: formatProgramOption(p, t) || p?.name || toId(p),
           program_type: p?.program_type || "",
           year: Number(p?.year) || 1,
         }));
@@ -314,7 +318,7 @@ const CreateThesis = ({
         const normalizedYears = Array.isArray(thesisData.current_year)
           ? thesisData.current_year.map((y) => ({
               _id: String(y),
-              name: t("thesisManagement.modal.yearOption", `Year ${y}`, {
+              name: t("thesisManagement.modal.yearOption", "Year {{year}}", {
                 year: y,
               }),
               year: Number(y),
@@ -325,7 +329,7 @@ const CreateThesis = ({
                   _id: String(thesisData.current_year),
                   name: t(
                     "thesisManagement.modal.yearOption",
-                    `Year ${thesisData.current_year}`,
+                    "Year {{year}}",
                     { year: thesisData.current_year }
                   ),
                   year: Number(thesisData.current_year),
