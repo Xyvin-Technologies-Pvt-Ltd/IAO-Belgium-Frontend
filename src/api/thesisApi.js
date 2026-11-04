@@ -250,14 +250,10 @@ export const getTrajectoryStudents = async (thesisId, trajectoryId, params = {})
   }
 };
 
-export const getTrajectoryEligibleStudents = async (
-  thesisId,
-  trajectoryId,
-  params = {}
-) => {
+export const getThesisEligibleStudents = async (thesisId, params = {}) => {
   try {
     const response = await axiosInstance.get(
-      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/eligible`,
+      `/thesis/${thesisId}/students/eligible`,
       { params }
     );
     return response.data;
@@ -265,6 +261,13 @@ export const getTrajectoryEligibleStudents = async (
     throw error.response?.data || error;
   }
 };
+
+/** @deprecated Use getThesisEligibleStudents — eligibility is thesis-scoped */
+export const getTrajectoryEligibleStudents = async (
+  thesisId,
+  _trajectoryId,
+  params = {}
+) => getThesisEligibleStudents(thesisId, params);
 
 export const exportTrajectoryStudentsCsv = async (
   thesisId,
@@ -282,14 +285,13 @@ export const exportTrajectoryStudentsCsv = async (
   }
 };
 
-export const exportTrajectoryEligibleStudentsCsv = async (
+export const exportThesisEligibleStudentsCsv = async (
   thesisId,
-  trajectoryId,
   params = {}
 ) => {
   try {
     const response = await axiosInstance.get(
-      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/eligible/export-csv`,
+      `/thesis/${thesisId}/students/eligible/export-csv`,
       { params, responseType: "blob" }
     );
     return response.data;
@@ -298,14 +300,17 @@ export const exportTrajectoryEligibleStudentsCsv = async (
   }
 };
 
-export const addTrajectoryEligibleStudents = async (
+/** @deprecated Use exportThesisEligibleStudentsCsv */
+export const exportTrajectoryEligibleStudentsCsv = async (
   thesisId,
-  trajectoryId,
-  userIds = []
-) => {
+  _trajectoryId,
+  params = {}
+) => exportThesisEligibleStudentsCsv(thesisId, params);
+
+export const addThesisEligibleStudents = async (thesisId, userIds = []) => {
   try {
     const response = await axiosInstance.post(
-      `/thesis/${thesisId}/trajectories/${trajectoryId}/eligible-students`,
+      `/thesis/${thesisId}/eligible-students`,
       { user_ids: userIds }
     );
     return response.data;
@@ -314,20 +319,30 @@ export const addTrajectoryEligibleStudents = async (
   }
 };
 
-export const removeTrajectoryEligibleStudent = async (
+/** @deprecated Use addThesisEligibleStudents */
+export const addTrajectoryEligibleStudents = async (
   thesisId,
-  trajectoryId,
-  userId
-) => {
+  _trajectoryId,
+  userIds = []
+) => addThesisEligibleStudents(thesisId, userIds);
+
+export const removeThesisEligibleStudent = async (thesisId, userId) => {
   try {
     const response = await axiosInstance.delete(
-      `/thesis/${thesisId}/trajectories/${trajectoryId}/eligible-students/${userId}`
+      `/thesis/${thesisId}/eligible-students/${userId}`
     );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
   }
 };
+
+/** @deprecated Use removeThesisEligibleStudent */
+export const removeTrajectoryEligibleStudent = async (
+  thesisId,
+  _trajectoryId,
+  userId
+) => removeThesisEligibleStudent(thesisId, userId);
 
 export const getTrajectoryStudentDetail = async (thesisId, trajectoryId, userId) => {
   try {

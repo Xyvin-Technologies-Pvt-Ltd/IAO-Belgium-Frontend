@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 export function getProformaStatusChip(proforma) {
   if (proforma?.status === "MOVED_TO_FINANCE" || proforma?.status === "PAID") {
     return {
-      label: proforma.status === "PAID" ? "Paid" : "In finance",
+      label: proforma.status === "PAID" ? "Sent to Exact Manually" : "In finance",
       className: "bg-violet-100 text-violet-800 border-violet-200",
     };
   }
@@ -50,6 +50,16 @@ export function formatAuditAction(action) {
 
 const OBJECT_ID_RE = /^[a-f0-9]{24}$/i;
 
+const STATUS_DISPLAY = {
+  PAID: "Sent to Exact Manually",
+  MOVED_TO_FINANCE: "Moved to finance",
+  TEACHER_SIGNED_APPROVED: "Teacher signed — approved",
+  SENT_TO_TEACHER: "Sent to teacher",
+  CHANGE_REQUESTED: "Change requested",
+  REJECTED: "Rejected",
+  DRAFT: "Draft",
+};
+
 /** Skip objects, JSON dumps, and internal IDs — notes + action label are enough. */
 function formatAuditDisplayValue(value) {
   if (value == null || value === "") return null;
@@ -59,7 +69,7 @@ function formatAuditDisplayValue(value) {
   if (OBJECT_ID_RE.test(text)) return null;
   if ((text.startsWith("{") || text.startsWith("[")) && text.length > 24) return null;
   if (text.length > 100) return null;
-  return text;
+  return STATUS_DISPLAY[text] || text;
 }
 
 /** Who changed what last — visible to teacher and admin */

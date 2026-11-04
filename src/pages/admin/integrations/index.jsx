@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, FileCheck, Plug, RefreshCw, Unplug, Users } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -33,6 +33,8 @@ import { useCanModify } from "@/hooks/useCanModify";
 import ReconciliationTab from "./ReconciliationTab";
 import MollieRefBackfillCard from "./MollieRefBackfillCard";
 import ToSendTab from "./ToSendTab";
+import IntegrationsFilterBar from "./IntegrationsFilterBar";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v1/";
 
@@ -68,6 +70,20 @@ const IntegrationsPage = () => {
   const [docCheck, setDocCheck] = useState(null);
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  //* One search + date filter shared by every tab below.
+  const [searchInput, setSearchInput] = useState("");
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
+  const debouncedSearch = useDebounce(searchInput, 400);
+  const filters = useMemo(
+    () => ({
+      ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+      ...(filterFrom ? { from: filterFrom } : {}),
+      ...(filterTo ? { to: filterTo } : {}),
+    }),
+    [debouncedSearch, filterFrom, filterTo],
+  );
+  const filtersActive = Object.keys(filters).length > 0;
 
   const {
     data: statusResponse,
@@ -82,7 +98,7 @@ const IntegrationsPage = () => {
     error: unsyncedError,
     refetch: refetchUnsynced,
   } = useGetExactUnsynced(
-    { page, limit: rowsPerPage },
+    { page, limit: rowsPerPage, ...filters },
     { enabled: syncTab === "pending" },
   );
 
@@ -99,7 +115,7 @@ const IntegrationsPage = () => {
     error: sentError,
     refetch: refetchSent,
   } = useGetExactSent(
-    { page, limit: rowsPerPage },
+    { page, limit: rowsPerPage, ...filters },
     { enabled: syncTab === "sent" },
   );
 
@@ -129,7 +145,7 @@ const IntegrationsPage = () => {
       ? (unsyncedResponse?.total_count ?? 0)
       : (unsyncedCountResponse?.total_count ?? unsyncedResponse?.total_count ?? 0);
   const sendMode = sendModeResponse?.data?.mode === "auto" ? "auto" : "manual";
-  const toSendCounts = toSendResponse?.counts ?? {};
+  const toSendCounts = toSendResponse?.counts_all ?? toSendResponse?.counts ?? {};
   const toSendWaiting = (toSendCounts.held || 0) + (toSendCounts.failed || 0);
   const sentRows = sentResponse?.data ?? [];
   const sentCount =
@@ -170,6 +186,26 @@ const IntegrationsPage = () => {
 
   const handleBackfillContacts = () => {
     backfillContacts();
+  };
+
+  //* Filter changes start at page 1 (set here, not in an effect).
+  const changeSearch = (value) => {
+    setSearchInput(value);
+    setPage(1);
+  };
+  const changeFrom = (value) => {
+    setFilterFrom(value);
+    setPage(1);
+  };
+  const changeTo = (value) => {
+    setFilterTo(value);
+    setPage(1);
+  };
+  const clearFilters = () => {
+    setSearchInput("");
+    setFilterFrom("");
+    setFilterTo("");
+    setPage(1);
   };
 
   //* Changing tab starts at page 1 (set here, not in an effect).
@@ -478,12 +514,29 @@ const IntegrationsPage = () => {
           </button>
         </div>
 
+        <IntegrationsFilterBar
+          tab={syncTab}
+          search={searchInput}
+          from={filterFrom}
+          to={filterTo}
+          onSearchChange={changeSearch}
+          onFromChange={changeFrom}
+          onToChange={changeTo}
+          onClear={clearFilters}
+        />
+
         {syncTab === "to_send" ? (
-          <ToSendTab isConnected={isConnected} canModify={canModify} mode={sendMode} />
+          <ToSendTab
+            isConnected={isConnected}
+            canModify={canModify}
+            mode={sendMode}
+            filters={filters}
+            filtersActive={filtersActive}
+          />
         ) : syncTab === "pending" ? (
           <>
             {isUnsyncedLoading ? (
-              <TableSkeleton rows={3} columns={6} />
+              <TableSkeleton rows={3} columns={7} />
             ) : unsyncedError ? (
               <ErrorMessage
                 message={
@@ -493,6 +546,10 @@ const IntegrationsPage = () => {
                 onRetry={refetchUnsynced}
                 variant="inline"
               />
+            ) : unsyncedCount === 0 && filtersActive ? (
+              <div className="rounded-lg bg-muted/50 border dark:border-white/10 px-4 py-3 text-sm text-muted-foreground">
+                {t("integrations.exact.filters.noMatch")}
+              </div>
             ) : unsyncedCount === 0 ? (
               <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
                 {t("integrations.exact.allSynced")}
@@ -510,7 +567,8 @@ const IntegrationsPage = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t("integrations.exact.table.date")}</TableHead>
-                        <TableHead>{t("integrations.exact.table.email")}</TableHead>
+                        <TableHead>{t("integrations.exact.toSend.name")}</TableHead>
+                        <TableHead>{t("integrations.exact.toSend.record")}</TableHead>
                         <TableHead>{t("integrations.exact.table.purpose")}</TableHead>
                         <TableHead>{t("integrations.exact.table.program")}</TableHead>
                         <TableHead>{t("integrations.exact.table.glAccount")}</TableHead>
@@ -528,8 +586,22 @@ const IntegrationsPage = () => {
                       {unsyncedRows.map((row) => (
                         <TableRow key={row.payment_id}>
                           <TableCell>{formatPaymentDate(row.created_at)}</TableCell>
-                          <TableCell className="max-w-[140px] truncate">
-                            {row.email || "—"}
+                          <TableCell className="max-w-[220px]">
+                            <div className="truncate" title={row.student_name || undefined}>
+                              {row.company_name || row.student_name || "—"}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate" title={row.email || undefined}>
+                              {row.email || "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            <div className="font-mono text-sm">{row.uid || "—"}</div>
+                            <div
+                              className="font-mono text-xs text-muted-foreground max-w-[200px] truncate"
+                              title={row.transaction_id || undefined}
+                            >
+                              {row.transaction_id || "—"}
+                            </div>
                           </TableCell>
                           <TableCell>{row.purpose || "—"}</TableCell>
                           <TableCell>{row.program_name || "—"}</TableCell>
@@ -629,6 +701,10 @@ const IntegrationsPage = () => {
                 onRetry={refetchSent}
                 variant="inline"
               />
+            ) : sentCount === 0 && filtersActive ? (
+              <div className="rounded-lg bg-muted/50 border dark:border-white/10 px-4 py-3 text-sm text-muted-foreground">
+                {t("integrations.exact.filters.noMatch")}
+              </div>
             ) : sentCount === 0 ? (
               <div className="rounded-lg bg-muted/50 border dark:border-white/10 px-4 py-3 text-sm text-muted-foreground">
                 {t("integrations.exact.noSentEntries")}
@@ -750,6 +826,7 @@ const IntegrationsPage = () => {
               setPage={setPage}
               rowsPerPage={rowsPerPage}
               setRowsPerPage={setRowsPerPage}
+              filters={filters}
             />
           </div>
         )}

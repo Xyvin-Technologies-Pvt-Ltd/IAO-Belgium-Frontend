@@ -9,8 +9,6 @@ import {
   Users,
   Search,
   Edit,
-  Plus,
-  Trash2,
   Download,
 } from "lucide-react";
 
@@ -34,15 +32,10 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
-import AddEligibleStudentsModal from "@/components/admin/thesis/AddEligibleStudentsModal";
-import DeleteConfirm from "@/components/DeleteConfirm";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
-  useGetTrajectoryEligibleStudents,
-  useRemoveTrajectoryEligibleStudent,
   useExportTrajectoryStudentsCsv,
-  useExportTrajectoryEligibleStudentsCsv,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -56,7 +49,6 @@ export default function TrajectoryDetails() {
   const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
   const canModify = useCanModify(basePath);
 
-  const [activeTab, setActiveTab] = useState("enrolled");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -77,22 +69,10 @@ export default function TrajectoryDetails() {
   const debouncedSearch = useDebounce(search, 400);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddEligibleOpen, setIsAddEligibleOpen] = useState(false);
-  const [studentToRemove, setStudentToRemove] = useState(null);
-  const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false);
-
-  const isEnrolledTab = activeTab === "enrolled";
-  const isEligibleTab = activeTab === "eligible";
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(1);
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setPage(1);
-    setSearch("");
   };
 
   const {
@@ -102,30 +82,18 @@ export default function TrajectoryDetails() {
   } = useGetThesisById(thesisId, { type: thesisType });
 
   const enrolledParams = {
-    page: isEnrolledTab ? page : 1,
-    limit: isEnrolledTab ? rowsPerPage : 10,
-    ...(isEnrolledTab && debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(isEnrolledTab && appliedFilters.batch !== "all"
-      ? { batch: appliedFilters.batch }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.supervisor !== "all"
-      ? { supervisor: appliedFilters.supervisor }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.reader !== "all"
-      ? { reader: appliedFilters.reader }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.status !== "all"
-      ? { status: appliedFilters.status }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.attention !== "all"
-      ? { attention: appliedFilters.attention }
-      : {}),
-  };
-
-  const eligibleParams = {
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
+    ...(appliedFilters.supervisor !== "all"
+      ? { supervisor: appliedFilters.supervisor }
+      : {}),
+    ...(appliedFilters.reader !== "all" ? { reader: appliedFilters.reader } : {}),
+    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
+    ...(appliedFilters.attention !== "all"
+      ? { attention: appliedFilters.attention }
+      : {}),
   };
 
   const {
@@ -136,36 +104,10 @@ export default function TrajectoryDetails() {
     refetch: refetchEnrolled,
   } = useGetTrajectoryStudents(thesisId, trajectoryId, enrolledParams);
 
-  const {
-    data: eligibleResponse,
-    isLoading: isEligibleLoading,
-    isFetching: isEligibleFetching,
-    error: eligibleError,
-    refetch: refetchEligible,
-  } = useGetTrajectoryEligibleStudents(
-    thesisId,
-    trajectoryId,
-    eligibleParams,
-    { enabled: !!thesisId && !!trajectoryId && isEligibleTab }
-  );
-
-  const removeEligibleMutation = useRemoveTrajectoryEligibleStudent();
   const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
-  const exportEligibleCsvMutation = useExportTrajectoryEligibleStudentsCsv();
-
-  const exportCsvPending =
-    exportEnrolledCsvMutation.isPending || exportEligibleCsvMutation.isPending;
+  const exportCsvPending = exportEnrolledCsvMutation.isPending;
 
   const handleExportCsv = () => {
-    if (isEligibleTab) {
-      const { page: _page, limit: _limit, ...exportParams } = eligibleParams;
-      exportEligibleCsvMutation.mutate({
-        thesisId,
-        trajectoryId,
-        params: exportParams,
-      });
-      return;
-    }
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
       thesisId,
@@ -176,22 +118,17 @@ export default function TrajectoryDetails() {
 
   const thesis = thesisResponse?.data;
   const enrolledData = enrolledResponse?.data;
-  const eligibleData = eligibleResponse?.data;
-  const trajectory = enrolledData?.trajectory || eligibleData?.trajectory;
+  const trajectory = enrolledData?.trajectory;
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
 
-  const students = isEnrolledTab
-    ? enrolledData?.students || []
-    : eligibleData?.students || [];
-  const totalRows = isEnrolledTab
-    ? enrolledCount
-    : eligibleResponse?.total_count ?? eligibleData?.total_count ?? 0;
-  const isListLoading = isEnrolledTab ? isEnrolledLoading : isEligibleLoading;
-  const isListFetching = isEnrolledTab ? isEnrolledFetching : isEligibleFetching;
-  const listError = isEnrolledTab ? enrolledError : eligibleError;
-  const refetchList = isEnrolledTab ? refetchEnrolled : refetchEligible;
+  const students = enrolledData?.students || [];
+  const totalRows = enrolledCount;
+  const isListLoading = isEnrolledLoading;
+  const isListFetching = isEnrolledFetching;
+  const listError = enrolledError;
+  const refetchList = refetchEnrolled;
 
   useEffect(() => {
     updateBreadcrumbs([
@@ -229,7 +166,7 @@ export default function TrajectoryDetails() {
   ]);
 
   const isLoading =
-    isThesisLoading || (isEnrolledLoading && !enrolledData && !eligibleData);
+    isThesisLoading || (isEnrolledLoading && !enrolledData);
   const error = thesisError || enrolledError;
 
   if (isLoading) {
@@ -261,19 +198,6 @@ export default function TrajectoryDetails() {
       <div className="flex items-center justify-between">
         <div className="flex-1" />
         <div className="flex items-center gap-2">
-          {canModify && isEligibleTab && (
-            <Button
-              size="sm"
-              onClick={() => setIsAddEligibleOpen(true)}
-              className="gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-            >
-              <Plus className="w-4 h-4" />
-              {t(
-                "thesisManagement.trajectories.addStudents",
-                "Add students"
-              )}
-            </Button>
-          )}
           {canModify && (
             <Button
               variant="outline"
@@ -346,40 +270,15 @@ export default function TrajectoryDetails() {
       </div>
 
       <div className="space-y-4 pt-2">
-        <div className="border-b border-border">
-          <nav className="-mb-px flex space-x-8 overflow-x-auto">
-            {[
-              {
-                id: "enrolled",
-                label: t(
-                  "thesisManagement.trajectories.enrolledStudents",
-                  "Enrolled students"
-                ),
-              },
-              {
-                id: "eligible",
-                label: t(
-                  "thesisManagement.trajectories.eligibleStudents",
-                  "Eligible students"
-                ),
-              },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${
-                  activeTab === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+        <div className="flex items-center gap-2">
+          <Users className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">
+            {t(
+              "thesisManagement.trajectories.enrolledStudents",
+              "Enrolled students"
+            )}
+          </h2>
         </div>
-
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -394,8 +293,7 @@ export default function TrajectoryDetails() {
             />
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-            {isEnrolledTab && (
-              <TrajectoryStudentsFilterDrawer
+            <TrajectoryStudentsFilterDrawer
                 filterOptions={enrolledData?.filter_options}
                 draftFilters={draftFilters}
                 setDraftFilters={setDraftFilters}
@@ -403,7 +301,6 @@ export default function TrajectoryDetails() {
                 setAppliedFilters={setAppliedFilters}
                 setPage={setPage}
               />
-            )}
             <Button
               variant="outline"
               size="sm"
@@ -419,152 +316,6 @@ export default function TrajectoryDetails() {
           </div>
         </div>
 
-        {isEligibleTab ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  {t("thesisManagement.table.studentUid", "Student UID")}
-                </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.studentName", "Student Name")}
-                </TableHead>
-                <TableHead>{t("common.email", "Email")}</TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.group", "Group")}
-                </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.purchase", "Purchase")}
-                </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.source", "Source")}
-                </TableHead>
-                {canModify && (
-                  <TableHead className="text-right">
-                    {t("common.actions", "Actions")}
-                  </TableHead>
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody
-              className={
-                isListFetching ? "opacity-50 pointer-events-none" : ""
-              }
-            >
-              {isListLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={canModify ? 7 : 6} />
-              ) : listError ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={canModify ? 7 : 6}
-                    className="text-center p-8"
-                  >
-                    <ErrorMessage
-                      message={
-                        listError?.message ||
-                        t("common.failedToLoad", "Failed to load data")
-                      }
-                      onRetry={refetchList}
-                      variant="inline"
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : students?.length > 0 ? (
-                students.map((row) => {
-                  const student = row.student;
-                  const studentName = student
-                    ? `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
-                      student.email
-                    : t(
-                        "thesisManagement.trajectories.unknownStudent",
-                        "Unknown Student"
-                      );
-                  const isManual = row.source === "manual";
-
-                  return (
-                    <TableRow key={row.application?._id || student?._id}>
-                      <TableCell>{student?.uid || "-"}</TableCell>
-                      <TableCell>{studentName}</TableCell>
-                      <TableCell>{student?.email || "-"}</TableCell>
-                      <TableCell>{row.batch?.name || "-"}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium ${
-                            row.purchased
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {row.purchased
-                            ? t(
-                                "thesisManagement.trajectories.purchased",
-                                "Purchased"
-                              )
-                            : t(
-                                "thesisManagement.trajectories.notPurchased",
-                                "Not purchased"
-                              )}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {isManual
-                            ? t(
-                                "thesisManagement.trajectories.sourceManual",
-                                "Manual"
-                              )
-                            : t(
-                                "thesisManagement.trajectories.sourceRules",
-                                "Rules"
-                              )}
-                        </span>
-                      </TableCell>
-                      {canModify && (
-                        <TableCell className="text-right">
-                          {isManual ? (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                              onClick={() => {
-                                setStudentToRemove(student);
-                                setIsRemoveConfirmOpen(true);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">
-                              —
-                            </span>
-                          )}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={canModify ? 7 : 6}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    {search
-                      ? t(
-                          "common.noResultsFound",
-                          "No students match your search query."
-                        )
-                      : t(
-                          "thesisManagement.trajectories.noEligibleStudents",
-                          "No eligible students found for this trajectory."
-                        )}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        ) : (
           <Table>
             <TableHeader>
               <TableRow>
@@ -706,7 +457,6 @@ export default function TrajectoryDetails() {
               )}
             </TableBody>
           </Table>
-        )}
 
         <Pagination
           page={page}
@@ -723,56 +473,12 @@ export default function TrajectoryDetails() {
           onClose={() => {
             setIsEditModalOpen(false);
             refetchEnrolled();
-            if (isEligibleTab) refetchEligible();
           }}
           thesisId={thesisId}
           initialData={trajectory}
         />
       )}
 
-      {isAddEligibleOpen && (
-        <AddEligibleStudentsModal
-          open={isAddEligibleOpen}
-          onClose={() => {
-            setIsAddEligibleOpen(false);
-            refetchEligible();
-          }}
-          thesisId={thesisId}
-          trajectoryId={trajectoryId}
-        />
-      )}
-
-      <DeleteConfirm
-        open={isRemoveConfirmOpen}
-        onClose={() => {
-          setIsRemoveConfirmOpen(false);
-          setStudentToRemove(null);
-        }}
-        onConfirm={async () => {
-          if (!studentToRemove?._id) return;
-          try {
-            await removeEligibleMutation.mutateAsync({
-              thesisId,
-              trajectoryId,
-              userId: studentToRemove._id,
-            });
-            setIsRemoveConfirmOpen(false);
-            setStudentToRemove(null);
-            refetchEligible();
-          } catch {
-            // Error handled by store/hook toast
-          }
-        }}
-        count={1}
-        data={
-          studentToRemove
-            ? `${studentToRemove.first_name || ""} ${studentToRemove.last_name || ""}`.trim() ||
-              studentToRemove.email ||
-              studentToRemove.uid
-            : ""
-        }
-        isLoading={removeEligibleMutation.isPending}
-      />
     </div>
   );
 }

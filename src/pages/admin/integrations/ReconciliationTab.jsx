@@ -1,15 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CheckCircle2,
   Download,
-  Search,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -28,7 +26,6 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useDebounce } from "@/hooks/useDebounce";
 import { useCanModify } from "@/hooks/useCanModify";
 import {
   useGetExactReconciliation,
@@ -107,31 +104,28 @@ function ExactCheck({ verify, t }) {
   );
 }
 
-const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
+//* Search and dates come from the shared Integrations filter bar (filters prop);
+//* the record-type filter is specific to this tab.
+const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage, filters = {} }) => {
   const { t } = useTranslation();
   const canModify = useCanModify("finance");
 
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
   const [recordType, setRecordType] = useState(ALL);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
   const [verdicts, setVerdicts] = useState({});
   const [isExporting, setIsExporting] = useState(false);
 
   const filterParams = useMemo(
     () => ({
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...filters,
       ...(recordType !== ALL ? { record_type: recordType } : {}),
-      ...(from ? { from } : {}),
-      ...(to ? { to } : {}),
     }),
-    [debouncedSearch, recordType, from, to],
+    [filters, recordType],
   );
 
-  useEffect(() => {
+  const changeRecordType = (value) => {
+    setRecordType(value);
     setPage(1);
-  }, [debouncedSearch, recordType, from, to, setPage]);
+  };
 
   const { data, isLoading, isFetching, error, refetch } = useGetExactReconciliation({
     page,
@@ -190,34 +184,15 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
     }
   };
 
-  const hasFilters =
-    Boolean(debouncedSearch) || recordType !== ALL || Boolean(from) || Boolean(to);
-
-  const clearFilters = () => {
-    setSearch("");
-    setRecordType(ALL);
-    setFrom("");
-    setTo("");
-  };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            placeholder={t("integrations.exact.reconciliation.searchPlaceholder")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
         <div className="flex flex-col gap-1">
           <label className="text-xs text-muted-foreground">
             {t("integrations.exact.reconciliation.recordType")}
           </label>
-          <Select value={recordType} onValueChange={setRecordType}>
+          <Select value={recordType} onValueChange={changeRecordType}>
             <SelectTrigger className="w-[170px]">
               <SelectValue />
             </SelectTrigger>
@@ -234,36 +209,6 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage }) => {
             </SelectContent>
           </Select>
         </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-muted-foreground">
-            {t("integrations.exact.reconciliation.from")}
-          </label>
-          <Input
-            type="date"
-            className="w-[150px]"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-muted-foreground">
-            {t("integrations.exact.reconciliation.to")}
-          </label>
-          <Input
-            type="date"
-            className="w-[150px]"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
-        </div>
-
-        {hasFilters ? (
-          <Button variant="ghost" onClick={clearFilters}>
-            {t("integrations.exact.reconciliation.clear")}
-          </Button>
-        ) : null}
 
         <div className="ml-auto flex gap-2">
           {canModify ? (

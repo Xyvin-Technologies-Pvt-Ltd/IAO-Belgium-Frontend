@@ -690,6 +690,20 @@
         "lineGl": "GL account",
         "lineVat": "VAT code",
         "close": "Close"
+      },
+      "filters": {
+        "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
+        "clearSearch": "Clear search",
+        "from": "From",
+        "to": "To",
+        "clear": "Clear filters",
+        "noMatch": "No records match this search or date range.",
+        "dateHint": {
+          "to_send": "Dates filter on the IAO document date. Every word you type must match.",
+          "pending": "Dates filter on the payment date. Every word you type must match.",
+          "sent": "Dates filter on the date it was sent to Exact. Every word you type must match.",
+          "reconciliation": "Dates filter on the date it was sent to Exact. Every word you type must match."
+        }
       }
     }
   },
@@ -3586,7 +3600,7 @@
       "signedAwaitingAdmin": "Signed — awaiting admin",
       "inFinance": "In finance",
       "inFinanceQueue": "In finance queue",
-      "paid": "Paid",
+      "paid": "Sent to Exact Manually",
       "needsConfirmSignShort": "Needs confirm & sign",
       "open": "Open"
     },
