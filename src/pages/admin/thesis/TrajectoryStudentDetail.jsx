@@ -877,7 +877,6 @@ export default function TrajectoryStudentDetail() {
               onClick={() => {
                 if (attemptActionsDisabled) return;
                 setReenrollThesisId(thesisId || "");
-                setReenrollTrajectoryId("");
                 setReenrollOpen(true);
               }}
             >
