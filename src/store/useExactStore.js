@@ -2,10 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   getExactStatus,
-  getExactUnsynced,
   getExactSent,
-  reconcileExact,
-  reconcileExactPayment,
   backfillExactContacts,
   startMollieRefBackfill,
   getMollieRefBackfillStatus,
@@ -18,20 +15,20 @@ import {
   getExactToSendPreview,
   sendExactJob,
   getExactDocumentTypes,
+  getExactMissing,
+  addExactToOutbox,
+  getExactPayouts,
+  getExactPayout,
+  syncExactPayouts,
+  getExactPayoutsSyncStatus,
+  queueExactPayoutMissing,
+  sendExactPayoutWaiting,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
   useQuery({
     queryKey: ["exact-status"],
     queryFn: getExactStatus,
-    staleTime: 30000,
-    ...options,
-  });
-
-export const useGetExactUnsynced = (params = {}, options = {}) =>
-  useQuery({
-    queryKey: ["exact-unsynced", params],
-    queryFn: () => getExactUnsynced(params),
     staleTime: 30000,
     ...options,
   });
@@ -64,52 +61,6 @@ export const useVerifyExactReconciliation = () =>
     onError: (err) =>
       toast.error(err?.message || "Failed to verify against Mollie and Exact"),
   });
-
-export const useReconcileExact = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: reconcileExact,
-    onSuccess: (res) => {
-      const { queued = 0, retried = 0, skipped = 0 } = res?.data || {};
-      const parts = [];
-      if (queued > 0) parts.push(`${queued} queued`);
-      if (retried > 0) parts.push(`${retried} retried`);
-      if (skipped > 0) parts.push(`${skipped} already in queue`);
-      toast.success(
-        parts.length
-          ? `Sync started: ${parts.join(", ")}`
-          : "All payments are already synced",
-      );
-      queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
-      queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
-      queryClient.invalidateQueries({ queryKey: ["exact-status"] });
-    },
-    onError: (err) =>
-      toast.error(err?.message || "Failed to sync payments to Exact Online"),
-  });
-};
-
-export const useReconcileExactPayment = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: reconcileExactPayment,
-    onSuccess: (res) => {
-      const uid = res?.data?.uid;
-      toast.success(uid ? `Queued ${uid} for Exact Online` : "Payment queued for Exact Online");
-      // The worker posts to Exact asynchronously, so the row only leaves Pending once
-      // it has an entry id. Refetch now for the queue state, then again once the push
-      // has realistically finished, so the result shows up without a manual reload.
-      const refresh = () => {
-        queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
-        queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
-      };
-      refresh();
-      setTimeout(refresh, 6000);
-    },
-    onError: (err) =>
-      toast.error(err?.message || "Failed to sync this payment to Exact Online"),
-  });
-};
 
 export const useBackfillExactContacts = () => {
   const queryClient = useQueryClient();
@@ -225,7 +176,7 @@ export const useSendExactJob = () => {
       const refresh = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
         queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
-        queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
         queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
       };
       refresh();
@@ -245,11 +196,114 @@ export const useDisconnectExact = () => {
     mutationFn: disconnectExact,
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["exact-status"] });
-      queryClient.invalidateQueries({ queryKey: ["exact-unsynced"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
       queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
       toast.success(res?.message || "Exact Online disconnected");
     },
     onError: (err) =>
       toast.error(err?.message || "Failed to disconnect Exact Online"),
+  });
+};
+
+// ─── To send → Missing ───────────────────────────────────────────────────────
+
+/** Records that should be in Exact but aren't. count_only for the chip badge. */
+export const useGetExactMissing = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-missing", params],
+    queryFn: () => getExactMissing(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+/** Missing → "Add to To send". Only queues; the admin previews and sends it there. */
+export const useAddExactToOutbox = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addExactToOutbox,
+    onSuccess: (res) => {
+      toast.success(res?.data?.uid ? `${res.data.uid}: ${res.message}` : res?.message || "Added to To send");
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Failed to add this record to To send");
+      //* Already queued elsewhere: refresh so the row shows its To send state.
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+    },
+  });
+};
+
+// ─── Payouts (Mollie settlements ↔ Exact) ────────────────────────────────────
+
+const PAYOUT_KEYS = [["exact-payouts"], ["exact-payout"], ["exact-to-send"], ["exact-missing"]];
+
+function refreshPayouts(queryClient) {
+  for (const queryKey of PAYOUT_KEYS) queryClient.invalidateQueries({ queryKey });
+}
+
+export const useGetExactPayouts = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-payouts", params],
+    queryFn: () => getExactPayouts(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+export const useGetExactPayout = (settlementId, options = {}) =>
+  useQuery({
+    queryKey: ["exact-payout", settlementId],
+    queryFn: () => getExactPayout(settlementId),
+    enabled: Boolean(settlementId),
+    staleTime: 10000,
+    ...options,
+  });
+
+/** Polls every 3s while a refresh from Mollie is running. */
+export const useGetExactPayoutsSyncStatus = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-payouts-sync"],
+    queryFn: getExactPayoutsSyncStatus,
+    refetchInterval: (query) => (query.state.data?.data?.state === "running" ? 3000 : false),
+    ...options,
+  });
+
+export const useSyncExactPayouts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: syncExactPayouts,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Refreshing payouts from Mollie");
+      queryClient.invalidateQueries({ queryKey: ["exact-payouts-sync"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to refresh payouts from Mollie"),
+  });
+};
+
+export const useQueueExactPayoutMissing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: queueExactPayoutMissing,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Added to To send");
+      refreshPayouts(queryClient);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to add this payout's records to To send"),
+  });
+};
+
+export const useSendExactPayoutWaiting = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendExactPayoutWaiting,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sent to Exact");
+      //* The worker posts asynchronously; refresh now and again shortly after.
+      refreshPayouts(queryClient);
+      setTimeout(() => refreshPayouts(queryClient), 8000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send this payout's records"),
   });
 };
