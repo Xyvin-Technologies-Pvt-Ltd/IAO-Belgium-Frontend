@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, PlusCircle, Send } from "lucide-react";
+import { ArrowUpRight, Download, PlusCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,19 @@ import {
 import { LINE_STYLES, formatDate, money } from "./payoutUi";
 import PayoutStateBadge from "./PayoutStateBadge";
 
-/** One payout: every transaction with its Exact status, plus the batch actions. */
-const PayoutDetailDialog = ({ settlementId, onClose, isConnected, canModify }) => {
+//* Where a click on a line's status takes the admin (filtered on that record).
+const STATUS_TARGET = {
+  waiting: { tab: "to_send", view: "waiting" },
+  sending: { tab: "to_send", view: "waiting" },
+  failed: { tab: "to_send", view: "failed" },
+  missing: { tab: "to_send", view: "missing" },
+  in_exact: { tab: "history", view: "documents" },
+  other_ref: { tab: "history", view: "documents" },
+};
+
+/** One payout: every transaction with its Exact status, plus the batch actions.
+ * onOpenRecord({ tab, view, search }): jump to To send / History filtered on a record. */
+const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, canModify }) => {
   const { t } = useTranslation();
   const p = (key, opts) => t(`integrations.exact.payouts.${key}`, opts);
   const [exporting, setExporting] = useState(false);
@@ -62,7 +73,7 @@ const PayoutDetailDialog = ({ settlementId, onClose, isConnected, canModify }) =
 
   return (
     <Dialog open={Boolean(settlementId)} onOpenChange={(open) => !open && !busy && onClose()}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-[min(1400px,95vw)] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {p("detailTitle")} {payout?.reference ? <span className="font-mono">{payout.reference}</span> : null}
@@ -111,7 +122,7 @@ const PayoutDetailDialog = ({ settlementId, onClose, isConnected, canModify }) =
             </div>
 
             <div className="border dark:border-white/10 rounded-lg overflow-x-auto">
-              <Table className="w-full min-w-[1000px]">
+              <Table className="w-full min-w-[1100px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>{p("col.mollie")}</TableHead>
@@ -153,14 +164,28 @@ const PayoutDetailDialog = ({ settlementId, onClose, isConnected, canModify }) =
                         {money(l.amount, l.currency)}
                       </TableCell>
                       <TableCell className="whitespace-nowrap">{formatDate(l.date)}</TableCell>
-                      <TableCell className="max-w-[300px]">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                            LINE_STYLES[l.status] || LINE_STYLES.unknown
-                          }`}
-                        >
-                          {p(`line.${l.status}`)}
-                        </span>
+                      <TableCell className="min-w-[260px]">
+                        {STATUS_TARGET[l.status] && l.record?.uid && onOpenRecord ? (
+                          <button
+                            type="button"
+                            onClick={() => onOpenRecord({ ...STATUS_TARGET[l.status], search: l.record.uid })}
+                            title={p(STATUS_TARGET[l.status].tab === "history" ? "openInHistory" : "openInToSend")}
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium underline-offset-2 hover:underline ${
+                              LINE_STYLES[l.status] || LINE_STYLES.unknown
+                            }`}
+                          >
+                            {p(`line.${l.status}`)}
+                            <ArrowUpRight className="h-3 w-3" />
+                          </button>
+                        ) : (
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              LINE_STYLES[l.status] || LINE_STYLES.unknown
+                            }`}
+                          >
+                            {p(`line.${l.status}`)}
+                          </span>
+                        )}
                         <div className="text-xs text-muted-foreground mt-1">
                           {l.exact_entry_number ? `#${l.exact_entry_number} · ` : ""}
                           {l.your_ref ? `${p("yourRef")}: ${l.your_ref}` : p(`lineHint.${l.status}`)}

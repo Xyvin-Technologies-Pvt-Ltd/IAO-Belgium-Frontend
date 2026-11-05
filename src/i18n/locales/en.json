@@ -781,7 +781,8 @@
           "open": "Open",
           "pending": "Pending",
           "paidout": "Paid out",
-          "failed": "Failed"
+          "failed": "Failed",
+          "processing-at-bank": "Processing at bank"
         },
         "line": {
           "in_exact": "In Exact",
@@ -824,7 +825,9 @@
         "confirmSendWaiting": "Send all {{count}} waiting record(s) of payout {{reference}} to Exact? Each is checked the same way as when you click Send on it; records with problems will fail and stay in To send.",
         "export": "Export CSV",
         "exporting": "Exporting…",
-        "exportFailed": "Failed to export this payout"
+        "exportFailed": "Failed to export this payout",
+        "openInToSend": "Open this record in To send",
+        "openInHistory": "Open this record in History"
       },
       "guide": {
         "intro": "How IAO sends payments to Exact Online, how xCore matches them with Mollie payouts, and how to use these tabs.",
@@ -855,7 +858,7 @@
             },
             {
               "title": "Payouts",
-              "text": "One row per Mollie payout, with the same payout number xCore shows. It tells you how many transactions are in Exact and whether xCore can match the payout. Open a payout to see every transaction and to add the missing ones or send the waiting ones in one go. It refreshes from Mollie every day at 06:30; use \"Refresh from Mollie\" for the latest."
+              "text": "One row per Mollie payout, with the same payout number xCore shows. It tells you how many transactions are in Exact and whether xCore can match the payout. Open a payout to see every transaction and to add the missing ones or send the waiting ones in one go. It refreshes from Mollie every day at 06:30; use \"Refresh from Mollie\" for the latest. Click a transaction's status to open that record in To send or History."
             },
             {
               "title": "History",
