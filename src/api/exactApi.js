@@ -9,36 +9,9 @@ export const getExactStatus = async () => {
   }
 };
 
-export const getExactUnsynced = async (params = {}) => {
-  try {
-    const response = await axiosInstance.get("/exact/unsynced", { params });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
 export const getExactSent = async (params = {}) => {
   try {
     const response = await axiosInstance.get("/exact/sent", { params });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
-export const reconcileExact = async () => {
-  try {
-    const response = await axiosInstance.post("/exact/reconcile");
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-};
-
-export const reconcileExactPayment = async (paymentId) => {
-  try {
-    const response = await axiosInstance.post(`/exact/reconcile/${paymentId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -168,6 +141,96 @@ export const sendExactJob = async (jobId) => {
 export const getExactDocumentTypes = async () => {
   try {
     const response = await axiosInstance.get("/exact/document-types");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── To send → Missing ───────────────────────────────────────────────────────
+
+//* Records that should be in Exact but aren't (payments + third-party invoices).
+export const getExactMissing = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/missing", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Queue one Missing record for To send. Never sends: an admin still previews it.
+export const addExactToOutbox = async ({ kind, id }) => {
+  try {
+    const response = await axiosInstance.post("/exact/outbox/add", { kind, id });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── Payouts (Mollie settlements ↔ Exact) ────────────────────────────────────
+
+export const getExactPayouts = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/payouts", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactPayout = async (settlementId) => {
+  try {
+    const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactPayout = async (settlementId) => {
+  try {
+    const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}/export`, {
+      responseType: "text",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const syncExactPayouts = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/payouts/sync");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactPayoutsSyncStatus = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/payouts/sync/status");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const queueExactPayoutMissing = async (settlementId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/payouts/${encodeURIComponent(settlementId)}/queue-missing`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const sendExactPayoutWaiting = async (settlementId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/payouts/${encodeURIComponent(settlementId)}/send-waiting`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
