@@ -29,6 +29,10 @@ const SIDEBAR_PERMISSIONS = {
     "academic_management_view",
     "academic_management_modify",
   ],
+  "/admin/location-changes": [
+    "academic_management_view",
+    "academic_management_modify",
+  ],
   "/admin/notification-management": [
     "academic_management_view",
     "academic_management_modify",
