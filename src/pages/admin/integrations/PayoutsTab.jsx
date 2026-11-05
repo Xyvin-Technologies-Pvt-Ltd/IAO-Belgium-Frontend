@@ -43,7 +43,17 @@ function SyncInfo({ sync, p }) {
  * its transactions are in Exact. Click a row for the transactions and the
  * per-payout actions.
  */
-const PayoutsTab = ({ isConnected, canModify, page, setPage, rowsPerPage, setRowsPerPage, filters = {}, filtersActive }) => {
+const PayoutsTab = ({
+  isConnected,
+  canModify,
+  page,
+  setPage,
+  rowsPerPage,
+  setRowsPerPage,
+  filters = {},
+  filtersActive,
+  onOpenRecord,
+}) => {
   const { t } = useTranslation();
   const p = (key, opts) => t(`integrations.exact.payouts.${key}`, opts);
   const queryClient = useQueryClient();
@@ -121,7 +131,7 @@ const PayoutsTab = ({ isConnected, canModify, page, setPage, rowsPerPage, setRow
                   >
                     <TableCell className="whitespace-nowrap">
                       <div className="font-mono text-sm">{row.reference || row.settlement_id}</div>
-                      <div className="text-xs text-muted-foreground">{p(`mollieStatus.${row.status}`)}</div>
+                      <div className="text-xs text-muted-foreground">{p(`mollieStatus.${row.status}`, { defaultValue: String(row.status || "").replaceAll("-", " ") })}</div>
                     </TableCell>
                     <TableCell className="whitespace-nowrap">{formatDate(row.settled_at || row.created_at)}</TableCell>
                     <TableCell className="text-right whitespace-nowrap font-medium">{money(row.amount, row.currency)}</TableCell>
@@ -164,6 +174,10 @@ const PayoutsTab = ({ isConnected, canModify, page, setPage, rowsPerPage, setRow
       <PayoutDetailDialog
         settlementId={openId}
         onClose={() => setOpenId(null)}
+        onOpenRecord={(target) => {
+          setOpenId(null);
+          onOpenRecord?.(target);
+        }}
         isConnected={isConnected}
         canModify={canModify}
       />
