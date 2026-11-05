@@ -96,6 +96,16 @@ const IntegrationsPage = () => {
   const changeTo = resetPage(setFilterTo);
   const switchTab = resetPage(setTab);
   const changeHistoryView = resetPage(setHistoryView);
+  //* Payouts → click a transaction's status: open that record in To send / History.
+  const openRecord = ({ tab: target, view, search }) => {
+    setTab(target);
+    if (target === "to_send") setToSendView(view);
+    if (target === "history") setHistoryView(view);
+    setSearchInput(search || "");
+    setFilterFrom("");
+    setFilterTo("");
+    setPage(1);
+  };
   const clearFilters = () => {
     setSearchInput("");
     setFilterFrom("");
@@ -238,6 +248,7 @@ const IntegrationsPage = () => {
             setRowsPerPage={setRowsPerPage}
             filters={filters}
             filtersActive={filtersActive}
+            onOpenRecord={openRecord}
           />
         ) : tab === "history" ? (
           <HistoryTab
