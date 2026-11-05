@@ -50,13 +50,13 @@ export const getTeacherSidebarData = (t) => ({
           url: "/teacher/thesis",
           icon: GraduationCap,
         },
-        {
-          title: t("sidebar.teacher.masterThesis", {
-            defaultValue: "Master Thesis",
-          }),
-          url: "/teacher/master-thesis",
-          icon: GraduationCap,
-        },
+        // {
+        //   title: t("sidebar.teacher.masterThesis", {
+        //     defaultValue: "Master Thesis",
+        //   }),
+        //   url: "/teacher/master-thesis",
+        //   icon: GraduationCap,
+        // },
         {
           title: t("sidebar.teacher.exams"),
           url: "/teacher/planning?tab=exams",
