@@ -12,6 +12,7 @@ import ToSendTab from "./ToSendTab";
 import HistoryTab from "./HistoryTab";
 import PayoutsTab from "./PayoutsTab";
 import SettingsTab from "./SettingsTab";
+import GuideTab from "./GuideTab";
 import IntegrationsFilterBar from "./IntegrationsFilterBar";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -20,7 +21,10 @@ const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v
 //* To send: what still has to reach Exact (Waiting / Failed / Missing).
 //* Payouts: Mollie payouts and whether xCore can match them.
 //* History: what is already in Exact. Settings: send mode, checks, tools.
-const TABS = ["to_send", "payouts", "history", "settings"];
+//* Guide: how it all works, what to watch out for, what is next.
+const TABS = ["to_send", "payouts", "history", "settings", "guide"];
+//* Tabs without the search / date filter.
+const NO_FILTER_TABS = ["settings", "guide"];
 
 function formatExpiryDate(value) {
   if (!value) return null;
@@ -201,7 +205,7 @@ const IntegrationsPage = () => {
           ))}
         </div>
 
-        {tab !== "settings" ? (
+        {!NO_FILTER_TABS.includes(tab) ? (
           <IntegrationsFilterBar
             tab={filterHintKey}
             search={searchInput}
@@ -246,8 +250,10 @@ const IntegrationsPage = () => {
             filters={filters}
             filtersActive={filtersActive}
           />
-        ) : (
+        ) : tab === "settings" ? (
           <SettingsTab isConnected={isConnected} canModify={canModify} />
+        ) : (
+          <GuideTab />
         )}
       </div>
     </div>

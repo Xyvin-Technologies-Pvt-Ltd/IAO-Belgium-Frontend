@@ -704,7 +704,8 @@
         "to_send": "To send",
         "payouts": "Payouts",
         "history": "History",
-        "settings": "Settings"
+        "settings": "Settings",
+        "guide": "Guide"
       },
       "missing": {
         "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s)), paid since {{since}}. Add one to To send, then preview and send it there.",
@@ -824,6 +825,124 @@
         "export": "Export CSV",
         "exporting": "Exporting…",
         "exportFailed": "Failed to export this payout"
+      },
+      "guide": {
+        "intro": "How IAO sends payments to Exact Online, how xCore matches them with Mollie payouts, and how to use these tabs.",
+        "flow": {
+          "title": "How it works",
+          "steps": [
+            "A student, a company or a third-party payer pays through Mollie. IAO creates the IAO invoice.",
+            "IAO prepares a sales entry for Exact with the IAO invoice PDF attached. Sending is manual: the record waits in To send → Waiting.",
+            "An admin opens Preview, checks it and clicks Send. Exact receives the sales entry. Its \"Your ref.\" is the Mollie payment ID (tr_…).",
+            "Mollie pays out in batches (payouts). xCore imports each payout and matches every payment to Exact on that Mollie ID.",
+            "xCore books a payout automatically only when every line in it matches. One unmatched line holds up the whole payout."
+          ]
+        },
+        "tabs": {
+          "title": "The tabs",
+          "items": [
+            {
+              "title": "To send → Waiting",
+              "text": "Records ready for Exact. Open Preview, check customer, date, amount and Your ref., then click Send."
+            },
+            {
+              "title": "To send → Failed",
+              "text": "Exact refused the record. The reason is shown on the row and in the preview. Fix the cause in IAO (for example the company's country), then Retry."
+            },
+            {
+              "title": "To send → Missing",
+              "text": "Records that should be in Exact but are not, paid since 18 Aug 2026. \"Add to To send\" only puts the record in Waiting — nothing is sent until you preview and send it."
+            },
+            {
+              "title": "Payouts",
+              "text": "One row per Mollie payout, with the same payout number xCore shows. It tells you how many transactions are in Exact and whether xCore can match the payout. Open a payout to see every transaction and to add the missing ones or send the waiting ones in one go. It refreshes from Mollie every day at 06:30; use \"Refresh from Mollie\" for the latest."
+            },
+            {
+              "title": "History",
+              "text": "Everything already in Exact. Documents: one row per IAO document with Verify and CSV export. GL lines: one row per general ledger line for the accountant."
+            },
+            {
+              "title": "Settings",
+              "text": "Send mode (keep it on Manual), the IAO invoice PDF check, one-off tools and Disconnect."
+            }
+          ]
+        },
+        "statuses": {
+          "title": "What the statuses mean",
+          "intro": "Used in Payouts for each Mollie transaction:"
+        },
+        "routine": {
+          "title": "Daily routine",
+          "steps": [
+            "Open Payouts. The list refreshes at 06:30; click \"Refresh from Mollie\" if you need newer payouts.",
+            "Open each payout marked \"Action needed\". Click \"Add missing to To send\".",
+            "In To send → Waiting, preview a few records, then send them (one by one, or \"Send waiting\" on the payout).",
+            "Check To send → Failed and fix what Exact refused.",
+            "In xCore, match by hand the lines marked \"Match by hand\" (refunds, older references, payments not in IAO)."
+          ]
+        },
+        "careful": {
+          "title": "Be careful",
+          "items": [
+            {
+              "title": "Keep sending on Manual",
+              "text": "until the accountant agrees to automatic sending. Always open Preview before Send."
+            },
+            {
+              "title": "Third-party and KMO payments",
+              "text": "are booked in Exact through their invoice, not the payment. That is why you never see those payments in Missing — only the third-party invoice."
+            },
+            {
+              "title": "Advance payments",
+              "text": "are booked on the first session day. A payout that contains one stays unmatched in xCore until then."
+            },
+            {
+              "title": "Refunds and chargebacks",
+              "text": "are not matched automatically yet. Match them by hand in xCore."
+            },
+            {
+              "title": "Older third-party invoices",
+              "text": "(sent before November 2026) are in Exact under their invoice number, not the Mollie ID. Match them by hand in xCore."
+            },
+            {
+              "title": "Company country",
+              "text": "When a company is new to Exact, its country must be a country Exact recognises (for example \"BE\" or \"België\"). \"Belgique\" or \"Belgium\" makes Exact refuse to create the customer (error 500). Fix the country on the company, then send again."
+            },
+            {
+              "title": "25 Aug – 22 Sep 2026",
+              "text": "About 700 payments from this period were never sent to Exact. They are listed in Missing. Wait for the accountant's decision before sending them."
+            },
+            {
+              "title": "\"Send waiting\" on a payout",
+              "text": "sends all of that payout's waiting records at once. Each is still checked, and records with problems fail and stay in To send — but preview a few first."
+            }
+          ]
+        },
+        "next": {
+          "title": "Next steps",
+          "items": [
+            {
+              "title": "Accountant decisions",
+              "text": "the 25 Aug – 22 Sep gap, advance payments holding up payouts, and the older third-party invoices."
+            },
+            {
+              "title": "Refunds",
+              "text": "send refunds to Exact with the Mollie refund ID (re_…) so xCore can match them automatically."
+            },
+            {
+              "title": "KMO invoices",
+              "text": "list unsent KMO invoices in Missing too."
+            },
+            {
+              "title": "Company countries",
+              "text": "turn country names (Belgique, Belgium, Danmark…) into country codes automatically, so new companies don't fail."
+            },
+            {
+              "title": "Automatic sending",
+              "text": "switch Settings → Send mode to Automatic once the accountant signs off."
+            }
+          ]
+        }
       }
     }
   },
