@@ -9,3 +9,4 @@ export { teacherSchema } from "./teacher.validation";
 export { componentSchema } from "./component.validation";
 export { planningSchema } from "./planning.validation";
 export { contractSchema } from "./contract.validation";
+export { thesisSchema } from "./thesis.validation";

@@ -2,6 +2,8 @@ const SIDEBAR_PERMISSIONS = {
   // Admin routes
   "/admin/dashboard": [],
   "/admin/program": ["operations_management_view", "operations_management_modify"],
+  "/admin/thesis": ["do_thesis_view", "do_thesis_modify"],
+  "/admin/master-thesis": ["master_thesis_view", "master_thesis_modify"],
   "/admin/admission-administration/application-review": [
     "operations_management_view",
     "operations_management_modify",
@@ -169,6 +171,8 @@ export const MODULE_MODIFY_PERMISSIONS = {
   fkf: "fkf_management_modify",
   master_data: "master_data_management_modify",
   queue: "queue_management_modify",
+  do_thesis: "do_thesis_modify",
+  master_thesis: "master_thesis_modify",
 };
 
 /** Full finance access also covers KMO-Portefeuille and Fachkursförderung. */

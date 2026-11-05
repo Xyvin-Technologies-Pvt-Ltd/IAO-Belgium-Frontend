@@ -1,7 +1,16 @@
 import { Navigate } from "@tanstack/react-router";
 import Programs from "@/pages/admin/program";
-import Submissions from "@/pages/admin/submission";
 import ProgramDetail from "@/pages/admin/program/ProgramDetail";
+import ThesisList from "@/pages/admin/thesis";
+import ThesisDetail from "@/pages/admin/thesis/ThesisDetail";
+import ThesisTeachers from "@/pages/admin/thesis/ThesisTeachers";
+import ThesisSteps from "@/pages/admin/thesis/ThesisSteps";
+import ThesisDeadlines from "@/pages/admin/thesis/ThesisDeadlines";
+import TrajectoryDetails from "@/pages/admin/thesis/TrajectoryDetails";
+import TrajectoryStudentDetail from "@/pages/admin/thesis/TrajectoryStudentDetail";
+import MasterTrajectoryDetails from "@/pages/admin/master-thesis/MasterTrajectoryDetails";
+import MasterTrajectoryStudentDetail from "@/pages/admin/master-thesis/MasterTrajectoryStudentDetail";
+import Submissions from "@/pages/admin/submission";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
 import AdminManagement from "@/pages/admin/admin-management";
@@ -100,6 +109,68 @@ export const adminRoutes = [
   {
     path: "/admin/program/$id",
     component: withPermissionProtection(ProgramDetail, "/admin/program"),
+  },
+  {
+    path: "/admin/thesis",
+    component: withPermissionProtection(ThesisList, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id",
+    component: withPermissionProtection(ThesisDetail, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/teachers",
+    component: withPermissionProtection(ThesisTeachers, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/steps",
+    component: withPermissionProtection(ThesisSteps, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/deadlines",
+    component: withPermissionProtection(ThesisDeadlines, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/trajectories/$trajectoryId",
+    component: withPermissionProtection(TrajectoryDetails, "/admin/thesis"),
+  },
+  {
+    path: "/admin/thesis/$id/trajectories/$trajectoryId/students/$userId",
+    component: withPermissionProtection(TrajectoryStudentDetail, "/admin/thesis"),
+  },
+  {
+    path: "/admin/master-thesis",
+    component: withPermissionProtection(ThesisList, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id",
+    component: withPermissionProtection(ThesisDetail, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id/teachers",
+    component: withPermissionProtection(ThesisTeachers, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id/steps",
+    component: withPermissionProtection(ThesisSteps, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id/deadlines",
+    component: withPermissionProtection(ThesisDeadlines, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id/trajectories/$trajectoryId",
+    component: withPermissionProtection(
+      MasterTrajectoryDetails,
+      "/admin/master-thesis"
+    ),
+  },
+  {
+    path: "/admin/master-thesis/$id/trajectories/$trajectoryId/students/$userId",
+    component: withPermissionProtection(
+      MasterTrajectoryStudentDetail,
+      "/admin/master-thesis"
+    ),
   },
   {
     path: "/admin/planning",

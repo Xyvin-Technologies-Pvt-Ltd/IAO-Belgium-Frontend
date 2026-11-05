@@ -139,6 +139,32 @@ const CreateRole = ({ open, onClose, roleData }) => {
         },
       ],
     },
+    {
+      name: t("roleManagement.permissions.doThesis", "DO Thesis"),
+      permissions: [
+        {
+          id: "do_thesis_view",
+          label: t("roleManagement.modal.viewLabel"),
+        },
+        {
+          id: "do_thesis_modify",
+          label: t("roleManagement.modal.modifyLabel"),
+        },
+      ],
+    },
+    // {
+    //   name: t("roleManagement.permissions.masterThesis", "Master Thesis"),
+    //   permissions: [
+    //     {
+    //       id: "master_thesis_view",
+    //       label: t("roleManagement.modal.viewLabel"),
+    //     },
+    //     {
+    //       id: "master_thesis_modify",
+    //       label: t("roleManagement.modal.modifyLabel"),
+    //     },
+    //   ],
+    // },
   ];
 
   const {

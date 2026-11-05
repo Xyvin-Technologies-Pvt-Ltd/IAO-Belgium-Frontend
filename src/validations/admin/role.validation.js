@@ -19,7 +19,11 @@ const VALID_PERMISSIONS = [
   "master_data_management_modify",
   "queue_management_view",
   "queue_management_modify",
-  "logs_management_view"
+  "logs_management_view",
+  "do_thesis_view",
+  "do_thesis_modify",
+  "master_thesis_view",
+  "master_thesis_modify",
 ];
 
 export { VALID_PERMISSIONS };
