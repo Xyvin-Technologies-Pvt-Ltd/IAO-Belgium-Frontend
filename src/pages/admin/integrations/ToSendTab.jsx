@@ -326,6 +326,14 @@ const ToSendTab = ({
                       {row.invoice_uid && row.invoice_uid !== row.record_uid ? (
                         <div className="font-mono text-xs text-muted-foreground">{row.invoice_uid}</div>
                       ) : null}
+                      {row.transaction_id ? (
+                        <div
+                          className="font-mono text-xs text-muted-foreground max-w-[220px] truncate"
+                          title={row.transaction_id}
+                        >
+                          {row.transaction_id}
+                        </div>
+                      ) : null}
                       {row.summary_error ? (
                         <div className="text-xs text-red-600 dark:text-red-400">{row.summary_error}</div>
                       ) : null}
@@ -382,7 +390,7 @@ const ToSendTab = ({
       )}
 
       <Dialog open={Boolean(previewJob)} onOpenChange={(open) => !open && !isSending && setPreviewJob(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{k("previewTitle")}</DialogTitle>
             <DialogDescription>
