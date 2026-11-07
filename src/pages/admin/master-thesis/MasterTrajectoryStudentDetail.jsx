@@ -46,6 +46,7 @@ import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
+import ThesisEvaluationPanel from "@/components/admin/thesis/ThesisEvaluationPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -250,6 +251,7 @@ export default function MasterTrajectoryStudentDetail() {
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
   const [reenrollOpen, setReenrollOpen] = useState(false);
   const [reenrollThesisId, setReenrollThesisId] = useState("");
+  const [detailTab, setDetailTab] = useState("progress");
 
   // Queries & Mutations
   const {
@@ -954,8 +956,31 @@ export default function MasterTrajectoryStudentDetail() {
         </div>
       )}
 
-      {/* Main Content Layout: Left (Steps) | Right (Assigned Reader & Activity Log) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="flex gap-2 border-b border-border">
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "progress" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("progress")}
+        >
+          {t("thesisManagement.marking.progressTab", "Progress")}
+        </button>
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "evaluation" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("evaluation")}
+        >
+          {t("thesisManagement.marking.evaluationTab", "Evaluation")}
+        </button>
+      </div>
+      {detailTab === "evaluation" && (
+        <ThesisEvaluationPanel
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          userId={userId}
+          canModify={canModify}
+        />
+      )}
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 items-start ${detailTab === "evaluation" ? "hidden" : ""}`}>
         {/* Left Column (8 cols): Steps & Submissions */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
           {/* Steps & Submissions Section */}

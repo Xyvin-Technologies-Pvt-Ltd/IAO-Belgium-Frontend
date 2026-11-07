@@ -508,12 +508,19 @@ export default function MasterTrajectoryDetails() {
                         </TableCell>
                         <TableCell>
                           {item.scheduled_at ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                              <Calendar className="w-3 h-3" />
-                              {moment(item.scheduled_at).format(
-                                "DD/MM/YYYY HH:mm"
-                              )}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                                <Calendar className="w-3 h-3" />
+                                {moment(item.scheduled_at).format(
+                                  "DD/MM/YYYY HH:mm"
+                                )}
+                              </span>
+                              {moment(item.scheduled_at).isBefore(moment()) ? (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+                                  {t("thesisManagement.qna.expired", "Expired")}
+                                </span>
+                              ) : null}
+                            </div>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
                               <MessageSquare className="w-3 h-3" />

@@ -40,6 +40,7 @@ import {
   deleteStaffThesisDocument,
   createStudentPersonalNote,
   getStudentPersonalNotes,
+  getAdminStudentTheses,
   getTrajectoryQnaAnnouncements,
   getTrajectoryQnaAnnouncementById,
   createTrajectoryQnaAnnouncement,
@@ -869,6 +870,20 @@ export const useCreateStudentPersonalNote = () => {
     onError: (error) => {
       toast.error(error?.message || "Failed to add note");
     },
+  });
+};
+
+export const useGetAdminStudentTheses = (
+  userId,
+  params = {},
+  options = {}
+) => {
+  return useQuery({
+    queryKey: ["admin-student-theses", userId, params],
+    queryFn: () => getAdminStudentTheses(userId, params),
+    enabled: !!userId,
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
 

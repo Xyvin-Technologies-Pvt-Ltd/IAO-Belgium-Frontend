@@ -453,6 +453,7 @@ const StepForm = ({
             sections: (formSchema.sections || []).map((sec, sIdx) => ({
               id: sec.id,
               title: String(sec.title || "").trim(),
+              description: String(sec.description || "").trim(),
               sequence: sIdx,
               questions: (sec.questions || []).map((q, qIdx) => ({
                 id: q.id,
