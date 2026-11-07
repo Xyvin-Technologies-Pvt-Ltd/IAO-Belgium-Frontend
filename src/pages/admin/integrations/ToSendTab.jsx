@@ -24,7 +24,9 @@ import {
   useGetExactToSend,
   useGetExactToSendPreview,
   useSendExactJob,
+  useGetExactMissing,
 } from "@/store/useExactStore";
+import MissingList from "./MissingList";
 
 const STATE_STYLES = {
   held: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
@@ -180,7 +182,42 @@ function PreviewBody({ preview, t }) {
   );
 }
 
-const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive = false }) => {
+//* Sub-views: Waiting (held / sending), Failed, Missing (should be in Exact but isn't).
+const VIEWS = ["waiting", "failed", "missing"];
+
+function ViewChips({ view, onViewChange, counts, k }) {
+  return (
+    <div className="flex flex-wrap gap-2" role="tablist">
+      {VIEWS.map((v) => (
+        <button
+          key={v}
+          type="button"
+          role="tab"
+          aria-selected={view === v}
+          onClick={() => onViewChange(v)}
+          className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
+            view === v
+              ? "border-blue-600 bg-blue-600 text-white"
+              : "border-gray-200 dark:border-white/10 text-muted-foreground hover:text-gray-900 dark:hover:text-white"
+          }`}
+        >
+          {k(`views.${v}`)}
+          {counts[v] ? ` (${counts[v]})` : ""}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const ToSendTab = ({
+  isConnected,
+  canModify,
+  mode,
+  filters = {},
+  filtersActive = false,
+  view = "waiting",
+  onViewChange = () => {},
+}) => {
   const { t } = useTranslation();
   const k = (key, opts) => t(`integrations.exact.toSend.${key}`, opts);
   const [previewJob, setPreviewJob] = useState(null);
@@ -193,9 +230,17 @@ const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive =
   } = useGetExactToSendPreview(previewJob?.job_id);
   const { mutate: sendJob, isPending: isSending, variables: sendingJobId } = useSendExactJob();
 
-  const rows = data?.data ?? [];
+  const { data: missingCountResponse } = useGetExactMissing({ count_only: true, ...filters });
+
+  const allRows = data?.data ?? [];
   const counts = data?.counts ?? {};
   const waiting = (counts.held || 0) + (counts.failed || 0);
+  const viewCounts = {
+    waiting: (counts.held || 0) + (counts.sending || 0),
+    failed: counts.failed || 0,
+    missing: missingCountResponse?.total_count || 0,
+  };
+  const rows = allRows.filter((row) => (view === "failed" ? row.state === "failed" : row.state !== "failed"));
   const preview = previewResponse?.data;
 
   const handleSend = (row) => {
@@ -209,8 +254,24 @@ const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive =
 
   const actionLabel = (row) => (row.state === "failed" ? k("retry") : k("send"));
 
+  if (view === "missing") {
+    return (
+      <div className="space-y-4">
+        <ViewChips view={view} onViewChange={onViewChange} counts={viewCounts} k={k} />
+        <MissingList
+          key={JSON.stringify(filters)}
+          isConnected={isConnected}
+          canModify={canModify}
+          filters={filters}
+          filtersActive={filtersActive}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      <ViewChips view={view} onViewChange={onViewChange} counts={viewCounts} k={k} />
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
         <div
           className={`rounded-lg border px-4 py-3 text-sm flex-1 ${
@@ -237,7 +298,7 @@ const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive =
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
-          {k("empty")}
+          {view === "failed" ? k("emptyFailed") : k("empty")}
         </div>
       ) : (
         <div className="border dark:border-white/10 rounded-lg overflow-x-auto">
@@ -264,6 +325,14 @@ const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive =
                       <div className="font-mono text-sm">{row.record_uid || "—"}</div>
                       {row.invoice_uid && row.invoice_uid !== row.record_uid ? (
                         <div className="font-mono text-xs text-muted-foreground">{row.invoice_uid}</div>
+                      ) : null}
+                      {row.transaction_id ? (
+                        <div
+                          className="font-mono text-xs text-muted-foreground max-w-[220px] truncate"
+                          title={row.transaction_id}
+                        >
+                          {row.transaction_id}
+                        </div>
                       ) : null}
                       {row.summary_error ? (
                         <div className="text-xs text-red-600 dark:text-red-400">{row.summary_error}</div>
@@ -321,7 +390,7 @@ const ToSendTab = ({ isConnected, canModify, mode, filters = {}, filtersActive =
       )}
 
       <Dialog open={Boolean(previewJob)} onOpenChange={(open) => !open && !isSending && setPreviewJob(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{k("previewTitle")}</DialogTitle>
             <DialogDescription>
