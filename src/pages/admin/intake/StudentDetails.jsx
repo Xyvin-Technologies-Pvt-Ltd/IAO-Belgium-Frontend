@@ -1,6 +1,8 @@
 import EditStudentDialog from "@/components/admin/student/EditStudentDialog";
 import { Pencil, Download } from "lucide-react";
 import UserCard from "@/components/admin/UserCard";
+import StudentCompaniesCard from "@/components/admin/student/StudentCompaniesCard";
+import { useCanModify } from "@/hooks/useCanModify";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
 import ModuleSelectionCard from "@/components/admin/manual-therapy/ModuleSelectionCard";
 import PreMigrationHistory from "@/components/admin/student/PreMigrationHistory";
@@ -120,6 +122,7 @@ const StudentDetails = () => {
   );
 
   const studentData = student?.data;
+  const canEditCompanies = useCanModify("finance");
   const { data: auditLogsRes, isLoading: isLogsLoading } = useGetStudentProfileLogs(studentData?._id);
   const auditLogs = auditLogsRes?.data || [];
 
@@ -402,6 +405,7 @@ const StudentDetails = () => {
   return (
     <div className="space-y-6 mt-4 bg-sidebar rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} onEdit={() => setIsStudentEditOpen(true)} />
+      <StudentCompaniesCard userId={studentData?._id} canEdit={canEditCompanies} />
 
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
