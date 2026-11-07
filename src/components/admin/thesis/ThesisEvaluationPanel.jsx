@@ -101,7 +101,10 @@ const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
       ...section,
       criteria: (section.criteria || []).filter(
         (criterion) =>
-          !(role === "reader" && criterion.filled_by === "supervisor")
+          !(
+            (role === "reader" || role === "additional_reader") &&
+            criterion.filled_by === "supervisor"
+          )
       ),
     }))
     .filter((section) => section.criteria.length);
@@ -154,7 +157,12 @@ const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
             <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
               {role === "supervisor"
                 ? t("thesisManagement.marking.supervisor", "Supervisor")
-                : t("thesisManagement.marking.reader", "Reader")}
+                : role === "additional_reader"
+                  ? t(
+                      "thesisManagement.marking.additionalReader",
+                      "Additional Reader"
+                    )
+                  : t("thesisManagement.marking.reader", "Reader")}
             </span>
             <div className="flex items-center gap-2">
               {assessorName ? (
@@ -201,7 +209,12 @@ const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
                         role:
                           role === "supervisor"
                             ? t("thesisManagement.marking.supervisor", "supervisor")
-                            : t("thesisManagement.marking.reader", "reader"),
+                            : role === "additional_reader"
+                              ? t(
+                                  "thesisManagement.marking.additionalReader",
+                                  "additional reader"
+                                )
+                              : t("thesisManagement.marking.reader", "reader"),
                       }
                     )}
               </p>
@@ -528,7 +541,12 @@ const ThesisEvaluationPanel = ({
     const criteria = [];
     for (const section of assessment.config_snapshot?.sections || []) {
       for (const criterion of section.criteria || []) {
-        if (role === "reader" && criterion.filled_by === "supervisor") continue;
+        if (
+          (role === "reader" || role === "additional_reader") &&
+          criterion.filled_by === "supervisor"
+        ) {
+          continue;
+        }
         const score = (assessment.scores || []).find(
           (row) => String(row.criterion_id) === String(criterion._id)
         );
@@ -566,7 +584,7 @@ const ThesisEvaluationPanel = ({
 
   return (
     <div className="space-y-5">
-      {/* 2-Column Role Cards (Supervisor & Reader) */}
+      {/* Role Cards (Supervisor, Reader, Additional Reader) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
         <RoleCard
           role="supervisor"
@@ -584,6 +602,16 @@ const ThesisEvaluationPanel = ({
           onEdit={openEditor}
           onReopen={(role) => reopenMutation.mutate(role)}
         />
+        {data.additional_reader ? (
+          <RoleCard
+            role="additional_reader"
+            block={data.additional_reader}
+            canModify={canModify}
+            busy={reopenMutation.isPending}
+            onEdit={openEditor}
+            onReopen={(role) => reopenMutation.mutate(role)}
+          />
+        ) : null}
       </div>
 
       {/* Grade Summary & Publication Card */}
@@ -616,7 +644,11 @@ const ThesisEvaluationPanel = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div
+          className={`grid grid-cols-1 gap-3 ${
+            data.additional_reader ? "sm:grid-cols-3" : "sm:grid-cols-2"
+          }`}
+        >
           <div className="p-3.5 rounded-lg border border-border bg-muted/20 space-y-1">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
               {t("thesisManagement.marking.supervisorScore", "Supervisor Total")}
@@ -648,6 +680,27 @@ const ThesisEvaluationPanel = ({
                 : t("common.pending", "Pending")}
             </p>
           </div>
+
+          {data.additional_reader ? (
+            <div className="p-3.5 rounded-lg border border-border bg-muted/20 space-y-1">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                {t(
+                  "thesisManagement.marking.additionalReaderScore",
+                  "Additional Reader Total"
+                )}
+              </span>
+              <p className="text-lg font-bold text-foreground">
+                {data.calculation?.additional_reader_total != null
+                  ? `${data.calculation.additional_reader_total} / ${data.calculation.additional_reader_max}`
+                  : "—"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {data.calculation?.additional_reader_percentage != null
+                  ? `${data.calculation.additional_reader_percentage}%`
+                  : t("common.pending", "Pending")}
+              </p>
+            </div>
+          ) : null}
         </div>
 
         <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-2">
@@ -824,7 +877,12 @@ const ThesisEvaluationPanel = ({
               {t("thesisManagement.marking.editMarks", "Edit marks")} -{" "}
               {editor?.role === "supervisor"
                 ? t("thesisManagement.marking.supervisor", "Supervisor")
-                : t("thesisManagement.marking.reader", "Reader")}
+                : editor?.role === "additional_reader"
+                  ? t(
+                      "thesisManagement.marking.additionalReader",
+                      "Additional Reader"
+                    )
+                  : t("thesisManagement.marking.reader", "Reader")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3.5 py-2">

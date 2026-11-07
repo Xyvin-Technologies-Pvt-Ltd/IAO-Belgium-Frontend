@@ -74,6 +74,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   useGetTrajectoryStudentDetail,
   useUpdateTrajectoryStudentReader,
+  useUpdateTrajectoryStudentAdditionalReader,
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
   useReenrollTrajectoryStudent,
@@ -139,8 +140,20 @@ const RichHtml = ({ html, className = "" }) => {
   );
 };
 
-const formatActionLabel = (action) => {
-  if (!action) return "Activity";
+const formatActionLabel = (action, t) => {
+  if (!action) return t ? t("thesisManagement.activity", "Activity") : "Activity";
+  const known = {
+    additional_reader_assigned: "thesisManagement.activityLabels.additionalReaderAssigned",
+    additional_reader_cleared: "thesisManagement.activityLabels.additionalReaderCleared",
+  };
+  if (t && known[action]) {
+    return t(
+      known[action],
+      action
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    );
+  }
   return action
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -248,6 +261,8 @@ export default function TrajectoryStudentDetail() {
   });
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
+  const updateAdditionalReaderMutation =
+    useUpdateTrajectoryStudentAdditionalReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
   const reenrollMutation = useReenrollTrajectoryStudent();
@@ -262,10 +277,17 @@ export default function TrajectoryStudentDetail() {
   const thesis = detail?.thesis;
   const trajectory = detail?.trajectory;
   const reader = detail?.reader;
+  const additionalReader = detail?.additional_reader;
   const supervisor = detail?.supervisor;
   const supervisorRequest = detail?.supervisor_request;
   const eligibleReaders = detail?.eligible_readers || [];
   const eligibleSupervisors = detail?.supervisors || [];
+  const primaryReaderOptions = eligibleReaders.filter(
+    (teacher) => String(teacher._id) !== String(additionalReader?._id)
+  );
+  const additionalReaderOptions = eligibleReaders.filter(
+    (teacher) => String(teacher._id) !== String(reader?._id)
+  );
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
   const allLogs = useMemo(() => detail?.logs || [], [detail?.logs]);
@@ -361,6 +383,20 @@ export default function TrajectoryStudentDetail() {
         trajectoryId,
         userId,
         reader: readerValue,
+      });
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
+  const handleAdditionalReaderChange = async (selectedReaderId) => {
+    const readerValue = selectedReaderId === "NONE" ? null : selectedReaderId;
+    try {
+      await updateAdditionalReaderMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        additional_reader: readerValue,
       });
     } catch {
       // Error handled by store hook
@@ -1562,8 +1598,76 @@ export default function TrajectoryStudentDetail() {
                 <SelectItem value="NONE" className="text-xs text-muted-foreground">
                   {t("thesisManagement.noReaderAssigned", "— No Reader Assigned —")}
                 </SelectItem>
-                {eligibleReaders.map((teacher) => (
+                {primaryReaderOptions.map((teacher) => (
                   <SelectItem key={teacher._id} value={teacher._id} className="text-xs">
+                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Additional Reader Card */}
+        <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <UserCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">
+                  {t(
+                    "thesisManagement.assignedAdditionalReader",
+                    "Additional Reader"
+                  )}
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.additionalReaderDesc",
+                    "Optional second thesis evaluator"
+                  )}
+                </p>
+              </div>
+            </div>
+            {updateAdditionalReaderMutation.isPending && (
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground block">
+              {t(
+                "thesisManagement.selectAdditionalReader",
+                "Select Additional Reader"
+              )}
+            </label>
+            <Select
+              disabled={!canModify || updateAdditionalReaderMutation.isPending}
+              value={additionalReader?._id || "NONE"}
+              onValueChange={handleAdditionalReaderChange}
+            >
+              <SelectTrigger className="w-full h-9 bg-background text-xs">
+                <SelectValue
+                  placeholder={t(
+                    "thesisManagement.selectAdditionalReader",
+                    "Select Additional Reader..."
+                  )}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NONE" className="text-xs text-muted-foreground">
+                  {t(
+                    "thesisManagement.noAdditionalReaderAssigned",
+                    "— No Additional Reader —"
+                  )}
+                </SelectItem>
+                {additionalReaderOptions.map((teacher) => (
+                  <SelectItem
+                    key={teacher._id}
+                    value={teacher._id}
+                    className="text-xs"
+                  >
                     {teacher.first_name} {teacher.last_name} ({teacher.email})
                   </SelectItem>
                 ))}
@@ -1578,6 +1682,7 @@ export default function TrajectoryStudentDetail() {
           trajectoryId={trajectoryId}
           userId={userId}
           notes={personalNotes}
+          steps={steps}
           canModify={canModify}
         />
 
@@ -1653,7 +1758,7 @@ export default function TrajectoryStudentDetail() {
                           <span
                             className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${meta.badgeClass}`}
                           >
-                            {formatActionLabel(log.action)}
+                            {formatActionLabel(log.action, t)}
                           </span>
                           {stepName && (
                             <span

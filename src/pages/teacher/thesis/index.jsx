@@ -49,6 +49,11 @@ const formatRoleLabel = (role, t) => {
   if (role === "supervisor")
     return t("thesisManagement.teacher.supervisor", "Supervisor");
   if (role === "reader") return t("thesisManagement.teacher.reader", "Reader");
+  if (role === "additional_reader")
+    return t(
+      "thesisManagement.teacher.additionalReader",
+      "Additional Reader"
+    );
   return role
     ? String(role)
         .replace(/_/g, " ")

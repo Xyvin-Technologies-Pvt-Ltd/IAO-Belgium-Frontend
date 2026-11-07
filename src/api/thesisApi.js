@@ -372,6 +372,23 @@ export const updateTrajectoryStudentReader = async (
   }
 };
 
+export const updateTrajectoryStudentAdditionalReader = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/additional-reader`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const updateTrajectoryStudentSupervisor = async (
   thesisId,
   trajectoryId,

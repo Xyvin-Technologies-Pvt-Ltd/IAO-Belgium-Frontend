@@ -30,6 +30,7 @@ import {
   removeThesisEligibleStudent,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
+  updateTrajectoryStudentAdditionalReader,
   updateTrajectoryStudentSupervisor,
   updateTrajectoryStudentAttemptStatus,
   reenrollTrajectoryStudent,
@@ -581,6 +582,39 @@ export const useUpdateTrajectoryStudentReader = () => {
   });
 };
 
+export const useUpdateTrajectoryStudentAdditionalReader = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, userId, additional_reader }) =>
+      updateTrajectoryStudentAdditionalReader(thesisId, trajectoryId, userId, {
+        additional_reader,
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-students",
+          variables.thesisId,
+          variables.trajectoryId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-evaluation"],
+      });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update additional reader");
+    },
+  });
+};
+
 export const useUpdateTrajectoryStudentSupervisor = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -854,8 +888,19 @@ export const useGetStudentPersonalNotes = (thesisId, trajectoryId, userId, optio
 export const useCreateStudentPersonalNote = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, trajectoryId, userId, note }) =>
-      createStudentPersonalNote(thesisId, trajectoryId, userId, { note }),
+    mutationFn: ({
+      thesisId,
+      trajectoryId,
+      userId,
+      note,
+      step = null,
+      attachments = [],
+    }) =>
+      createStudentPersonalNote(thesisId, trajectoryId, userId, {
+        note,
+        step,
+        attachments,
+      }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [
