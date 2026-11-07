@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, CheckCircle2, Eye, RefreshCw, Send, XCircle } from "lucide-react";
+import { AlertTriangle, Building2, CheckCircle2, Eye, RefreshCw, RotateCcw, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,14 @@ import {
   useGetExactToSend,
   useGetExactToSendPreview,
   useSendExactJob,
+  useRetryExactJobs,
   useGetExactMissing,
 } from "@/store/useExactStore";
 import MissingList from "./MissingList";
+import CompanyEditDialog from "@/components/admin/student/CompanyEditDialog";
+
+//* Failed view: why it failed (backend failed_category), worst-known first.
+const FAILURE_CATEGORIES = ["customer", "blocked", "exact_rejected", "pdf", "other"];
 
 const STATE_STYLES = {
   held: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
@@ -221,14 +226,18 @@ const ToSendTab = ({
   const { t } = useTranslation();
   const k = (key, opts) => t(`integrations.exact.toSend.${key}`, opts);
   const [previewJob, setPreviewJob] = useState(null);
+  const [failedFilter, setFailedFilter] = useState(null);
+  const [editCompanyId, setEditCompanyId] = useState(null);
 
   const { data, isLoading, isFetching, error, refetch } = useGetExactToSend(filters);
   const {
     data: previewResponse,
     isLoading: isPreviewLoading,
     error: previewError,
+    refetch: refetchPreview,
   } = useGetExactToSendPreview(previewJob?.job_id);
   const { mutate: sendJob, isPending: isSending, variables: sendingJobId } = useSendExactJob();
+  const { mutate: retryJobs, isPending: isRetrying } = useRetryExactJobs();
 
   const { data: missingCountResponse } = useGetExactMissing({ count_only: true, ...filters });
 
@@ -240,8 +249,28 @@ const ToSendTab = ({
     failed: counts.failed || 0,
     missing: missingCountResponse?.total_count || 0,
   };
-  const rows = allRows.filter((row) => (view === "failed" ? row.state === "failed" : row.state !== "failed"));
+  const failedRows = allRows.filter((row) => row.state === "failed");
+  const failedCounts = failedRows.reduce((acc, row) => {
+    const key = row.failed_category || "other";
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const rows =
+    view === "failed"
+      ? failedRows.filter((row) => !failedFilter || (row.failed_category || "other") === failedFilter)
+      : allRows.filter((row) => row.state !== "failed");
   const preview = previewResponse?.data;
+  //* Company-billed record blocked by its company data (e.g. country): offer Edit company.
+  const previewCompanyId =
+    preview?.plan?.customer?.kind === "company" && preview.plan.customer.company_id && !preview?.ok
+      ? preview.plan.customer.company_id
+      : null;
+
+  const handleRetryShown = () => {
+    const ids = rows.map((row) => row.job_id);
+    if (!ids.length || !window.confirm(k("confirmRetryAll", { count: ids.length }))) return;
+    retryJobs(ids);
+  };
 
   const handleSend = (row) => {
     sendJob(row.job_id, {
@@ -272,6 +301,40 @@ const ToSendTab = ({
   return (
     <div className="space-y-4">
       <ViewChips view={view} onViewChange={onViewChange} counts={viewCounts} k={k} />
+      {view === "failed" && failedRows.length ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setFailedFilter(null)}
+              className={`rounded-full border px-3 py-0.5 text-xs font-medium ${
+                failedFilter ? "border-gray-200 dark:border-white/10 text-muted-foreground" : "border-red-600 bg-red-600 text-white"
+              }`}
+            >
+              {k("failedCategory.all")} ({failedRows.length})
+            </button>
+            {FAILURE_CATEGORIES.filter((cat) => failedCounts[cat]).map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setFailedFilter(cat)}
+                title={k(`failedCategoryHint.${cat}`)}
+                className={`rounded-full border px-3 py-0.5 text-xs font-medium ${
+                  failedFilter === cat ? "border-red-600 bg-red-600 text-white" : "border-gray-200 dark:border-white/10 text-muted-foreground"
+                }`}
+              >
+                {k(`failedCategory.${cat}`)} ({failedCounts[cat]})
+              </button>
+            ))}
+          </div>
+          {canModify ? (
+            <Button size="sm" variant="outline" onClick={handleRetryShown} disabled={!rows.length || isRetrying || !isConnected}>
+              <RotateCcw className={`h-4 w-4 mr-2 ${isRetrying ? "animate-spin" : ""}`} />
+              {k("retryAllShown", { count: rows.length })}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
         <div
           className={`rounded-lg border px-4 py-3 text-sm flex-1 ${
@@ -407,6 +470,12 @@ const ToSendTab = ({
           ) : null}
 
           <div className="flex justify-end gap-3 mt-4">
+            {canModify && previewCompanyId ? (
+              <Button variant="outline" onClick={() => setEditCompanyId(previewCompanyId)} disabled={isSending}>
+                <Building2 className="h-4 w-4 mr-2" />
+                {k("editCompany")}
+              </Button>
+            ) : null}
             <Button variant="outline" onClick={() => setPreviewJob(null)} disabled={isSending}>
               {k("close")}
             </Button>
@@ -427,6 +496,12 @@ const ToSendTab = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      <CompanyEditDialog
+        companyId={editCompanyId}
+        onClose={() => setEditCompanyId(null)}
+        onSaved={() => refetchPreview()}
+      />
     </div>
   );
 };

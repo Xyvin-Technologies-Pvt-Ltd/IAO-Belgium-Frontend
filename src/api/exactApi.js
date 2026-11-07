@@ -236,3 +236,33 @@ export const sendExactPayoutWaiting = async (settlementId) => {
     throw error.response?.data || error;
   }
 };
+
+// ─── Company countries + bulk retry ──────────────────────────────────────────
+
+export const getCompanyCountries = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/company-countries");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const applyCompanyCountries = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/company-countries/apply");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Retry the listed To send jobs that are still failed (others are skipped).
+export const retryExactJobs = async (jobIds = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/to-send/retry", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

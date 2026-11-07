@@ -23,6 +23,9 @@ import {
   getExactPayoutsSyncStatus,
   queueExactPayoutMissing,
   sendExactPayoutWaiting,
+  getCompanyCountries,
+  applyCompanyCountries,
+  retryExactJobs,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -305,5 +308,47 @@ export const useSendExactPayoutWaiting = () => {
       setTimeout(() => refreshPayouts(queryClient), 8000);
     },
     onError: (err) => toast.error(err?.message || "Failed to send this payout's records"),
+  });
+};
+
+// ─── Company countries + bulk retry ──────────────────────────────────────────
+
+export const useGetCompanyCountries = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-company-countries"],
+    queryFn: getCompanyCountries,
+    staleTime: 30000,
+    ...options,
+  });
+
+export const useApplyCompanyCountries = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: applyCompanyCountries,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Company countries fixed");
+      queryClient.invalidateQueries({ queryKey: ["exact-company-countries"] });
+      queryClient.invalidateQueries({ queryKey: ["user-companies"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-to-send-preview"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to fix company countries"),
+  });
+};
+
+export const useRetryExactJobs = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: retryExactJobs,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Retried");
+      const refresh = () => {
+        queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-payout"] });
+      };
+      refresh();
+      setTimeout(refresh, 8000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to retry these records"),
   });
 };
