@@ -11,6 +11,7 @@ import {
   useCheckExactDocumentTypes,
 } from "@/store/useExactStore";
 import MollieRefBackfillCard from "./MollieRefBackfillCard";
+import CompanyCountriesCard from "./CompanyCountriesCard";
 
 function formatDateTime(value) {
   if (!value) return "—";
@@ -112,6 +113,8 @@ const SettingsTab = ({ isConnected, canModify }) => {
           ) : null}
         </div>
       </Section>
+
+      <CompanyCountriesCard canModify={canModify} />
 
       <Section title={e("settings.pdfTitle")} hint={e("settings.pdfHint")}>
         <div className="flex flex-wrap items-center gap-3">
