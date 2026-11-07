@@ -72,6 +72,11 @@ export default function ThesisFormAnswersView({ step }) {
               {section.title}
             </p>
           ) : null}
+          {section.description ? (
+            <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+              {section.description}
+            </p>
+          ) : null}
           <div className="space-y-2">
             {(section.questions || []).map((q) => (
               <div

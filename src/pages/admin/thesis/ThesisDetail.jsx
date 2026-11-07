@@ -139,8 +139,11 @@ const ThesisDetail = () => {
     {
       label: t("thesisManagement.menu.markingScheme", "Marking scheme"),
       icon: ClipboardList,
-      disabled: true,
-      onClick: () => {},
+      onClick: () =>
+        navigate({
+          to: `${basePath}/$id/marking-scheme`,
+          params: { id },
+        }),
     },
     ...(canModify
       ? [

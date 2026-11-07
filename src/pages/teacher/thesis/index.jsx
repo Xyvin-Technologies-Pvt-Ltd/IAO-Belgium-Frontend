@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, Trash2, Search } from "lucide-react";
@@ -639,25 +639,24 @@ const StudentsTab = () => {
                 return (
                   <TableRow
                     key={key}
-                    // Detail navigation temporarily disabled
-                    // className="cursor-pointer"
-                    // onClick={() => {
-                    //   if (
-                    //     !row.thesis?._id ||
-                    //     !row.trajectory?._id ||
-                    //     !row.student?._id
-                    //   ) {
-                    //     return;
-                    //   }
-                    //   navigate({
-                    //     to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
-                    //     params: {
-                    //       thesisId: row.thesis._id,
-                    //       trajectoryId: row.trajectory._id,
-                    //       userId: row.student._id,
-                    //     },
-                    //   });
-                    // }}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (
+                        !row.thesis?._id ||
+                        !row.trajectory?._id ||
+                        !row.student?._id
+                      ) {
+                        return;
+                      }
+                      navigate({
+                        to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
+                        params: {
+                          thesisId: row.thesis._id,
+                          trajectoryId: row.trajectory._id,
+                          userId: row.student._id,
+                        },
+                      });
+                    }}
                   >
                     <TableCell className="capitalize">
                       <div className="space-y-0.5">

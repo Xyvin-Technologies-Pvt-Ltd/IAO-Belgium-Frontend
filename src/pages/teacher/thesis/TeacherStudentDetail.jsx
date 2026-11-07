@@ -54,6 +54,7 @@ import {
 } from "@/api/thesisApi";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useThesisTeacherKind } from "@/hooks/useThesisTeacherKind";
+import TeacherMarkingPanel from "@/components/teacher/thesis/TeacherMarkingPanel";
 
 const RichHtml = ({ html, className = "" }) => {
   const secureHtml = useSecureHtml(html);
@@ -446,6 +447,11 @@ const TeacherStudentDetail = () => {
                         </span>
                         <h3 className="text-base font-bold text-foreground">
                           {step.name}
+                          {step.required !== false && (
+                            <span className="text-destructive ml-1" title={t("common.required", "Required")}>
+                              *
+                            </span>
+                          )}
                         </h3>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground pl-8.5">
@@ -907,6 +913,11 @@ const TeacherStudentDetail = () => {
               );
             })
           )}
+          <TeacherMarkingPanel
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            userId={userId}
+          />
         </div>
 
         {/* Right Column (4 cols): Context Sidebar */}
