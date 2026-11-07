@@ -684,7 +684,25 @@
           "failed": "Failed",
           "missing": "Missing"
         },
-        "emptyFailed": "No failed records."
+        "emptyFailed": "No failed records.",
+        "failedCategory": {
+          "all": "All",
+          "customer": "Customer",
+          "blocked": "Blocked by checks",
+          "exact_rejected": "Exact rejected",
+          "pdf": "PDF",
+          "other": "Other"
+        },
+        "failedCategoryHint": {
+          "customer": "Exact couldn't find or create the customer — usually the company's country. Fix it in Settings → Company countries, then retry.",
+          "blocked": "IAO's checks stopped it before Exact (data missing or wrong). Open the preview to see what.",
+          "exact_rejected": "Exact refused the sales entry. The reason is on the row.",
+          "pdf": "The IAO invoice PDF could not be made or attached.",
+          "other": "Anything else (network, Exact unavailable…). Retrying usually helps."
+        },
+        "retryAllShown": "Retry all shown ({{count}})",
+        "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
+        "editCompany": "Edit company"
       },
       "filters": {
         "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
@@ -866,7 +884,7 @@
             },
             {
               "title": "Settings",
-              "text": "Send mode (keep it on Manual), the IAO invoice PDF check, one-off tools and Disconnect."
+              "text": "Send mode (keep it on Manual), the IAO invoice PDF check, one-off tools and Disconnect. Company countries: fix old company countries so Exact accepts them."
             }
           ]
         },
@@ -880,7 +898,7 @@
             "Open Payouts. The list refreshes at 06:30; click \"Refresh from Mollie\" if you need newer payouts.",
             "Open each payout marked \"Action needed\". Click \"Add missing to To send\".",
             "In To send → Waiting, preview a few records, then send them (one by one, or \"Send waiting\" on the payout).",
-            "Check To send → Failed and fix what Exact refused.",
+            "Check To send → Failed. Use the reason chips (e.g. Customer) and \"Retry all shown\" once the cause is fixed.",
             "In xCore, match by hand the lines marked \"Match by hand\" (refunds, older references, payments not in IAO)."
           ]
         },
@@ -909,7 +927,7 @@
             },
             {
               "title": "Company country",
-              "text": "When a company is new to Exact, its country must be a country Exact recognises (for example \"BE\" or \"België\"). \"Belgique\" or \"Belgium\" makes Exact refuse to create the customer (error 500). Fix the country on the company, then send again."
+              "text": "A company new to Exact needs a real country. Names typed before 3 Nov 2026 (\"Belgique\", \"Danmark\") are fixed in Settings → Company countries; the preview blocks a record whose company country isn't a country and offers \"Edit company\". Then retry it from To send → Failed."
             },
             {
               "title": "25 Aug – 22 Sep 2026",
@@ -938,7 +956,7 @@
             },
             {
               "title": "Company countries",
-              "text": "turn country names (Belgique, Belgium, Danmark…) into country codes automatically, so new companies don't fail."
+              "text": "done — fix old companies in Settings → Company countries; new ones are picked from a list."
             },
             {
               "title": "Automatic sending",
@@ -946,6 +964,32 @@
             }
           ]
         }
+      },
+      "companyCountries": {
+        "title": "Company countries",
+        "hint": "Exact Online refuses to create a customer whose country is typed as a name (\"Belgique\", \"Danmark\"). Companies saved before 3 Nov 2026 often have that. Fixing writes the country code on the company — nothing is sent to Exact.",
+        "loading": "Checking company countries…",
+        "loadFailed": "Failed to check company countries",
+        "summary": "{{companies}} companies: {{ok}} correct, {{blank}} without a country, {{fixable}} can be fixed automatically, {{unknown}} need a person. {{unsent}} unsent record(s) are held up by these companies.",
+        "masterDataIssue": "Country list: \"{{name}}\" has code {{code}} but should be {{expected}} — fix it in Master Data → Country Management.",
+        "allClean": "Every company country is a valid code.",
+        "fixableTitle": "{{count}} can be fixed automatically",
+        "fix": "Fix {{count}} companies",
+        "fixing": "Fixing…",
+        "confirmFix": "Change the country of {{count}} companies to its country code (e.g. Belgique → BE)? Nothing is sent to Exact; issued invoices stay as they are.",
+        "col": {
+          "company": "Company",
+          "now": "Now",
+          "becomes": "Becomes",
+          "unsent": "Unsent records"
+        },
+        "inExact": "already in Exact",
+        "showAll": "Show all {{count}}",
+        "showLess": "Show less",
+        "unknownTitle": "{{count}} need a person — the country isn't a country (e.g. a town)",
+        "unsentCount": "{{count}} unsent",
+        "pickCountry": "Pick country",
+        "afterFix": "After fixing, go to To send → Failed → Customer and click \"Retry all shown\"."
       }
     }
   },
@@ -4063,5 +4107,33 @@
     "stepTypeInfo": "Information Only",
     "stepTypeUpload": "Document Upload",
     "submitted": "Submitted"
+  },
+  "companyEdit": {
+    "title": "Company details",
+    "cardTitle": "Billing companies",
+    "loading": "Loading company…",
+    "loadFailed": "Failed to load this company",
+    "inExactNote": "Already a customer in Exact Online — changes here don't update the existing Exact customer.",
+    "countryNeedsFix": "Country is saved as \"{{value}}\", which Exact Online doesn't accept. Pick the country below.",
+    "countryNotCode": "not a country code — Exact will refuse it",
+    "countryPlaceholder": "Select country",
+    "default": "Default",
+    "inExact": "In Exact",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "fields": {
+      "companyName": "Company name",
+      "vat": "VAT number",
+      "registration": "Registration number",
+      "email": "Contact email",
+      "phone": "Phone",
+      "address1": "Address line 1",
+      "address2": "Address line 2",
+      "postalCode": "Postal code",
+      "city": "City",
+      "country": "Country"
+    }
   }
 }
