@@ -410,7 +410,20 @@ export default function TrajectoryDetails() {
                       <TableCell>{studentName}</TableCell>
                       <TableCell>{row.batch?.name || "-"}</TableCell>
                       <TableCell>{row.supervisor?.name || "-"}</TableCell>
-                      <TableCell>{row.reader?.name || "-"}</TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <div>{row.reader?.name || "-"}</div>
+                          {row.additional_reader?.name ? (
+                            <div className="text-xs text-muted-foreground">
+                              {t(
+                                "thesisManagement.table.additionalReader",
+                                "Additional"
+                              )}
+                              : {row.additional_reader.name}
+                            </div>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {row.attempt?.attempt_number ?? "-"}
                       </TableCell>

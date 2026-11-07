@@ -588,7 +588,7 @@ const MarkingSchemePage = () => {
           <p className="text-[11px] text-muted-foreground">
             {t(
               "thesisManagement.marking.finalPercentageEquationHint",
-              "Use supervisor_score, supervisor_max, reader_score, and reader_max."
+              "Use supervisor_score, supervisor_max, reader_score, reader_max, additional_reader_score, and additional_reader_max."
             )}
           </p>
         </div>

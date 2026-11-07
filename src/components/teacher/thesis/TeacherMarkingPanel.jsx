@@ -229,7 +229,12 @@ const RoleForm = ({ thesisId, trajectoryId, userId, block, onSaved }) => {
           <h2 className="text-base font-bold text-foreground">
             {block.role === "supervisor"
               ? t("thesis.marking.supervisorForm", "Supervisor Assessment")
-              : t("thesis.marking.readerForm", "Reader Assessment")}
+              : block.role === "additional_reader"
+                ? t(
+                    "thesis.marking.additionalReaderForm",
+                    "Additional Reader Assessment"
+                  )
+                : t("thesis.marking.readerForm", "Reader Assessment")}
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {readOnly

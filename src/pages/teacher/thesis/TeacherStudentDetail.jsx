@@ -73,6 +73,7 @@ const RichHtml = ({ html, className = "" }) => {
 const formatRoleLabel = (role) => {
   if (role === "supervisor") return "Supervisor";
   if (role === "reader") return "Reader";
+  if (role === "additional_reader") return "Additional Reader";
   return role
     ? String(role)
         .replace(/_/g, " ")
@@ -252,6 +253,7 @@ const TeacherStudentDetail = () => {
   const attemptStatus = attempt?.status || "active";
   const supervisor = detail?.supervisor;
   const reader = detail?.reader;
+  const additionalReader = detail?.additional_reader;
 
   const staffName = (person) => {
     if (!person) return null;
@@ -923,7 +925,9 @@ const TeacherStudentDetail = () => {
         {/* Right Column (4 cols): Context Sidebar */}
         <div className="lg:col-span-5 xl:col-span-4 space-y-6">
           {isMaster &&
-            (myRoles.includes("supervisor") || myRoles.includes("reader")) && (
+            (myRoles.includes("supervisor") ||
+              myRoles.includes("reader") ||
+              myRoles.includes("additional_reader")) && (
             <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-border">
                 <Users className="w-4 h-4 text-primary" />
@@ -961,6 +965,24 @@ const TeacherStudentDetail = () => {
                     <p className="text-sm font-medium text-foreground">
                       {staffName(reader) ||
                         t("thesisManagement.noReaderAssigned", "Not assigned yet")}
+                    </p>
+                  </div>
+                )}
+                {myRoles.includes("additional_reader") && (
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <UserCheck className="w-3.5 h-3.5 text-primary" />
+                      {t(
+                        "thesisManagement.assignedAdditionalReader",
+                        "Additional Reader"
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-foreground">
+                      {staffName(additionalReader) ||
+                        t(
+                          "thesisManagement.noAdditionalReaderAssigned",
+                          "Not assigned yet"
+                        )}
                     </p>
                   </div>
                 )}
