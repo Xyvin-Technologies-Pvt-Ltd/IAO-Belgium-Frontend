@@ -545,8 +545,8 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
 
 const StudentsTab = () => {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
-  const { type, isMaster } = useThesisTeacherKind(); // basePath unused while detail navigate is commented
+  const navigate = useNavigate();
+  const { type, basePath, isMaster } = useThesisTeacherKind();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
