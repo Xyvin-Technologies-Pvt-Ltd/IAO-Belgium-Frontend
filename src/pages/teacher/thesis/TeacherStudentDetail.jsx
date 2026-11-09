@@ -8,14 +8,11 @@ import {
   Download,
   Eye,
   Compass,
-  ShieldCheck,
   GraduationCap,
   Award,
   ChevronDown,
   ChevronUp,
   Paperclip,
-  UserCheck,
-  Users,
 } from "lucide-react";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useSecureHtml } from "@/hooks/useSecureHtml";
@@ -59,7 +56,7 @@ const TeacherStudentDetail = () => {
   const trajectoryId = params?.trajectoryId;
   const userId = params?.userId;
   const { updateBreadcrumbs } = useBreadcrumb();
-  const { type, basePath, label: kindLabel, isMaster } = useThesisTeacherKind();
+  const { type, basePath, label: kindLabel } = useThesisTeacherKind();
 
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
@@ -84,15 +81,6 @@ const TeacherStudentDetail = () => {
   const myRoles = detail?.my_roles || [];
   const attempt = detail?.attempt;
   const attemptStatus = attempt?.status || "active";
-  const supervisor = detail?.supervisor;
-  const reader = detail?.reader;
-  const additionalReader = detail?.additional_reader;
-
-  const staffName = (person) => {
-    if (!person) return null;
-    const name = `${person.first_name || ""} ${person.last_name || ""}`.trim();
-    return name || person.email || null;
-  };
 
   useEffect(() => {
     const studentName = student
@@ -389,89 +377,6 @@ const TeacherStudentDetail = () => {
           )}
       </div>
 
-      {/* Assigned Staff (if isMaster) */}
-      {isMaster &&
-        (myRoles.includes("supervisor") ||
-          myRoles.includes("reader") ||
-          myRoles.includes("additional_reader")) && (
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-border">
-              <Users className="w-4 h-4 text-primary" />
-              <div>
-                <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
-                  {t(
-                    "thesisManagement.assignedStaff",
-                    "Assigned Staff"
-                  )}
-                </h2>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {t(
-                    "thesisManagement.assignedByBackoffice",
-                    "Assigned by the backoffice"
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {myRoles.includes("supervisor") && (
-                <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                    <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                    {t(
-                      "thesisManagement.assignedSupervisor",
-                      "Assigned Supervisor"
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {staffName(supervisor) ||
-                      t(
-                        "thesisManagement.noSupervisorAssigned",
-                        "Not assigned yet"
-                      )}
-                  </p>
-                </div>
-              )}
-              {myRoles.includes("reader") && (
-                <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                    <UserCheck className="w-3.5 h-3.5 text-primary" />
-                    {t(
-                      "thesisManagement.assignedReader",
-                      "Assigned Reader"
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {staffName(reader) ||
-                      t(
-                        "thesisManagement.noReaderAssigned",
-                        "— No Reader Assigned —"
-                      )}
-                  </p>
-                </div>
-              )}
-              {myRoles.includes("additional_reader") && (
-                <div className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                    <UserCheck className="w-3.5 h-3.5 text-primary" />
-                    {t(
-                      "thesisManagement.assignedAdditionalReader",
-                      "Additional Reader"
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {staffName(additionalReader) ||
-                      t(
-                        "thesisManagement.noAdditionalReaderAssigned",
-                        "— No Additional Reader —"
-                      )}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-      {/* Steps & Submissions */}
       <TeacherStudentDocumentsCard steps={steps} />
 
       {/* Marking Panel */}

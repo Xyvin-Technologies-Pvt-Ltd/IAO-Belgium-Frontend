@@ -43,6 +43,23 @@ import {
 const DEFAULT_FINAL_PERCENTAGE_EQUATION =
   "((supervisor_score / supervisor_max * 100) + (reader_score / reader_max * 100)) / 2";
 
+const DEFAULT_WEIGHTED_FINAL_PERCENTAGE_EQUATION =
+  "(supervisor_percentage + reader_percentage) / 2";
+
+const normalizeEquation = (source) =>
+  String(source ?? "")
+    .replace(/\u00d7/g, "*")
+    .replace(/\u00f7/g, "/")
+    .trim();
+
+const isClassicFinalEquation = (source) => {
+  const normalized = normalizeEquation(source);
+  return (
+    !normalized ||
+    normalized === normalizeEquation(DEFAULT_FINAL_PERCENTAGE_EQUATION)
+  );
+};
+
 const blankCriterion = (maxScore = 0) => ({
   name: "",
   max_score: maxScore,
@@ -421,7 +438,7 @@ const MarkingSchemePage = () => {
           }
           value={
             form.weights_enabled
-              ? `${totals.supervisor_total_weight}%`
+              ? `${totals.supervisor_total_weight}`
               : `${totals.supervisor_total_score} pts`
           }
           subtitle={
@@ -449,7 +466,7 @@ const MarkingSchemePage = () => {
           }
           value={
             form.weights_enabled
-              ? `${totals.reader_total_weight}%`
+              ? `${totals.reader_total_weight}`
               : `${totals.reader_total_score} pts`
           }
           subtitle={
@@ -521,52 +538,168 @@ const MarkingSchemePage = () => {
                 updateForm({ pass_percentage: event.target.value })
               }
             />
-            <p className="text-[11px] text-muted-foreground">
-              {t(
-                "thesisManagement.marking.passPercentageHint",
-                "Minimum overall percentage required for a student to pass this thesis."
-              )}
-            </p>
           </div>
 
           {/* Weights switch panel */}
           <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-border bg-muted/20">
-            <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-foreground">
-                {t("thesisManagement.marking.weights", "Weighting System")}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {form.weights_enabled
-                  ? t(
-                      "thesisManagement.marking.weightsEnabledHint",
-                      "Scores are calculated using criterion weights and evaluator percentages."
-                    )
-                  : t(
-                      "thesisManagement.marking.weightsDisabledHint",
-                      "Scores are calculated as a simple sum of maximum marks."
-                    )}
-              </p>
-            </div>
+            <p className="text-sm font-semibold text-foreground">
+              {t("thesisManagement.marking.weights", "Weighting System")}
+            </p>
             <Switch
               checked={form.weights_enabled}
               disabled={!canModify}
               onCheckedChange={(checked) =>
-                updateForm((current) => ({
-                  ...current,
-                  weights_enabled: checked,
-                  sections: checked
-                    ? (current.sections || []).map((section) => ({
-                        ...section,
-                        criteria: (section.criteria || []).map((criterion) => ({
-                          ...criterion,
-                          max_score: 10,
-                        })),
-                      }))
-                    : current.sections,
-                }))
+                updateForm((current) => {
+                  const nextEquation =
+                    checked && isClassicFinalEquation(current.final_percentage_equation)
+                      ? DEFAULT_WEIGHTED_FINAL_PERCENTAGE_EQUATION
+                      : !checked &&
+                          normalizeEquation(current.final_percentage_equation) ===
+                            normalizeEquation(
+                              DEFAULT_WEIGHTED_FINAL_PERCENTAGE_EQUATION
+                            )
+                        ? DEFAULT_FINAL_PERCENTAGE_EQUATION
+                        : current.final_percentage_equation;
+                  return {
+                    ...current,
+                    weights_enabled: checked,
+                    final_percentage_equation: nextEquation,
+                    sections: checked
+                      ? (current.sections || []).map((section) => ({
+                          ...section,
+                          criteria: (section.criteria || []).map((criterion) => ({
+                            ...criterion,
+                            max_score: 10,
+                          })),
+                        }))
+                      : current.sections,
+                  };
+                })
               }
             />
           </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
+          <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
+            {form.weights_enabled
+              ? t(
+                  "thesisManagement.marking.weightedFormulasTitle",
+                  "Weighted calculation formulas"
+                )
+              : t(
+                  "thesisManagement.marking.unweightedFormulasTitle",
+                  "Unweighted calculation formulas"
+                )}
+          </p>
+          {form.weights_enabled ? (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  1.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaCriterionWeight",
+                    "Criterion weight %"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  weight ÷ total_weight × 100
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  2.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaRolePercentage",
+                    "Role percentage"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  Σ(weight × score) ÷ total_weight × 10
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  3.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaFinalPercentage",
+                    "Final percentage"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  (supervisor_percentage + reader_percentage) / 2
+                </code>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  (supervisor_percentage + reader_percentage +
+                  additional_reader_percentage) / 3
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  4.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaPassFail",
+                    "Pass / Fail"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  percentage ≥ pass_percentage → Pass, else Fail
+                </code>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  1.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaRoleMarks",
+                    "Role marks"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  total = Σ score · max = Σ max_score
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  2.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaRolePercentage",
+                    "Role percentage"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  Σ score ÷ Σ max_score × 100
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  3.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaFinalPercentage",
+                    "Final percentage"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  ((supervisor_score / supervisor_max × 100) + (reader_score /
+                  reader_max × 100)) / 2
+                </code>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">
+                  4.{" "}
+                  {t(
+                    "thesisManagement.marking.formulaPassFail",
+                    "Pass / Fail"
+                  )}
+                </p>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  percentage ≥ pass_percentage → Pass, else Fail
+                </code>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -585,12 +718,6 @@ const MarkingSchemePage = () => {
               updateForm({ final_percentage_equation: event.target.value })
             }
           />
-          <p className="text-[11px] text-muted-foreground">
-            {t(
-              "thesisManagement.marking.finalPercentageEquationHint",
-              "Use supervisor_score, supervisor_max, reader_score, reader_max, additional_reader_score, and additional_reader_max."
-            )}
-          </p>
         </div>
       </div>
 
@@ -811,7 +938,12 @@ const MarkingSchemePage = () => {
                     {t("thesisManagement.marking.criteria", "criteria")} ·{" "}
                     {sectionTotalScore}{" "}
                     {t("thesisManagement.marking.marks", "marks")}
-                    {form.weights_enabled && ` · ${sectionTotalWeight}%`}
+                    {form.weights_enabled
+                      ? ` · ${sectionTotalWeight} ${t(
+                          "thesisManagement.marking.weight",
+                          "weight"
+                        )}`
+                      : ""}
                   </span>
 
                   {/* Reorder Buttons */}

@@ -70,14 +70,12 @@ export default function MasterTrajectoryDetails() {
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const [draftFilters, setDraftFilters] = useState({
     batch: "all",
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const debouncedSearch = useDebounce(search, 400);
 
@@ -126,9 +124,6 @@ export default function MasterTrajectoryDetails() {
       : {}),
     ...(isEnrolledTab && appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.attention !== "all"
-      ? { attention: appliedFilters.attention }
       : {}),
   };
 
@@ -760,9 +755,6 @@ export default function MasterTrajectoryDetails() {
                 <TableHead>
                   {t("thesisManagement.table.status", "Status")}
                 </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.attention", "Attention")}
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody
@@ -771,10 +763,10 @@ export default function MasterTrajectoryDetails() {
               }
             >
               {isListLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={8} />
+                <TableSkeleton rows={rowsPerPage} columns={7} />
               ) : listError ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center p-8">
+                  <TableCell colSpan={7} className="text-center p-8">
                     <ErrorMessage
                       message={
                         listError?.message ||
@@ -796,18 +788,6 @@ export default function MasterTrajectoryDetails() {
                         "Unknown Student"
                       );
                   const attemptStatus = row.attempt?.status || "active";
-                  const attentionLabel =
-                    row.attention === "suggest_fail"
-                      ? t(
-                          "thesisManagement.attempt.suggestFail",
-                          "Overdue — review fail"
-                        )
-                      : row.attention === "suggest_pass"
-                        ? t(
-                            "thesisManagement.attempt.suggestPass",
-                            "Ready for pass"
-                          )
-                        : "—";
 
                   return (
                     <TableRow
@@ -850,26 +830,13 @@ export default function MasterTrajectoryDetails() {
                       <TableCell>
                         <StatusBadge status={attemptStatus} />
                       </TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium ${
-                            row.attention === "suggest_fail"
-                              ? "text-destructive"
-                              : row.attention === "suggest_pass"
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-muted-foreground"
-                          }`}
-                        >
-                          {attentionLabel}
-                        </span>
-                      </TableCell>
                     </TableRow>
                   );
                 })
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {search ||

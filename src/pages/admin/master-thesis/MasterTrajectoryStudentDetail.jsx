@@ -319,9 +319,6 @@ export default function MasterTrajectoryStudentDetail() {
   const attemptStatus = attempt?.status || "active";
   const hasReenrolled = Boolean(detail?.has_reenrolled);
   const attemptActionsDisabled = hasReenrolled;
-  const failReasons = detail?.fail_reasons || [];
-  const suggestPass = detail?.suggest_pass;
-  const suggestFail = detail?.suggest_fail;
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
@@ -933,57 +930,6 @@ export default function MasterTrajectoryStudentDetail() {
           icon={CheckCircle2}
         />
       </div>
-
-      {/* Signal / Hint Banners when active */}
-      {attemptStatus === "active" && suggestPass && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-950 dark:text-emerald-200">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span className="font-semibold">
-              {t("thesisManagement.attempt.passHint", "All required steps are complete! You can mark this thesis attempt as passed.")}
-            </span>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "passed", reason: "" })}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markPassed", "Mark as Passed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
-      {attemptStatus === "active" && suggestFail && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 dark:text-amber-200">
-          <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-            <div className="space-y-0.5">
-              <span className="font-semibold">
-                {t("thesisManagement.attempt.failHint", "Signals suggest marking failed.")}
-              </span>
-              {failReasons.length > 0 && (
-                <span className="ml-1 text-[11px] text-amber-800 dark:text-amber-300">
-                  ({failReasons.map((r) => (r.type === "trajectory_ended" ? t("thesisManagement.attempt.trajectoryEnded", "Trajectory ended") : `${r.step_name || "Step"} overdue`)).join(", ")})
-                </span>
-              )}
-            </div>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 px-3.5 text-destructive border-destructive/30 hover:bg-destructive/10 font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "failed", reason: "" })}
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markFailed", "Mark as Failed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
 
       {attempt?.status_reason && (
         <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground flex items-center gap-2">
