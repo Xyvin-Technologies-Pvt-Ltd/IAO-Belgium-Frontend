@@ -166,13 +166,28 @@ export function ProformaInvoiceDocument({ proforma, previewParty = null }) {
   const party = resolvePartyDisplay(proforma, previewParty);
   const roleName =
     teacher.teacher_role?.name || items.find((i) => i.teacher_role_name)?.teacher_role_name || "—";
-  const sessionDates = [
-    ...new Set(
-      items
-        .map((i) => (i.session_date ? moment(i.session_date).format("DD MMM YYYY") : null))
-        .filter(Boolean)
-    ),
-  ];
+  // Prefer planning session dates (course_meta) so claim/add dates do not pollute Program Dates.
+  const sessionDates = (() => {
+    if (courseMeta.session_date_label) {
+      return [courseMeta.session_date_label];
+    }
+    if (Array.isArray(courseMeta.session_dates) && courseMeta.session_dates.length > 0) {
+      return [
+        ...new Set(
+          courseMeta.session_dates
+            .map((d) => (d ? moment(d).format("DD MMM YYYY") : null))
+            .filter(Boolean)
+        ),
+      ];
+    }
+    return [
+      ...new Set(
+        items
+          .map((i) => (i.session_date ? moment(i.session_date).format("DD MMM YYYY") : null))
+          .filter(Boolean)
+      ),
+    ];
+  })();
   const approvedForFinance =
     proforma.status === "MOVED_TO_FINANCE" || proforma.status === "PAID";
   const showSigned = Boolean(signature.is_signed) && !previewParty?.forceUnsigned;
