@@ -39,6 +39,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
 import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import {
@@ -83,6 +84,7 @@ export default function MasterTrajectoryDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isEnrolledTab = activeTab === "enrolled";
+  const isFormDataTab = activeTab === "form-data";
   const isQnaTab = activeTab === "qna";
 
   const [qnaAudience, setQnaAudience] = useState("all");
@@ -184,6 +186,14 @@ export default function MasterTrajectoryDetails() {
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
+  const formSteps = enrolledData?.form_steps || [];
+  const hasFormSteps = formSteps.length > 0;
+
+  useEffect(() => {
+    if (!hasFormSteps && activeTab === "form-data") {
+      setActiveTab("enrolled");
+    }
+  }, [hasFormSteps, activeTab]);
 
   const students = enrolledData?.students || [];
   const totalRows = enrolledCount;
@@ -356,6 +366,17 @@ export default function MasterTrajectoryDetails() {
                   "Enrolled students"
                 ),
               },
+              ...(hasFormSteps
+                ? [
+                    {
+                      id: "form-data",
+                      label: t(
+                        "thesisManagement.formData.tab",
+                        "Form data"
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "qna",
                 label: t(
@@ -380,7 +401,14 @@ export default function MasterTrajectoryDetails() {
           </nav>
         </div>
 
-        {isQnaTab ? (
+        {isFormDataTab && hasFormSteps ? (
+          <TrajectoryFormDataTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+            formSteps={formSteps}
+          />
+        ) : isQnaTab ? (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-2">

@@ -48,6 +48,7 @@ import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalN
 import StatusBadge from "@/components/StatusBadge";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 import ThesisEvaluationPanel from "@/components/admin/thesis/ThesisEvaluationPanel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -86,6 +87,37 @@ import {
   useGetThesisTrajectories,
   useGetTheses,
 } from "@/store/useThesisStore";
+
+const staffOptionValue = (person) => {
+  if (!person?._id) return "NONE";
+  const type = person.teacher_type === "external" ? "external" : "internal";
+  return `${type}:${person._id}`;
+};
+
+const StaffOptionLabel = ({ person, t }) => {
+  const name =
+    `${person?.first_name || ""} ${person?.last_name || ""}`.trim() ||
+    person?.email ||
+    "—";
+  const email = person?.email ? ` (${person.email})` : "";
+  const isExternal = person?.teacher_type === "external";
+  return (
+    <span className="inline-flex items-center gap-1.5 flex-wrap">
+      <span>
+        {name}
+        {email}
+      </span>
+      {isExternal && (
+        <Badge
+          variant="outline"
+          className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 font-normal"
+        >
+          {t("thesisManagement.teachers.external", "External")}
+        </Badge>
+      )}
+    </span>
+  );
+};
 
 const RichHtml = ({ html, className = "" }) => {
   const secureHtml = useSecureHtml(html);
@@ -283,10 +315,10 @@ export default function TrajectoryStudentDetail() {
   const eligibleReaders = detail?.eligible_readers || [];
   const eligibleSupervisors = detail?.supervisors || [];
   const primaryReaderOptions = eligibleReaders.filter(
-    (teacher) => String(teacher._id) !== String(additionalReader?._id)
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(additionalReader)
   );
   const additionalReaderOptions = eligibleReaders.filter(
-    (teacher) => String(teacher._id) !== String(reader?._id)
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(reader)
   );
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
@@ -404,14 +436,18 @@ export default function TrajectoryStudentDetail() {
   };
 
   const handleSupervisorSubmit = async () => {
-    const supervisorValue = selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const supervisorValue =
+      selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const isExternalSelection =
+      typeof supervisorValue === "string" &&
+      supervisorValue.startsWith("external:");
     try {
       await updateSupervisorMutation.mutateAsync({
         thesisId,
         trajectoryId,
         userId,
         supervisor: supervisorValue,
-        status: selectedSupervisorStatus,
+        status: isExternalSelection ? "approved" : selectedSupervisorStatus,
       });
       setSupervisorModalOpen(false);
     } catch {
@@ -420,7 +456,7 @@ export default function TrajectoryStudentDetail() {
   };
 
   const openSupervisorEdit = () => {
-    setSelectedSupervisorId(supervisor?._id || "NONE");
+    setSelectedSupervisorId(staffOptionValue(supervisor));
     setSelectedSupervisorStatus(supervisorRequest?.status || "approved");
     setSupervisorModalOpen(true);
   };
@@ -1588,7 +1624,7 @@ export default function TrajectoryStudentDetail() {
             </label>
             <Select
               disabled={!canModify || updateReaderMutation.isPending}
-              value={reader?._id || "NONE"}
+              value={staffOptionValue(reader)}
               onValueChange={handleReaderChange}
             >
               <SelectTrigger className="w-full h-9 bg-background text-xs">
@@ -1599,8 +1635,12 @@ export default function TrajectoryStudentDetail() {
                   {t("thesisManagement.noReaderAssigned", "— No Reader Assigned —")}
                 </SelectItem>
                 {primaryReaderOptions.map((teacher) => (
-                  <SelectItem key={teacher._id} value={teacher._id} className="text-xs">
-                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                  <SelectItem
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
+                    className="text-xs"
+                  >
+                    <StaffOptionLabel person={teacher} t={t} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1644,7 +1684,7 @@ export default function TrajectoryStudentDetail() {
             </label>
             <Select
               disabled={!canModify || updateAdditionalReaderMutation.isPending}
-              value={additionalReader?._id || "NONE"}
+              value={staffOptionValue(additionalReader)}
               onValueChange={handleAdditionalReaderChange}
             >
               <SelectTrigger className="w-full h-9 bg-background text-xs">
@@ -1664,11 +1704,11 @@ export default function TrajectoryStudentDetail() {
                 </SelectItem>
                 {additionalReaderOptions.map((teacher) => (
                   <SelectItem
-                    key={teacher._id}
-                    value={teacher._id}
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
                     className="text-xs"
                   >
-                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                    <StaffOptionLabel person={teacher} t={t} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1845,8 +1885,12 @@ export default function TrajectoryStudentDetail() {
                     {t("thesisManagement.noSupervisorAssigned", "— No Supervisor Assigned —")}
                   </SelectItem>
                   {eligibleSupervisors.map((s) => (
-                    <SelectItem key={s._id} value={s._id} className="text-xs">
-                      {s.first_name} {s.last_name} ({s.email})
+                    <SelectItem
+                      key={staffOptionValue(s)}
+                      value={staffOptionValue(s)}
+                      className="text-xs"
+                    >
+                      <StaffOptionLabel person={s} t={t} />
                     </SelectItem>
                   ))}
                 </SelectContent>

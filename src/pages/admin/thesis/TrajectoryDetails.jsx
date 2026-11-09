@@ -32,6 +32,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
@@ -49,6 +50,7 @@ export default function TrajectoryDetails() {
   const { type: thesisType, basePath, label: kindLabel } = useThesisAdminKind();
   const canModify = useCanModify(basePath);
 
+  const [activeTab, setActiveTab] = useState("enrolled");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -69,10 +71,18 @@ export default function TrajectoryDetails() {
   const debouncedSearch = useDebounce(search, 400);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const isEnrolledTab = activeTab === "enrolled";
+  const isFormDataTab = activeTab === "form-data";
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(1);
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setPage(1);
+    setSearch("");
   };
 
   const {
@@ -82,16 +92,22 @@ export default function TrajectoryDetails() {
   } = useGetThesisById(thesisId, { type: thesisType });
 
   const enrolledParams = {
-    page,
-    limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
-    ...(appliedFilters.supervisor !== "all"
+    page: isEnrolledTab ? page : 1,
+    limit: isEnrolledTab ? rowsPerPage : 10,
+    ...(isEnrolledTab && debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(isEnrolledTab && appliedFilters.batch !== "all"
+      ? { batch: appliedFilters.batch }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.supervisor !== "all"
       ? { supervisor: appliedFilters.supervisor }
       : {}),
-    ...(appliedFilters.reader !== "all" ? { reader: appliedFilters.reader } : {}),
-    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
-    ...(appliedFilters.attention !== "all"
+    ...(isEnrolledTab && appliedFilters.reader !== "all"
+      ? { reader: appliedFilters.reader }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
+    ...(isEnrolledTab && appliedFilters.attention !== "all"
       ? { attention: appliedFilters.attention }
       : {}),
   };
@@ -122,6 +138,14 @@ export default function TrajectoryDetails() {
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
+  const formSteps = enrolledData?.form_steps || [];
+  const hasFormSteps = formSteps.length > 0;
+
+  useEffect(() => {
+    if (!hasFormSteps && activeTab === "form-data") {
+      setActiveTab("enrolled");
+    }
+  }, [hasFormSteps, activeTab]);
 
   const students = enrolledData?.students || [];
   const totalRows = enrolledCount;
@@ -270,15 +294,61 @@ export default function TrajectoryDetails() {
       </div>
 
       <div className="space-y-4 pt-2">
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold text-foreground">
-            {t(
-              "thesisManagement.trajectories.enrolledStudents",
-              "Enrolled students"
-            )}
-          </h2>
-        </div>
+        {hasFormSteps ? (
+          <div className="border-b border-border">
+            <nav className="-mb-px flex space-x-8 overflow-x-auto">
+              {[
+                {
+                  id: "enrolled",
+                  label: t(
+                    "thesisManagement.trajectories.enrolledStudents",
+                    "Enrolled students"
+                  ),
+                },
+                {
+                  id: "form-data",
+                  label: t(
+                    "thesisManagement.formData.tab",
+                    "Form data"
+                  ),
+                },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === tab.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">
+              {t(
+                "thesisManagement.trajectories.enrolledStudents",
+                "Enrolled students"
+              )}
+            </h2>
+          </div>
+        )}
+
+        {isFormDataTab && hasFormSteps ? (
+          <TrajectoryFormDataTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+            formSteps={formSteps}
+          />
+        ) : (
+          <>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -478,6 +548,8 @@ export default function TrajectoryDetails() {
           setRowsPerPage={setRowsPerPage}
           totalRows={totalRows}
         />
+          </>
+        )}
       </div>
 
       {isEditModalOpen && (

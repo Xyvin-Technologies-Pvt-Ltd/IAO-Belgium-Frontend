@@ -81,12 +81,22 @@ const calculateSectionTotal = (section, scores) => {
   return { awarded, max };
 };
 
-const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
+const RoleCard = ({
+  role,
+  block,
+  canModify,
+  markingScheme,
+  onEdit,
+  onReopen,
+  busy,
+}) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const assessment = block?.assessment;
   const snapshot = assessment?.config_snapshot;
   const assessorName = personName(block?.assessor);
+  const hasMarkingScheme = Boolean(markingScheme?.sections?.length);
+  const canEnterMarks = canModify && !assessment;
 
   const hasMarks = Boolean(
     assessment &&
@@ -187,7 +197,7 @@ const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
 
         {/* Empty State when no marks added */}
         {!hasMarks && !assessment ? (
-          <div className="rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center space-y-2.5">
+          <div className="rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center space-y-3">
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
               <ClipboardList className="w-5 h-5" />
             </div>
@@ -219,6 +229,30 @@ const RoleCard = ({ role, block, canModify, onEdit, onReopen, busy }) => {
                     )}
               </p>
             </div>
+            {canEnterMarks ? (
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
+                  onClick={() => onEdit(role, null)}
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>
+                    {t("thesisManagement.marking.enterMarks", "Enter marks")}
+                  </span>
+                </Button>
+                {!hasMarkingScheme ? (
+                  <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                    {t(
+                      "thesisManagement.marking.configureSchemeFirst",
+                      "Configure a marking scheme on this thesis first."
+                    )}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         ) : (
           /* Marks Summary Grid */
@@ -472,7 +506,9 @@ const ThesisEvaluationPanel = ({
       }),
     onSuccess: () => {
       toast.success(
-        t("thesisManagement.marking.marksUpdated", "Marks updated")
+        editor?.isCreate
+          ? t("thesisManagement.marking.marksEntered", "Marks entered")
+          : t("thesisManagement.marking.marksUpdated", "Marks updated")
       );
       setEditor(null);
       invalidate();
@@ -538,8 +574,19 @@ const ThesisEvaluationPanel = ({
   if (!data) return null;
 
   const openEditor = (role, assessment) => {
+    const scheme = assessment?.config_snapshot || data.marking_scheme;
+    if (!scheme?.sections?.length) {
+      toast.error(
+        t(
+          "thesisManagement.marking.noMarkingScheme",
+          "No marking scheme is configured for this thesis"
+        )
+      );
+      return;
+    }
+
     const criteria = [];
-    for (const section of assessment.config_snapshot?.sections || []) {
+    for (const section of scheme.sections || []) {
       for (const criterion of section.criteria || []) {
         if (
           (role === "reader" || role === "additional_reader") &&
@@ -547,7 +594,7 @@ const ThesisEvaluationPanel = ({
         ) {
           continue;
         }
-        const score = (assessment.scores || []).find(
+        const score = (assessment?.scores || []).find(
           (row) => String(row.criterion_id) === String(criterion._id)
         );
         criteria.push({
@@ -562,11 +609,10 @@ const ThesisEvaluationPanel = ({
     }
     setEditor({
       role,
+      isCreate: !assessment,
       scores: criteria,
-      final_feedback: assessment.final_feedback || "",
-      feedback_enabled: Boolean(
-        assessment.config_snapshot?.final_feedback?.enabled
-      ),
+      final_feedback: assessment?.final_feedback || "",
+      feedback_enabled: Boolean(scheme?.final_feedback?.enabled),
     });
   };
 
@@ -590,6 +636,7 @@ const ThesisEvaluationPanel = ({
           role="supervisor"
           block={data.supervisor}
           canModify={canModify}
+          markingScheme={data.marking_scheme}
           busy={reopenMutation.isPending}
           onEdit={openEditor}
           onReopen={(role) => reopenMutation.mutate(role)}
@@ -598,6 +645,7 @@ const ThesisEvaluationPanel = ({
           role="reader"
           block={data.reader}
           canModify={canModify}
+          markingScheme={data.marking_scheme}
           busy={reopenMutation.isPending}
           onEdit={openEditor}
           onReopen={(role) => reopenMutation.mutate(role)}
@@ -607,6 +655,7 @@ const ThesisEvaluationPanel = ({
             role="additional_reader"
             block={data.additional_reader}
             canModify={canModify}
+            markingScheme={data.marking_scheme}
             busy={reopenMutation.isPending}
             onEdit={openEditor}
             onReopen={(role) => reopenMutation.mutate(role)}
@@ -874,7 +923,10 @@ const ThesisEvaluationPanel = ({
         <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-base font-bold">
-              {t("thesisManagement.marking.editMarks", "Edit marks")} -{" "}
+              {editor?.isCreate
+                ? t("thesisManagement.marking.enterMarks", "Enter marks")
+                : t("thesisManagement.marking.editMarks", "Edit marks")}{" "}
+              -{" "}
               {editor?.role === "supervisor"
                 ? t("thesisManagement.marking.supervisor", "Supervisor")
                 : editor?.role === "additional_reader"

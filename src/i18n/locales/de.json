@@ -1056,6 +1056,19 @@
       "title": "Persönliche Notizen",
       "subtitle": "Für diesen Studenten sichtbare Notizen"
     },
+    "formData": {
+      "tab": "Formulardaten",
+      "formStep": "Formularschritt",
+      "selectFormStep": "Formularschritt auswählen",
+      "searchPlaceholder": "Studenten oder Antworten suchen...",
+      "filterTitle": "Formulardaten filtern",
+      "filterSubtitle": "Nach Einreichungsstatus und Antworten eingrenzen",
+      "answersSection": "Antworten",
+      "submission": "Einreichung",
+      "submitted": "Eingereicht",
+      "notSubmitted": "Nicht eingereicht",
+      "empty": "Keine Formularantworten entsprechen Ihren Filtern."
+    },
     "qna": {
       "addQna": "Q&A oder Ankündigung hinzufügen",
       "addVideo": "Video hinzufügen",

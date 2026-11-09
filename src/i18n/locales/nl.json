@@ -1039,6 +1039,19 @@
       "title": "Persoonlijke notities",
       "subtitle": "Notities zichtbaar voor deze student"
     },
+    "formData": {
+      "tab": "Formuliergegevens",
+      "formStep": "Formulierstap",
+      "selectFormStep": "Formulierstap selecteren",
+      "searchPlaceholder": "Zoek studenten of antwoorden...",
+      "filterTitle": "Formuliergegevens filteren",
+      "filterSubtitle": "Beperk op indieningsstatus en antwoorden",
+      "answersSection": "Antwoorden",
+      "submission": "Indiening",
+      "submitted": "Ingediend",
+      "notSubmitted": "Niet ingediend",
+      "empty": "Geen formulierantwoorden komen overeen met je filters."
+    },
     "qna": {
       "addQna": "Q&A of mededeling toevoegen",
       "addVideo": "Video toevoegen",
