@@ -250,6 +250,34 @@ export const getTrajectoryStudents = async (thesisId, trajectoryId, params = {})
   }
 };
 
+export const getTrajectoryFormData = async (thesisId, trajectoryId, params = {}) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/form-data`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportTrajectoryFormDataCsv = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/form-data/export-csv`,
+      { params, responseType: "blob" }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getThesisEligibleStudents = async (thesisId, params = {}) => {
   try {
     const response = await axiosInstance.get(

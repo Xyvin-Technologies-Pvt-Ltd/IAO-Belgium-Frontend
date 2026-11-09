@@ -48,6 +48,7 @@ import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalN
 import StatusBadge from "@/components/StatusBadge";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 import ThesisEvaluationPanel from "@/components/admin/thesis/ThesisEvaluationPanel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -86,6 +87,37 @@ import {
   useGetThesisTrajectories,
   useGetTheses,
 } from "@/store/useThesisStore";
+
+const staffOptionValue = (person) => {
+  if (!person?._id) return "NONE";
+  const type = person.teacher_type === "external" ? "external" : "internal";
+  return `${type}:${person._id}`;
+};
+
+const StaffOptionLabel = ({ person, t }) => {
+  const name =
+    `${person?.first_name || ""} ${person?.last_name || ""}`.trim() ||
+    person?.email ||
+    "—";
+  const email = person?.email ? ` (${person.email})` : "";
+  const isExternal = person?.teacher_type === "external";
+  return (
+    <span className="inline-flex items-center gap-1.5 flex-wrap">
+      <span>
+        {name}
+        {email}
+      </span>
+      {isExternal && (
+        <Badge
+          variant="outline"
+          className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 font-normal"
+        >
+          {t("thesisManagement.teachers.external", "External")}
+        </Badge>
+      )}
+    </span>
+  );
+};
 
 const RichHtml = ({ html, className = "" }) => {
   const secureHtml = useSecureHtml(html);
@@ -283,10 +315,10 @@ export default function TrajectoryStudentDetail() {
   const eligibleReaders = detail?.eligible_readers || [];
   const eligibleSupervisors = detail?.supervisors || [];
   const primaryReaderOptions = eligibleReaders.filter(
-    (teacher) => String(teacher._id) !== String(additionalReader?._id)
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(additionalReader)
   );
   const additionalReaderOptions = eligibleReaders.filter(
-    (teacher) => String(teacher._id) !== String(reader?._id)
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(reader)
   );
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
@@ -299,9 +331,6 @@ export default function TrajectoryStudentDetail() {
   const attemptStatus = attempt?.status || "active";
   const hasReenrolled = Boolean(detail?.has_reenrolled);
   const attemptActionsDisabled = hasReenrolled;
-  const failReasons = detail?.fail_reasons || [];
-  const suggestPass = detail?.suggest_pass;
-  const suggestFail = detail?.suggest_fail;
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
@@ -404,14 +433,18 @@ export default function TrajectoryStudentDetail() {
   };
 
   const handleSupervisorSubmit = async () => {
-    const supervisorValue = selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const supervisorValue =
+      selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const isExternalSelection =
+      typeof supervisorValue === "string" &&
+      supervisorValue.startsWith("external:");
     try {
       await updateSupervisorMutation.mutateAsync({
         thesisId,
         trajectoryId,
         userId,
         supervisor: supervisorValue,
-        status: selectedSupervisorStatus,
+        status: isExternalSelection ? "approved" : selectedSupervisorStatus,
       });
       setSupervisorModalOpen(false);
     } catch {
@@ -420,7 +453,7 @@ export default function TrajectoryStudentDetail() {
   };
 
   const openSupervisorEdit = () => {
-    setSelectedSupervisorId(supervisor?._id || "NONE");
+    setSelectedSupervisorId(staffOptionValue(supervisor));
     setSelectedSupervisorStatus(supervisorRequest?.status || "approved");
     setSupervisorModalOpen(true);
   };
@@ -967,57 +1000,6 @@ export default function TrajectoryStudentDetail() {
           icon={CheckCircle2}
         />
       </div>
-
-      {/* Signal / Hint Banners when active */}
-      {attemptStatus === "active" && suggestPass && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-950 dark:text-emerald-200">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span className="font-semibold">
-              {t("thesisManagement.attempt.passHint", "All required steps are complete! You can mark this thesis attempt as passed.")}
-            </span>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "passed", reason: "" })}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markPassed", "Mark as Passed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
-      {attemptStatus === "active" && suggestFail && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 dark:text-amber-200">
-          <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-            <div className="space-y-0.5">
-              <span className="font-semibold">
-                {t("thesisManagement.attempt.failHint", "Signals suggest marking failed.")}
-              </span>
-              {failReasons.length > 0 && (
-                <span className="ml-1 text-[11px] text-amber-800 dark:text-amber-300">
-                  ({failReasons.map((r) => (r.type === "trajectory_ended" ? t("thesisManagement.attempt.trajectoryEnded", "Trajectory ended") : `${r.step_name || "Step"} overdue`)).join(", ")})
-                </span>
-              )}
-            </div>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 px-3.5 text-destructive border-destructive/30 hover:bg-destructive/10 font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "failed", reason: "" })}
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markFailed", "Mark as Failed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
 
       {attempt?.status_reason && (
         <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground flex items-center gap-2">
@@ -1588,7 +1570,7 @@ export default function TrajectoryStudentDetail() {
             </label>
             <Select
               disabled={!canModify || updateReaderMutation.isPending}
-              value={reader?._id || "NONE"}
+              value={staffOptionValue(reader)}
               onValueChange={handleReaderChange}
             >
               <SelectTrigger className="w-full h-9 bg-background text-xs">
@@ -1599,8 +1581,12 @@ export default function TrajectoryStudentDetail() {
                   {t("thesisManagement.noReaderAssigned", "— No Reader Assigned —")}
                 </SelectItem>
                 {primaryReaderOptions.map((teacher) => (
-                  <SelectItem key={teacher._id} value={teacher._id} className="text-xs">
-                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                  <SelectItem
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
+                    className="text-xs"
+                  >
+                    <StaffOptionLabel person={teacher} t={t} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1644,7 +1630,7 @@ export default function TrajectoryStudentDetail() {
             </label>
             <Select
               disabled={!canModify || updateAdditionalReaderMutation.isPending}
-              value={additionalReader?._id || "NONE"}
+              value={staffOptionValue(additionalReader)}
               onValueChange={handleAdditionalReaderChange}
             >
               <SelectTrigger className="w-full h-9 bg-background text-xs">
@@ -1664,11 +1650,11 @@ export default function TrajectoryStudentDetail() {
                 </SelectItem>
                 {additionalReaderOptions.map((teacher) => (
                   <SelectItem
-                    key={teacher._id}
-                    value={teacher._id}
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
                     className="text-xs"
                   >
-                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                    <StaffOptionLabel person={teacher} t={t} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1845,8 +1831,12 @@ export default function TrajectoryStudentDetail() {
                     {t("thesisManagement.noSupervisorAssigned", "— No Supervisor Assigned —")}
                   </SelectItem>
                   {eligibleSupervisors.map((s) => (
-                    <SelectItem key={s._id} value={s._id} className="text-xs">
-                      {s.first_name} {s.last_name} ({s.email})
+                    <SelectItem
+                      key={staffOptionValue(s)}
+                      value={staffOptionValue(s)}
+                      className="text-xs"
+                    >
+                      <StaffOptionLabel person={s} t={t} />
                     </SelectItem>
                   ))}
                 </SelectContent>

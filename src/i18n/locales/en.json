@@ -1653,6 +1653,19 @@
     "noLogsYet": "No activity logs found",
     "noReaderAssigned": "— No Reader Assigned —",
     "noSupervisorAssigned": "Not assigned yet",
+    "formData": {
+      "tab": "Form data",
+      "formStep": "Form step",
+      "selectFormStep": "Select form step",
+      "searchPlaceholder": "Search students or answers...",
+      "filterTitle": "Filter form data",
+      "filterSubtitle": "Narrow down by submission status and answers",
+      "answersSection": "Answers",
+      "submission": "Submission",
+      "submitted": "Submitted",
+      "notSubmitted": "Not submitted",
+      "empty": "No form responses match your filters."
+    },
     "qna": {
       "addQna": "Add Q&A or Announcement",
       "addVideo": "Add Video",

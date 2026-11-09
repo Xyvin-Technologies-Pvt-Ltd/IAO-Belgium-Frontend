@@ -39,6 +39,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
 import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import {
@@ -69,20 +70,19 @@ export default function MasterTrajectoryDetails() {
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const [draftFilters, setDraftFilters] = useState({
     batch: "all",
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const debouncedSearch = useDebounce(search, 400);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isEnrolledTab = activeTab === "enrolled";
+  const isFormDataTab = activeTab === "form-data";
   const isQnaTab = activeTab === "qna";
 
   const [qnaAudience, setQnaAudience] = useState("all");
@@ -124,9 +124,6 @@ export default function MasterTrajectoryDetails() {
       : {}),
     ...(isEnrolledTab && appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
-      : {}),
-    ...(isEnrolledTab && appliedFilters.attention !== "all"
-      ? { attention: appliedFilters.attention }
       : {}),
   };
 
@@ -184,6 +181,14 @@ export default function MasterTrajectoryDetails() {
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
+  const formSteps = enrolledData?.form_steps || [];
+  const hasFormSteps = formSteps.length > 0;
+
+  useEffect(() => {
+    if (!hasFormSteps && activeTab === "form-data") {
+      setActiveTab("enrolled");
+    }
+  }, [hasFormSteps, activeTab]);
 
   const students = enrolledData?.students || [];
   const totalRows = enrolledCount;
@@ -356,6 +361,17 @@ export default function MasterTrajectoryDetails() {
                   "Enrolled students"
                 ),
               },
+              ...(hasFormSteps
+                ? [
+                    {
+                      id: "form-data",
+                      label: t(
+                        "thesisManagement.formData.tab",
+                        "Form data"
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "qna",
                 label: t(
@@ -380,7 +396,14 @@ export default function MasterTrajectoryDetails() {
           </nav>
         </div>
 
-        {isQnaTab ? (
+        {isFormDataTab && hasFormSteps ? (
+          <TrajectoryFormDataTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+            formSteps={formSteps}
+          />
+        ) : isQnaTab ? (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -732,9 +755,6 @@ export default function MasterTrajectoryDetails() {
                 <TableHead>
                   {t("thesisManagement.table.status", "Status")}
                 </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.attention", "Attention")}
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody
@@ -743,10 +763,10 @@ export default function MasterTrajectoryDetails() {
               }
             >
               {isListLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={8} />
+                <TableSkeleton rows={rowsPerPage} columns={7} />
               ) : listError ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center p-8">
+                  <TableCell colSpan={7} className="text-center p-8">
                     <ErrorMessage
                       message={
                         listError?.message ||
@@ -768,18 +788,6 @@ export default function MasterTrajectoryDetails() {
                         "Unknown Student"
                       );
                   const attemptStatus = row.attempt?.status || "active";
-                  const attentionLabel =
-                    row.attention === "suggest_fail"
-                      ? t(
-                          "thesisManagement.attempt.suggestFail",
-                          "Overdue — review fail"
-                        )
-                      : row.attention === "suggest_pass"
-                        ? t(
-                            "thesisManagement.attempt.suggestPass",
-                            "Ready for pass"
-                          )
-                        : "—";
 
                   return (
                     <TableRow
@@ -822,26 +830,13 @@ export default function MasterTrajectoryDetails() {
                       <TableCell>
                         <StatusBadge status={attemptStatus} />
                       </TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium ${
-                            row.attention === "suggest_fail"
-                              ? "text-destructive"
-                              : row.attention === "suggest_pass"
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-muted-foreground"
-                          }`}
-                        >
-                          {attentionLabel}
-                        </span>
-                      </TableCell>
                     </TableRow>
                   );
                 })
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {search ||

@@ -23,6 +23,8 @@ import {
   getThesisDeadlines,
   saveThesisDeadlines,
   getTrajectoryStudents,
+  getTrajectoryFormData,
+  exportTrajectoryFormDataCsv,
   getThesisEligibleStudents,
   exportTrajectoryStudentsCsv,
   exportThesisEligibleStudentsCsv,
@@ -437,6 +439,37 @@ export const useGetTrajectoryStudents = (
     placeholderData: (previousData) => previousData,
     staleTime: 30000,
     ...options,
+  });
+};
+
+export const useGetTrajectoryFormData = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  const { enabled = true, ...queryOptions } = options;
+  return useQuery({
+    queryKey: ["thesis-trajectory-form-data", thesisId, trajectoryId, params],
+    queryFn: () => getTrajectoryFormData(thesisId, trajectoryId, params),
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...queryOptions,
+    enabled: Boolean(thesisId && trajectoryId && enabled),
+  });
+};
+
+export const useExportTrajectoryFormDataCsv = () => {
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
+      exportTrajectoryFormDataCsv(thesisId, trajectoryId, params),
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `trajectory-form-data-${Date.now()}.csv`);
+      toast.success("Form data CSV exported successfully");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to export form data CSV");
+    },
   });
 };
 

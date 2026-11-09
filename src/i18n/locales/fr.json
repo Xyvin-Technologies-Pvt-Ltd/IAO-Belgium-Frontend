@@ -1038,6 +1038,19 @@
       "title": "Notes personnelles",
       "subtitle": "Notes visibles par cet étudiant"
     },
+    "formData": {
+      "tab": "Données du formulaire",
+      "formStep": "Étape formulaire",
+      "selectFormStep": "Sélectionner l'étape formulaire",
+      "searchPlaceholder": "Rechercher étudiants ou réponses...",
+      "filterTitle": "Filtrer les données du formulaire",
+      "filterSubtitle": "Affiner par statut de soumission et réponses",
+      "answersSection": "Réponses",
+      "submission": "Soumission",
+      "submitted": "Soumis",
+      "notSubmitted": "Non soumis",
+      "empty": "Aucune réponse au formulaire ne correspond à vos filtres."
+    },
     "qna": {
       "addQna": "Ajouter une Q&R ou une annonce",
       "addVideo": "Ajouter une vidéo",
