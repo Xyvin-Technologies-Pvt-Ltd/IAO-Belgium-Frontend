@@ -715,6 +715,8 @@ export default function TrajectoryStudentDetail() {
         return t("thesis.types.informationOnly", "Information Only");
       case "form":
         return t("thesis.types.form", "Form");
+      case "oral_defence":
+        return t("thesis.types.oralDefence", "Oral Defence");
       default:
         return type;
     }

@@ -262,6 +262,22 @@ export const getTrajectoryFormData = async (thesisId, trajectoryId, params = {})
   }
 };
 
+export const getTrajectoryDissertationPassed = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/dissertation-passed`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const exportTrajectoryFormDataCsv = async (
   thesisId,
   trajectoryId,
@@ -495,6 +511,42 @@ export const updateTrajectoryStudentStepDeadline = async (
   try {
     const response = await axiosInstance.patch(
       `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/deadline`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateOralDefenceSchedule = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/oral-defence-schedule`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const updateOralDefenceResult = async (
+  thesisId,
+  trajectoryId,
+  userId,
+  stepId,
+  data
+) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/${userId}/steps/${stepId}/oral-defence-result`,
       data
     );
     return response.data;

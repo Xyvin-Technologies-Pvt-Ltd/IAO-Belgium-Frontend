@@ -24,6 +24,7 @@ import {
   saveThesisDeadlines,
   getTrajectoryStudents,
   getTrajectoryFormData,
+  getTrajectoryDissertationPassed,
   exportTrajectoryFormDataCsv,
   getThesisEligibleStudents,
   exportTrajectoryStudentsCsv,
@@ -38,6 +39,8 @@ import {
   reenrollTrajectoryStudent,
   moveTrajectoryEnrolment,
   updateTrajectoryStudentStepDeadline,
+  updateOralDefenceSchedule,
+  updateOralDefenceResult,
   uploadStaffThesisDocument,
   renameStaffThesisDocument,
   deleteStaffThesisDocument,
@@ -459,6 +462,29 @@ export const useGetTrajectoryFormData = (
   });
 };
 
+export const useGetTrajectoryDissertationPassed = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  const { enabled = true, ...queryOptions } = options;
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-dissertation-passed",
+      thesisId,
+      trajectoryId,
+      params,
+    ],
+    queryFn: () =>
+      getTrajectoryDissertationPassed(thesisId, trajectoryId, params),
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...queryOptions,
+    enabled: Boolean(thesisId && trajectoryId && enabled),
+  });
+};
+
 export const useExportTrajectoryFormDataCsv = () => {
   return useMutation({
     mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
@@ -832,6 +858,72 @@ export const useUpdateTrajectoryStudentStepDeadline = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update deadline");
+    },
+  });
+};
+
+export const useUpdateOralDefenceSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      thesisId,
+      trajectoryId,
+      userId,
+      stepId,
+      scheduled_at,
+      meeting_link,
+    }) =>
+      updateOralDefenceSchedule(thesisId, trajectoryId, userId, stepId, {
+        scheduled_at,
+        meeting_link,
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success(response?.message || "Oral defence scheduled");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to schedule oral defence");
+    },
+  });
+};
+
+export const useUpdateOralDefenceResult = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      thesisId,
+      trajectoryId,
+      userId,
+      stepId,
+      oral_defence_result,
+      oral_defence_class,
+      oral_defence_feedback,
+    }) =>
+      updateOralDefenceResult(thesisId, trajectoryId, userId, stepId, {
+        oral_defence_result,
+        oral_defence_class,
+        oral_defence_feedback,
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          "thesis-trajectory-student-detail",
+          variables.thesisId,
+          variables.trajectoryId,
+          variables.userId,
+        ],
+      });
+      toast.success(response?.message || "Oral defence result saved");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save oral defence result");
     },
   });
 };

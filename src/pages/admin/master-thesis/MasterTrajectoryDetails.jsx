@@ -40,6 +40,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
 import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
+import TrajectoryDissertationPassedTab from "@/components/admin/thesis/TrajectoryDissertationPassedTab";
 import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import {
@@ -83,6 +84,7 @@ export default function MasterTrajectoryDetails() {
 
   const isEnrolledTab = activeTab === "enrolled";
   const isFormDataTab = activeTab === "form-data";
+  const isDissertationPassedTab = activeTab === "dissertation-passed";
   const isQnaTab = activeTab === "qna";
 
   const [qnaAudience, setQnaAudience] = useState("all");
@@ -183,12 +185,19 @@ export default function MasterTrajectoryDetails() {
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
   const formSteps = enrolledData?.form_steps || [];
   const hasFormSteps = formSteps.length > 0;
+  const hasOralDefenceStep = Boolean(enrolledData?.has_oral_defence_step);
 
   useEffect(() => {
     if (!hasFormSteps && activeTab === "form-data") {
       setActiveTab("enrolled");
     }
   }, [hasFormSteps, activeTab]);
+
+  useEffect(() => {
+    if (!hasOralDefenceStep && activeTab === "dissertation-passed") {
+      setActiveTab("enrolled");
+    }
+  }, [hasOralDefenceStep, activeTab]);
 
   const students = enrolledData?.students || [];
   const totalRows = enrolledCount;
@@ -372,6 +381,17 @@ export default function MasterTrajectoryDetails() {
                     },
                   ]
                 : []),
+              ...(hasOralDefenceStep
+                ? [
+                    {
+                      id: "dissertation-passed",
+                      label: t(
+                        "thesisManagement.oralDefence.tab",
+                        "Oral defence"
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "qna",
                 label: t(
@@ -402,6 +422,12 @@ export default function MasterTrajectoryDetails() {
             trajectoryId={trajectoryId}
             basePath={basePath}
             formSteps={formSteps}
+          />
+        ) : isDissertationPassedTab && hasOralDefenceStep ? (
+          <TrajectoryDissertationPassedTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
           />
         ) : isQnaTab ? (
           <>

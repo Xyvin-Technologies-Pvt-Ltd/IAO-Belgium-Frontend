@@ -1767,7 +1767,8 @@
         "documentUpload": "Document Upload",
         "form": "Form",
         "informationOnly": "Information Only",
-        "teacherApproval": "Teacher Approval"
+        "teacherApproval": "Teacher Approval",
+        "oralDefence": "Oral Defence"
       },
       "warningDesc": "There are {{count}} student(s) currently enrolled in this thesis. Modifying, reordering, or removing steps will affect their active progress and milestone tracking.",
       "warningTitle": "Students Already Enrolled",
@@ -1775,7 +1776,8 @@
         "documentUpload": "Document upload",
         "teacherApproval": "Teacher approval",
         "informationOnly": "Information only",
-        "form": "Form (questions)"
+        "form": "Form (questions)",
+        "oralDefence": "Oral defence"
       },
       "deadlineModes": {
         "none": "No deadline",
@@ -4055,7 +4057,16 @@
       "documentUpload": "Document Upload",
       "form": "Form",
       "informationOnly": "Information Only",
-      "teacherApproval": "Teacher Approval"
+      "teacherApproval": "Teacher Approval",
+      "oralDefence": "Oral Defence"
+    },
+    "oralDefence": {
+      "schedule": "Oral defence schedule",
+      "statusScheduled": "Scheduled",
+      "statusNotScheduled": "Not scheduled",
+      "scheduleAction": "Schedule oral defence",
+      "reschedule": "Update schedule",
+      "meetingLink": "Meeting link"
     },
     "uploadDocument": "Upload Document",
     "uploadedDocuments": "Submissions & Files",
