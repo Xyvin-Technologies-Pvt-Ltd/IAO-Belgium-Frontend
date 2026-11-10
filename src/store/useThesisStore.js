@@ -25,12 +25,15 @@ import {
   getTrajectoryStudents,
   getTrajectoryFormData,
   getTrajectoryDissertationPassed,
+  getTrajectoryEvaluations,
   exportTrajectoryFormDataCsv,
   getThesisEligibleStudents,
   exportTrajectoryStudentsCsv,
+  exportTrajectoryStudentsDocumentsZip,
   exportThesisEligibleStudentsCsv,
   addThesisEligibleStudents,
   removeThesisEligibleStudent,
+  markThesisStudentAsPaid,
   getTrajectoryStudentDetail,
   updateTrajectoryStudentReader,
   updateTrajectoryStudentAdditionalReader,
@@ -485,6 +488,28 @@ export const useGetTrajectoryDissertationPassed = (
   });
 };
 
+export const useGetTrajectoryEvaluations = (
+  thesisId,
+  trajectoryId,
+  params = {},
+  options = {}
+) => {
+  const { enabled = true, ...queryOptions } = options;
+  return useQuery({
+    queryKey: [
+      "thesis-trajectory-evaluations",
+      thesisId,
+      trajectoryId,
+      params,
+    ],
+    queryFn: () => getTrajectoryEvaluations(thesisId, trajectoryId, params),
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    ...queryOptions,
+    enabled: Boolean(thesisId && trajectoryId && enabled),
+  });
+};
+
 export const useExportTrajectoryFormDataCsv = () => {
   return useMutation({
     mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
@@ -535,6 +560,25 @@ export const useExportTrajectoryStudentsCsv = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to export enrolled students CSV");
+    },
+  });
+};
+
+export const useExportTrajectoryStudentsDocumentsZip = () => {
+  return useMutation({
+    mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
+      exportTrajectoryStudentsDocumentsZip(thesisId, trajectoryId, params),
+    onSuccess: (data) => {
+      triggerBlobDownload(
+        data,
+        `trajectory-documents-${Date.now()}.zip`
+      );
+      toast.success("Student documents ZIP downloaded successfully");
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message || "Failed to download student documents ZIP"
+      );
     },
   });
 };
@@ -601,6 +645,34 @@ export const useRemoveThesisEligibleStudent = () => {
 /** @deprecated Use useRemoveThesisEligibleStudent */
 export const useRemoveTrajectoryEligibleStudent =
   useRemoveThesisEligibleStudent;
+
+export const useMarkThesisStudentAsPaid = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ thesisId, userId, trajectoryId, reason }) =>
+      markThesisStudentAsPaid(thesisId, userId, {
+        trajectory_id: trajectoryId,
+        reason,
+      }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-eligible-students", variables.thesisId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["admin-student-theses"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["thesis-trajectory-students", variables.thesisId],
+      });
+      toast.success(
+        response?.message || "Student marked as paid successfully"
+      );
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to mark student as paid");
+    },
+  });
+};
 
 export const useGetTrajectoryStudentDetail = (
   thesisId,
