@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useCallback, useEffect, useState } from "react";
 import { PROGRAM_TYPES } from "@/constants/programTypes";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
@@ -134,7 +135,32 @@ const EMPTY = {
   location: "all",
   region: "all",
   payment_status: "all",
+  start_date: "",
+  end_date: "",
 };
+
+//* Date input with a clear (×) button that clears only this date (IPB-142)
+const ClearableDateInput = ({ value, onChange, min, invalid }) => (
+  <div className="relative">
+    <Input
+      type="date"
+      className={`bg-sidebar border-sidebar-border pr-9 ${invalid ? "border-red-500" : ""}`}
+      value={value || ""}
+      min={min || undefined}
+      onChange={(e) => onChange(e.target.value)}
+    />
+    {value && (
+      <button
+        type="button"
+        aria-label="Clear date"
+        onClick={() => onChange("")}
+        className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    )}
+  </div>
+);
 
 export default function ProformaInvoicesFilterDrawer({
   draftFilters,
@@ -149,8 +175,16 @@ export default function ProformaInvoicesFilterDrawer({
 
   const activeFiltersCount = Object.entries(appliedFilters || {}).filter(([key, val]) => {
     if (!showPaymentFilter && key === "payment_status") return false;
+    //* Date generated counts once (below), whether one or both dates are set
+    if (key === "start_date" || key === "end_date") return false;
     return val && val !== "all";
-  }).length;
+  }).length + (appliedFilters?.start_date || appliedFilters?.end_date ? 1 : 0);
+
+  const dateRangeInvalid = Boolean(
+    draftFilters?.start_date &&
+      draftFilters?.end_date &&
+      draftFilters.end_date < draftFilters.start_date
+  );
 
   const rememberLabel = (key, value, name) => {
     setSelectedLabels((prev) => ({
@@ -184,6 +218,7 @@ export default function ProformaInvoicesFilterDrawer({
   };
 
   const handleApply = () => {
+    if (dateRangeInvalid) return;
     setAppliedFilters({ ...draftFilters });
     setPage?.(1);
     setIsOpen(false);
@@ -251,7 +286,7 @@ export default function ProformaInvoicesFilterDrawer({
                 Filter invoices
               </SheetTitle>
               <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                Program, role, location, and region
+                Program, role, location, region, and date
               </p>
             </div>
           </div>
@@ -424,6 +459,42 @@ export default function ProformaInvoicesFilterDrawer({
               />
             </FilterSection>
           </div>
+
+          {/* IPB-142: Date generated */}
+          <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
+            <FilterSection
+              label="Date generated"
+              onReset={
+                isSet("start_date") || isSet("end_date")
+                  ? () => applyPatch({ start_date: "", end_date: "" })
+                  : null
+              }
+            >
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <p className="text-xs" style={{ color: "#94a3b8" }}>From</p>
+                  <ClearableDateInput
+                    value={draftFilters.start_date}
+                    onChange={(val) => setDraftFilters((prev) => ({ ...prev, start_date: val }))}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs" style={{ color: "#94a3b8" }}>To</p>
+                  <ClearableDateInput
+                    value={draftFilters.end_date}
+                    min={draftFilters.start_date}
+                    invalid={dateRangeInvalid}
+                    onChange={(val) => setDraftFilters((prev) => ({ ...prev, end_date: val }))}
+                  />
+                  {dateRangeInvalid && (
+                    <p className="text-xs text-red-600">
+                      End date cannot be earlier than the start date.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </FilterSection>
+          </div>
         </div>
 
         <SheetFooter
@@ -434,7 +505,7 @@ export default function ProformaInvoicesFilterDrawer({
             Clear all
           </Button>
           <SheetClose asChild>
-            <Button className="flex-1" onClick={handleApply}>
+            <Button className="flex-1" onClick={handleApply} disabled={dateRangeInvalid}>
               Apply filters
             </Button>
           </SheetClose>

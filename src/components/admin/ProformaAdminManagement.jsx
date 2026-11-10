@@ -100,7 +100,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       f.sort_by = sortBy;
       f.sort_order = sortOrder;
     }
-    ["program_type", "program_id", "component_id", "role", "location", "region"].forEach((key) => {
+    ["program_type", "program_id", "component_id", "role", "location", "region", "start_date", "end_date"].forEach((key) => {
       if (appliedFilters[key] && appliedFilters[key] !== "all") {
         f[key] = appliedFilters[key];
       }
