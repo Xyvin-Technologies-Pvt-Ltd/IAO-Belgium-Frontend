@@ -26,7 +26,9 @@ export default function AdminTeacherLayoutComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPrintOnly =
     typeof pathname === "string" &&
-    /\/admin\/proforma-invoices\/[^/]+\/print\/?$/.test(pathname);
+    (/\/admin\/proforma-invoices\/[^/]+\/print\/?$/.test(pathname) ||
+      //* IPB-146: KMO invoice view tab
+      /\/admin\/kmo-applications\/invoice\/[^/]+\/print\/?$/.test(pathname));
 
   useEffect(() => {
     initializeTheme();

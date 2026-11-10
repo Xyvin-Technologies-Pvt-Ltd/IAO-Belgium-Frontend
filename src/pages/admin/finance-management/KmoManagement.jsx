@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetKmoApplications, useUpdateKmoStatus } from "@/store/usePaymentStore";
+import { useGetKmoApplications, useUpdateKmoStatus, useDownloadInvoicePdf } from "@/store/usePaymentStore";
 import KmoApplicationsFilterDrawer, { EMPTY_KMO_FILTERS } from "./KmoApplicationsFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, Download } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +48,13 @@ const KmoStatusLabel = ({ status }) => (
     {kmoStatusLabel(status)}
   </span>
 );
+
+//* IPB-146: open the KMO invoice in a new tab (like openProformaInvoiceTab)
+const openKmoInvoiceTab = (invoice) => {
+  if (!invoice?._id) return;
+  const query = invoice.uid ? `?uid=${encodeURIComponent(invoice.uid)}` : "";
+  window.open(`/admin/kmo-applications/invoice/${invoice._id}/print${query}`, "_blank", "noopener,noreferrer");
+};
 
 const formatKmoAmount = (app) => {
   const currency =
@@ -128,6 +135,7 @@ const KmoManagement = () => {
 
   // Mutation
   const updateStatusMutation = useUpdateKmoStatus();
+  const downloadInvoicePdf = useDownloadInvoicePdf();
 
   // Dialog State
   const [selectedApp, setSelectedApp] = useState(null);
@@ -296,6 +304,38 @@ const KmoManagement = () => {
                     {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
+                    {/* IPB-146: view / download the invoice (only when one exists) */}
+                    {app.invoice_id?._id && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="View invoice"
+                          onClick={() => openKmoInvoiceTab(app.invoice_id)}
+                          className="rounded-[6px]"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Download invoice PDF"
+                          disabled={
+                            downloadInvoicePdf.isPending &&
+                            downloadInvoicePdf.variables?.id === app.invoice_id._id
+                          }
+                          onClick={() =>
+                            downloadInvoicePdf.mutate({
+                              id: app.invoice_id._id,
+                              filename: `${app.invoice_id.uid || "invoice"}.pdf`,
+                            })
+                          }
+                          className="rounded-[6px]"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
