@@ -131,11 +131,11 @@ export const updateProformaStatus = async ({ id, data }) => {
   }
 };
 
-// Retry the expense note email to Exact Online (status "Email failed")
-export const retryProformaFinanceEmail = async ({ id, pdf_key }) => {
+// Send / retry the expense note email to Exact Online
+export const sendProformaFinanceEmail = async ({ id, pdf_key }) => {
   try {
     const response = await axiosInstance.post(
-      `/proforma-invoice/invoices/${id}/retry-finance-email`,
+      `/proforma-invoice/invoices/${id}/send-finance-email`,
       pdf_key ? { pdf_key } : {}
     );
     return response.data;

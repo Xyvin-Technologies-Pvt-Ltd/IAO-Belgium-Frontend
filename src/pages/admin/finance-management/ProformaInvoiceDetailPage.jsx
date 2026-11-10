@@ -9,7 +9,7 @@ import {
   useUpdateSectionApproval,
   useUpdateProformaLineItem,
   useSetActiveTravelMode,
-  useRetryProformaFinanceEmail,
+  useSendProformaFinanceEmail,
 } from "@/store/useProformaStore";
 import { uploadFile } from "@/api/uploadApi";
 import {
@@ -141,7 +141,7 @@ export default function ProformaInvoiceDetailPage() {
   const proforma = responseData?.data || responseData;
 
   const updateStatusMutation = useUpdateProformaStatus();
-  const retryFinanceEmailMutation = useRetryProformaFinanceEmail();
+  const retryFinanceEmailMutation = useSendProformaFinanceEmail();
   const [preparingFinancePdf, setPreparingFinancePdf] = useState(false);
   const [renderAsFinance, setRenderAsFinance] = useState(false);
   const addCommentMutation = useAddSectionComment();

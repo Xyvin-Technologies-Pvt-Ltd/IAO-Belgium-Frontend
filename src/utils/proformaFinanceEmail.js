@@ -1,6 +1,7 @@
 /**
- * Expense note → Exact Online email delivery state (IPB-139).
- * The note keeps status MOVED_TO_FINANCE; delivery lives in `finance_email`.
+ * Expense note → Exact Online email delivery state (IPB-139, IPB-141).
+ * Delivery lives in `finance_email`; a manual send lives in status PAID / paid_at.
+ * When a note was sent both ways, the latest action wins.
  * The shown status stays unchanged while attempts run (`finance_email.sending`).
  */
 export const FINANCE_EMAIL_LABELS = {
@@ -8,16 +9,32 @@ export const FINANCE_EMAIL_LABELS = {
   FAILED: "Email failed",
 };
 
+const IN_FINANCE = ["MOVED_TO_FINANCE", "PAID"];
+
+function emailEventTime(fe = {}) {
+  if (fe.status === "SENT") return fe.sent_at;
+  if (fe.status === "FAILED") return fe.last_attempt_at;
+  return null;
+}
+
+/** "SENT" | "FAILED" when the email is the latest Exact action, else null. */
 export function financeEmailStatus(proforma) {
-  if (proforma?.status !== "MOVED_TO_FINANCE") return null;
-  return proforma?.finance_email?.status || null;
+  if (!IN_FINANCE.includes(proforma?.status)) return null;
+  const fe = proforma?.finance_email || {};
+  if (!fe.status) return null;
+  if (proforma.status === "PAID") {
+    const emailAt = emailEventTime(fe);
+    if (!emailAt || !proforma.paid_at) return null;
+    if (new Date(proforma.paid_at) >= new Date(emailAt)) return null;
+  }
+  return fe.status;
 }
 
 export function isFinanceEmailSending(proforma) {
-  return proforma?.status === "MOVED_TO_FINANCE" && Boolean(proforma?.finance_email?.sending);
+  return IN_FINANCE.includes(proforma?.status) && Boolean(proforma?.finance_email?.sending);
 }
 
-/** Badge for a MOVED_TO_FINANCE note, or null to fall back to the default. */
+/** Badge for the email state, or null to fall back to the default badge. */
 export function financeEmailBadge(proforma) {
   const status = financeEmailStatus(proforma);
   if (status === "SENT") {
@@ -37,4 +54,13 @@ export function financeEmailBadge(proforma) {
 
 export function canRetryFinanceEmail(proforma) {
   return financeEmailStatus(proforma) === "FAILED";
+}
+
+/** IPB-141: "Send to Exact via Email" is active unless that is already the latest status. */
+export function canSendFinanceEmail(proforma) {
+  return (
+    IN_FINANCE.includes(proforma?.status) &&
+    !isFinanceEmailSending(proforma) &&
+    financeEmailStatus(proforma) !== "SENT"
+  );
 }
