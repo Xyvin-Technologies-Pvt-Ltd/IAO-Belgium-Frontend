@@ -685,6 +685,11 @@ const MarkingSchemePage = () => {
                   ((supervisor_score / supervisor_max × 100) + (reader_score /
                   reader_max × 100)) / 2
                 </code>
+                <code className="block rounded-md bg-background border border-border px-3 py-2 font-mono text-[11px] text-foreground">
+                  ((supervisor_score / supervisor_max × 100) + (reader_score /
+                  reader_max × 100) + (additional_reader_score /
+                  additional_reader_max × 100)) / 3
+                </code>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-foreground">
