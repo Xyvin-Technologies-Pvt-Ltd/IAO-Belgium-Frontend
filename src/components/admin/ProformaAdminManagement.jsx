@@ -1,18 +1,40 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma, useUpdateProformaStatus } from "@/store/useProformaStore";
+import {
+  useGetFinanceQueue,
+  useGetProformaErrors,
+  useRetryPlanningProforma,
+  useUpdateProformaStatus,
+  useSendProformaFinanceEmail,
+} from "@/store/useProformaStore";
+import {
+  financeEmailBadge,
+  financeEmailStatus,
+  isFinanceEmailSending,
+  canRetryFinanceEmail,
+  canSendFinanceEmail,
+} from "@/utils/proformaFinanceEmail";
+import { getProformaById } from "@/api/proformaApi";
+import { uploadFile } from "@/api/uploadApi";
+import { toast } from "sonner";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "@tanstack/react-router";
-import { openProformaInvoiceTab } from "./ProformaInvoiceDocument";
+import {
+  ProformaInvoiceDocument,
+  buildProformaInvoicePdfFile,
+  openProformaInvoiceTab,
+} from "./ProformaInvoiceDocument";
 import ProformaInvoicesFilterDrawer, {
   EMPTY_PROFORMA_FILTERS,
 } from "./ProformaInvoicesFilterDrawer";
 import { MarkProformaPaidDialog, ProformaPaidBadge } from "./ProformaPaidActions";
+import { ProformaFinanceEmailBadge } from "./ProformaFinanceEmailStatus";
 import { coursePlanningLabel, proformaTeacherName, proformaTeacherRole } from "@/utils/proformaCourseLabel";
-import { Eye, FileText } from "lucide-react";
+import { Eye, FileText, Mail, RotateCcw, Send } from "lucide-react";
 import SortableTableHead from "@/components/ui/table/SortableTableHead";
 import {
   Table,
@@ -30,6 +52,10 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const navigate = useNavigate();
   const retryMutation = useRetryPlanningProforma();
   const updateStatusMutation = useUpdateProformaStatus();
+  const sendFinanceEmailMutation = useSendProformaFinanceEmail();
+  //* Expense note rendered off-screen to build its PDF when none was uploaded yet
+  const [pdfNote, setPdfNote] = useState(null);
+  const [preparingPdfId, setPreparingPdfId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -74,7 +100,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
       f.sort_by = sortBy;
       f.sort_order = sortOrder;
     }
-    ["program_type", "program_id", "component_id", "role", "location", "region"].forEach((key) => {
+    ["program_type", "program_id", "component_id", "role", "location", "region", "start_date", "end_date"].forEach((key) => {
       if (appliedFilters[key] && appliedFilters[key] !== "all") {
         f[key] = appliedFilters[key];
       }
@@ -84,7 +110,14 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
   const { data: queueData, isLoading: loadingQueue, isFetching: fetchingQueue, refetch: refetchQueue } = useGetFinanceQueue(
     queueFilter,
-    { enabled: statusFilter !== "ERRORS" }
+    {
+      enabled: statusFilter !== "ERRORS",
+      //* Poll while any email to Exact is in flight so badges settle on Sent / Email failed.
+      refetchInterval: (query) =>
+        (query.state.data?.data || []).some((inv) => isFinanceEmailSending(inv))
+          ? 5000
+          : false,
+    }
   );
 
   const { data: errorsData, isLoading: loadingErrors, isFetching: fetchingErrors, refetch: refetchErrors } = useGetProformaErrors({
@@ -99,6 +132,42 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const invoices = queueData?.data || [];
   const errorsList = errorsData?.data || [];
   const totalRows = isErrorsTab ? (errorsData?.total_count || 0) : (queueData?.total_count || 0);
+  //* IPB-141: manual send is the only action once "Sent to Exact via Email" is latest,
+  //* and is not offered again while "Sent to Exact Manually" is already the latest.
+  const canSendManually = (inv) =>
+    inv.status === "MOVED_TO_FINANCE" || Boolean(financeEmailStatus(inv));
+
+  //* "Send to Exact via Email" / "Retry": reuse the PDF uploaded on "Send to finance";
+  //* notes moved before IPB-139 have none, so build it here like the detail page does.
+  const sendViaEmail = async (inv) => {
+    if (inv.finance_email?.pdf_key) {
+      sendFinanceEmailMutation.mutate({ id: inv._id });
+      return;
+    }
+    let pdfKey;
+    try {
+      setPreparingPdfId(inv._id);
+      const res = await getProformaById(inv._id);
+      const full = res?.data || res;
+      setPdfNote(full);
+      const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+      await nextFrame();
+      await nextFrame();
+      const file = await buildProformaInvoicePdfFile(full);
+      if (!file) throw new Error("Could not prepare the expense note PDF");
+      const uploaded = await uploadFile(file);
+      pdfKey = uploaded?.data?.key;
+      if (!pdfKey) throw new Error("Could not upload the expense note PDF");
+    } catch (err) {
+      toast.error(err?.message || "Could not prepare the expense note PDF");
+      return;
+    } finally {
+      setPdfNote(null);
+      setPreparingPdfId(null);
+    }
+    sendFinanceEmailMutation.mutate({ id: inv._id, pdf_key: pdfKey });
+  };
+
   const confirmMarkPaid = () => {
     if (!payTarget?._id) return;
     updateStatusMutation.mutate(
@@ -141,7 +210,10 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
         bg: statusBadges.CHANGE_REQUESTED.bg,
       };
     }
-    return statusBadges[inv.status] || { label: inv.status, bg: "bg-muted text-muted-foreground" };
+    return (
+      financeEmailBadge(inv) ||
+      statusBadges[inv.status] || { label: inv.status, bg: "bg-muted text-muted-foreground" }
+    );
   };
 
   return (
@@ -340,42 +412,23 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                   <TableHead>{t("proforma.list.number")}</TableHead>
                 )}
                 <TableHead>Teacher Name & Email</TableHead>
-                <TableHead>Role</TableHead>
+                {/* IPB-141: Role, Location, Region hidden in the finance tab (still filterable) */}
+                {!isFinanceTab && <TableHead>Role</TableHead>}
                 <TableHead>Course Planning</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Region</TableHead>
+                {!isFinanceTab && <TableHead>Location</TableHead>}
+                {!isFinanceTab && <TableHead>Region</TableHead>}
                 <TableHead className="text-right">Grand Total</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 {isFinanceTab ? (
-                  <>
-                    <SortableTableHead
-                      sortKey="createdAt"
-                      activeKey={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      defaultOrder="desc"
-                    >
-                      Date Generated
-                    </SortableTableHead>
-                    <SortableTableHead
-                      sortKey="moved_to_finance_at"
-                      activeKey={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      defaultOrder="desc"
-                    >
-                      Date Approved
-                    </SortableTableHead>
-                    <SortableTableHead
-                      sortKey="module_end_date"
-                      activeKey={sortBy}
-                      order={sortOrder}
-                      onSort={handleSort}
-                      defaultOrder="desc"
-                    >
-                      Last day of the module
-                    </SortableTableHead>
-                  </>
+                  <SortableTableHead
+                    sortKey="createdAt"
+                    activeKey={sortBy}
+                    order={sortOrder}
+                    onSort={handleSort}
+                    defaultOrder="desc"
+                  >
+                    Date Generated
+                  </SortableTableHead>
                 ) : (
                   <TableHead className="text-center">Date Generated</TableHead>
                 )}
@@ -385,7 +438,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
             <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
               {isLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={isFinanceTab ? 12 : 10} />
+                <TableSkeleton rows={rowsPerPage} columns={isFinanceTab ? 7 : 10} />
               ) : invoices.length > 0 ? (
                 invoices.map((inv) => {
                   const badge = getStatusBadge(inv);
@@ -393,46 +446,60 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                   const role = proformaTeacherRole(inv);
 
                   return (
-                    <TableRow key={inv._id} className="hover:bg-muted/40 transition">
+                    <TableRow
+                      key={inv._id}
+                      className={`hover:bg-muted/40 transition ${
+                        canRetryFinanceEmail(inv) ? "bg-red-50/60 dark:bg-red-950/20" : ""
+                      }`}
+                    >
                       <TableCell className="font-semibold text-foreground">{inv.proforma_number}</TableCell>
                       <TableCell className="font-medium text-foreground">
                         {proformaTeacherName(inv.teacher_id)}
                         <span className="block text-xs text-muted-foreground font-normal mt-0.5">{inv.teacher_id?.email}</span>
                       </TableCell>
-                      <TableCell className="text-sm text-foreground whitespace-nowrap">
-                        {role || "—"}
-                      </TableCell>
+                      {!isFinanceTab && (
+                        <TableCell className="text-sm text-foreground whitespace-nowrap">
+                          {role || "—"}
+                        </TableCell>
+                      )}
                       <TableCell className="font-medium text-foreground">
                         {title}
                         {subtitle && (
                           <span className="block text-xs text-muted-foreground font-normal mt-0.5">{subtitle}</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-foreground max-w-[220px]">
-                        {locationLines.length > 0 ? (
-                          <>
-                            <span className="font-medium">{locationLines[0]}</span>
-                            {locationLines.slice(1).map((line) => (
-                              <span
-                                key={line}
-                                className="block text-xs text-muted-foreground font-normal mt-0.5"
-                              >
-                                {line}
-                              </span>
-                            ))}
-                          </>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground font-medium text-xs">
-                        {inv.region_snapshot_name || "—"}
-                      </TableCell>
+                      {!isFinanceTab && (
+                        <TableCell className="text-sm text-foreground max-w-[220px]">
+                          {locationLines.length > 0 ? (
+                            <>
+                              <span className="font-medium">{locationLines[0]}</span>
+                              {locationLines.slice(1).map((line) => (
+                                <span
+                                  key={line}
+                                  className="block text-xs text-muted-foreground font-normal mt-0.5"
+                                >
+                                  {line}
+                                </span>
+                              ))}
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                      )}
+                      {!isFinanceTab && (
+                        <TableCell className="text-muted-foreground font-medium text-xs">
+                          {inv.region_snapshot_name || "—"}
+                        </TableCell>
+                      )}
                       <TableCell className="text-right font-mono font-bold text-foreground">
                         €{inv.grand_total?.toFixed(2)}
                       </TableCell>
                       <TableCell className="text-center align-middle whitespace-nowrap">
-                        {inv.status === "PAID" ? (
+                        {/* Latest Exact action wins: email (sent/failed) vs. manual send */}
+                        {financeEmailStatus(inv) ? (
+                          <ProformaFinanceEmailBadge proforma={inv} />
+                        ) : inv.status === "PAID" ? (
                           <ProformaPaidBadge paidAt={inv.paid_at} paidByName={inv.paid_by_name} />
                         ) : (
                           <span className={`px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}>
@@ -440,23 +507,9 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           </span>
                         )}
                       </TableCell>
-                      {isFinanceTab ? (
-                        <>
-                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
-                            {formatDateOnly(inv.createdAt)}
-                          </TableCell>
-                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
-                            {formatDateOnly(inv.moved_to_finance_at)}
-                          </TableCell>
-                          <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
-                            {formatDateOnly(inv.module_end_date)}
-                          </TableCell>
-                        </>
-                      ) : (
-                        <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
-                          {formatDateOnly(inv.createdAt)}
-                        </TableCell>
-                      )}
+                      <TableCell className="text-center text-xs text-muted-foreground font-mono whitespace-nowrap">
+                        {formatDateOnly(inv.createdAt)}
+                      </TableCell>
                       <TableCell className="text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           {(inv.status === "MOVED_TO_FINANCE" || inv.status === "PAID") && (
@@ -483,15 +536,27 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          {isFinanceTab && inv.status === "MOVED_TO_FINANCE" && (
-                            <Button
-                              type="button"
-                              size="sm"
-                              className="h-7 px-2 text-xs"
-                              onClick={() => setPayTarget(inv)}
-                            >
-                              SEND TO EXACT MANUALLY
-                            </Button>
+                          {isFinanceTab && (
+                            <RowActionMenu
+                              actions={[
+                                {
+                                  label: "Send to Exact manually",
+                                  icon: Send,
+                                  disabled: !canSendManually(inv),
+                                  onClick: () => setPayTarget(inv),
+                                },
+                                {
+                                  label: canRetryFinanceEmail(inv) ? "Retry" : "Send to Exact via Email",
+                                  icon: canRetryFinanceEmail(inv) ? RotateCcw : Mail,
+                                  disabled:
+                                    !canSendFinanceEmail(inv) ||
+                                    preparingPdfId === inv._id ||
+                                    (sendFinanceEmailMutation.isPending &&
+                                      sendFinanceEmailMutation.variables?.id === inv._id),
+                                  onClick: () => sendViaEmail(inv),
+                                },
+                              ]}
+                            />
                           )}
                         </div>
                       </TableCell>
@@ -518,6 +583,12 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
         setRowsPerPage={setRowsPerPage}
         totalRows={totalRows}
       />
+
+      {pdfNote && (
+        <div aria-hidden className="fixed left-[-10000px] top-0 w-[794px] pointer-events-none">
+          <ProformaInvoiceDocument proforma={pdfNote} />
+        </div>
+      )}
 
       <MarkProformaPaidDialog
         invoice={payTarget}

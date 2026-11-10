@@ -41,6 +41,7 @@ import AllReports from "@/pages/admin/finance-management/AllReports";
 import CityReports from "@/pages/admin/finance-management/CityReports";
 import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
 import BatchReports from "@/pages/admin/finance-management/BatchReports";
+import ModuleReports from "@/pages/admin/finance-management/ModuleReports";
 import FinanceManagement from "@/pages/admin/finance-management";
 import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseReport";
 import TransactionLogs from "@/pages/admin/finance-management/TransactionLogs";
@@ -355,6 +356,13 @@ export const adminRoutes = [
     path: "/admin/finance-reports/batch",
     component: withPermissionProtection(
       BatchReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/module",
+    component: withPermissionProtection(
+      ModuleReports,
       "/admin/finance-reports",
     ),
   },
