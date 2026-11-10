@@ -168,6 +168,10 @@ const KmoManagement = () => {
 
   // Admin never sets submitted — that is student-only after "I had applied".
   const availableStatusOptions = STATUS_OPTIONS.filter((opt) => {
+    //* IPB-148: an already Paid application can only be rejected
+    if (["paid", "payment_released"].includes(selectedApp?.status)) {
+      return opt.value === "rejected";
+    }
     // Don't offer the current status again
     if (selectedApp?.status && opt.value === selectedApp.status) {
       return false;
@@ -385,7 +389,8 @@ const KmoManagement = () => {
                       <Eye className="h-4 w-4" />
                     </Button>
                     {canModify &&
-                      !["waiting", "paid", "rejected"].includes(app.status) && (
+                      //* IPB-148: Paid applications can be edited too (Reject only)
+                      !["waiting", "rejected"].includes(app.status) && (
                       <Button
                         variant="ghost"
                         size="icon"
