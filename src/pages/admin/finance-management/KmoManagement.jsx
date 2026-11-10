@@ -106,9 +106,10 @@ const KmoManagement = () => {
 
   // Fetch batches dropdown list
   const selectedProgramId = filters.program !== "all" ? filters.program : null;
+  //* IPB-144: include batches of closed intakes — KMO applications often belong to them
   const { data: batchesData } = useGetBatches(
     selectedProgramId,
-    {},
+    { include_closed: true },
     { enabled: !!selectedProgramId }
   );
   const batchesList = batchesData?.data || [];
@@ -309,9 +310,9 @@ const KmoManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              {/* IPB-144: Invoice Number first; Program and Batch hidden (still filterable) */}
+              <TableHead>Invoice Number</TableHead>
               <TableHead>Student</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead>Batch</TableHead>
               <TableHead>Learning Module</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
@@ -323,10 +324,10 @@ const KmoManagement = () => {
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={8} />
+              <TableSkeleton rows={rowsPerPage} columns={7} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center p-8">
+                <TableCell colSpan={7} className="text-center p-8">
                   <ErrorMessage
                     message={error.message || "Failed to load KMO applications"}
                     onRetry={refetch}
@@ -337,17 +338,14 @@ const KmoManagement = () => {
             ) : applications.length > 0 ? (
               applications.map((app) => (
                 <TableRow key={app._id}>
+                  <TableCell className="font-mono text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                    {app.invoice_id?.uid || "-"}
+                  </TableCell>
                   <TableCell>
                     <p className="font-semibold text-gray-900 dark:text-white">
                       {app.student_id?.first_name} {app.student_id?.last_name}
                     </p>
                     <p className="text-xs text-muted-foreground">{app.student_id?.email}</p>
-                  </TableCell>
-                  <TableCell className="max-w-[180px] truncate text-gray-700 dark:text-gray-300">
-                    {app.program?.name || "-"}
-                  </TableCell>
-                  <TableCell className="text-gray-700 dark:text-gray-300">
-                    {app.batch?.name || "-"}
                   </TableCell>
                   <TableCell>
                     <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
@@ -390,7 +388,7 @@ const KmoManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                   No KMO applications found.
                 </TableCell>
               </TableRow>
