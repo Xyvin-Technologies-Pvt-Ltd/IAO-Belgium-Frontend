@@ -131,6 +131,19 @@ export const updateProformaStatus = async ({ id, data }) => {
   }
 };
 
+// Send / retry the expense note email to Exact Online
+export const sendProformaFinanceEmail = async ({ id, pdf_key }) => {
+  try {
+    const response = await axiosInstance.post(
+      `/proforma-invoice/invoices/${id}/send-finance-email`,
+      pdf_key ? { pdf_key } : {}
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 // Update Section Approval Status
 export const updateSectionApproval = async ({ id, section, status, action, notes }) => {
   try {

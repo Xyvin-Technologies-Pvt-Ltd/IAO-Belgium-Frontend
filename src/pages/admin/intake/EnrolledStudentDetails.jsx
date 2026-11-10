@@ -857,6 +857,9 @@ const EnrolledStudentDetails = () => {
                     <TableHead>
                       {t("common.transactionId", "Transaction ID")}
                     </TableHead>
+                    <TableHead>
+                      {t("common.expenseNoteId", "Expense note ID")}
+                    </TableHead>
                     <TableHead>{t("common.purpose", "Purpose")}</TableHead>
                     <TableHead>{t("common.component", "Component")}</TableHead>
                     <TableHead>{t("common.amount", "Amount")}</TableHead>
@@ -882,6 +885,7 @@ const EnrolledStudentDetails = () => {
                           </span>
                         </TableCell>
                         <TableCell>{item.transaction_id || "—"}</TableCell>
+                        <TableCell>{item.invoice_ref || "-"}</TableCell>
                         <TableCell>{formatPurpose(item)}</TableCell>
                         <TableCell>
                           {item.component_name || t("common.notAvailable")}
@@ -924,7 +928,7 @@ const EnrolledStudentDetails = () => {
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={9}
+                        colSpan={10}
                         className="text-center text-muted-foreground"
                       >
                         {t("studentManagement.details.noInvoices")}
@@ -966,6 +970,9 @@ const EnrolledStudentDetails = () => {
                     <TableHead>
                       {t("common.transactionId", "Transaction ID")}
                     </TableHead>
+                    <TableHead>
+                      {t("common.expenseNoteId", "Expense note ID")}
+                    </TableHead>
                     <TableHead>{t("common.purpose", "Purpose")}</TableHead>
                     <TableHead>{t("common.component", "Component")}</TableHead>
                     <TableHead>{t("common.amount", "Amount")}</TableHead>
@@ -984,6 +991,7 @@ const EnrolledStudentDetails = () => {
                     transactions.map((payment) => (
                       <TableRow key={payment._id}>
                         <TableCell>{payment.transaction_id || "—"}</TableCell>
+                        <TableCell>{payment.invoice_ref || "-"}</TableCell>
                         <TableCell>{formatPurpose(payment.purpose)}</TableCell>
                         <TableCell>
                           {payment.component_name || t("common.notAvailable")}
@@ -1021,7 +1029,7 @@ const EnrolledStudentDetails = () => {
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={8}
+                        colSpan={9}
                         className="text-center text-muted-foreground"
                       >
                         {t(

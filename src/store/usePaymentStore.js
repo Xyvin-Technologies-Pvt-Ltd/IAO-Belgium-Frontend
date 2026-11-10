@@ -6,10 +6,12 @@ import {
   getAnalyticsByProgramList,
   getAnalyticsByBatch,
   getAnalyticsByBatchList,
+  getAnalyticsByModuleList,
   getAnalyticsByStudent,
   exportAnalyticsCityCsv,
   exportAnalyticsProgramCsv,
   exportAnalyticsBatchCsv,
+  exportAnalyticsModuleCsv,
   exportInvoicesCsv,
   createPayment,
   getTransactionLogs,
@@ -104,6 +106,17 @@ export const useGetAnalyticsByBatchList = (filter, options = {}) => {
   return useQuery({
     queryKey: ["payment-analytics-batch-list", filter],
     queryFn: () => getAnalyticsByBatchList(filter),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+//* IPB-151 Module Reports
+export const useGetAnalyticsByModuleList = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["payment-analytics-module-list", filter],
+    queryFn: () => getAnalyticsByModuleList(filter),
     staleTime: 60000,
     placeholderData: (previousData) => previousData,
     ...options,
@@ -250,6 +263,24 @@ export const useExportAnalyticsBatchCsv = () => {
     mutationFn: exportAnalyticsBatchCsv,
     onSuccess: (data) => {
       triggerBlobDownload(data, `batch-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+      );
+    },
+  });
+};
+
+export const useExportAnalyticsModuleCsv = () => {
+  return useMutation({
+    mutationFn: exportAnalyticsModuleCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `module-reports-${Date.now()}.csv`);
       toast.success(
         i18n.t("finance.messages.csvExported", "CSV exported successfully"),
       );

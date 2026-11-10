@@ -23,6 +23,7 @@ import {
   updateProformaLineItem,
   removeProformaLineItem,
   retryPlanningProforma,
+  sendProformaFinanceEmail,
 } from "@/api/proformaApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -192,6 +193,22 @@ export const useUpdateProformaStatus = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update proforma status");
+    },
+  });
+};
+
+export const useSendProformaFinanceEmail = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, pdf_key }) => sendProformaFinanceEmail({ id, pdf_key }),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["proforma-invoice", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["proforma-finance-queue"] });
+      toast.success(response?.message || "Email to Exact queued");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Could not send the email to Exact");
     },
   });
 };

@@ -88,6 +88,17 @@ export const getAnalyticsByBatchList = async (filter) => {
   }
 };
 
+export const getAnalyticsByModuleList = async (filter) => {
+  try {
+    const response = await axiosInstance.get(`/payment/analytics/module/list`, {
+      params: filter,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getAnalyticsByStudent = async (filter) => {
   try {
     const response = await axiosInstance.get(`/payment/analytics/student`, {
@@ -127,6 +138,18 @@ export const exportAnalyticsBatchCsv = async (filter) => {
   try {
     const response = await axiosInstance.get(
       `/payment/analytics/batch/export-csv`,
+      { params: filter, responseType: "blob" },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportAnalyticsModuleCsv = async (filter) => {
+  try {
+    const response = await axiosInstance.get(
+      `/payment/analytics/module/export-csv`,
       { params: filter, responseType: "blob" },
     );
     return response.data;
