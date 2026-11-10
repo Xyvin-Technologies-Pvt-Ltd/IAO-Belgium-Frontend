@@ -17,6 +17,7 @@ import {
   getTransactionLogs,
   getKmoApplications,
   updateKmoStatus,
+  updateKmoProjectNumber,
   getInvoicePrintHtml,
   getInvoicePdf,
 } from "@/api/paymentApi";
@@ -171,6 +172,22 @@ export const useUpdateKmoStatus = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update KMO status");
+    },
+  });
+};
+
+//* IPB-147
+export const useUpdateKmoProjectNumber = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, project_number }) => updateKmoProjectNumber(id, project_number),
+    onSuccess: () => {
+      toast.success("Project number updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["kmo-applications"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update the project number");
     },
   });
 };

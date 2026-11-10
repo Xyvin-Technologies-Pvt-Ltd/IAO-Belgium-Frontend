@@ -225,6 +225,16 @@ export const updateKmoStatus = async (id, data) => {
   }
 };
 
+//* IPB-147: edit the Project Number of a paid KMO application
+export const updateKmoProjectNumber = async (id, project_number) => {
+  try {
+    const response = await axiosInstance.put(`/kmo/applications/${id}/project-number`, { project_number });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getThirdPartyApplications = async (filter) => {
   try {
     const response = await axiosInstance.get(`/third-party-payment/applications`, { params: filter });

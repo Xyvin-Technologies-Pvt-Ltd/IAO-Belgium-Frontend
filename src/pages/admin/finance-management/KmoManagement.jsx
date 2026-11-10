@@ -13,7 +13,12 @@ import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetKmoApplications, useUpdateKmoStatus, useDownloadInvoicePdf } from "@/store/usePaymentStore";
+import {
+  useGetKmoApplications,
+  useUpdateKmoStatus,
+  useDownloadInvoicePdf,
+  useUpdateKmoProjectNumber,
+} from "@/store/usePaymentStore";
 import KmoApplicationsFilterDrawer, { EMPTY_KMO_FILTERS } from "./KmoApplicationsFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, Download } from "lucide-react";
@@ -137,6 +142,11 @@ const KmoManagement = () => {
   const updateStatusMutation = useUpdateKmoStatus();
   const downloadInvoicePdf = useDownloadInvoicePdf();
 
+  //* IPB-147: inline edit of the Project Number in KMO Application Details (paid only)
+  const updateProjectNumberMutation = useUpdateKmoProjectNumber();
+  const [isEditingProjectNumber, setIsEditingProjectNumber] = useState(false);
+  const [projectNumberDraft, setProjectNumberDraft] = useState("");
+
   // Dialog State
   const [selectedApp, setSelectedApp] = useState(null);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
@@ -181,7 +191,37 @@ const KmoManagement = () => {
   const handleOpenDetails = (app) => {
     setSelectedApp(app);
     setIsConfirmationsOpen(false);
+    setIsEditingProjectNumber(false);
     setIsDetailsOpen(true);
+  };
+
+  const canEditProjectNumber = (app) =>
+    canModify && ["paid", "payment_released"].includes(app?.status);
+
+  const startEditProjectNumber = () => {
+    setProjectNumberDraft(selectedApp?.project_number || "");
+    setIsEditingProjectNumber(true);
+  };
+
+  const cancelEditProjectNumber = () => {
+    setProjectNumberDraft(selectedApp?.project_number || "");
+    setIsEditingProjectNumber(false);
+  };
+
+  const saveProjectNumber = async () => {
+    const value = projectNumberDraft.trim();
+    if (!value || !selectedApp?._id) return;
+    try {
+      const res = await updateProjectNumberMutation.mutateAsync({
+        id: selectedApp._id,
+        project_number: value,
+      });
+      setSelectedApp((prev) => ({ ...prev, project_number: res?.data?.project_number ?? value }));
+      setIsEditingProjectNumber(false);
+    } catch (err) {
+      //* Error toast is handled by useUpdateKmoProjectNumber onError
+      console.error("Failed to update project number:", err);
+    }
   };
 
   const handleUpdateStatus = async () => {
@@ -390,7 +430,54 @@ const KmoManagement = () => {
               {/* Primary Details */}
               <div className="grid grid-cols-2 gap-2 border-b border-sidebar-border pb-3">
                 <p className="font-bold text-gray-500 dark:text-gray-400">Project Number:</p>
-                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
+                {isEditingProjectNumber ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={projectNumberDraft}
+                      onChange={(e) => setProjectNumberDraft(e.target.value)}
+                      placeholder="Enter KMO Project Number..."
+                      className="rounded-[6px] h-9"
+                      autoFocus
+                    />
+                    {!projectNumberDraft.trim() && (
+                      <p className="text-xs text-red-600">Project number cannot be empty.</p>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="h-8 rounded-[6px]"
+                        onClick={saveProjectNumber}
+                        disabled={!projectNumberDraft.trim() || updateProjectNumberMutation.isPending}
+                      >
+                        {updateProjectNumberMutation.isPending ? "Saving..." : "Save"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 rounded-[6px]"
+                        onClick={cancelEditProjectNumber}
+                        disabled={updateProjectNumberMutation.isPending}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
+                    {canEditProjectNumber(selectedApp) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Edit project number"
+                        onClick={startEditProjectNumber}
+                        className="h-7 w-7 rounded-[6px]"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                )}
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Current Status:</p>
                 <p className="font-bold text-amber-600 dark:text-amber-400">{kmoStatusLabel(selectedApp.status)}</p>
