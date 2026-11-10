@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useGetFinanceQueue, useGetProformaErrors, useRetryPlanningProforma, useUpdateProformaStatus } from "@/store/useProformaStore";
+import {
+  useGetFinanceQueue,
+  useGetProformaErrors,
+  useRetryPlanningProforma,
+  useUpdateProformaStatus,
+  useRetryProformaFinanceEmail,
+} from "@/store/useProformaStore";
+import {
+  financeEmailBadge,
+  financeEmailStatus,
+  isFinanceEmailSending,
+  canRetryFinanceEmail,
+} from "@/utils/proformaFinanceEmail";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/button";
@@ -11,6 +23,7 @@ import ProformaInvoicesFilterDrawer, {
   EMPTY_PROFORMA_FILTERS,
 } from "./ProformaInvoicesFilterDrawer";
 import { MarkProformaPaidDialog, ProformaPaidBadge } from "./ProformaPaidActions";
+import { ProformaFinanceEmailBadge } from "./ProformaFinanceEmailStatus";
 import { coursePlanningLabel, proformaTeacherName, proformaTeacherRole } from "@/utils/proformaCourseLabel";
 import { Eye, FileText } from "lucide-react";
 import SortableTableHead from "@/components/ui/table/SortableTableHead";
@@ -30,6 +43,7 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
   const navigate = useNavigate();
   const retryMutation = useRetryPlanningProforma();
   const updateStatusMutation = useUpdateProformaStatus();
+  const retryFinanceEmailMutation = useRetryProformaFinanceEmail();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -84,7 +98,14 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
 
   const { data: queueData, isLoading: loadingQueue, isFetching: fetchingQueue, refetch: refetchQueue } = useGetFinanceQueue(
     queueFilter,
-    { enabled: statusFilter !== "ERRORS" }
+    {
+      enabled: statusFilter !== "ERRORS",
+      //* Poll while any email to Exact is in flight so badges settle on Sent / Email failed.
+      refetchInterval: (query) =>
+        (query.state.data?.data || []).some((inv) => isFinanceEmailSending(inv))
+          ? 5000
+          : false,
+    }
   );
 
   const { data: errorsData, isLoading: loadingErrors, isFetching: fetchingErrors, refetch: refetchErrors } = useGetProformaErrors({
@@ -141,7 +162,10 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
         bg: statusBadges.CHANGE_REQUESTED.bg,
       };
     }
-    return statusBadges[inv.status] || { label: inv.status, bg: "bg-muted text-muted-foreground" };
+    return (
+      financeEmailBadge(inv) ||
+      statusBadges[inv.status] || { label: inv.status, bg: "bg-muted text-muted-foreground" }
+    );
   };
 
   return (
@@ -393,7 +417,12 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                   const role = proformaTeacherRole(inv);
 
                   return (
-                    <TableRow key={inv._id} className="hover:bg-muted/40 transition">
+                    <TableRow
+                      key={inv._id}
+                      className={`hover:bg-muted/40 transition ${
+                        canRetryFinanceEmail(inv) ? "bg-red-50/60 dark:bg-red-950/20" : ""
+                      }`}
+                    >
                       <TableCell className="font-semibold text-foreground">{inv.proforma_number}</TableCell>
                       <TableCell className="font-medium text-foreground">
                         {proformaTeacherName(inv.teacher_id)}
@@ -434,6 +463,8 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                       <TableCell className="text-center align-middle whitespace-nowrap">
                         {inv.status === "PAID" ? (
                           <ProformaPaidBadge paidAt={inv.paid_at} paidByName={inv.paid_by_name} />
+                        ) : financeEmailStatus(inv) ? (
+                          <ProformaFinanceEmailBadge proforma={inv} />
                         ) : (
                           <span className={`px-2.5 py-1 text-xs rounded-full font-semibold border ${badge.bg}`}>
                             {badge.label}
@@ -483,6 +514,23 @@ export default function ProformaAdminManagement({ onViewInvoice }) {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          {canRetryFinanceEmail(inv) && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs border-red-300 text-red-700 hover:bg-red-50"
+                              title={inv.finance_email?.failure_reason || "Retry the email to Exact"}
+                              disabled={
+                                isFinanceEmailSending(inv) ||
+                                (retryFinanceEmailMutation.isPending &&
+                                  retryFinanceEmailMutation.variables?.id === inv._id)
+                              }
+                              onClick={() => retryFinanceEmailMutation.mutate({ id: inv._id })}
+                            >
+                              {isFinanceEmailSending(inv) ? "Retrying..." : "Retry"}
+                            </Button>
+                          )}
                           {isFinanceTab && inv.status === "MOVED_TO_FINANCE" && (
                             <Button
                               type="button"

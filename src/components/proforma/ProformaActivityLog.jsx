@@ -41,6 +41,9 @@ const ACTION_LABELS = {
   SENT_BACK_TO_TEACHER: "Sent back to teacher",
   MOVED_TO_FINANCE: "Moved to finance",
   SIGNATURE_VOIDED: "Signature cleared",
+  FINANCE_EMAIL_SENT: "Sent to Exact via Email",
+  FINANCE_EMAIL_FAILED: "Email to Exact failed",
+  FINANCE_EMAIL_RETRIED: "Email to Exact retried",
 };
 
 export function formatAuditAction(action) {
