@@ -223,6 +223,7 @@
     "searchRoles": "Rechercher des rôles enseignants...",
     "paymentId": "ID de paiement",
     "transactionId": "ID de transaction",
+    "expenseNoteId": "ID de note de frais",
     "invoiceId": "ID de la note de frais",
     "receiptId": "ID de reçu",
     "downloadReceipt": "Télécharger le reçu",

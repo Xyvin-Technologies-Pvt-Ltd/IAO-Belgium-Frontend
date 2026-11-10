@@ -225,6 +225,7 @@
     "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
     "transactionId": "Transaction ID",
+    "expenseNoteId": "Expense note ID",
     "invoiceId": "Expense Note ID",
     "receiptId": "Receipt ID",
     "downloadReceipt": "Download receipt",

@@ -222,6 +222,7 @@
     "searchRoles": "Dozentenrollen suchen...",
     "paymentId": "Zahlungs-ID",
     "transactionId": "Transaktions-ID",
+    "expenseNoteId": "Kostenaufstellungs-ID",
     "invoiceId": "ID der Kostenaufstellung",
     "receiptId": "Quittungs-ID",
     "downloadReceipt": "Quittung herunterladen",
