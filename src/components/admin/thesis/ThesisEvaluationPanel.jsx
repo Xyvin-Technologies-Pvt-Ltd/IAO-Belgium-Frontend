@@ -116,7 +116,6 @@ const RoleCard = ({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const assessment = block?.assessment;
-  const snapshot = assessment?.config_snapshot;
   const assessorName = personName(block?.assessor);
   const hasMarkingScheme = Boolean(markingScheme?.sections?.length);
   const canEnterMarks = canModify && !assessment;
@@ -130,7 +129,7 @@ const RoleCard = ({
       )
   );
 
-  const sections = (snapshot?.sections || [])
+  const sections = (markingScheme?.sections || [])
     .map((section) => ({
       ...section,
       criteria: (section.criteria || []).filter(
@@ -492,7 +491,7 @@ const RoleCard = ({
               <div className="flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider">
                 <MessageSquareQuote className="w-4 h-4 shrink-0" />
                 <span>
-                  {snapshot?.final_feedback?.title ||
+                  {markingScheme?.final_feedback?.title ||
                     t(
                       "thesisManagement.marking.finalFeedback",
                       "Final Feedback"
@@ -605,7 +604,7 @@ const ThesisEvaluationPanel = ({
   if (!data) return null;
 
   const openEditor = (role, assessment) => {
-    const scheme = assessment?.config_snapshot || data.marking_scheme;
+    const scheme = data.marking_scheme;
     if (!scheme?.sections?.length) {
       toast.error(
         t(
