@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import StatusBadge from "@/components/StatusBadge";
 import { useGetKmoApplications, useUpdateKmoStatus } from "@/store/usePaymentStore";
 import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -30,6 +29,25 @@ import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
+
+//* IPB-143: five KMO statuses shown on this page (labels only — stored values unchanged).
+//* payment_released is shown as Paid.
+const KMO_STATUS_DISPLAY = {
+  waiting: { label: "Incomplete", className: "text-amber-600 dark:text-amber-400" },
+  submitted: { label: "Submitted", className: "text-blue-600 dark:text-blue-400" },
+  contribution_received: { label: "Student Paid", className: "text-indigo-600 dark:text-indigo-400" },
+  payment_released: { label: "Paid", className: "text-green-600 dark:text-green-400" },
+  paid: { label: "Paid", className: "text-green-600 dark:text-green-400" },
+  rejected: { label: "Rejected", className: "text-red-600 dark:text-red-400" },
+};
+
+const kmoStatusLabel = (status) => KMO_STATUS_DISPLAY[status]?.label || status || "-";
+
+const KmoStatusLabel = ({ status }) => (
+  <span className={`font-medium ${KMO_STATUS_DISPLAY[status]?.className || "text-gray-600"}`}>
+    {kmoStatusLabel(status)}
+  </span>
+);
 
 const formatKmoAmount = (app) => {
   const currency =
@@ -123,9 +141,9 @@ const KmoManagement = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [notes, setNotes] = useState("");
 
+  //* IPB-143: Payment Released is no longer offered (it is shown as Paid)
   const STATUS_OPTIONS = [
-    { value: "contribution_received", label: "Contribution Received" },
-    { value: "payment_released", label: "Payment Released" },
+    { value: "contribution_received", label: "Student Paid" },
     { value: "paid", label: "Paid" },
     { value: "rejected", label: "Rejected" },
   ];
@@ -204,24 +222,6 @@ const KmoManagement = () => {
     }
   };
 
-  const getDisplayStatusColor = (status) => {
-    switch (status) {
-      case "paid":
-        return "paid";
-      case "rejected":
-        return "failed";
-      case "waiting":
-        return "pending";
-      case "submitted":
-        return "ongoing";
-      case "contribution_received":
-      case "payment_released":
-        return "available";
-      default:
-        return "pending";
-    }
-  };
-
   return (
     <div className="space-y-6 mt-4">
       <div className="flex items-center justify-between">
@@ -246,10 +246,10 @@ const KmoManagement = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="waiting">Waiting for KMO</SelectItem>
+              {/* IPB-143: five statuses */}
+              <SelectItem value="waiting">Incomplete</SelectItem>
               <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="contribution_received">Contribution Received</SelectItem>
-              <SelectItem value="payment_released">Payment Released</SelectItem>
+              <SelectItem value="contribution_received">Student Paid</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
@@ -360,7 +360,7 @@ const KmoManagement = () => {
                     <p className="text-xs text-muted-foreground">VAT: {app.company_id?.vat_number}</p>
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={getDisplayStatusColor(app.status)} label={app.status} />
+                    <KmoStatusLabel status={app.status} />
                   </TableCell>
                   <TableCell className="text-gray-700 dark:text-gray-300">
                     {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
@@ -423,7 +423,7 @@ const KmoManagement = () => {
                 <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Current Status:</p>
-                <p className="font-bold text-amber-600 dark:text-amber-400 capitalize">{selectedApp.status}</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400">{kmoStatusLabel(selectedApp.status)}</p>
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Student:</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
