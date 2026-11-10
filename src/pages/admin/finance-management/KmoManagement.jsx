@@ -14,7 +14,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useGetKmoApplications, useUpdateKmoStatus } from "@/store/usePaymentStore";
-import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import KmoApplicationsFilterDrawer, { EMPTY_KMO_FILTERS } from "./KmoApplicationsFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 import {
@@ -87,9 +87,7 @@ const KmoManagement = () => {
     const saved = sessionStorage.getItem("kmo_management_filters");
     return saved ? JSON.parse(saved) : {
       search: "",
-      status: "all",
-      program: "all",
-      batch: "all",
+      ...EMPTY_KMO_FILTERS,
     };
   });
 
@@ -100,19 +98,20 @@ const KmoManagement = () => {
 
   const debouncedSearch = useDebounce(filters.search, 500);
 
-  // Fetch programs dropdown list
-  const { data: programsData } = useGetAllPrograms();
-  const programsList = programsData?.data || [];
-
-  // Fetch batches dropdown list
-  const selectedProgramId = filters.program !== "all" ? filters.program : null;
-  //* IPB-144: include batches of closed intakes — KMO applications often belong to them
-  const { data: batchesData } = useGetBatches(
-    selectedProgramId,
-    { include_closed: true },
-    { enabled: !!selectedProgramId }
-  );
-  const batchesList = batchesData?.data || [];
+  //* IPB-145: Status / Program / Batch live in the filter panel (proforma style).
+  //* The panel edits a draft; Apply / Reset / Clear all update the applied filters.
+  const pickPanelFilters = (f) => ({
+    status: f.status ?? "all",
+    program: f.program ?? "all",
+    batch: f.batch ?? "all",
+  });
+  const [draftFilters, setDraftFilters] = useState(() => pickPanelFilters(filters));
+  const appliedFilters = pickPanelFilters(filters);
+  const setAppliedFilters = (next) =>
+    setFilters((prev) => ({
+      ...prev,
+      ...(typeof next === "function" ? next(pickPanelFilters(prev)) : next),
+    }));
 
   // Queries
   const { data, isLoading, error, refetch, isFetching } = useGetKmoApplications({
@@ -161,14 +160,6 @@ const KmoManagement = () => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, filters.status, filters.program, filters.batch]);
-
-  const handleProgramChange = (val) => {
-    setFilters(prev => ({
-      ...prev,
-      program: val,
-      batch: "all"
-    }));
-  };
 
   const handleOpenUpdate = (app) => {
     setSelectedApp(app);
@@ -225,83 +216,24 @@ const KmoManagement = () => {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           KMO-Portefeuille Applications
         </h2>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="bg-sidebar rounded-xl border border-sidebar-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap flex-1 items-center gap-3">
+        {/* IPB-145: search + filter panel, as on Teacher Proforma Expense Notes */}
+        <div className="flex flex-wrap items-center gap-3">
+          <KmoApplicationsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+          />
           <Input
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             placeholder="Search by student..."
-            className="max-w-xs h-10 rounded-[6px]"
+            className="w-full md:w-72 h-10 rounded-[6px]"
           />
-          
-          <Select value={filters.status} onValueChange={(val) => setFilters(prev => ({ ...prev, status: val }))}>
-            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {/* IPB-143: five statuses */}
-              <SelectItem value="waiting">Incomplete</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="contribution_received">Student Paid</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.program} onValueChange={handleProgramChange}>
-            <SelectTrigger className="w-[320px] h-10 rounded-[6px]">
-              <SelectValue placeholder="All Programs" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Programs</SelectItem>
-              {programsList.map((prog) => (
-                <SelectItem key={prog._id} value={prog._id}>
-                  {`${prog.name} - ${prog.city?.name || "N/A"} - ${prog.language?.name || "N/A"}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select 
-            value={filters.batch} 
-            onValueChange={(val) => setFilters(prev => ({ ...prev, batch: val }))}
-            disabled={filters.program === "all"}
-          >
-            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
-              <SelectValue placeholder={filters.program === "all" ? "Select Program First" : "All Batches"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Batches</SelectItem>
-              {batchesList.map((b) => (
-                <SelectItem key={b._id} value={b._id}>
-                  {b.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {(filters.search || filters.status !== "all" || filters.program !== "all" || filters.batch !== "all") && (
-            <Button
-              variant="outline"
-              onClick={() => setFilters({
-                search: "",
-                status: "all",
-                program: "all",
-                batch: "all",
-              })}
-              className="h-10 rounded-[6px] border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5"
-            >
-              Clear Filters
-            </Button>
-          )}
         </div>
       </div>
 
