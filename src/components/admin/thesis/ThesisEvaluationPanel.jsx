@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import {
   getThesisEvaluation,
   publishThesisEvaluation,
   reopenThesisEvaluation,
+  updateOralDefenceResult,
   withdrawThesisEvaluation,
 } from "@/api/thesisApi";
 import { Button } from "@/components/ui/button";
@@ -516,8 +517,10 @@ const ThesisEvaluationPanel = ({
   canModify,
 }) => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [editor, setEditor] = useState(null);
   const [resultDraft, setResultDraft] = useState(null);
+  const [oralDraft, setOralDraft] = useState(null);
 
   const query = useQuery({
     queryKey: ["thesis-evaluation", thesisId, trajectoryId, userId],
@@ -526,7 +529,17 @@ const ThesisEvaluationPanel = ({
   });
 
   const data = query.data?.data;
-  const invalidate = () => query.refetch();
+  const invalidate = () => {
+    query.refetch();
+    queryClient.invalidateQueries({
+      queryKey: [
+        "thesis-trajectory-student-detail",
+        thesisId,
+        trajectoryId,
+        userId,
+      ],
+    });
+  };
 
   const editMutation = useMutation({
     mutationFn: () =>
@@ -580,6 +593,30 @@ const ThesisEvaluationPanel = ({
     },
     onError: (error) =>
       toast.error(error?.message || "Could not withdraw the result"),
+  });
+
+  const oralResultMutation = useMutation({
+    mutationFn: (body) =>
+      updateOralDefenceResult(
+        thesisId,
+        trajectoryId,
+        userId,
+        body.step_id,
+        {
+          oral_defence_result: body.oral_defence_result,
+          oral_defence_class: body.oral_defence_class,
+          oral_defence_feedback: body.oral_defence_feedback,
+        }
+      ),
+    onSuccess: () => {
+      toast.success(
+        t("thesis.oralDefence.resultSaved", "Oral defence result saved")
+      );
+      setOralDraft(null);
+      invalidate();
+    },
+    onError: (error) =>
+      toast.error(error?.message || "Could not save oral defence result"),
   });
 
   if (query.isLoading) {
@@ -673,6 +710,43 @@ const ThesisEvaluationPanel = ({
   const resultForm = resultDraft || savedResult;
   const updateResult = (patch) => {
     setResultDraft({ ...resultForm, ...patch });
+  };
+
+  const oral = data.oral_defence;
+  const savedOral = {
+    result: oral?.result != null ? String(oral.result) : "",
+    class: oral?.class || "",
+    feedback: oral?.feedback || "",
+  };
+  const oralForm = oralDraft || savedOral;
+  const updateOral = (patch) => {
+    setOralDraft({ ...oralForm, ...patch });
+  };
+  const oralLocked = !canModify || !oral?.unlocked;
+
+  const handleSaveOralResult = () => {
+    if (!oral?.step_id) return;
+    const resultNum = Number(oralForm.result);
+    if (
+      Number.isNaN(resultNum) ||
+      resultNum < 0 ||
+      resultNum > 100 ||
+      !oralForm.class
+    ) {
+      toast.error(
+        t(
+          "thesis.oralDefence.resultValidation",
+          "Enter a result between 0 and 100 and select a class"
+        )
+      );
+      return;
+    }
+    oralResultMutation.mutate({
+      step_id: oral.step_id,
+      oral_defence_result: resultNum,
+      oral_defence_class: oralForm.class,
+      oral_defence_feedback: oralForm.feedback || "",
+    });
   };
 
   return (
@@ -968,6 +1042,132 @@ const ThesisEvaluationPanel = ({
           </div>
         )}
       </div>
+
+      {oral ? (
+        <div className="bg-card border border-border rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
+          <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-3">
+            <div className="space-y-1 min-w-0">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                {t("thesis.oralDefence.result", "Oral Defence Result")}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {oral.step_name ||
+                  t("thesis.types.oralDefence", "Oral Defence")}
+              </p>
+            </div>
+            {!oral.unlocked ? (
+              <span className="shrink-0 text-[11px] font-semibold px-2 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                {t("thesis.oralDefence.lockedBadge", "Locked")}
+              </span>
+            ) : oral.recorded_at ? (
+              <span className="shrink-0 text-[11px] font-semibold px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                {t("thesis.oralDefence.recordedBadge", "Recorded")}
+              </span>
+            ) : null}
+          </div>
+
+          {!oral.unlocked ? (
+            <p className="text-sm text-muted-foreground">
+              {t(
+                "thesis.oralDefence.lockedNotice",
+                "Oral defence unlocks after the dissertation result is published and the student has passed (pass percentage)."
+              )}
+            </p>
+          ) : null}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                {t("thesis.oralDefence.resultPercent", "Result (%)")}
+              </Label>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                disabled={oralLocked}
+                value={oralForm.result}
+                onChange={(event) =>
+                  updateOral({ result: event.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                {t("thesis.oralDefence.resultClass", "Class")}
+              </Label>
+              <Select
+                value={oralForm.class || undefined}
+                disabled={oralLocked}
+                onValueChange={(value) => updateOral({ class: value })}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue
+                    placeholder={t(
+                      "thesis.oralDefence.selectClass",
+                      "Select class"
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {DISSERTATION_CLASSES.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-foreground">
+              {t("thesis.oralDefence.feedback", "Feedback (optional)")}
+            </Label>
+            <Textarea
+              rows={3}
+              disabled={oralLocked}
+              value={oralForm.feedback}
+              onChange={(event) =>
+                updateOral({ feedback: event.target.value })
+              }
+            />
+          </div>
+
+          {canModify ? (
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+              <Button
+                type="button"
+                size="sm"
+                disabled={
+                  oralLocked ||
+                  oralResultMutation.isPending ||
+                  !oralForm.class ||
+                  oralForm.result === ""
+                }
+                className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
+                onClick={handleSaveOralResult}
+              >
+                {oralResultMutation.isPending ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : null}
+                <span>
+                  {t(
+                    "thesis.oralDefence.saveResult",
+                    "Save oral result"
+                  )}
+                </span>
+              </Button>
+              {oral.recorded_at ? (
+                <span className="text-xs text-muted-foreground">
+                  {t("thesis.oralDefence.lastRecorded", "Last recorded")}{" "}
+                  {moment(oral.recorded_at).format("DD/MM/YYYY HH:mm")}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {/* Activity Log Card */}
       <div className="bg-card border border-border rounded-xl p-5 sm:p-6 space-y-3.5 shadow-2xs">

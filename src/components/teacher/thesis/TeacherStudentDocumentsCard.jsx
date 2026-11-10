@@ -31,7 +31,11 @@ const TeacherStudentDocumentsCard = ({ steps = [] }) => {
   const rows = useMemo(() => {
     const list = [];
     for (const step of steps || []) {
-      if (step?.type !== "document_upload") continue;
+      if (
+        step?.type !== "document_upload" &&
+        step?.type !== "oral_defence"
+      )
+        continue;
       const docs = (step.documents || []).filter(isStudentDoc);
       for (const doc of docs) {
         list.push({
