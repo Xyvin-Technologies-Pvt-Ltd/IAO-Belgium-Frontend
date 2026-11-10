@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ExternalLink } from "lucide-react";
+import { BadgeCheck, ExternalLink } from "lucide-react";
+import moment from "moment";
 
 import { ErrorMessage, LoadingState } from "@/components/common";
-import { Button } from "@/components/ui/button";
+import StatusBadge from "@/components/StatusBadge";
 import {
   Table,
   TableBody,
@@ -14,6 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Pagination } from "@/components/ui/table/Pagination";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
+import MarkThesisPaidDialog from "@/components/admin/thesis/MarkThesisPaidDialog";
+import { useCanModify } from "@/hooks/useCanModify";
 import { useGetAdminStudentTheses } from "@/store/useThesisStore";
 
 function eligibilityLabel(item, t) {
@@ -27,16 +31,6 @@ function eligibilityLabel(item, t) {
     return t("studentManagement.thesis.eligibilityRules", "Rules");
   }
   return t("studentManagement.thesis.eligibilityNone", "—");
-}
-
-function enrolmentLabel(status, t) {
-  if (status === "purchased") {
-    return t("studentManagement.thesis.enrolmentPurchased", "Purchased");
-  }
-  if (status === "pending") {
-    return t("studentManagement.thesis.enrolmentPending", "Pending payment");
-  }
-  return t("studentManagement.thesis.enrolmentNotPurchased", "Not purchased");
 }
 
 function attemptLabel(status, t) {
@@ -60,10 +54,48 @@ function detailPath(item, userId) {
   return `${base}/${item._id}/trajectories/${item.trajectory._id}/students/${userId}`;
 }
 
+function markedPaidAudit(markedPaid, t) {
+  const admin = markedPaid?.marked_paid_by;
+  if (!admin) return null;
+  const name =
+    `${admin.first_name || ""} ${admin.last_name || ""}`.trim() ||
+    admin.email;
+  if (!name) return null;
+  const date = markedPaid?.marked_paid_at
+    ? moment(markedPaid.marked_paid_at).format("DD MMM YYYY")
+    : null;
+  return t(
+    "thesisManagement.markPaid.markedByAudit",
+    "Marked paid by {{name}}{{date}}",
+    { name, date: date ? ` · ${date}` : "" }
+  );
+}
+
+function enrolmentStatus(item) {
+  if (item.enrolment_status === "purchased") {
+    return item.marked_paid?.marked_paid_by ? "marked_paid" : "paid";
+  }
+  if (item.enrolment_status === "pending") return "pending";
+  return "unpaid";
+}
+
+function canMarkPaid(item) {
+  const eligible = item.eligible_by_rules || item.eligible_by_manual;
+  return (
+    eligible &&
+    (item.enrolment_status === "not_purchased" ||
+      item.enrolment_status === "pending")
+  );
+}
+
 export default function StudentThesisTab({ userId }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const canModifyDo = useCanModify("/admin/thesis");
+  const canModifyMaster = useCanModify("/admin/master-thesis");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [markPaidItem, setMarkPaidItem] = useState(null);
 
   const {
     data: response,
@@ -93,7 +125,7 @@ export default function StudentThesisTab({ userId }) {
     );
   }
 
-  if (error) {
+  if (error && !items.length) {
     return (
       <ErrorMessage
         message={
@@ -101,27 +133,24 @@ export default function StudentThesisTab({ userId }) {
           t("studentManagement.thesis.loadFailed", "Failed to load theses")
         }
         onRetry={refetch}
-        variant="inline"
       />
     );
   }
 
-  if (!items.length && totalCount === 0) {
+  if (!items.length) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-10 text-center">
-        <p className="text-sm text-muted-foreground">
-          {t(
-            "studentManagement.thesis.empty",
-            "No thesis eligibility or purchases for this student."
-          )}
-        </p>
+      <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        {t(
+          "studentManagement.thesis.empty",
+          "No thesis eligibility or purchases for this student."
+        )}
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className={isFetching ? "opacity-60 pointer-events-none" : ""}>
+    <div className={`space-y-4 ${isFetching ? "opacity-70" : ""}`}>
+      <div className="rounded-xl border border-border overflow-hidden bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -143,8 +172,10 @@ export default function StudentThesisTab({ userId }) {
               <TableHead>
                 {t("studentManagement.thesis.colTrajectory", "Trajectory")}
               </TableHead>
-              <TableHead className="text-right">
-                {t("common.actions", "Actions")}
+              <TableHead className="w-12 text-right">
+                <span className="sr-only">
+                  {t("common.actions", "Actions")}
+                </span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -152,26 +183,48 @@ export default function StudentThesisTab({ userId }) {
             {items.map((item) => {
               const href = detailPath(item, userId);
               const isMaster = item.type === "master";
+              const canModify = isMaster ? canModifyMaster : canModifyDo;
+              const audit = markedPaidAudit(item.marked_paid, t);
+              const actions = [];
+
+              if (canModify && canMarkPaid(item)) {
+                actions.push({
+                  label: t(
+                    "thesisManagement.markPaid.confirm",
+                    "Mark as paid"
+                  ),
+                  icon: BadgeCheck,
+                  onClick: () => setMarkPaidItem(item),
+                });
+              }
+              if (href) {
+                actions.push({
+                  label: t("common.open", "Open"),
+                  icon: ExternalLink,
+                  onClick: () => navigate({ to: href }),
+                });
+              }
+
               return (
                 <TableRow key={String(item._id)}>
                   <TableCell>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-foreground truncate max-w-xs">
+                    <div className="min-w-0 flex flex-col gap-0.5">
+                      <span className="font-medium text-foreground truncate max-w-xs">
                         {item.name || "—"}
-                      </p>
+                      </span>
                       {item.uid ? (
-                        <p className="text-xs text-muted-foreground">
+                        <span className="font-mono text-xs text-muted-foreground">
                           {item.uid}
-                        </p>
+                        </span>
                       ) : null}
                     </div>
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                      className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ring-1 ring-inset ${
                         isMaster
-                          ? "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/20"
-                          : "bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20"
+                          ? "text-violet-700 ring-violet-500/20 dark:text-violet-300"
+                          : "text-sky-700 ring-sky-500/20 dark:text-sky-300"
                       }`}
                     >
                       {isMaster
@@ -182,8 +235,15 @@ export default function StudentThesisTab({ userId }) {
                   <TableCell className="text-sm">
                     {eligibilityLabel(item, t)}
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {enrolmentLabel(item.enrolment_status, t)}
+                  <TableCell>
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <StatusBadge status={enrolmentStatus(item)} />
+                      {audit ? (
+                        <span className="truncate text-xs text-muted-foreground">
+                          {audit}
+                        </span>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm">
                     {attemptLabel(item.attempt_status, t)}
@@ -196,23 +256,11 @@ export default function StudentThesisTab({ userId }) {
                   <TableCell className="text-sm text-muted-foreground">
                     {item.trajectory?.name || "—"}
                   </TableCell>
-                  <TableCell className="text-right">
-                    {href ? (
-                      <Button
-                        asChild
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="gap-1.5 cursor-pointer"
-                      >
-                        <Link to={href}>
-                          {t("common.open", "Open")}
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
+                  <TableCell
+                    className="text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <RowActionMenu actions={actions} />
                   </TableCell>
                 </TableRow>
               );
@@ -233,6 +281,17 @@ export default function StudentThesisTab({ userId }) {
           totalRows={totalCount}
         />
       ) : null}
+
+      <MarkThesisPaidDialog
+        open={Boolean(markPaidItem)}
+        onOpenChange={(open) => {
+          if (!open) setMarkPaidItem(null);
+        }}
+        thesisId={markPaidItem?._id}
+        thesisName={markPaidItem?.name}
+        userId={userId}
+        onDone={() => refetch()}
+      />
     </div>
   );
 }

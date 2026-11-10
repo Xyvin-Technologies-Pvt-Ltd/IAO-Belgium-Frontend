@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/table/table";
 import { downloadSecureFile, openSecureFile } from "@/utils/secureFile";
 
-const isStudentDoc = (doc) => doc && doc.source !== "backoffice";
-
 const onTimeStatus = (uploadedAt, deadlineDate) => {
   if (!uploadedAt || !deadlineDate) return null;
   const uploaded = moment(uploadedAt);
@@ -36,8 +34,9 @@ const TeacherStudentDocumentsCard = ({ steps = [] }) => {
         step?.type !== "oral_defence"
       )
         continue;
-      const docs = (step.documents || []).filter(isStudentDoc);
+      const docs = step.documents || [];
       for (const doc of docs) {
+        if (!doc) continue;
         list.push({
           id: doc._id,
           stepName: step.name || "—",
@@ -118,7 +117,7 @@ const TeacherStudentDocumentsCard = ({ steps = [] }) => {
         <div className="rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center text-sm text-muted-foreground">
           {t(
             "thesis.noStudentDocuments",
-            "No documents uploaded yet by the student."
+            "No documents uploaded yet."
           )}
         </div>
       ) : (

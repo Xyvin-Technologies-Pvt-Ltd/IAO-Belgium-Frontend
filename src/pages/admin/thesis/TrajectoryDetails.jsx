@@ -33,10 +33,12 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
 import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
+import TrajectoryEvaluationTab from "@/components/admin/thesis/TrajectoryEvaluationTab";
 import {
   useGetThesisById,
   useGetTrajectoryStudents,
   useExportTrajectoryStudentsCsv,
+  useExportTrajectoryStudentsDocumentsZip,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -70,6 +72,7 @@ export default function TrajectoryDetails() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const isEnrolledTab = activeTab === "enrolled";
+  const isEvaluationTab = activeTab === "evaluation";
   const isFormDataTab = activeTab === "form-data";
 
   const handleSearchChange = (e) => {
@@ -116,11 +119,23 @@ export default function TrajectoryDetails() {
   } = useGetTrajectoryStudents(thesisId, trajectoryId, enrolledParams);
 
   const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
+  const exportDocumentsZipMutation =
+    useExportTrajectoryStudentsDocumentsZip();
   const exportCsvPending = exportEnrolledCsvMutation.isPending;
+  const exportZipPending = exportDocumentsZipMutation.isPending;
 
   const handleExportCsv = () => {
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
+      thesisId,
+      trajectoryId,
+      params: exportParams,
+    });
+  };
+
+  const handleDownloadDocumentsZip = () => {
+    const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
+    exportDocumentsZipMutation.mutate({
       thesisId,
       trajectoryId,
       params: exportParams,
@@ -289,53 +304,55 @@ export default function TrajectoryDetails() {
       </div>
 
       <div className="space-y-4 pt-2">
-        {hasFormSteps ? (
-          <div className="border-b border-border">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
-              {[
-                {
-                  id: "enrolled",
-                  label: t(
-                    "thesisManagement.trajectories.enrolledStudents",
-                    "Enrolled students"
-                  ),
-                },
-                {
-                  id: "form-data",
-                  label: t(
-                    "thesisManagement.formData.tab",
-                    "Form data"
-                  ),
-                },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === tab.id
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">
-              {t(
-                "thesisManagement.trajectories.enrolledStudents",
-                "Enrolled students"
-              )}
-            </h2>
-          </div>
-        )}
+        <div className="border-b border-border">
+          <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            {[
+              {
+                id: "enrolled",
+                label: t(
+                  "thesisManagement.trajectories.enrolledStudents",
+                  "Enrolled students"
+                ),
+              },
+              {
+                id: "evaluation",
+                label: t("thesisManagement.evaluation.tab", "Evaluation"),
+              },
+              ...(hasFormSteps
+                ? [
+                    {
+                      id: "form-data",
+                      label: t(
+                        "thesisManagement.formData.tab",
+                        "Form data"
+                      ),
+                    },
+                  ]
+                : []),
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap cursor-pointer ${
+                  activeTab === tab.id
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-        {isFormDataTab && hasFormSteps ? (
+        {isEvaluationTab ? (
+          <TrajectoryEvaluationTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+          />
+        ) : isFormDataTab && hasFormSteps ? (
           <TrajectoryFormDataTab
             thesisId={thesisId}
             trajectoryId={trajectoryId}
@@ -370,13 +387,28 @@ export default function TrajectoryDetails() {
               variant="outline"
               size="sm"
               onClick={handleExportCsv}
-              disabled={exportCsvPending}
+              disabled={exportCsvPending || exportZipPending}
               className="gap-2 h-9"
             >
               <Download className="w-4 h-4" />
               {exportCsvPending
                 ? t("common.exporting", "Exporting...")
                 : t("common.exportCsv", "Export CSV")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadDocumentsZip}
+              disabled={exportZipPending || exportCsvPending}
+              className="gap-2 h-9"
+            >
+              <Download className="w-4 h-4" />
+              {exportZipPending
+                ? t("common.downloading", "Downloading...")
+                : t(
+                    "thesisManagement.trajectories.downloadDocuments",
+                    "Download documents"
+                  )}
             </Button>
           </div>
         </div>

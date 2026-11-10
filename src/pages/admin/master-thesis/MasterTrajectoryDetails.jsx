@@ -40,6 +40,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
 import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
+import TrajectoryEvaluationTab from "@/components/admin/thesis/TrajectoryEvaluationTab";
 import TrajectoryDissertationPassedTab from "@/components/admin/thesis/TrajectoryDissertationPassedTab";
 import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
@@ -49,6 +50,7 @@ import {
   useGetTrajectoryQnaAnnouncements,
   useDeleteTrajectoryQnaAnnouncement,
   useExportTrajectoryStudentsCsv,
+  useExportTrajectoryStudentsDocumentsZip,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -83,6 +85,7 @@ export default function MasterTrajectoryDetails() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isEnrolledTab = activeTab === "enrolled";
+  const isEvaluationTab = activeTab === "evaluation";
   const isFormDataTab = activeTab === "form-data";
   const isDissertationPassedTab = activeTab === "dissertation-passed";
   const isQnaTab = activeTab === "qna";
@@ -156,12 +159,24 @@ export default function MasterTrajectoryDetails() {
 
   const deleteQnaMutation = useDeleteTrajectoryQnaAnnouncement();
   const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
+  const exportDocumentsZipMutation =
+    useExportTrajectoryStudentsDocumentsZip();
 
   const exportCsvPending = exportEnrolledCsvMutation.isPending;
+  const exportZipPending = exportDocumentsZipMutation.isPending;
 
   const handleExportCsv = () => {
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
+      thesisId,
+      trajectoryId,
+      params: exportParams,
+    });
+  };
+
+  const handleDownloadDocumentsZip = () => {
+    const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
+    exportDocumentsZipMutation.mutate({
       thesisId,
       trajectoryId,
       params: exportParams,
@@ -370,6 +385,13 @@ export default function MasterTrajectoryDetails() {
                   "Enrolled students"
                 ),
               },
+              {
+                id: "evaluation",
+                label: t(
+                  "thesisManagement.evaluation.tab",
+                  "Evaluation"
+                ),
+              },
               ...(hasFormSteps
                 ? [
                     {
@@ -416,7 +438,13 @@ export default function MasterTrajectoryDetails() {
           </nav>
         </div>
 
-        {isFormDataTab && hasFormSteps ? (
+        {isEvaluationTab ? (
+          <TrajectoryEvaluationTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+          />
+        ) : isFormDataTab && hasFormSteps ? (
           <TrajectoryFormDataTab
             thesisId={thesisId}
             trajectoryId={trajectoryId}
@@ -741,18 +769,35 @@ export default function MasterTrajectoryDetails() {
               />
             )}
             {!isQnaTab && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCsv}
-                disabled={exportCsvPending}
-                className="gap-2 h-9"
-              >
-                <Download className="w-4 h-4" />
-                {exportCsvPending
-                  ? t("common.exporting", "Exporting...")
-                  : t("common.exportCsv", "Export CSV")}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCsv}
+                  disabled={exportCsvPending || exportZipPending}
+                  className="gap-2 h-9"
+                >
+                  <Download className="w-4 h-4" />
+                  {exportCsvPending
+                    ? t("common.exporting", "Exporting...")
+                    : t("common.exportCsv", "Export CSV")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadDocumentsZip}
+                  disabled={exportZipPending || exportCsvPending}
+                  className="gap-2 h-9"
+                >
+                  <Download className="w-4 h-4" />
+                  {exportZipPending
+                    ? t("common.downloading", "Downloading...")
+                    : t(
+                        "thesisManagement.trajectories.downloadDocuments",
+                        "Download documents"
+                      )}
+                </Button>
+              </>
             )}
           </div>
         </div>

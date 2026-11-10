@@ -278,6 +278,22 @@ export const getTrajectoryDissertationPassed = async (
   }
 };
 
+export const getTrajectoryEvaluations = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/evaluations`,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const exportTrajectoryFormDataCsv = async (
   thesisId,
   trajectoryId,
@@ -321,6 +337,22 @@ export const exportTrajectoryStudentsCsv = async (
   try {
     const response = await axiosInstance.get(
       `/thesis/${thesisId}/trajectories/${trajectoryId}/students/export-csv`,
+      { params, responseType: "blob" }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const exportTrajectoryStudentsDocumentsZip = async (
+  thesisId,
+  trajectoryId,
+  params = {}
+) => {
+  try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/trajectories/${trajectoryId}/students/documents-zip`,
       { params, responseType: "blob" }
     );
     return response.data;
@@ -374,6 +406,25 @@ export const removeThesisEligibleStudent = async (thesisId, userId) => {
   try {
     const response = await axiosInstance.delete(
       `/thesis/${thesisId}/eligible-students/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const markThesisStudentAsPaid = async (
+  thesisId,
+  userId,
+  { trajectory_id, reason } = {}
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/thesis/${thesisId}/students/${userId}/mark-as-paid`,
+      {
+        trajectory_id,
+        ...(reason ? { reason } : {}),
+      }
     );
     return response.data;
   } catch (error) {
