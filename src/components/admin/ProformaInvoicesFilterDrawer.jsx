@@ -15,8 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SlidersHorizontal, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { SlidersHorizontal } from "lucide-react";
+import ClearableDateInput from "./ClearableDateInput";
 import { useCallback, useEffect, useState } from "react";
 import { PROGRAM_TYPES } from "@/constants/programTypes";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
@@ -138,29 +138,6 @@ const EMPTY = {
   start_date: "",
   end_date: "",
 };
-
-//* Date input with a clear (×) button that clears only this date (IPB-142)
-const ClearableDateInput = ({ value, onChange, min, invalid }) => (
-  <div className="relative">
-    <Input
-      type="date"
-      className={`bg-sidebar border-sidebar-border pr-9 ${invalid ? "border-red-500" : ""}`}
-      value={value || ""}
-      min={min || undefined}
-      onChange={(e) => onChange(e.target.value)}
-    />
-    {value && (
-      <button
-        type="button"
-        aria-label="Clear date"
-        onClick={() => onChange("")}
-        className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
-    )}
-  </div>
-);
 
 export default function ProformaInvoicesFilterDrawer({
   draftFilters,

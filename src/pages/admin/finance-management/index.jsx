@@ -8,6 +8,7 @@ import {
   Briefcase,
   CreditCard,
   FileText,
+  BookOpen,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -57,6 +58,17 @@ const REPORT_CARDS = [
     bgColor: "rgba(139,92,246,0.08)",
     accentColor: "#8b5cf6",
     path: "/admin/finance-reports/batch",
+    permissionPath: "/admin/finance-reports",
+  },
+  {
+    key: "module",
+    titleKey: "finance.reports.module.title",
+    descriptionKey: "finance.reports.module.description",
+    icon: BookOpen,
+    iconColor: "#0ea5e9",
+    bgColor: "rgba(14,165,233,0.08)",
+    accentColor: "#0ea5e9",
+    path: "/admin/finance-reports/module",
     permissionPath: "/admin/finance-reports",
   },
   {

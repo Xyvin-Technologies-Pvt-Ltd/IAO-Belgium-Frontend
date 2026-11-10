@@ -369,6 +369,10 @@
         "title": "Rapports par groupe",
         "description": "Analyse des paiements par groupe"
       },
+      "module": {
+        "title": "Rapports par module",
+        "description": "Occupation, heures de formation et revenus par module"
+      },
       "student": {
         "title": "Rapports par étudiant",
         "description": "Analyse des paiements par étudiant"
@@ -422,6 +426,48 @@
     "toasts": {
       "manualCreated": "Note de frais manuelle créée !",
       "createFailed": "Échec de la création de la note de frais"
+    },
+    "moduleReports": {
+      "columns": {
+        "moduleName": "Nom du module",
+        "course": "Formation",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "city": "Ville",
+        "language": "Langue",
+        "occupied": "Occupés",
+        "freeSeats": "Places libres",
+        "trainingHours": "Heures de formation",
+        "revenue": "Revenus"
+      },
+      "types": {
+        "module": "Module",
+        "skillDay": "Journée de compétences",
+        "thesis": "Thèse"
+      },
+      "filters": {
+        "button": "Filtres",
+        "title": "Filtrer les modules",
+        "subtitle": "Type, programme, ville, dates de début et de fin",
+        "moduleType": "Type de module",
+        "allTypes": "Tous les types",
+        "programType": "Type de programme",
+        "allProgramTypes": "Tous les types de programme",
+        "program": "Programme",
+        "allPrograms": "Tous les programmes",
+        "searchPrograms": "Rechercher des programmes...",
+        "city": "Ville",
+        "allCities": "Toutes les villes",
+        "searchCities": "Rechercher des villes...",
+        "from": "Du",
+        "to": "Au",
+        "invalidRange": "La date de fin ne peut pas être antérieure à la date de début.",
+        "clearAll": "Tout effacer",
+        "apply": "Appliquer les filtres"
+      },
+      "search": "Rechercher un module...",
+      "empty": "Aucun module trouvé",
+      "loadFailed": "Impossible de charger le rapport par module"
     }
   },
   "queues": {

@@ -369,6 +369,10 @@
         "title": "Groepsrapporten",
         "description": "Betalingsanalyse per groep"
       },
+      "module": {
+        "title": "Modulerapporten",
+        "description": "Bezetting, opleidingsuren en omzet per module"
+      },
       "student": {
         "title": "Studentrapporten",
         "description": "Betalingsanalyse per student",
@@ -423,6 +427,48 @@
     "toasts": {
       "manualCreated": "Handmatige onkostennota aangemaakt!",
       "createFailed": "Aanmaken van onkostennota mislukt"
+    },
+    "moduleReports": {
+      "columns": {
+        "moduleName": "Modulenaam",
+        "course": "Opleiding",
+        "startDate": "Startdatum",
+        "endDate": "Einddatum",
+        "city": "Stad",
+        "language": "Taal",
+        "occupied": "Bezet",
+        "freeSeats": "Vrije plaatsen",
+        "trainingHours": "Opleidingsuren",
+        "revenue": "Omzet"
+      },
+      "types": {
+        "module": "Module",
+        "skillDay": "Skill day",
+        "thesis": "Thesis"
+      },
+      "filters": {
+        "button": "Filters",
+        "title": "Modules filteren",
+        "subtitle": "Type, programma, stad, start- en einddatum",
+        "moduleType": "Moduletype",
+        "allTypes": "Alle types",
+        "programType": "Programmatype",
+        "allProgramTypes": "Alle programmatypes",
+        "program": "Programma",
+        "allPrograms": "Alle programma's",
+        "searchPrograms": "Programma's zoeken...",
+        "city": "Stad",
+        "allCities": "Alle steden",
+        "searchCities": "Steden zoeken...",
+        "from": "Van",
+        "to": "Tot",
+        "invalidRange": "De einddatum mag niet vóór de startdatum liggen.",
+        "clearAll": "Alles wissen",
+        "apply": "Filters toepassen"
+      },
+      "search": "Zoek op modulenaam...",
+      "empty": "Geen modules gevonden",
+      "loadFailed": "Modulerapport kon niet worden geladen"
     }
   },
   "queues": {
