@@ -13,11 +13,15 @@ import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import StatusBadge from "@/components/StatusBadge";
-import { useGetKmoApplications, useUpdateKmoStatus } from "@/store/usePaymentStore";
-import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
+import {
+  useGetKmoApplications,
+  useUpdateKmoStatus,
+  useDownloadInvoicePdf,
+  useUpdateKmoProjectNumber,
+} from "@/store/usePaymentStore";
+import KmoApplicationsFilterDrawer, { EMPTY_KMO_FILTERS } from "./KmoApplicationsFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, Download } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +34,32 @@ import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
+
+//* IPB-143: five KMO statuses shown on this page (labels only — stored values unchanged).
+//* payment_released is shown as Paid.
+const KMO_STATUS_DISPLAY = {
+  waiting: { label: "Incomplete", className: "text-amber-600 dark:text-amber-400" },
+  submitted: { label: "Submitted", className: "text-blue-600 dark:text-blue-400" },
+  contribution_received: { label: "Student Paid", className: "text-indigo-600 dark:text-indigo-400" },
+  payment_released: { label: "Paid", className: "text-green-600 dark:text-green-400" },
+  paid: { label: "Paid", className: "text-green-600 dark:text-green-400" },
+  rejected: { label: "Rejected", className: "text-red-600 dark:text-red-400" },
+};
+
+const kmoStatusLabel = (status) => KMO_STATUS_DISPLAY[status]?.label || status || "-";
+
+const KmoStatusLabel = ({ status }) => (
+  <span className={`font-medium ${KMO_STATUS_DISPLAY[status]?.className || "text-gray-600"}`}>
+    {kmoStatusLabel(status)}
+  </span>
+);
+
+//* IPB-146: open the KMO invoice in a new tab (like openProformaInvoiceTab)
+const openKmoInvoiceTab = (invoice) => {
+  if (!invoice?._id) return;
+  const query = invoice.uid ? `?uid=${encodeURIComponent(invoice.uid)}` : "";
+  window.open(`/admin/kmo-applications/invoice/${invoice._id}/print${query}`, "_blank", "noopener,noreferrer");
+};
 
 const formatKmoAmount = (app) => {
   const currency =
@@ -69,9 +99,7 @@ const KmoManagement = () => {
     const saved = sessionStorage.getItem("kmo_management_filters");
     return saved ? JSON.parse(saved) : {
       search: "",
-      status: "all",
-      program: "all",
-      batch: "all",
+      ...EMPTY_KMO_FILTERS,
     };
   });
 
@@ -82,18 +110,20 @@ const KmoManagement = () => {
 
   const debouncedSearch = useDebounce(filters.search, 500);
 
-  // Fetch programs dropdown list
-  const { data: programsData } = useGetAllPrograms();
-  const programsList = programsData?.data || [];
-
-  // Fetch batches dropdown list
-  const selectedProgramId = filters.program !== "all" ? filters.program : null;
-  const { data: batchesData } = useGetBatches(
-    selectedProgramId,
-    {},
-    { enabled: !!selectedProgramId }
-  );
-  const batchesList = batchesData?.data || [];
+  //* IPB-145: Status / Program / Batch live in the filter panel (proforma style).
+  //* The panel edits a draft; Apply / Reset / Clear all update the applied filters.
+  const pickPanelFilters = (f) => ({
+    status: f.status ?? "all",
+    program: f.program ?? "all",
+    batch: f.batch ?? "all",
+  });
+  const [draftFilters, setDraftFilters] = useState(() => pickPanelFilters(filters));
+  const appliedFilters = pickPanelFilters(filters);
+  const setAppliedFilters = (next) =>
+    setFilters((prev) => ({
+      ...prev,
+      ...(typeof next === "function" ? next(pickPanelFilters(prev)) : next),
+    }));
 
   // Queries
   const { data, isLoading, error, refetch, isFetching } = useGetKmoApplications({
@@ -110,6 +140,12 @@ const KmoManagement = () => {
 
   // Mutation
   const updateStatusMutation = useUpdateKmoStatus();
+  const downloadInvoicePdf = useDownloadInvoicePdf();
+
+  //* IPB-147: inline edit of the Project Number in KMO Application Details (paid only)
+  const updateProjectNumberMutation = useUpdateKmoProjectNumber();
+  const [isEditingProjectNumber, setIsEditingProjectNumber] = useState(false);
+  const [projectNumberDraft, setProjectNumberDraft] = useState("");
 
   // Dialog State
   const [selectedApp, setSelectedApp] = useState(null);
@@ -123,15 +159,19 @@ const KmoManagement = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [notes, setNotes] = useState("");
 
+  //* IPB-143: Payment Released is no longer offered (it is shown as Paid)
   const STATUS_OPTIONS = [
-    { value: "contribution_received", label: "Contribution Received" },
-    { value: "payment_released", label: "Payment Released" },
+    { value: "contribution_received", label: "Student Paid" },
     { value: "paid", label: "Paid" },
     { value: "rejected", label: "Rejected" },
   ];
 
   // Admin never sets submitted — that is student-only after "I had applied".
   const availableStatusOptions = STATUS_OPTIONS.filter((opt) => {
+    //* IPB-148: an already Paid application can only be rejected
+    if (["paid", "payment_released"].includes(selectedApp?.status)) {
+      return opt.value === "rejected";
+    }
     // Don't offer the current status again
     if (selectedApp?.status && opt.value === selectedApp.status) {
       return false;
@@ -142,14 +182,6 @@ const KmoManagement = () => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, filters.status, filters.program, filters.batch]);
-
-  const handleProgramChange = (val) => {
-    setFilters(prev => ({
-      ...prev,
-      program: val,
-      batch: "all"
-    }));
-  };
 
   const handleOpenUpdate = (app) => {
     setSelectedApp(app);
@@ -163,7 +195,37 @@ const KmoManagement = () => {
   const handleOpenDetails = (app) => {
     setSelectedApp(app);
     setIsConfirmationsOpen(false);
+    setIsEditingProjectNumber(false);
     setIsDetailsOpen(true);
+  };
+
+  const canEditProjectNumber = (app) =>
+    canModify && ["paid", "payment_released"].includes(app?.status);
+
+  const startEditProjectNumber = () => {
+    setProjectNumberDraft(selectedApp?.project_number || "");
+    setIsEditingProjectNumber(true);
+  };
+
+  const cancelEditProjectNumber = () => {
+    setProjectNumberDraft(selectedApp?.project_number || "");
+    setIsEditingProjectNumber(false);
+  };
+
+  const saveProjectNumber = async () => {
+    const value = projectNumberDraft.trim();
+    if (!value || !selectedApp?._id) return;
+    try {
+      const res = await updateProjectNumberMutation.mutateAsync({
+        id: selectedApp._id,
+        project_number: value,
+      });
+      setSelectedApp((prev) => ({ ...prev, project_number: res?.data?.project_number ?? value }));
+      setIsEditingProjectNumber(false);
+    } catch (err) {
+      //* Error toast is handled by useUpdateKmoProjectNumber onError
+      console.error("Failed to update project number:", err);
+    }
   };
 
   const handleUpdateStatus = async () => {
@@ -204,103 +266,26 @@ const KmoManagement = () => {
     }
   };
 
-  const getDisplayStatusColor = (status) => {
-    switch (status) {
-      case "paid":
-        return "paid";
-      case "rejected":
-        return "failed";
-      case "waiting":
-        return "pending";
-      case "submitted":
-        return "ongoing";
-      case "contribution_received":
-      case "payment_released":
-        return "available";
-      default:
-        return "pending";
-    }
-  };
-
   return (
     <div className="space-y-6 mt-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           KMO-Portefeuille Applications
         </h2>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="bg-sidebar rounded-xl border border-sidebar-border p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap flex-1 items-center gap-3">
+        {/* IPB-145: search + filter panel, as on Teacher Proforma Expense Notes */}
+        <div className="flex flex-wrap items-center gap-3">
+          <KmoApplicationsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+          />
           <Input
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             placeholder="Search by student..."
-            className="max-w-xs h-10 rounded-[6px]"
+            className="w-full md:w-72 h-10 rounded-[6px]"
           />
-          
-          <Select value={filters.status} onValueChange={(val) => setFilters(prev => ({ ...prev, status: val }))}>
-            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="waiting">Waiting for KMO</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="contribution_received">Contribution Received</SelectItem>
-              <SelectItem value="payment_released">Payment Released</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.program} onValueChange={handleProgramChange}>
-            <SelectTrigger className="w-[320px] h-10 rounded-[6px]">
-              <SelectValue placeholder="All Programs" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Programs</SelectItem>
-              {programsList.map((prog) => (
-                <SelectItem key={prog._id} value={prog._id}>
-                  {`${prog.name} - ${prog.city?.name || "N/A"} - ${prog.language?.name || "N/A"}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select 
-            value={filters.batch} 
-            onValueChange={(val) => setFilters(prev => ({ ...prev, batch: val }))}
-            disabled={filters.program === "all"}
-          >
-            <SelectTrigger className="w-[200px] h-10 rounded-[6px]">
-              <SelectValue placeholder={filters.program === "all" ? "Select Program First" : "All Batches"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Batches</SelectItem>
-              {batchesList.map((b) => (
-                <SelectItem key={b._id} value={b._id}>
-                  {b.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {(filters.search || filters.status !== "all" || filters.program !== "all" || filters.batch !== "all") && (
-            <Button
-              variant="outline"
-              onClick={() => setFilters({
-                search: "",
-                status: "all",
-                program: "all",
-                batch: "all",
-              })}
-              className="h-10 rounded-[6px] border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5"
-            >
-              Clear Filters
-            </Button>
-          )}
         </div>
       </div>
 
@@ -309,9 +294,9 @@ const KmoManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              {/* IPB-144: Invoice Number first; Program and Batch hidden (still filterable) */}
+              <TableHead>Invoice Number</TableHead>
               <TableHead>Student</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead>Batch</TableHead>
               <TableHead>Learning Module</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
@@ -323,10 +308,10 @@ const KmoManagement = () => {
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={8} />
+              <TableSkeleton rows={rowsPerPage} columns={7} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center p-8">
+                <TableCell colSpan={7} className="text-center p-8">
                   <ErrorMessage
                     message={error.message || "Failed to load KMO applications"}
                     onRetry={refetch}
@@ -337,17 +322,14 @@ const KmoManagement = () => {
             ) : applications.length > 0 ? (
               applications.map((app) => (
                 <TableRow key={app._id}>
+                  <TableCell className="font-mono text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                    {app.invoice_id?.uid || "-"}
+                  </TableCell>
                   <TableCell>
                     <p className="font-semibold text-gray-900 dark:text-white">
                       {app.student_id?.first_name} {app.student_id?.last_name}
                     </p>
                     <p className="text-xs text-muted-foreground">{app.student_id?.email}</p>
-                  </TableCell>
-                  <TableCell className="max-w-[180px] truncate text-gray-700 dark:text-gray-300">
-                    {app.program?.name || "-"}
-                  </TableCell>
-                  <TableCell className="text-gray-700 dark:text-gray-300">
-                    {app.batch?.name || "-"}
                   </TableCell>
                   <TableCell>
                     <p className="font-semibold text-gray-900 dark:text-white">{app.module_id?.name}</p>
@@ -360,12 +342,44 @@ const KmoManagement = () => {
                     <p className="text-xs text-muted-foreground">VAT: {app.company_id?.vat_number}</p>
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={getDisplayStatusColor(app.status)} label={app.status} />
+                    <KmoStatusLabel status={app.status} />
                   </TableCell>
                   <TableCell className="text-gray-700 dark:text-gray-300">
                     {moment(app.createdAt).format("DD MMM YYYY HH:mm")}
                   </TableCell>
                   <TableCell className="text-right space-x-2">
+                    {/* IPB-146: view / download the invoice (only when one exists) */}
+                    {app.invoice_id?._id && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="View invoice"
+                          onClick={() => openKmoInvoiceTab(app.invoice_id)}
+                          className="rounded-[6px]"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Download invoice PDF"
+                          disabled={
+                            downloadInvoicePdf.isPending &&
+                            downloadInvoicePdf.variables?.id === app.invoice_id._id
+                          }
+                          onClick={() =>
+                            downloadInvoicePdf.mutate({
+                              id: app.invoice_id._id,
+                              filename: `${app.invoice_id.uid || "invoice"}.pdf`,
+                            })
+                          }
+                          className="rounded-[6px]"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -375,7 +389,8 @@ const KmoManagement = () => {
                       <Eye className="h-4 w-4" />
                     </Button>
                     {canModify &&
-                      !["waiting", "paid", "rejected"].includes(app.status) && (
+                      //* IPB-148: Paid applications can be edited too (Reject only)
+                      !["waiting", "rejected"].includes(app.status) && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -390,7 +405,7 @@ const KmoManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                   No KMO applications found.
                 </TableCell>
               </TableRow>
@@ -420,10 +435,57 @@ const KmoManagement = () => {
               {/* Primary Details */}
               <div className="grid grid-cols-2 gap-2 border-b border-sidebar-border pb-3">
                 <p className="font-bold text-gray-500 dark:text-gray-400">Project Number:</p>
-                <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
+                {isEditingProjectNumber ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={projectNumberDraft}
+                      onChange={(e) => setProjectNumberDraft(e.target.value)}
+                      placeholder="Enter KMO Project Number..."
+                      className="rounded-[6px] h-9"
+                      autoFocus
+                    />
+                    {!projectNumberDraft.trim() && (
+                      <p className="text-xs text-red-600">Project number cannot be empty.</p>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="h-8 rounded-[6px]"
+                        onClick={saveProjectNumber}
+                        disabled={!projectNumberDraft.trim() || updateProjectNumberMutation.isPending}
+                      >
+                        {updateProjectNumberMutation.isPending ? "Saving..." : "Save"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 rounded-[6px]"
+                        onClick={cancelEditProjectNumber}
+                        disabled={updateProjectNumberMutation.isPending}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.project_number || "N/A"}</p>
+                    {canEditProjectNumber(selectedApp) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Edit project number"
+                        onClick={startEditProjectNumber}
+                        className="h-7 w-7 rounded-[6px]"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                )}
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Current Status:</p>
-                <p className="font-bold text-amber-600 dark:text-amber-400 capitalize">{selectedApp.status}</p>
+                <p className="font-bold text-amber-600 dark:text-amber-400">{kmoStatusLabel(selectedApp.status)}</p>
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Student:</p>
                 <p className="font-semibold text-gray-900 dark:text-white">

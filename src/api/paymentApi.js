@@ -188,6 +188,16 @@ export const getInvoicePrintHtml = async (id) => {
   }
 };
 
+//* IPB-146: invoice as PDF (same document as /html)
+export const getInvoicePdf = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/invoice/${id}/pdf`, { responseType: "blob" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const createPayment = async (data) => {
   try {
     const response = await axiosInstance.post(`/payment`, data);
@@ -209,6 +219,16 @@ export const getKmoApplications = async (filter) => {
 export const updateKmoStatus = async (id, data) => {
   try {
     const response = await axiosInstance.put(`/kmo/applications/${id}/status`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* IPB-147: edit the Project Number of a paid KMO application
+export const updateKmoProjectNumber = async (id, project_number) => {
+  try {
+    const response = await axiosInstance.put(`/kmo/applications/${id}/project-number`, { project_number });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
