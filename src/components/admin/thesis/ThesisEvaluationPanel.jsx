@@ -667,6 +667,7 @@ const ThesisEvaluationPanel = ({
         criteria.push({
           criterion_id: criterion._id,
           section_id: section._id,
+          section_name: section.name || "",
           name: criterion.name,
           max_score: criterion.max_score,
           marks: score?.marks ?? "",
@@ -1229,78 +1230,119 @@ const ThesisEvaluationPanel = ({
                   : t("thesisManagement.marking.reader", "Reader")}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3.5 py-2">
-            {(editor?.scores || []).map((row, index) => (
-              <div
-                key={row.criterion_id}
-                className="p-3.5 rounded-lg border border-border/80 bg-card space-y-2"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-foreground">
-                    {row.name}
-                  </p>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    / {row.max_score} pts
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-start">
-                  <div className="sm:col-span-1 space-y-1">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                      <span>{t("thesisManagement.marking.score", "Score")}</span>
-                      <span className="text-destructive font-bold">*</span>
-                    </label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max={row.max_score}
-                      step="any"
-                      value={row.marks}
-                      placeholder={`0 - ${row.max_score}`}
-                      className="h-9 text-sm"
-                      onChange={(event) =>
-                        setEditor((current) => ({
-                          ...current,
-                          scores: current.scores.map((item, i) =>
-                            i === index
-                              ? { ...item, marks: event.target.value }
-                              : item
-                          ),
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="sm:col-span-3 space-y-1">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                      <span>
-                        {t("thesisManagement.marking.comment", "Comment")}
+          <div className="space-y-4 py-2">
+            {(() => {
+              const scores = editor?.scores || [];
+              const groups = [];
+              const groupIndex = new Map();
+              scores.forEach((row, index) => {
+                const key = String(row.section_id || row.section_name || "");
+                if (!groupIndex.has(key)) {
+                  groupIndex.set(key, groups.length);
+                  groups.push({
+                    section_id: row.section_id,
+                    section_name: row.section_name || "",
+                    rows: [],
+                  });
+                }
+                groups[groupIndex.get(key)].rows.push({ row, index });
+              });
+              return groups.map((group) => (
+                <div
+                  key={String(group.section_id || group.section_name)}
+                  className="space-y-2.5"
+                >
+                  {group.section_name ? (
+                    <div className="flex items-center px-2.5 py-1.5 rounded-md bg-muted/40 border border-border/60">
+                      <span className="text-[11px] font-bold text-foreground uppercase tracking-wider truncate">
+                        {group.section_name}
                       </span>
-                      {row.comment_required ? (
-                        <span className="text-destructive font-bold">*</span>
-                      ) : null}
-                    </label>
-                    <Textarea
-                      rows={2}
-                      value={row.comment}
-                      placeholder={t(
-                        "thesisManagement.marking.commentPlaceholder",
-                        "Enter evaluator comment..."
-                      )}
-                      className="text-xs sm:text-sm"
-                      onChange={(event) =>
-                        setEditor((current) => ({
-                          ...current,
-                          scores: current.scores.map((item, i) =>
-                            i === index
-                              ? { ...item, comment: event.target.value }
-                              : item
-                          ),
-                        }))
-                      }
-                    />
-                  </div>
+                    </div>
+                  ) : null}
+                  {group.rows.map(({ row, index }) => (
+                    <div
+                      key={row.criterion_id}
+                      className="p-3.5 rounded-lg border border-border/80 bg-card space-y-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-foreground">
+                          {row.name}
+                        </p>
+                        <span className="text-xs font-medium text-muted-foreground">
+                          / {row.max_score} pts
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-start">
+                        <div className="sm:col-span-1 space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                            <span>
+                              {t("thesisManagement.marking.score", "Score")}
+                            </span>
+                            <span className="text-destructive font-bold">*</span>
+                          </label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={row.max_score}
+                            step="any"
+                            value={row.marks}
+                            placeholder={`0 - ${row.max_score}`}
+                            className="h-9 text-sm"
+                            onChange={(event) =>
+                              setEditor((current) => ({
+                                ...current,
+                                scores: current.scores.map((item, i) =>
+                                  i === index
+                                    ? { ...item, marks: event.target.value }
+                                    : item
+                                ),
+                              }))
+                            }
+                          />
+                        </div>
+                        <div className="sm:col-span-3 space-y-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                            <span>
+                              {t(
+                                "thesisManagement.marking.comment",
+                                "Comment"
+                              )}
+                            </span>
+                            {row.comment_required ? (
+                              <span className="text-destructive font-bold">
+                                *
+                              </span>
+                            ) : null}
+                          </label>
+                          <Textarea
+                            rows={2}
+                            value={row.comment}
+                            placeholder={t(
+                              "thesisManagement.marking.commentPlaceholder",
+                              "Enter evaluator comment..."
+                            )}
+                            className="text-xs sm:text-sm"
+                            onChange={(event) =>
+                              setEditor((current) => ({
+                                ...current,
+                                scores: current.scores.map((item, i) =>
+                                  i === index
+                                    ? {
+                                        ...item,
+                                        comment: event.target.value,
+                                      }
+                                    : item
+                                ),
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              ));
+            })()}
 
             {editor?.feedback_enabled && (
               <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-1.5">

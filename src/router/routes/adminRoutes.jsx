@@ -85,6 +85,7 @@ import ProformaAdminManagement from "@/components/admin/ProformaAdminManagement"
 import ProformaSettingsConfig from "@/components/admin/ProformaSettingsConfig";
 import ProformaInvoiceDetailPage from "@/pages/admin/finance-management/ProformaInvoiceDetailPage";
 import ProformaInvoicePrintPage from "@/pages/admin/finance-management/ProformaInvoicePrintPage";
+import KmoInvoicePrintPage from "@/pages/admin/finance-management/KmoInvoicePrintPage";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -315,6 +316,13 @@ export const adminRoutes = [
     component: withPermissionProtection(
       ProformaInvoiceDetailPage,
       "/admin/proforma-invoices",
+    ),
+  },
+  {
+    path: "/admin/kmo-applications/invoice/$id/print",
+    component: withPermissionProtection(
+      KmoInvoicePrintPage,
+      "/admin/kmo-applications",
     ),
   },
   {
