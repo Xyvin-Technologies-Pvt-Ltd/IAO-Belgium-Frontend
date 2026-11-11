@@ -103,6 +103,36 @@ const RoleForm = ({ thesisId, trajectoryId, userId, block, onSaved }) => {
     return { awarded, max };
   };
 
+  const liveRoleTotal = useMemo(() => {
+    let awarded = 0;
+    let max = 0;
+    for (const section of block.config?.sections || []) {
+      for (const criterion of section.criteria || []) {
+        max += Number(criterion.max_score) || 0;
+        const marks = scores[String(criterion._id)]?.marks;
+        awarded += marks === "" || marks == null ? 0 : Number(marks) || 0;
+      }
+    }
+    return { awarded, max };
+  }, [block.config?.sections, scores]);
+
+  const weightsEnabled = Boolean(block.config?.weights_enabled);
+  const assessment = block.assessment;
+  const hasUnsavedScoreEdits = draftScores != null;
+  const showAsPercentage =
+    weightsEnabled && !hasUnsavedScoreEdits && assessment?.percentage != null;
+  const summaryValue = showAsPercentage
+    ? assessment.percentage
+    : hasUnsavedScoreEdits || !assessment
+      ? liveRoleTotal.awarded
+      : assessment.total_marks ?? liveRoleTotal.awarded;
+  const summaryMax = showAsPercentage
+    ? null
+    : hasUnsavedScoreEdits || !assessment
+      ? liveRoleTotal.max
+      : assessment.max_marks ?? liveRoleTotal.max;
+  const outcome = assessment?.outcome;
+
   const handleScoreChange = (criterionId, val) => {
     setDraftScores((prev) => {
       const current = prev ?? initialScores;
@@ -260,6 +290,59 @@ const RoleForm = ({ thesisId, trajectoryId, userId, block, onSaved }) => {
             ? t("thesis.marking.submittedStatus", "Submitted")
             : t("thesis.marking.draftStatus", "Draft in Progress")}
         </span>
+      </div>
+
+      {/* Role total: percentage when weights on (saved), else marks/max */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-lg bg-muted/30 border border-border/70 items-center">
+        <div className="space-y-0.5">
+          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">
+            {showAsPercentage
+              ? t("thesis.marking.percentage", "Percentage")
+              : t("thesis.marking.totalScore", "Total Score")}
+          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {showAsPercentage ? (
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-xl font-bold text-foreground">
+                  {summaryValue}
+                </span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  %
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-bold text-foreground">
+                  {summaryValue ?? 0}
+                </span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  / {summaryMax ?? 0}
+                </span>
+              </div>
+            )}
+            {outcome === "pass" || outcome === "fail" ? (
+              <span
+                className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                  outcome === "pass"
+                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
+                    : "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20"
+                }`}
+              >
+                {outcome === "pass"
+                  ? t("thesis.marking.pass", "Pass")
+                  : t("thesis.marking.fail", "Fail")}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        {hasUnsavedScoreEdits && weightsEnabled ? (
+          <p className="text-xs text-muted-foreground sm:border-l sm:border-border/60 sm:pl-3">
+            {t(
+              "thesis.marking.percentageAfterSave",
+              "Weighted percentage updates after you save or submit."
+            )}
+          </p>
+        ) : null}
       </div>
 
       {/* Evaluation Sections */}

@@ -476,15 +476,15 @@ function addCanvasPagesToPdf(pdf, canvas, sourceEl, marginMm = 8) {
 const A4_CAPTURE_WIDTH_PX = 794;
 
 /**
- * Direct .pdf download of the invoice at a fixed A4 layout width.
- * Uses html2canvas-pro (oklch/Tailwind v4 safe) + jsPDF.
+ * Render the on-page invoice (#printable-proforma-invoice) to an A4 jsPDF doc
+ * at a fixed layout width. Uses html2canvas-pro (oklch/Tailwind v4 safe).
+ * Returns null when the invoice element is not mounted.
  */
-export async function downloadProformaInvoicePdf(proforma) {
-  if (typeof window === "undefined") return false;
+async function renderProformaInvoicePdf() {
+  if (typeof window === "undefined") return null;
   const el = document.getElementById("printable-proforma-invoice");
-  if (!el) return false;
+  if (!el) return null;
 
-  const filename = `${proforma?.proforma_number || "proforma-invoice"}.pdf`;
   const host = document.createElement("div");
   host.setAttribute("data-proforma-pdf-host", "true");
   Object.assign(host.style, {
@@ -535,11 +535,33 @@ export async function downloadProformaInvoicePdf(proforma) {
 
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     addCanvasPagesToPdf(pdf, canvas, clone, 10);
-    pdf.save(filename);
-    return true;
+    return pdf;
   } finally {
     host.remove();
   }
+}
+
+function proformaPdfFilename(proforma) {
+  return `${proforma?.proforma_number || "proforma-invoice"}.pdf`;
+}
+
+/** Direct .pdf download of the invoice. */
+export async function downloadProformaInvoicePdf(proforma) {
+  const pdf = await renderProformaInvoicePdf();
+  if (!pdf) return false;
+  pdf.save(proformaPdfFilename(proforma));
+  return true;
+}
+
+/**
+ * Same PDF as the download, as a File — uploaded on "Send to finance" so the
+ * backend can email it to Exact Online (IPB-139). Null when not mounted.
+ */
+export async function buildProformaInvoicePdfFile(proforma) {
+  const pdf = await renderProformaInvoicePdf();
+  if (!pdf) return null;
+  const blob = pdf.output("blob");
+  return new File([blob], proformaPdfFilename(proforma), { type: "application/pdf" });
 }
 
 /** @deprecated Use printProformaInvoicePdf */

@@ -6,15 +6,20 @@ import {
   getAnalyticsByProgramList,
   getAnalyticsByBatch,
   getAnalyticsByBatchList,
+  getAnalyticsByModuleList,
   getAnalyticsByStudent,
   exportAnalyticsCityCsv,
   exportAnalyticsProgramCsv,
   exportAnalyticsBatchCsv,
+  exportAnalyticsModuleCsv,
   exportInvoicesCsv,
   createPayment,
   getTransactionLogs,
   getKmoApplications,
   updateKmoStatus,
+  updateKmoProjectNumber,
+  getInvoicePrintHtml,
+  getInvoicePdf,
 } from "@/api/paymentApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -110,6 +115,17 @@ export const useGetAnalyticsByBatchList = (filter, options = {}) => {
   });
 };
 
+//* IPB-151 Module Reports
+export const useGetAnalyticsByModuleList = (filter, options = {}) => {
+  return useQuery({
+    queryKey: ["payment-analytics-module-list", filter],
+    queryFn: () => getAnalyticsByModuleList(filter),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
 export const useGetAnalyticsByStudent = (filter, options = {}) => {
   return useQuery({
     queryKey: ["payment-analytics-student", filter],
@@ -156,6 +172,22 @@ export const useUpdateKmoStatus = () => {
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to update KMO status");
+    },
+  });
+};
+
+//* IPB-147
+export const useUpdateKmoProjectNumber = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, project_number }) => updateKmoProjectNumber(id, project_number),
+    onSuccess: () => {
+      toast.success("Project number updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["kmo-applications"] });
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update the project number");
     },
   });
 };
@@ -259,6 +291,47 @@ export const useExportAnalyticsBatchCsv = () => {
         error?.message ||
           i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
       );
+    },
+  });
+};
+
+export const useExportAnalyticsModuleCsv = () => {
+  return useMutation({
+    mutationFn: exportAnalyticsModuleCsv,
+    onSuccess: (data) => {
+      triggerBlobDownload(data, `module-reports-${Date.now()}.csv`);
+      toast.success(
+        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        error?.message ||
+          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+      );
+    },
+  });
+};
+
+//* IPB-146: invoice print HTML + PDF download (KMO applications overview)
+export const useGetInvoicePrintHtml = (id, options = {}) => {
+  return useQuery({
+    queryKey: ["invoice-print-html", id],
+    queryFn: () => getInvoicePrintHtml(id),
+    enabled: !!id,
+    staleTime: 60000,
+    ...options,
+  });
+};
+
+export const useDownloadInvoicePdf = () => {
+  return useMutation({
+    mutationFn: ({ id }) => getInvoicePdf(id),
+    onSuccess: (data, { filename }) => {
+      triggerBlobDownload(data, filename || `invoice-${Date.now()}.pdf`);
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Could not download the invoice PDF");
     },
   });
 };

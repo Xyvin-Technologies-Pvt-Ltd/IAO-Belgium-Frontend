@@ -222,6 +222,7 @@
     "searchRoles": "Dozentenrollen suchen...",
     "paymentId": "Zahlungs-ID",
     "transactionId": "Transaktions-ID",
+    "expenseNoteId": "Kostenaufstellungs-ID",
     "invoiceId": "ID der Kostenaufstellung",
     "receiptId": "Quittungs-ID",
     "downloadReceipt": "Quittung herunterladen",
@@ -365,6 +366,10 @@
         "title": "Gruppenberichte",
         "description": "Zahlungsanalyse nach Gruppe"
       },
+      "module": {
+        "title": "Modulberichte",
+        "description": "Belegung, Unterrichtsstunden und Umsatz pro Modul"
+      },
       "student": {
         "title": "Studentenberichte",
         "description": "Zahlungsanalyse nach Student/in",
@@ -439,6 +444,48 @@
     "toasts": {
       "manualCreated": "Manuelle Kostenaufstellung erstellt!",
       "createFailed": "Kostenaufstellung konnte nicht erstellt werden"
+    },
+    "moduleReports": {
+      "columns": {
+        "moduleName": "Modulname",
+        "course": "Kurs",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "city": "Stadt",
+        "language": "Sprache",
+        "occupied": "Belegt",
+        "freeSeats": "Freie Plätze",
+        "trainingHours": "Unterrichtsstunden",
+        "revenue": "Umsatz"
+      },
+      "types": {
+        "module": "Modul",
+        "skillDay": "Skill Day",
+        "thesis": "Thesis"
+      },
+      "filters": {
+        "button": "Filter",
+        "title": "Module filtern",
+        "subtitle": "Typ, Programm, Stadt, Start- und Enddatum",
+        "moduleType": "Modultyp",
+        "allTypes": "Alle Typen",
+        "programType": "Programmtyp",
+        "allProgramTypes": "Alle Programmtypen",
+        "program": "Programm",
+        "allPrograms": "Alle Programme",
+        "searchPrograms": "Programme suchen...",
+        "city": "Stadt",
+        "allCities": "Alle Städte",
+        "searchCities": "Städte suchen...",
+        "from": "Von",
+        "to": "Bis",
+        "invalidRange": "Das Enddatum darf nicht vor dem Startdatum liegen.",
+        "clearAll": "Alle löschen",
+        "apply": "Filter anwenden"
+      },
+      "search": "Modulname suchen...",
+      "empty": "Keine Module gefunden",
+      "loadFailed": "Modulbericht konnte nicht geladen werden"
     }
   },
   "queues": {

@@ -225,6 +225,7 @@
     "searchRoles": "Search lecturer roles...",
     "paymentId": "Payment ID",
     "transactionId": "Transaction ID",
+    "expenseNoteId": "Expense note ID",
     "invoiceId": "Expense Note ID",
     "receiptId": "Receipt ID",
     "downloadReceipt": "Download receipt",
@@ -372,6 +373,10 @@
         "title": "Group Reports",
         "description": "Payment analytics by group"
       },
+      "module": {
+        "title": "Module Reports",
+        "description": "Occupancy, training hours and revenue per module"
+      },
       "student": {
         "title": "Student Reports",
         "description": "Payment analytics by student",
@@ -454,6 +459,48 @@
     "toasts": {
       "manualCreated": "Manual expense note created!",
       "createFailed": "Failed to create expense note"
+    },
+    "moduleReports": {
+      "columns": {
+        "moduleName": "Module name",
+        "course": "Course",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "city": "City",
+        "language": "Language",
+        "occupied": "Occupied",
+        "freeSeats": "Free seats",
+        "trainingHours": "Training hours",
+        "revenue": "Revenue"
+      },
+      "types": {
+        "module": "Module",
+        "skillDay": "Skill day",
+        "thesis": "Thesis"
+      },
+      "filters": {
+        "button": "Filters",
+        "title": "Filter modules",
+        "subtitle": "Type, program, city, start and end date",
+        "moduleType": "Module type",
+        "allTypes": "All types",
+        "programType": "Program type",
+        "allProgramTypes": "All program types",
+        "program": "Program",
+        "allPrograms": "All programs",
+        "searchPrograms": "Search programs...",
+        "city": "City",
+        "allCities": "All cities",
+        "searchCities": "Search cities...",
+        "from": "From",
+        "to": "To",
+        "invalidRange": "End date cannot be earlier than the start date.",
+        "clearAll": "Clear all",
+        "apply": "Apply filters"
+      },
+      "search": "Search module name...",
+      "empty": "No modules found",
+      "loadFailed": "Failed to load module report"
     }
   },
   "integrations": {

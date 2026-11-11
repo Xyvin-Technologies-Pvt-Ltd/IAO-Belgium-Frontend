@@ -41,6 +41,7 @@ import AllReports from "@/pages/admin/finance-management/AllReports";
 import CityReports from "@/pages/admin/finance-management/CityReports";
 import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
 import BatchReports from "@/pages/admin/finance-management/BatchReports";
+import ModuleReports from "@/pages/admin/finance-management/ModuleReports";
 import FinanceManagement from "@/pages/admin/finance-management";
 import StudentwiseReport from "@/pages/admin/finance-management/StudentwiseReport";
 import TransactionLogs from "@/pages/admin/finance-management/TransactionLogs";
@@ -84,6 +85,7 @@ import ProformaAdminManagement from "@/components/admin/ProformaAdminManagement"
 import ProformaSettingsConfig from "@/components/admin/ProformaSettingsConfig";
 import ProformaInvoiceDetailPage from "@/pages/admin/finance-management/ProformaInvoiceDetailPage";
 import ProformaInvoicePrintPage from "@/pages/admin/finance-management/ProformaInvoicePrintPage";
+import KmoInvoicePrintPage from "@/pages/admin/finance-management/KmoInvoicePrintPage";
 
 const withPermissionProtection = (Component, path) => {
   const requiredPermissions = getRequiredPermissions(path);
@@ -317,6 +319,13 @@ export const adminRoutes = [
     ),
   },
   {
+    path: "/admin/kmo-applications/invoice/$id/print",
+    component: withPermissionProtection(
+      KmoInvoicePrintPage,
+      "/admin/kmo-applications",
+    ),
+  },
+  {
     path: "/admin/proforma-invoices/$id/print",
     component: withPermissionProtection(
       ProformaInvoicePrintPage,
@@ -355,6 +364,13 @@ export const adminRoutes = [
     path: "/admin/finance-reports/batch",
     component: withPermissionProtection(
       BatchReports,
+      "/admin/finance-reports",
+    ),
+  },
+  {
+    path: "/admin/finance-reports/module",
+    component: withPermissionProtection(
+      ModuleReports,
       "/admin/finance-reports",
     ),
   },

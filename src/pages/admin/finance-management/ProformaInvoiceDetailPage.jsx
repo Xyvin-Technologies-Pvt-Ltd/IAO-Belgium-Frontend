@@ -9,7 +9,15 @@ import {
   useUpdateSectionApproval,
   useUpdateProformaLineItem,
   useSetActiveTravelMode,
+  useSendProformaFinanceEmail,
 } from "@/store/useProformaStore";
+import { uploadFile } from "@/api/uploadApi";
+import {
+  financeEmailBadge,
+  financeEmailStatus,
+  isFinanceEmailSending,
+  canRetryFinanceEmail,
+} from "@/utils/proformaFinanceEmail";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +45,7 @@ import ProformaEditableClaimRow from "@/components/proforma/ProformaEditableClai
 import {
   ProformaInvoiceDocument,
   downloadProformaInvoicePdf,
+  buildProformaInvoicePdfFile,
   openProformaInvoiceTab,
 } from "@/components/admin/ProformaInvoiceDocument";
 import { getActiveTravelMode, activeTravelModeLabel } from "@/utils/proformaTravelMode";
@@ -123,10 +132,18 @@ export default function ProformaInvoiceDetailPage() {
 
   const { data: responseData, isLoading, isError, error } = useGetProformaById(id, {
     enabled: Boolean(id),
+    //* While the email to Exact is in flight, poll so the badge flips to Sent / Email failed.
+    refetchInterval: (query) => {
+      const p = query.state.data?.data || query.state.data;
+      return isFinanceEmailSending(p) ? 5000 : false;
+    },
   });
   const proforma = responseData?.data || responseData;
 
   const updateStatusMutation = useUpdateProformaStatus();
+  const retryFinanceEmailMutation = useSendProformaFinanceEmail();
+  const [preparingFinancePdf, setPreparingFinancePdf] = useState(false);
+  const [renderAsFinance, setRenderAsFinance] = useState(false);
   const addCommentMutation = useAddSectionComment();
   const updateItemsMutation = useUpdateSectionItems();
   const updateApprovalMutation = useUpdateSectionApproval();
@@ -231,7 +248,7 @@ export default function ProformaInvoiceDetailPage() {
     },
     REJECTED: { label: "Rejected", bg: "bg-red-100 text-red-800 border-red-200" },
   };
-  const badgeInfo = statusBadges[proforma?.status] || {
+  const badgeInfo = financeEmailBadge(proforma) || statusBadges[proforma?.status] || {
     label: proforma?.status || "Open",
     bg: "bg-muted text-muted-foreground",
   };
@@ -403,15 +420,63 @@ export default function ProformaInvoiceDetailPage() {
     );
   };
 
-  const sendToFinance = () => {
+  //* Build the same PDF as "Download PDF" (with the "approved for finance" stamp,
+  //* which the document shows only for finance statuses) and upload it; returns the S3 key.
+  const uploadFinancePdf = async () => {
+    let file;
+    try {
+      setRenderAsFinance(true);
+      const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+      await nextFrame();
+      await nextFrame();
+      file = await buildProformaInvoicePdfFile(proforma);
+    } finally {
+      setRenderAsFinance(false);
+    }
+    if (!file) throw new Error("Could not prepare the expense note PDF");
+    const uploaded = await uploadFile(file);
+    const key = uploaded?.data?.key;
+    if (!key) throw new Error("Could not upload the expense note PDF");
+    return key;
+  };
+
+  const sendToFinance = async () => {
     if (!canSendToFinance) {
       toast.error("Teacher must confirm all sections and digitally sign first");
       return;
     }
+    let pdfKey;
+    try {
+      setPreparingFinancePdf(true);
+      pdfKey = await uploadFinancePdf();
+    } catch (err) {
+      toast.error(err?.message || "Could not prepare the expense note PDF");
+      return;
+    } finally {
+      setPreparingFinancePdf(false);
+    }
     updateStatusMutation.mutate({
       id: proforma._id,
-      data: { status: "MOVED_TO_FINANCE", notes: "Moved to Finance Payout Queue" },
+      data: {
+        status: "MOVED_TO_FINANCE",
+        notes: "Moved to Finance Payout Queue",
+        pdf_key: pdfKey,
+      },
     });
+  };
+
+  const retryFinanceEmail = async () => {
+    let pdfKey;
+    try {
+      setPreparingFinancePdf(true);
+      pdfKey = await uploadFinancePdf();
+    } catch {
+      //* Fall back to the PDF uploaded on "Send to finance".
+      pdfKey = undefined;
+    } finally {
+      setPreparingFinancePdf(false);
+    }
+    retryFinanceEmailMutation.mutate({ id: proforma._id, pdf_key: pdfKey });
   };
 
   const confirmMarkPaid = () => {
@@ -454,6 +519,17 @@ export default function ProformaInvoiceDetailPage() {
             {proforma.status === "PAID" && (
               <ProformaPaidNote paidAt={proforma.paid_at} paidByName={proforma.paid_by_name} />
             )}
+            {financeEmailStatus(proforma) === "FAILED" && proforma.finance_email?.failure_reason && (
+              <p className="mt-1 text-xs text-red-700 dark:text-red-400">
+                Email to Exact failed: {proforma.finance_email.failure_reason}
+              </p>
+            )}
+            {financeEmailStatus(proforma) === "SENT" && proforma.finance_email?.sent_at && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Emailed to {proforma.finance_email.to} on{" "}
+                {new Date(proforma.finance_email.sent_at).toLocaleString()}
+              </p>
+            )}
           </div>
         </div>
 
@@ -490,13 +566,37 @@ export default function ProformaInvoiceDetailPage() {
               size="sm"
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 disabled:opacity-50"
               onClick={sendToFinance}
-              disabled={!canSendToFinance || updateStatusMutation.isPending}
+              disabled={!canSendToFinance || updateStatusMutation.isPending || preparingFinancePdf}
               title={!canSendToFinance ? "Requires teacher confirm + digital signature" : undefined}
             >
               <ArrowRight className="w-4 h-4" />
-              {updateStatusMutation.isPending ? "Sending..." : "Send to finance"}
+              {preparingFinancePdf
+                ? "Preparing PDF..."
+                : updateStatusMutation.isPending
+                  ? "Sending..."
+                  : "Send to finance"}
             </Button>
           ) : proforma.status === "MOVED_TO_FINANCE" ? (
+            <>
+            {canRetryFinanceEmail(proforma) && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs font-semibold border-red-300 text-red-700 hover:bg-red-50"
+                onClick={retryFinanceEmail}
+                disabled={
+                  retryFinanceEmailMutation.isPending ||
+                  preparingFinancePdf ||
+                  isFinanceEmailSending(proforma)
+                }
+              >
+                {retryFinanceEmailMutation.isPending ||
+                preparingFinancePdf ||
+                isFinanceEmailSending(proforma)
+                  ? "Retrying..."
+                  : "Retry"}
+              </Button>
+            )}
             <Button
               size="sm"
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
@@ -505,6 +605,7 @@ export default function ProformaInvoiceDetailPage() {
             >
               SEND TO EXACT MANUALLY
             </Button>
+            </>
           ) : null}
         </div>
       </div>
@@ -514,7 +615,13 @@ export default function ProformaInvoiceDetailPage() {
           aria-hidden
           className="fixed left-[-10000px] top-0 w-[794px] pointer-events-none"
         >
-          <ProformaInvoiceDocument proforma={proforma} />
+          <ProformaInvoiceDocument
+            proforma={
+              renderAsFinance && proforma.status === "TEACHER_SIGNED_APPROVED"
+                ? { ...proforma, status: "MOVED_TO_FINANCE" }
+                : proforma
+            }
+          />
         </div>
       )}
 
