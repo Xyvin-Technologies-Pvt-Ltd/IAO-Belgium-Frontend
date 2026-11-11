@@ -981,7 +981,7 @@ export default function MasterTrajectoryDetails() {
             await deleteQnaMutation.mutateAsync({
               thesisId,
               trajectoryId,
-              id: qnaItemToDelete._id,
+              itemId: qnaItemToDelete._id,
             });
             setIsDeleteConfirmOpen(false);
             setQnaItemToDelete(null);
