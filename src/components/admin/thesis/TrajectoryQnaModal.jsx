@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+import moment from "moment-timezone";
 import { toast } from "sonner";
 import {
   X,
@@ -52,8 +52,15 @@ export default function TrajectoryQnaModal({
   const updateMutation = useUpdateTrajectoryQnaAnnouncement();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  // Form states
-  const [audience, setAudience] = useState("after_purchase");
+  const savedAudience =
+    initialData?.audience === "before_purchase" ||
+    initialData?.audience === "after_purchase"
+      ? initialData.audience
+      : "after_purchase";
+
+  // Form states. null means "use the saved audience" so edit opens on the stored value.
+  const [audienceChoice, setAudienceChoice] = useState(null);
+  const audience = audienceChoice || savedAudience;
   const [isScheduled, setIsScheduled] = useState(false);
   const [title, setTitle] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
@@ -69,8 +76,8 @@ export default function TrajectoryQnaModal({
 
   // Initialize form state
   useEffect(() => {
+    setAudienceChoice(null);
     if (initialData) {
-      setAudience(initialData.audience || "after_purchase");
       setTitle(initialData.title || "");
       setMessage(initialData.message || "");
       setVideoCallLink(initialData.video_call_link || "");
@@ -113,7 +120,6 @@ export default function TrajectoryQnaModal({
           : []
       );
     } else {
-      setAudience("after_purchase");
       setIsScheduled(false);
       setTitle("");
       setScheduledDate("");
@@ -219,8 +225,17 @@ export default function TrajectoryQnaModal({
         );
         return;
       }
-      const timeStr = scheduledTime || "00:00";
-      scheduled_at = new Date(`${scheduledDate}T${timeStr}`);
+      if (scheduledTime) {
+        scheduled_at = new Date(`${scheduledDate}T${scheduledTime}`);
+      } else {
+        scheduled_at = moment
+          .tz(
+            `${scheduledDate} 23:59:59`,
+            "YYYY-MM-DD HH:mm:ss",
+            "Europe/Brussels"
+          )
+          .toDate();
+      }
     }
 
     const payload = {
@@ -310,7 +325,7 @@ export default function TrajectoryQnaModal({
                   {initialData?.audience === "before_purchase"
                     ? t(
                         "thesisManagement.qna.beforePurchaseTitle",
-                        "Eligible Students (Before & After Purchase)"
+                        "Eligible Students (Before Purchase)"
                       )
                     : t(
                         "thesisManagement.qna.afterPurchaseTitle",
@@ -494,20 +509,25 @@ export default function TrajectoryQnaModal({
                   {t("thesisManagement.qna.audienceLabel", "Target Audience")}{" "}
                   <span className="text-red-500">*</span>
                 </Label>
-                <Select value={audience} onValueChange={setAudience}>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t(
-                        "thesisManagement.qna.audiencePlaceholder",
-                        "Select target audience"
-                      )}
-                    />
+                <Select value={audience} onValueChange={setAudienceChoice}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {audience === "before_purchase"
+                        ? t(
+                            "thesisManagement.qna.beforePurchaseTitle",
+                            "Eligible Students (Before Purchase)"
+                          )
+                        : t(
+                            "thesisManagement.qna.afterPurchaseTitle",
+                            "Enrolled Students Only (After Purchase)"
+                          )}
+                    </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[200]">
                     <SelectItem value="before_purchase">
                       {t(
                         "thesisManagement.qna.beforePurchaseTitle",
-                        "Eligible Students (Before & After Purchase)"
+                        "Eligible Students (Before Purchase)"
                       )}
                     </SelectItem>
                     <SelectItem value="after_purchase">
@@ -522,7 +542,7 @@ export default function TrajectoryQnaModal({
                   {audience === "before_purchase"
                     ? t(
                         "thesisManagement.qna.beforePurchaseDesc",
-                        "Visible to all eligible students on thesis catalogue and enrolled view."
+                        "Visible only to eligible students on the thesis catalogue, before they purchase."
                       )
                     : t(
                         "thesisManagement.qna.afterPurchaseDesc",

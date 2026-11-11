@@ -43,7 +43,7 @@ const URL_PATTERN = /^https?:\/\/.+/i;
 const YOUTUBE_URL_PATTERN =
   /^https?:\/\/(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/).+/i;
 
-const STEP_TYPES = [
+const BASE_STEP_TYPES = [
   {
     value: "document_upload",
     labelKey: "thesisManagement.steps.types.documentUpload",
@@ -65,6 +65,12 @@ const STEP_TYPES = [
     labelDefault: "Form (questions)",
   },
 ];
+
+const ORAL_DEFENCE_STEP_TYPE = {
+  value: "oral_defence",
+  labelKey: "thesisManagement.steps.types.oralDefence",
+  labelDefault: "Oral defence",
+};
 
 const DEADLINE_MODES = [
   {
@@ -93,6 +99,7 @@ const STEP_TYPE_HINT = {
   document_upload: "document upload",
   teacher_approval: "teacher approval",
   form: "form",
+  oral_defence: "oral defence",
 };
 
 const StepForm = ({
@@ -102,8 +109,15 @@ const StepForm = ({
   initialData,
   siblingSteps = [],
   editingIndex = -1,
+  thesisType = "do",
 }) => {
   const { t } = useTranslation();
+  const STEP_TYPES = useMemo(() => {
+    if (thesisType === "master") {
+      return [...BASE_STEP_TYPES, ORAL_DEFENCE_STEP_TYPE];
+    }
+    return BASE_STEP_TYPES;
+  }, [thesisType]);
 
   const { data: rolesResponse, isLoading: isRolesLoading } = useGetThesisRoles({
     status: true,
@@ -124,7 +138,8 @@ const StepForm = ({
         return (
           step.type === "document_upload" ||
           step.type === "teacher_approval" ||
-          step.type === "form"
+          step.type === "form" ||
+          step.type === "oral_defence"
         );
       })
       .map(({ step, idx }) => {
@@ -453,6 +468,7 @@ const StepForm = ({
             sections: (formSchema.sections || []).map((sec, sIdx) => ({
               id: sec.id,
               title: String(sec.title || "").trim(),
+              description: String(sec.description || "").trim(),
               sequence: sIdx,
               questions: (sec.questions || []).map((q, qIdx) => ({
                 id: q.id,
@@ -557,7 +573,10 @@ const StepForm = ({
                 if (val !== "information_only" && deadlineMode === "event_date") {
                   setDeadlineMode("none");
                 }
-                if (val === "document_upload" && !initialData) {
+                if (
+                  (val === "document_upload" || val === "oral_defence") &&
+                  !initialData
+                ) {
                   setStudentUploadsDocument(true);
                 }
                 // New info-only steps default off so they don't inflate progress
@@ -650,8 +669,8 @@ const StepForm = ({
                 />
               </div>
 
-              {/* Student document upload (Only for document_upload) */}
-              {type === "document_upload" && (
+              {/* Student document upload (document_upload + oral_defence) */}
+              {(type === "document_upload" || type === "oral_defence") && (
                 <div className="flex items-center justify-between gap-3 pt-2 border-t border-border/40">
                   <Label
                     htmlFor="step-student-upload"

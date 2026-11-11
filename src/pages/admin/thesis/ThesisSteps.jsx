@@ -363,6 +363,7 @@ const ThesisSteps = () => {
         initialData={editingStep}
         siblingSteps={draftSteps}
         editingIndex={editingIndex}
+        thesisType={thesisType}
       />
 
       {/* Remove Confirmation Dialog */}

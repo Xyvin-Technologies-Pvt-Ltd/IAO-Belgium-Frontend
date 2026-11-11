@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Search, Plus, Trash2, Download, Users } from "lucide-react";
+import { Search, Plus, Trash2, Download, Users, BadgeCheck } from "lucide-react";
+import moment from "moment";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { ErrorMessage } from "@/components/common";
+import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,13 +18,38 @@ import {
 } from "@/components/ui/table/table";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
+import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import AddEligibleStudentsModal from "@/components/admin/thesis/AddEligibleStudentsModal";
+import MarkThesisPaidDialog from "@/components/admin/thesis/MarkThesisPaidDialog";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import {
   useGetThesisEligibleStudents,
   useRemoveThesisEligibleStudent,
   useExportThesisEligibleStudentsCsv,
 } from "@/store/useThesisStore";
+
+const markedPaidAudit = (markedPaid, t) => {
+  const admin = markedPaid?.marked_paid_by;
+  if (!admin) return null;
+  const name =
+    `${admin.first_name || ""} ${admin.last_name || ""}`.trim() ||
+    admin.email;
+  if (!name) return null;
+  const date = markedPaid?.marked_paid_at
+    ? moment(markedPaid.marked_paid_at).format("DD MMM YYYY")
+    : null;
+  return t(
+    "thesisManagement.markPaid.markedByAudit",
+    "Marked paid by {{name}}{{date}}",
+    { name, date: date ? ` · ${date}` : "" }
+  );
+};
+
+const purchaseStatus = (row) => {
+  if (!row.purchased) return "unpaid";
+  if (row.marked_paid?.marked_paid_by) return "marked_paid";
+  return "paid";
+};
 
 export default function ThesisEligibleStudentsSection({
   thesisId,
@@ -37,6 +64,8 @@ export default function ThesisEligibleStudentsSection({
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [studentToRemove, setStudentToRemove] = useState(null);
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false);
+  const [studentToMarkPaid, setStudentToMarkPaid] = useState(null);
+  const [isMarkPaidOpen, setIsMarkPaidOpen] = useState(false);
 
   const params = {
     page,
@@ -58,6 +87,7 @@ export default function ThesisEligibleStudentsSection({
   const exportCsvMutation = useExportThesisEligibleStudentsCsv();
 
   const students = response?.data?.students || [];
+  const thesisName = response?.data?.thesis?.name || "";
   const totalRows = response?.total_count ?? response?.data?.total_count ?? 0;
 
   const handleSearchChange = (e) => {
@@ -164,8 +194,10 @@ export default function ThesisEligibleStudentsSection({
               {t("thesisManagement.table.source", "Source")}
             </TableHead>
             {canModify && (
-              <TableHead className="text-right">
-                {t("common.actions", "Actions")}
+              <TableHead className="w-12 text-right">
+                <span className="sr-only">
+                  {t("common.actions", "Actions")}
+                </span>
               </TableHead>
             )}
           </TableRow>
@@ -202,31 +234,51 @@ export default function ThesisEligibleStudentsSection({
                     "Unknown Student"
                   );
               const isManual = row.source === "manual";
+              const audit = markedPaidAudit(row.marked_paid, t);
+              const actions = [];
+              if (canModify && !row.purchased && student?._id) {
+                actions.push({
+                  label: t(
+                    "thesisManagement.markPaid.confirm",
+                    "Mark as paid"
+                  ),
+                  icon: BadgeCheck,
+                  onClick: () => {
+                    setStudentToMarkPaid(student);
+                    setIsMarkPaidOpen(true);
+                  },
+                });
+              }
+              if (canModify && isManual) {
+                actions.push({
+                  label: t("common.remove", "Remove"),
+                  icon: Trash2,
+                  className:
+                    "text-red-600 focus:text-red-600 dark:text-red-400",
+                  onClick: () => {
+                    setStudentToRemove(student);
+                    setIsRemoveConfirmOpen(true);
+                  },
+                });
+              }
 
               return (
                 <TableRow key={row.application?._id || student?._id}>
-                  <TableCell>{student?.uid || "-"}</TableCell>
-                  <TableCell>{studentName}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    {student?.uid || "-"}
+                  </TableCell>
+                  <TableCell className="font-medium">{studentName}</TableCell>
                   <TableCell>{student?.email || "-"}</TableCell>
                   <TableCell>{row.batch?.name || "-"}</TableCell>
                   <TableCell>
-                    <span
-                      className={`text-xs font-medium ${
-                        row.purchased
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {row.purchased
-                        ? t(
-                            "thesisManagement.trajectories.purchased",
-                            "Purchased"
-                          )
-                        : t(
-                            "thesisManagement.trajectories.notPurchased",
-                            "Not purchased"
-                          )}
-                    </span>
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <StatusBadge status={purchaseStatus(row)} />
+                      {audit ? (
+                        <span className="truncate text-xs text-muted-foreground">
+                          {audit}
+                        </span>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {row.enrolled_trajectory?.name || (
@@ -252,23 +304,11 @@ export default function ThesisEligibleStudentsSection({
                     </span>
                   </TableCell>
                   {canModify && (
-                    <TableCell className="text-right">
-                      {isManual ? (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={() => {
-                            setStudentToRemove(student);
-                            setIsRemoveConfirmOpen(true);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
+                    <TableCell
+                      className="text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <RowActionMenu actions={actions} />
                     </TableCell>
                   )}
                 </TableRow>
@@ -312,6 +352,21 @@ export default function ThesisEligibleStudentsSection({
           thesisId={thesisId}
         />
       )}
+
+      {canModify ? (
+        <MarkThesisPaidDialog
+          open={isMarkPaidOpen}
+          onOpenChange={(open) => {
+            setIsMarkPaidOpen(open);
+            if (!open) setStudentToMarkPaid(null);
+          }}
+          thesisId={thesisId}
+          thesisName={thesisName}
+          student={studentToMarkPaid}
+          userId={studentToMarkPaid?._id}
+          onDone={() => refetch()}
+        />
+      ) : null}
 
       <DeleteConfirm
         open={isRemoveConfirmOpen}

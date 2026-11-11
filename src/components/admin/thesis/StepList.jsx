@@ -118,6 +118,11 @@ const SortableStepItem = ({
       icon: ListChecks,
       className: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
     },
+    oral_defence: {
+      label: t("thesisManagement.steps.type.oralDefence", "Oral Defence"),
+      icon: FileText,
+      className: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+    },
   }[step.type] || {
     label: step.type,
     icon: Layers,
@@ -249,7 +254,8 @@ const SortableStepItem = ({
         )}
 
         {/* Student Document Upload tag (if document upload type) */}
-        {step.type === "document_upload" && step.student_uploads_document && (
+        {(step.type === "document_upload" || step.type === "oral_defence") &&
+          step.student_uploads_document && (
           <span
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
             title={t("thesisManagement.steps.tags.studentUpload", "Student Upload")}

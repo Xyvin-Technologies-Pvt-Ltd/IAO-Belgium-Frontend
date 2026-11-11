@@ -39,6 +39,9 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import TrajectoryModal from "@/components/admin/thesis/TrajectoryModal";
 import TrajectoryStudentsFilterDrawer from "@/components/admin/thesis/TrajectoryStudentsFilterDrawer";
+import TrajectoryFormDataTab from "@/components/admin/thesis/TrajectoryFormDataTab";
+import TrajectoryEvaluationTab from "@/components/admin/thesis/TrajectoryEvaluationTab";
+import TrajectoryDissertationPassedTab from "@/components/admin/thesis/TrajectoryDissertationPassedTab";
 import TrajectoryQnaModal from "@/components/admin/thesis/TrajectoryQnaModal";
 import DeleteConfirm from "@/components/DeleteConfirm";
 import {
@@ -47,6 +50,7 @@ import {
   useGetTrajectoryQnaAnnouncements,
   useDeleteTrajectoryQnaAnnouncement,
   useExportTrajectoryStudentsCsv,
+  useExportTrajectoryStudentsDocumentsZip,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
 
@@ -69,20 +73,21 @@ export default function MasterTrajectoryDetails() {
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const [draftFilters, setDraftFilters] = useState({
     batch: "all",
     supervisor: "all",
     reader: "all",
     status: "all",
-    attention: "all",
   });
   const debouncedSearch = useDebounce(search, 400);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const isEnrolledTab = activeTab === "enrolled";
+  const isEvaluationTab = activeTab === "evaluation";
+  const isFormDataTab = activeTab === "form-data";
+  const isDissertationPassedTab = activeTab === "dissertation-passed";
   const isQnaTab = activeTab === "qna";
 
   const [qnaAudience, setQnaAudience] = useState("all");
@@ -125,9 +130,6 @@ export default function MasterTrajectoryDetails() {
     ...(isEnrolledTab && appliedFilters.status !== "all"
       ? { status: appliedFilters.status }
       : {}),
-    ...(isEnrolledTab && appliedFilters.attention !== "all"
-      ? { attention: appliedFilters.attention }
-      : {}),
   };
 
   const {
@@ -157,12 +159,24 @@ export default function MasterTrajectoryDetails() {
 
   const deleteQnaMutation = useDeleteTrajectoryQnaAnnouncement();
   const exportEnrolledCsvMutation = useExportTrajectoryStudentsCsv();
+  const exportDocumentsZipMutation =
+    useExportTrajectoryStudentsDocumentsZip();
 
   const exportCsvPending = exportEnrolledCsvMutation.isPending;
+  const exportZipPending = exportDocumentsZipMutation.isPending;
 
   const handleExportCsv = () => {
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
+      thesisId,
+      trajectoryId,
+      params: exportParams,
+    });
+  };
+
+  const handleDownloadDocumentsZip = () => {
+    const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
+    exportDocumentsZipMutation.mutate({
       thesisId,
       trajectoryId,
       params: exportParams,
@@ -184,6 +198,21 @@ export default function MasterTrajectoryDetails() {
   const nextDeadline = enrolledData?.next_deadline;
   const enrolledCount =
     enrolledResponse?.total_count ?? enrolledData?.total_count ?? 0;
+  const formSteps = enrolledData?.form_steps || [];
+  const hasFormSteps = formSteps.length > 0;
+  const hasOralDefenceStep = Boolean(enrolledData?.has_oral_defence_step);
+
+  useEffect(() => {
+    if (!hasFormSteps && activeTab === "form-data") {
+      setActiveTab("enrolled");
+    }
+  }, [hasFormSteps, activeTab]);
+
+  useEffect(() => {
+    if (!hasOralDefenceStep && activeTab === "dissertation-passed") {
+      setActiveTab("enrolled");
+    }
+  }, [hasOralDefenceStep, activeTab]);
 
   const students = enrolledData?.students || [];
   const totalRows = enrolledCount;
@@ -357,6 +386,35 @@ export default function MasterTrajectoryDetails() {
                 ),
               },
               {
+                id: "evaluation",
+                label: t(
+                  "thesisManagement.evaluation.tab",
+                  "Evaluation"
+                ),
+              },
+              ...(hasFormSteps
+                ? [
+                    {
+                      id: "form-data",
+                      label: t(
+                        "thesisManagement.formData.tab",
+                        "Form data"
+                      ),
+                    },
+                  ]
+                : []),
+              ...(hasOralDefenceStep
+                ? [
+                    {
+                      id: "dissertation-passed",
+                      label: t(
+                        "thesisManagement.oralDefence.tab",
+                        "Oral defence"
+                      ),
+                    },
+                  ]
+                : []),
+              {
                 id: "qna",
                 label: t(
                   "thesisManagement.trajectories.qnaAnnouncements",
@@ -380,7 +438,26 @@ export default function MasterTrajectoryDetails() {
           </nav>
         </div>
 
-        {isQnaTab ? (
+        {isEvaluationTab ? (
+          <TrajectoryEvaluationTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+          />
+        ) : isFormDataTab && hasFormSteps ? (
+          <TrajectoryFormDataTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+            formSteps={formSteps}
+          />
+        ) : isDissertationPassedTab && hasOralDefenceStep ? (
+          <TrajectoryDissertationPassedTab
+            thesisId={thesisId}
+            trajectoryId={trajectoryId}
+            basePath={basePath}
+          />
+        ) : isQnaTab ? (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -508,12 +585,19 @@ export default function MasterTrajectoryDetails() {
                         </TableCell>
                         <TableCell>
                           {item.scheduled_at ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                              <Calendar className="w-3 h-3" />
-                              {moment(item.scheduled_at).format(
-                                "DD/MM/YYYY HH:mm"
-                              )}
-                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                                <Calendar className="w-3 h-3" />
+                                {moment(item.scheduled_at).format(
+                                  "DD/MM/YYYY HH:mm"
+                                )}
+                              </span>
+                              {moment(item.scheduled_at).isBefore(moment()) ? (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border">
+                                  {t("thesisManagement.qna.expired", "Expired")}
+                                </span>
+                              ) : null}
+                            </div>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
                               <MessageSquare className="w-3 h-3" />
@@ -685,18 +769,35 @@ export default function MasterTrajectoryDetails() {
               />
             )}
             {!isQnaTab && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportCsv}
-                disabled={exportCsvPending}
-                className="gap-2 h-9"
-              >
-                <Download className="w-4 h-4" />
-                {exportCsvPending
-                  ? t("common.exporting", "Exporting...")
-                  : t("common.exportCsv", "Export CSV")}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCsv}
+                  disabled={exportCsvPending || exportZipPending}
+                  className="gap-2 h-9"
+                >
+                  <Download className="w-4 h-4" />
+                  {exportCsvPending
+                    ? t("common.exporting", "Exporting...")
+                    : t("common.exportCsv", "Export CSV")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadDocumentsZip}
+                  disabled={exportZipPending || exportCsvPending}
+                  className="gap-2 h-9"
+                >
+                  <Download className="w-4 h-4" />
+                  {exportZipPending
+                    ? t("common.downloading", "Downloading...")
+                    : t(
+                        "thesisManagement.trajectories.downloadDocuments",
+                        "Download documents"
+                      )}
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -725,9 +826,6 @@ export default function MasterTrajectoryDetails() {
                 <TableHead>
                   {t("thesisManagement.table.status", "Status")}
                 </TableHead>
-                <TableHead>
-                  {t("thesisManagement.table.attention", "Attention")}
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody
@@ -736,10 +834,10 @@ export default function MasterTrajectoryDetails() {
               }
             >
               {isListLoading ? (
-                <TableSkeleton rows={rowsPerPage} columns={8} />
+                <TableSkeleton rows={rowsPerPage} columns={7} />
               ) : listError ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center p-8">
+                  <TableCell colSpan={7} className="text-center p-8">
                     <ErrorMessage
                       message={
                         listError?.message ||
@@ -761,18 +859,6 @@ export default function MasterTrajectoryDetails() {
                         "Unknown Student"
                       );
                   const attemptStatus = row.attempt?.status || "active";
-                  const attentionLabel =
-                    row.attention === "suggest_fail"
-                      ? t(
-                          "thesisManagement.attempt.suggestFail",
-                          "Overdue — review fail"
-                        )
-                      : row.attention === "suggest_pass"
-                        ? t(
-                            "thesisManagement.attempt.suggestPass",
-                            "Ready for pass"
-                          )
-                        : "—";
 
                   return (
                     <TableRow
@@ -795,25 +881,25 @@ export default function MasterTrajectoryDetails() {
                       <TableCell>{studentName}</TableCell>
                       <TableCell>{row.batch?.name || "-"}</TableCell>
                       <TableCell>{row.supervisor?.name || "-"}</TableCell>
-                      <TableCell>{row.reader?.name || "-"}</TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <div>{row.reader?.name || "-"}</div>
+                          {row.additional_reader?.name ? (
+                            <div className="text-xs text-muted-foreground">
+                              {t(
+                                "thesisManagement.table.additionalReader",
+                                "Additional"
+                              )}
+                              : {row.additional_reader.name}
+                            </div>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {row.attempt?.attempt_number ?? "-"}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={attemptStatus} />
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium ${
-                            row.attention === "suggest_fail"
-                              ? "text-destructive"
-                              : row.attention === "suggest_pass"
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-muted-foreground"
-                          }`}
-                        >
-                          {attentionLabel}
-                        </span>
                       </TableCell>
                     </TableRow>
                   );
@@ -821,7 +907,7 @@ export default function MasterTrajectoryDetails() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="text-center py-6 text-muted-foreground"
                   >
                     {search ||
@@ -895,7 +981,7 @@ export default function MasterTrajectoryDetails() {
             await deleteQnaMutation.mutateAsync({
               thesisId,
               trajectoryId,
-              id: qnaItemToDelete._id,
+              itemId: qnaItemToDelete._id,
             });
             setIsDeleteConfirmOpen(false);
             setQnaItemToDelete(null);

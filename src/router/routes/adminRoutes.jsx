@@ -10,6 +10,7 @@ import TrajectoryDetails from "@/pages/admin/thesis/TrajectoryDetails";
 import TrajectoryStudentDetail from "@/pages/admin/thesis/TrajectoryStudentDetail";
 import MasterTrajectoryDetails from "@/pages/admin/master-thesis/MasterTrajectoryDetails";
 import MasterTrajectoryStudentDetail from "@/pages/admin/master-thesis/MasterTrajectoryStudentDetail";
+import MarkingSchemePage from "@/pages/admin/thesis/MarkingSchemePage";
 import Submissions from "@/pages/admin/submission";
 import Locations from "@/pages/admin/location";
 import ApplicationReview from "@/pages/admin/application-review";
@@ -133,6 +134,10 @@ export const adminRoutes = [
     component: withPermissionProtection(ThesisDeadlines, "/admin/thesis"),
   },
   {
+    path: "/admin/thesis/$id/marking-scheme",
+    component: withPermissionProtection(MarkingSchemePage, "/admin/thesis"),
+  },
+  {
     path: "/admin/thesis/$id/trajectories/$trajectoryId",
     component: withPermissionProtection(TrajectoryDetails, "/admin/thesis"),
   },
@@ -159,6 +164,10 @@ export const adminRoutes = [
   {
     path: "/admin/master-thesis/$id/deadlines",
     component: withPermissionProtection(ThesisDeadlines, "/admin/master-thesis"),
+  },
+  {
+    path: "/admin/master-thesis/$id/marking-scheme",
+    component: withPermissionProtection(MarkingSchemePage, "/admin/master-thesis"),
   },
   {
     path: "/admin/master-thesis/$id/trajectories/$trajectoryId",

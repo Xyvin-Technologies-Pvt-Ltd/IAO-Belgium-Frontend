@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, Trash2, Search } from "lucide-react";
@@ -49,6 +49,11 @@ const formatRoleLabel = (role, t) => {
   if (role === "supervisor")
     return t("thesisManagement.teacher.supervisor", "Supervisor");
   if (role === "reader") return t("thesisManagement.teacher.reader", "Reader");
+  if (role === "additional_reader")
+    return t(
+      "thesisManagement.teacher.additionalReader",
+      "Additional Reader"
+    );
   return role
     ? String(role)
         .replace(/_/g, " ")
@@ -540,8 +545,8 @@ const ContactInfoForm = ({ initialCard, onSave, isSaving }) => {
 
 const StudentsTab = () => {
   const { t } = useTranslation();
-  // const navigate = useNavigate();
-  const { type, isMaster } = useThesisTeacherKind(); // basePath unused while detail navigate is commented
+  const navigate = useNavigate();
+  const { type, basePath, isMaster } = useThesisTeacherKind();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -639,25 +644,24 @@ const StudentsTab = () => {
                 return (
                   <TableRow
                     key={key}
-                    // Detail navigation temporarily disabled
-                    // className="cursor-pointer"
-                    // onClick={() => {
-                    //   if (
-                    //     !row.thesis?._id ||
-                    //     !row.trajectory?._id ||
-                    //     !row.student?._id
-                    //   ) {
-                    //     return;
-                    //   }
-                    //   navigate({
-                    //     to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
-                    //     params: {
-                    //       thesisId: row.thesis._id,
-                    //       trajectoryId: row.trajectory._id,
-                    //       userId: row.student._id,
-                    //     },
-                    //   });
-                    // }}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (
+                        !row.thesis?._id ||
+                        !row.trajectory?._id ||
+                        !row.student?._id
+                      ) {
+                        return;
+                      }
+                      navigate({
+                        to: `${basePath}/$thesisId/trajectories/$trajectoryId/students/$userId`,
+                        params: {
+                          thesisId: row.thesis._id,
+                          trajectoryId: row.trajectory._id,
+                          userId: row.student._id,
+                        },
+                      });
+                    }}
                   >
                     <TableCell className="capitalize">
                       <div className="space-y-0.5">

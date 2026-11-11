@@ -47,6 +47,8 @@ import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
+import ThesisEvaluationPanel from "@/components/admin/thesis/ThesisEvaluationPanel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -73,6 +75,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   useGetTrajectoryStudentDetail,
   useUpdateTrajectoryStudentReader,
+  useUpdateTrajectoryStudentAdditionalReader,
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
   useReenrollTrajectoryStudent,
@@ -84,6 +87,37 @@ import {
   useGetThesisTrajectories,
   useGetTheses,
 } from "@/store/useThesisStore";
+
+const staffOptionValue = (person) => {
+  if (!person?._id) return "NONE";
+  const type = person.teacher_type === "external" ? "external" : "internal";
+  return `${type}:${person._id}`;
+};
+
+const StaffOptionLabel = ({ person, t }) => {
+  const name =
+    `${person?.first_name || ""} ${person?.last_name || ""}`.trim() ||
+    person?.email ||
+    "—";
+  const email = person?.email ? ` (${person.email})` : "";
+  const isExternal = person?.teacher_type === "external";
+  return (
+    <span className="inline-flex items-center gap-1.5 flex-wrap">
+      <span>
+        {name}
+        {email}
+      </span>
+      {isExternal && (
+        <Badge
+          variant="outline"
+          className="text-[10px] px-1.5 py-0 border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 font-normal"
+        >
+          {t("thesisManagement.teachers.external", "External")}
+        </Badge>
+      )}
+    </span>
+  );
+};
 
 const RichHtml = ({ html, className = "" }) => {
   const secureHtml = useSecureHtml(html);
@@ -138,8 +172,20 @@ const RichHtml = ({ html, className = "" }) => {
   );
 };
 
-const formatActionLabel = (action) => {
-  if (!action) return "Activity";
+const formatActionLabel = (action, t) => {
+  if (!action) return t ? t("thesisManagement.activity", "Activity") : "Activity";
+  const known = {
+    additional_reader_assigned: "thesisManagement.activityLabels.additionalReaderAssigned",
+    additional_reader_cleared: "thesisManagement.activityLabels.additionalReaderCleared",
+  };
+  if (t && known[action]) {
+    return t(
+      known[action],
+      action
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    );
+  }
   return action
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -224,6 +270,7 @@ export default function TrajectoryStudentDetail() {
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
   const [reenrollOpen, setReenrollOpen] = useState(false);
   const [reenrollThesisId, setReenrollThesisId] = useState("");
+  const [detailTab, setDetailTab] = useState("progress");
   const [moveOpen, setMoveOpen] = useState(false);
   const [moveTrajectoryId, setMoveTrajectoryId] = useState("");
 
@@ -246,6 +293,8 @@ export default function TrajectoryStudentDetail() {
   });
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
+  const updateAdditionalReaderMutation =
+    useUpdateTrajectoryStudentAdditionalReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
   const reenrollMutation = useReenrollTrajectoryStudent();
@@ -260,10 +309,17 @@ export default function TrajectoryStudentDetail() {
   const thesis = detail?.thesis;
   const trajectory = detail?.trajectory;
   const reader = detail?.reader;
+  const additionalReader = detail?.additional_reader;
   const supervisor = detail?.supervisor;
   const supervisorRequest = detail?.supervisor_request;
   const eligibleReaders = detail?.eligible_readers || [];
   const eligibleSupervisors = detail?.supervisors || [];
+  const primaryReaderOptions = eligibleReaders.filter(
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(additionalReader)
+  );
+  const additionalReaderOptions = eligibleReaders.filter(
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(reader)
+  );
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
   const allLogs = useMemo(() => detail?.logs || [], [detail?.logs]);
@@ -275,9 +331,6 @@ export default function TrajectoryStudentDetail() {
   const attemptStatus = attempt?.status || "active";
   const hasReenrolled = Boolean(detail?.has_reenrolled);
   const attemptActionsDisabled = hasReenrolled;
-  const failReasons = detail?.fail_reasons || [];
-  const suggestPass = detail?.suggest_pass;
-  const suggestFail = detail?.suggest_fail;
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
@@ -365,15 +418,33 @@ export default function TrajectoryStudentDetail() {
     }
   };
 
+  const handleAdditionalReaderChange = async (selectedReaderId) => {
+    const readerValue = selectedReaderId === "NONE" ? null : selectedReaderId;
+    try {
+      await updateAdditionalReaderMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        additional_reader: readerValue,
+      });
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
   const handleSupervisorSubmit = async () => {
-    const supervisorValue = selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const supervisorValue =
+      selectedSupervisorId === "NONE" ? null : selectedSupervisorId;
+    const isExternalSelection =
+      typeof supervisorValue === "string" &&
+      supervisorValue.startsWith("external:");
     try {
       await updateSupervisorMutation.mutateAsync({
         thesisId,
         trajectoryId,
         userId,
         supervisor: supervisorValue,
-        status: selectedSupervisorStatus,
+        status: isExternalSelection ? "approved" : selectedSupervisorStatus,
       });
       setSupervisorModalOpen(false);
     } catch {
@@ -382,7 +453,7 @@ export default function TrajectoryStudentDetail() {
   };
 
   const openSupervisorEdit = () => {
-    setSelectedSupervisorId(supervisor?._id || "NONE");
+    setSelectedSupervisorId(staffOptionValue(supervisor));
     setSelectedSupervisorStatus(supervisorRequest?.status || "approved");
     setSupervisorModalOpen(true);
   };
@@ -644,6 +715,8 @@ export default function TrajectoryStudentDetail() {
         return t("thesis.types.informationOnly", "Information Only");
       case "form":
         return t("thesis.types.form", "Form");
+      case "oral_defence":
+        return t("thesis.types.oralDefence", "Oral Defence");
       default:
         return type;
     }
@@ -930,57 +1003,6 @@ export default function TrajectoryStudentDetail() {
         />
       </div>
 
-      {/* Signal / Hint Banners when active */}
-      {attemptStatus === "active" && suggestPass && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-950 dark:text-emerald-200">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span className="font-semibold">
-              {t("thesisManagement.attempt.passHint", "All required steps are complete! You can mark this thesis attempt as passed.")}
-            </span>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "passed", reason: "" })}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markPassed", "Mark as Passed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
-      {attemptStatus === "active" && suggestFail && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 dark:text-amber-200">
-          <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-            <div className="space-y-0.5">
-              <span className="font-semibold">
-                {t("thesisManagement.attempt.failHint", "Signals suggest marking failed.")}
-              </span>
-              {failReasons.length > 0 && (
-                <span className="ml-1 text-[11px] text-amber-800 dark:text-amber-300">
-                  ({failReasons.map((r) => (r.type === "trajectory_ended" ? t("thesisManagement.attempt.trajectoryEnded", "Trajectory ended") : `${r.step_name || "Step"} overdue`)).join(", ")})
-                </span>
-              )}
-            </div>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 px-3.5 text-destructive border-destructive/30 hover:bg-destructive/10 font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "failed", reason: "" })}
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markFailed", "Mark as Failed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
       {attempt?.status_reason && (
         <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground flex items-center gap-2">
           <strong className="text-foreground">{t("thesisManagement.attempt.reason", "Reason")}:</strong>
@@ -988,8 +1010,31 @@ export default function TrajectoryStudentDetail() {
         </div>
       )}
 
-      {/* Main Content Layout: Left (Steps) | Right (Assigned Reader & Activity Log) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="flex gap-2 border-b border-border">
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "progress" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("progress")}
+        >
+          {t("thesisManagement.marking.progressTab", "Progress")}
+        </button>
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "evaluation" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("evaluation")}
+        >
+          {t("thesisManagement.marking.evaluationTab", "Evaluation")}
+        </button>
+      </div>
+      {detailTab === "evaluation" && (
+        <ThesisEvaluationPanel
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          userId={userId}
+          canModify={canModify}
+        />
+      )}
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 items-start ${detailTab === "evaluation" ? "hidden" : ""}`}>
         {/* Left Column (8 cols): Steps & Submissions */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
           {/* Steps & Submissions Section */}
@@ -1527,7 +1572,7 @@ export default function TrajectoryStudentDetail() {
             </label>
             <Select
               disabled={!canModify || updateReaderMutation.isPending}
-              value={reader?._id || "NONE"}
+              value={staffOptionValue(reader)}
               onValueChange={handleReaderChange}
             >
               <SelectTrigger className="w-full h-9 bg-background text-xs">
@@ -1537,9 +1582,81 @@ export default function TrajectoryStudentDetail() {
                 <SelectItem value="NONE" className="text-xs text-muted-foreground">
                   {t("thesisManagement.noReaderAssigned", "— No Reader Assigned —")}
                 </SelectItem>
-                {eligibleReaders.map((teacher) => (
-                  <SelectItem key={teacher._id} value={teacher._id} className="text-xs">
-                    {teacher.first_name} {teacher.last_name} ({teacher.email})
+                {primaryReaderOptions.map((teacher) => (
+                  <SelectItem
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
+                    className="text-xs"
+                  >
+                    <StaffOptionLabel person={teacher} t={t} />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Additional Reader Card */}
+        <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <UserCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">
+                  {t(
+                    "thesisManagement.assignedAdditionalReader",
+                    "Additional Reader"
+                  )}
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.additionalReaderDesc",
+                    "Optional second thesis evaluator"
+                  )}
+                </p>
+              </div>
+            </div>
+            {updateAdditionalReaderMutation.isPending && (
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground block">
+              {t(
+                "thesisManagement.selectAdditionalReader",
+                "Select Additional Reader"
+              )}
+            </label>
+            <Select
+              disabled={!canModify || updateAdditionalReaderMutation.isPending}
+              value={staffOptionValue(additionalReader)}
+              onValueChange={handleAdditionalReaderChange}
+            >
+              <SelectTrigger className="w-full h-9 bg-background text-xs">
+                <SelectValue
+                  placeholder={t(
+                    "thesisManagement.selectAdditionalReader",
+                    "Select Additional Reader..."
+                  )}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NONE" className="text-xs text-muted-foreground">
+                  {t(
+                    "thesisManagement.noAdditionalReaderAssigned",
+                    "— No Additional Reader —"
+                  )}
+                </SelectItem>
+                {additionalReaderOptions.map((teacher) => (
+                  <SelectItem
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
+                    className="text-xs"
+                  >
+                    <StaffOptionLabel person={teacher} t={t} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -1553,6 +1670,7 @@ export default function TrajectoryStudentDetail() {
           trajectoryId={trajectoryId}
           userId={userId}
           notes={personalNotes}
+          steps={steps}
           canModify={canModify}
         />
 
@@ -1628,7 +1746,7 @@ export default function TrajectoryStudentDetail() {
                           <span
                             className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${meta.badgeClass}`}
                           >
-                            {formatActionLabel(log.action)}
+                            {formatActionLabel(log.action, t)}
                           </span>
                           {stepName && (
                             <span
@@ -1715,8 +1833,12 @@ export default function TrajectoryStudentDetail() {
                     {t("thesisManagement.noSupervisorAssigned", "— No Supervisor Assigned —")}
                   </SelectItem>
                   {eligibleSupervisors.map((s) => (
-                    <SelectItem key={s._id} value={s._id} className="text-xs">
-                      {s.first_name} {s.last_name} ({s.email})
+                    <SelectItem
+                      key={staffOptionValue(s)}
+                      value={staffOptionValue(s)}
+                      className="text-xs"
+                    >
+                      <StaffOptionLabel person={s} t={t} />
                     </SelectItem>
                   ))}
                 </SelectContent>

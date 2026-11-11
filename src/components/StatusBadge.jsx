@@ -19,6 +19,7 @@ const statusVariants = {
   drafted: "text-amber-600",
   draft: "text-amber-600",
   published: "text-green-600",
+  unpublished: "text-amber-600",
   archived: "text-gray-500",
   sended: "text-green-600",
   scheduled: "text-blue-600",

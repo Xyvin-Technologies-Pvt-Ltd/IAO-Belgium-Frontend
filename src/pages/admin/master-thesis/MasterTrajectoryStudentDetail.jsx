@@ -46,6 +46,7 @@ import DashboardCard from "@/components/admin/dashboard/DashboardCard";
 import StudentPersonalNotesCard from "@/components/admin/thesis/StudentPersonalNotesCard";
 import StatusBadge from "@/components/StatusBadge";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
+import ThesisEvaluationPanel from "@/components/admin/thesis/ThesisEvaluationPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -73,10 +74,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   useGetTrajectoryStudentDetail,
   useUpdateTrajectoryStudentReader,
+  useUpdateTrajectoryStudentAdditionalReader,
   useUpdateTrajectoryStudentSupervisor,
   useUpdateTrajectoryStudentAttemptStatus,
   useReenrollTrajectoryStudent,
   useUpdateTrajectoryStudentStepDeadline,
+  useUpdateOralDefenceSchedule,
   useUploadStaffThesisDocument,
   useRenameStaffThesisDocument,
   useDeleteStaffThesisDocument,
@@ -167,8 +170,20 @@ const RichHtml = ({ html, className = "" }) => {
   );
 };
 
-const formatActionLabel = (action) => {
-  if (!action) return "Activity";
+const formatActionLabel = (action, t) => {
+  if (!action) return t ? t("thesisManagement.activity", "Activity") : "Activity";
+  const known = {
+    additional_reader_assigned: "thesisManagement.activityLabels.additionalReaderAssigned",
+    additional_reader_cleared: "thesisManagement.activityLabels.additionalReaderCleared",
+  };
+  if (t && known[action]) {
+    return t(
+      known[action],
+      action
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    );
+  }
   return action
     .replace(/_/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -248,8 +263,10 @@ export default function MasterTrajectoryStudentDetail() {
   // Attempt status decision modal
   const [statusDraft, setStatusDraft] = useState(null); // { status: 'passed'|'failed', reason: '' }
   const [deadlineDraft, setDeadlineDraft] = useState(null); // { stepId, date: 'YYYY-MM-DD' }
+  const [oralScheduleDraft, setOralScheduleDraft] = useState(null); // { stepId, date, time, meeting_link }
   const [reenrollOpen, setReenrollOpen] = useState(false);
   const [reenrollThesisId, setReenrollThesisId] = useState("");
+  const [detailTab, setDetailTab] = useState("progress");
 
   // Queries & Mutations
   const {
@@ -267,10 +284,13 @@ export default function MasterTrajectoryStudentDetail() {
   );
 
   const updateReaderMutation = useUpdateTrajectoryStudentReader();
+  const updateAdditionalReaderMutation =
+    useUpdateTrajectoryStudentAdditionalReader();
   const updateSupervisorMutation = useUpdateTrajectoryStudentSupervisor();
   const updateAttemptStatusMutation = useUpdateTrajectoryStudentAttemptStatus();
   const reenrollMutation = useReenrollTrajectoryStudent();
   const updateStepDeadlineMutation = useUpdateTrajectoryStudentStepDeadline();
+  const updateOralScheduleMutation = useUpdateOralDefenceSchedule();
   const uploadDocMutation = useUploadStaffThesisDocument();
   const renameDocMutation = useRenameStaffThesisDocument();
   const deleteDocMutation = useDeleteStaffThesisDocument();
@@ -280,10 +300,17 @@ export default function MasterTrajectoryStudentDetail() {
   const thesis = detail?.thesis;
   const trajectory = detail?.trajectory;
   const reader = detail?.reader;
+  const additionalReader = detail?.additional_reader;
   const supervisor = detail?.supervisor;
   const supervisorRequest = detail?.supervisor_request;
   const eligibleReaders = detail?.eligible_readers || [];
   const eligibleSupervisors = detail?.supervisors || [];
+  const primaryReaderOptions = eligibleReaders.filter(
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(additionalReader)
+  );
+  const additionalReaderOptions = eligibleReaders.filter(
+    (teacher) => staffOptionValue(teacher) !== staffOptionValue(reader)
+  );
   const steps = useMemo(() => detail?.steps || [], [detail?.steps]);
   const progress = detail?.progress || { total: 0, completed: 0, percentage: 0 };
   const allLogs = useMemo(() => detail?.logs || [], [detail?.logs]);
@@ -295,9 +322,6 @@ export default function MasterTrajectoryStudentDetail() {
   const attemptStatus = attempt?.status || "active";
   const hasReenrolled = Boolean(detail?.has_reenrolled);
   const attemptActionsDisabled = hasReenrolled;
-  const failReasons = detail?.fail_reasons || [];
-  const suggestPass = detail?.suggest_pass;
-  const suggestFail = detail?.suggest_fail;
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
@@ -369,6 +393,20 @@ export default function MasterTrajectoryStudentDetail() {
         trajectoryId,
         userId,
         reader: readerValue,
+      });
+    } catch {
+      // Error handled by store hook
+    }
+  };
+
+  const handleAdditionalReaderChange = async (selectedReaderId) => {
+    const readerValue = selectedReaderId === "NONE" ? null : selectedReaderId;
+    try {
+      await updateAdditionalReaderMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        additional_reader: readerValue,
       });
     } catch {
       // Error handled by store hook
@@ -640,8 +678,33 @@ export default function MasterTrajectoryStudentDetail() {
         return t("thesis.types.informationOnly", "Information Only");
       case "form":
         return t("thesis.types.form", "Form");
+      case "oral_defence":
+        return t("thesis.types.oralDefence", "Oral Defence");
       default:
         return type;
+    }
+  };
+
+  const handleOralScheduleSave = async () => {
+    if (!oralScheduleDraft?.stepId || !oralScheduleDraft?.date) return;
+    const timePart = oralScheduleDraft.time || "09:00";
+    const scheduled_at = moment(
+      `${oralScheduleDraft.date} ${timePart}`,
+      "YYYY-MM-DD HH:mm"
+    );
+    if (!scheduled_at.isValid()) return;
+    try {
+      await updateOralScheduleMutation.mutateAsync({
+        thesisId,
+        trajectoryId,
+        userId,
+        stepId: oralScheduleDraft.stepId,
+        scheduled_at: scheduled_at.toISOString(),
+        meeting_link: oralScheduleDraft.meeting_link || "",
+      });
+      setOralScheduleDraft(null);
+    } catch {
+      // Error handled by store hook
     }
   };
 
@@ -896,57 +959,6 @@ export default function MasterTrajectoryStudentDetail() {
         />
       </div>
 
-      {/* Signal / Hint Banners when active */}
-      {attemptStatus === "active" && suggestPass && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-950 dark:text-emerald-200">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span className="font-semibold">
-              {t("thesisManagement.attempt.passHint", "All required steps are complete! You can mark this thesis attempt as passed.")}
-            </span>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              className="h-8 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "passed", reason: "" })}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markPassed", "Mark as Passed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
-      {attemptStatus === "active" && suggestFail && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 dark:text-amber-200">
-          <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-            <div className="space-y-0.5">
-              <span className="font-semibold">
-                {t("thesisManagement.attempt.failHint", "Signals suggest marking failed.")}
-              </span>
-              {failReasons.length > 0 && (
-                <span className="ml-1 text-[11px] text-amber-800 dark:text-amber-300">
-                  ({failReasons.map((r) => (r.type === "trajectory_ended" ? t("thesisManagement.attempt.trajectoryEnded", "Trajectory ended") : `${r.step_name || "Step"} overdue`)).join(", ")})
-                </span>
-              )}
-            </div>
-          </div>
-          {canModify && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 px-3.5 text-destructive border-destructive/30 hover:bg-destructive/10 font-semibold self-start sm:self-auto gap-1.5"
-              onClick={() => setStatusDraft({ status: "failed", reason: "" })}
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>{t("thesisManagement.attempt.markFailed", "Mark as Failed")}</span>
-            </Button>
-          )}
-        </div>
-      )}
-
       {attempt?.status_reason && (
         <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground flex items-center gap-2">
           <strong className="text-foreground">{t("thesisManagement.attempt.reason", "Reason")}:</strong>
@@ -954,8 +966,31 @@ export default function MasterTrajectoryStudentDetail() {
         </div>
       )}
 
-      {/* Main Content Layout: Left (Steps) | Right (Assigned Reader & Activity Log) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="flex gap-2 border-b border-border">
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "progress" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("progress")}
+        >
+          {t("thesisManagement.marking.progressTab", "Progress")}
+        </button>
+        <button
+          type="button"
+          className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${detailTab === "evaluation" ? "border-primary text-foreground" : "border-transparent text-muted-foreground"}`}
+          onClick={() => setDetailTab("evaluation")}
+        >
+          {t("thesisManagement.marking.evaluationTab", "Evaluation")}
+        </button>
+      </div>
+      {detailTab === "evaluation" && (
+        <ThesisEvaluationPanel
+          thesisId={thesisId}
+          trajectoryId={trajectoryId}
+          userId={userId}
+          canModify={canModify}
+        />
+      )}
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 items-start ${detailTab === "evaluation" ? "hidden" : ""}`}>
         {/* Left Column (8 cols): Steps & Submissions */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
           {/* Steps & Submissions Section */}
@@ -1008,7 +1043,9 @@ export default function MasterTrajectoryStudentDetail() {
                           </span>
                         );
                       })()}
-                      {step.type === "document_upload" && step.student_uploads_document === false && (
+                      {(step.type === "document_upload" ||
+                        step.type === "oral_defence") &&
+                        step.student_uploads_document === false && (
                         <span className="font-medium px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                           {t("thesis.staffUploadOnly", "Staff upload only")}
                         </span>
@@ -1079,7 +1116,15 @@ export default function MasterTrajectoryStudentDetail() {
 
                 {/* Instruction & Resources */}
                 <div className="pl-0 sm:pl-8 space-y-3">
-                  {step.status === "locked" && (
+                  {step.status === "locked" && step.type === "oral_defence" && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300">
+                      {t(
+                        "thesis.oralDefence.lockedNotice",
+                        "Oral defence is locked until the dissertation result is published and the student has passed (pass percentage)."
+                      )}
+                    </div>
+                  )}
+                  {step.status === "locked" && step.type !== "oral_defence" && (
                     <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
                       <Lock className="w-3.5 h-3.5 shrink-0" />
                       <span>
@@ -1238,8 +1283,79 @@ export default function MasterTrajectoryStudentDetail() {
                     </div>
                   )}
 
-                  {/* Step Action 1: Document Upload */}
-                  {step.type === "document_upload" && (
+                  {step.type === "oral_defence" && (
+                    <div className="space-y-4 pt-2 border-t border-border/40">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-1">
+                          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                            {t("thesis.oralDefence.schedule", "Oral defence schedule")}
+                          </span>
+                          {step.oral_defence_schedule?.scheduled_at ? (
+                            <div className="text-sm text-foreground space-y-0.5">
+                              <p>
+                                <span className="text-muted-foreground">
+                                  {t("thesis.oralDefence.statusScheduled", "Scheduled")}:{" "}
+                                </span>
+                                {moment(step.oral_defence_schedule.scheduled_at).format(
+                                  "DD/MM/YYYY HH:mm"
+                                )}
+                              </p>
+                              {step.oral_defence_schedule.meeting_link ? (
+                                <a
+                                  href={step.oral_defence_schedule.meeting_link}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-primary underline break-all text-xs"
+                                >
+                                  {step.oral_defence_schedule.meeting_link}
+                                </a>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              {t(
+                                "thesis.oralDefence.statusNotScheduled",
+                                "Not scheduled"
+                              )}
+                            </p>
+                          )}
+                        </div>
+                        {canModify && step.status !== "locked" && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-1.5"
+                            onClick={() => {
+                              const existing = step.oral_defence_schedule;
+                              setOralScheduleDraft({
+                                stepId: step._id,
+                                date: existing?.scheduled_at
+                                  ? moment(existing.scheduled_at).format("YYYY-MM-DD")
+                                  : "",
+                                time: existing?.scheduled_at
+                                  ? moment(existing.scheduled_at).format("HH:mm")
+                                  : "09:00",
+                                meeting_link: existing?.meeting_link || "",
+                              });
+                            }}
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            {step.oral_defence_schedule?.scheduled_at
+                              ? t("thesis.oralDefence.reschedule", "Update schedule")
+                              : t(
+                                  "thesis.oralDefence.scheduleAction",
+                                  "Schedule oral defence"
+                                )}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step Action 1: Document Upload / Oral defence docs */}
+                  {(step.type === "document_upload" ||
+                    step.type === "oral_defence") && (
                     <div className="space-y-3 pt-2">
                       {/* Submissions list */}
                       {step.documents && step.documents.length > 0 && (
@@ -1565,7 +1681,75 @@ export default function MasterTrajectoryStudentDetail() {
                 <SelectItem value="NONE" className="text-xs text-muted-foreground">
                   {t("thesisManagement.noReaderAssigned", "— No Reader Assigned —")}
                 </SelectItem>
-                {eligibleReaders.map((teacher) => (
+                {primaryReaderOptions.map((teacher) => (
+                  <SelectItem
+                    key={staffOptionValue(teacher)}
+                    value={staffOptionValue(teacher)}
+                    className="text-xs"
+                  >
+                    <StaffOptionLabel person={teacher} t={t} />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Additional Reader Card */}
+        <div className="bg-card border border-border rounded-xl p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <UserCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">
+                  {t(
+                    "thesisManagement.assignedAdditionalReader",
+                    "Additional Reader"
+                  )}
+                </h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {t(
+                    "thesisManagement.additionalReaderDesc",
+                    "Optional second thesis evaluator"
+                  )}
+                </p>
+              </div>
+            </div>
+            {updateAdditionalReaderMutation.isPending && (
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground block">
+              {t(
+                "thesisManagement.selectAdditionalReader",
+                "Select Additional Reader"
+              )}
+            </label>
+            <Select
+              disabled={!canModify || updateAdditionalReaderMutation.isPending}
+              value={staffOptionValue(additionalReader)}
+              onValueChange={handleAdditionalReaderChange}
+            >
+              <SelectTrigger className="w-full h-9 bg-background text-xs">
+                <SelectValue
+                  placeholder={t(
+                    "thesisManagement.selectAdditionalReader",
+                    "Select Additional Reader..."
+                  )}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NONE" className="text-xs text-muted-foreground">
+                  {t(
+                    "thesisManagement.noAdditionalReaderAssigned",
+                    "— No Additional Reader —"
+                  )}
+                </SelectItem>
+                {additionalReaderOptions.map((teacher) => (
                   <SelectItem
                     key={staffOptionValue(teacher)}
                     value={staffOptionValue(teacher)}
@@ -1585,6 +1769,7 @@ export default function MasterTrajectoryStudentDetail() {
           trajectoryId={trajectoryId}
           userId={userId}
           notes={personalNotes}
+          steps={steps}
           canModify={canModify}
         />
 
@@ -1660,7 +1845,7 @@ export default function MasterTrajectoryStudentDetail() {
                           <span
                             className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${meta.badgeClass}`}
                           >
-                            {formatActionLabel(log.action)}
+                            {formatActionLabel(log.action, t)}
                           </span>
                           {stepName && (
                             <span
@@ -2269,6 +2454,92 @@ export default function MasterTrajectoryStudentDetail() {
               className="gap-2"
             >
               {updateStepDeadlineMutation.isPending && (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              )}
+              {t("common.save", "Save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!oralScheduleDraft}
+        onOpenChange={(open) => !open && setOralScheduleDraft(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold">
+              {t("thesis.oralDefence.scheduleAction", "Schedule oral defence")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground">
+                  {t("common.date", "Date")}
+                </label>
+                <Input
+                  type="date"
+                  value={oralScheduleDraft?.date || ""}
+                  onChange={(e) =>
+                    setOralScheduleDraft((prev) =>
+                      prev ? { ...prev, date: e.target.value } : prev
+                    )
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-muted-foreground">
+                  {t("common.time", "Time")}
+                </label>
+                <Input
+                  type="time"
+                  value={oralScheduleDraft?.time || "09:00"}
+                  onChange={(e) =>
+                    setOralScheduleDraft((prev) =>
+                      prev ? { ...prev, time: e.target.value } : prev
+                    )
+                  }
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground">
+                {t("thesis.oralDefence.meetingLink", "Meeting link")}
+              </label>
+              <Input
+                type="url"
+                placeholder="https://"
+                value={oralScheduleDraft?.meeting_link || ""}
+                onChange={(e) =>
+                  setOralScheduleDraft((prev) =>
+                    prev ? { ...prev, meeting_link: e.target.value } : prev
+                  )
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setOralScheduleDraft(null)}
+              disabled={updateOralScheduleMutation.isPending}
+            >
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleOralScheduleSave}
+              disabled={
+                updateOralScheduleMutation.isPending ||
+                !oralScheduleDraft?.date
+              }
+              className="gap-2"
+            >
+              {updateOralScheduleMutation.isPending && (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               )}
               {t("common.save", "Save")}

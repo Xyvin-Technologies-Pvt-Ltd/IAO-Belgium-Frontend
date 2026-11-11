@@ -97,7 +97,6 @@ const TrajectoryStudentsFilterDrawer = ({
       supervisor: "all",
       reader: "all",
       status: "all",
-      attention: "all",
     };
     setDraftFilters(resetObj);
     setAppliedFilters(resetObj);
@@ -316,49 +315,6 @@ const TrajectoryStudentsFilterDrawer = ({
                   </SelectItem>
                   <SelectItem value="failed">
                     {t("thesisManagement.attempt.failed", "Failed")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FilterSection>
-
-            <FilterSection
-              label={t("thesisManagement.table.attention", "Attention")}
-            >
-              <Select
-                value={draftFilters?.attention || "all"}
-                onValueChange={(val) =>
-                  setDraftFilters((prev) => ({ ...prev, attention: val }))
-                }
-              >
-                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
-                  <SelectValue
-                    placeholder={t(
-                      "thesisManagement.attempt.allAttention",
-                      "All attention"
-                    )}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t(
-                      "thesisManagement.attempt.allAttention",
-                      "All attention"
-                    )}
-                  </SelectItem>
-                  <SelectItem value="suggest_fail">
-                    {t(
-                      "thesisManagement.attempt.suggestFail",
-                      "Overdue — review fail"
-                    )}
-                  </SelectItem>
-                  <SelectItem value="suggest_pass">
-                    {t(
-                      "thesisManagement.attempt.suggestPass",
-                      "Ready for pass"
-                    )}
-                  </SelectItem>
-                  <SelectItem value="none">
-                    {t("thesisManagement.attempt.none", "In progress")}
                   </SelectItem>
                 </SelectContent>
               </Select>

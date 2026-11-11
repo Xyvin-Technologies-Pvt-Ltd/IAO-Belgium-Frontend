@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -67,6 +68,7 @@ export function createEmptySection() {
   return {
     id: `s_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     title: "",
+    description: "",
     questions: [createEmptyQuestion()],
   };
 }
@@ -78,6 +80,7 @@ export function normalizeFormSchema(raw) {
     sections: sections.map((sec) => ({
       id: sec.id || createEmptySection().id,
       title: sec.title || "",
+      description: sec.description || "",
       questions:
         Array.isArray(sec.questions) && sec.questions.length
           ? sec.questions.map((q) => ({
@@ -204,7 +207,8 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
               className="rounded-xl border border-border bg-card shadow-xs overflow-hidden transition-all"
             >
               {/* Section Header */}
-              <div className="bg-muted/30 px-3.5 py-2.5 border-b border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-muted/30 px-3.5 py-2.5 border-b border-border/70 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-primary/10 text-primary border border-primary/30 shrink-0">
                     {t("thesisManagement.steps.form.sectionPrefix", "Section {{num}}", {
@@ -296,6 +300,20 @@ export default function ThesisFormBuilder({ value, onChange, error }) {
                     </Button>
                   </div>
                 </div>
+                </div>
+
+                <Textarea
+                  value={section.description || ""}
+                  onChange={(e) =>
+                    updateSection(sIdx, { description: e.target.value })
+                  }
+                  placeholder={t(
+                    "thesisManagement.steps.form.sectionDescriptionPlaceholder",
+                    "Section description"
+                  )}
+                  rows={2}
+                  className="min-h-16 resize-y bg-background text-sm"
+                />
               </div>
 
               {/* Section Body (Visible when not collapsed) */}
