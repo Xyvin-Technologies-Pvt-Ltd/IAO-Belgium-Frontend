@@ -550,11 +550,20 @@ const StudentsTab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [thesisFilter, setThesisFilter] = useState("all");
+  const [markingFilter, setMarkingFilter] = useState("all");
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, thesisFilter, markingFilter]);
+
+  useEffect(() => {
+    setThesisFilter("all");
+    setMarkingFilter("all");
+    setSearch("");
+    setPage(1);
+  }, [type]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: [
@@ -563,6 +572,8 @@ const StudentsTab = () => {
       page,
       rowsPerPage,
       debouncedSearch,
+      thesisFilter,
+      markingFilter,
     ],
     queryFn: () =>
       getTeacherThesisStudents({
@@ -570,11 +581,20 @@ const StudentsTab = () => {
         limit: rowsPerPage,
         type,
         ...(debouncedSearch ? { search: debouncedSearch } : {}),
+        ...(thesisFilter !== "all" ? { thesis_id: thesisFilter } : {}),
+        ...(markingFilter !== "all"
+          ? { marking_status: markingFilter }
+          : {}),
       }),
   });
 
   const rows = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const filterTheses = data?.filter_theses || [];
+  const hasActiveFilters =
+    Boolean(debouncedSearch) ||
+    thesisFilter !== "all" ||
+    markingFilter !== "all";
 
   const studentName = (student) => {
     if (!student) return "—";
@@ -584,7 +604,48 @@ const StudentsTab = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-end gap-3">
+        <Select value={thesisFilter} onValueChange={setThesisFilter}>
+          <SelectTrigger className="w-full sm:w-56 h-9 bg-background">
+            <SelectValue
+              placeholder={t(
+                "thesisManagement.teacher.filterThesis",
+                "All theses"
+              )}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">
+              {t("thesisManagement.teacher.allTheses", "All theses")}
+            </SelectItem>
+            {filterTheses.map((thesis) => (
+              <SelectItem key={String(thesis._id)} value={String(thesis._id)}>
+                {thesis.name || String(thesis._id)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={markingFilter} onValueChange={setMarkingFilter}>
+          <SelectTrigger className="w-full sm:w-48 h-9 bg-background">
+            <SelectValue
+              placeholder={t(
+                "thesisManagement.teacher.filterMarking",
+                "All marking"
+              )}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">
+              {t("thesisManagement.teacher.allMarking", "All marking")}
+            </SelectItem>
+            <SelectItem value="marked">
+              {t("thesisManagement.teacher.marked", "Marked")}
+            </SelectItem>
+            <SelectItem value="not_marked">
+              {t("thesisManagement.teacher.notMarked", "Not marked")}
+            </SelectItem>
+          </SelectContent>
+        </Select>
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -615,16 +676,19 @@ const StudentsTab = () => {
               <TableHead>
                 {t("thesisManagement.teacher.role", "Role")}
               </TableHead>
+              <TableHead>
+                {t("thesisManagement.teacher.marking", "Marking")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody
             className={isFetching ? "opacity-50 pointer-events-none" : ""}
           >
             {isLoading ? (
-              <TableSkeleton rows={rowsPerPage} columns={4} />
+              <TableSkeleton rows={rowsPerPage} columns={5} />
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center p-8">
+                <TableCell colSpan={5} className="text-center p-8">
                   <ErrorMessage
                     message={
                       error?.message ||
@@ -641,6 +705,7 @@ const StudentsTab = () => {
             ) : rows.length > 0 ? (
               rows.map((row) => {
                 const key = `${row.application?._id || ""}-${row.thesis?._id || ""}-${row.trajectory?._id || ""}`;
+                const isMarked = row.marking_status === "marked";
                 return (
                   <TableRow
                     key={key}
@@ -701,16 +766,32 @@ const StudentsTab = () => {
                         )}
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          isMarked
+                            ? "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                            : "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20"
+                        }
+                      >
+                        {isMarked
+                          ? t("thesisManagement.teacher.marked", "Marked")
+                          : t(
+                              "thesisManagement.teacher.notMarked",
+                              "Not marked"
+                            )}
+                      </span>
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="text-center p-8 text-muted-foreground"
                 >
-                  {debouncedSearch
+                  {hasActiveFilters
                     ? t(
                         "thesisManagement.teacher.noStudentsMatch",
                         "No students match your search."
