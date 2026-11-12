@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { ArrowUpRight, Download, PlusCircle, Send } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowUpRight, Download, PlusCircle, Search, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,31 @@ const STATUS_TARGET = {
   other_ref: { tab: "history", view: "documents" },
 };
 
+//* IPB-153: text a payout line can be found by — Mollie IDs, IAO record,
+//* name/email, amount (150 / 150.00 / 150,00) and the Exact reference.
+const lineSearchText = (l) => {
+  const amount = l.amount === null || l.amount === undefined || l.amount === "" ? null : Number(l.amount);
+  const amountText =
+    amount === null || Number.isNaN(amount)
+      ? []
+      : [String(amount), amount.toFixed(2), amount.toFixed(2).replace(".", ",")];
+  return [
+    l.mollie_id,
+    l.mollie_payment_id,
+    l.record?.uid,
+    l.payment_uid,
+    l.name,
+    l.description,
+    l.email,
+    ...amountText,
+    l.your_ref,
+    l.exact_entry_number,
+  ]
+    .filter((v) => v !== null && v !== undefined && v !== "")
+    .join(" ")
+    .toLowerCase();
+};
+
 /** One payout: every transaction with its Exact status, plus the batch actions.
  * onOpenRecord({ tab, view, search }): jump to To send / History filtered on a record. */
 const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, canModify }) => {
@@ -51,9 +77,24 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
   const { mutate: sendWaiting, isPending: isSending } = useSendExactPayoutWaiting();
 
   const payout = data?.data?.payout;
-  const lines = data?.data?.lines ?? [];
+  const lines = useMemo(() => data?.data?.lines ?? [], [data]);
   const counts = payout?.counts ?? {};
   const busy = isQueueing || isSending;
+
+  //* IPB-153: search within the payout's payments (all lines are loaded, so filter client-side)
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    setSearch("");
+  }, [settlementId]);
+  const query = search.trim().toLowerCase();
+  const visibleLines = useMemo(() => {
+    if (!query) return lines;
+    const terms = query.split(/\s+/);
+    return lines.filter((l) => {
+      const text = lineSearchText(l);
+      return terms.every((term) => text.includes(term));
+    });
+  }, [lines, query]);
 
   const handleSendWaiting = () => {
     if (!window.confirm(p("confirmSendWaiting", { count: counts.waiting || 0, reference: payout?.reference }))) return;
@@ -121,6 +162,35 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
               </Button>
             </div>
 
+            {/* IPB-153: search the payments of this payout */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[260px] max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-9 pr-9"
+                  placeholder={p("searchPlaceholder")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  aria-label={p("searchPlaceholder")}
+                />
+                {search ? (
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gray-900 dark:hover:text-white"
+                    onClick={() => setSearch("")}
+                    aria-label={p("clearSearch")}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                ) : null}
+              </div>
+              {query ? (
+                <span className="text-sm text-muted-foreground">
+                  {p("searchCount", { shown: visibleLines.length, total: lines.length })}
+                </span>
+              ) : null}
+            </div>
+
             <div className="border dark:border-white/10 rounded-lg overflow-x-auto">
               <Table className="w-full min-w-[1100px]">
                 <TableHeader>
@@ -134,7 +204,14 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {lines.map((l) => (
+                  {query && visibleLines.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        {p("noSearchResults", { search: search.trim() })}
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                  {visibleLines.map((l) => (
                     <TableRow key={l.mollie_id}>
                       <TableCell className="whitespace-nowrap">
                         <div className="font-mono text-xs">{l.mollie_id}</div>
