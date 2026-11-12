@@ -803,6 +803,7 @@
       },
       "payouts": {
         "searchPlaceholder": "Search by Mollie ID, IAO record, name, email, amount or Exact reference…",
+        "exportFiltered": "Export CSV ({{count}})",
         "clearSearch": "Clear search",
         "searchCount": "{{shown}} of {{total}} payments",
         "noSearchResults": "No payments match \"{{search}}\"",

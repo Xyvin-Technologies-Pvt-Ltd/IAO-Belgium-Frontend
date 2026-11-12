@@ -104,7 +104,11 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
   const handleExport = async () => {
     setExporting(true);
     try {
-      downloadCsv(await exportExactPayout(settlementId), `mollie_payout_${payout?.reference || settlementId}`);
+      //* IPB-153: the export follows the search — only the payments shown are exported
+      downloadCsv(
+        await exportExactPayout(settlementId, search.trim()),
+        `mollie_payout_${payout?.reference || settlementId}${search.trim() ? "_filtered" : ""}`,
+      );
     } catch (err) {
       toast.error(err?.message || p("exportFailed"));
     } finally {
@@ -156,9 +160,18 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
                   </Button>
                 </>
               ) : null}
-              <Button size="sm" variant="ghost" onClick={handleExport} disabled={exporting}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleExport}
+                disabled={exporting || (Boolean(query) && visibleLines.length === 0)}
+              >
                 <Download className="h-4 w-4 mr-2" />
-                {exporting ? p("exporting") : p("export")}
+                {exporting
+                  ? p("exporting")
+                  : query
+                    ? p("exportFiltered", { count: visibleLines.length })
+                    : p("export")}
               </Button>
             </div>
 
