@@ -2085,10 +2085,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noIntakes": "No intakes found"
+      "noIntakes": "No intakes found",
+      "enrolled": "Enrolled",
+      "capacity": "Capacity"
     },
     "messages": {
-      "loadFailed": "Failed to load intakes"
+      "loadFailed": "Failed to load intakes",
+      "exportFailed": "Failed to export intakes"
     },
     "modal": {
       "createTitle": "Create a new intake",
@@ -2144,7 +2147,27 @@
       "searchCities": "Search cities...",
       "clearAll": "Clear All",
       "applyFilters": "Apply Filters",
-      "narrowDownIntakes": "Narrow down the intakes list"
+      "narrowDownIntakes": "Narrow down the intakes list",
+      "type": "Type",
+      "allTypes": "All Types",
+      "programName": "Programme name",
+      "programNamePlaceholder": "Search by programme name...",
+      "registrationFee": "Registration fee",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "deadline": "Deadline",
+      "from": "From",
+      "to": "To",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "The end of the range must be after the start",
+      "clearFilters": "Clear filters"
+    },
+    "export": {
+      "title": "Export",
+      "exporting": "Exporting...",
+      "csv": "Export as CSV",
+      "excel": "Export as Excel"
     }
   },
   "adminManagement": {

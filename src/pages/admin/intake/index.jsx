@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Edit, Trash2, Download, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
@@ -25,9 +25,28 @@ import moment from "moment";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import IntakesFilterDrawer from "./IntakesFilterDrawer";
 import { useCanModify } from "@/hooks/useCanModify";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { exportIntakes } from "@/api/intakeApi";
+import { toast } from "sonner";
+import {
+  DEFAULT_INTAKE_FILTERS,
+  buildIntakeQueryFilters,
+  countActiveIntakeFilters,
+  loadStoredIntakeFilters,
+  loadStoredIntakeSearch,
+  saveStoredIntakeFilters,
+  saveStoredIntakeSearch,
+} from "./intakeFilterUtils";
 
-
-const DEFAULT_FILTERS = { status: "all", city: "all", language: "all", country: "all" };
+const EXPORT_MIME = {
+  csv: "text/csv;charset=utf-8",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
 
 const Intakes = () => {
   const { t } = useTranslation();
@@ -37,26 +56,69 @@ const Intakes = () => {
   const id = params.id;
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [search, setSearch] = useState("");
+  //* IPB-152: filters + search survive opening an intake and coming back
+  const [search, setSearch] = useState(() => loadStoredIntakeSearch(id));
   const [openDelete, setOpenDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIntake, setSelectedIntake] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+  const [draftFilters, setDraftFilters] = useState(() => loadStoredIntakeFilters(id));
+  const [appliedFilters, setAppliedFilters] = useState(() => loadStoredIntakeFilters(id));
+  const [exportPending, setExportPending] = useState(false);
   const { updateBreadcrumbs } = useBreadcrumb();
   const debouncedSearch = useDebounce(search, 500);
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (id) saveStoredIntakeFilters(id, appliedFilters);
+  }, [id, appliedFilters]);
+
+  useEffect(() => {
+    if (id) saveStoredIntakeSearch(id, search);
+  }, [id, search]);
+
+  const queryFilters = buildIntakeQueryFilters(appliedFilters, {
+    search: debouncedSearch,
+  });
+  const hasActiveFilters = countActiveIntakeFilters(appliedFilters) > 0 || Boolean(search);
+
   const { data, isLoading, error, refetch, isFetching } = useGetIntakes(id, {
     page: page,
     limit: rowsPerPage,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(appliedFilters.status !== "all" ? { status: appliedFilters.status } : {}),
-    ...(appliedFilters.city !== "all" ? { city: appliedFilters.city } : {}),
-    ...(appliedFilters.language !== "all" ? { language: appliedFilters.language } : {}),
+    ...queryFilters,
   });
+
+  const handleClearFilters = () => {
+    setDraftFilters({ ...DEFAULT_INTAKE_FILTERS });
+    setAppliedFilters({ ...DEFAULT_INTAKE_FILTERS });
+    setSearch("");
+    setPage(1);
+  };
+
+  const handleExport = async (format) => {
+    try {
+      setExportPending(true);
+      const fileData = await exportIntakes(id, queryFilters, format);
+      const blob = new Blob([fileData], { type: EXPORT_MIME[format] });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `intakes_${moment().format("YYYY-MM-DD")}.${format}`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(err?.message || t("intakeManagement.messages.exportFailed"));
+    } finally {
+      setExportPending(false);
+    }
+  };
   const { mutateAsync: deleteIntake, isPending: isDeleting } =
     useDeleteIntake();
 
@@ -139,21 +201,48 @@ const Intakes = () => {
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
           />
+          {hasActiveFilters && (
+            <Button variant="ghost" className="gap-1" onClick={handleClearFilters}>
+              <X className="h-4 w-4" />
+              {t("intakeManagement.filters.clearFilters")}
+            </Button>
+          )}
         </div>
-        {canModify && (
-          <Button onClick={handleOpenCreate}>
-            {t("intakeManagement.createIntake")}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2" disabled={exportPending}>
+                <Download className="h-4 w-4" />
+                {exportPending
+                  ? t("intakeManagement.export.exporting")
+                  : t("intakeManagement.export.title")}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport("csv")}>
+                {t("intakeManagement.export.csv")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport("xlsx")}>
+                {t("intakeManagement.export.excel")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {canModify && (
+            <Button onClick={handleOpenCreate}>
+              {t("intakeManagement.createIntake")}
+            </Button>
+          )}
+        </div>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>{t("intakeManagement.table.name")}</TableHead>
-            <TableHead>{t("intakeManagement.table.program")}</TableHead>
             <TableHead>{t("intakeManagement.table.city")}</TableHead>
             <TableHead>{t("intakeManagement.table.language")}</TableHead>
+            <TableHead>{t("intakeManagement.table.enrolled")}</TableHead>
+            <TableHead>{t("intakeManagement.table.capacity")}</TableHead>
             <TableHead>{t("intakeManagement.table.registrationFee")}</TableHead>
             <TableHead>{t("intakeManagement.table.startDate")}</TableHead>
             <TableHead>{t("intakeManagement.table.endDate")}</TableHead>
@@ -168,10 +257,10 @@ const Intakes = () => {
           className={isFetching ? "opacity-50 pointer-events-none" : ""}
         >
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={10} />
+            <TableSkeleton rows={rowsPerPage} columns={11} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={10} className="text-center p-8">
+              <TableCell colSpan={11} className="text-center p-8">
                 <ErrorMessage
                   message={
                     error?.message || t("intakeManagement.messages.loadFailed")
@@ -188,10 +277,10 @@ const Intakes = () => {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleRowClick(i._id)}
               >
-                <TableCell>{i?.name}</TableCell>
+                {/* IPB-152: Programme column hidden — the intake name already contains it */}
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span>{i?.program?.name || "N/A"}</span>
+                    <span>{i?.name}</span>
                     {i?.program?.is_online && (
                       <span className="px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-[#ff8904]/10 text-[#ff8904] border border-[#ff8904]/20">
                         {t("common.online", "Online")}
@@ -201,6 +290,8 @@ const Intakes = () => {
                 </TableCell>
                 <TableCell>{i?.program?.city?.name || "N/A"}</TableCell>
                 <TableCell>{i?.program?.language?.name || "N/A"}</TableCell>
+                <TableCell>{i?.enrolled_count ?? 0}</TableCell>
+                <TableCell>{i?.max_student_enrollment ?? 0}</TableCell>
                 <TableCell>{i?.admission_fee || 0}</TableCell>
                 <TableCell>
                   {i?.start_date
@@ -242,7 +333,7 @@ const Intakes = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={10} className="text-center">
+              <TableCell colSpan={11} className="text-center">
                 {t("intakeManagement.table.noIntakes")}
               </TableCell>
             </TableRow>

@@ -1518,10 +1518,13 @@
       "status": "Status",
       "action": "Aktion",
       "edit": "Bearbeiten",
-      "noIntakes": "Keine Aufnahmen gefunden"
+      "noIntakes": "Keine Aufnahmen gefunden",
+      "enrolled": "Eingeschrieben",
+      "capacity": "Kapazität"
     },
     "messages": {
-      "loadFailed": "Aufnahmen konnten nicht geladen werden"
+      "loadFailed": "Aufnahmen konnten nicht geladen werden",
+      "exportFailed": "Export der Aufnahmen fehlgeschlagen"
     },
     "modal": {
       "createTitle": "Neue Aufnahme erstellen",
@@ -1577,7 +1580,27 @@
       "searchCities": "Städte suchen...",
       "clearAll": "Alle löschen",
       "applyFilters": "Filter anwenden",
-      "narrowDownIntakes": "Aufnahmeliste einschränken"
+      "narrowDownIntakes": "Aufnahmeliste einschränken",
+      "type": "Typ",
+      "allTypes": "Alle Typen",
+      "programName": "Ausbildungsname",
+      "programNamePlaceholder": "Nach Ausbildungsname suchen...",
+      "registrationFee": "Anmeldegebühr",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "deadline": "Frist",
+      "from": "Von",
+      "to": "Bis",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "Das Ende des Bereichs muss nach dem Anfang liegen",
+      "clearFilters": "Filter löschen"
+    },
+    "export": {
+      "title": "Exportieren",
+      "exporting": "Wird exportiert...",
+      "csv": "Als CSV exportieren",
+      "excel": "Als Excel exportieren"
     }
   },
   "adminManagement": {
