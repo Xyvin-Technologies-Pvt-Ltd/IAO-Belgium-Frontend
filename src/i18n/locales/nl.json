@@ -2707,7 +2707,7 @@
     "sharedProgramsHint": "Andere programma's die deze module delen via dezelfde systeem-ID.",
     "sharedProgramsEmpty": "Deze module wordt nog niet gedeeld met andere programma's.",
     "linkToModuleLabel": "Koppelen aan module",
-    "linkToModulePlaceholder": "Zoek modulenaam om te koppelen…",
+    "linkToModulePlaceholder": "Zoek modulenaam of UID om te koppelen…",
     "linkToModuleHint": "Deze module en alle programma's die al dezelfde systeem-ID delen, nemen de systeem-ID van de geselecteerde module over.",
     "linkConfirm": "Deze module koppelen aan de systeem-ID van de geselecteerde module?",
     "linkConfirmFamily": "Ook {{count}} ander(e) programma('s) die deze module delen naar de geselecteerde systeem-ID verplaatsen?",

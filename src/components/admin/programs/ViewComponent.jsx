@@ -88,18 +88,14 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
 
   const linkSuggestions = (() => {
     const modules = linkModulesData?.data || [];
-    const seenSystemIds = new Set();
     const unique = [];
     const currentId = viewData?._id?.toString();
     const currentSystemId = viewData?.system_id;
 
+    //* List every matching programme (master + lateral entry); picking any still links the whole family.
     for (const module of modules) {
       if (module._id?.toString() === currentId) continue;
       if (currentSystemId && module.system_id === currentSystemId) continue;
-      if (module.system_id) {
-        if (seenSystemIds.has(module.system_id)) continue;
-        seenSystemIds.add(module.system_id);
-      }
       unique.push(module);
     }
     return unique;
@@ -669,9 +665,9 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                   {viewData.files.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between hover:bg-muted/50 p-2 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center justify-between gap-2 min-w-0 overflow-hidden hover:bg-muted/50 p-2 rounded-lg transition-colors cursor-pointer"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0 overflow-hidden flex-1">
                         <FileText className="h-8 w-8 text-orange-500 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm text-gray-700 dark:text-white truncate">
@@ -680,7 +676,7 @@ const ViewComponent = ({ open, onClose, componentData, program }) => {
                         </div>
                       </div>
                       <button
-                        className="flex items-center gap-1 text-sm font-semibold text-muted-foreground dark:text-white/70 hover:text-black dark:hover:text-white"
+                        className="flex items-center gap-1 flex-shrink-0 text-sm font-semibold text-muted-foreground dark:text-white/70 hover:text-black dark:hover:text-white"
                         onClick={() => handleView(file)}
                       >
                         <Eye className="h-4 w-4" />
