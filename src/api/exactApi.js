@@ -190,9 +190,11 @@ export const getExactPayout = async (settlementId) => {
 };
 
 //* Raw CSV text for downloadCsv().
-export const exportExactPayout = async (settlementId) => {
+//* IPB-153: optional search — export only the payments matching it
+export const exportExactPayout = async (settlementId, search) => {
   try {
     const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}/export`, {
+      params: search ? { search } : undefined,
       responseType: "text",
     });
     return response.data;

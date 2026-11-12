@@ -1500,10 +1500,13 @@
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
-      "noIntakes": "Aucune promotion trouvée"
+      "noIntakes": "Aucune promotion trouvée",
+      "enrolled": "Inscrits",
+      "capacity": "Capacité"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des promotions"
+      "loadFailed": "Échec du chargement des promotions",
+      "exportFailed": "Échec de l'exportation des promotions"
     },
     "modal": {
       "createTitle": "Créer une nouvelle promotion",
@@ -1559,7 +1562,27 @@
       "searchCities": "Rechercher des villes...",
       "clearAll": "Tout effacer",
       "applyFilters": "Appliquer les filtres",
-      "narrowDownIntakes": "Affiner la liste des promotions"
+      "narrowDownIntakes": "Affiner la liste des promotions",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "programName": "Nom de la formation",
+      "programNamePlaceholder": "Rechercher par nom de formation...",
+      "registrationFee": "Frais d'inscription",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "deadline": "Date limite",
+      "from": "Du",
+      "to": "Au",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "La fin de la plage doit être postérieure au début",
+      "clearFilters": "Effacer les filtres"
+    },
+    "export": {
+      "title": "Exporter",
+      "exporting": "Exportation...",
+      "csv": "Exporter en CSV",
+      "excel": "Exporter en Excel"
     }
   },
   "adminManagement": {

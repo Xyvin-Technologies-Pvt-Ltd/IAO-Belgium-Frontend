@@ -1511,10 +1511,13 @@
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
-      "noIntakes": "Geen instroom gevonden"
+      "noIntakes": "Geen instroom gevonden",
+      "enrolled": "Ingeschreven",
+      "capacity": "Capaciteit"
     },
     "messages": {
-      "loadFailed": "Laden van instroom mislukt"
+      "loadFailed": "Laden van instroom mislukt",
+      "exportFailed": "Exporteren van instroom mislukt"
     },
     "modal": {
       "createTitle": "Nieuwe instroom aanmaken",
@@ -1570,7 +1573,27 @@
       "searchCities": "Steden zoeken...",
       "clearAll": "Alles wissen",
       "applyFilters": "Filters toepassen",
-      "narrowDownIntakes": "Instroomlijst beperken"
+      "narrowDownIntakes": "Instroomlijst beperken",
+      "type": "Type",
+      "allTypes": "Alle types",
+      "programName": "Opleidingsnaam",
+      "programNamePlaceholder": "Zoeken op opleidingsnaam...",
+      "registrationFee": "Inschrijvingsgeld",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "deadline": "Deadline",
+      "from": "Van",
+      "to": "Tot",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "Het einde van het bereik moet na het begin liggen",
+      "clearFilters": "Filters wissen"
+    },
+    "export": {
+      "title": "Exporteren",
+      "exporting": "Exporteren...",
+      "csv": "Exporteren als CSV",
+      "excel": "Exporteren als Excel"
     }
   },
   "adminManagement": {

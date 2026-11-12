@@ -22,7 +22,17 @@ import {
   useGetAllCountries,
 } from "@/store/useDropdownStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
+import { Input } from "@/components/ui/input";
+import ClearableDateInput from "@/components/admin/ClearableDateInput";
+import { PROGRAM_TYPES, PROGRAM_TYPE_I18N_KEYS } from "@/constants/programTypes";
 import { useTranslation } from "react-i18next";
+import {
+  DEFAULT_INTAKE_FILTERS,
+  countActiveIntakeFilters,
+  hasInvalidIntakeRange,
+  isDateRangeInvalid,
+  isFeeRangeInvalid,
+} from "./intakeFilterUtils";
 
 const FilterSection = ({ label, children }) => (
   <div className="space-y-2">
@@ -66,25 +76,84 @@ const IntakesFilterDrawer = ({
     { enabled: isOpen }
   );
 
-  const activeFiltersCount = Object.entries(appliedFilters).filter(
-    ([key, val]) => key !== "country" && val !== "all"
-  ).length;
+  const activeFiltersCount = countActiveIntakeFilters(appliedFilters);
+  const rangeInvalid = hasInvalidIntakeRange(draftFilters);
+
+  const setDraft = (patch) => setDraftFilters((prev) => ({ ...prev, ...patch }));
+
+  //* IPB-152: from/to pair (date range or fee range)
+  const renderRange = (label, fromKey, toKey, invalid, type = "date") => (
+    <FilterSection label={label}>
+      <div className="grid grid-cols-2 gap-2">
+        {type === "date" ? (
+          <>
+            <ClearableDateInput
+              value={draftFilters[fromKey]}
+              onChange={(val) => setDraft({ [fromKey]: val })}
+            />
+            <ClearableDateInput
+              value={draftFilters[toKey]}
+              min={draftFilters[fromKey]}
+              invalid={invalid}
+              onChange={(val) => setDraft({ [toKey]: val })}
+            />
+          </>
+        ) : (
+          <>
+            <Input
+              type="number"
+              min={0}
+              placeholder={t("intakeManagement.filters.min")}
+              className="bg-sidebar border-sidebar-border"
+              value={draftFilters[fromKey]}
+              onChange={(e) => setDraft({ [fromKey]: e.target.value })}
+            />
+            <Input
+              type="number"
+              min={0}
+              placeholder={t("intakeManagement.filters.max")}
+              className={`bg-sidebar border-sidebar-border ${invalid ? "border-red-500" : ""}`}
+              value={draftFilters[toKey]}
+              onChange={(e) => setDraft({ [toKey]: e.target.value })}
+            />
+          </>
+        )}
+      </div>
+      {type === "date" && (
+        <div className="grid grid-cols-2 gap-2 text-[11px]" style={{ color: "#94a3b8" }}>
+          <span>{t("intakeManagement.filters.from")}</span>
+          <span>{t("intakeManagement.filters.to")}</span>
+        </div>
+      )}
+      {invalid && (
+        <p className="text-xs text-red-500">{t("intakeManagement.filters.invalidRange")}</p>
+      )}
+    </FilterSection>
+  );
 
   const handleClearAll = () => {
-    const reset = { status: "all", city: "all", language: "all", country: "all" };
+    const reset = { ...DEFAULT_INTAKE_FILTERS };
     setDraftFilters(reset);
     setAppliedFilters(reset);
     setPage(1);
   };
 
   const handleApply = () => {
+    if (rangeInvalid) return;
     setAppliedFilters(draftFilters);
     setPage(1);
     setIsOpen(false);
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        //* start from the applied filters (they may have been cleared/restored outside the drawer)
+        if (open) setDraftFilters(appliedFilters);
+        setIsOpen(open);
+      }}
+    >
       <SheetTrigger asChild>
         <Button variant={activeFiltersCount > 0 ? "default" : "outline"} className="relative gap-2">
           <SlidersHorizontal className="h-4 w-4" />
@@ -125,6 +194,37 @@ const IntakesFilterDrawer = ({
         </SheetHeader>
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
+          {/* IPB-152: Type + Programme name */}
+          <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
+            <FilterSection label={t("intakeManagement.filters.type")}>
+              <Select
+                value={draftFilters.program_type}
+                onValueChange={(val) => setDraft({ program_type: val })}
+              >
+                <SelectTrigger className="w-full bg-sidebar border-sidebar-border">
+                  <SelectValue placeholder={t("intakeManagement.filters.allTypes")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("intakeManagement.filters.allTypes")}</SelectItem>
+                  {PROGRAM_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(PROGRAM_TYPE_I18N_KEYS[type], type)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FilterSection>
+
+            <FilterSection label={t("intakeManagement.filters.programName")}>
+              <Input
+                placeholder={t("intakeManagement.filters.programNamePlaceholder")}
+                className="bg-sidebar border-sidebar-border"
+                value={draftFilters.program_name}
+                onChange={(e) => setDraft({ program_name: e.target.value })}
+              />
+            </FilterSection>
+          </div>
+
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
             <FilterSection label={t("intakeManagement.filters.status")}>
               <Select
@@ -187,6 +287,35 @@ const IntakesFilterDrawer = ({
               />
             </FilterSection>
           </div>
+
+          {/* IPB-152: Registration fee + date ranges */}
+          <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
+            {renderRange(
+              t("intakeManagement.filters.registrationFee"),
+              "fee_min",
+              "fee_max",
+              isFeeRangeInvalid(draftFilters.fee_min, draftFilters.fee_max),
+              "number",
+            )}
+            {renderRange(
+              t("intakeManagement.filters.startDate"),
+              "start_date_from",
+              "start_date_to",
+              isDateRangeInvalid(draftFilters.start_date_from, draftFilters.start_date_to),
+            )}
+            {renderRange(
+              t("intakeManagement.filters.endDate"),
+              "end_date_from",
+              "end_date_to",
+              isDateRangeInvalid(draftFilters.end_date_from, draftFilters.end_date_to),
+            )}
+            {renderRange(
+              t("intakeManagement.filters.deadline"),
+              "deadline_from",
+              "deadline_to",
+              isDateRangeInvalid(draftFilters.deadline_from, draftFilters.deadline_to),
+            )}
+          </div>
         </div>
 
         <SheetFooter className="mt-auto shrink-0" style={{
@@ -198,7 +327,7 @@ const IntakesFilterDrawer = ({
           <Button variant="outline" className="w-full border-sidebar-border" onClick={handleClearAll}>
             {t("intakeManagement.filters.clearAll")}
           </Button>
-          <Button className="w-full" onClick={handleApply}>
+          <Button className="w-full" onClick={handleApply} disabled={rangeInvalid}>
             {t("intakeManagement.filters.applyFilters")}
           </Button>
         </SheetFooter>
