@@ -276,7 +276,7 @@ export default function MasterTrajectoryStudentDetail() {
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
 
-  const selectedReenrollThesisId = reenrollThesisId || thesisId;
+  const selectedReenrollThesisId = reenrollThesisId;
 
   const { data: thesesResponse } = useGetTheses(
     { type: thesisType, limit: 200 },
@@ -325,8 +325,9 @@ export default function MasterTrajectoryStudentDetail() {
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
-    return Array.isArray(list) ? list : [];
-  }, [thesesResponse]);
+    const rows = Array.isArray(list) ? list : [];
+    return rows.filter((item) => String(item._id) !== String(thesisId));
+  }, [thesesResponse, thesisId]);
 
   // Activity log timeline state
   const [logSearch, setLogSearch] = useState("");
@@ -905,7 +906,7 @@ export default function MasterTrajectoryStudentDetail() {
               }
               onClick={() => {
                 if (attemptActionsDisabled) return;
-                setReenrollThesisId(thesisId || "");
+                setReenrollThesisId("");
                 setReenrollOpen(true);
               }}
             >
