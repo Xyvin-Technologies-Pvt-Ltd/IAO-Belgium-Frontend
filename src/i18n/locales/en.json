@@ -3484,7 +3484,7 @@
     "sharedProgramsHint": "Other programmes that share this module via the same system ID.",
     "sharedProgramsEmpty": "This module is not shared with other programmes yet.",
     "linkToModuleLabel": "Link to module",
-    "linkToModulePlaceholder": "Search module name to link…",
+    "linkToModulePlaceholder": "Search module name or UID to link…",
     "linkToModuleHint": "This module and all programmes already sharing its system ID will adopt the selected module’s system ID.",
     "linkConfirm": "Link this module to the selected module’s system ID?",
     "linkConfirmFamily": "Also move {{count}} other programme(s) that share this module onto the selected system ID?",

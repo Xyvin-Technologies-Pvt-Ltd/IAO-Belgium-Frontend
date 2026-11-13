@@ -2694,7 +2694,7 @@
     "sharedProgramsHint": "Autres programmes qui partagent ce module via le même identifiant système.",
     "sharedProgramsEmpty": "Ce module n'est pas encore partagé avec d'autres programmes.",
     "linkToModuleLabel": "Lier à un module",
-    "linkToModulePlaceholder": "Rechercher un module à lier…",
+    "linkToModulePlaceholder": "Rechercher un module par nom ou UID…",
     "linkToModuleHint": "Ce module et tous les programmes qui partagent déjà son identifiant système adopteront l'identifiant du module sélectionné.",
     "linkConfirm": "Lier ce module à l'identifiant système du module sélectionné ?",
     "linkConfirmFamily": "Déplacer aussi {{count}} autre(s) programme(s) qui partagent ce module vers l'identifiant système sélectionné ?",

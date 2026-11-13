@@ -282,7 +282,7 @@ export default function TrajectoryStudentDetail() {
     refetch,
   } = useGetTrajectoryStudentDetail(thesisId, trajectoryId, userId);
 
-  const selectedReenrollThesisId = reenrollThesisId || thesisId;
+  const selectedReenrollThesisId = reenrollThesisId;
 
   const { data: thesesResponse } = useGetTheses(
     { type: thesisType, limit: 200 },
@@ -334,8 +334,9 @@ export default function TrajectoryStudentDetail() {
 
   const reenrollThesisOptions = useMemo(() => {
     const list = thesesResponse?.data || [];
-    return Array.isArray(list) ? list : [];
-  }, [thesesResponse]);
+    const rows = Array.isArray(list) ? list : [];
+    return rows.filter((item) => String(item._id) !== String(thesisId));
+  }, [thesesResponse, thesisId]);
 
   const moveTargets = useMemo(() => {
     const list = moveTrajectoriesResponse?.data || moveTrajectoriesResponse || [];
@@ -949,7 +950,7 @@ export default function TrajectoryStudentDetail() {
               }
               onClick={() => {
                 if (attemptActionsDisabled) return;
-                setReenrollThesisId(thesisId || "");
+                setReenrollThesisId("");
                 setReenrollOpen(true);
               }}
             >

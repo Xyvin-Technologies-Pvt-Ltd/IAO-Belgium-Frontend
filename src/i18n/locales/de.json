@@ -2713,7 +2713,7 @@
     "sharedProgramsHint": "Andere Programme, die dieses Modul über dieselbe System-ID teilen.",
     "sharedProgramsEmpty": "Dieses Modul wird noch nicht mit anderen Programmen geteilt.",
     "linkToModuleLabel": "Mit Modul verknüpfen",
-    "linkToModulePlaceholder": "Modulname zum Verknüpfen suchen…",
+    "linkToModulePlaceholder": "Modulname oder UID zum Verknüpfen suchen…",
     "linkToModuleHint": "Dieses Modul und alle Programme, die bereits seine System-ID teilen, übernehmen die System-ID des ausgewählten Moduls.",
     "linkConfirm": "Dieses Modul mit der System-ID des ausgewählten Moduls verknüpfen?",
     "linkConfirmFamily": "{{count}} weitere(s) Programm(e), die dieses Modul teilen, ebenfalls auf die ausgewählte System-ID verschieben?",
