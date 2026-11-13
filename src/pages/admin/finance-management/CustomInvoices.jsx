@@ -102,7 +102,7 @@ const CustomInvoices = () => {
               <TableHead>{t("common.studentName")}</TableHead>
               <TableHead>{t("common.amount")}</TableHead>
               <TableHead>{t("common.date")}</TableHead>
-              <TableHead>{t("common.status")}</TableHead>
+              <TableHead>{t("common.status.label")}</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>

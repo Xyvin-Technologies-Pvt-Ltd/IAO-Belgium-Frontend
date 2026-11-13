@@ -102,7 +102,7 @@ const AllReportsFilterDrawer = ({
 
         <div className="p-6 space-y-5 flex-1 overflow-y-auto">
           <div className="bg-sidebar rounded-xl p-5 border border-sidebar-border space-y-4">
-            <FilterSection label={t("common.status")}>
+            <FilterSection label={t("common.status.label")}>
               <Select
                 value={draftFilters.status}
                 onValueChange={(val) => setDraftFilters((prev) => ({ ...prev, status: val }))}

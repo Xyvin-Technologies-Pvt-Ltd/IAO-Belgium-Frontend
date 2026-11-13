@@ -140,6 +140,7 @@
     "name": "Name",
     "email": "E-Mail-Adresse",
     "status": {
+      "label": "Status",
       "pending": "Ausstehend",
       "onRide": "Unterwegs",
       "inProgress": "In Bearbeitung",

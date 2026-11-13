@@ -143,6 +143,7 @@
     "name": "Name",
     "email": "Email",
     "status": {
+      "label": "Status",
       "pending": "Pending",
       "onRide": "On Ride",
       "inProgress": "In Progress",
