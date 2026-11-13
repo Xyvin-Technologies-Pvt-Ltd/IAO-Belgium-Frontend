@@ -137,7 +137,7 @@ const AllContracts = () => {
             <TableHead>Contract Type</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>{t("common.version")}</TableHead>
-            <TableHead>{t("common.status")}</TableHead>
+            <TableHead>{t("common.status.label")}</TableHead>
             <TableHead>{t("common.file") || "File"}</TableHead>
             <TableHead>{t("common.actions")}</TableHead>
           </TableRow>

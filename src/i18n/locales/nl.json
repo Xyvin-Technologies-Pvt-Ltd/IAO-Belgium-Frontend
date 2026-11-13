@@ -142,6 +142,7 @@
     "name": "Naam",
     "email": "E-mailadres",
     "status": {
+      "label": "Status",
       "pending": "In behandeling",
       "onRide": "Op rit",
       "inProgress": "Bezig",
