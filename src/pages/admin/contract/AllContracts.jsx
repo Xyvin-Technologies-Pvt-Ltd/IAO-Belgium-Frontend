@@ -135,6 +135,7 @@ const AllContracts = () => {
             <TableHead>Program Type</TableHead>
             <TableHead>Language</TableHead>
             <TableHead>Contract Type</TableHead>
+            <TableHead>Duration</TableHead>
             <TableHead>{t("common.version")}</TableHead>
             <TableHead>{t("common.status")}</TableHead>
             <TableHead>{t("common.file") || "File"}</TableHead>
@@ -143,10 +144,10 @@ const AllContracts = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={8} />
+            <TableSkeleton rows={rowsPerPage} columns={9} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center p-8">
+              <TableCell colSpan={9} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("common.failedToLoadContracts")}
                   onRetry={refetch}
@@ -161,6 +162,11 @@ const AllContracts = () => {
                 <TableCell>{contract.program_type || "—"}</TableCell>
                 <TableCell>{contract.language?.name || "—"}</TableCell>
                 <TableCell className="capitalize">{contract.contract_type?.replace("_", " ")}</TableCell>
+                <TableCell>
+                  {contract.duration_years != null
+                    ? String(contract.duration_years)
+                    : "All"}
+                </TableCell>
                 <TableCell>v{contract.version}</TableCell>
                 <TableCell>
                   <span
@@ -206,7 +212,7 @@ const AllContracts = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={9} className="text-center">
                 {t("common.noContracts")}
               </TableCell>
             </TableRow>

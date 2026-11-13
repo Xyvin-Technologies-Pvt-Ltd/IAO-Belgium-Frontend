@@ -8,4 +8,10 @@ export const contractSchema = z.object({
   contract_type: z.enum(["student_contract", "internal_regulations"], {
     required_error: "Contract type is required",
   }),
+  // empty / null = all programme durations
+  duration_years: z
+    .union([z.literal(""), z.null(), z.coerce.number().int().positive()])
+    .optional()
+    .nullable()
+    .transform((v) => (v === "" || v == null ? null : v)),
 });
