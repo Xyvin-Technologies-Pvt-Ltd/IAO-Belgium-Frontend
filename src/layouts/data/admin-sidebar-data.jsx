@@ -132,6 +132,10 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
                 url: "/admin/student-management",
               },
               {
+                title: t("sidebar.admin.studentId", "IAO Student ID"),
+                url: "/admin/student-id",
+              },
+              {
                 title: t("sidebar.admin.locationChanges", "Location Changes"),
                 url: "/admin/location-changes",
               },
