@@ -152,7 +152,7 @@ const StudentIdPhotoCropModal = ({
               type="file"
               accept="image/*"
               onChange={handleFile}
-              className="block w-full text-sm text-dashboard-text file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium dark:text-white dark:file:bg-white/10"
+              className="block w-full cursor-pointer text-sm text-dashboard-text file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium dark:text-white dark:file:bg-white/10"
             />
             <p className="text-sm text-muted-foreground">
               Resize the photo with the slider, then accept it.

@@ -24,6 +24,7 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import StatusBadge from "@/components/StatusBadge";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import StudentIdPhotoCropModal from "@/components/admin/student-id/StudentIdPhotoCropModal";
+import { checkIssueStudentIdCard } from "@/api/studentIdApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetUsers } from "@/store/useDropdownStore";
 import {
@@ -207,6 +208,7 @@ const StudentIdAdminPage = () => {
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
   const [issuePhotoOpen, setIssuePhotoOpen] = useState(false);
+  const [issueCheckPending, setIssueCheckPending] = useState(false);
 
   const [reasonModal, setReasonModal] = useState({
     open: false,
@@ -276,12 +278,24 @@ const StudentIdAdminPage = () => {
     );
   };
 
-  const openIssuePhoto = () => {
+  const openIssuePhoto = async () => {
     if (!selectedUserId) {
       toast.error("Select a student first");
       return;
     }
-    setIssuePhotoOpen(true);
+    try {
+      setIssueCheckPending(true);
+      await checkIssueStudentIdCard(selectedUserId);
+      setIssuePhotoOpen(true);
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Cannot issue an ID card for this student",
+      );
+    } finally {
+      setIssueCheckPending(false);
+    }
   };
 
   const handleIssuePhoto = async (photo_key) => {
@@ -416,9 +430,9 @@ const StudentIdAdminPage = () => {
             <div className="flex items-end">
               <Button
                 onClick={openIssuePhoto}
-                disabled={issueMutation.isPending}
+                disabled={issueMutation.isPending || issueCheckPending}
               >
-                Crop photo & issue ID card
+                {issueCheckPending ? "Checking…" : "Issue ID card"}
               </Button>
             </div>
           </div>
