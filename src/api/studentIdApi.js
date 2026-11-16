@@ -57,10 +57,3 @@ export const getStudentIdApplicationActivity = async (applicationId) => {
   );
   return response.data;
 };
-
-export const simulateYearlyReissue = async () => {
-  const response = await axiosInstance.post(
-    "/student-id-card/jobs/yearly-reissue",
-  );
-  return response.data;
-};

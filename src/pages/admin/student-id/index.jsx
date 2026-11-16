@@ -23,7 +23,7 @@ import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import StatusBadge from "@/components/StatusBadge";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
-import { uploadFile } from "@/api/uploadApi";
+import StudentIdPhotoCropModal from "@/components/admin/student-id/StudentIdPhotoCropModal";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetUsers } from "@/store/useDropdownStore";
 import {
@@ -32,7 +32,6 @@ import {
   useRejectStudentIdCard,
   useReissueStudentIdCard,
   useRevokeStudentIdCard,
-  useSimulateYearlyReissue,
   useStudentIdApplicationActivity,
   useStudentIdCards,
   useStudentIdEligibility,
@@ -207,7 +206,7 @@ const StudentIdAdminPage = () => {
   const [issueOpen, setIssueOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [issueFile, setIssueFile] = useState(null);
+  const [issuePhotoOpen, setIssuePhotoOpen] = useState(false);
 
   const [reasonModal, setReasonModal] = useState({
     open: false,
@@ -248,7 +247,6 @@ const StudentIdAdminPage = () => {
   const revokeMutation = useRevokeStudentIdCard();
   const reissueMutation = useReissueStudentIdCard();
   const issueMutation = useIssueStudentIdCard();
-  const yearlyMutation = useSimulateYearlyReissue();
 
   useEffect(() => {
     setPage(1);
@@ -278,42 +276,28 @@ const StudentIdAdminPage = () => {
     );
   };
 
-  const handleIssue = async () => {
-    if (!selectedUserId || !issueFile) {
-      toast.error("Select a student and photo");
+  const openIssuePhoto = () => {
+    if (!selectedUserId) {
+      toast.error("Select a student first");
       return;
     }
-    try {
-      const uploadRes = await uploadFile(issueFile);
-      const photo_key = uploadRes?.data?.key || uploadRes?.key;
-      if (!photo_key) throw new Error("Upload failed");
-      await issueMutation.mutateAsync({
-        user_id: selectedUserId,
-        photo_key,
-      });
-      setIssueOpen(false);
-      setSelectedUserId("");
-      setIssueFile(null);
-      setUserSearchTerm("");
-    } catch (err) {
-      toast.error(err?.message || "Failed to issue card");
-    }
+    setIssuePhotoOpen(true);
   };
 
-  const handleReissueFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !reissueCardId) return;
-    try {
-      const uploadRes = await uploadFile(file);
-      const photo_key = uploadRes?.data?.key || uploadRes?.key;
-      if (!photo_key) throw new Error("Upload failed");
-      await reissueMutation.mutateAsync({ id: reissueCardId, photo_key });
-      setReissueCardId(null);
-    } catch (err) {
-      toast.error(err?.message || "Failed to reissue");
-    } finally {
-      e.target.value = "";
-    }
+  const handleIssuePhoto = async (photo_key) => {
+    await issueMutation.mutateAsync({
+      user_id: selectedUserId,
+      photo_key,
+    });
+    setIssuePhotoOpen(false);
+    setIssueOpen(false);
+    setSelectedUserId("");
+    setUserSearchTerm("");
+  };
+
+  const handleReissuePhoto = async (photo_key) => {
+    await reissueMutation.mutateAsync({ id: reissueCardId, photo_key });
+    setReissueCardId(null);
   };
 
   const getRowActions = (card) => {
@@ -375,21 +359,12 @@ const StudentIdAdminPage = () => {
           <h3 className="font-semibold text-dashboard-text dark:text-white">
             Programmes that receive a Student ID
           </h3>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => yearlyMutation.mutate()}
-              disabled={yearlyMutation.isPending}
-            >
-              Simulate yearly reissue (1 Sept)
-            </Button>
-            <Button
-              onClick={saveEligibility}
-              disabled={updateEligibility.isPending}
-            >
-              Save eligibility
-            </Button>
-          </div>
+          <Button
+            onClick={saveEligibility}
+            disabled={updateEligibility.isPending}
+          >
+            Save eligibility
+          </Button>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {eligDraft.map((p) => (
@@ -424,7 +399,7 @@ const StudentIdAdminPage = () => {
           + Issue new ID card
         </Button>
         {issueOpen && (
-          <div className="grid gap-3 md:grid-cols-3 border dark:border-white/10 rounded-lg p-3">
+          <div className="grid gap-3 md:grid-cols-2 border dark:border-white/10 rounded-lg p-3">
             <div>
               <SearchableSelect
                 label="Student"
@@ -438,22 +413,12 @@ const StudentIdAdminPage = () => {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-dashboard-text dark:text-white">
-                Student photo
-              </label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setIssueFile(e.target.files?.[0] || null)}
-              />
-            </div>
             <div className="flex items-end">
               <Button
-                onClick={handleIssue}
+                onClick={openIssuePhoto}
                 disabled={issueMutation.isPending}
               >
-                Issue ID card
+                Crop photo & issue ID card
               </Button>
             </div>
           </div>
@@ -612,35 +577,23 @@ const StudentIdAdminPage = () => {
         onClose={() => setHistoryApplicationId(null)}
       />
 
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        id="reissue-photo-input"
-        onChange={handleReissueFile}
+      <StudentIdPhotoCropModal
+        open={issuePhotoOpen}
+        title="Issue student ID — crop photo"
+        confirmLabel="Issue ID card"
+        isSubmitting={issueMutation.isPending}
+        onClose={() => setIssuePhotoOpen(false)}
+        onSubmit={handleIssuePhoto}
       />
-      {reissueCardId ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-xl bg-white dark:bg-black border dark:border-white/20 p-5 space-y-3">
-            <h3 className="font-semibold text-dashboard-text dark:text-white">
-              Reissue with new photo
-            </h3>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleReissueFile}
-            />
-            <div className="flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setReissueCardId(null)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+
+      <StudentIdPhotoCropModal
+        open={Boolean(reissueCardId)}
+        title="Reissue with new photo"
+        confirmLabel="Reissue ID card"
+        isSubmitting={reissueMutation.isPending}
+        onClose={() => setReissueCardId(null)}
+        onSubmit={handleReissuePhoto}
+      />
     </div>
   );
 };

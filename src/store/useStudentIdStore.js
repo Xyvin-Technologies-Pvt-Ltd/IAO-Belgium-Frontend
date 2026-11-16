@@ -9,9 +9,11 @@ import {
   rejectStudentIdCard,
   reissueStudentIdCard,
   revokeStudentIdCard,
-  simulateYearlyReissue,
   updateStudentIdEligibility,
 } from "@/api/studentIdApi";
+
+const apiErrorMessage = (error, fallback) =>
+  error?.response?.data?.message || error?.message || fallback;
 
 export const useStudentIdCards = (params, options = {}) => {
   return useQuery({
@@ -51,7 +53,7 @@ export const useUpdateStudentIdEligibility = () => {
       toast.success("Programme eligibility updated");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to update eligibility");
+      toast.error(apiErrorMessage(error, "Failed to update eligibility"));
     },
   });
 };
@@ -68,7 +70,7 @@ export const useApproveStudentIdCard = () => {
       toast.success("Card approved");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to approve card");
+      toast.error(apiErrorMessage(error, "Failed to approve card"));
     },
   });
 };
@@ -85,7 +87,7 @@ export const useRejectStudentIdCard = () => {
       toast.success("Card rejected");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to reject card");
+      toast.error(apiErrorMessage(error, "Failed to reject card"));
     },
   });
 };
@@ -102,7 +104,7 @@ export const useRevokeStudentIdCard = () => {
       toast.success("Card revoked");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to revoke card");
+      toast.error(apiErrorMessage(error, "Failed to revoke card"));
     },
   });
 };
@@ -119,7 +121,7 @@ export const useReissueStudentIdCard = () => {
       toast.success("Card reissued");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to reissue card");
+      toast.error(apiErrorMessage(error, "Failed to reissue card"));
     },
   });
 };
@@ -136,26 +138,7 @@ export const useIssueStudentIdCard = () => {
       toast.success("Card issued");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to issue card");
-    },
-  });
-};
-
-export const useSimulateYearlyReissue = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: simulateYearlyReissue,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["studentIdCards"] });
-      queryClient.invalidateQueries({
-        queryKey: ["studentIdApplicationActivity"],
-      });
-      const expired = response?.data?.expired_count ?? 0;
-      const created = response?.data?.created_count ?? 0;
-      toast.success(`Expired ${expired}, created ${created}`);
-    },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to run yearly reissue");
+      toast.error(apiErrorMessage(error, "Failed to issue card"));
     },
   });
 };
