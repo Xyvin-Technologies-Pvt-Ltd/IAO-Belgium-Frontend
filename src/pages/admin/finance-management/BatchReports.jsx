@@ -8,7 +8,8 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Download, List } from "lucide-react";
+import { List } from "lucide-react";
+import ReportExportButton from "./ReportExportButton";
 
 const defaultFilters = { status: "paid", purpose: "all", from: "", to: "" };
 
@@ -70,17 +71,7 @@ const BatchReports = () => {
           >
             <List className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            className="gap-2"
-            disabled={exportCsv.isPending}
-            onClick={() => exportCsv.mutate(queryFilters)}
-          >
-            <Download className="h-4 w-4" />
-            {exportCsv.isPending
-              ? t("common.exporting", "Exporting…")
-              : t("common.exportCsv", "Export CSV")}
-          </Button>
+          <ReportExportButton mutation={exportCsv} filters={queryFilters} />
           <CityReportsFilterDrawer
             draftFilters={draftFilters}
             setDraftFilters={setDraftFilters}

@@ -7,8 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatTZ } from "@/utils/dateUtils";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
@@ -24,6 +22,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ModuleReportsFilterDrawer, {
   EMPTY_MODULE_REPORT_FILTERS,
 } from "./ModuleReportsFilterDrawer";
+import ReportExportButton from "./ReportExportButton";
 
 //* IPB-151: Module Reports — occupancy, training hours and revenue per module.
 
@@ -91,17 +90,7 @@ const ModuleReports = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("finance.reports.module.title", "Module Reports")}
         </h2>
-        <Button
-          variant="outline"
-          className="gap-2"
-          disabled={exportCsv.isPending}
-          onClick={() => exportCsv.mutate(queryFilters)}
-        >
-          <Download className="h-4 w-4" />
-          {exportCsv.isPending
-            ? t("common.exporting", "Exporting…")
-            : t("common.exportCsv", "Export CSV")}
-        </Button>
+        <ReportExportButton mutation={exportCsv} filters={queryFilters} />
       </div>
 
       <div className="space-y-4">
