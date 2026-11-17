@@ -22,6 +22,7 @@ import {
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { exportExactPayout } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import {
   useGetExactPayout,
   useQueueExactPayoutMissing,
@@ -101,13 +102,14 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
     sendWaiting(settlementId);
   };
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     setExporting(true);
     try {
       //* IPB-153: the export follows the search — only the payments shown are exported
-      downloadCsv(
+      await downloadCsv(
         await exportExactPayout(settlementId, search.trim()),
         `mollie_payout_${payout?.reference || settlementId}${search.trim() ? "_filtered" : ""}`,
+        format,
       );
     } catch (err) {
       toast.error(err?.message || p("exportFailed"));
@@ -160,19 +162,14 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
                   </Button>
                 </>
               ) : null}
-              <Button
+              <ExportMenu
                 size="sm"
                 variant="ghost"
-                onClick={handleExport}
-                disabled={exporting || (Boolean(query) && visibleLines.length === 0)}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {exporting
-                  ? p("exporting")
-                  : query
-                    ? p("exportFiltered", { count: visibleLines.length })
-                    : p("export")}
-              </Button>
+                onExport={handleExport}
+                isPending={exporting}
+                disabled={Boolean(query) && visibleLines.length === 0}
+                label={query ? p("exportFiltered", { count: visibleLines.length }) : p("export")}
+              />
             </div>
 
             {/* IPB-153: search the payments of this payout */}

@@ -22,7 +22,7 @@ import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import ModuleReportsFilterDrawer, {
   EMPTY_MODULE_REPORT_FILTERS,
 } from "./ModuleReportsFilterDrawer";
-import ReportExportButton from "./ReportExportButton";
+import ExportMenu from "@/components/common/ExportMenu";
 
 //* IPB-151: Module Reports — occupancy, training hours and revenue per module.
 
@@ -90,7 +90,7 @@ const ModuleReports = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("finance.reports.module.title", "Module Reports")}
         </h2>
-        <ReportExportButton mutation={exportCsv} filters={queryFilters} />
+        <ExportMenu isPending={exportCsv.isPending} onExport={(format) => exportCsv.mutate({ ...queryFilters, format })} />
       </div>
 
       <div className="space-y-4">
