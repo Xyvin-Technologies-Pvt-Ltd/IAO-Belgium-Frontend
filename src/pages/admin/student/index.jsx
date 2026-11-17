@@ -254,9 +254,11 @@ const AllStudents = () => {
             ) : students?.length > 0 ? (
               students?.map((i) => (
                 <TableRow
-                  key={i._id}
+                  key={i.application_id || i._id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleRowClick(i._id)}
+                  onClick={() =>
+                    handleRowClick(i.application_id || i._id)
+                  }
                 >
                   <TableCell className="capitalize">{i?.uid}</TableCell>
                   <TableCell className="capitalize">{i?.first_name}</TableCell>

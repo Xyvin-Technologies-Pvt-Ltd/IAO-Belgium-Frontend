@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "@tanstack/react-router";
-import {
-  useGetStudentAttendance,
-  useGetStudentById,
-} from "@/store/useStudentStore";
+import { useGetStudentAttendance } from "@/store/useStudentStore";
+import { useGetStudentByApplication } from "@/store/useIntakeStore";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import { useTranslation } from "react-i18next";
 import StudentAttendanceTable from "@/components/admin/StudentAttendanceTable";
@@ -33,16 +31,27 @@ const getDurationUnitLabel = (durationUnit, t) => {
 const AttendenceView = () => {
   const { t } = useTranslation();
   const params = useParams({ strict: false });
+  //* Route id is application id (same as student-management detail)
   const id = params.id;
   const { updateBreadcrumbs } = useBreadcrumb();
   const [filter, setFilter] = useState({ year: 1 });
 
-  const { data: studentData } = useGetStudentById(id);
-
-  const { data, isLoading, error, refetch, isFetching } =
-    useGetStudentAttendance(id, filter);
+  const { data: studentData } = useGetStudentByApplication(id, {
+    year: filter.year,
+  });
 
   const studentInfo = studentData?.data;
+  const studentUserId = studentInfo?._id;
+
+  const { data, isLoading, error, refetch, isFetching } =
+    useGetStudentAttendance(
+      studentUserId,
+      { ...filter, application_id: id },
+      {
+        enabled: !!studentUserId && !!id,
+      },
+    );
+
   const totalYears = studentInfo?.year || 1;
   const years = Array.from({ length: totalYears }, (_, i) => i + 1);
 
@@ -79,49 +88,28 @@ const AttendenceView = () => {
             <div className="w-12 h-12 rounded-full bg-[#ff8904] flex items-center justify-center text-white font-semibold text-lg shrink-0">
               {studentInfo.first_name?.charAt(0).toUpperCase() || "?"}
             </div>
-
-            <div className="flex flex-col gap-0.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base font-bold text-foreground capitalize">
-                  {studentInfo.last_name} {studentInfo.first_name}
-                </span>
-                {studentInfo.uid && (
-                  <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-muted text-muted-foreground">
-                    {studentInfo.uid}
-                  </span>
-                )}
-                {studentInfo.year && (
-                  <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-muted text-muted-foreground">
-                    {`${getDurationUnitLabel(studentInfo?.duration_unit, t)} ${filter.year}`}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-                {studentInfo.program_name && (
-                  <span>{studentInfo.program_name}</span>
-                )}
-                {studentInfo.batch_name && (
-                  <>
-                    <span className="text-muted-foreground/40">•</span>
-                    <span>{studentInfo.batch_name}</span>
-                  </>
-                )}
-              </div>
+            <div>
+              <h1 className="text-xl font-semibold text-dashboard-text dark:text-white capitalize">
+                {studentInfo.last_name} {studentInfo.first_name}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {studentInfo.email}
+              </p>
             </div>
           </div>
         )}
       </div>
 
-      <div className="border-b border-gray-200 dark:border-white/20">
-        <nav className="-mb-px flex space-x-8">
+      <div className="border-b border-gray-150 dark:border-white/10 pb-2">
+        <nav className="flex space-x-6">
           {years.map((y) => (
             <button
               key={y}
               onClick={() => setFilter({ ...filter, year: y })}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-1.5 px-1 border-b-2 font-semibold text-xs transition-colors cursor-pointer ${
                 filter.year === y
                   ? "border-[#ff8904] text-[#ff8904]"
-                  : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+                  : "border-transparent text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:border-gray-200"
               }`}
             >
               {`${getDurationUnitLabel(studentInfo?.duration_unit, t)} ${y}`}
@@ -132,10 +120,13 @@ const AttendenceView = () => {
 
       <StudentAttendanceTable
         modules={modules}
-        isLoading={isLoading}
+        isLoading={isLoading || isFetching}
         error={error}
-        refetch={refetch}
-        isFetching={isFetching}
+        onRetry={refetch}
+        emptyMessage={t(
+          "studentManagement.attendance.empty",
+          "No attendance records found",
+        )}
       />
     </div>
   );

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import moment from "moment-timezone";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Check,
   History,
   RefreshCw,
   ShieldOff,
   X,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -197,6 +199,7 @@ function HistoryModal({ applicationId, open, onClose }) {
 }
 
 const StudentIdAdminPage = () => {
+  const navigate = useNavigate();
   const [status, setStatus] = useState("pending");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -359,6 +362,17 @@ const StudentIdAdminPage = () => {
       icon: History,
       onClick: () => setHistoryApplicationId(card.application_id || null),
     });
+    if (card.application_id) {
+      actions.push({
+        label: "Open enrollment",
+        icon: ExternalLink,
+        onClick: () =>
+          navigate({
+            to: "/admin/student-management/$id",
+            params: { id: String(card.application_id) },
+          }),
+      });
+    }
     return actions;
   };
 

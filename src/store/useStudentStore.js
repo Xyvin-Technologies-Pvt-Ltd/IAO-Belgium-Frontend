@@ -52,7 +52,13 @@ export const useGetStudentProfileLogs = (id, options = {}) => {
 
 export const useGetStudentAttendance = (id, filter, options = {}) => {
   return useQuery({
-    queryKey: ["student-attendance", id, filter],
+    queryKey: [
+      "student-attendance",
+      id,
+      filter?.application_id,
+      filter?.year,
+      filter,
+    ],
     queryFn: () => getStudentAttendance(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
@@ -62,7 +68,13 @@ export const useGetStudentAttendance = (id, filter, options = {}) => {
 
 export const useGetStudentPayments = (id, filter = {}, options = {}) => {
   return useQuery({
-    queryKey: ["student-payments", id, filter],
+    queryKey: [
+      "student-payments",
+      id,
+      filter?.application_id,
+      filter?.page,
+      filter?.limit,
+    ],
     queryFn: () => getStudentPayments(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
@@ -72,7 +84,13 @@ export const useGetStudentPayments = (id, filter = {}, options = {}) => {
 
 export const useGetStudentInvoices = (id, filter = {}, options = {}) => {
   return useQuery({
-    queryKey: ["student-invoices", id, filter],
+    queryKey: [
+      "student-invoices",
+      id,
+      filter?.application_id,
+      filter?.page,
+      filter?.limit,
+    ],
     queryFn: () => getStudentInvoices(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,
@@ -82,7 +100,13 @@ export const useGetStudentInvoices = (id, filter = {}, options = {}) => {
 
 export const useGetStudentReceipts = (id, filter = {}, options = {}) => {
   return useQuery({
-    queryKey: ["student-receipts", id, filter],
+    queryKey: [
+      "student-receipts",
+      id,
+      filter?.application_id,
+      filter?.page,
+      filter?.limit,
+    ],
     queryFn: () => getStudentReceipts(id, filter),
     staleTime: 30000,
     placeholderData: (previousData) => previousData,

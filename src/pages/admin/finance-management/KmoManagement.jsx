@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Table,
   TableBody,
@@ -21,7 +22,7 @@ import {
 } from "@/store/usePaymentStore";
 import KmoApplicationsFilterDrawer, { EMPTY_KMO_FILTERS } from "./KmoApplicationsFilterDrawer";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, Download } from "lucide-react";
+import { Edit2, Eye, Building2, CheckCircle2, XCircle, ChevronDown, ChevronUp, FileText, Download, ExternalLink } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,12 @@ import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
+
+const resolveEnrollmentId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  return value._id ? String(value._id) : null;
+};
 
 //* IPB-143: five KMO statuses shown on this page (labels only — stored values unchanged).
 //* payment_released is shown as Paid.
@@ -90,6 +97,7 @@ const formatKmoAmount = (app) => {
 
 const KmoManagement = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("kmo");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -498,6 +506,32 @@ const KmoManagement = () => {
 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Batch:</p>
                 <p className="font-semibold text-gray-900 dark:text-white">{selectedApp.batch?.name || "-"}</p>
+
+                {resolveEnrollmentId(selectedApp.application_id) && (
+                  <>
+                    <p className="font-bold text-gray-500 dark:text-gray-400">Enrollment:</p>
+                    <div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8 gap-1"
+                        onClick={() => {
+                          setIsDetailsOpen(false);
+                          navigate({
+                            to: "/admin/student-management/$id",
+                            params: {
+                              id: resolveEnrollmentId(selectedApp.application_id),
+                            },
+                          });
+                        }}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        Open enrollment
+                      </Button>
+                    </div>
+                  </>
+                )}
                 
                 <p className="font-bold text-gray-500 dark:text-gray-400">Module:</p>
                 <p className="font-semibold text-gray-900 dark:text-white">
