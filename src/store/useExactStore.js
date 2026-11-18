@@ -36,6 +36,7 @@ import {
   postExactCredit,
   linkExactAuditRecords,
   getExactAuditNightly,
+  getExactKmo,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -413,6 +414,7 @@ export const useAddExactToOutboxMany = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
       queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
     onError: (err) => toast.error(err?.message || "Failed to add these records to To send"),
   });
@@ -481,5 +483,16 @@ export const useGetExactAuditNightly = (options = {}) =>
     queryKey: ["exact-audit-nightly"],
     queryFn: getExactAuditNightly,
     staleTime: 5 * 60 * 1000,
+    ...options,
+  });
+
+// ─── KMOP tab ────────────────────────────────────────────────────────────────
+
+export const useGetExactKmo = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-kmo", params],
+    queryFn: () => getExactKmo(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
     ...options,
   });
