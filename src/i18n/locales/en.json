@@ -749,7 +749,9 @@
         },
         "retryAllShown": "Retry all shown ({{count}})",
         "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
-        "editCompany": "Edit company"
+        "editCompany": "Edit company",
+        "sendAllShown": "Send all shown ({{count}})",
+        "confirmSendAll": "Send {{count}} waiting record(s) to Exact? Each is checked the same way as when you click Send on it; records with problems fail and stay in To send."
       },
       "filters": {
         "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
@@ -775,7 +777,7 @@
         "guide": "Guide"
       },
       "missing": {
-        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s)), paid since {{since}}. Add one to To send, then preview and send it there.",
+        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s)), since {{since}}. Add them to To send, then preview and send them there.",
         "empty": "Nothing missing in Exact since {{since}}.",
         "loadFailed": "Failed to load records missing in Exact",
         "paidOn": "Paid on",
@@ -785,13 +787,19 @@
         "addHint": "Puts this record in To send (Waiting). Nothing is sent until you preview it and click Send there.",
         "kind": {
           "payment": "Payment",
-          "third_party_invoice": "Third-party invoice"
+          "third_party_invoice": "Third-party invoice",
+          "kmo_invoice": "KMO invoice"
         },
         "queued": {
           "held": "In To send",
           "failed": "Failed in To send",
           "sending": "Sending"
-        }
+        },
+        "addAll": "Add all {{count}} to To send",
+        "addingAll": "Adding… {{done}} / {{total}}",
+        "confirmAddAll": "Add all {{count}} record(s) matching this filter to To send? Nothing is sent yet — they wait in To send → Waiting.",
+        "addedAll": "{{queued}} added to To send, {{refused}} not added (already queued or not eligible).",
+        "addAllFailed": "Failed to add these records to To send"
       },
       "history": {
         "documents": "Documents",
@@ -918,7 +926,7 @@
           "items": [
             {
               "title": "To send → Waiting",
-              "text": "Records ready for Exact. Open Preview, check customer, date, amount and Your ref., then click Send."
+              "text": "Records ready for Exact. Open Preview, check customer, date, amount and Your ref., then click Send — or \"Send all shown\" once you've checked a few."
             },
             {
               "title": "To send → Failed",
@@ -926,7 +934,7 @@
             },
             {
               "title": "To send → Missing",
-              "text": "Records that should be in Exact but are not, paid since 18 Aug 2026. \"Add to To send\" only puts the record in Waiting — nothing is sent until you preview and send it."
+              "text": "Records that should be in Exact but are not: payments, third-party invoices and KMO invoices (KMO: Your ref. = invoice number, module name in the description). \"Add to To send\" or \"Add all\" only puts them in Waiting — nothing is sent until you send them there."
             },
             {
               "title": "Payouts",
@@ -938,7 +946,7 @@
             },
             {
               "title": "Audit",
-              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem (missing, duplicates, unknown Exact entries, amounts, old references, refunds…). \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed."
+              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem (missing, duplicates, unknown Exact entries, amounts, old references, refunds…). \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed. Duplicates have a \"Credit\" button that previews and posts a credit entry cancelling the extra Exact copy."
             },
             {
               "title": "Settings",
@@ -1074,7 +1082,8 @@
           "iaoAmount": "IAO amount",
           "exact": "Exact entry",
           "exactAmount": "Exact amount",
-          "detail": "Detail"
+          "detail": "Detail",
+          "action": "Action"
         },
         "category": {
           "missing": "Missing in Exact",
@@ -1130,9 +1139,9 @@
               "title": "Fix — preview, test on one, then batch",
               "text": "Every fix goes through the same safe sending path (strict duplicate check), so a fix can't create a new duplicate.",
               "items": [
-                "Missing → To send → Send (live now)",
+                "Missing → To send → Send, incl. KMO invoices and \"Add all\" / \"Send all shown\" (live now)",
                 "Company countries fix + Retry all (live now)",
-                "Credit duplicate: a credit entry for the extra Exact copy (planned)",
+                "Credit duplicate: a credit entry for the extra Exact copy, from Audit → Duplicates (live now)",
                 "Re-post for xCore: reverse the old entry and post it again under the Mollie ID (planned, if the accountant chooses it)",
                 "Refunds matched with credit notes (planned)"
               ]
@@ -1146,7 +1155,40 @@
             }
           }
         },
-        "exporting": "Exporting…"
+        "exporting": "Exporting…",
+        "credit": {
+          "button": "Credit",
+          "title": "Credit duplicate Exact entry {{number}}",
+          "intro": "Posts a credit entry in Exact that cancels this duplicate: same customer, same GL accounts and VAT, amounts negated. The copy IAO is linked to stays as it is.",
+          "date": {
+            "today": "Date: today",
+            "original": "Date: same as the duplicate"
+          },
+          "loading": "Reading the duplicate from Exact…",
+          "loadFailed": "Couldn't build the credit",
+          "ready": "Ready to post.",
+          "blocked": "Can't be credited:",
+          "alreadyInExact": "A credit for this duplicate already exists in Exact (entry {{number}}). Click \"Record it\" to mark the duplicate as settled — nothing new is posted.",
+          "duplicate": "Duplicate in Exact",
+          "iaoRecord": "IAO record it duplicates",
+          "creditTitle": "Credit that will be posted",
+          "entry": "Entry",
+          "entryDate": "Date",
+          "yourRef": "Your ref.",
+          "customer": "Customer",
+          "amount": "Amount",
+          "record": "IAO record",
+          "payment": "Payment",
+          "why": "Why",
+          "description": "Description",
+          "total": "Total",
+          "vat": "VAT code",
+          "after": "After posting, ask the accountant to match the duplicate with this credit in Exact (same customer, same amount).",
+          "post": "Post credit in Exact",
+          "recordExisting": "Record it",
+          "posting": "Posting…",
+          "confirm": "Post a credit of {{amount}} EUR in Exact to cancel duplicate entry {{number}}?"
+        }
       }
     }
   },
