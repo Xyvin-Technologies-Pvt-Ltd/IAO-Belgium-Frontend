@@ -37,9 +37,12 @@ export const revokeStudentIdCard = async (id, reason) => {
 };
 
 export const reissueStudentIdCard = async (id, photo_key) => {
-  const response = await axiosInstance.post(`/student-id-card/${id}/reissue`, {
-    photo_key,
-  });
+  const body = {};
+  if (photo_key) body.photo_key = photo_key;
+  const response = await axiosInstance.post(
+    `/student-id-card/${id}/reissue`,
+    body,
+  );
   return response.data;
 };
 
@@ -61,6 +64,13 @@ export const issueStudentIdCard = async ({ user_id, photo_key }) => {
 export const getStudentIdApplicationActivity = async (applicationId) => {
   const response = await axiosInstance.get(
     `/student-id-card/application/${applicationId}/activity`,
+  );
+  return response.data;
+};
+
+export const getStudentIdApplicationCard = async (applicationId) => {
+  const response = await axiosInstance.get(
+    `/student-id-card/application/${applicationId}/card`,
   );
   return response.data;
 };

@@ -176,7 +176,9 @@
       "usedViaKmo": "Utilisé via KMO",
       "usedViaLocationSwitch": "Utilisé via changement de lieu",
       "approved": "Approuvé",
-      "rejected": "Rejeté"
+      "rejected": "Rejeté",
+      "revoked": "Révoqué",
+      "expired": "Expiré"
     },
     "file": "fichier",
     "actions": "Actions",
@@ -1501,10 +1503,13 @@
       "status": "Statut",
       "action": "Action",
       "edit": "Modifier",
-      "noIntakes": "Aucune promotion trouvée"
+      "noIntakes": "Aucune promotion trouvée",
+      "enrolled": "Inscrits",
+      "capacity": "Capacité"
     },
     "messages": {
-      "loadFailed": "Échec du chargement des promotions"
+      "loadFailed": "Échec du chargement des promotions",
+      "exportFailed": "Échec de l'exportation des promotions"
     },
     "modal": {
       "createTitle": "Créer une nouvelle promotion",
@@ -1560,7 +1565,27 @@
       "searchCities": "Rechercher des villes...",
       "clearAll": "Tout effacer",
       "applyFilters": "Appliquer les filtres",
-      "narrowDownIntakes": "Affiner la liste des promotions"
+      "narrowDownIntakes": "Affiner la liste des promotions",
+      "type": "Type",
+      "allTypes": "Tous les types",
+      "programName": "Nom de la formation",
+      "programNamePlaceholder": "Rechercher par nom de formation...",
+      "registrationFee": "Frais d'inscription",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "deadline": "Date limite",
+      "from": "Du",
+      "to": "Au",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "La fin de la plage doit être postérieure au début",
+      "clearFilters": "Effacer les filtres"
+    },
+    "export": {
+      "title": "Exporter",
+      "exporting": "Exportation...",
+      "csv": "Exporter en CSV",
+      "excel": "Exporter en Excel"
     }
   },
   "adminManagement": {
@@ -1734,6 +1759,7 @@
       "general": "Sélection de module",
       "payments": "Paiements",
       "thesis": "Thèse",
+      "documents": "Documents",
       "notesAndAttachments": "Notes et pièces jointes",
       "invoices": "Notes de frais"
     },
@@ -2009,7 +2035,9 @@
       "waitlisted": "En cours",
       "resubmitted": "Soumis à nouveau",
       "approved": "Approuvé",
-      "rejected": "Rejeté"
+      "rejected": "Rejeté",
+      "revoked": "Révoqué",
+      "expired": "Expiré"
     },
     "documents": {
       "idCard": "Carte d'identité",
@@ -3392,5 +3420,32 @@
     "stepTypeInfo": "Information uniquement",
     "stepTypeUpload": "Téléversement de document",
     "submitted": "Soumis"
+  },
+  "idCard": {
+    "teacherTitle": "Carte d'identité Enseignant",
+    "studentTitle": "Carte d'identité Étudiant",
+    "viewCard": "Voir la carte",
+    "recordId": "Identifiant",
+    "validFrom": "Valable du",
+    "validUntil": "Valable jusqu'au",
+    "academicYear": "Année académique",
+    "previousCards": "Cartes précédentes",
+    "noCardIssued": "Aucune carte d'identité délivrée pour le moment",
+    "noTeacherCardDesc": "Cet enseignant ne dispose actuellement d'aucune carte d'identité active ou délivrée.",
+    "noStudentCardDesc": "Cet étudiant ne dispose actuellement d'aucune carte d'identité active ou délivrée."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Rechercher par UID, nom ou e-mail...",
+    "filters": {
+      "button": "Filtrer",
+      "title": "Filtrer les cartes d'identité",
+      "subtitle": "Affinez la liste des cartes d'étudiant",
+      "programType": "Type de programme",
+      "allProgramTypes": "Tous les types de programme",
+      "program": "Programme",
+      "allPrograms": "Tous les programmes",
+      "clearAll": "Tout effacer",
+      "applyFilters": "Appliquer les filtres"
+    }
   }
 }

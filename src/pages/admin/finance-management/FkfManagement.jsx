@@ -62,6 +62,7 @@ import {
   useUpdateFkfConfig,
 } from "@/store/useFkfStore";
 import { useCanModify } from "@/hooks/useCanModify";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const studentName = (s) =>
   `${s?.first_name || ""} ${s?.last_name || ""}`.trim() || s?.email || "-";
@@ -478,8 +479,9 @@ const FkfManagement = () => {
     );
   };
 
-  const handleExport = () => {
+  const handleExport = (format) => {
     exportStudents.mutate({
+      format,
       apply_postal_filter: "true",
       ...(debouncedStudentsSearch ? { search: debouncedStudentsSearch } : {}),
       ...(studentsProgram ? { program: studentsProgram } : {}),
@@ -690,16 +692,11 @@ const FkfManagement = () => {
             </div>
 
             <div className="flex flex-wrap gap-2 ml-auto">
-              <Button
+              <ExportMenu
                 type="button"
-                variant="outline"
-                onClick={handleExport}
-                disabled={exportStudents.isPending}
-              >
-                {exportStudents.isPending
-                  ? t("common.exporting", "Exporting…")
-                  : t("common.exportCsv", "Export CSV")}
-              </Button>
+                onExport={handleExport}
+                isPending={exportStudents.isPending}
+              />
               <Button
                 type="button"
                 onClick={handleMarkEligible}

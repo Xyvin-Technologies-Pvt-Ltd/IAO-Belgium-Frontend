@@ -30,6 +30,8 @@ const statusVariants = {
   paused: "text-amber-600",
   stopped: "text-red-600",
   removed: "text-gray-500",
+  revoked: "text-red-600 dark:text-red-400",
+  expired: "text-amber-600 dark:text-amber-400",
 
   // Bloom levels (Difficulty)
   remember: "text-green-600",
@@ -227,6 +229,10 @@ const StatusBadge = ({ status }) => {
     displayText = t("common.status.approved", "Approved");
   } else if (status === "rejected") {
     displayText = t("common.status.rejected", "Rejected");
+  } else if (status === "revoked") {
+    displayText = t("common.status.revoked", "Revoked");
+  } else if (status === "expired") {
+    displayText = t("common.status.expired", "Expired");
   } else {
     displayText = status;
   }

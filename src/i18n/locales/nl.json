@@ -177,7 +177,9 @@
       "usedViaKmo": "Gebruikt via KMO",
       "usedViaLocationSwitch": "Gebruikt via locatiewissel",
       "approved": "Goedgekeurd",
-      "rejected": "Afgewezen"
+      "rejected": "Afgewezen",
+      "revoked": "Ingetrokken",
+      "expired": "Verlopen"
     },
     "file": "bestand",
     "actions": "Acties",
@@ -1512,10 +1514,13 @@
       "status": "Status",
       "action": "Actie",
       "edit": "Bewerken",
-      "noIntakes": "Geen instroom gevonden"
+      "noIntakes": "Geen instroom gevonden",
+      "enrolled": "Ingeschreven",
+      "capacity": "Capaciteit"
     },
     "messages": {
-      "loadFailed": "Laden van instroom mislukt"
+      "loadFailed": "Laden van instroom mislukt",
+      "exportFailed": "Exporteren van instroom mislukt"
     },
     "modal": {
       "createTitle": "Nieuwe instroom aanmaken",
@@ -1571,7 +1576,27 @@
       "searchCities": "Steden zoeken...",
       "clearAll": "Alles wissen",
       "applyFilters": "Filters toepassen",
-      "narrowDownIntakes": "Instroomlijst beperken"
+      "narrowDownIntakes": "Instroomlijst beperken",
+      "type": "Type",
+      "allTypes": "Alle types",
+      "programName": "Opleidingsnaam",
+      "programNamePlaceholder": "Zoeken op opleidingsnaam...",
+      "registrationFee": "Inschrijvingsgeld",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "deadline": "Deadline",
+      "from": "Van",
+      "to": "Tot",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "Het einde van het bereik moet na het begin liggen",
+      "clearFilters": "Filters wissen"
+    },
+    "export": {
+      "title": "Exporteren",
+      "exporting": "Exporteren...",
+      "csv": "Exporteren als CSV",
+      "excel": "Exporteren als Excel"
     }
   },
   "adminManagement": {
@@ -1758,6 +1783,7 @@
       "general": "Module selectie",
       "payments": "Betalingen",
       "thesis": "Thesis",
+      "documents": "Documenten",
       "notesAndAttachments": "Notities & Bijlagen",
       "invoices": "Onkostennota’s"
     },
@@ -2034,7 +2060,9 @@
       "waitlisted": "In behandeling",
       "resubmitted": "Opnieuw ingediend",
       "approved": "Goedgekeurd",
-      "rejected": "Afgewezen"
+      "rejected": "Afgewezen",
+      "revoked": "Ingetrokken",
+      "expired": "Verlopen"
     },
     "documents": {
       "idCard": "Identiteitskaart",
@@ -3425,5 +3453,32 @@
     "stepTypeInfo": "Enkel informatie",
     "stepTypeUpload": "Document uploaden",
     "submitted": "Ingediend"
+  },
+  "idCard": {
+    "teacherTitle": "Identiteitskaart Docent",
+    "studentTitle": "Identiteitskaart Student",
+    "viewCard": "Kaart bekijken",
+    "recordId": "Record-ID",
+    "validFrom": "Geldig vanaf",
+    "validUntil": "Geldig tot",
+    "academicYear": "Academisch jaar",
+    "previousCards": "Eerdere kaarten",
+    "noCardIssued": "Nog geen identiteitskaart uitgegeven",
+    "noTeacherCardDesc": "Deze docent heeft momenteel geen actieve of uitgegeven identiteitskaart.",
+    "noStudentCardDesc": "Deze student heeft momenteel geen actieve of uitgegeven identiteitskaart."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Zoeken op UID, naam of e-mail...",
+    "filters": {
+      "button": "Filter",
+      "title": "Filter identiteitskaarten",
+      "subtitle": "Verfijn de lijst met studentenkaarten",
+      "programType": "Programmatype",
+      "allProgramTypes": "Alle programmatypes",
+      "program": "Programma",
+      "allPrograms": "Alle programma's",
+      "clearAll": "Alles wissen",
+      "applyFilters": "Filters toepassen"
+    }
   }
 }

@@ -33,6 +33,7 @@ import {
 import { useCanModify } from "@/hooks/useCanModify";
 import { getStudentByBatch } from "@/api/batchApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import AddStudentsFromCoachViewDialog from "./AddStudentsFromCoachViewDialog";
 import RemoveStudentFromBatchDialog from "./RemoveStudentFromBatchDialog";
 import PauseStopEnrollmentDialog from "./PauseStopEnrollmentDialog";
@@ -82,7 +83,7 @@ const BatchStudentList = () => {
     });
   };
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     const toastId = toast.loading(t("studentManagement.exporting", "Preparing CSV export..."));
     try {
       const response = await getStudentByBatch(id, {
@@ -108,7 +109,7 @@ const BatchStudentList = () => {
           r.year_status || r.status,
         ],
       );
-      downloadCsv(csv, `${batch?.data?.name || "group"}_students`);
+      await downloadCsv(csv, `${batch?.data?.name || "group"}_students`, format);
       toast.success(t("studentManagement.exportSuccess", "Students exported successfully!"), { id: toastId });
     } catch (err) {
       toast.error(err?.message || t("studentManagement.exportFailed", "Failed to export students."), {
@@ -219,10 +220,7 @@ const BatchStudentList = () => {
           </Select>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Button variant="outline" onClick={handleExport} className="flex h-9 items-center gap-2">
-            <Download className="h-4 w-4" />
-            {t("studentManagement.exportCsv", "Export CSV")}
-          </Button>
+          <ExportMenu onExport={handleExport} className="flex h-9 items-center gap-2" />
           {canModify && (
             <Button
               variant="outline"

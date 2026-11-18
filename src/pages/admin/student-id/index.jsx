@@ -3,11 +3,13 @@ import moment from "moment-timezone";
 import { toast } from "sonner";
 import {
   Check,
+  Eye,
   History,
   RefreshCw,
   ShieldOff,
   X,
 } from "lucide-react";
+import IdCardViewModal from "@/components/id-card/IdCardViewModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,8 +26,11 @@ import RowActionMenu from "@/components/ui/table/RowActionMenu";
 import StatusBadge from "@/components/StatusBadge";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import StudentIdPhotoCropModal from "@/components/admin/student-id/StudentIdPhotoCropModal";
+import ReissueChoiceModal from "@/components/id-card/ReissueChoiceModal";
 import { checkIssueStudentIdCard } from "@/api/studentIdApi";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTranslation } from "react-i18next";
+import IdCardFilterDrawer from "@/components/id-card/IdCardFilterDrawer";
 import { useGetUsers } from "@/store/useDropdownStore";
 import {
   useApproveStudentIdCard,
@@ -52,6 +57,11 @@ const PANEL_CLASS =
 
 const TABLE_COLUMNS = 8;
 const CARD_TZ = "Europe/Brussels";
+
+const DEFAULT_ID_CARD_FILTERS = {
+  program_type: "all",
+  program: "all",
+};
 
 const formatCardDate = (value) =>
   value ? moment.tz(value, CARD_TZ).format("DD/MM/YYYY") : "—";
@@ -102,6 +112,13 @@ function HistoryModal({ applicationId, open, onClose }) {
   const payload = data?.data;
   const cards = Array.isArray(payload) ? [] : payload?.cards || [];
   const rows = Array.isArray(payload) ? payload : payload?.activity || [];
+  const cardMap = useMemo(() => {
+    const map = new Map();
+    for (const c of cards) {
+      if (c.document_id) map.set(String(c.document_id), c);
+    }
+    return map;
+  }, [cards]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -135,14 +152,20 @@ function HistoryModal({ applicationId, open, onClose }) {
                       ) : null}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-dashboard-text dark:text-white truncate">
-                        {card.academic?.name || "—"} ·{" "}
-                        <span className="capitalize">{card.status}</span>
-                      </p>
+                      <div className="flex items-center gap-2 font-medium text-dashboard-text dark:text-white truncate">
+                        <span>{card.card_uid || card.academic?.name || "—"}</span>
+                        <span>·</span>
+                        <StatusBadge status={card.status} />
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         {formatCardDate(card.valid_from)} –{" "}
                         {formatCardDate(card.valid_until)}
                       </p>
+                      {card.academic?.name ? (
+                        <p className="text-xs text-muted-foreground">
+                          {card.academic.name}
+                        </p>
+                      ) : null}
                       {card.issued_by ? (
                         <p className="text-xs text-muted-foreground capitalize">
                           Issued by: {card.issued_by}
@@ -158,30 +181,48 @@ function HistoryModal({ applicationId, open, onClose }) {
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Activity
                 </p>
-                {rows.map((entry, idx) => (
-                  <div
-                    key={`${entry.card_id}-${idx}`}
-                    className="rounded border border-gray-100 dark:border-white/10 p-2"
-                  >
-                    <p className="font-medium text-dashboard-text dark:text-white">
-                      {moment(entry.at).format("DD/MM/YYYY HH:mm:ss")} ·{" "}
-                      {entry.action}
-                      {entry.to_status ? ` → ${entry.to_status}` : ""}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      By: {formatActivityActor(entry.actor)}
-                      {entry.actor?.email ? ` (${entry.actor.email})` : ""}
-                    </p>
-                    {entry.card_status ? (
-                      <p className="text-xs text-muted-foreground capitalize">
-                        Card: {entry.card_status}
+                {rows.map((entry, idx) => {
+                  const cardUid =
+                    entry.card_uid ||
+                    cardMap.get(String(entry.card_id))?.card_uid;
+                  return (
+                    <div
+                      key={`${entry.card_id}-${idx}`}
+                      className="rounded border border-gray-100 dark:border-white/10 p-2"
+                    >
+                      <p className="font-medium text-dashboard-text dark:text-white flex items-center gap-1.5 flex-wrap">
+                        <span>
+                          {moment(entry.at).format("DD/MM/YYYY HH:mm:ss")}
+                        </span>
+                        <span>·</span>
+                        {cardUid ? (
+                          <>
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-[#ff8904]/10 text-[#ff8904] dark:bg-[#ff8904]/20 border border-[#ff8904]/30">
+                              {cardUid}
+                            </span>
+                            <span>·</span>
+                          </>
+                        ) : null}
+                        <span>{entry.action}</span>
+                        {entry.to_status ? (
+                          <span>→ {entry.to_status}</span>
+                        ) : null}
                       </p>
-                    ) : null}
-                    {entry.note ? (
-                      <p className="text-muted-foreground">{entry.note}</p>
-                    ) : null}
-                  </div>
-                ))}
+                      <p className="text-xs text-muted-foreground">
+                        By: {formatActivityActor(entry.actor)}
+                        {entry.actor?.email ? ` (${entry.actor.email})` : ""}
+                      </p>
+                      {entry.card_status ? (
+                        <p className="text-xs text-muted-foreground capitalize">
+                          Card: {entry.card_status}
+                        </p>
+                      ) : null}
+                      {entry.note ? (
+                        <p className="text-muted-foreground">{entry.note}</p>
+                      ) : null}
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
           </div>
@@ -197,11 +238,15 @@ function HistoryModal({ applicationId, open, onClose }) {
 }
 
 const StudentIdAdminPage = () => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState("pending");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);
+
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_ID_CARD_FILTERS);
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_ID_CARD_FILTERS);
 
   const [eligDraft, setEligDraft] = useState([]);
   const [issueOpen, setIssueOpen] = useState(false);
@@ -216,7 +261,9 @@ const StudentIdAdminPage = () => {
     cardId: null,
   });
   const [historyApplicationId, setHistoryApplicationId] = useState(null);
+  const [reissueChoiceCardId, setReissueChoiceCardId] = useState(null);
   const [reissueCardId, setReissueCardId] = useState(null);
+  const [viewCard, setViewCard] = useState(null);
 
   const listParams = useMemo(
     () => ({
@@ -224,8 +271,14 @@ const StudentIdAdminPage = () => {
       limit: rowsPerPage,
       status,
       search: debouncedSearch || undefined,
+      program_type:
+        appliedFilters.program_type !== "all"
+          ? appliedFilters.program_type
+          : undefined,
+      program:
+        appliedFilters.program !== "all" ? appliedFilters.program : undefined,
     }),
-    [page, rowsPerPage, status, debouncedSearch],
+    [page, rowsPerPage, status, debouncedSearch, appliedFilters],
   );
 
   const { data, isLoading, isFetching } = useStudentIdCards(listParams);
@@ -252,7 +305,7 @@ const StudentIdAdminPage = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [status, debouncedSearch]);
+  }, [status, debouncedSearch, appliedFilters]);
 
   useEffect(() => {
     if (eligData?.data) {
@@ -268,6 +321,11 @@ const StudentIdAdminPage = () => {
   const rows = data?.data || [];
   const totalRows = data?.total_count || data?.total || 0;
   const statusCounts = data?.status_counts || {};
+
+  const reissueCard = useMemo(
+    () => rows.find((c) => c.document_id === reissueChoiceCardId) || null,
+    [rows, reissueChoiceCardId],
+  );
 
   const saveEligibility = () => {
     updateEligibility.mutate(
@@ -314,8 +372,19 @@ const StudentIdAdminPage = () => {
     setReissueCardId(null);
   };
 
+  const handleReissueKeepSame = async () => {
+    await reissueMutation.mutateAsync({ id: reissueChoiceCardId });
+    setReissueChoiceCardId(null);
+  };
+
   const getRowActions = (card) => {
-    const actions = [];
+    const actions = [
+      {
+        label: "View ID card",
+        icon: Eye,
+        onClick: () => setViewCard(card),
+      },
+    ];
     if (card.status === "pending") {
       actions.push({
         label: "Approve",
@@ -334,12 +403,14 @@ const StudentIdAdminPage = () => {
           }),
       });
     }
-    if (card.status === "active") {
+    if (card.status === "active" || card.status === "revoked") {
       actions.push({
-        label: "Reissue with new photo",
+        label: "Reissue",
         icon: RefreshCw,
-        onClick: () => setReissueCardId(card.document_id),
+        onClick: () => setReissueChoiceCardId(card.document_id),
       });
+    }
+    if (card.status === "active") {
       actions.push({
         label: "Revoke ID",
         icon: ShieldOff,
@@ -472,23 +543,33 @@ const StudentIdAdminPage = () => {
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
           <Input
-            placeholder="Search by name or student ID"
+            placeholder={t(
+              "idCardManagement.searchPlaceholder",
+              "Search by UID, name, or email...",
+            )}
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+          />
+          <IdCardFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
           />
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>UID</TableHead>
               <TableHead>Photo</TableHead>
               <TableHead>Student</TableHead>
               <TableHead>Student ID</TableHead>
               <TableHead>Programme</TableHead>
-              <TableHead>Card</TableHead>
               <TableHead>Validity</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Action</TableHead>
@@ -505,6 +586,9 @@ const StudentIdAdminPage = () => {
                   key={card.document_id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
+                  <TableCell className="whitespace-nowrap">
+                    {card.card_uid || "—"}
+                  </TableCell>
                   <TableCell>
                     <div className="h-12 w-10 overflow-hidden rounded border dark:border-white/10 bg-gray-50 dark:bg-white/5">
                       {card.photo_url ? (
@@ -527,7 +611,6 @@ const StudentIdAdminPage = () => {
                     {card.student_uid || "—"}
                   </TableCell>
                   <TableCell>{card.program?.name || "—"}</TableCell>
-                  <TableCell>{card.card_title || "—"}</TableCell>
                   <TableCell className="whitespace-nowrap">
                     {card.valid_from || card.valid_until
                       ? `${formatCardDate(card.valid_from)} – ${formatCardDate(card.valid_until)}`
@@ -591,6 +674,12 @@ const StudentIdAdminPage = () => {
         onClose={() => setHistoryApplicationId(null)}
       />
 
+      <IdCardViewModal
+        open={Boolean(viewCard)}
+        card={viewCard}
+        onClose={() => setViewCard(null)}
+      />
+
       <StudentIdPhotoCropModal
         open={issuePhotoOpen}
         title="Issue student ID — crop photo"
@@ -598,6 +687,18 @@ const StudentIdAdminPage = () => {
         isSubmitting={issueMutation.isPending}
         onClose={() => setIssuePhotoOpen(false)}
         onSubmit={handleIssuePhoto}
+      />
+
+      <ReissueChoiceModal
+        open={Boolean(reissueChoiceCardId)}
+        card={reissueCard}
+        loading={reissueMutation.isPending}
+        onClose={() => setReissueChoiceCardId(null)}
+        onKeepSame={handleReissueKeepSame}
+        onUploadNew={() => {
+          setReissueCardId(reissueChoiceCardId);
+          setReissueChoiceCardId(null);
+        }}
       />
 
       <StudentIdPhotoCropModal

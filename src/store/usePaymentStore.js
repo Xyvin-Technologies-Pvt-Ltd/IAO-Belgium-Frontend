@@ -1,3 +1,4 @@
+import { downloadCsv } from "@/utils/exportCsv";
 import {
   getPayments,
   getAnalyticsByCity,
@@ -244,16 +245,16 @@ export const useAdminReconcileThirdParty = () => {
 export const useExportAnalyticsCityCsv = () => {
   return useMutation({
     mutationFn: exportAnalyticsCityCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `city-reports-${Date.now()}.csv`);
+    onSuccess: (data, vars) => {
+      triggerBlobDownload(data, `city-reports-${Date.now()}.${vars?.format === "xlsx" ? "xlsx" : "csv"}`);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });
@@ -262,16 +263,16 @@ export const useExportAnalyticsCityCsv = () => {
 export const useExportAnalyticsProgramCsv = () => {
   return useMutation({
     mutationFn: exportAnalyticsProgramCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `program-reports-${Date.now()}.csv`);
+    onSuccess: (data, vars) => {
+      triggerBlobDownload(data, `program-reports-${Date.now()}.${vars?.format === "xlsx" ? "xlsx" : "csv"}`);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });
@@ -280,16 +281,16 @@ export const useExportAnalyticsProgramCsv = () => {
 export const useExportAnalyticsBatchCsv = () => {
   return useMutation({
     mutationFn: exportAnalyticsBatchCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `batch-reports-${Date.now()}.csv`);
+    onSuccess: (data, vars) => {
+      triggerBlobDownload(data, `batch-reports-${Date.now()}.${vars?.format === "xlsx" ? "xlsx" : "csv"}`);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });
@@ -298,16 +299,16 @@ export const useExportAnalyticsBatchCsv = () => {
 export const useExportAnalyticsModuleCsv = () => {
   return useMutation({
     mutationFn: exportAnalyticsModuleCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `module-reports-${Date.now()}.csv`);
+    onSuccess: (data, vars) => {
+      triggerBlobDownload(data, `module-reports-${Date.now()}.${vars?.format === "xlsx" ? "xlsx" : "csv"}`);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });
@@ -338,17 +339,20 @@ export const useDownloadInvoicePdf = () => {
 
 export const useExportInvoicesCsv = () => {
   return useMutation({
-    mutationFn: exportInvoicesCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `all-reports-${Date.now()}.csv`);
+    mutationFn: (vars = {}) => {
+      const { format: _format, ...filter } = vars; //* format only picks the file type
+      return exportInvoicesCsv(filter);
+    },
+    onSuccess: (data, vars) => {
+      downloadCsv(data, "all-reports", vars?.format);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });

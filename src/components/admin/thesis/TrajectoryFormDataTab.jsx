@@ -33,6 +33,7 @@ import {
   formatFormAnswer,
   isFilterableFormQuestion,
 } from "@/utils/thesisFormAnswers";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const emptyFilters = (questions = []) => {
   const next = { submission: "all" };
@@ -119,13 +120,14 @@ export default function TrajectoryFormDataTab({
   const exportCsvMutation = useExportTrajectoryFormDataCsv();
   const exportCsvPending = exportCsvMutation.isPending;
 
-  const handleExportCsv = () => {
+  const handleExportCsv = (format) => {
     if (!selectedStepId) return;
     const { page: _page, limit: _limit, ...exportParams } = queryParams;
     exportCsvMutation.mutate({
       thesisId,
       trajectoryId,
       params: exportParams,
+      format,
     });
   };
 
@@ -227,18 +229,13 @@ export default function TrajectoryFormDataTab({
             setAppliedFilters={setAppliedFilters}
             setPage={setPage}
           />
-          <Button
-            variant="outline"
+          <ExportMenu
             size="sm"
-            onClick={handleExportCsv}
-            disabled={exportCsvPending || !selectedStepId}
             className="gap-2 h-9"
-          >
-            <Download className="w-4 h-4" />
-            {exportCsvPending
-              ? t("common.exporting", "Exporting...")
-              : t("common.exportCsv", "Export CSV")}
-          </Button>
+            onExport={handleExportCsv}
+            isPending={exportCsvPending}
+            disabled={!selectedStepId}
+          />
         </div>
       </div>
 
