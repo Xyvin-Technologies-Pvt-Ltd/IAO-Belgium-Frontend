@@ -192,6 +192,7 @@ export const useSendExactJob = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
         queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
         queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
       };
       refresh();
       setTimeout(refresh, 6000);
@@ -240,11 +241,13 @@ export const useAddExactToOutbox = () => {
       toast.success(res?.data?.uid ? `${res.data.uid}: ${res.message}` : res?.message || "Added to To send");
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
       queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
     onError: (err) => {
       toast.error(err?.message || "Failed to add this record to To send");
       //* Already queued elsewhere: refresh so the row shows its To send state.
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
   });
 };
@@ -356,6 +359,7 @@ export const useRetryExactJobs = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
         queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
         queryClient.invalidateQueries({ queryKey: ["exact-payout"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
       };
       refresh();
       setTimeout(refresh, 8000);
@@ -430,6 +434,7 @@ export const useSendExactJobsMany = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
         queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
         queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
       };
       refresh();
       setTimeout(refresh, 8000);

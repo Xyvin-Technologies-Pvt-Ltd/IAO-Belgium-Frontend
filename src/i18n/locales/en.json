@@ -779,7 +779,7 @@
         "guide": "Guide"
       },
       "missing": {
-        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s)), since {{since}}. Add them to To send, then preview and send them there.",
+        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s), {{creditNotes}} credit note(s)), since {{since}}. Add them to To send, then preview and send them there.",
         "empty": "Nothing missing in Exact since {{since}}.",
         "loadFailed": "Failed to load records missing in Exact",
         "paidOn": "Paid on",
@@ -790,7 +790,8 @@
         "kind": {
           "payment": "Payment",
           "third_party_invoice": "Third-party invoice",
-          "kmo_invoice": "KMO invoice"
+          "kmo_invoice": "KMO invoice",
+          "credit_note": "Credit note"
         },
         "queued": {
           "held": "In To send",
@@ -801,7 +802,8 @@
         "addingAll": "Adding… {{done}} / {{total}}",
         "confirmAddAll": "Add all {{count}} record(s) matching this filter to To send? Nothing is sent yet — they wait in To send → Waiting.",
         "addedAll": "{{queued}} added to To send, {{refused}} not added (already queued or not eligible).",
-        "addAllFailed": "Failed to add these records to To send"
+        "addAllFailed": "Failed to add these records to To send",
+        "credits": "Credits {{record}}"
       },
       "history": {
         "documents": "Documents",
@@ -944,7 +946,7 @@
             },
             {
               "title": "To send → Missing",
-              "text": "Records that should be in Exact but are not: payments, third-party invoices and KMO invoices (KMO: Your ref. = invoice number, module name in the description). \"Add to To send\" or \"Add all\" only puts them in Waiting — nothing is sent until you send them there."
+              "text": "Records that should be in Exact but are not: payments, third-party invoices, KMO invoices (KMO: Your ref. = invoice number, module name in the description) and credit notes whose original invoice is already in Exact. \"Add to To send\" or \"Add all\" only puts them in Waiting — nothing is sent until you send them there. An invoice that was credited before it reached Exact is never sent."
             },
             {
               "title": "Payouts",
@@ -1253,10 +1255,10 @@
           "failed": "Sending failed. See To send → Failed.",
           "sending": "Being posted to Exact right now.",
           "missing": "Never sent to Exact.",
-          "not_needed": "Cancelled or draft; nothing to send."
+          "not_needed": "Not sendable: cancelled, draft, or credited before it reached Exact (then it is never sent)."
         },
         "creditMissing": "Credit note not in Exact",
-        "creditMissingHint": "Rejected KMO with a credit note that isn't in Exact.",
+        "creditMissingHint": "Credit note of a KMO invoice that is in Exact, not in Exact itself yet. Add it to To send, then Send.",
         "kmoStatus": "KMO status",
         "allStatuses": "All statuses ({{count}})",
         "kmo": {
@@ -1287,7 +1289,18 @@
         },
         "noRef": "no Your ref.",
         "noDescription": "no description",
-        "creditNotInExact": "not in Exact"
+        "creditNotInExact": "not in Exact",
+        "creditState": {
+          "in_exact": "in Exact",
+          "waiting": "waiting in To send",
+          "sending": "sending",
+          "failed": "failed in To send",
+          "missing": "not in Exact",
+          "not_needed": "not needed (invoice not in Exact)"
+        },
+        "addCredit": "Add to To send",
+        "addCredits": "Add credit notes to To send ({{count}})",
+        "confirmAddCredits": "Add {{count}} credit note(s) to To send? Each credits a KMO invoice that is already in Exact. Nothing is sent until you preview and Send them in To send."
       }
     }
   },

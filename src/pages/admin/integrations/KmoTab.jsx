@@ -16,7 +16,7 @@ import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { exportExactKmo, getExactKmo } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
-import { useAddExactToOutboxMany, useGetExactKmo } from "@/store/useExactStore";
+import { useAddExactToOutbox, useAddExactToOutboxMany, useGetExactKmo } from "@/store/useExactStore";
 
 const STATE_STYLES = {
   ok: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300",
@@ -28,6 +28,14 @@ const STATE_STYLES = {
   sending: "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300",
   missing: "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300",
   not_needed: "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300",
+};
+const CREDIT_STYLES = {
+  in_exact: "text-muted-foreground",
+  waiting: "text-amber-700 dark:text-amber-300",
+  sending: "text-blue-700 dark:text-blue-300",
+  failed: "text-red-700 dark:text-red-300",
+  missing: "text-red-700 dark:text-red-300",
+  not_needed: "text-muted-foreground",
 };
 const KMO_STATUSES = ["waiting", "submitted", "contribution_received", "payment_released", "paid", "rejected"];
 
@@ -57,11 +65,13 @@ const KmoTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsPer
   };
   const { data, isLoading, error, refetch } = useGetExactKmo({ ...query, page, limit: rowsPerPage });
   const { mutateAsync: addMany } = useAddExactToOutboxMany();
+  const { mutate: addOne, isPending: addingOne, variables: addingVars } = useAddExactToOutbox();
 
   const rows = data?.data ?? [];
   const total = data?.total_count ?? 0;
   const summary = data?.summary ?? {};
   const counts = summary.counts ?? {};
+  const creditCounts = summary.credit_counts ?? {};
 
   const pick = (value) => {
     setState((current) => (current === value ? null : value));
@@ -89,6 +99,27 @@ const KmoTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsPer
         refused += res?.data?.refused ?? 0;
       }
       toast.success(k("added", { queued, refused }));
+    } catch (err) {
+      toast.error(err?.message || k("addFailed"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  //* Credit notes whose invoice is in Exact but that aren't queued → To send. Nothing is sent yet.
+  const handleAddCredits = async () => {
+    setBusy(true);
+    try {
+      const ids = [];
+      for (let p = 1; p < 50; p += 1) {
+        const res = await getExactKmo({ ...filters, credit_missing: 1, page: p, limit: 200 });
+        const pageRows = res?.data ?? [];
+        ids.push(...pageRows.filter((r) => r.credit_note?.state === "missing").map((r) => r.credit_note.id));
+        if (!pageRows.length || p * 200 >= (res?.total_count ?? 0)) break;
+      }
+      if (!ids.length || !window.confirm(k("confirmAddCredits", { count: ids.length }))) return;
+      const res = await addMany(ids.map((id) => ({ kind: "credit_note", id })));
+      toast.success(k("added", { queued: res?.data?.queued ?? 0, refused: res?.data?.refused ?? 0 }));
     } catch (err) {
       toast.error(err?.message || k("addFailed"));
     } finally {
@@ -174,6 +205,12 @@ const KmoTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsPer
               </select>
             </div>
             <div className="flex flex-wrap gap-2">
+              {canModify && creditCounts.missing ? (
+                <Button size="sm" variant="outline" onClick={handleAddCredits} disabled={busy || !isConnected}>
+                  <ListPlus className="h-4 w-4 mr-2" />
+                  {busy ? k("adding") : k("addCredits", { count: creditCounts.missing })}
+                </Button>
+              ) : null}
               {canModify && counts.missing ? (
                 <Button size="sm" onClick={handleAddMissing} disabled={busy || !isConnected}>
                   <ListPlus className="h-4 w-4 mr-2" />
@@ -237,9 +274,21 @@ const KmoTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsPer
                             <span className="text-muted-foreground">—</span>
                           )}
                           {r.credit_note ? (
-                            <div className={`text-xs ${r.credit_missing ? "text-red-700 dark:text-red-300" : "text-muted-foreground"}`}>
-                              {r.credit_note.uid}
-                              {r.credit_note.entry_number ? ` #${r.credit_note.entry_number}` : ` · ${k("creditNotInExact")}`}
+                            <div className={`flex flex-wrap items-center gap-x-2 text-xs ${CREDIT_STYLES[r.credit_note.state] || "text-muted-foreground"}`}>
+                              <span>
+                                {r.credit_note.uid}
+                                {r.credit_note.entry_number ? ` #${r.credit_note.entry_number}` : ` · ${k(`creditState.${r.credit_note.state || "missing"}`)}`}
+                              </span>
+                              {canModify && r.credit_note.state === "missing" ? (
+                                <button
+                                  type="button"
+                                  className="underline font-medium disabled:opacity-50"
+                                  disabled={!isConnected || (addingOne && addingVars?.id === r.credit_note.id)}
+                                  onClick={() => addOne({ kind: "credit_note", id: r.credit_note.id })}
+                                >
+                                  {addingOne && addingVars?.id === r.credit_note.id ? k("adding") : k("addCredit")}
+                                </button>
+                              ) : null}
                             </div>
                           ) : null}
                         </TableCell>
