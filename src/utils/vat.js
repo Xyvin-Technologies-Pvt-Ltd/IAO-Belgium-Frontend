@@ -8,21 +8,39 @@
 //*   { ok: false, reason }                reason: iban | be_length | be_check | country | not_vat
 
 const NONE_WORDS = new Set(["", "/", "-", "--", ".", "0", "NVT", "NV", "NA", "N/A", "NONE", "GEEN", "AUCUN", "AUCUNE", "NEANT", "X"]);
-const EU_PREFIXES = new Set([
-  "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "EL", "ES", "FI", "FR", "HR", "HU", "IE", "IT",
-  "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK", "XI",
-]);
+//* Number part per country (after the prefix): the official VIES formats for
+//* all 27 EU countries + Northern Ireland (XI). Greece uses EL, not GR.
 const FORMATS = {
-  DK: /^\d{8}$/,
-  DE: /^\d{9}$/,
-  NL: /^\d{9}B\d{2}$/,
-  FR: /^[0-9A-Z]{2}\d{9}$/,
-  LU: /^\d{8}$/,
-  PT: /^\d{9}$/,
-  ES: /^[0-9A-Z]\d{7}[0-9A-Z]$/,
-  IT: /^\d{11}$/,
   AT: /^U\d{8}$/,
+  BE: /^[01]\d{9}$/,
+  BG: /^\d{9,10}$/,
+  CY: /^\d{8}[A-Z]$/,
+  CZ: /^\d{8,10}$/,
+  DE: /^\d{9}$/,
+  DK: /^\d{8}$/,
+  EE: /^\d{9}$/,
+  EL: /^\d{9}$/,
+  ES: /^[A-Z0-9]\d{7}[A-Z0-9]$/,
+  FI: /^\d{8}$/,
+  FR: /^[A-HJ-NP-Z0-9]{2}\d{9}$/,
+  HR: /^\d{11}$/,
+  HU: /^\d{8}$/,
+  IE: /^(\d{7}[A-W][A-IW]?|\d[A-Z+*]\d{5}[A-W])$/,
+  IT: /^\d{11}$/,
+  LT: /^(\d{9}|\d{12})$/,
+  LU: /^\d{8}$/,
+  LV: /^\d{11}$/,
+  MT: /^\d{8}$/,
+  NL: /^\d{9}B\d{2}$/,
+  PL: /^\d{10}$/,
+  PT: /^\d{9}$/,
+  RO: /^\d{2,10}$/,
+  SE: /^\d{10}01$/,
+  SI: /^\d{8}$/,
+  SK: /^\d{10}$/,
+  XI: /^(\d{9}|\d{12}|GD\d{3}|HA\d{3})$/,
 };
+const EU_PREFIXES = new Set(Object.keys(FORMATS));
 
 function beCheckOk(tenDigits) {
   return 97 - (Number(tenDigits.slice(0, 8)) % 97) === Number(tenDigits.slice(8));
@@ -40,7 +58,7 @@ export function checkVat(value, { country = null } = {}) {
   const home = country ? String(country).toUpperCase().replace(/^GR$/, "EL") : null;
   if (home && home !== "BE" && /^[0-9]/.test(compact)) {
     const format = FORMATS[home];
-    if (EU_PREFIXES.has(home) && (format ? format.test(compact) : /^[0-9A-Z]{2,12}$/.test(compact))) {
+    if (EU_PREFIXES.has(home) && format.test(compact)) {
       return { ok: true, value: `${home}${compact}` };
     }
     return { ok: false, reason: "country" };
