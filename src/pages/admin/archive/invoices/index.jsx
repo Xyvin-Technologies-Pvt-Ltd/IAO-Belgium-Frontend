@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { useArchiveInvoices } from "@/store/useArchiveStore";
 import { getArchiveInvoices } from "@/api/archiveApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import { buildCsvHeaders } from "../labels/archiveLabels";
 import ArchiveGate from "../components/ArchiveGate";
 import InvoicesFilterDrawer, { INVOICES_FILTER_DEFAULTS } from "./InvoicesFilterDrawer";
@@ -64,7 +65,7 @@ const ArchiveInvoices = () => {
   const invoices = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
       const response = await getArchiveInvoices({ ...filterParams, export: true });
@@ -78,7 +79,7 @@ const ArchiveInvoices = () => {
         rows,
         (r) => [r.nummer, r.person_name, r.datum, r.line_total, r.betaald ? "Paid" : "Open", r.omschrijving],
       );
-      downloadCsv(csv, "coachview_archive_invoices");
+      await downloadCsv(csv, "coachview_archive_invoices", format);
       toast.success("Expense notes exported successfully!", { id: toastId });
     } catch (err) {
       toast.error(err?.message || "Failed to export expense notes.", { id: toastId });
@@ -98,10 +99,7 @@ const ArchiveInvoices = () => {
               "Open" reflects the payment status as of the snapshot date, not necessarily today.
             </p>
           </div>
-          <Button onClick={handleExport} className="flex items-center gap-2 self-start sm:self-auto">
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+          <ExportMenu variant="default" onExport={handleExport} className="flex items-center gap-2 self-start sm:self-auto" />
         </div>
 
         <div className="flex items-center gap-2">

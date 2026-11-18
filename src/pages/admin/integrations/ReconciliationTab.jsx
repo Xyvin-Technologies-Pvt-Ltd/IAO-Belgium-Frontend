@@ -33,6 +33,7 @@ import {
 } from "@/store/useExactStore";
 import { exportExactReconciliation } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const ALL = "all";
 
@@ -165,14 +166,14 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage, filters
       { onSuccess: (res) => applyResults(res?.data || []) },
     );
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     setIsExporting(true);
     const toastId = toast.loading(t("integrations.exact.reconciliation.exporting"));
     try {
       //* Export re-queries with the active filters so the file matches the
       //* filtered set, not just the visible page.
       const csv = await exportExactReconciliation(filterParams);
-      downloadCsv(csv, "exact_reconciliation");
+      await downloadCsv(csv, "exact_reconciliation", format);
       toast.success(t("integrations.exact.reconciliation.exported"), { id: toastId });
     } catch (err) {
       toast.error(
@@ -223,14 +224,12 @@ const ReconciliationTab = ({ page, setPage, rowsPerPage, setRowsPerPage, filters
                 : t("integrations.exact.reconciliation.verifyPage")}
             </Button>
           ) : null}
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={isExporting || totalRows === 0}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            {t("integrations.exact.reconciliation.export")}
-          </Button>
+          <ExportMenu
+            onExport={handleExport}
+            isPending={isExporting}
+            disabled={totalRows === 0}
+            label={t("integrations.exact.reconciliation.export")}
+          />
         </div>
       </div>
 

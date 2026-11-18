@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useArchivePersonResults } from "@/store/useArchiveStore";
 import { getArchivePersonResults } from "@/api/archiveApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import { buildCsvHeaders } from "../../labels/archiveLabels";
 
 //* Grade-code semantics (PAS/MER/DIS/CRE/5Y/4Y) and the pass threshold for
@@ -54,7 +55,7 @@ const ResultsTab = ({ personId }) => {
   const results = data?.data || [];
   const totalRows = data?.total_count || 0;
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
       const response = await getArchivePersonResults(personId, { ...filterParams, export: true });
@@ -68,7 +69,7 @@ const ResultsTab = ({ personId }) => {
         rows,
         (r) => [r.datum, `${r.soort_code} — ${r.soort_naam}`, r.score_absoluut, r.score_code, r.opmerking || r.score_vrij],
       );
-      downloadCsv(csv, "coachview_archive_results");
+      await downloadCsv(csv, "coachview_archive_results", format);
       toast.success("Results exported successfully!", { id: toastId });
     } catch (err) {
       toast.error(err?.message || "Failed to export results.", { id: toastId });
@@ -83,10 +84,7 @@ const ResultsTab = ({ personId }) => {
           <Input type="date" className="w-40" placeholder="To" value={to} onChange={(e) => setTo(e.target.value)} />
           <span className="text-sm text-gray-400">{totalRows} results</span>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExport} className="flex items-center gap-2">
-          <Download className="h-3.5 w-3.5" />
-          Export CSV
-        </Button>
+        <ExportMenu size="sm" onExport={handleExport} className="flex items-center gap-2" />
       </div>
 
       <Table>

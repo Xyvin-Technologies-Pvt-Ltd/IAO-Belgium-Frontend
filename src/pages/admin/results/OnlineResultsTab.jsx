@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Download } from "lucide-react";
+import { downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,7 +21,6 @@ import ResultsFilterDrawer from "./ResultsFilterDrawer";
 import AssignResitDialog from "./AssignResitDialog";
 import StatusBadge from "@/components/StatusBadge";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import moment from "moment";
 import { toast } from "sonner";
 import { formatInstant } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
@@ -106,7 +106,7 @@ const OnlineResultsTab = () => {
     setAssignOpen(true);
   };
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
       const params = {
@@ -182,14 +182,7 @@ const OnlineResultsTab = () => {
       ];
 
       const csvContent = csvRows.join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `online_exam_results_${moment().format("YYYYMMDD_HHmmss")}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      await downloadCsv(csvContent, "online_exam_results", format);
 
       toast.success("Results exported successfully!", { id: toastId });
     } catch (err) {
@@ -216,10 +209,12 @@ const OnlineResultsTab = () => {
             setPage={setPage}
           />
         </div>
-        <Button onClick={handleExport} className="flex items-center gap-2 bg-[#ff8904] hover:bg-[#ff8904]/90 text-white font-medium">
-          <Download className="h-4 w-4" />
-          {t("resultsManagement.exportBtn")}
-        </Button>
+        <ExportMenu
+          variant="default"
+          onExport={handleExport}
+          className="flex items-center gap-2 bg-[#ff8904] hover:bg-[#ff8904]/90 text-white font-medium"
+          label={t("resultsManagement.exportBtn")}
+        />
         {canModify && (
           <Button
             variant="outline"

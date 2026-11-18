@@ -8,7 +8,7 @@ import AnalyticsChartView from "./AnalyticsChartView";
 import { useBreadcrumb } from "@/context/BreadCrumbContext";
 import CityReportsFilterDrawer from "./CityReportsFilterDrawer";
 import { useTranslation } from "react-i18next";
-import ReportExportButton from "./ReportExportButton";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const defaultFilters = { status: "paid", purpose: "all", from: "", to: "" };
 
@@ -67,7 +67,7 @@ const CityReports = () => {
           {t("common.cityReports")}
         </h2>
         <div className="flex items-center gap-2">
-          <ReportExportButton mutation={exportCsv} filters={queryFilters} />
+          <ExportMenu isPending={exportCsv.isPending} onExport={(format) => exportCsv.mutate({ ...queryFilters, format })} />
           <CityReportsFilterDrawer
             draftFilters={draftFilters}
             setDraftFilters={setDraftFilters}

@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useArchivePersons } from "@/store/useArchiveStore";
 import { getArchivePersons } from "@/api/archiveApi";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
+import ExportMenu from "@/components/common/ExportMenu";
 import { buildCsvHeaders } from "../labels/archiveLabels";
 import ArchiveGate from "../components/ArchiveGate";
 import StudentsFilterDrawer, { STUDENTS_FILTER_DEFAULTS } from "./StudentsFilterDrawer";
@@ -68,7 +69,7 @@ const ArchiveStudents = () => {
     navigate({ to: "/admin/archive/students/$id", params: { id } });
   };
 
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     const toastId = toast.loading("Preparing CSV export...");
     try {
       const response = await getArchivePersons({ ...filterParams, export: true });
@@ -90,7 +91,7 @@ const ArchiveStudents = () => {
           r.gewijzigd_at,
         ],
       );
-      downloadCsv(csv, "coachview_archive_students");
+      await downloadCsv(csv, "coachview_archive_students", format);
       toast.success("Students exported successfully!", { id: toastId });
     } catch (err) {
       toast.error(err?.message || "Failed to export students.", { id: toastId });
@@ -109,10 +110,7 @@ const ArchiveStudents = () => {
               Read-only history from the legacy CoachView system. Search a student to see their full CoachView record.
             </p>
           </div>
-          <Button onClick={handleExport} className="flex items-center gap-2 self-start sm:self-auto">
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+          <ExportMenu variant="default" onExport={handleExport} className="flex items-center gap-2 self-start sm:self-auto" />
         </div>
 
         <div className="flex items-center gap-2">

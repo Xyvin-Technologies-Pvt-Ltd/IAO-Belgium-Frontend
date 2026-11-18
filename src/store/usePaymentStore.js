@@ -1,3 +1,4 @@
+import { downloadCsv } from "@/utils/exportCsv";
 import {
   getPayments,
   getAnalyticsByCity,
@@ -338,17 +339,20 @@ export const useDownloadInvoicePdf = () => {
 
 export const useExportInvoicesCsv = () => {
   return useMutation({
-    mutationFn: exportInvoicesCsv,
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `all-reports-${Date.now()}.csv`);
+    mutationFn: (vars = {}) => {
+      const { format: _format, ...filter } = vars; //* format only picks the file type
+      return exportInvoicesCsv(filter);
+    },
+    onSuccess: (data, vars) => {
+      downloadCsv(data, "all-reports", vars?.format);
       toast.success(
-        i18n.t("finance.messages.csvExported", "CSV exported successfully"),
+        i18n.t("finance.messages.csvExported", "Export downloaded successfully"),
       );
     },
     onError: (error) => {
       toast.error(
         error?.message ||
-          i18n.t("finance.messages.csvExportFailed", "Failed to export CSV"),
+          i18n.t("finance.messages.csvExportFailed", "Failed to export"),
       );
     },
   });

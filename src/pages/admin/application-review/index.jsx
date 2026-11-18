@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { useGetAllLanguages, useGetAllPrograms } from "@/store/useDropdownStore";
 import axiosInstance from "@/api/axiosintercepter";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const ApplicationReview = () => {
   const { t, i18n } = useTranslation();
@@ -145,7 +146,7 @@ const ApplicationReview = () => {
     });
   };
 
-  const handleExportExcel = async () => {
+  const handleExportExcel = async (format) => {
     try {
       setExportPending(true);
       const response = await axiosInstance.get("/application/export", {
@@ -165,17 +166,15 @@ const ApplicationReview = () => {
           end_date: filters.end_date,
           sortBy: sorting.sortBy,
           sortOrder: sorting.sortOrder,
+          format,
         },
         responseType: "blob",
       });
 
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `applications_report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      link.setAttribute("download", `applications_report_${new Date().toISOString().slice(0, 10)}.${format === "csv" ? "csv" : "xlsx"}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -222,14 +221,12 @@ const ApplicationReview = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("applicationReview.title")}
         </h2>
-        <Button
-          disabled={exportPending}
-          onClick={handleExportExcel}
+        <ExportMenu
+          variant="default"
           className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 h-10 px-4 shrink-0 shadow-sm transition-colors duration-150"
-        >
-          <Download className="w-4 h-4" />
-          {exportPending ? t("applicationReview.exporting", "Exporting...") : t("applicationReview.exportExcel", "Export Excel")}
-        </Button>
+          onExport={handleExportExcel}
+          isPending={exportPending}
+        />
       </div>
 
       {/* Persistent glassmorphic program type tabs */}
