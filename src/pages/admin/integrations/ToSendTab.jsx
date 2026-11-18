@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Building2, CheckCircle2, Eye, RefreshCw, RotateCcw, Send, XCircle } from "lucide-react";
+import { AlertTriangle, Building2, CheckCircle2, Eye, RefreshCw, RotateCcw, Send, Square, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,9 @@ import {
   useRetryExactJobs,
   useSendExactJobsMany,
   useGetExactMissing,
+  useStopExactJob,
+  useRestartExactJob,
+  useStopExactJobsMany,
 } from "@/store/useExactStore";
 import MissingList from "./MissingList";
 import CompanyEditDialog from "@/components/admin/student/CompanyEditDialog";
@@ -240,6 +243,9 @@ const ToSendTab = ({
   const { mutate: sendJob, isPending: isSending, variables: sendingJobId } = useSendExactJob();
   const { mutate: retryJobs, isPending: isRetrying } = useRetryExactJobs();
   const { mutate: sendMany, isPending: isSendingMany } = useSendExactJobsMany();
+  const { mutate: stopJob, isPending: isStopping, variables: stoppingJobId } = useStopExactJob();
+  const { mutate: restartJob, isPending: isRestarting, variables: restartingJobId } = useRestartExactJob();
+  const { mutate: stopMany, isPending: isStoppingMany } = useStopExactJobsMany();
 
   const { data: missingCountResponse } = useGetExactMissing({ count_only: true, ...filters });
 
@@ -274,6 +280,14 @@ const ToSendTab = ({
     const ids = heldShown.slice(0, 200).map((row) => row.job_id);
     if (!ids.length || !window.confirm(k("confirmSendAll", { count: ids.length }))) return;
     sendMany(ids);
+  };
+
+  //* Waiting → records in Sending (incl. retrying after an Exact error): stop them all.
+  const sendingShown = view === "waiting" ? rows.filter((row) => row.state === "sending") : [];
+  const handleStopShown = () => {
+    const ids = sendingShown.slice(0, 200).map((row) => row.job_id);
+    if (!ids.length || !window.confirm(k("confirmStopAll", { count: ids.length }))) return;
+    stopMany(ids);
   };
 
   const handleRetryShown = () => {
@@ -311,12 +325,20 @@ const ToSendTab = ({
   return (
     <div className="space-y-4">
       <ViewChips view={view} onViewChange={onViewChange} counts={viewCounts} k={k} />
-      {view === "waiting" && canModify && heldShown.length ? (
-        <div className="flex justify-end">
-          <Button size="sm" onClick={handleSendShown} disabled={isSendingMany || !isConnected}>
-            <Send className={`h-4 w-4 mr-2 ${isSendingMany ? "animate-pulse" : ""}`} />
-            {k("sendAllShown", { count: Math.min(heldShown.length, 200) })}
-          </Button>
+      {view === "waiting" && canModify && (heldShown.length || sendingShown.length) ? (
+        <div className="flex flex-wrap justify-end gap-2">
+          {sendingShown.length ? (
+            <Button size="sm" variant="outline" onClick={handleStopShown} disabled={isStoppingMany}>
+              <Square className="h-4 w-4 mr-2" />
+              {k("stopAllSending", { count: Math.min(sendingShown.length, 200) })}
+            </Button>
+          ) : null}
+          {heldShown.length ? (
+            <Button size="sm" onClick={handleSendShown} disabled={isSendingMany || !isConnected}>
+              <Send className={`h-4 w-4 mr-2 ${isSendingMany ? "animate-pulse" : ""}`} />
+              {k("sendAllShown", { count: Math.min(heldShown.length, 200) })}
+            </Button>
+          ) : null}
         </div>
       ) : null}
       {view === "failed" && failedRows.length ? (
@@ -442,15 +464,52 @@ const ToSendTab = ({
                           STATE_STYLES[row.state] || STATE_STYLES.held
                         }`}
                       >
-                        {k(`state.${row.state}`)}
+                        {row.retrying
+                          ? k("retrying", { n: row.attempts_made, max: row.attempts_max || "?" })
+                          : k(`state.${row.state}`)}
                       </span>
+                      {row.state === "held" && row.stopped_at ? (
+                        <div className="text-xs text-muted-foreground mt-1">{k("stoppedNote", { at: formatDateTime(row.stopped_at) })}</div>
+                      ) : null}
+                      {row.last_error ? (
+                        <div className="text-xs text-red-700 dark:text-red-300 mt-1 break-words">
+                          {k("lastError")}: {row.last_error}
+                        </div>
+                      ) : null}
+                      {row.retrying && row.next_try_at ? (
+                        <div className="text-xs text-muted-foreground mt-0.5">{k("nextTry", { at: formatDateTime(row.next_try_at) })}</div>
+                      ) : null}
                       {row.failed_reason ? (
                         <div className="text-xs text-red-700 dark:text-red-300 mt-1 break-words">
                           {row.failed_reason}
                         </div>
                       ) : null}
                     </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell className="text-right whitespace-nowrap space-x-1">
+                      {canModify && row.state === "sending" ? (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => stopJob(row.job_id)}
+                            disabled={isStopping && stoppingJobId === row.job_id}
+                            title={k("stopHint")}
+                          >
+                            <Square className="h-3.5 w-3.5 mr-1.5" />
+                            {k("stop")}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => restartJob(row.job_id)}
+                            disabled={!isConnected || (isRestarting && restartingJobId === row.job_id)}
+                            title={k("sendAgainHint")}
+                          >
+                            <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                            {k("sendAgain")}
+                          </Button>
+                        </>
+                      ) : null}
                       {/* Send / Retry live in the preview, so every record is
                           looked at before it goes to Exact. */}
                       <Button
