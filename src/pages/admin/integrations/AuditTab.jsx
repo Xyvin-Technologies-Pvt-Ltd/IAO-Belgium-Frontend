@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, Database, Download, ReceiptText, RefreshCw } from "lucide-react";
+import { AlertTriangle, BellDot, Database, Download, Link2, ReceiptText, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -15,13 +15,14 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { exportExactAudit } from "@/api/exactApi";
+import { exportExactAudit, getExactAuditIssues } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
 import {
   useGetExactAuditIssues,
   useGetExactAuditPullStatus,
   useGetExactAuditSummary,
   usePullExactAudit,
+  useLinkExactAuditRecords,
 } from "@/store/useExactStore";
 import AuditPlan from "./AuditPlan";
 import CreditDuplicateDialog from "./CreditDuplicateDialog";
@@ -51,14 +52,18 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
   const [category, setCategory] = useState(null);
   const [exporting, setExporting] = useState(false);
   const [creditEntry, setCreditEntry] = useState(null);
+  const [onlyNew, setOnlyNew] = useState(false);
+  const [linking, setLinking] = useState(false);
 
   const { data: summaryRes, isLoading: summaryLoading, error: summaryError, refetch } = useGetExactAuditSummary(filters);
   const { data: issuesRes, isLoading: issuesLoading } = useGetExactAuditIssues({
     ...filters,
     ...(category ? { category } : {}),
+    ...(onlyNew ? { only_new: 1 } : {}),
     page,
     limit: rowsPerPage,
   });
+  const { mutateAsync: linkRecords } = useLinkExactAuditRecords();
   const { data: pullRes } = useGetExactAuditPullStatus();
   const { mutate: startPull, isPending: isStarting } = usePullExactAudit();
 
@@ -73,6 +78,41 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
   const total = issuesRes?.total_count ?? 0;
   const noExactCopy = summary && !coverage.exact_entries;
   const totalIssues = Object.values(totals).reduce((sum, n) => sum + n, 0);
+  const nightly = summary?.nightly;
+
+  //* Link one record, or every linkable "not linked" record for the current filter.
+  const runLink = async (keys) => {
+    setLinking(true);
+    try {
+      let linked = 0;
+      let skipped = 0;
+      for (let i = 0; i < keys.length; i += 200) {
+        const res = await linkRecords(keys.slice(i, i + 200));
+        linked += res?.data?.linked ?? 0;
+        skipped += res?.data?.skipped ?? 0;
+      }
+      toast.success(a("link.done", { linked, skipped }));
+    } catch (err) {
+      toast.error(err?.message || a("link.failed"));
+    } finally {
+      setLinking(false);
+    }
+  };
+  const handleLinkAll = async () => {
+    const keys = [];
+    for (let pageNo = 1; pageNo < 100; pageNo += 1) {
+      const res = await getExactAuditIssues({ ...filters, category: "link_missing", page: pageNo, limit: 200 });
+      const pageRows = res?.data ?? [];
+      keys.push(...pageRows.filter((r) => r.linkable).map((r) => r.key));
+      if (!pageRows.length || pageNo * 200 >= (res?.total_count ?? 0)) break;
+    }
+    if (!keys.length) {
+      toast.info(a("link.noneLinkable"));
+      return;
+    }
+    if (!window.confirm(a("link.confirmAll", { count: keys.length }))) return;
+    await runLink(keys);
+  };
 
   //* When a pull finishes, rebuild the audit.
   const wasRunning = useRef(false);
@@ -105,6 +145,38 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
   return (
     <div className="space-y-4">
       <AuditPlan />
+
+      {nightly ? (
+        <div
+          className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border px-4 py-2 text-sm ${
+            nightly.new_count
+              ? "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200"
+              : "border-gray-200 dark:border-white/10 text-muted-foreground"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <BellDot className="h-4 w-4 shrink-0" />
+            {nightly.first_run
+              ? a("nightly.first", { when: formatDateTime(nightly.at) })
+              : a("nightly.summary", { when: formatDateTime(nightly.at), count: nightly.new_count, total: nightly.total_issues })}
+            {nightly.pull_error ? ` · ${a("nightly.pullError", { error: nightly.pull_error })}` : ""}
+          </span>
+          {nightly.new_count ? (
+            <Button
+              size="sm"
+              variant={onlyNew ? "default" : "outline"}
+              onClick={() => {
+                setOnlyNew((v) => !v);
+                setPage(1);
+              }}
+            >
+              {onlyNew ? a("nightly.showAll") : a("nightly.showNew", { count: nightly.new_count })}
+            </Button>
+          ) : null}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">{a("nightly.never")}</p>
+      )}
 
       <div className="rounded-lg border dark:border-white/10 px-4 py-3 text-sm space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -155,10 +227,18 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
             <p className="text-sm text-muted-foreground">
               {totalIssues ? a("issuesFound", { count: totalIssues }) : a("noIssues")}
             </p>
+            <div className="flex flex-wrap gap-2">
+            {canModify && category === "link_missing" && total ? (
+              <Button size="sm" onClick={handleLinkAll} disabled={linking}>
+                <Link2 className="h-4 w-4 mr-2" />
+                {linking ? a("link.linking") : a("link.all")}
+              </Button>
+            ) : null}
             <Button variant="outline" size="sm" onClick={handleExport} disabled={!total || exporting}>
               <Download className="h-4 w-4 mr-2" />
               {exporting ? a("exporting") : a("export")}
             </Button>
+            </div>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -256,9 +336,30 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
                           )}
                         </TableCell>
                         <TableCell className="text-right whitespace-nowrap">{money(i.exact?.amount)}</TableCell>
-                        <TableCell className="text-xs text-muted-foreground max-w-[280px]">{i.detail || a(`hint.${i.category}`)}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground max-w-[280px]">
+                          {i.detail || a(`hint.${i.category}`)}
+                          {i.refund ? (
+                            <div className="mt-0.5">
+                              {[
+                                i.refund.credit_note_uid && `${i.refund.credit_note_uid}${i.refund.credit_note_entry ? ` (#${i.refund.credit_note_entry})` : ""}`,
+                                i.refund.switch_invoice_uid && `${i.refund.switch_invoice_uid}${i.refund.switch_invoice_entry ? ` (#${i.refund.switch_invoice_entry})` : ""}`,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </div>
+                          ) : null}
+                        </TableCell>
                         {canModify ? (
                           <TableCell className="text-right whitespace-nowrap">
+                            {i.category === "link_missing" && i.linkable ? (
+                              <Button size="sm" variant="outline" onClick={() => runLink([i.key])} disabled={linking}>
+                                <Link2 className="h-3.5 w-3.5 mr-1.5" />
+                                {a("link.button")}
+                              </Button>
+                            ) : null}
+                            {i.category === "link_missing" && !i.linkable ? (
+                              <span className="text-xs text-muted-foreground">{a("link.byHand")}</span>
+                            ) : null}
                             {i.category === "duplicate" && i.exact?.entry_number ? (
                               <Button size="sm" variant="outline" onClick={() => setCreditEntry(i.exact.entry_number)} disabled={!isConnected}>
                                 <ReceiptText className="h-3.5 w-3.5 mr-1.5" />

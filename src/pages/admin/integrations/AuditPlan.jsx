@@ -7,7 +7,7 @@ const STEPS = [
   { key: "audit", status: "done" },
   { key: "decide", status: "planned" },
   { key: "fix", status: "partial" },
-  { key: "confirm", status: "planned" },
+  { key: "confirm", status: "partial" },
 ];
 
 function StatusIcon({ status }) {

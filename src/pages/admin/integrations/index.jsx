@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetExactStatus, useGetExactSendMode, useGetExactToSend } from "@/store/useExactStore";
+import { useGetExactStatus, useGetExactSendMode, useGetExactToSend, useGetExactAuditNightly } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
 import ToSendTab from "./ToSendTab";
@@ -60,6 +60,9 @@ const IntegrationsPage = () => {
   const { data: sendModeResponse } = useGetExactSendMode();
   //* Badge on the To send tab while another tab is open.
   const { data: toSendResponse } = useGetExactToSend({}, { enabled: tab !== "to_send" });
+  //* "new" badge on the Audit tab (issues the nightly audit saw for the first time).
+  const { data: nightlyResponse } = useGetExactAuditNightly();
+  const auditNew = nightlyResponse?.data?.new_count || 0;
 
   const status = statusResponse?.data;
   const isConnected = Boolean(status?.connected);
@@ -212,6 +215,11 @@ const IntegrationsPage = () => {
             >
               {t(`integrations.exact.tabs.${key}`)}
               {key === "to_send" && tab !== "to_send" && toSendWaiting > 0 ? ` (${toSendWaiting})` : ""}
+              {key === "audit" && auditNew > 0 ? (
+                <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  {t("integrations.exact.audit.nightly.badge", { count: auditNew })}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
