@@ -317,3 +317,49 @@ export const getExactAuditPullStatus = async () => {
     throw error.response?.data || error;
   }
 };
+
+// ─── Bulk + Credit duplicate ─────────────────────────────────────────────────
+
+//* Missing → add many records to To send (queues only). items: [{ kind, id }], max 200.
+export const addExactToOutboxMany = async (items = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/outbox/add-many", { items });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Waiting → send the listed held jobs (as if Send was clicked on each). Max 200.
+export const sendExactJobsMany = async (jobIds = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/to-send/send-many", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Audit → Duplicate → Credit: preview (reads Exact, posts nothing).
+export const getExactCreditPreview = async (entryNumber, dateMode = "today") => {
+  try {
+    const response = await axiosInstance.get(`/exact/audit/credit/${encodeURIComponent(entryNumber)}/preview`, {
+      params: { date_mode: dateMode },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Audit → Duplicate → Credit: post the credit in Exact (once).
+export const postExactCredit = async ({ entryNumber, dateMode = "today" }) => {
+  try {
+    const response = await axiosInstance.post(`/exact/audit/credit/${encodeURIComponent(entryNumber)}`, {
+      date_mode: dateMode,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

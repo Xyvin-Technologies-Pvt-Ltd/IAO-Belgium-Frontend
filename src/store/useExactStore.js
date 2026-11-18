@@ -30,6 +30,10 @@ import {
   getExactAuditIssues,
   pullExactAudit,
   getExactAuditPullStatus,
+  addExactToOutboxMany,
+  sendExactJobsMany,
+  getExactCreditPreview,
+  postExactCredit,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -395,5 +399,61 @@ export const usePullExactAudit = () => {
       queryClient.invalidateQueries({ queryKey: ["exact-audit-pull"] });
     },
     onError: (err) => toast.error(err?.message || "Failed to copy the Exact sales journal"),
+  });
+};
+
+// ─── Bulk + Credit duplicate ─────────────────────────────────────────────────
+
+export const useAddExactToOutboxMany = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addExactToOutboxMany,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to add these records to To send"),
+  });
+};
+
+export const useSendExactJobsMany = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendExactJobsMany,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sent");
+      const refresh = () => {
+        queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
+      };
+      refresh();
+      setTimeout(refresh, 8000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send these records"),
+  });
+};
+
+export const useGetExactCreditPreview = (entryNumber, dateMode = "today", options = {}) =>
+  useQuery({
+    queryKey: ["exact-credit-preview", entryNumber, dateMode],
+    queryFn: () => getExactCreditPreview(entryNumber, dateMode),
+    enabled: Boolean(entryNumber),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    ...options,
+  });
+
+export const usePostExactCredit = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: postExactCredit,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Credit posted in Exact");
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-issues"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to post the credit"),
   });
 };

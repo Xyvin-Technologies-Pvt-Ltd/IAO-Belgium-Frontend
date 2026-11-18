@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { ListPlus, PlusCircle } from "lucide-react";
+import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,10 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetExactMissing, useAddExactToOutbox } from "@/store/useExactStore";
+import { useGetExactMissing, useAddExactToOutbox, useAddExactToOutboxMany } from "@/store/useExactStore";
+import { getExactMissing } from "@/api/exactApi";
+
+const BULK_SIZE = 200;
 
 const QUEUED_STYLES = {
   held: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
@@ -27,10 +31,11 @@ function formatDate(value) {
 }
 
 /**
- * To send → Missing: records that should be in Exact but aren't (normal payments
- * and third-party invoices). "Add to To send" only queues the record — it is
- * previewed and sent from the Waiting list like everything else. Third-party and
- * KMO payments never show here: their invoice is what goes to Exact.
+ * To send → Missing: records that should be in Exact but aren't (normal payments,
+ * third-party invoices and KMO invoices). "Add to To send" only queues the record —
+ * it is previewed and sent from the Waiting list like everything else. "Add all"
+ * queues every record matching the current filter, in batches. Third-party and
+ * KMO *payments* never show here: their invoice is what goes to Exact.
  * Remount (key) on filter change to start at page 1.
  */
 const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = false }) => {
@@ -41,6 +46,37 @@ const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = fal
 
   const { data, isLoading, error, refetch } = useGetExactMissing({ page, limit: rowsPerPage, ...filters });
   const { mutate: addToOutbox, isPending: isAdding, variables: addingRecord } = useAddExactToOutbox();
+  const { mutateAsync: addMany } = useAddExactToOutboxMany();
+  const [bulk, setBulk] = useState(null); //* { done, total } while "Add all" runs
+
+  //* Collect every Missing record for the current filter (not already queued), then add in batches.
+  const handleAddAll = async () => {
+    if (!window.confirm(k("confirmAddAll", { count: data?.total_count ?? 0 }))) return;
+    try {
+      setBulk({ done: 0, total: 0 });
+      const items = [];
+      for (let pageNo = 1; pageNo < 100; pageNo += 1) {
+        const res = await getExactMissing({ ...filters, page: pageNo, limit: BULK_SIZE });
+        const pageRows = res?.data ?? [];
+        items.push(...pageRows.filter((r) => !r.queued_state).map((r) => ({ kind: r.kind, id: r.id })));
+        if (!pageRows.length || pageNo * BULK_SIZE >= (res?.total_count ?? 0)) break;
+      }
+      let queued = 0;
+      let refused = 0;
+      setBulk({ done: 0, total: items.length });
+      for (let i = 0; i < items.length; i += BULK_SIZE) {
+        const res = await addMany(items.slice(i, i + BULK_SIZE));
+        queued += res?.data?.queued ?? 0;
+        refused += res?.data?.refused ?? 0;
+        setBulk({ done: Math.min(i + BULK_SIZE, items.length), total: items.length });
+      }
+      toast.success(k("addedAll", { queued, refused }));
+    } catch (err) {
+      toast.error(err?.message || k("addAllFailed"));
+    } finally {
+      setBulk(null);
+    }
+  };
 
   const rows = data?.data ?? [];
   const total = data?.total_count ?? 0;
@@ -72,9 +108,19 @@ const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = fal
           count: total,
           payments: counts.payment || 0,
           invoices: counts.third_party_invoice || 0,
+          kmo: counts.kmo_invoice || 0,
           since: since || "—",
         })}
       </div>
+
+      {canModify ? (
+        <div className="flex justify-end">
+          <Button size="sm" variant="outline" onClick={handleAddAll} disabled={!isConnected || Boolean(bulk) || isAdding}>
+            <ListPlus className="h-4 w-4 mr-2" />
+            {bulk ? k("addingAll", { done: bulk.done, total: bulk.total }) : k("addAll", { count: total })}
+          </Button>
+        </div>
+      ) : null}
 
       <div className="border dark:border-white/10 rounded-lg overflow-x-auto">
         <Table className="w-full min-w-[1000px]">
