@@ -38,6 +38,7 @@ import AllStudents from "@/pages/admin/student";
 import StudentView from "@/pages/admin/student/StudentView";
 import LocationChanges from "@/pages/admin/student/LocationChanges";
 import StudentIdAdminPage from "@/pages/admin/student-id";
+import TeacherIdAdminPage from "@/pages/admin/teacher-id";
 import AllReports from "@/pages/admin/finance-management/AllReports";
 import CityReports from "@/pages/admin/finance-management/CityReports";
 import ProgramReports from "@/pages/admin/finance-management/ProgramReports";
@@ -263,6 +264,10 @@ export const adminRoutes = [
   {
     path: "/admin/student-id",
     component: withPermissionProtection(StudentIdAdminPage, "/admin/student-id"),
+  },
+  {
+    path: "/admin/teacher-id",
+    component: withPermissionProtection(TeacherIdAdminPage, "/admin/teacher-id"),
   },
   {
     path: "/admin/location-changes",

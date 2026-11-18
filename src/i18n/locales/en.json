@@ -806,6 +806,11 @@
         "connectionHint": "Disconnecting stops all sending to Exact until someone authorises again."
       },
       "payouts": {
+        "searchPlaceholder": "Search by Mollie ID, IAO record, name, email, amount or Exact reference…",
+        "exportFiltered": "Export CSV ({{count}})",
+        "clearSearch": "Clear search",
+        "searchCount": "{{shown}} of {{total}} payments",
+        "noSearchResults": "No payments match \"{{search}}\"",
         "refresh": "Refresh from Mollie",
         "refreshing": "Refreshing…",
         "syncRunning": "Reading payouts from Mollie…",
@@ -2089,10 +2094,13 @@
       "status": "Status",
       "action": "Action",
       "edit": "Edit",
-      "noIntakes": "No intakes found"
+      "noIntakes": "No intakes found",
+      "enrolled": "Enrolled",
+      "capacity": "Capacity"
     },
     "messages": {
-      "loadFailed": "Failed to load intakes"
+      "loadFailed": "Failed to load intakes",
+      "exportFailed": "Failed to export intakes"
     },
     "modal": {
       "createTitle": "Create a new intake",
@@ -2148,7 +2156,27 @@
       "searchCities": "Search cities...",
       "clearAll": "Clear All",
       "applyFilters": "Apply Filters",
-      "narrowDownIntakes": "Narrow down the intakes list"
+      "narrowDownIntakes": "Narrow down the intakes list",
+      "type": "Type",
+      "allTypes": "All Types",
+      "programName": "Programme name",
+      "programNamePlaceholder": "Search by programme name...",
+      "registrationFee": "Registration fee",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "deadline": "Deadline",
+      "from": "From",
+      "to": "To",
+      "min": "Min",
+      "max": "Max",
+      "invalidRange": "The end of the range must be after the start",
+      "clearFilters": "Clear filters"
+    },
+    "export": {
+      "title": "Export",
+      "exporting": "Exporting...",
+      "csv": "Export as CSV",
+      "excel": "Export as Excel"
     }
   },
   "adminManagement": {
@@ -4230,6 +4258,33 @@
       "postalCode": "Postal code",
       "city": "City",
       "country": "Country"
+    }
+  },
+  "idCard": {
+    "teacherTitle": "Teacher Identity Card",
+    "studentTitle": "Student Identity Card",
+    "viewCard": "View Card",
+    "recordId": "Record ID",
+    "validFrom": "Valid from",
+    "validUntil": "Valid until",
+    "academicYear": "Academic year",
+    "previousCards": "Previous cards",
+    "noCardIssued": "No ID card issued yet",
+    "noTeacherCardDesc": "This lecturer does not currently have an active or issued teacher identity card.",
+    "noStudentCardDesc": "This student does not currently have an active or issued student identity card."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Search by UID, name, or email...",
+    "filters": {
+      "button": "Filter",
+      "title": "Filter ID Cards",
+      "subtitle": "Narrow down the student ID cards list",
+      "programType": "Programme Type",
+      "allProgramTypes": "All Programme Types",
+      "program": "Programme",
+      "allPrograms": "All Programmes",
+      "clearAll": "Clear All",
+      "applyFilters": "Apply Filters"
     }
   }
 }

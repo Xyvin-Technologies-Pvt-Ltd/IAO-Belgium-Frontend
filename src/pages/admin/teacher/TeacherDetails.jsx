@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import TeacherSessions from "./TeacherSessions";
 import TeacherAttachments from "./TeacherAttachments";
+import IdCardDocumentTab from "@/components/id-card/IdCardDocumentTab";
 
-const TABS = ["sessions", "attachments"];
+const TABS = ["sessions", "documents", "attachments"];
 
 const TeacherDetails = () => {
   const { t } = useTranslation();
@@ -77,15 +78,24 @@ const TeacherDetails = () => {
                   : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
               }`}
             >
-              {tab === "attachments" 
-                ? t("teacherManagement.notesAndAttachments", "Notes & Attachments") 
-                : t(`planningManagement.${tab}`, tab)}
+              {tab === "attachments"
+                ? t("teacherManagement.notesAndAttachments", "Notes & Attachments")
+                : tab === "documents"
+                  ? t("common.documents", "Documents")
+                  : t(`planningManagement.${tab}`, tab)}
             </button>
           ))}
         </nav>
       </div>
 
       {activeTab === "sessions" && <TeacherSessions teacherId={id} />}
+      {activeTab === "documents" && (
+        <IdCardDocumentTab
+          type="teacher"
+          id={id}
+          userName={`${teacherData.first_name || ""} ${teacherData.last_name || ""}`.trim()}
+        />
+      )}
       {activeTab === "attachments" && <TeacherAttachments teacherId={id} attachments={teacherData.attachments || []} />}
     </div>
   );

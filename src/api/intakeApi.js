@@ -1,5 +1,21 @@
 import axiosInstance from "./axiosintercepter";
 
+//* IPB-152: export the Intake view (filters + search) as csv | xlsx
+export const exportIntakes = async (academicId, filter, format) => {
+  try {
+    const response = await axiosInstance.get(
+      `/academic/intakes/${academicId}/export`,
+      {
+        params: { ...filter, format },
+        responseType: "blob",
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getIntakes = async (academicId, filter) => {
   try {
     const response = await axiosInstance.get(

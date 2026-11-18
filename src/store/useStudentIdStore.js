@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   approveStudentIdCard,
   getStudentIdApplicationActivity,
+  getStudentIdApplicationCard,
   getStudentIdCards,
   getStudentIdEligibility,
   issueStudentIdCard,
@@ -39,6 +40,18 @@ export const useStudentIdApplicationActivity = (
   return useQuery({
     queryKey: ["studentIdApplicationActivity", applicationId],
     queryFn: () => getStudentIdApplicationActivity(applicationId),
+    enabled: Boolean(applicationId),
+    ...options,
+  });
+};
+
+export const useStudentIdApplicationCard = (
+  applicationId,
+  options = {},
+) => {
+  return useQuery({
+    queryKey: ["studentIdApplicationCard", applicationId],
+    queryFn: () => getStudentIdApplicationCard(applicationId),
     enabled: Boolean(applicationId),
     ...options,
   });

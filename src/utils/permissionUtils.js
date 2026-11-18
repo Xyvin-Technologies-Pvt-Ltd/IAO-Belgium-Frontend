@@ -35,6 +35,12 @@ const SIDEBAR_PERMISSIONS = {
     "academic_management_view",
     "academic_management_modify",
   ],
+  "/admin/teacher-id": [
+    "operations_management_view",
+    "operations_management_modify",
+    "academic_management_view",
+    "academic_management_modify",
+  ],
   "/admin/location-changes": [
     "academic_management_view",
     "academic_management_modify",
