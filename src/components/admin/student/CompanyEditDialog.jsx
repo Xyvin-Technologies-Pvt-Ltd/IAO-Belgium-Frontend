@@ -14,6 +14,7 @@ import {
 import { useGetCompany, useUpdateCompany } from "@/store/useCompanyStore";
 import { useCountries, isCountryCode } from "@/hooks/useCountries";
 import CountrySelect from "./CountrySelect";
+import { checkVat, VAT_REASON_EN } from "@/utils/vat";
 
 const FIELDS = [
   ["company_name", "companyName"],
@@ -40,8 +41,14 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
       String(form[f] ?? "").trim(),
     ]),
   );
+  //* Same VAT rule as the backend: empty / "/" → none; else a real VAT number (saved cleaned).
+  const vat = checkVat(form.vat_number, { country: form.country });
+  if ("vat_number" in changed && vat.ok) changed.vat_number = vat.value;
+  const stored_vat = checkVat(company.vat_number, { country: company.country });
   const has_changes = Object.keys(changed).length > 0;
   const name_missing = !String(form.company_name || "").trim();
+  //* Country is required (Exact needs it to create the customer).
+  const country_missing = !String(form.country || "").trim();
 
   return (
     <>
@@ -61,6 +68,15 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
           </div>
         ) : null}
 
+        {!stored_vat.ok ? (
+          <div className="flex gap-2 rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+            {c("vatNeedsFix", 'VAT number is saved as "{{value}}", which Exact Online doesn\'t accept. Correct it, or clear it if the company has no VAT number.', {
+              value: company.vat_number,
+            })}
+          </div>
+        ) : null}
+
         <div className="grid gap-4 sm:grid-cols-2">
           {FIELDS.map(([field, key]) => (
             <div key={field} className={field === "company_name" || field.startsWith("address") ? "sm:col-span-2 space-y-1" : "space-y-1"}>
@@ -69,16 +85,26 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
                 id={`company-${field}`}
                 value={form[field] ?? ""}
                 onChange={(e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))}
+                aria-invalid={field === "vat_number" && !vat.ok}
+                className={field === "vat_number" && !vat.ok ? "border-red-500" : undefined}
               />
+              {field === "vat_number" ? (
+                <p className={`text-xs ${vat.ok ? "text-muted-foreground" : "text-red-600 dark:text-red-400"}`}>
+                  {vat.ok ? c("vatHint", "Leave empty if the company is not VAT-registered.") : c(`vatReason.${vat.reason}`, VAT_REASON_EN[vat.reason])}
+                </p>
+              ) : null}
             </div>
           ))}
           <div className="space-y-1">
-            <Label htmlFor="company-country">{c("fields.country", "Country")}</Label>
+            <Label htmlFor="company-country">{c("fields.countryRequired", "Country *")}</Label>
             <CountrySelect
               id="company-country"
               value={form.country}
               onChange={(code) => setForm((prev) => ({ ...prev, country: code }))}
             />
+            {country_missing ? (
+              <p className="text-xs text-red-600 dark:text-red-400">{c("countryMissing", "Pick the company's country — Exact Online needs it.")}</p>
+            ) : null}
           </div>
         </div>
       </div>
@@ -87,7 +113,7 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
         <Button variant="outline" onClick={onCancel} disabled={saving}>
           {c("cancel", "Cancel")}
         </Button>
-        <Button onClick={() => onSave(changed)} disabled={!has_changes || name_missing || saving}>
+        <Button onClick={() => onSave(changed)} disabled={!has_changes || name_missing || country_missing || !vat.ok || saving}>
           {saving ? c("saving", "Saving…") : c("save", "Save")}
         </Button>
       </div>
