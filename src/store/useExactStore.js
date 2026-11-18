@@ -34,6 +34,8 @@ import {
   sendExactJobsMany,
   getExactCreditPreview,
   postExactCredit,
+  linkExactAuditRecords,
+  getExactAuditNightly,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -457,3 +459,27 @@ export const usePostExactCredit = () => {
     onError: (err) => toast.error(err?.message || "Failed to post the credit"),
   });
 };
+
+// ─── Link missing + nightly audit ────────────────────────────────────────────
+
+export const useLinkExactAuditRecords = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: linkExactAuditRecords,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-issues"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to link these records"),
+  });
+};
+
+/** Small: used for the "new" badge on the Audit tab. */
+export const useGetExactAuditNightly = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-nightly"],
+    queryFn: getExactAuditNightly,
+    staleTime: 5 * 60 * 1000,
+    ...options,
+  });
