@@ -47,6 +47,8 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
   const stored_vat = checkVat(company.vat_number, { country: company.country });
   const has_changes = Object.keys(changed).length > 0;
   const name_missing = !String(form.company_name || "").trim();
+  //* Country is required (Exact needs it to create the customer).
+  const country_missing = !String(form.country || "").trim();
 
   return (
     <>
@@ -94,12 +96,15 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
             </div>
           ))}
           <div className="space-y-1">
-            <Label htmlFor="company-country">{c("fields.country", "Country")}</Label>
+            <Label htmlFor="company-country">{c("fields.countryRequired", "Country *")}</Label>
             <CountrySelect
               id="company-country"
               value={form.country}
               onChange={(code) => setForm((prev) => ({ ...prev, country: code }))}
             />
+            {country_missing ? (
+              <p className="text-xs text-red-600 dark:text-red-400">{c("countryMissing", "Pick the company's country — Exact Online needs it.")}</p>
+            ) : null}
           </div>
         </div>
       </div>
@@ -108,7 +113,7 @@ function CompanyForm({ company, countries, c, onCancel, onSave, saving }) {
         <Button variant="outline" onClick={onCancel} disabled={saving}>
           {c("cancel", "Cancel")}
         </Button>
-        <Button onClick={() => onSave(changed)} disabled={!has_changes || name_missing || !vat.ok || saving}>
+        <Button onClick={() => onSave(changed)} disabled={!has_changes || name_missing || country_missing || !vat.ok || saving}>
           {saving ? c("saving", "Saving…") : c("save", "Save")}
         </Button>
       </div>
