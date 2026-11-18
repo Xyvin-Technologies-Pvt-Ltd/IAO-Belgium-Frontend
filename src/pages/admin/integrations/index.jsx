@@ -11,6 +11,7 @@ import { useCanModify } from "@/hooks/useCanModify";
 import ToSendTab from "./ToSendTab";
 import HistoryTab from "./HistoryTab";
 import PayoutsTab from "./PayoutsTab";
+import AuditTab from "./AuditTab";
 import SettingsTab from "./SettingsTab";
 import GuideTab from "./GuideTab";
 import IntegrationsFilterBar from "./IntegrationsFilterBar";
@@ -21,8 +22,8 @@ const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v
 //* To send: what still has to reach Exact (Waiting / Failed / Missing).
 //* Payouts: Mollie payouts and whether xCore can match them.
 //* History: what is already in Exact. Settings: send mode, checks, tools.
-//* Guide: how it all works, what to watch out for, what is next.
-const TABS = ["to_send", "payouts", "history", "settings", "guide"];
+//* Audit: IAO ↔ Exact ↔ Mollie check (clean-up plan). Guide: how it all works.
+const TABS = ["to_send", "payouts", "history", "audit", "settings", "guide"];
 //* Tabs without the search / date filter.
 const NO_FILTER_TABS = ["settings", "guide"];
 
@@ -115,7 +116,7 @@ const IntegrationsPage = () => {
 
   //* Which date the filter uses, shown under the fields.
   let filterHintKey = "to_send";
-  if (tab === "history" || tab === "payouts") filterHintKey = tab;
+  if (tab === "history" || tab === "payouts" || tab === "audit") filterHintKey = tab;
   else if (toSendView === "missing") filterHintKey = "missing";
 
   if (isLoading) {
@@ -254,6 +255,17 @@ const IntegrationsPage = () => {
           <HistoryTab
             view={historyView}
             onViewChange={changeHistoryView}
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            filters={filters}
+            filtersActive={filtersActive}
+          />
+        ) : tab === "audit" ? (
+          <AuditTab
+            canModify={canModify}
+            isConnected={isConnected}
             page={page}
             setPage={setPage}
             rowsPerPage={rowsPerPage}

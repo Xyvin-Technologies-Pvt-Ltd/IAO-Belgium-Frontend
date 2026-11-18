@@ -26,6 +26,10 @@ import {
   getCompanyCountries,
   applyCompanyCountries,
   retryExactJobs,
+  getExactAuditSummary,
+  getExactAuditIssues,
+  pullExactAudit,
+  getExactAuditPullStatus,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -350,5 +354,46 @@ export const useRetryExactJobs = () => {
       setTimeout(refresh, 8000);
     },
     onError: (err) => toast.error(err?.message || "Failed to retry these records"),
+  });
+};
+
+// ─── Accounting audit (read-only) ────────────────────────────────────────────
+
+export const useGetExactAuditSummary = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-summary", params],
+    queryFn: () => getExactAuditSummary(params),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+export const useGetExactAuditIssues = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-issues", params],
+    queryFn: () => getExactAuditIssues(params),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+/** Polls every 3s while the Exact copy is being refreshed. */
+export const useGetExactAuditPullStatus = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-pull"],
+    queryFn: getExactAuditPullStatus,
+    refetchInterval: (query) => (query.state.data?.data?.state === "running" ? 3000 : false),
+    ...options,
+  });
+
+export const usePullExactAudit = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: pullExactAudit,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Copying the Exact sales journal");
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-pull"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to copy the Exact sales journal"),
   });
 };
