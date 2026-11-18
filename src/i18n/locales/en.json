@@ -1064,7 +1064,7 @@
         "loadFailed": "Failed to build the audit",
         "issuesFound": "{{count}} problem(s) found. Click a category to see its records.",
         "noIssues": "No problems found.",
-        "export": "Export",
+        "export": "Export CSV",
         "exportFailed": "Failed to export the audit",
         "stepLabel": "Fixed in plan step {{step}}",
         "col": {
@@ -1145,7 +1145,8 @@
               ]
             }
           }
-        }
+        },
+        "exporting": "Exporting…"
       }
     }
   },

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, Database, RefreshCw } from "lucide-react";
+import { AlertTriangle, Database, Download, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,6 @@ import {
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { Pagination } from "@/components/ui/table/Pagination";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import ExportMenu from "@/components/common/ExportMenu";
 import { exportExactAudit } from "@/api/exactApi";
 import { downloadCsv } from "@/utils/exportCsv";
 import {
@@ -88,11 +87,12 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
     setPage(1);
   };
 
-  const handleExport = async (format) => {
+  //* Plain CSV button (works on prod and uat; the CSV/Excel menu isn't on uat yet).
+  const handleExport = async () => {
     setExporting(true);
     try {
       const csv = await exportExactAudit({ ...filters, ...(category ? { category } : {}) });
-      await downloadCsv(csv, `exact_audit${category ? `_${category}` : ""}`, format);
+      await downloadCsv(csv, `exact_audit${category ? `_${category}` : ""}`, "csv");
     } catch (err) {
       toast.error(err?.message || a("exportFailed"));
     } finally {
@@ -153,7 +153,10 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
             <p className="text-sm text-muted-foreground">
               {totalIssues ? a("issuesFound", { count: totalIssues }) : a("noIssues")}
             </p>
-            <ExportMenu onExport={handleExport} isPending={exporting} disabled={!total} label={a("export")} size="sm" />
+            <Button variant="outline" size="sm" onClick={handleExport} disabled={!total || exporting}>
+              <Download className="h-4 w-4 mr-2" />
+              {exporting ? a("exporting") : a("export")}
+            </Button>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
