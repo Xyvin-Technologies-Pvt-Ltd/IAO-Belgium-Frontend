@@ -363,3 +363,25 @@ export const postExactCredit = async ({ entryNumber, dateMode = "today" }) => {
     throw error.response?.data || error;
   }
 };
+
+// ─── Link missing + nightly audit ────────────────────────────────────────────
+
+//* Audit → link IAO records to the Exact entry found by reference (writes IAO only). Max 200 keys.
+export const linkExactAuditRecords = async (keys = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/audit/link", { keys });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Last nightly audit run: totals and what is new since the night before.
+export const getExactAuditNightly = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/nightly");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
