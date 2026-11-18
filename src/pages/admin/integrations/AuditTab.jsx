@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, Database, Download, RefreshCw } from "lucide-react";
+import { AlertTriangle, Database, Download, ReceiptText, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,7 @@ import {
   usePullExactAudit,
 } from "@/store/useExactStore";
 import AuditPlan from "./AuditPlan";
+import CreditDuplicateDialog from "./CreditDuplicateDialog";
 import { NEEDS_EXACT_COPY, SEVERITY_STYLES, formatDate, formatDateTime, money } from "./auditUi";
 
 function PullInfo({ pull, copiedAt, a }) {
@@ -49,6 +50,7 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
   const queryClient = useQueryClient();
   const [category, setCategory] = useState(null);
   const [exporting, setExporting] = useState(false);
+  const [creditEntry, setCreditEntry] = useState(null);
 
   const { data: summaryRes, isLoading: summaryLoading, error: summaryError, refetch } = useGetExactAuditSummary(filters);
   const { data: issuesRes, isLoading: issuesLoading } = useGetExactAuditIssues({
@@ -210,6 +212,7 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
                       <TableHead>{a("col.exact")}</TableHead>
                       <TableHead className="text-right">{a("col.exactAmount")}</TableHead>
                       <TableHead>{a("col.detail")}</TableHead>
+                      {canModify ? <TableHead className="text-right">{a("col.action")}</TableHead> : null}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -254,6 +257,16 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
                         </TableCell>
                         <TableCell className="text-right whitespace-nowrap">{money(i.exact?.amount)}</TableCell>
                         <TableCell className="text-xs text-muted-foreground max-w-[280px]">{i.detail || a(`hint.${i.category}`)}</TableCell>
+                        {canModify ? (
+                          <TableCell className="text-right whitespace-nowrap">
+                            {i.category === "duplicate" && i.exact?.entry_number ? (
+                              <Button size="sm" variant="outline" onClick={() => setCreditEntry(i.exact.entry_number)} disabled={!isConnected}>
+                                <ReceiptText className="h-3.5 w-3.5 mr-1.5" />
+                                {a("credit.button")}
+                              </Button>
+                            ) : null}
+                          </TableCell>
+                        ) : null}
                       </TableRow>
                     ))}
                   </TableBody>
@@ -264,6 +277,8 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
           )}
         </>
       )}
+
+      <CreditDuplicateDialog entryNumber={creditEntry} onClose={() => setCreditEntry(null)} canModify={canModify} />
     </div>
   );
 };
