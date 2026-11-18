@@ -911,7 +911,15 @@
         "exporting": "Exporting…",
         "exportFailed": "Failed to export this payout",
         "openInToSend": "Open this record in To send",
-        "openInHistory": "Open this record in History"
+        "openInHistory": "Open this record in History",
+        "refundStatus": {
+          "switch_booked": "City switch — credit note + new invoice in Exact (match by hand)",
+          "switch_not_in_exact": "City switch — credit note or new invoice not in Exact yet",
+          "credit_note_booked": "Credit note in Exact (match by hand)",
+          "not_booked": "No credit note in IAO/Exact",
+          "chargeback": "Chargeback (match by hand)",
+          "unknown_payment": "Payment not in IAO"
+        }
       },
       "guide": {
         "intro": "How IAO sends payments to Exact Online, how xCore matches them with Mollie payouts, and how to use these tabs.",
@@ -950,7 +958,7 @@
             },
             {
               "title": "Audit",
-              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem (missing, duplicates, unknown Exact entries, amounts, old references, refunds…). \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed. Duplicates have a \"Credit\" button that previews and posts a credit entry cancelling the extra Exact copy."
+              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem. Duplicates have \"Credit\"; records Exact already has get \"Link\". Every morning at 06:45 it re-checks and marks what is new. \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed by the check itself."
             },
             {
               "title": "Settings",
@@ -1104,7 +1112,7 @@
         },
         "hint": {
           "missing": "Should be in Exact but nothing was found. Send it from To send → Missing (check the period with the accountant for old months).",
-          "link_missing": "Exact has an entry with this record's reference, but IAO isn't linked to it. Don't send it again.",
+          "link_missing": "Exact has an entry with this record's reference, but IAO isn't linked to it. \"Link\" connects them (one clear match with the same amount) so it's never sent again.",
           "not_found_in_exact": "IAO points to an Exact entry number that isn't in the Exact sales journal (deleted or moved?). Check in Exact.",
           "duplicate": "A second Exact entry for the same IAO record (e.g. 23 Oct). The extra one should be credited.",
           "unknown_in_exact": "An Exact entry no IAO record explains: a duplicate, a test, or a manual entry by the accountant.",
@@ -1112,7 +1120,7 @@
           "wrong_customer": "Booked on the fallback customer instead of the student or company.",
           "old_reference": "In Exact under the invoice number, not the Mollie ID, so xCore can't match it automatically.",
           "mollie_unknown": "Mollie paid it out, but IAO has no payment with this Mollie ID.",
-          "refund_not_booked": "Mollie refund or chargeback with no credit note in Exact.",
+          "refund_not_booked": "Mollie refund or chargeback that isn't booked in Exact (no credit note, or the city-switch credit note / new invoice not sent yet).",
           "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet."
         },
         "plan": {
@@ -1146,15 +1154,16 @@
                 "Missing → To send → Send, incl. KMO invoices and \"Add all\" / \"Send all shown\" (live now)",
                 "Company countries fix + Retry all (live now)",
                 "Credit duplicate: a credit entry for the extra Exact copy, from Audit → Duplicates (live now)",
-                "Re-post for xCore: reverse the old entry and post it again under the Mollie ID (planned, if the accountant chooses it)",
-                "Refunds matched with credit notes (planned)"
+                "Link missing: connect IAO records to the Exact entry Exact already has (live now)",
+                "Refunds tracked: each Mollie refund linked to its payment, credit note and switch invoice (live now; matching in xCore by hand)",
+                "Re-post for xCore: reverse the old entry and post it again under the Mollie ID (planned, if the accountant chooses it)"
               ]
             },
             "confirm": {
               "title": "Confirm and keep it clean",
               "text": "Run the audit again until every category is 0 or accepted by the accountant, then rematch the old payouts in xCore.",
               "items": [
-                "Nightly audit with a warning badge when something new appears (planned)"
+                "Nightly check at 06:45: copy from Exact + audit, with a \"new\" badge on the Audit tab (live now)"
               ]
             }
           }
@@ -1192,6 +1201,25 @@
           "recordExisting": "Record it",
           "posting": "Posting…",
           "confirm": "Post a credit of {{amount}} EUR in Exact to cancel duplicate entry {{number}}?"
+        },
+        "nightly": {
+          "badge": "{{count}} new",
+          "first": "Nightly check ran {{when}} (first run — from tomorrow it shows what is new).",
+          "summary": "Nightly check {{when}}: {{count}} new problem(s) since the night before ({{total}} open in total).",
+          "pullError": "copying from Exact failed: {{error}}",
+          "showNew": "Show only the {{count}} new",
+          "showAll": "Show all",
+          "never": "The nightly check runs every morning at 06:45 (copy from Exact + audit) and shows here what is new."
+        },
+        "link": {
+          "button": "Link",
+          "all": "Link all that match",
+          "linking": "Linking…",
+          "byHand": "check by hand",
+          "noneLinkable": "Nothing can be linked automatically here (several matches or a different amount).",
+          "confirmAll": "Link {{count}} IAO record(s) to the Exact entry found by their reference? Only IAO is updated; nothing is posted to Exact.",
+          "done": "{{linked}} linked, {{skipped}} left for a person.",
+          "failed": "Failed to link these records"
         }
       }
     }
