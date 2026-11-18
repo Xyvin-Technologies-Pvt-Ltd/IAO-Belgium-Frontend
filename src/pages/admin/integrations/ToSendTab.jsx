@@ -25,6 +25,7 @@ import {
   useGetExactToSendPreview,
   useSendExactJob,
   useRetryExactJobs,
+  useSendExactJobsMany,
   useGetExactMissing,
 } from "@/store/useExactStore";
 import MissingList from "./MissingList";
@@ -238,6 +239,7 @@ const ToSendTab = ({
   } = useGetExactToSendPreview(previewJob?.job_id);
   const { mutate: sendJob, isPending: isSending, variables: sendingJobId } = useSendExactJob();
   const { mutate: retryJobs, isPending: isRetrying } = useRetryExactJobs();
+  const { mutate: sendMany, isPending: isSendingMany } = useSendExactJobsMany();
 
   const { data: missingCountResponse } = useGetExactMissing({ count_only: true, ...filters });
 
@@ -265,6 +267,14 @@ const ToSendTab = ({
     preview?.plan?.customer?.kind === "company" && preview.plan.customer.company_id && !preview?.ok
       ? preview.plan.customer.company_id
       : null;
+
+  //* Waiting → "Send all shown": only rows still waiting (held), at most 200 per click.
+  const heldShown = view === "waiting" ? rows.filter((row) => row.state === "held") : [];
+  const handleSendShown = () => {
+    const ids = heldShown.slice(0, 200).map((row) => row.job_id);
+    if (!ids.length || !window.confirm(k("confirmSendAll", { count: ids.length }))) return;
+    sendMany(ids);
+  };
 
   const handleRetryShown = () => {
     const ids = rows.map((row) => row.job_id);
@@ -301,6 +311,14 @@ const ToSendTab = ({
   return (
     <div className="space-y-4">
       <ViewChips view={view} onViewChange={onViewChange} counts={viewCounts} k={k} />
+      {view === "waiting" && canModify && heldShown.length ? (
+        <div className="flex justify-end">
+          <Button size="sm" onClick={handleSendShown} disabled={isSendingMany || !isConnected}>
+            <Send className={`h-4 w-4 mr-2 ${isSendingMany ? "animate-pulse" : ""}`} />
+            {k("sendAllShown", { count: Math.min(heldShown.length, 200) })}
+          </Button>
+        </div>
+      ) : null}
       {view === "failed" && failedRows.length ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap gap-2">
