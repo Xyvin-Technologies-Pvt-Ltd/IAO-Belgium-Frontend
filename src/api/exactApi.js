@@ -266,3 +266,52 @@ export const retryExactJobs = async (jobIds = []) => {
     throw error.response?.data || error;
   }
 };
+
+// ─── Accounting audit (read-only) ────────────────────────────────────────────
+
+export const getExactAuditSummary = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/summary", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactAuditIssues = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/issues", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactAudit = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/export", { params, responseType: "text" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Copy the Exact sales journal (read-only on Exact) in the background.
+export const pullExactAudit = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/audit/pull");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactAuditPullStatus = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/pull/status");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
