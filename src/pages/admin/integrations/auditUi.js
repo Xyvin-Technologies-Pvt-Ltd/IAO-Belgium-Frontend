@@ -15,6 +15,7 @@ export const NEEDS_EXACT_COPY = [
   "amount_mismatch",
   "wrong_customer",
   "old_reference",
+  "customer_gone",
 ];
 
 export function formatDate(value) {
