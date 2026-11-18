@@ -331,6 +331,34 @@ export const addExactToOutboxMany = async (items = []) => {
 };
 
 //* Waiting → send the listed held jobs (as if Send was clicked on each). Max 200.
+//* To send → a record stuck in Sending / retrying: Stop (back to Waiting) or Send again now.
+export const stopExactJob = async (jobId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/to-send/${encodeURIComponent(jobId)}/stop`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const restartExactJob = async (jobId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/to-send/${encodeURIComponent(jobId)}/restart`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const stopExactJobsMany = async (jobIds = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/to-send/stop-many", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const sendExactJobsMany = async (jobIds = []) => {
   try {
     const response = await axiosInstance.post("/exact/to-send/send-many", { job_ids: jobIds });
