@@ -1016,6 +1016,10 @@
             {
               "title": "\"Send waiting\" on a payout",
               "text": "sends all of that payout's waiting records at once. Each is still checked, and records with problems fail and stay in To send — but preview a few first."
+            },
+            {
+              "title": "Merging or deleting customers in Exact",
+              "text": "is fine: when a company's saved customer is gone, IAO follows the merge on the next send (or looks the company up again). The nightly audit lists such companies under \"Exact customer gone\". Please tell the IAO team when you merge customers."
             }
           ]
         },
@@ -1110,7 +1114,8 @@
           "old_reference": "Old reference (xCore)",
           "mollie_unknown": "Mollie payment not in IAO",
           "refund_not_booked": "Refund not booked",
-          "not_in_payout": "Paid, in no payout"
+          "not_in_payout": "Paid, in no payout",
+          "customer_gone": "Exact customer gone"
         },
         "hint": {
           "missing": "Should be in Exact but nothing was found. Send it from To send → Missing (check the period with the accountant for old months).",
@@ -1123,7 +1128,8 @@
           "old_reference": "In Exact under the invoice number, not the Mollie ID, so xCore can't match it automatically.",
           "mollie_unknown": "Mollie paid it out, but IAO has no payment with this Mollie ID.",
           "refund_not_booked": "Mollie refund or chargeback that isn't booked in Exact (no credit note, or the city-switch credit note / new invoice not sent yet).",
-          "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet."
+          "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet.",
+          "customer_gone": "The company's saved Exact customer no longer exists (merged or deleted in Exact). The next send follows the merge or looks the company up again; nothing to do unless it keeps failing."
         },
         "plan": {
           "title": "Accounting clean-up plan",
