@@ -762,13 +762,15 @@
           "to_send": "Dates filter on the IAO document date. Every word you type must match.",
           "missing": "Dates filter on the payment date. Every word you type must match.",
           "history": "Dates filter on the date it was sent to Exact. Every word you type must match.",
-          "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number."
+          "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number.",
+          "audit": "Dates filter on the IAO record date (or the Exact / Mollie date when there is no IAO record). Search an IAO number, Mollie ID, Exact entry number or name."
         }
       },
       "tabs": {
         "to_send": "To send",
         "payouts": "Payouts",
         "history": "History",
+        "audit": "Audit",
         "settings": "Settings",
         "guide": "Guide"
       },
@@ -935,6 +937,10 @@
               "text": "Everything already in Exact. Documents: one row per IAO document with Verify and CSV export. GL lines: one row per general ledger line for the accountant."
             },
             {
+              "title": "Audit",
+              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem (missing, duplicates, unknown Exact entries, amounts, old references, refunds…). \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed."
+            },
+            {
               "title": "Settings",
               "text": "Send mode (keep it on Manual), the IAO invoice PDF check, one-off tools and Disconnect. Company countries: fix old company countries so Exact accepts them."
             }
@@ -1042,6 +1048,104 @@
         "unsentCount": "{{count}} unsent",
         "pickCountry": "Pick country",
         "afterFix": "After fixing, go to To send → Failed → Customer and click \"Retry all shown\"."
+      },
+      "audit": {
+        "copyTitle": "Copy of the Exact sales journal",
+        "pull": "Pull from Exact",
+        "pulling": "Copying…",
+        "pullRunning": "Copying from Exact… {{pages}} page(s), {{entries}} entries so far.",
+        "pullDone": "Last copied from Exact {{when}}.",
+        "pullFailed": "Last copy failed: {{error}}",
+        "pullNever": "Not copied yet — click \"Pull from Exact\". Read-only: nothing in Exact is changed.",
+        "coverage": "Checked {{records}} IAO records ({{ok}} without problems) against {{entries}} Exact entries (#{{first}}–#{{last}}) and {{payouts}} Mollie payouts.",
+        "generated": "audit built {{when}}",
+        "noCopy": "Exact hasn't been copied yet, so only the IAO and Mollie checks ran. Click \"Pull from Exact\" to also find duplicates, entries IAO doesn't know, amount and customer problems, and old references.",
+        "needsCopy": "needs the Exact copy",
+        "loadFailed": "Failed to build the audit",
+        "issuesFound": "{{count}} problem(s) found. Click a category to see its records.",
+        "noIssues": "No problems found.",
+        "export": "Export",
+        "exportFailed": "Failed to export the audit",
+        "stepLabel": "Fixed in plan step {{step}}",
+        "col": {
+          "date": "Date",
+          "problem": "Problem",
+          "iao": "IAO record",
+          "iaoAmount": "IAO amount",
+          "exact": "Exact entry",
+          "exactAmount": "Exact amount",
+          "detail": "Detail"
+        },
+        "category": {
+          "missing": "Missing in Exact",
+          "link_missing": "In Exact, not linked in IAO",
+          "not_found_in_exact": "Linked, but not in Exact",
+          "duplicate": "Duplicate in Exact",
+          "unknown_in_exact": "In Exact, unknown to IAO",
+          "amount_mismatch": "Amount differs",
+          "wrong_customer": "Fallback customer",
+          "old_reference": "Old reference (xCore)",
+          "mollie_unknown": "Mollie payment not in IAO",
+          "refund_not_booked": "Refund not booked",
+          "not_in_payout": "Paid, in no payout"
+        },
+        "hint": {
+          "missing": "Should be in Exact but nothing was found. Send it from To send → Missing (check the period with the accountant for old months).",
+          "link_missing": "Exact has an entry with this record's reference, but IAO isn't linked to it. Don't send it again.",
+          "not_found_in_exact": "IAO points to an Exact entry number that isn't in the Exact sales journal (deleted or moved?). Check in Exact.",
+          "duplicate": "A second Exact entry for the same IAO record (e.g. 23 Oct). The extra one should be credited.",
+          "unknown_in_exact": "An Exact entry no IAO record explains: a duplicate, a test, or a manual entry by the accountant.",
+          "amount_mismatch": "IAO and Exact amounts differ.",
+          "wrong_customer": "Booked on the fallback customer instead of the student or company.",
+          "old_reference": "In Exact under the invoice number, not the Mollie ID, so xCore can't match it automatically.",
+          "mollie_unknown": "Mollie paid it out, but IAO has no payment with this Mollie ID.",
+          "refund_not_booked": "Mollie refund or chargeback with no credit note in Exact.",
+          "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet."
+        },
+        "plan": {
+          "title": "Accounting clean-up plan",
+          "intro": "Goal: every payment from day 1 correct in IAO, Exact and Mollie, and xCore able to match every payout.",
+          "status": {
+            "done": "live",
+            "partial": "partly live",
+            "planned": "planned"
+          },
+          "steps": {
+            "audit": {
+              "title": "Audit everything (this page)",
+              "text": "Every IAO payment, invoice and credit note since the first payment is compared with a read-only copy of the Exact sales journal and the Mollie payouts. Each problem gets one category (A–G below). Nothing is changed.",
+              "items": []
+            },
+            "decide": {
+              "title": "Decide with the accountant",
+              "text": "Questions only the accountant can answer:",
+              "items": [
+                "Fix old records in their original month (Aug–Oct) or in the current month? (closed periods, Q3 VAT already filed)",
+                "Records in Exact under the invoice number: re-post them under the Mollie ID so xCore matches, or book those payouts by hand?",
+                "Gap payments (25 Aug – 22 Sep): was any of that revenue booked by hand? (avoid booking it twice)",
+                "Duplicates and Exact entries unknown to IAO: credit them, or were some entered by hand on purpose?"
+              ]
+            },
+            "fix": {
+              "title": "Fix — preview, test on one, then batch",
+              "text": "Every fix goes through the same safe sending path (strict duplicate check), so a fix can't create a new duplicate.",
+              "items": [
+                "Missing → To send → Send (live now)",
+                "Company countries fix + Retry all (live now)",
+                "Credit duplicate: a credit entry for the extra Exact copy (planned)",
+                "Re-post for xCore: reverse the old entry and post it again under the Mollie ID (planned, if the accountant chooses it)",
+                "Refunds matched with credit notes (planned)"
+              ]
+            },
+            "confirm": {
+              "title": "Confirm and keep it clean",
+              "text": "Run the audit again until every category is 0 or accepted by the accountant, then rematch the old payouts in xCore.",
+              "items": [
+                "Nightly audit with a warning badge when something new appears (planned)"
+              ]
+            }
+          }
+        }
       }
     }
   },
