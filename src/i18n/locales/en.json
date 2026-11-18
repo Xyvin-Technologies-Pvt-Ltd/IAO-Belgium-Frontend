@@ -755,7 +755,17 @@
         "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
         "editCompany": "Edit company",
         "sendAllShown": "Send all shown ({{count}})",
-        "confirmSendAll": "Send {{count}} waiting record(s) to Exact? Each is checked the same way as when you click Send on it; records with problems fail and stay in To send."
+        "confirmSendAll": "Send {{count}} waiting record(s) to Exact? Each is checked the same way as when you click Send on it; records with problems fail and stay in To send.",
+        "retrying": "Retrying (attempt {{n}} of {{max}})",
+        "lastError": "Last error",
+        "nextTry": "Next try around {{at}}",
+        "stop": "Stop",
+        "stopHint": "Stop sending: back to Waiting with a fresh retry count. Nothing is sent until you click Send.",
+        "sendAgain": "Send again now",
+        "sendAgainHint": "Start over now with a fresh retry count.",
+        "stopAllSending": "Stop all sending ({{count}})",
+        "confirmStopAll": "Stop {{count}} record(s) that are sending or retrying? They go back to Waiting; nothing is sent until you click Send.",
+        "stoppedNote": "Stopped {{at}} — waiting for Send"
       },
       "filters": {
         "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
@@ -1026,6 +1036,10 @@
             {
               "title": "Merging or deleting customers in Exact",
               "text": "is fine: when a company's saved customer is gone, IAO follows the merge on the next send (or looks the company up again). The nightly audit lists such companies under \"Exact customer gone\". Please tell the IAO team when you merge customers."
+            },
+            {
+              "title": "Stuck in Sending",
+              "text": "A record that Exact refuses is tried 3 times (about 2 minutes), then moves to Failed with the reason. While it retries, To send shows \"Retrying (attempt n of 3)\" and the last error. Click Stop to put it back in Waiting, or Send again now to start over."
             }
           ]
         },

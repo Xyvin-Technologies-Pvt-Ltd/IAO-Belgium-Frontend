@@ -32,6 +32,9 @@ import {
   getExactAuditPullStatus,
   addExactToOutboxMany,
   sendExactJobsMany,
+  stopExactJob,
+  restartExactJob,
+  stopExactJobsMany,
   getExactCreditPreview,
   postExactCredit,
   linkExactAuditRecords,
@@ -421,6 +424,52 @@ export const useAddExactToOutboxMany = () => {
       queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
     onError: (err) => toast.error(err?.message || "Failed to add these records to To send"),
+  });
+};
+
+function useToSendRefresh() {
+  const queryClient = useQueryClient();
+  return () => {
+    for (const queryKey of [["exact-to-send"], ["exact-kmo"], ["exact-missing"], ["exact-payouts"], ["exact-payout"]]) {
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+}
+
+export const useStopExactJob = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: stopExactJob,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Stopped");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Failed to stop this record"),
+  });
+};
+
+export const useRestartExactJob = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: restartExactJob,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sending again");
+      refresh();
+      setTimeout(refresh, 6000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send this record again"),
+  });
+};
+
+export const useStopExactJobsMany = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: stopExactJobsMany,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Stopped");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Failed to stop these records"),
   });
 };
 
