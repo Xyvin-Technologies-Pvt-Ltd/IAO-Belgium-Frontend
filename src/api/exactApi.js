@@ -385,3 +385,24 @@ export const getExactAuditNightly = async () => {
     throw error.response?.data || error;
   }
 };
+
+// ─── KMOP tab ────────────────────────────────────────────────────────────────
+
+export const getExactKmo = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/kmo", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactKmo = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/kmo/export", { params, responseType: "text" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};

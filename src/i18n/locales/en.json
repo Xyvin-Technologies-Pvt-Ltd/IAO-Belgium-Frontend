@@ -765,7 +765,8 @@
           "missing": "Dates filter on the payment date. Every word you type must match.",
           "history": "Dates filter on the date it was sent to Exact. Every word you type must match.",
           "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number.",
-          "audit": "Dates filter on the IAO record date (or the Exact / Mollie date when there is no IAO record). Search an IAO number, Mollie ID, Exact entry number or name."
+          "audit": "Dates filter on the IAO record date (or the Exact / Mollie date when there is no IAO record). Search an IAO number, Mollie ID, Exact entry number or name.",
+          "kmo": "Dates filter on the KMO invoice date. Search an invoice number, module, company, student, project number or Exact entry number."
         }
       },
       "tabs": {
@@ -773,6 +774,7 @@
         "payouts": "Payouts",
         "history": "History",
         "audit": "Audit",
+        "kmo": "KMOP",
         "settings": "Settings",
         "guide": "Guide"
       },
@@ -957,6 +959,10 @@
               "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem. Duplicates have \"Credit\"; records Exact already has get \"Link\". Every morning at 06:45 it re-checks and marks what is new. \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed by the check itself."
             },
             {
+              "title": "KMOP",
+              "text": "Every KMO(P) invoice and where it stands in Exact: OK, Old format (in Exact but the description doesn't name the module), No reference, Missing, Waiting or Failed. \"Add missing to To send\" puts the unsent ones in Waiting. The \"Credit note not in Exact\" card lists rejected KMO applications whose credit note still has to be sent. Credit notes show the original IAO invoice number in their Exact description."
+            },
+            {
               "title": "Settings",
               "text": "Send mode (keep it on Manual), the IAO invoice PDF check, one-off tools and Disconnect. Company countries: fix old company countries so Exact accepts them."
             }
@@ -1026,7 +1032,7 @@
             },
             {
               "title": "KMO invoices",
-              "text": "list unsent KMO invoices in Missing too."
+              "text": "done — see the KMOP tab. Next: the accountant decides whether the older KMO entries that don't name the module need fixing in Exact."
             },
             {
               "title": "Company countries",
@@ -1217,6 +1223,65 @@
           "done": "{{linked}} linked, {{skipped}} left for a person.",
           "failed": "Failed to link these records"
         }
+      },
+      "kmo": {
+        "rule": "KMO(P) invoices have no Mollie payment. In Exact, Your ref. must be the IAO invoice number and the description must name the module.",
+        "flow": "Send through To send: “Add missing to To send” puts them in Waiting; nothing is posted until you press Send. A rejected KMO application gets a credit note, which is sent only if the invoice is in Exact.",
+        "state": {
+          "ok": "OK",
+          "old_format": "Old format",
+          "no_reference": "No reference",
+          "not_in_exact_copy": "Not in Exact copy",
+          "waiting": "Waiting",
+          "failed": "Failed",
+          "sending": "Sending",
+          "missing": "Missing",
+          "not_needed": "Not needed"
+        },
+        "hint": {
+          "ok": "In Exact with the invoice number and module name.",
+          "old_format": "In Exact with the invoice number, but the description doesn't name the module (older posting).",
+          "no_reference": "Linked to an Exact entry with an empty Your ref.",
+          "not_in_exact_copy": "IAO says it was sent, but the entry isn't in the Exact copy. Pull from Exact, then check.",
+          "waiting": "In To send, waiting for Send.",
+          "failed": "Sending failed. See To send → Failed.",
+          "sending": "Being posted to Exact right now.",
+          "missing": "Never sent to Exact.",
+          "not_needed": "Cancelled or draft; nothing to send."
+        },
+        "creditMissing": "Credit note not in Exact",
+        "creditMissingHint": "Rejected KMO with a credit note that isn't in Exact.",
+        "kmoStatus": "KMO status",
+        "allStatuses": "All statuses ({{count}})",
+        "kmo": {
+          "waiting": "Waiting",
+          "submitted": "Submitted",
+          "contribution_received": "Contribution received",
+          "payment_released": "Payment released",
+          "paid": "Paid",
+          "rejected": "Rejected"
+        },
+        "addMissing": "Add missing to To send ({{count}})",
+        "adding": "Adding…",
+        "confirmAdd": "Add {{count}} missing KMO invoices to To send? They wait there until you press Send.",
+        "added": "{{queued}} added to To send, {{refused}} refused.",
+        "addFailed": "Could not add the invoices to To send.",
+        "export": "Export CSV",
+        "exportFailed": "Export failed.",
+        "empty": "No KMO invoices yet.",
+        "loadFailed": "Could not load the KMO invoices.",
+        "col": {
+          "invoice": "Invoice",
+          "who": "Company / student",
+          "module": "Module",
+          "kmo": "KMO",
+          "amount": "Amount",
+          "exact": "Exact",
+          "state": "State"
+        },
+        "noRef": "no Your ref.",
+        "noDescription": "no description",
+        "creditNotInExact": "not in Exact"
       }
     }
   },
