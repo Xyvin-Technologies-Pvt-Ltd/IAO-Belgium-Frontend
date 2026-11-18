@@ -109,6 +109,7 @@ const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = fal
           payments: counts.payment || 0,
           invoices: counts.third_party_invoice || 0,
           kmo: counts.kmo_invoice || 0,
+          creditNotes: counts.credit_note || 0,
           since: since || "—",
         })}
       </div>
@@ -147,6 +148,12 @@ const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = fal
                     <div className="font-mono text-sm">{row.record_uid || "—"}</div>
                     {row.kind === "third_party_invoice" && row.payment_uid ? (
                       <div className="font-mono text-xs text-muted-foreground">{row.payment_uid}</div>
+                    ) : null}
+                    {row.kind === "credit_note" && (row.invoice_uid || row.payment_uid) ? (
+                      <div className="text-xs text-muted-foreground">
+                        {k("credits", { record: row.invoice_uid || row.payment_uid })}
+                        {row.original_entry_number ? ` (#${row.original_entry_number})` : ""}
+                      </div>
                     ) : null}
                     <div
                       className="font-mono text-xs text-muted-foreground max-w-[220px] truncate"
