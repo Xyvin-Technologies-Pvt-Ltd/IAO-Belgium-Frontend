@@ -789,7 +789,7 @@
         "guide": "Guide"
       },
       "missing": {
-        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s), {{creditNotes}} credit note(s)), since {{since}}. Add them to To send, then preview and send them there.",
+        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s), {{creditNotes}} credit note(s), {{switches}} location switch invoice(s)), since {{since}}. Add them to To send, then preview and send them there.",
         "empty": "Nothing missing in Exact since {{since}}.",
         "loadFailed": "Failed to load records missing in Exact",
         "paidOn": "Paid on",
@@ -801,7 +801,8 @@
           "payment": "Payment",
           "third_party_invoice": "Third-party invoice",
           "kmo_invoice": "KMO invoice",
-          "credit_note": "Credit note"
+          "credit_note": "Credit note",
+          "switch_invoice": "Location switch invoice"
         },
         "queued": {
           "held": "In To send",
@@ -813,7 +814,8 @@
         "confirmAddAll": "Add all {{count}} record(s) matching this filter to To send? Nothing is sent yet — they wait in To send → Waiting.",
         "addedAll": "{{queued}} added to To send, {{refused}} not added (already queued or not eligible).",
         "addAllFailed": "Failed to add these records to To send",
-        "credits": "Credits {{record}}"
+        "credits": "Credits {{record}}",
+        "replaces": "New location — {{creditNote}} already credits the original"
       },
       "history": {
         "documents": "Documents",
@@ -1036,6 +1038,10 @@
             {
               "title": "Stuck in Sending",
               "text": "A record that Exact refuses is tried 3 times (about 2 minutes), then moves to Failed with the reason. While it retries, To send shows \"Retrying (attempt n of 3)\" and the last error. Click Stop to put it back in Waiting, or Send again now to start over."
+            },
+            {
+              "title": "Location switches",
+              "text": "The original Mollie payment is booked under its tr_ (xCore matches the payout on it). The credit note and the new-location invoice follow and cancel each other on the customer — the accountant matches those two. Missing offers the credit note once the payment is in Exact, and the new-location invoice once the credit note is in Exact."
             }
           ]
         },
