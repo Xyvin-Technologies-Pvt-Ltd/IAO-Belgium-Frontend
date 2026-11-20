@@ -738,14 +738,16 @@
           "blocked": "Blocked by checks",
           "exact_rejected": "Exact rejected",
           "pdf": "PDF",
-          "other": "Other"
+          "other": "Other",
+          "no_gl": "No GL"
         },
         "failedCategoryHint": {
           "customer": "Exact couldn't find or create the customer — usually the company's country. Fix it in Settings → Company countries, then retry.",
           "blocked": "IAO's checks stopped it before Exact (data missing or wrong). Open the preview to see what.",
           "exact_rejected": "Exact refused the sales entry. The reason is on the row.",
           "pdf": "The IAO invoice PDF could not be made or attached.",
-          "other": "Anything else (network, Exact unavailable…). Retrying usually helps."
+          "other": "Anything else (network, Exact unavailable…). Retrying usually helps.",
+          "no_gl": "No GL account is mapped for this record (skill day, no programme, or a missing Accounting Mapping). It is never sent to a default account — add the mapping, then Retry."
         },
         "retryAllShown": "Retry all shown ({{count}})",
         "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
@@ -815,7 +817,8 @@
         "addedAll": "{{queued}} added to To send, {{refused}} not added (already queued or not eligible).",
         "addAllFailed": "Failed to add these records to To send",
         "credits": "Credits {{record}}",
-        "replaces": "New location — {{creditNote}} already credits the original"
+        "replaces": "New location — {{creditNote}} already credits the original",
+        "noGl": "No GL"
       },
       "history": {
         "documents": "Documents",
@@ -1042,6 +1045,10 @@
             {
               "title": "Location switches",
               "text": "The original Mollie payment is booked under its tr_ (xCore matches the payout on it). The credit note and the new-location invoice follow and cancel each other on the customer — the accountant matches those two. Missing offers the credit note once the payment is in Exact, and the new-location invoice once the credit note is in Exact."
+            },
+            {
+              "title": "No GL account",
+              "text": "IAO never books on a default or test account any more. A record whose programme has no Accounting Mapping — or a skill day, which isn't mapped yet — shows \"No GL\" in Missing, is blocked in the preview and lands in To send → Failed → No GL. Add the mapping, then Retry."
             }
           ]
         },
@@ -1137,7 +1144,8 @@
           "mollie_unknown": "Mollie payment not in IAO",
           "refund_not_booked": "Refund not booked",
           "not_in_payout": "Paid, in no payout",
-          "customer_gone": "Exact customer gone"
+          "customer_gone": "Exact customer gone",
+          "no_gl": "No GL account"
         },
         "hint": {
           "missing": "Should be in Exact but nothing was found. Send it from To send → Missing (check the period with the accountant for old months).",
@@ -1151,7 +1159,8 @@
           "mollie_unknown": "Mollie paid it out, but IAO has no payment with this Mollie ID.",
           "refund_not_booked": "Mollie refund or chargeback that isn't booked in Exact (no credit note, or the city-switch credit note / new invoice not sent yet).",
           "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet.",
-          "customer_gone": "The company's saved Exact customer no longer exists (merged or deleted in Exact). The next send follows the merge or looks the company up again; nothing to do unless it keeps failing."
+          "customer_gone": "The company's saved Exact customer no longer exists (merged or deleted in Exact). The next send follows the merge or looks the company up again; nothing to do unless it keeps failing.",
+          "no_gl": "Should be in Exact but has no GL account mapped, so sending is blocked. Add the Accounting Mapping (or, for skill days, ask the accountant), then send."
         },
         "plan": {
           "title": "Accounting clean-up plan",

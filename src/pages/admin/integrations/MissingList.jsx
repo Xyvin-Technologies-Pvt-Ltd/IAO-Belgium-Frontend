@@ -189,6 +189,14 @@ const MissingList = ({ isConnected, canModify, filters = {}, filtersActive = fal
                     ) : (
                       <span className="text-xs text-muted-foreground">{k("notQueued")}</span>
                     )}
+                    {row.gl_problem ? (
+                      <div className="mt-1 max-w-[260px]">
+                        <span className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300">
+                          {k("noGl")}
+                        </span>
+                        <div className="text-xs text-red-700 dark:text-red-300 mt-0.5 whitespace-normal">{row.gl_problem.replace(/^No GL:\s*/, "")}</div>
+                      </div>
+                    ) : null}
                   </TableCell>
                   {canModify ? (
                     <TableCell className="text-right whitespace-nowrap">
