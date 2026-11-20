@@ -742,14 +742,16 @@
           "blocked": "Blocked by checks",
           "exact_rejected": "Exact rejected",
           "pdf": "PDF",
-          "other": "Other"
+          "other": "Other",
+          "check_exact": "Check Exact"
         },
         "failedCategoryHint": {
           "customer": "Exact couldn't find or create the customer — usually the company's country. Fix it in Settings → Company countries, then retry.",
           "blocked": "IAO's checks stopped it before Exact (data missing or wrong). Open the preview to see what.",
           "exact_rejected": "Exact refused the sales entry. The reason is on the row.",
           "pdf": "The IAO invoice PDF could not be made or attached.",
-          "other": "Anything else (network, Exact unavailable…). Retrying usually helps."
+          "other": "Anything else (network, Exact unavailable…). Retrying usually helps.",
+          "check_exact": "IAO sent this entry but got no clear answer from Exact, so it may already be booked. Look it up in Exact by the Your ref. on the row; if it isn't there, click Retry (IAO searches again first and never books it twice)."
         },
         "retryAllShown": "Retry all shown ({{count}})",
         "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
@@ -1046,6 +1048,10 @@
             {
               "title": "Location switches",
               "text": "The original Mollie payment is booked under its tr_ (xCore matches the payout on it). The credit note and the new-location invoice follow and cancel each other on the customer — the accountant matches those two. Missing offers the credit note once the payment is in Exact, and the new-location invoice once the credit note is in Exact."
+            },
+            {
+              "title": "Check Exact",
+              "text": "If Exact doesn't answer clearly after IAO sent an entry (timeout), IAO never re-sends it on its own. The record lands in To send → Failed → Check Exact: look for its Your ref. in Exact, and click Retry only if it isn't there."
             }
           ]
         },
