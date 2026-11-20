@@ -12,6 +12,11 @@ export const submitTeacherIdPhoto = async (photo_key) => {
   return response.data;
 };
 
+export const getTeacherGoogleWalletSaveUrl = async () => {
+  const response = await axiosInstance.get("/teacher-id-card/me/wallet/google");
+  return response.data;
+};
+
 export const getTeacherIdCards = async (params = {}) => {
   const response = await axiosInstance.get("/teacher-id-card", { params });
   return response.data;

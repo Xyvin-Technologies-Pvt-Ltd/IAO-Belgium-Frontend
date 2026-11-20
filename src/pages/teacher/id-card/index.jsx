@@ -6,6 +6,7 @@ import StudentIdPhotoCropModal from "@/components/admin/student-id/StudentIdPhot
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
+  useAddTeacherIdToGoogleWallet,
   useMyTeacherId,
   useSubmitTeacherIdPhoto,
 } from "@/store/useTeacherIdStore";
@@ -28,6 +29,7 @@ const PANEL_CLASS =
 const TeacherIdCardPage = () => {
   const { data, isLoading } = useMyTeacherId();
   const submitMutation = useSubmitTeacherIdPhoto();
+  const googleWalletMutation = useAddTeacherIdToGoogleWallet();
   const [photoOpen, setPhotoOpen] = useState(false);
 
   const payload = data?.data || data;
@@ -200,6 +202,15 @@ const TeacherIdCardPage = () => {
         <div className="w-full max-w-xl p-2">
           <IdCardFront card={current} hideProgram />
         </div>
+        <Button
+          type="button"
+          disabled={googleWalletMutation.isPending}
+          onClick={() => googleWalletMutation.mutate()}
+        >
+          {googleWalletMutation.isPending
+            ? "Opening Google Wallet…"
+            : "Add to Google Wallet"}
+        </Button>
 
         {previous.length > 0 ? (
           <div className="w-full max-w-2xl mt-4">

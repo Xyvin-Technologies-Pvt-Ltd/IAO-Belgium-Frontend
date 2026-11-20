@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   approveTeacherIdCard,
   getMyTeacherId,
+  getTeacherGoogleWalletSaveUrl,
   getTeacherIdCards,
   getTeacherIdUserActivity,
   getTeacherIdUserCard,
@@ -34,6 +35,25 @@ export const useSubmitTeacherIdPhoto = () => {
     },
     onError: (error) => {
       toast.error(apiErrorMessage(error, "Failed to submit photo"));
+    },
+  });
+};
+
+export const useAddTeacherIdToGoogleWallet = () => {
+  return useMutation({
+    mutationFn: getTeacherGoogleWalletSaveUrl,
+    onSuccess: (payload) => {
+      const saveUrl = payload?.data?.save_url || payload?.save_url;
+      if (!saveUrl) {
+        toast.error("Google Wallet link was not returned");
+        return;
+      }
+      window.open(saveUrl, "_blank", "noopener,noreferrer");
+    },
+    onError: (error) => {
+      toast.error(
+        apiErrorMessage(error, "Failed to add card to Google Wallet"),
+      );
     },
   });
 };

@@ -43,6 +43,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
   const [titleSearchTerm, setTitleSearchTerm] = useState("");
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [motherTongueSearchTerm, setMotherTongueSearchTerm] = useState("");
+  const [preferredLanguageSearchTerm, setPreferredLanguageSearchTerm] = useState("");
   const [contractTypeSearchTerm, setContractTypeSearchTerm] = useState("");
   const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
   const [regionSearchTerm, setRegionSearchTerm] = useState("");
@@ -83,6 +84,18 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       { ...(motherTongueSearchTerm && { search: motherTongueSearchTerm }) },
       { enabled: open }
     );
+  const { data: preferredLanguagesData, isLoading: preferredLanguagesLoading } =
+    useGetAllLanguages(
+      {
+        ...(preferredLanguageSearchTerm && {
+          search: preferredLanguageSearchTerm,
+        }),
+      },
+      { enabled: open }
+    );
+  const idCardLanguages = (preferredLanguagesData?.data || []).filter(
+    (lang) => !!lang.code
+  );
   const { data: contractTypesData, isLoading: contractTypesLoading } =
     useGetAllContractTypes(
       { ...(contractTypeSearchTerm && { search: contractTypeSearchTerm }) },
@@ -132,6 +145,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       academic_degree: [],
       teacher_role: "",
       mother_tongue: "",
+      preferred_language: "",
       contract_type: "",
       department: [],
       region: [],
@@ -168,6 +182,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
       academic_degree: [],
       teacher_role: "",
       mother_tongue: "",
+      preferred_language: "",
       contract_type: "",
       department: [],
       region: [],
@@ -179,6 +194,7 @@ const CreateTeacher = ({ open, onClose, teacherData }) => {
     setTitleSearchTerm("");
     setRoleSearchTerm("");
     setMotherTongueSearchTerm("");
+    setPreferredLanguageSearchTerm("");
     setContractTypeSearchTerm("");
     setDepartmentSearchTerm("");
     setRegionSearchTerm("");
@@ -224,6 +240,10 @@ const resolveDropdownId = (val, dropdownData = []) => {
 
     const teacherRoleId = resolveDropdownId(teacherData.teacher_role, rolesData?.data);
     const motherTongueId = resolveDropdownId(teacherData.mother_tongue, motherTonguesData?.data);
+    const preferredLanguageId = resolveDropdownId(
+      teacherData.preferred_language,
+      preferredLanguagesData?.data
+    );
     const contractTypeId = resolveDropdownId(teacherData.contract_type, contractTypesData?.data);
     // academic_degree may arrive as a single object (legacy) or an array (new)
     const academicDegreeArr = Array.isArray(teacherData.academic_degree)
@@ -244,6 +264,7 @@ const resolveDropdownId = (val, dropdownData = []) => {
       academic_degree: academicDegreeArr,
       teacher_role: teacherRoleId,
       mother_tongue: motherTongueId,
+      preferred_language: preferredLanguageId,
       contract_type: contractTypeId,
       department: Array.isArray(teacherData.department) ? teacherData.department : [],
       region: Array.isArray(teacherData.region) ? teacherData.region : [],
@@ -274,13 +295,34 @@ const resolveDropdownId = (val, dropdownData = []) => {
         setValue("mother_tongue", resolvedMotherTongue);
       }
     }
+    if (preferredLanguagesData?.data?.length) {
+      const resolvedPreferredLanguage = resolveDropdownId(
+        teacherData.preferred_language,
+        preferredLanguagesData.data
+      );
+      if (resolvedPreferredLanguage) {
+        setValue("preferred_language", resolvedPreferredLanguage, {
+          shouldValidate: true,
+        });
+        clearErrors("preferred_language");
+      }
+    }
     if (contractTypesData?.data?.length) {
       const resolvedContractType = resolveDropdownId(teacherData.contract_type, contractTypesData.data);
       if (resolvedContractType) {
         setValue("contract_type", resolvedContractType);
       }
     }
-  }, [open, teacherData, rolesData, motherTonguesData, contractTypesData, setValue]);
+  }, [
+    open,
+    teacherData,
+    rolesData,
+    motherTonguesData,
+    preferredLanguagesData,
+    contractTypesData,
+    setValue,
+    clearErrors,
+  ]);
 
   const onSubmit = (data) => {
     const payload = {
@@ -295,6 +337,7 @@ const resolveDropdownId = (val, dropdownData = []) => {
 
     // Drop empty optional single-selects so the backend doesn't receive blank ids
     if (!payload.mother_tongue) delete payload.mother_tongue;
+    if (!payload.preferred_language) delete payload.preferred_language;
     if (!payload.contract_type) delete payload.contract_type;
 
     if (isEdit && teacherData) {
@@ -464,6 +507,31 @@ const resolveDropdownId = (val, dropdownData = []) => {
                     onSearch={setMotherTongueSearchTerm}
                     isLoading={motherTonguesLoading}
                     error={errors.mother_tongue?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="preferred_language"
+                control={control}
+                render={({ field }) => (
+                  <SearchableSelect
+                    label={t(
+                      "teacherManagement.modal.preferredLanguageLabel",
+                      "IAO ID Language",
+                    )}
+                    placeholder={t(
+                      "teacherManagement.modal.preferredLanguagePlaceholder",
+                      "Select IAO ID language",
+                    )}
+                    searchPlaceholder={t("common.searchLanguages")}
+                    items={idCardLanguages}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onSearch={setPreferredLanguageSearchTerm}
+                    isLoading={preferredLanguagesLoading}
+                    error={errors.preferred_language?.message}
+                    required
                   />
                 )}
               />
