@@ -753,7 +753,19 @@
         },
         "retryAllShown": "Retry all shown ({{count}})",
         "confirmRetryAll": "Retry {{count}} failed record(s)? Each is checked again and sent to Exact; records with problems fail again and stay here.",
-        "editCompany": "Edit company"
+        "editCompany": "Edit company",
+        "sendAllShown": "Send all shown ({{count}})",
+        "confirmSendAll": "Send {{count}} waiting record(s) to Exact? Each is checked the same way as when you click Send on it; records with problems fail and stay in To send.",
+        "retrying": "Retrying (attempt {{n}} of {{max}})",
+        "lastError": "Last error",
+        "nextTry": "Next try around {{at}}",
+        "stop": "Stop",
+        "stopHint": "Stop sending: back to Waiting with a fresh retry count. Nothing is sent until you click Send.",
+        "sendAgain": "Send again now",
+        "sendAgainHint": "Start over now with a fresh retry count.",
+        "stopAllSending": "Stop all sending ({{count}})",
+        "confirmStopAll": "Stop {{count}} record(s) that are sending or retrying? They go back to Waiting; nothing is sent until you click Send.",
+        "stoppedNote": "Stopped {{at}} — waiting for Send"
       },
       "filters": {
         "searchPlaceholder": "Search name, email, IAO number, invoice number, Mollie ID (tr_…), Your ref., Exact entry, company",
@@ -766,18 +778,22 @@
           "to_send": "Dates filter on the IAO document date. Every word you type must match.",
           "missing": "Dates filter on the payment date. Every word you type must match.",
           "history": "Dates filter on the date it was sent to Exact. Every word you type must match.",
-          "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number."
+          "payouts": "Dates filter on the payout date. Search a payout number, Mollie ID (tr_…) or IAO payment number.",
+          "audit": "Dates filter on the IAO record date (or the Exact / Mollie date when there is no IAO record). Search an IAO number, Mollie ID, Exact entry number or name.",
+          "kmo": "Dates filter on the KMO invoice date. Search an invoice number, module, company, student, project number or Exact entry number."
         }
       },
       "tabs": {
         "to_send": "To send",
         "payouts": "Payouts",
         "history": "History",
+        "audit": "Audit",
+        "kmo": "KMOP",
         "settings": "Settings",
         "guide": "Guide"
       },
       "missing": {
-        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s)), paid since {{since}}. Add one to To send, then preview and send it there.",
+        "banner": "{{count}} record(s) should be in Exact but aren't ({{payments}} payment(s), {{invoices}} third-party invoice(s), {{kmo}} KMO invoice(s), {{creditNotes}} credit note(s), {{switches}} location switch invoice(s)), since {{since}}. Add them to To send, then preview and send them there.",
         "empty": "Nothing missing in Exact since {{since}}.",
         "loadFailed": "Failed to load records missing in Exact",
         "paidOn": "Paid on",
@@ -787,13 +803,23 @@
         "addHint": "Puts this record in To send (Waiting). Nothing is sent until you preview it and click Send there.",
         "kind": {
           "payment": "Payment",
-          "third_party_invoice": "Third-party invoice"
+          "third_party_invoice": "Third-party invoice",
+          "kmo_invoice": "KMO invoice",
+          "credit_note": "Credit note",
+          "switch_invoice": "Location switch invoice"
         },
         "queued": {
           "held": "In To send",
           "failed": "Failed in To send",
           "sending": "Sending"
-        }
+        },
+        "addAll": "Add all {{count}} to To send",
+        "addingAll": "Adding… {{done}} / {{total}}",
+        "confirmAddAll": "Add all {{count}} record(s) matching this filter to To send? Nothing is sent yet — they wait in To send → Waiting.",
+        "addedAll": "{{queued}} added to To send, {{refused}} not added (already queued or not eligible).",
+        "addAllFailed": "Failed to add these records to To send",
+        "credits": "Credits {{record}}",
+        "replaces": "New location — {{creditNote}} already credits the original"
       },
       "history": {
         "documents": "Documents",
@@ -901,7 +927,15 @@
         "exporting": "Exporting…",
         "exportFailed": "Failed to export this payout",
         "openInToSend": "Open this record in To send",
-        "openInHistory": "Open this record in History"
+        "openInHistory": "Open this record in History",
+        "refundStatus": {
+          "switch_booked": "City switch — credit note + new invoice in Exact (match by hand)",
+          "switch_not_in_exact": "City switch — credit note or new invoice not in Exact yet",
+          "credit_note_booked": "Credit note in Exact (match by hand)",
+          "not_booked": "No credit note in IAO/Exact",
+          "chargeback": "Chargeback (match by hand)",
+          "unknown_payment": "Payment not in IAO"
+        }
       },
       "guide": {
         "intro": "How IAO sends payments to Exact Online, how xCore matches them with Mollie payouts, and how to use these tabs.",
@@ -920,7 +954,7 @@
           "items": [
             {
               "title": "To send → Waiting",
-              "text": "Records ready for Exact. Open Preview, check customer, date, amount and Your ref., then click Send."
+              "text": "Records ready for Exact. Open Preview, check customer, date, amount and Your ref., then click Send — or \"Send all shown\" once you've checked a few."
             },
             {
               "title": "To send → Failed",
@@ -928,7 +962,7 @@
             },
             {
               "title": "To send → Missing",
-              "text": "Records that should be in Exact but are not, paid since 18 Aug 2026. \"Add to To send\" only puts the record in Waiting — nothing is sent until you preview and send it."
+              "text": "Records that should be in Exact but are not: payments, third-party invoices, KMO invoices (KMO: Your ref. = invoice number, module name in the description) and credit notes whose original invoice is already in Exact. \"Add to To send\" or \"Add all\" only puts them in Waiting — nothing is sent until you send them there. An invoice that was credited before it reached Exact is never sent."
             },
             {
               "title": "Payouts",
@@ -937,6 +971,14 @@
             {
               "title": "History",
               "text": "Everything already in Exact. Documents: one row per IAO document with Verify and CSV export. GL lines: one row per general ledger line for the accountant."
+            },
+            {
+              "title": "Audit",
+              "text": "The accounting clean-up plan and a read-only check of every IAO record against Exact and Mollie, grouped by problem. Duplicates have \"Credit\"; records Exact already has get \"Link\". Every morning at 06:45 it re-checks and marks what is new. \"Pull from Exact\" refreshes the Exact copy; nothing in Exact is changed by the check itself."
+            },
+            {
+              "title": "KMOP",
+              "text": "Every KMO(P) invoice and where it stands in Exact: OK, Old format (in Exact but the description doesn't name the module), No reference, Missing, Waiting or Failed. \"Add missing to To send\" puts the unsent ones in Waiting. The \"Credit note not in Exact\" card lists rejected KMO applications whose credit note still has to be sent. Credit notes show the original IAO invoice number in their Exact description."
             },
             {
               "title": "Settings",
@@ -992,6 +1034,18 @@
             {
               "title": "\"Send waiting\" on a payout",
               "text": "sends all of that payout's waiting records at once. Each is still checked, and records with problems fail and stay in To send — but preview a few first."
+            },
+            {
+              "title": "Merging or deleting customers in Exact",
+              "text": "is fine: when a company's saved customer is gone, IAO follows the merge on the next send (or looks the company up again). The nightly audit lists such companies under \"Exact customer gone\". Please tell the IAO team when you merge customers."
+            },
+            {
+              "title": "Stuck in Sending",
+              "text": "A record that Exact refuses is tried 3 times (about 2 minutes), then moves to Failed with the reason. While it retries, To send shows \"Retrying (attempt n of 3)\" and the last error. Click Stop to put it back in Waiting, or Send again now to start over."
+            },
+            {
+              "title": "Location switches",
+              "text": "The original Mollie payment is booked under its tr_ (xCore matches the payout on it). The credit note and the new-location invoice follow and cancel each other on the customer — the accountant matches those two. Missing offers the credit note once the payment is in Exact, and the new-location invoice once the credit note is in Exact."
             }
           ]
         },
@@ -1008,7 +1062,7 @@
             },
             {
               "title": "KMO invoices",
-              "text": "list unsent KMO invoices in Missing too."
+              "text": "done — see the KMOP tab. Next: the accountant decides whether the older KMO entries that don't name the module need fixing in Exact."
             },
             {
               "title": "Company countries",
@@ -1046,6 +1100,231 @@
         "unsentCount": "{{count}} unsent",
         "pickCountry": "Pick country",
         "afterFix": "After fixing, go to To send → Failed → Customer and click \"Retry all shown\"."
+      },
+      "audit": {
+        "copyTitle": "Copy of the Exact sales journal",
+        "pull": "Pull from Exact",
+        "pulling": "Copying…",
+        "pullRunning": "Copying from Exact… {{pages}} page(s), {{entries}} entries so far.",
+        "pullDone": "Last copied from Exact {{when}}.",
+        "pullFailed": "Last copy failed: {{error}}",
+        "pullNever": "Not copied yet — click \"Pull from Exact\". Read-only: nothing in Exact is changed.",
+        "coverage": "Checked {{records}} IAO records ({{ok}} without problems) against {{entries}} Exact entries (#{{first}}–#{{last}}) and {{payouts}} Mollie payouts.",
+        "generated": "audit built {{when}}",
+        "noCopy": "Exact hasn't been copied yet, so only the IAO and Mollie checks ran. Click \"Pull from Exact\" to also find duplicates, entries IAO doesn't know, amount and customer problems, and old references.",
+        "needsCopy": "needs the Exact copy",
+        "loadFailed": "Failed to build the audit",
+        "issuesFound": "{{count}} problem(s) found. Click a category to see its records.",
+        "noIssues": "No problems found.",
+        "export": "Export CSV",
+        "exportFailed": "Failed to export the audit",
+        "stepLabel": "Fixed in plan step {{step}}",
+        "col": {
+          "date": "Date",
+          "problem": "Problem",
+          "iao": "IAO record",
+          "iaoAmount": "IAO amount",
+          "exact": "Exact entry",
+          "exactAmount": "Exact amount",
+          "detail": "Detail",
+          "action": "Action"
+        },
+        "category": {
+          "missing": "Missing in Exact",
+          "link_missing": "In Exact, not linked in IAO",
+          "not_found_in_exact": "Linked, but not in Exact",
+          "duplicate": "Duplicate in Exact",
+          "unknown_in_exact": "In Exact, unknown to IAO",
+          "amount_mismatch": "Amount differs",
+          "wrong_customer": "Fallback customer",
+          "old_reference": "Old reference (xCore)",
+          "mollie_unknown": "Mollie payment not in IAO",
+          "refund_not_booked": "Refund not booked",
+          "not_in_payout": "Paid, in no payout",
+          "customer_gone": "Exact customer gone"
+        },
+        "hint": {
+          "missing": "Should be in Exact but nothing was found. Send it from To send → Missing (check the period with the accountant for old months).",
+          "link_missing": "Exact has an entry with this record's reference, but IAO isn't linked to it. \"Link\" connects them (one clear match with the same amount) so it's never sent again.",
+          "not_found_in_exact": "IAO points to an Exact entry number that isn't in the Exact sales journal (deleted or moved?). Check in Exact.",
+          "duplicate": "A second Exact entry for the same IAO record (e.g. 23 Oct). The extra one should be credited.",
+          "unknown_in_exact": "An Exact entry no IAO record explains: a duplicate, a test, or a manual entry by the accountant.",
+          "amount_mismatch": "IAO and Exact amounts differ.",
+          "wrong_customer": "Booked on the fallback customer instead of the student or company.",
+          "old_reference": "In Exact under the invoice number, not the Mollie ID, so xCore can't match it automatically.",
+          "mollie_unknown": "Mollie paid it out, but IAO has no payment with this Mollie ID.",
+          "refund_not_booked": "Mollie refund or chargeback that isn't booked in Exact (no credit note, or the city-switch credit note / new invoice not sent yet).",
+          "not_in_payout": "Paid in IAO with a Mollie ID more than 10 days ago, but in no Mollie payout yet.",
+          "customer_gone": "The company's saved Exact customer no longer exists (merged or deleted in Exact). The next send follows the merge or looks the company up again; nothing to do unless it keeps failing."
+        },
+        "plan": {
+          "title": "Accounting clean-up plan",
+          "intro": "Goal: every payment from day 1 correct in IAO, Exact and Mollie, and xCore able to match every payout.",
+          "status": {
+            "done": "live",
+            "partial": "partly live",
+            "planned": "planned"
+          },
+          "steps": {
+            "audit": {
+              "title": "Audit everything (this page)",
+              "text": "Every IAO payment, invoice and credit note since the first payment is compared with a read-only copy of the Exact sales journal and the Mollie payouts. Each problem gets one category (A–G below). Nothing is changed.",
+              "items": []
+            },
+            "decide": {
+              "title": "Decide with the accountant",
+              "text": "Questions only the accountant can answer:",
+              "items": [
+                "Fix old records in their original month (Aug–Oct) or in the current month? (closed periods, Q3 VAT already filed)",
+                "Records in Exact under the invoice number: re-post them under the Mollie ID so xCore matches, or book those payouts by hand?",
+                "Gap payments (25 Aug – 22 Sep): was any of that revenue booked by hand? (avoid booking it twice)",
+                "Duplicates and Exact entries unknown to IAO: credit them, or were some entered by hand on purpose?"
+              ]
+            },
+            "fix": {
+              "title": "Fix — preview, test on one, then batch",
+              "text": "Every fix goes through the same safe sending path (strict duplicate check), so a fix can't create a new duplicate.",
+              "items": [
+                "Missing → To send → Send, incl. KMO invoices and \"Add all\" / \"Send all shown\" (live now)",
+                "Company countries fix + Retry all (live now)",
+                "Credit duplicate: a credit entry for the extra Exact copy, from Audit → Duplicates (live now)",
+                "Link missing: connect IAO records to the Exact entry Exact already has (live now)",
+                "Refunds tracked: each Mollie refund linked to its payment, credit note and switch invoice (live now; matching in xCore by hand)",
+                "Re-post for xCore: reverse the old entry and post it again under the Mollie ID (planned, if the accountant chooses it)"
+              ]
+            },
+            "confirm": {
+              "title": "Confirm and keep it clean",
+              "text": "Run the audit again until every category is 0 or accepted by the accountant, then rematch the old payouts in xCore.",
+              "items": [
+                "Nightly check at 06:45: copy from Exact + audit, with a \"new\" badge on the Audit tab (live now)"
+              ]
+            }
+          }
+        },
+        "exporting": "Exporting…",
+        "credit": {
+          "button": "Credit",
+          "title": "Credit duplicate Exact entry {{number}}",
+          "intro": "Posts a credit entry in Exact that cancels this duplicate: same customer, same GL accounts and VAT, amounts negated. The copy IAO is linked to stays as it is.",
+          "date": {
+            "today": "Date: today",
+            "original": "Date: same as the duplicate"
+          },
+          "loading": "Reading the duplicate from Exact…",
+          "loadFailed": "Couldn't build the credit",
+          "ready": "Ready to post.",
+          "blocked": "Can't be credited:",
+          "alreadyInExact": "A credit for this duplicate already exists in Exact (entry {{number}}). Click \"Record it\" to mark the duplicate as settled — nothing new is posted.",
+          "duplicate": "Duplicate in Exact",
+          "iaoRecord": "IAO record it duplicates",
+          "creditTitle": "Credit that will be posted",
+          "entry": "Entry",
+          "entryDate": "Date",
+          "yourRef": "Your ref.",
+          "customer": "Customer",
+          "amount": "Amount",
+          "record": "IAO record",
+          "payment": "Payment",
+          "why": "Why",
+          "description": "Description",
+          "total": "Total",
+          "vat": "VAT code",
+          "after": "After posting, ask the accountant to match the duplicate with this credit in Exact (same customer, same amount).",
+          "post": "Post credit in Exact",
+          "recordExisting": "Record it",
+          "posting": "Posting…",
+          "confirm": "Post a credit of {{amount}} EUR in Exact to cancel duplicate entry {{number}}?"
+        },
+        "nightly": {
+          "badge": "{{count}} new",
+          "first": "Nightly check ran {{when}} (first run — from tomorrow it shows what is new).",
+          "summary": "Nightly check {{when}}: {{count}} new problem(s) since the night before ({{total}} open in total).",
+          "pullError": "copying from Exact failed: {{error}}",
+          "showNew": "Show only the {{count}} new",
+          "showAll": "Show all",
+          "never": "The nightly check runs every morning at 06:45 (copy from Exact + audit) and shows here what is new."
+        },
+        "link": {
+          "button": "Link",
+          "all": "Link all that match",
+          "linking": "Linking…",
+          "byHand": "check by hand",
+          "noneLinkable": "Nothing can be linked automatically here (several matches or a different amount).",
+          "confirmAll": "Link {{count}} IAO record(s) to the Exact entry found by their reference? Only IAO is updated; nothing is posted to Exact.",
+          "done": "{{linked}} linked, {{skipped}} left for a person.",
+          "failed": "Failed to link these records"
+        }
+      },
+      "kmo": {
+        "rule": "KMO(P) invoices have no Mollie payment. In Exact, Your ref. must be the IAO invoice number and the description must name the module.",
+        "flow": "Send through To send: “Add missing to To send” puts them in Waiting; nothing is posted until you press Send. A rejected KMO application gets a credit note, which is sent only if the invoice is in Exact.",
+        "state": {
+          "ok": "OK",
+          "old_format": "Old format",
+          "no_reference": "No reference",
+          "not_in_exact_copy": "Not in Exact copy",
+          "waiting": "Waiting",
+          "failed": "Failed",
+          "sending": "Sending",
+          "missing": "Missing",
+          "not_needed": "Not needed"
+        },
+        "hint": {
+          "ok": "In Exact with the invoice number and module name.",
+          "old_format": "In Exact with the invoice number, but the description doesn't name the module (older posting).",
+          "no_reference": "Linked to an Exact entry with an empty Your ref.",
+          "not_in_exact_copy": "IAO says it was sent, but the entry isn't in the Exact copy. Pull from Exact, then check.",
+          "waiting": "In To send, waiting for Send.",
+          "failed": "Sending failed. See To send → Failed.",
+          "sending": "Being posted to Exact right now.",
+          "missing": "Never sent to Exact.",
+          "not_needed": "Not sendable: cancelled, draft, or credited before it reached Exact (then it is never sent)."
+        },
+        "creditMissing": "Credit note not in Exact",
+        "creditMissingHint": "Credit note of a KMO invoice that is in Exact, not in Exact itself yet. Add it to To send, then Send.",
+        "kmoStatus": "KMO status",
+        "allStatuses": "All statuses ({{count}})",
+        "kmo": {
+          "waiting": "Waiting",
+          "submitted": "Submitted",
+          "contribution_received": "Contribution received",
+          "payment_released": "Payment released",
+          "paid": "Paid",
+          "rejected": "Rejected"
+        },
+        "addMissing": "Add missing to To send ({{count}})",
+        "adding": "Adding…",
+        "confirmAdd": "Add {{count}} missing KMO invoices to To send? They wait there until you press Send.",
+        "added": "{{queued}} added to To send, {{refused}} refused.",
+        "addFailed": "Could not add the invoices to To send.",
+        "export": "Export CSV",
+        "exportFailed": "Export failed.",
+        "empty": "No KMO invoices yet.",
+        "loadFailed": "Could not load the KMO invoices.",
+        "col": {
+          "invoice": "Invoice",
+          "who": "Company / student",
+          "module": "Module",
+          "kmo": "KMO",
+          "amount": "Amount",
+          "exact": "Exact",
+          "state": "State"
+        },
+        "noRef": "no Your ref.",
+        "noDescription": "no description",
+        "creditNotInExact": "not in Exact",
+        "creditState": {
+          "in_exact": "in Exact",
+          "waiting": "waiting in To send",
+          "sending": "sending",
+          "failed": "failed in To send",
+          "missing": "not in Exact",
+          "not_needed": "not needed (invoice not in Exact)"
+        },
+        "addCredit": "Add to To send",
+        "addCredits": "Add credit notes to To send ({{count}})",
+        "confirmAddCredits": "Add {{count}} credit note(s) to To send? Each credits a KMO invoice that is already in Exact. Nothing is sent until you preview and Send them in To send."
       }
     }
   },

@@ -275,7 +275,19 @@ const PayoutDetailDialog = ({ settlementId, onClose, onOpenRecord, isConnected, 
                         )}
                         <div className="text-xs text-muted-foreground mt-1">
                           {l.exact_entry_number ? `#${l.exact_entry_number} · ` : ""}
-                          {l.your_ref ? `${p("yourRef")}: ${l.your_ref}` : p(`lineHint.${l.status}`)}
+                          {l.refund
+                            ? [
+                                p(`refundStatus.${l.refund.status}`),
+                                l.refund.credit_note_uid &&
+                                  `${l.refund.credit_note_uid}${l.refund.credit_note_entry ? ` #${l.refund.credit_note_entry}` : ""}`,
+                                l.refund.switch_invoice_uid &&
+                                  `${l.refund.switch_invoice_uid}${l.refund.switch_invoice_entry ? ` #${l.refund.switch_invoice_entry}` : ""}`,
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")
+                            : l.your_ref
+                              ? `${p("yourRef")}: ${l.your_ref}`
+                              : p(`lineHint.${l.status}`)}
                         </div>
                       </TableCell>
                     </TableRow>

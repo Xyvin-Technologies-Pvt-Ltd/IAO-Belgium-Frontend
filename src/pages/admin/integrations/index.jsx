@@ -5,12 +5,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { useGetExactStatus, useGetExactSendMode, useGetExactToSend } from "@/store/useExactStore";
+import { useGetExactStatus, useGetExactSendMode, useGetExactToSend, useGetExactAuditNightly } from "@/store/useExactStore";
 import { useTranslation } from "react-i18next";
 import { useCanModify } from "@/hooks/useCanModify";
 import ToSendTab from "./ToSendTab";
 import HistoryTab from "./HistoryTab";
 import PayoutsTab from "./PayoutsTab";
+import AuditTab from "./AuditTab";
+import KmoTab from "./KmoTab";
 import SettingsTab from "./SettingsTab";
 import GuideTab from "./GuideTab";
 import IntegrationsFilterBar from "./IntegrationsFilterBar";
@@ -21,8 +23,8 @@ const apiBase = import.meta.env.VITE_APP_API_URL || "http://localhost:3005/api/v
 //* To send: what still has to reach Exact (Waiting / Failed / Missing).
 //* Payouts: Mollie payouts and whether xCore can match them.
 //* History: what is already in Exact. Settings: send mode, checks, tools.
-//* Guide: how it all works, what to watch out for, what is next.
-const TABS = ["to_send", "payouts", "history", "settings", "guide"];
+//* Audit: IAO ↔ Exact ↔ Mollie check (clean-up plan). Guide: how it all works.
+const TABS = ["to_send", "payouts", "history", "audit", "kmo", "settings", "guide"];
 //* Tabs without the search / date filter.
 const NO_FILTER_TABS = ["settings", "guide"];
 
@@ -59,6 +61,9 @@ const IntegrationsPage = () => {
   const { data: sendModeResponse } = useGetExactSendMode();
   //* Badge on the To send tab while another tab is open.
   const { data: toSendResponse } = useGetExactToSend({}, { enabled: tab !== "to_send" });
+  //* "new" badge on the Audit tab (issues the nightly audit saw for the first time).
+  const { data: nightlyResponse } = useGetExactAuditNightly();
+  const auditNew = nightlyResponse?.data?.new_count || 0;
 
   const status = statusResponse?.data;
   const isConnected = Boolean(status?.connected);
@@ -115,7 +120,7 @@ const IntegrationsPage = () => {
 
   //* Which date the filter uses, shown under the fields.
   let filterHintKey = "to_send";
-  if (tab === "history" || tab === "payouts") filterHintKey = tab;
+  if (tab === "history" || tab === "payouts" || tab === "audit" || tab === "kmo") filterHintKey = tab;
   else if (toSendView === "missing") filterHintKey = "missing";
 
   if (isLoading) {
@@ -211,6 +216,11 @@ const IntegrationsPage = () => {
             >
               {t(`integrations.exact.tabs.${key}`)}
               {key === "to_send" && tab !== "to_send" && toSendWaiting > 0 ? ` (${toSendWaiting})` : ""}
+              {key === "audit" && auditNew > 0 ? (
+                <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  {t("integrations.exact.audit.nightly.badge", { count: auditNew })}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -254,6 +264,28 @@ const IntegrationsPage = () => {
           <HistoryTab
             view={historyView}
             onViewChange={changeHistoryView}
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            filters={filters}
+            filtersActive={filtersActive}
+          />
+        ) : tab === "audit" ? (
+          <AuditTab
+            canModify={canModify}
+            isConnected={isConnected}
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            filters={filters}
+            filtersActive={filtersActive}
+          />
+        ) : tab === "kmo" ? (
+          <KmoTab
+            canModify={canModify}
+            isConnected={isConnected}
             page={page}
             setPage={setPage}
             rowsPerPage={rowsPerPage}
