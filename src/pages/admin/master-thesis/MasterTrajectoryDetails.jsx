@@ -53,6 +53,7 @@ import {
   useExportTrajectoryStudentsDocumentsZip,
 } from "@/store/useThesisStore";
 import { useThesisAdminKind } from "@/hooks/useThesisAdminKind";
+import ExportMenu from "@/components/common/ExportMenu";
 
 export default function MasterTrajectoryDetails() {
   const { t } = useTranslation();
@@ -165,12 +166,12 @@ export default function MasterTrajectoryDetails() {
   const exportCsvPending = exportEnrolledCsvMutation.isPending;
   const exportZipPending = exportDocumentsZipMutation.isPending;
 
-  const handleExportCsv = () => {
+  const handleExportCsv = (format) => {
     const { page: _page, limit: _limit, ...exportParams } = enrolledParams;
     exportEnrolledCsvMutation.mutate({
       thesisId,
       trajectoryId,
-      params: exportParams,
+      params: exportParams, format,
     });
   };
 
@@ -770,18 +771,13 @@ export default function MasterTrajectoryDetails() {
             )}
             {!isQnaTab && (
               <>
-                <Button
-                  variant="outline"
+                <ExportMenu
                   size="sm"
-                  onClick={handleExportCsv}
-                  disabled={exportCsvPending || exportZipPending}
                   className="gap-2 h-9"
-                >
-                  <Download className="w-4 h-4" />
-                  {exportCsvPending
-                    ? t("common.exporting", "Exporting...")
-                    : t("common.exportCsv", "Export CSV")}
-                </Button>
+                  onExport={handleExportCsv}
+                  isPending={exportCsvPending}
+                  disabled={exportZipPending}
+                />
                 <Button
                   variant="outline"
                   size="sm"

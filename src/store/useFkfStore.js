@@ -1,3 +1,4 @@
+import { downloadCsv } from "@/utils/exportCsv";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFkfBulkInvoices,
@@ -85,17 +86,13 @@ export const useUnmarkFkfEligible = () => {
 
 export const useExportFkfStudents = () =>
   useMutation({
-    mutationFn: exportFkfStudents,
-    onSuccess: (blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "fkf-students.csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      toast.success("CSV exported");
+    mutationFn: (vars = {}) => {
+      const { format: _format, ...params } = vars; //* format only picks the file type
+      return exportFkfStudents(params);
+    },
+    onSuccess: (blob, vars) => {
+      downloadCsv(blob, "fkf-students", vars?.format);
+      toast.success("Export downloaded");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to export students");

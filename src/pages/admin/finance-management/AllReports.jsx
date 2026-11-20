@@ -24,6 +24,7 @@ import {
   getPaymentConvenienceFeeAmount,
   getPaymentModuleAmount,
 } from "@/utils/financePaymentUtils";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const AllReports = () => {
   const { t } = useTranslation();
@@ -167,17 +168,10 @@ const AllReports = () => {
             }}
           />
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="gap-2"
-              disabled={exportCsv.isPending}
-              onClick={() => exportCsv.mutate(listFilters)}
-            >
-              <Download className="h-4 w-4" />
-              {exportCsv.isPending
-                ? t("common.exporting", "Exporting…")
-                : t("common.exportCsv", "Export CSV")}
-            </Button>
+            <ExportMenu
+              isPending={exportCsv.isPending}
+              onExport={(format) => exportCsv.mutate({ ...listFilters, format })}
+            />
             <AllReportsFilterDrawer
               draftFilters={draftFilters}
               setDraftFilters={setDraftFilters}

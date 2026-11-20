@@ -1,3 +1,4 @@
+import { downloadCsv } from "@/utils/exportCsv";
 import {
   createThesis,
   getThesisById,
@@ -514,12 +515,12 @@ export const useExportTrajectoryFormDataCsv = () => {
   return useMutation({
     mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
       exportTrajectoryFormDataCsv(thesisId, trajectoryId, params),
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `trajectory-form-data-${Date.now()}.csv`);
-      toast.success("Form data CSV exported successfully");
+    onSuccess: (data, vars) => {
+      downloadCsv(data, "trajectory-form-data", vars?.format);
+      toast.success("Form data exported successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to export form data CSV");
+      toast.error(error?.message || "Failed to export form data");
     },
   });
 };
@@ -551,15 +552,12 @@ export const useExportTrajectoryStudentsCsv = () => {
   return useMutation({
     mutationFn: ({ thesisId, trajectoryId, params = {} }) =>
       exportTrajectoryStudentsCsv(thesisId, trajectoryId, params),
-    onSuccess: (data) => {
-      triggerBlobDownload(
-        data,
-        `trajectory-enrolled-${Date.now()}.csv`
-      );
-      toast.success("Enrolled students CSV exported successfully");
+    onSuccess: (data, vars) => {
+      downloadCsv(data, "trajectory-enrolled", vars?.format);
+      toast.success("Enrolled students exported successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to export enrolled students CSV");
+      toast.error(error?.message || "Failed to export enrolled students");
     },
   });
 };
@@ -587,12 +585,12 @@ export const useExportThesisEligibleStudentsCsv = () => {
   return useMutation({
     mutationFn: ({ thesisId, params = {} }) =>
       exportThesisEligibleStudentsCsv(thesisId, params),
-    onSuccess: (data) => {
-      triggerBlobDownload(data, `thesis-eligible-${Date.now()}.csv`);
-      toast.success("Eligible students CSV exported successfully");
+    onSuccess: (data, vars) => {
+      downloadCsv(data, "thesis-eligible", vars?.format);
+      toast.success("Eligible students exported successfully");
     },
     onError: (error) => {
-      toast.error(error?.message || "Failed to export eligible students CSV");
+      toast.error(error?.message || "Failed to export eligible students");
     },
   });
 };

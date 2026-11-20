@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const ViewPlanning = ({ open, onClose, planningData }) => {
   const { t } = useTranslation();
@@ -50,9 +51,9 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
 
   const exportStudentsCsvMutation = useExportPlanningStudentsCsv();
 
-  const handleExportStudentsCsv = () => {
+  const handleExportStudentsCsv = (format) => {
     if (planningId) {
-      exportStudentsCsvMutation.mutate(planningId);
+      exportStudentsCsvMutation.mutate({ id: planningId, format });
     }
   };
 
@@ -210,16 +211,14 @@ const ViewPlanning = ({ open, onClose, planningData }) => {
                   placeholder={t("planningManagement.view.searchStudents")}
                   className="sm:max-w-xs"
                 />
-                <Button
-                  variant="outline"
+                <ExportMenu
                   size="sm"
-                  onClick={handleExportStudentsCsv}
-                  disabled={exportStudentsCsvMutation.isPending || !planningId}
                   className="gap-2 whitespace-nowrap"
-                >
-                  <Download className="h-4 w-4" />
-                  {exportStudentsCsvMutation.isPending ? "Exporting..." : "Export Students"}
-                </Button>
+                  label="Export Students"
+                  onExport={handleExportStudentsCsv}
+                  isPending={exportStudentsCsvMutation.isPending}
+                  disabled={!planningId}
+                />
               </div>
             </div>
 

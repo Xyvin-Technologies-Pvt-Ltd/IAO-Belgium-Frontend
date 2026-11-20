@@ -30,6 +30,7 @@ import SharePlanningModal from "@/components/admin/planning/SharePlanningModal";
 import StatusBadge from "@/components/StatusBadge";
 import { getMoment } from "@/utils/dateUtils";
 import { useCanModify } from "@/hooks/useCanModify";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const PLANNING_FILTERS_KEY = "planning_filters";
 const PLANNING_SEARCH_KEY = "planning_search";
@@ -118,8 +119,8 @@ const PlanningTable = ({ activeCity }) => {
     useDeletePlanning();
   const exportPlanningsCsvMutation = useExportPlanningsCsv();
 
-  const handleExportCsv = () => {
-    exportPlanningsCsvMutation.mutate(queryFilters);
+  const handleExportCsv = (format) => {
+    exportPlanningsCsvMutation.mutate({ ...queryFilters, format });
   };
 
   const plannings = data?.data || [];
@@ -386,15 +387,10 @@ const PlanningTable = ({ activeCity }) => {
             setPage={setPage}
             activeCity={activeCity}
           />
-          <Button
-            variant="outline"
-            onClick={handleExportCsv}
-            disabled={exportPlanningsCsvMutation.isPending}
-            className="gap-2"
-          >
-            <Download className="h-4 w-4" />
-            {exportPlanningsCsvMutation.isPending ? "Exporting..." : "Export CSV"}
-          </Button>
+          <ExportMenu
+            onExport={handleExportCsv}
+            isPending={exportPlanningsCsvMutation.isPending}
+          />
         </div>
         {canModify && (
           <Button onClick={handleOpenCreate}>

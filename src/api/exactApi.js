@@ -190,9 +190,11 @@ export const getExactPayout = async (settlementId) => {
 };
 
 //* Raw CSV text for downloadCsv().
-export const exportExactPayout = async (settlementId) => {
+//* IPB-153: optional search — export only the payments matching it
+export const exportExactPayout = async (settlementId, search) => {
   try {
     const response = await axiosInstance.get(`/exact/payouts/${encodeURIComponent(settlementId)}/export`, {
+      params: search ? { search } : undefined,
       responseType: "text",
     });
     return response.data;
@@ -261,6 +263,172 @@ export const applyCompanyCountries = async () => {
 export const retryExactJobs = async (jobIds = []) => {
   try {
     const response = await axiosInstance.post("/exact/to-send/retry", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── Accounting audit (read-only) ────────────────────────────────────────────
+
+export const getExactAuditSummary = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/summary", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactAuditIssues = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/issues", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactAudit = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/export", { params, responseType: "text" });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Copy the Exact sales journal (read-only on Exact) in the background.
+export const pullExactAudit = async () => {
+  try {
+    const response = await axiosInstance.post("/exact/audit/pull");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactAuditPullStatus = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/pull/status");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── Bulk + Credit duplicate ─────────────────────────────────────────────────
+
+//* Missing → add many records to To send (queues only). items: [{ kind, id }], max 200.
+export const addExactToOutboxMany = async (items = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/outbox/add-many", { items });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Waiting → send the listed held jobs (as if Send was clicked on each). Max 200.
+//* To send → a record stuck in Sending / retrying: Stop (back to Waiting) or Send again now.
+export const stopExactJob = async (jobId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/to-send/${encodeURIComponent(jobId)}/stop`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const restartExactJob = async (jobId) => {
+  try {
+    const response = await axiosInstance.post(`/exact/to-send/${encodeURIComponent(jobId)}/restart`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const stopExactJobsMany = async (jobIds = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/to-send/stop-many", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const sendExactJobsMany = async (jobIds = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/to-send/send-many", { job_ids: jobIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Audit → Duplicate → Credit: preview (reads Exact, posts nothing).
+export const getExactCreditPreview = async (entryNumber, dateMode = "today") => {
+  try {
+    const response = await axiosInstance.get(`/exact/audit/credit/${encodeURIComponent(entryNumber)}/preview`, {
+      params: { date_mode: dateMode },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Audit → Duplicate → Credit: post the credit in Exact (once).
+export const postExactCredit = async ({ entryNumber, dateMode = "today" }) => {
+  try {
+    const response = await axiosInstance.post(`/exact/audit/credit/${encodeURIComponent(entryNumber)}`, {
+      date_mode: dateMode,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── Link missing + nightly audit ────────────────────────────────────────────
+
+//* Audit → link IAO records to the Exact entry found by reference (writes IAO only). Max 200 keys.
+export const linkExactAuditRecords = async (keys = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/audit/link", { keys });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Last nightly audit run: totals and what is new since the night before.
+export const getExactAuditNightly = async () => {
+  try {
+    const response = await axiosInstance.get("/exact/audit/nightly");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+// ─── KMOP tab ────────────────────────────────────────────────────────────────
+
+export const getExactKmo = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/kmo", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+//* Raw CSV text for downloadCsv().
+export const exportExactKmo = async (params = {}) => {
+  try {
+    const response = await axiosInstance.get("/exact/kmo/export", { params, responseType: "text" });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

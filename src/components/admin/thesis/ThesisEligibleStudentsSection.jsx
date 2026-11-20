@@ -27,6 +27,7 @@ import {
   useRemoveThesisEligibleStudent,
   useExportThesisEligibleStudentsCsv,
 } from "@/store/useThesisStore";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const markedPaidAudit = (markedPaid, t) => {
   const admin = markedPaid?.marked_paid_by;
@@ -95,9 +96,9 @@ export default function ThesisEligibleStudentsSection({
     setPage(1);
   };
 
-  const handleExportCsv = () => {
+  const handleExportCsv = (format) => {
     const { page: _page, limit: _limit, ...exportParams } = params;
-    exportCsvMutation.mutate({ thesisId, params: exportParams });
+    exportCsvMutation.mutate({ thesisId, params: exportParams, format });
   };
 
   const handleConfirmRemove = async () => {
@@ -140,18 +141,12 @@ export default function ThesisEligibleStudentsSection({
               )}
             </Button>
           )}
-          <Button
-            variant="outline"
+          <ExportMenu
             size="sm"
-            onClick={handleExportCsv}
-            disabled={exportCsvMutation.isPending}
             className="gap-2 h-9"
-          >
-            <Download className="w-4 h-4" />
-            {exportCsvMutation.isPending
-              ? t("common.exporting", "Exporting...")
-              : t("common.exportCsv", "Export CSV")}
-          </Button>
+            onExport={handleExportCsv}
+            isPending={exportCsvMutation.isPending}
+          />
         </div>
       </div>
 

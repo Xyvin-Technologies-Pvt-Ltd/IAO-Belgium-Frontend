@@ -26,6 +26,20 @@ import {
   getCompanyCountries,
   applyCompanyCountries,
   retryExactJobs,
+  getExactAuditSummary,
+  getExactAuditIssues,
+  pullExactAudit,
+  getExactAuditPullStatus,
+  addExactToOutboxMany,
+  sendExactJobsMany,
+  stopExactJob,
+  restartExactJob,
+  stopExactJobsMany,
+  getExactCreditPreview,
+  postExactCredit,
+  linkExactAuditRecords,
+  getExactAuditNightly,
+  getExactKmo,
 } from "@/api/exactApi";
 
 export const useGetExactStatus = (options = {}) =>
@@ -181,6 +195,7 @@ export const useSendExactJob = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-reconciliation"] });
         queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
         queryClient.invalidateQueries({ queryKey: ["exact-sent"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
       };
       refresh();
       setTimeout(refresh, 6000);
@@ -229,11 +244,13 @@ export const useAddExactToOutbox = () => {
       toast.success(res?.data?.uid ? `${res.data.uid}: ${res.message}` : res?.message || "Added to To send");
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
       queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
     onError: (err) => {
       toast.error(err?.message || "Failed to add this record to To send");
       //* Already queued elsewhere: refresh so the row shows its To send state.
       queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
     },
   });
 };
@@ -345,6 +362,7 @@ export const useRetryExactJobs = () => {
         queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
         queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
         queryClient.invalidateQueries({ queryKey: ["exact-payout"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
       };
       refresh();
       setTimeout(refresh, 8000);
@@ -352,3 +370,183 @@ export const useRetryExactJobs = () => {
     onError: (err) => toast.error(err?.message || "Failed to retry these records"),
   });
 };
+
+// ─── Accounting audit (read-only) ────────────────────────────────────────────
+
+export const useGetExactAuditSummary = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-summary", params],
+    queryFn: () => getExactAuditSummary(params),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+export const useGetExactAuditIssues = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-issues", params],
+    queryFn: () => getExactAuditIssues(params),
+    staleTime: 60000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });
+
+/** Polls every 3s while the Exact copy is being refreshed. */
+export const useGetExactAuditPullStatus = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-pull"],
+    queryFn: getExactAuditPullStatus,
+    refetchInterval: (query) => (query.state.data?.data?.state === "running" ? 3000 : false),
+    ...options,
+  });
+
+export const usePullExactAudit = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: pullExactAudit,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Copying the Exact sales journal");
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-pull"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to copy the Exact sales journal"),
+  });
+};
+
+// ─── Bulk + Credit duplicate ─────────────────────────────────────────────────
+
+export const useAddExactToOutboxMany = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addExactToOutboxMany,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to add these records to To send"),
+  });
+};
+
+function useToSendRefresh() {
+  const queryClient = useQueryClient();
+  return () => {
+    for (const queryKey of [["exact-to-send"], ["exact-kmo"], ["exact-missing"], ["exact-payouts"], ["exact-payout"]]) {
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+}
+
+export const useStopExactJob = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: stopExactJob,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Stopped");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Failed to stop this record"),
+  });
+};
+
+export const useRestartExactJob = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: restartExactJob,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sending again");
+      refresh();
+      setTimeout(refresh, 6000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send this record again"),
+  });
+};
+
+export const useStopExactJobsMany = () => {
+  const refresh = useToSendRefresh();
+  return useMutation({
+    mutationFn: stopExactJobsMany,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Stopped");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Failed to stop these records"),
+  });
+};
+
+export const useSendExactJobsMany = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendExactJobsMany,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Sent");
+      const refresh = () => {
+        queryClient.invalidateQueries({ queryKey: ["exact-to-send"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-payouts"] });
+        queryClient.invalidateQueries({ queryKey: ["exact-kmo"] });
+      };
+      refresh();
+      setTimeout(refresh, 8000);
+    },
+    onError: (err) => toast.error(err?.message || "Failed to send these records"),
+  });
+};
+
+export const useGetExactCreditPreview = (entryNumber, dateMode = "today", options = {}) =>
+  useQuery({
+    queryKey: ["exact-credit-preview", entryNumber, dateMode],
+    queryFn: () => getExactCreditPreview(entryNumber, dateMode),
+    enabled: Boolean(entryNumber),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    ...options,
+  });
+
+export const usePostExactCredit = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: postExactCredit,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Credit posted in Exact");
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-issues"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to post the credit"),
+  });
+};
+
+// ─── Link missing + nightly audit ────────────────────────────────────────────
+
+export const useLinkExactAuditRecords = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: linkExactAuditRecords,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-summary"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-audit-issues"] });
+      queryClient.invalidateQueries({ queryKey: ["exact-missing"] });
+    },
+    onError: (err) => toast.error(err?.message || "Failed to link these records"),
+  });
+};
+
+/** Small: used for the "new" badge on the Audit tab. */
+export const useGetExactAuditNightly = (options = {}) =>
+  useQuery({
+    queryKey: ["exact-audit-nightly"],
+    queryFn: getExactAuditNightly,
+    staleTime: 5 * 60 * 1000,
+    ...options,
+  });
+
+// ─── KMOP tab ────────────────────────────────────────────────────────────────
+
+export const useGetExactKmo = (params = {}, options = {}) =>
+  useQuery({
+    queryKey: ["exact-kmo", params],
+    queryFn: () => getExactKmo(params),
+    staleTime: 30000,
+    placeholderData: (previousData) => previousData,
+    ...options,
+  });

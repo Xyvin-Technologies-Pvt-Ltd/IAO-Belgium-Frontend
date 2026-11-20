@@ -37,6 +37,7 @@ import { exportStudents } from "@/api/studentApi";
 import moment from "moment";
 import { formatPaymentMethod } from "@/utils/paymentMethod";
 import { useCanModify } from "@/hooks/useCanModify";
+import ExportMenu from "@/components/common/ExportMenu";
 
 const BoolBadge = ({ value, t }) => (
   <span
@@ -104,16 +105,16 @@ const AllStudents = () => {
     });
   };
 
-  const handleExportExcel = async () => {
+  const handleExportExcel = async (format) => {
     try {
       setExportPending(true);
-      const blob = await exportStudents(queryFilters);
+      const blob = await exportStudents({ ...queryFilters, format });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute(
         "download",
-        `students_report_${new Date().toISOString().slice(0, 10)}.xlsx`,
+        `students_report_${new Date().toISOString().slice(0, 10)}.${format === "csv" ? "csv" : "xlsx"}`,
       );
       document.body.appendChild(link);
       link.click();
@@ -134,17 +135,11 @@ const AllStudents = () => {
         <h2 className="text-xl font-semibold text-dashboard-text dark:text-white">
           {t("studentManagement.title")}
         </h2>
-        <Button
-          disabled={exportPending}
-          onClick={handleExportExcel}
-          variant="outline"
+        <ExportMenu
           className="gap-2 shrink-0"
-        >
-          <Download className="h-4 w-4" />
-          {exportPending
-            ? t("studentManagement.exporting", "Exporting...")
-            : t("studentManagement.exportExcel", "Export Excel")}
-        </Button>
+          onExport={handleExportExcel}
+          isPending={exportPending}
+        />
       </div>
 
       <div className="flex items-center justify-between gap-2">
