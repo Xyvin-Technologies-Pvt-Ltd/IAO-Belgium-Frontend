@@ -26,6 +26,7 @@ import {
 } from "@/store/useExactStore";
 import AuditPlan from "./AuditPlan";
 import CreditDuplicateDialog from "./CreditDuplicateDialog";
+import RebookPanel from "./RebookPanel";
 import { NEEDS_EXACT_COPY, SEVERITY_STYLES, formatDate, formatDateTime, money } from "./auditUi";
 
 function PullInfo({ pull, copiedAt, a }) {
@@ -145,6 +146,7 @@ const AuditTab = ({ canModify, isConnected, page, setPage, rowsPerPage, setRowsP
   return (
     <div className="space-y-4">
       <AuditPlan />
+      <RebookPanel canModify={canModify} isConnected={isConnected} />
 
       {nightly ? (
         <div

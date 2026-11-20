@@ -36,6 +36,10 @@ import {
   restartExactJob,
   stopExactJobsMany,
   getExactCreditPreview,
+  findExactRebook,
+  getExactRebookPreview,
+  postExactRebook,
+  postExactRebookMany,
   postExactCredit,
   linkExactAuditRecords,
   getExactAuditNightly,
@@ -550,3 +554,58 @@ export const useGetExactKmo = (params = {}, options = {}) =>
     placeholderData: (previousData) => previousData,
     ...options,
   });
+
+// ─── Re-book on correct GL ───────────────────────────────────────────────────
+export const useFindExactRebook = (gl, options = {}) =>
+  useQuery({
+    queryKey: ["exact-rebook-find", gl],
+    queryFn: () => findExactRebook(gl),
+    enabled: Boolean(gl),
+    staleTime: 0,
+    retry: false,
+    ...options,
+  });
+
+export const useGetExactRebookPreview = (entryNumber, options = {}) =>
+  useQuery({
+    queryKey: ["exact-rebook-preview", entryNumber],
+    queryFn: () => getExactRebookPreview(entryNumber),
+    enabled: Boolean(entryNumber),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    ...options,
+  });
+
+function useRebookRefresh() {
+  const queryClient = useQueryClient();
+  return () => {
+    for (const queryKey of [["exact-rebook-find"], ["exact-rebook-preview"], ["exact-audit-summary"], ["exact-audit-issues"]]) {
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+}
+
+export const usePostExactRebook = () => {
+  const refresh = useRebookRefresh();
+  return useMutation({
+    mutationFn: postExactRebook,
+    onSuccess: (res) => {
+      toast.success(res?.message || "Re-booked");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Re-book failed"),
+  });
+};
+
+export const usePostExactRebookMany = () => {
+  const refresh = useRebookRefresh();
+  return useMutation({
+    mutationFn: postExactRebookMany,
+    onSuccess: (res) => {
+      (res?.data?.stopped_at ? toast.warning : toast.success)(res?.message || "Re-booked");
+      refresh();
+    },
+    onError: (err) => toast.error(err?.message || "Re-book failed"),
+  });
+};
