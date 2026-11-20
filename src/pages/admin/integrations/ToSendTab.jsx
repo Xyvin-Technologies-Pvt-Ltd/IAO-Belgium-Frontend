@@ -35,7 +35,7 @@ import MissingList from "./MissingList";
 import CompanyEditDialog from "@/components/admin/student/CompanyEditDialog";
 
 //* Failed view: why it failed (backend failed_category), worst-known first.
-const FAILURE_CATEGORIES = ["customer", "blocked", "exact_rejected", "pdf", "other"];
+const FAILURE_CATEGORIES = ["check_exact", "customer", "blocked", "exact_rejected", "pdf", "other"];
 
 const STATE_STYLES = {
   held: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
