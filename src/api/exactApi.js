@@ -369,6 +369,43 @@ export const sendExactJobsMany = async (jobIds = []) => {
 };
 
 //* Audit → Duplicate → Credit: preview (reads Exact, posts nothing).
+//* Re-book on correct GL: find entries on a GL, preview, re-book one / many.
+export const findExactRebook = async (gl) => {
+  try {
+    const response = await axiosInstance.get("/exact/rebook/find", { params: { gl } });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getExactRebookPreview = async (entryNumber) => {
+  try {
+    const response = await axiosInstance.get(`/exact/rebook/${entryNumber}/preview`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const postExactRebook = async (entryNumber) => {
+  try {
+    const response = await axiosInstance.post(`/exact/rebook/${entryNumber}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const postExactRebookMany = async (entryNumbers = []) => {
+  try {
+    const response = await axiosInstance.post("/exact/rebook/many", { entry_numbers: entryNumbers });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 export const getExactCreditPreview = async (entryNumber, dateMode = "today") => {
   try {
     const response = await axiosInstance.get(`/exact/audit/credit/${encodeURIComponent(entryNumber)}/preview`, {
