@@ -63,6 +63,7 @@ export const teacherSchema = z.object({
 
   // Optional master-data backed fields
   mother_tongue: z.string().optional(),
+  preferred_language: z.string().min(1, "IAO ID language is required"),
   contract_type: z.string().optional(),
   department: z.array(z.object({
     _id: z.string(),

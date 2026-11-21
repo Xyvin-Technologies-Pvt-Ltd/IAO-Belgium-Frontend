@@ -12,7 +12,10 @@ import {
   updateGlobalVatConfig,
 } from "@/api/accountingMappingApi";
 import { getProgramTypes } from "@/api/programApi";
-import { PROGRAM_TYPES } from "@/constants/programTypes";
+import {
+  PROGRAM_TYPES,
+  STANDALONE_MODULE_PROGRAM_TYPE,
+} from "@/constants/programTypes";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,10 +97,12 @@ const AccountingMappings = () => {
     staleTime: 60000,
   });
 
-  const availableProgramTypes = useMemo(
-    () => programTypesQuery.data?.data || PROGRAM_TYPES,
-    [programTypesQuery.data],
-  );
+  const availableProgramTypes = useMemo(() => {
+    const base = programTypesQuery.data?.data || PROGRAM_TYPES;
+    return base.includes(STANDALONE_MODULE_PROGRAM_TYPE)
+      ? base
+      : [...base, STANDALONE_MODULE_PROGRAM_TYPE];
+  }, [programTypesQuery.data]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["accounting-mappings"] });
@@ -421,15 +426,25 @@ const AccountingMappingModal = ({
       return;
     }
 
+    const isStandalone =
+      formData.program_type === STANDALONE_MODULE_PROGRAM_TYPE;
     const payload = {
       language: formData.language,
       country: formData.country || null,
       program_type: formData.program_type,
       gl_revenue_module: formData.gl_revenue_module?.trim() || "",
-      gl_revenue_research: formData.gl_revenue_research?.trim() || "",
-      gl_revenue_admission_fee: formData.gl_revenue_admission_fee?.trim() || "",
-      gl_revenue_convenience_fee: formData.gl_revenue_convenience_fee?.trim() || "",
-      gl_revenue_fce_exam: formData.gl_revenue_fce_exam?.trim() || "",
+      gl_revenue_research: isStandalone
+        ? ""
+        : formData.gl_revenue_research?.trim() || "",
+      gl_revenue_admission_fee: isStandalone
+        ? ""
+        : formData.gl_revenue_admission_fee?.trim() || "",
+      gl_revenue_convenience_fee: isStandalone
+        ? ""
+        : formData.gl_revenue_convenience_fee?.trim() || "",
+      gl_revenue_fce_exam: isStandalone
+        ? ""
+        : formData.gl_revenue_fce_exam?.trim() || "",
     };
 
     const mutation = isEdit ? updateMutation : createMutation;
@@ -525,31 +540,35 @@ const AccountingMappingModal = ({
               label={t("programManagement.modal.exactGlRevenueModuleLabel", "Module Revenue GL Account")}
               {...register("gl_revenue_module")}
             />
-            <FormField
-              label={t("programManagement.modal.exactGlRevenueResearchLabel", "Thesis Revenue GL Account")}
-              {...register("gl_revenue_research")}
-            />
-            <FormField
-              label={t(
-                "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
-                "Registration Fee Revenue GL Account",
-              )}
-              {...register("gl_revenue_admission_fee")}
-            />
-            <FormField
-              label={t(
-                "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
-                "Administration Fee Revenue GL Account",
-              )}
-              {...register("gl_revenue_convenience_fee")}
-            />
-            <FormField
-              label={t(
-                "programManagement.modal.exactGlRevenueFceExamLabel",
-                "FCE Fee Revenue GL Account",
-              )}
-              {...register("gl_revenue_fce_exam")}
-            />
+            {selectedProgramType !== STANDALONE_MODULE_PROGRAM_TYPE ? (
+              <>
+                <FormField
+                  label={t("programManagement.modal.exactGlRevenueResearchLabel", "Thesis Revenue GL Account")}
+                  {...register("gl_revenue_research")}
+                />
+                <FormField
+                  label={t(
+                    "programManagement.modal.exactGlRevenueAdmissionFeeLabel",
+                    "Registration Fee Revenue GL Account",
+                  )}
+                  {...register("gl_revenue_admission_fee")}
+                />
+                <FormField
+                  label={t(
+                    "programManagement.modal.exactGlRevenueConvenienceFeeLabel",
+                    "Administration Fee Revenue GL Account",
+                  )}
+                  {...register("gl_revenue_convenience_fee")}
+                />
+                <FormField
+                  label={t(
+                    "programManagement.modal.exactGlRevenueFceExamLabel",
+                    "FCE Fee Revenue GL Account",
+                  )}
+                  {...register("gl_revenue_fce_exam")}
+                />
+              </>
+            ) : null}
           </div>
 
           <FormActions onCancel={handleClose} isLoading={isSubmitting} isEdit={isEdit} />
