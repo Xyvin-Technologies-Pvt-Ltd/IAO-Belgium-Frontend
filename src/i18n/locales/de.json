@@ -140,6 +140,7 @@
     "name": "Name",
     "email": "E-Mail-Adresse",
     "status": {
+      "label": "Status",
       "pending": "Ausstehend",
       "onRide": "Unterwegs",
       "inProgress": "In Bearbeitung",
@@ -174,7 +175,9 @@
       "usedViaKmo": "Über KMO genutzt",
       "usedViaLocationSwitch": "Über Standortwechsel genutzt",
       "approved": "Genehmigt",
-      "rejected": "Abgelehnt"
+      "rejected": "Abgelehnt",
+      "revoked": "Widerrufen",
+      "expired": "Abgelaufen"
     },
     "file": "Datei",
     "actions": "Aktionen",
@@ -1774,6 +1777,7 @@
       "general": "Modulauswahl",
       "payments": "Zahlungen",
       "thesis": "Abschlussarbeit",
+      "documents": "Dokumente",
       "notesAndAttachments": "Notizen & Anhänge",
       "invoices": "Kostenaufstellungen"
     },
@@ -2050,7 +2054,9 @@
       "waitlisted": "In Bearbeitung",
       "resubmitted": "Erneut eingereicht",
       "approved": "Genehmigt",
-      "rejected": "Abgelehnt"
+      "rejected": "Abgelehnt",
+      "revoked": "Widerrufen",
+      "expired": "Abgelaufen"
     },
     "documents": {
       "idCard": "Personalausweis",
@@ -2210,6 +2216,9 @@
       "teacherRolePlaceholder": "Rolle auswählen",
       "motherTongueLabel": "Muttersprache",
       "motherTonguePlaceholder": "Muttersprache auswählen",
+      "preferredLanguageLabel": "IAO-Ausweis-Sprache",
+      "preferredLanguagePlaceholder": "IAO-Ausweis-Sprache auswählen",
+      "preferredLanguageRequired": "IAO-Ausweis-Sprache ist erforderlich",
       "contractTypeLabel": "Vertragsart",
       "contractTypePlaceholder": "Vertragsart auswählen",
       "departmentLabel": "Abteilung",
@@ -3430,5 +3439,32 @@
     "stepTypeInfo": "Nur Information",
     "stepTypeUpload": "Dokument-Upload",
     "submitted": "Eingereicht"
+  },
+  "idCard": {
+    "teacherTitle": "Dozentenausweis",
+    "studentTitle": "Studentenausweis",
+    "viewCard": "Ausweis ansehen",
+    "recordId": "Datensatz-ID",
+    "validFrom": "Gültig ab",
+    "validUntil": "Gültig bis",
+    "academicYear": "Studienjahr",
+    "previousCards": "Frühere Ausweise",
+    "noCardIssued": "Noch kein Ausweis ausgestellt",
+    "noTeacherCardDesc": "Dieser Dozent verfügt derzeit über keinen aktiven oder ausgestellten Ausweis.",
+    "noStudentCardDesc": "Dieser Student verfügt derzeit über keinen aktiven oder ausgestellten Ausweis."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Nach UID, Name oder E-Mail suchen...",
+    "filters": {
+      "button": "Filter",
+      "title": "Ausweise filtern",
+      "subtitle": "Grenzen Sie die Liste der Studentenausweise ein",
+      "programType": "Programmtyp",
+      "allProgramTypes": "Alle Programmtypen",
+      "program": "Programm",
+      "allPrograms": "Alle Programme",
+      "clearAll": "Alles löschen",
+      "applyFilters": "Filter anwenden"
+    }
   }
 }

@@ -19,6 +19,7 @@ import TeacherProformaListPage from "@/pages/teacher/invoices/TeacherProformaLis
 import TeacherProformaDetailPage from "@/pages/teacher/invoices/TeacherProformaDetailPage";
 import TeacherThesis from "@/pages/teacher/thesis";
 import TeacherStudentDetail from "@/pages/teacher/thesis/TeacherStudentDetail";
+import TeacherIdCardPage from "@/pages/teacher/id-card";
 
 export const teacherRoutes = [
   {
@@ -26,6 +27,7 @@ export const teacherRoutes = [
     component: () => <Navigate to="/teacher/dashboard" replace />,
   },
   { path: "/teacher/dashboard", component: TeacherDashboard },
+  { path: "/teacher/id-card", component: TeacherIdCardPage },
   { path: "/teacher/mark-attendance/$id", component: SessionAttendence },
   { path: "/teacher/planning", component: Plannings },
   { path: "/teacher/schedules/module/$id", component: SessionScheduleList },

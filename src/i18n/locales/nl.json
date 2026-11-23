@@ -142,6 +142,7 @@
     "name": "Naam",
     "email": "E-mailadres",
     "status": {
+      "label": "Status",
       "pending": "In behandeling",
       "onRide": "Op rit",
       "inProgress": "Bezig",
@@ -176,7 +177,9 @@
       "usedViaKmo": "Gebruikt via KMO",
       "usedViaLocationSwitch": "Gebruikt via locatiewissel",
       "approved": "Goedgekeurd",
-      "rejected": "Afgewezen"
+      "rejected": "Afgewezen",
+      "revoked": "Ingetrokken",
+      "expired": "Verlopen"
     },
     "file": "bestand",
     "actions": "Acties",
@@ -1780,6 +1783,7 @@
       "general": "Module selectie",
       "payments": "Betalingen",
       "thesis": "Thesis",
+      "documents": "Documenten",
       "notesAndAttachments": "Notities & Bijlagen",
       "invoices": "Onkostennota’s"
     },
@@ -2056,7 +2060,9 @@
       "waitlisted": "In behandeling",
       "resubmitted": "Opnieuw ingediend",
       "approved": "Goedgekeurd",
-      "rejected": "Afgewezen"
+      "rejected": "Afgewezen",
+      "revoked": "Ingetrokken",
+      "expired": "Verlopen"
     },
     "documents": {
       "idCard": "Identiteitskaart",
@@ -2216,6 +2222,9 @@
       "teacherRolePlaceholder": "Rol selecteren",
       "motherTongueLabel": "Moedertaal",
       "motherTonguePlaceholder": "Moedertaal selecteren",
+      "preferredLanguageLabel": "IAO-ID-taal",
+      "preferredLanguagePlaceholder": "IAO-ID-taal selecteren",
+      "preferredLanguageRequired": "IAO-ID-taal is verplicht",
       "contractTypeLabel": "Contracttype",
       "contractTypePlaceholder": "Contracttype selecteren",
       "departmentLabel": "Afdeling",
@@ -3447,5 +3456,32 @@
     "stepTypeInfo": "Enkel informatie",
     "stepTypeUpload": "Document uploaden",
     "submitted": "Ingediend"
+  },
+  "idCard": {
+    "teacherTitle": "Identiteitskaart Docent",
+    "studentTitle": "Identiteitskaart Student",
+    "viewCard": "Kaart bekijken",
+    "recordId": "Record-ID",
+    "validFrom": "Geldig vanaf",
+    "validUntil": "Geldig tot",
+    "academicYear": "Academisch jaar",
+    "previousCards": "Eerdere kaarten",
+    "noCardIssued": "Nog geen identiteitskaart uitgegeven",
+    "noTeacherCardDesc": "Deze docent heeft momenteel geen actieve of uitgegeven identiteitskaart.",
+    "noStudentCardDesc": "Deze student heeft momenteel geen actieve of uitgegeven identiteitskaart."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Zoeken op UID, naam of e-mail...",
+    "filters": {
+      "button": "Filter",
+      "title": "Filter identiteitskaarten",
+      "subtitle": "Verfijn de lijst met studentenkaarten",
+      "programType": "Programmatype",
+      "allProgramTypes": "Alle programmatypes",
+      "program": "Programma",
+      "allPrograms": "Alle programma's",
+      "clearAll": "Alles wissen",
+      "applyFilters": "Filters toepassen"
+    }
   }
 }

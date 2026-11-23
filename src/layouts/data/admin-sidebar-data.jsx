@@ -120,8 +120,17 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
         items: [
           {
             title: t("sidebar.admin.teacherManagement"),
-            url: "/admin/teacher-management",
             icon: GraduationCap,
+            items: [
+              {
+                title: t("sidebar.admin.allTeachers", "All Teachers"),
+                url: "/admin/teacher-management",
+              },
+              {
+                title: t("sidebar.admin.teacherId", "IAO Teacher ID"),
+                url: "/admin/teacher-id",
+              },
+            ],
           },
           {
             title: t("sidebar.admin.studentManagement"),
@@ -130,6 +139,10 @@ export const getAdminSidebarData = (t, userPermissions = []) => {
               {
                 title: t("sidebar.admin.allStudents", "All Students"),
                 url: "/admin/student-management",
+              },
+              {
+                title: t("sidebar.admin.studentId", "IAO Student ID"),
+                url: "/admin/student-id",
               },
               {
                 title: t("sidebar.admin.locationChanges", "Location Changes"),

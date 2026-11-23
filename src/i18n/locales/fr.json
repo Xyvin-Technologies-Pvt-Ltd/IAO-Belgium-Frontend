@@ -141,6 +141,7 @@
     "name": "Nom",
     "email": "Adresse e-mail",
     "status": {
+      "label": "Statut",
       "pending": "En attente",
       "onRide": "En course",
       "inProgress": "En cours",
@@ -175,7 +176,9 @@
       "usedViaKmo": "Utilisé via KMO",
       "usedViaLocationSwitch": "Utilisé via changement de lieu",
       "approved": "Approuvé",
-      "rejected": "Rejeté"
+      "rejected": "Rejeté",
+      "revoked": "Révoqué",
+      "expired": "Expiré"
     },
     "file": "fichier",
     "actions": "Actions",
@@ -1756,6 +1759,7 @@
       "general": "Sélection de module",
       "payments": "Paiements",
       "thesis": "Thèse",
+      "documents": "Documents",
       "notesAndAttachments": "Notes et pièces jointes",
       "invoices": "Notes de frais"
     },
@@ -2031,7 +2035,9 @@
       "waitlisted": "En cours",
       "resubmitted": "Soumis à nouveau",
       "approved": "Approuvé",
-      "rejected": "Rejeté"
+      "rejected": "Rejeté",
+      "revoked": "Révoqué",
+      "expired": "Expiré"
     },
     "documents": {
       "idCard": "Carte d'identité",
@@ -2191,6 +2197,9 @@
       "teacherRolePlaceholder": "Sélectionner le rôle",
       "motherTongueLabel": "Langue maternelle",
       "motherTonguePlaceholder": "Sélectionner la langue maternelle",
+      "preferredLanguageLabel": "Langue de la carte IAO",
+      "preferredLanguagePlaceholder": "Sélectionner la langue de la carte IAO",
+      "preferredLanguageRequired": "La langue de la carte IAO est obligatoire",
       "contractTypeLabel": "Type de contrat",
       "contractTypePlaceholder": "Sélectionner le type de contrat",
       "departmentLabel": "Département",
@@ -3414,5 +3423,32 @@
     "stepTypeInfo": "Information uniquement",
     "stepTypeUpload": "Téléversement de document",
     "submitted": "Soumis"
+  },
+  "idCard": {
+    "teacherTitle": "Carte d'identité Enseignant",
+    "studentTitle": "Carte d'identité Étudiant",
+    "viewCard": "Voir la carte",
+    "recordId": "Identifiant",
+    "validFrom": "Valable du",
+    "validUntil": "Valable jusqu'au",
+    "academicYear": "Année académique",
+    "previousCards": "Cartes précédentes",
+    "noCardIssued": "Aucune carte d'identité délivrée pour le moment",
+    "noTeacherCardDesc": "Cet enseignant ne dispose actuellement d'aucune carte d'identité active ou délivrée.",
+    "noStudentCardDesc": "Cet étudiant ne dispose actuellement d'aucune carte d'identité active ou délivrée."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Rechercher par UID, nom ou e-mail...",
+    "filters": {
+      "button": "Filtrer",
+      "title": "Filtrer les cartes d'identité",
+      "subtitle": "Affinez la liste des cartes d'étudiant",
+      "programType": "Type de programme",
+      "allProgramTypes": "Tous les types de programme",
+      "program": "Programme",
+      "allPrograms": "Tous les programmes",
+      "clearAll": "Tout effacer",
+      "applyFilters": "Appliquer les filtres"
+    }
   }
 }

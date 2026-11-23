@@ -49,7 +49,14 @@ const CreateContract = ({ open, onClose, contractData }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(contractSchema),
-    defaultValues: { name: "", file: "", program_type: "", language: "", contract_type: "student_contract" },
+    defaultValues: {
+      name: "",
+      file: "",
+      program_type: "",
+      language: "",
+      contract_type: "student_contract",
+      duration_years: "",
+    },
   });
 
   const fileValue = watch("file");
@@ -57,7 +64,14 @@ const CreateContract = ({ open, onClose, contractData }) => {
   const updateContract = useUpdateContract();
 
   const handleClose = () => {
-    reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
+    reset({
+      name: "",
+      file: "",
+      program_type: "",
+      language: "",
+      contract_type: "student_contract",
+      duration_years: "",
+    });
     setFileName("");
     setPendingFile(null);
     setIsUploading(false);
@@ -72,7 +86,11 @@ const CreateContract = ({ open, onClose, contractData }) => {
           file: contractData.file || "",
           program_type: contractData.program_type || "",
           language: contractData.language?._id || contractData.language || "",
-          contract_type: contractData.contract_type || "student_contract"
+          contract_type: contractData.contract_type || "student_contract",
+          duration_years:
+            contractData.duration_years != null
+              ? String(contractData.duration_years)
+              : "",
         });
         if (contractData.file) {
           const urlFileName = contractData.file.split("/").pop().split("?")[0];
@@ -81,7 +99,14 @@ const CreateContract = ({ open, onClose, contractData }) => {
           setFileName("");
         }
       } else {
-        reset({ name: "", file: "", program_type: "", language: "", contract_type: "student_contract" });
+        reset({
+          name: "",
+          file: "",
+          program_type: "",
+          language: "",
+          contract_type: "student_contract",
+          duration_years: "",
+        });
         setFileName("");
       }
       setPendingFile(null);
@@ -114,7 +139,11 @@ const CreateContract = ({ open, onClose, contractData }) => {
         file: fileUrl,
         program_type: formData.program_type,
         language: formData.language,
-        contract_type: formData.contract_type
+        contract_type: formData.contract_type,
+        duration_years:
+          formData.duration_years === "" || formData.duration_years == null
+            ? null
+            : Number(formData.duration_years),
       };
 
       if (isEdit) {
@@ -171,6 +200,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
             required
           >
             <Select
+              key={`pt-${contractData?._id || "new"}-${watch("program_type") || "empty"}`}
               value={watch("program_type") || ""}
               onValueChange={(val) => setValue("program_type", val, { shouldValidate: true })}
             >
@@ -216,6 +246,7 @@ const CreateContract = ({ open, onClose, contractData }) => {
             required
           >
             <Select
+              key={`ct-${contractData?._id || "new"}-${watch("contract_type") || "empty"}`}
               value={watch("contract_type") || ""}
               onValueChange={(val) => setValue("contract_type", val, { shouldValidate: true })}
             >
@@ -225,6 +256,38 @@ const CreateContract = ({ open, onClose, contractData }) => {
               <SelectContent position="popper">
                 <SelectItem value="student_contract">Student Contract</SelectItem>
                 <SelectItem value="internal_regulations">Internal Regulations</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
+
+          <FormField
+            label="Programme duration"
+            error={errors.duration_years?.message}
+          >
+            <Select
+              key={`dur-${contractData?._id || "new"}-${watch("duration_years") || "all"}`}
+              value={
+                watch("duration_years") === "" ||
+                watch("duration_years") == null
+                  ? "all"
+                  : String(watch("duration_years"))
+              }
+              onValueChange={(val) =>
+                setValue("duration_years", val === "all" ? "" : val, {
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger className="w-full bg-white dark:bg-black border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white">
+                <SelectValue placeholder="All durations" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectItem value="all">All durations</SelectItem>
+                {[1, 2, 3, 4, 5, 6].map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </FormField>

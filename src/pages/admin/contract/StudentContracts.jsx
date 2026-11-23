@@ -133,7 +133,7 @@ const StudentContracts = () => {
             <TableHead>{t("common.contract")}</TableHead>
             <TableHead>Contract Type</TableHead>
             <TableHead>{t("common.version")}</TableHead>
-            <TableHead>{t("common.status")}</TableHead>
+            <TableHead>{t("common.status.label")}</TableHead>
             <TableHead>{t("common.signedAt")}</TableHead>
           </TableRow>
         </TableHeader>

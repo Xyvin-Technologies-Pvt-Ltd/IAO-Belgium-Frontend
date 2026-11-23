@@ -173,7 +173,7 @@ const TransactionLogs = () => {
               <TableHead>{t("common.invoiceId")}</TableHead>
               <TableHead>{t("common.receiptId", "Receipt ID")}</TableHead>
               <TableHead>{t("common.date")}</TableHead>
-              <TableHead>{t("common.status")}</TableHead>
+              <TableHead>{t("common.status.label")}</TableHead>
               <TableHead>{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>

@@ -59,6 +59,9 @@
       "skillDays": "Standalone Modules",
       "teacherManagement": "Lecturer Management",
       "studentManagement": "Student Management",
+      "studentId": "IAO Student ID",
+      "allStudents": "All Students",
+      "locationChanges": "Location Changes",
       "financeReports": "Finance Reports",
       "customInvoices": "Custom Expense Notes",
       "fkf": "Fachkursförderung",
@@ -143,6 +146,7 @@
     "name": "Name",
     "email": "Email",
     "status": {
+      "label": "Status",
       "pending": "Pending",
       "onRide": "On Ride",
       "inProgress": "In Progress",
@@ -3283,6 +3287,9 @@
       "teacherRolePlaceholder": "Select role",
       "motherTongueLabel": "Mother Tongue",
       "motherTonguePlaceholder": "Select mother tongue",
+      "preferredLanguageLabel": "IAO ID Language",
+      "preferredLanguagePlaceholder": "Select IAO ID language",
+      "preferredLanguageRequired": "IAO ID language is required",
       "contractTypeLabel": "Contract Type",
       "contractTypePlaceholder": "Select contract type",
       "departmentLabel": "Department",
@@ -4591,6 +4598,33 @@
       "postalCode": "Postal code",
       "city": "City",
       "country": "Country"
+    }
+  },
+  "idCard": {
+    "teacherTitle": "Teacher Identity Card",
+    "studentTitle": "Student Identity Card",
+    "viewCard": "View Card",
+    "recordId": "Record ID",
+    "validFrom": "Valid from",
+    "validUntil": "Valid until",
+    "academicYear": "Academic year",
+    "previousCards": "Previous cards",
+    "noCardIssued": "No ID card issued yet",
+    "noTeacherCardDesc": "This lecturer does not currently have an active or issued teacher identity card.",
+    "noStudentCardDesc": "This student does not currently have an active or issued student identity card."
+  },
+  "idCardManagement": {
+    "searchPlaceholder": "Search by UID, name, or email...",
+    "filters": {
+      "button": "Filter",
+      "title": "Filter ID Cards",
+      "subtitle": "Narrow down the student ID cards list",
+      "programType": "Programme Type",
+      "allProgramTypes": "All Programme Types",
+      "program": "Programme",
+      "allPrograms": "All Programmes",
+      "clearAll": "Clear All",
+      "applyFilters": "Apply Filters"
     }
   }
 }

@@ -40,6 +40,7 @@ import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
 import StudentThesisTab from "@/components/admin/student/StudentThesisTab";
+import IdCardDocumentTab from "@/components/id-card/IdCardDocumentTab";
 import ModuleReattemptDialog from "@/components/admin/batch/ModuleReattemptDialog";
 import { Button } from "@/components/ui/button";
 
@@ -476,6 +477,16 @@ const EnrolledStudentDetails = () => {
             }`}
           >
             {t("studentManagement.tabs.thesis", "Thesis")}
+          </button>
+          <button
+            onClick={() => setActiveTab("documents")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              activeTab === "documents"
+                ? "border-[#ff8904] text-[#ff8904]"
+                : "border-transparent text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/30"
+            }`}
+          >
+            {t("studentManagement.tabs.documents", "Documents")}
           </button>
           <button
             onClick={() => setActiveTab("attachments")}
@@ -1184,6 +1195,14 @@ const EnrolledStudentDetails = () => {
 
       {activeTab === "thesis" && (
         <StudentThesisTab userId={studentUserId} />
+      )}
+
+      {activeTab === "documents" && (
+        <IdCardDocumentTab
+          type="student"
+          id={studentData.application_id || id}
+          userName={`${studentData.first_name || ""} ${studentData.last_name || ""}`.trim()}
+        />
       )}
 
       {activeTab === "attachments" && (

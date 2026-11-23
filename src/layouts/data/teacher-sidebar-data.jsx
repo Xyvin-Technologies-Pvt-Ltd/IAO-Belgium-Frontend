@@ -8,6 +8,7 @@ import {
   Bell,
   Receipt,
   GraduationCap,
+  IdCard,
 } from "lucide-react";
 
 export const getTeacherSidebarData = (t) => ({
@@ -19,6 +20,11 @@ export const getTeacherSidebarData = (t) => ({
           title: t("sidebar.teacher.dashboard"),
           url: "/teacher/dashboard",
           icon: LayoutDashboard,
+        },
+        {
+          title: t("sidebar.teacher.teacherId", "IAO Teacher ID"),
+          url: "/teacher/id-card",
+          icon: IdCard,
         },
       ],
     },

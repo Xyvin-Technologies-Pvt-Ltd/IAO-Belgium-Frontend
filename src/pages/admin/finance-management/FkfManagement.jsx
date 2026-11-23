@@ -739,7 +739,7 @@ const FkfManagement = () => {
                   <TableHead>
                     {t("finance.fkf.postalCode", "Postal code")}
                   </TableHead>
-                  <TableHead>{t("common.status", "Status")}</TableHead>
+                  <TableHead>{t("common.status.label", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody
@@ -1064,7 +1064,7 @@ const FkfManagement = () => {
 
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">
-                {t("common.status", "Status")}
+                {t("common.status.label", "Status")}
               </Label>
               <Select
                 value={historyStatus}
@@ -1167,7 +1167,7 @@ const FkfManagement = () => {
                   <TableHead>
                     {t("finance.fkf.invoice")}
                   </TableHead>
-                  <TableHead>{t("common.status", "Status")}</TableHead>
+                  <TableHead>{t("common.status.label", "Status")}</TableHead>
                   <TableHead>
                     {t("finance.fkf.sentAt", "Sent")}
                   </TableHead>
@@ -1696,7 +1696,7 @@ const FkfManagement = () => {
                       <TableHead>
                         {t("finance.fkf.subsidizedAmount", "Subsidy")}
                       </TableHead>
-                      <TableHead>{t("common.status", "Status")}</TableHead>
+                      <TableHead>{t("common.status.label", "Status")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
