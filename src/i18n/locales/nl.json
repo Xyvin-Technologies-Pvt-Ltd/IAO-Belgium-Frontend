@@ -2600,6 +2600,8 @@
     "archive": "Archiveren",
     "allStatuses": "Alle statussen",
     "allLanguages": "Alle talen",
+    "filterTitle": "Examens filteren",
+    "filterSubtitle": "Filter op status, taal, opleiding of groep",
     "status": {
       "draft": "Concept",
       "published": "Gepubliceerd",
@@ -2612,6 +2614,7 @@
       "duration": "Duur",
       "passingMarks": "Slaaggrens",
       "module": "Module",
+      "batch": "Groep",
       "language": "Taal",
       "status": "Status",
       "action": "Actie",

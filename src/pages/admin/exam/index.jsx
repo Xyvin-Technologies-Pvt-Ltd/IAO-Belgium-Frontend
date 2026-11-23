@@ -8,13 +8,6 @@ import {
 } from "@/components/ui/table/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import TableSkeleton from "@/components/ui/table/TableSkeleton";
@@ -32,10 +25,10 @@ import {
   useArchiveExam,
   useUnarchiveExam,
 } from "@/store/useExamStore";
-import { useGetAllLanguages } from "@/store/useDropdownStore";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useCanModify } from "@/hooks/useCanModify";
+import ExamsFilterDrawer, { EMPTY_EXAM_FILTERS } from "./ExamsFilterDrawer";
 
 const Exams = () => {
   const navigate = useNavigate();
@@ -44,26 +37,28 @@ const Exams = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("");
+  const [draftFilters, setDraftFilters] = useState(EMPTY_EXAM_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState(EMPTY_EXAM_FILTERS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data: languagesData } = useGetAllLanguages({ status: true });
-  const languages = languagesData?.data || [];
-
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter, languageFilter]);
+  }, [debouncedSearch]);
 
   const { data, isLoading, error, refetch, isFetching } = useGetExams({
     page,
     limit: rowsPerPage,
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    ...(statusFilter ? { status: statusFilter } : {}),
-    ...(languageFilter ? { exam_language: languageFilter } : {}),
+    ...(appliedFilters.status !== "all"
+      ? { status: appliedFilters.status }
+      : {}),
+    ...(appliedFilters.language !== "all"
+      ? { exam_language: appliedFilters.language }
+      : {}),
+    ...(appliedFilters.batch !== "all" ? { batch: appliedFilters.batch } : {}),
   });
   const publishExam = usePublishExam();
   const archiveExam = useArchiveExam();
@@ -71,6 +66,7 @@ const Exams = () => {
 
   const exams = data?.data || [];
   const totalRows = data?.total_count || 0;
+  const colCount = 10;
 
   const handleOpenCreate = () => {
     setSelectedExam(null);
@@ -148,35 +144,20 @@ const Exams = () => {
         {t("exam.title")}
       </h2>
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex-1 flex gap-2">
+        <div className="flex-1 flex gap-2 items-center">
           <Input
             placeholder={t("exam.search")}
             className="max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Select value={statusFilter || undefined} onValueChange={(value) => setStatusFilter(value || "")}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={t("exam.allStatuses")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">{t("exam.status.draft")}</SelectItem>
-              <SelectItem value="published">{t("exam.status.published")}</SelectItem>
-              <SelectItem value="archived">{t("exam.status.archived")}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={languageFilter || undefined} onValueChange={(value) => setLanguageFilter(value || "")}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={t("exam.allLanguages")} />
-            </SelectTrigger>
-            <SelectContent>
-              {languages.map((lang) => (
-                <SelectItem key={lang._id} value={lang._id}>
-                  {lang.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ExamsFilterDrawer
+            draftFilters={draftFilters}
+            setDraftFilters={setDraftFilters}
+            appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
+            setPage={setPage}
+          />
         </div>
         {canModify && (
           <Button onClick={handleOpenCreate}>{t("exam.createExam")}</Button>
@@ -189,6 +170,7 @@ const Exams = () => {
             <TableHead>{t("exam.table.uid")}</TableHead>
             <TableHead>{t("exam.table.name")}</TableHead>
             <TableHead>{t("exam.table.type", "Type")}</TableHead>
+            <TableHead>{t("exam.table.batch", "Batch")}</TableHead>
             <TableHead>{t("exam.table.questions")}</TableHead>
             <TableHead>{t("exam.table.duration")}</TableHead>
             <TableHead>{t("exam.table.passingMarks")}</TableHead>
@@ -199,10 +181,10 @@ const Exams = () => {
         </TableHeader>
         <TableBody className={isFetching ? "opacity-50 pointer-events-none" : ""}>
           {isLoading ? (
-            <TableSkeleton rows={rowsPerPage} columns={9} />
+            <TableSkeleton rows={rowsPerPage} columns={colCount} />
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center p-8">
+              <TableCell colSpan={colCount} className="text-center p-8">
                 <ErrorMessage
                   message={error?.message || t("exam.messages.loadFailed")}
                   onRetry={refetch}
@@ -230,12 +212,15 @@ const Exams = () => {
                   </div>
                 </TableCell>
                 <TableCell>{getTypeBadge(i?.type)}</TableCell>
+                <TableCell>{i?.batch?.name || "—"}</TableCell>
                 <TableCell>{i?.total_questions ?? 0}</TableCell>
-                <TableCell>{i?.duration ?? 0} {t("common.min")}</TableCell>
+                <TableCell>
+                  {i?.duration ?? 0} {t("common.min")}
+                </TableCell>
                 <TableCell>
                   {i?.passing_type === "percentage"
                     ? `${i?.passing_percentage ?? i?.passing_marks ?? 0}%`
-                    : i?.passing_marks ?? i?.passing_percentage ?? 0}
+                    : (i?.passing_marks ?? i?.passing_percentage ?? 0)}
                 </TableCell>
                 <TableCell>{i?.exam_language?.name || "-"}</TableCell>
                 <TableCell>
@@ -271,7 +256,10 @@ const Exams = () => {
                             : i?.status === "archived"
                               ? [
                                   {
-                                    label: t("exam.table.unarchive", "Unarchive"),
+                                    label: t(
+                                      "exam.table.unarchive",
+                                      "Unarchive",
+                                    ),
                                     onClick: () => handleUnarchive(i),
                                   },
                                 ]
@@ -284,7 +272,7 @@ const Exams = () => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={9} className="text-center">
+              <TableCell colSpan={colCount} className="text-center">
                 {t("exam.table.noExams")}
               </TableCell>
             </TableRow>
