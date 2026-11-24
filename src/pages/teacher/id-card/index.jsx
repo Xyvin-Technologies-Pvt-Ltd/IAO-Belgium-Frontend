@@ -6,10 +6,22 @@ import StudentIdPhotoCropModal from "@/components/admin/student-id/StudentIdPhot
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   useAddTeacherIdToGoogleWallet,
   useMyTeacherId,
   useSubmitTeacherIdPhoto,
 } from "@/store/useTeacherIdStore";
+import {
+  ENABLE_APPLE_WALLET,
+  ENABLE_GOOGLE_WALLET,
+} from "@/utils/idCardWallet";
 
 const CARD_TZ = "Europe/Brussels";
 
@@ -31,6 +43,26 @@ const TeacherIdCardPage = () => {
   const submitMutation = useSubmitTeacherIdPhoto();
   const googleWalletMutation = useAddTeacherIdToGoogleWallet();
   const [photoOpen, setPhotoOpen] = useState(false);
+  const [walletComingSoonOpen, setWalletComingSoonOpen] = useState(false);
+
+  const openWalletComingSoon = () => setWalletComingSoonOpen(true);
+
+  const onGoogleWalletClick = () => {
+    if (!ENABLE_GOOGLE_WALLET) {
+      openWalletComingSoon();
+      return;
+    }
+    googleWalletMutation.mutate();
+  };
+
+  const onAppleWalletClick = () => {
+    // Apple Wallet API is not implemented yet; always Coming soon for now.
+    if (!ENABLE_APPLE_WALLET) {
+      openWalletComingSoon();
+      return;
+    }
+    openWalletComingSoon();
+  };
 
   const payload = data?.data || data;
   const eligible = payload?.eligible;
@@ -202,15 +234,40 @@ const TeacherIdCardPage = () => {
         <div className="w-full max-w-xl p-2">
           <IdCardFront card={current} hideProgram />
         </div>
-        <Button
-          type="button"
-          disabled={googleWalletMutation.isPending}
-          onClick={() => googleWalletMutation.mutate()}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            type="button"
+            disabled={ENABLE_GOOGLE_WALLET && googleWalletMutation.isPending}
+            onClick={onGoogleWalletClick}
+          >
+            {ENABLE_GOOGLE_WALLET && googleWalletMutation.isPending
+              ? "Opening Google Wallet…"
+              : "Add to Google Wallet"}
+          </Button>
+          <Button type="button" onClick={onAppleWalletClick}>
+            Add to Apple Wallet
+          </Button>
+        </div>
+
+        <Dialog
+          open={walletComingSoonOpen}
+          onOpenChange={setWalletComingSoonOpen}
         >
-          {googleWalletMutation.isPending
-            ? "Opening Google Wallet…"
-            : "Add to Google Wallet"}
-        </Button>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Coming soon</DialogTitle>
+              <DialogDescription>
+                Adding your ID card to a digital wallet is not available yet.
+                Please check back later.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button type="button" onClick={() => setWalletComingSoonOpen(false)}>
+                OK
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {previous.length > 0 ? (
           <div className="w-full max-w-2xl mt-4">

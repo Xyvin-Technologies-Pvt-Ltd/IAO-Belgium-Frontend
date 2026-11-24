@@ -2564,6 +2564,8 @@
     "archive": "Archiver",
     "allStatuses": "Tous les statuts",
     "allLanguages": "Toutes les langues",
+    "filterTitle": "Filtrer les examens",
+    "filterSubtitle": "Affiner par statut, langue, programme ou groupe",
     "status": {
       "draft": "Brouillon",
       "published": "Publié",
@@ -2576,6 +2578,7 @@
       "duration": "Durée",
       "passingMarks": "Note de passage",
       "module": "Module",
+      "batch": "Groupe",
       "language": "Langue",
       "status": "Statut",
       "action": "Action",
