@@ -1,10 +1,12 @@
-import { X, Eye, Download, Flag, FileText } from "lucide-react";
+import { X, Eye, Download, Flag, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useUpdateApplication } from "@/store/useApplication";
+import { useGetStudentById } from "@/store/useStudentStore";
 import { useTranslation } from "react-i18next";
 import { openSecureFile, downloadSecureFile } from "@/utils/secureFile";
 import {
@@ -36,6 +38,7 @@ const getRejectionReason = (application) => {
 
 const ViewApplication = ({ open, onClose, application }) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("operations");
   const [requestAdditionalInfo, setRequestAdditionalInfo] = useState(false);
   const [remarks, setRemarks] = useState("");
@@ -47,6 +50,13 @@ const ViewApplication = ({ open, onClose, application }) => {
   const [pendingStatus, setPendingStatus] = useState(null);
   
   const updateApplicationMutation = useUpdateApplication();
+  const studentUserId = application?.user?._id || application?.user;
+  const { data: studentProfile } = useGetStudentById(
+    studentUserId,
+    {},
+    { enabled: !!open && !!studentUserId },
+  );
+  const siblingApplications = studentProfile?.data?.applications || [];
 
   const getUploadedCertificates = (app) =>
     Array.isArray(app?.qualification_certificate)
@@ -182,6 +192,30 @@ const ViewApplication = ({ open, onClose, application }) => {
                 </span>
               </div>
               <p className="text-sm font-medium text-gray-600 dark:text-white/70">{application?.uid || t("common.notAvailable")}</p>
+              {(application?.status === "approved" ||
+                ["active", "paused", "re_enrolled", "completed"].includes(
+                  application?.year_status,
+                )) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 h-8 gap-1"
+                  onClick={() => {
+                    onClose();
+                    navigate({
+                      to: "/admin/student-management/$id",
+                      params: { id: String(application._id) },
+                    });
+                  }}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  {t(
+                    "applicationReview.modal.openEnrollment",
+                    "Open enrollment",
+                  )}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -198,6 +232,69 @@ const ViewApplication = ({ open, onClose, application }) => {
         </div>
 
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          {siblingApplications.length > 1 && (
+            <div className="rounded-lg border border-sidebar-border bg-muted/30 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-dashboard-text dark:text-white">
+                {t(
+                  "applicationReview.modal.otherEnrollments",
+                  "Other enrollments for this student",
+                )}
+              </h3>
+              <ul className="space-y-2">
+                {siblingApplications.map((app) => {
+                  const isCurrent =
+                    String(app._id) === String(application?._id);
+                  const name =
+                    app.program?.name ||
+                    app.intake?.name ||
+                    app.uid ||
+                    String(app._id);
+                  return (
+                    <li
+                      key={app._id}
+                      className="flex items-center justify-between gap-3 text-sm"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {name}
+                          {isCurrent
+                            ? ` (${t("common.current", "current")})`
+                            : ""}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground capitalize">
+                          {[app.status, app.year_status]
+                            .filter(Boolean)
+                            .map((s) => String(s).replace(/_/g, " "))
+                            .join(" · ")}
+                        </p>
+                      </div>
+                      {!isCurrent && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="shrink-0 h-8"
+                          onClick={() => {
+                            onClose();
+                            navigate({
+                              to: "/admin/student-management/$id",
+                              params: { id: String(app._id) },
+                            });
+                          }}
+                        >
+                          {t(
+                            "applicationReview.modal.openEnrollment",
+                            "Open enrollment",
+                          )}
+                        </Button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
           <div>
             <h3 className="text-base font-semibold mb-4 text-dashboard-text dark:text-white">
               {t("applicationReview.modal.basicInfo")}

@@ -3685,6 +3685,8 @@
     "archive": "Archive",
     "allStatuses": "All Statuses",
     "allLanguages": "All Languages",
+    "filterTitle": "Filter exams",
+    "filterSubtitle": "Narrow by status, language, programme, or batch",
     "status": {
       "draft": "Draft",
       "published": "Published",
@@ -3697,6 +3699,7 @@
       "duration": "Duration",
       "passingMarks": "Passing",
       "module": "Module",
+      "batch": "Batch",
       "language": "Language",
       "status": "Status",
       "action": "Action",

@@ -2583,6 +2583,8 @@
     "archive": "Archivieren",
     "allStatuses": "Alle Status",
     "allLanguages": "Alle Sprachen",
+    "filterTitle": "Prüfungen filtern",
+    "filterSubtitle": "Nach Status, Sprache, Programm oder Gruppe eingrenzen",
     "status": {
       "draft": "Entwurf",
       "published": "Veröffentlicht",
@@ -2595,6 +2597,7 @@
       "duration": "Dauer",
       "passingMarks": "Bestehensnote",
       "module": "Modul",
+      "batch": "Gruppe",
       "language": "Sprache",
       "status": "Status",
       "action": "Aktion",

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Table,
   TableBody,
@@ -18,7 +19,7 @@ import { useGetThirdPartyApplications, useAdminCancelThirdParty, useAdminReconci
 import { useGetAllPrograms, useGetBatches } from "@/store/useDropdownStore";
 import SearchableSelect from "@/components/ui/forms/SearchableSelect";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Ban, Eye, AlertTriangle, RefreshCw } from "lucide-react";
+import { Ban, Eye, AlertTriangle, RefreshCw, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import moment from "moment";
 import {
@@ -31,6 +32,12 @@ import {
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useCanModify } from "@/hooks/useCanModify";
 
+const resolveEnrollmentId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  return value._id ? String(value._id) : null;
+};
+
 /** Statuses that can be synced from Mollie (must match backend allow-list). */
 const MOLLIE_RECONCILE_STATUSES = [
   "invoice_issued",
@@ -41,6 +48,7 @@ const MOLLIE_RECONCILE_STATUSES = [
 
 const ThirdPartyPaymentManagement = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const canModify = useCanModify("finance");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -518,6 +526,27 @@ const ThirdPartyPaymentManagement = () => {
                       : selectedApp.module_id?.name || "-"}
                   </span>
                 </div>
+                {resolveEnrollmentId(selectedApp.application_id) && (
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1"
+                      onClick={() => {
+                        navigate({
+                          to: "/admin/student-management/$id",
+                          params: {
+                            id: resolveEnrollmentId(selectedApp.application_id),
+                          },
+                        });
+                      }}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      {t("Open enrollment", "Open enrollment")}
+                    </Button>
+                  </div>
+                )}
                 <div className="flex justify-between gap-4">
                   <span className="text-gray-500 dark:text-gray-400 font-medium shrink-0">{t("Status")}</span>
                   <span className="font-bold uppercase text-right">{selectedApp.status.replace("_", " ")}</span>

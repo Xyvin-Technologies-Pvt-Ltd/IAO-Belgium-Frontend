@@ -40,6 +40,7 @@ import StatusBadge from "@/components/StatusBadge";
 import moment from "moment";
 import StudentAttachments from "./StudentAttachments";
 import StudentThesisTab from "@/components/admin/student/StudentThesisTab";
+import StudentEnrollmentsPanel from "@/components/admin/student/StudentEnrollmentsPanel";
 import IdCardDocumentTab from "@/components/id-card/IdCardDocumentTab";
 import ModuleReattemptDialog from "@/components/admin/batch/ModuleReattemptDialog";
 import { Button } from "@/components/ui/button";
@@ -143,15 +144,23 @@ const EnrolledStudentDetails = () => {
   );
 
   const studentUserId = student?.data?._id;
+  const applicationId = student?.data?.application_id || id;
   const {
     data: attendanceResponse,
     isLoading: attendanceLoading,
     error: attendanceError,
     refetch: refetchAttendance,
     isFetching: attendanceFetching,
-  } = useGetStudentAttendance(studentUserId, filter, {
-    enabled: !!studentUserId && !student?.data?.is_online,
-  });
+  } = useGetStudentAttendance(
+    studentUserId,
+    {
+      ...filter,
+      application_id: applicationId,
+    },
+    {
+      enabled: !!studentUserId && !student?.data?.is_online,
+    },
+  );
 
   const {
     data: invoicesResponse,
@@ -160,7 +169,11 @@ const EnrolledStudentDetails = () => {
     refetch: refetchInvoices,
   } = useGetStudentInvoices(
     studentUserId,
-    { page: paymentsPage, limit: paymentsRowsPerPage },
+    {
+      page: paymentsPage,
+      limit: paymentsRowsPerPage,
+      application_id: applicationId,
+    },
     {
       enabled: !!studentUserId && activeTab === "payments",
     },
@@ -173,7 +186,11 @@ const EnrolledStudentDetails = () => {
     refetch: refetchTransactions,
   } = useGetStudentPayments(
     studentUserId,
-    { page: transactionsPage, limit: transactionsRowsPerPage },
+    {
+      page: transactionsPage,
+      limit: transactionsRowsPerPage,
+      application_id: applicationId,
+    },
     {
       enabled: !!studentUserId && activeTab === "transactions",
     },
@@ -186,7 +203,11 @@ const EnrolledStudentDetails = () => {
     refetch: refetchReceipts,
   } = useGetStudentReceipts(
     studentUserId,
-    { page: receiptsPage, limit: receiptsRowsPerPage },
+    {
+      page: receiptsPage,
+      limit: receiptsRowsPerPage,
+      application_id: applicationId,
+    },
     {
       enabled: !!studentUserId && activeTab === "receipts",
     },
@@ -403,6 +424,10 @@ const EnrolledStudentDetails = () => {
     <div className="space-y-6 mt-4 bg-sidebar rounded-xl p-5 border border-sidebar-border">
       <UserCard student={studentData} onEdit={() => setIsStudentEditOpen(true)} />
       <StudentCompaniesCard userId={studentData?._id} canEdit={canEditCompanies} />
+      <StudentEnrollmentsPanel
+        applications={studentData?.applications || []}
+        currentApplicationId={studentData?.application_id || id}
+      />
 
       <div className="border-b border-gray-200 dark:border-white/20">
         <nav className="-mb-px flex space-x-8">
