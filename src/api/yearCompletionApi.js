@@ -11,11 +11,20 @@ export const evaluateYearCompletion = async (application_id) => {
   }
 };
 
-export const promoteYearCompletion = async (application_id) => {
+export const promoteYearCompletion = async (payload) => {
   try {
-    const response = await axiosInstance.post(`/student/year-completion/promote`, {
-      application_id,
-    });
+    const body =
+      typeof payload === "string" || payload == null
+        ? { application_id: payload }
+        : {
+            application_id: payload.application_id || payload.applicationId,
+            selected_thesis_id:
+              payload.selected_thesis_id || payload.selectedThesisId || undefined,
+          };
+    const response = await axiosInstance.post(
+      `/student/year-completion/promote`,
+      body,
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -52,4 +61,3 @@ export const assignModuleReattempt = async (payload) => {
     throw error.response?.data || error;
   }
 };
-

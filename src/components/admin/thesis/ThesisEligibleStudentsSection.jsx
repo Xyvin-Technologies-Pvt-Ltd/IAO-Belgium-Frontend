@@ -244,7 +244,13 @@ export default function ThesisEligibleStudentsSection({
                   },
                 });
               }
-              if (canModify && isManual) {
+              // Manual: soft-remove allow grant. Rules: upsert exclusion so
+              // programme/year matching no longer lists this student.
+              if (
+                canModify &&
+                (isManual || row.source === "rules") &&
+                student?._id
+              ) {
                 actions.push({
                   label: t("common.remove", "Remove"),
                   icon: Trash2,
