@@ -46,17 +46,25 @@ export const reissueStudentIdCard = async (id, photo_key) => {
   return response.data;
 };
 
-export const checkIssueStudentIdCard = async (user_id) => {
+export const checkIssueStudentIdCard = async (user_id, application_id = null) => {
   const response = await axiosInstance.get("/student-id-card/issue-check", {
-    params: { user_id },
+    params: {
+      user_id,
+      ...(application_id ? { application_id } : {}),
+    },
   });
   return response.data;
 };
 
-export const issueStudentIdCard = async ({ user_id, photo_key }) => {
+export const issueStudentIdCard = async ({
+  user_id,
+  photo_key,
+  application_id = null,
+}) => {
   const response = await axiosInstance.post("/student-id-card/issue", {
     user_id,
     photo_key,
+    ...(application_id ? { application_id } : {}),
   });
   return response.data;
 };

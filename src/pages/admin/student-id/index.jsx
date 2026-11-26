@@ -255,6 +255,8 @@ const StudentIdAdminPage = () => {
   const [issueOpen, setIssueOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedApplicationId, setSelectedApplicationId] = useState("");
+  const [eligibleApplications, setEligibleApplications] = useState([]);
   const [issuePhotoOpen, setIssuePhotoOpen] = useState(false);
   const [issueCheckPending, setIssueCheckPending] = useState(false);
 
@@ -339,14 +341,58 @@ const StudentIdAdminPage = () => {
     );
   };
 
+  const loadEligibleApplications = async (userId) => {
+    setEligibleApplications([]);
+    setSelectedApplicationId("");
+    if (!userId) return;
+    try {
+      setIssueCheckPending(true);
+      const res = await checkIssueStudentIdCard(userId);
+      const payload = res?.data || res;
+      const apps = payload?.eligible_applications || [];
+      setEligibleApplications(apps);
+      if (apps.length === 1) {
+        setSelectedApplicationId(String(apps[0]._id));
+      }
+      if (payload?.ok && payload?.application_id) {
+        setSelectedApplicationId(String(payload.application_id));
+      }
+    } catch (err) {
+      setEligibleApplications([]);
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Cannot issue an ID card for this student",
+      );
+    } finally {
+      setIssueCheckPending(false);
+    }
+  };
+
   const openIssuePhoto = async () => {
     if (!selectedUserId) {
       toast.error("Select a student first");
       return;
     }
+    if (eligibleApplications.length > 1 && !selectedApplicationId) {
+      toast.error("Select a programme / enrolment first");
+      return;
+    }
     try {
       setIssueCheckPending(true);
-      await checkIssueStudentIdCard(selectedUserId);
+      const res = await checkIssueStudentIdCard(
+        selectedUserId,
+        selectedApplicationId || null,
+      );
+      const payload = res?.data || res;
+      if (payload?.requires_application_selection) {
+        setEligibleApplications(payload.eligible_applications || []);
+        toast.error("Select a programme / enrolment first");
+        return;
+      }
+      if (payload?.application_id) {
+        setSelectedApplicationId(String(payload.application_id));
+      }
       setIssuePhotoOpen(true);
     } catch (err) {
       toast.error(
@@ -363,12 +409,27 @@ const StudentIdAdminPage = () => {
     await issueMutation.mutateAsync({
       user_id: selectedUserId,
       photo_key,
+      application_id: selectedApplicationId || null,
     });
     setIssuePhotoOpen(false);
     setIssueOpen(false);
     setSelectedUserId("");
+    setSelectedApplicationId("");
+    setEligibleApplications([]);
     setUserSearchTerm("");
   };
+
+  const applicationSelectItems = useMemo(
+    () =>
+      eligibleApplications.map((app) => ({
+        _id: String(app._id),
+        name:
+          app.program?.name ||
+          app.program?.program_type ||
+          `Application ${String(app._id).slice(-6)}`,
+      })),
+    [eligibleApplications],
+  );
 
   const handleReissuePhoto = async (photo_key) => {
     await reissueMutation.mutateAsync({ id: reissueCardId, photo_key });
@@ -506,16 +567,38 @@ const StudentIdAdminPage = () => {
                 searchPlaceholder="Search"
                 items={students}
                 value={selectedUserId}
-                onChange={setSelectedUserId}
+                onChange={(id) => {
+                  setSelectedUserId(id);
+                  loadEligibleApplications(id);
+                }}
                 onSearch={setUserSearchTerm}
                 isLoading={usersLoading}
                 required
               />
             </div>
-            <div className="flex items-end">
+            {eligibleApplications.length > 1 ? (
+              <div>
+                <SearchableSelect
+                  label="Programme / enrolment"
+                  placeholder="Select enrolment"
+                  searchPlaceholder="Search"
+                  items={applicationSelectItems}
+                  value={selectedApplicationId}
+                  onChange={setSelectedApplicationId}
+                  isLoading={issueCheckPending}
+                  required
+                />
+              </div>
+            ) : null}
+            <div className="flex items-end md:col-span-2">
               <Button
                 onClick={openIssuePhoto}
-                disabled={issueMutation.isPending || issueCheckPending}
+                disabled={
+                  issueMutation.isPending ||
+                  issueCheckPending ||
+                  !selectedUserId ||
+                  (eligibleApplications.length > 1 && !selectedApplicationId)
+                }
               >
                 {issueCheckPending ? "Checking…" : "Issue ID card"}
               </Button>

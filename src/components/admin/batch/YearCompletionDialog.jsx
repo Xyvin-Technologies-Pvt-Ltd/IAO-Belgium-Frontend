@@ -31,6 +31,31 @@ const MetBadge = ({ met, t }) => (
   </span>
 );
 
+const attemptLabel = (status, t) => {
+  switch (status) {
+    case "passed":
+      return t("yearCompletion.thesisPassed", "Passed");
+    case "active":
+      return t("yearCompletion.thesisActive", "Active");
+    case "failed":
+      return t("yearCompletion.thesisFailed", "Failed");
+    case "none":
+    default:
+      return t("yearCompletion.thesisNone", "Not started");
+  }
+};
+
+const purchaseLabel = (status, t) => {
+  switch (status) {
+    case "paid":
+      return t("yearCompletion.purchasePaid", "Paid");
+    case "pending":
+      return t("yearCompletion.purchasePending", "Pending");
+    default:
+      return t("yearCompletion.purchaseNone", "Not purchased");
+  }
+};
+
 const YearCompletionDialog = ({
   open,
   onOpenChange,
@@ -46,6 +71,7 @@ const YearCompletionDialog = ({
   const [confirmPromote, setConfirmPromote] = useState(false);
   const [confirmFailed, setConfirmFailed] = useState(false);
   const [failReason, setFailReason] = useState("");
+  const [selectedThesisId, setSelectedThesisId] = useState("");
 
   useEffect(() => {
     if (!open || !applicationId) return;
@@ -53,8 +79,18 @@ const YearCompletionDialog = ({
     setConfirmPromote(false);
     setConfirmFailed(false);
     setFailReason("");
+    setSelectedThesisId("");
     evaluateMutation.mutate(applicationId, {
-      onSuccess: (res) => setReport(res?.data || res),
+      onSuccess: (res) => {
+        const data = res?.data || res;
+        setReport(data);
+        const passed = (data?.theses || []).find(
+          (th) => th.attempt_status === "passed",
+        );
+        if (passed) {
+          setSelectedThesisId(String(passed.thesis_id));
+        }
+      },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, applicationId]);
@@ -68,18 +104,45 @@ const YearCompletionDialog = ({
     !!report &&
     (report.can_mark_failed === true || report.year_status === "active");
 
+  const isFinalYear =
+    !!report &&
+    (report.is_final_year === true ||
+      report.current_year === report.program_total_years);
+
+  const theses = report?.theses || [];
+  const thesisRequired = !!report?.thesis_required;
+  const thesisBlocksPromote =
+    isFinalYear &&
+    thesisRequired &&
+    (!selectedThesisId ||
+      !theses.some(
+        (th) =>
+          String(th.thesis_id) === String(selectedThesisId) &&
+          th.attempt_status === "passed",
+      ));
+
   const handlePromote = () => {
+    if (thesisBlocksPromote) {
+      return;
+    }
     if (!report?.met && !confirmPromote) {
       setConfirmPromote(true);
       setConfirmFailed(false);
       return;
     }
-    promoteMutation.mutate(applicationId, {
-      onSuccess: () => {
-        onOpenChange(false);
-        onDone?.();
+    promoteMutation.mutate(
+      {
+        application_id: applicationId,
+        selected_thesis_id:
+          isFinalYear && thesisRequired ? selectedThesisId : undefined,
       },
-    });
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          onDone?.();
+        },
+      },
+    );
   };
 
   const handleMarkFailedClick = () => {
@@ -142,6 +205,9 @@ const YearCompletionDialog = ({
               <span>
                 {t("yearCompletion.year", "Year")}{" "}
                 <strong>{report.current_year}</strong>
+                {isFinalYear
+                  ? ` (${t("yearCompletion.finalYear", "final year")})`
+                  : ""}
               </span>
               <StatusBadge status={report.year_status || "active"} />
               <MetBadge met={!!report.met} t={t} />
@@ -223,7 +289,79 @@ const YearCompletionDialog = ({
               </p>
             </section>
 
-            {confirmPromote && !report.met && (
+            {isFinalYear && theses.length > 0 && (
+              <section className="border rounded-md p-3 space-y-3">
+                <div className="flex justify-between font-medium">
+                  <span>{t("yearCompletion.thesis", "Thesis")}</span>
+                  <MetBadge
+                    met={thesisRequired ? !!report.thesis_met : true}
+                    t={t}
+                  />
+                </div>
+                {thesisRequired && !report.thesis_met && (
+                  <p className="text-amber-800 bg-amber-50 border border-amber-200 rounded p-2 text-xs">
+                    {t(
+                      "yearCompletion.thesisNotPassed",
+                      "Thesis not passed. Course completion is blocked until a thesis attempt is passed and selected.",
+                    )}
+                  </p>
+                )}
+                <p className="text-muted-foreground text-xs">
+                  {t(
+                    "yearCompletion.thesisChoose",
+                    "Select the thesis that satisfies the requirement (passed only).",
+                  )}
+                </p>
+                <ul className="space-y-2">
+                  {theses.map((th) => {
+                    const id = String(th.thesis_id);
+                    const isPassed = th.attempt_status === "passed";
+                    return (
+                      <li key={id}>
+                        <label
+                          className={`flex items-start gap-3 rounded border p-2 ${
+                            isPassed
+                              ? "cursor-pointer hover:bg-muted/40"
+                              : "opacity-60 cursor-not-allowed"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="year-completion-thesis"
+                            className="mt-1"
+                            value={id}
+                            checked={selectedThesisId === id}
+                            disabled={!isPassed}
+                            onChange={() => setSelectedThesisId(id)}
+                          />
+                          <span className="flex-1 min-w-0 space-y-1">
+                            <span className="font-medium block">
+                              {th.uid ? `${th.uid} — ` : ""}
+                              {th.name}
+                            </span>
+                            <span className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                              <span>
+                                {t("yearCompletion.purchase", "Purchase")}:{" "}
+                                {purchaseLabel(th.purchase_status, t)}
+                              </span>
+                              <span>
+                                {t("yearCompletion.attempt", "Attempt")}:{" "}
+                                {attemptLabel(th.attempt_status, t)}
+                              </span>
+                              {th.trajectory_name ? (
+                                <span>{th.trajectory_name}</span>
+                              ) : null}
+                            </span>
+                          </span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+
+            {confirmPromote && !report.met && !thesisBlocksPromote && (
               <p className="text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
                 {t(
                   "yearCompletion.overrideConfirm",
@@ -285,9 +423,22 @@ const YearCompletionDialog = ({
           </Button>
           <Button
             onClick={handlePromote}
-            disabled={busy || !report || report.year_status === "completed"}
+            disabled={
+              busy ||
+              !report ||
+              report.year_status === "completed" ||
+              thesisBlocksPromote
+            }
+            title={
+              thesisBlocksPromote
+                ? t(
+                    "yearCompletion.thesisNotPassed",
+                    "Thesis not passed. Course completion is blocked until a thesis attempt is passed and selected.",
+                  )
+                : undefined
+            }
           >
-            {confirmPromote && !report?.met
+            {confirmPromote && !report?.met && !thesisBlocksPromote
               ? t("yearCompletion.confirmPromote", "Confirm promote")
               : t("yearCompletion.promote", "Promote")}
           </Button>
