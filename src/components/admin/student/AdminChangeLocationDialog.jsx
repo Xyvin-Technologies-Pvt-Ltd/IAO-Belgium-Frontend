@@ -71,22 +71,10 @@ const AdminChangeLocationDialog = ({ open, onOpenChange, onSuccess }) => {
     selectedModule?.planning_id?.toString() ||
     "";
 
+  //* Include past plannings (admin may switch onto them to fix bookings / attendance).
   const alternativeSlots = slots.filter((slot) => {
     if (slot.planning_id?.toString() === currentPlanningId) return false;
     if ((slot.available_seats || 0) <= 0) return false;
-
-    // Filter out slots where all sessions have ended in the past (matching student side)
-    if (slot.sessions && slot.sessions.length > 0) {
-      return slot.sessions.some((s) => {
-        if (!s?.session_date) return false;
-        return getMoment(s.end_time || s.session_date).isSameOrAfter(
-          getMoment(),
-          "day",
-        );
-      });
-    }
-
-    // Keep slots with no sessions scheduled yet (TBA)
     return true;
   });
 
