@@ -77,12 +77,15 @@ export default function MarkThesisPaidDialog({
 
   const handleConfirm = async () => {
     if (!thesisId || !userId || !trajectoryId) return;
+    const applicationId =
+      student?.application?._id || student?.application || null;
     try {
       await markPaidMutation.mutateAsync({
         thesisId,
         userId,
         trajectoryId,
         reason: reason.trim() || undefined,
+        ...(applicationId ? { applicationId: String(applicationId) } : {}),
       });
       onDone?.();
       handleClose();

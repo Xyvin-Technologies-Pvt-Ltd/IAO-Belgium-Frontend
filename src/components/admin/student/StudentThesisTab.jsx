@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BadgeCheck, ExternalLink } from "lucide-react";
@@ -88,7 +88,7 @@ function canMarkPaid(item) {
   );
 }
 
-export default function StudentThesisTab({ userId }) {
+export default function StudentThesisTab({ userId, applicationId }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const canModifyDo = useCanModify("/admin/thesis");
@@ -96,6 +96,10 @@ export default function StudentThesisTab({ userId }) {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [markPaidItem, setMarkPaidItem] = useState(null);
+
+  useEffect(() => {
+    setPage(1);
+  }, [applicationId]);
 
   const {
     data: response,
@@ -105,7 +109,11 @@ export default function StudentThesisTab({ userId }) {
     refetch,
   } = useGetAdminStudentTheses(
     userId,
-    { page, limit: rowsPerPage },
+    {
+      page,
+      limit: rowsPerPage,
+      ...(applicationId ? { application_id: applicationId } : {}),
+    },
     { enabled: !!userId }
   );
 
@@ -290,6 +298,9 @@ export default function StudentThesisTab({ userId }) {
         thesisId={markPaidItem?._id}
         thesisName={markPaidItem?.name}
         userId={userId}
+        student={
+          applicationId ? { application: { _id: applicationId } } : null
+        }
         onDone={() => refetch()}
       />
     </div>

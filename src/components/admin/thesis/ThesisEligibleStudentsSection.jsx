@@ -107,6 +107,9 @@ export default function ThesisEligibleStudentsSection({
       await removeMutation.mutateAsync({
         thesisId,
         userId: studentToRemove._id,
+        ...(studentToRemove.applicationId
+          ? { applicationId: studentToRemove.applicationId }
+          : {}),
       });
       setIsRemoveConfirmOpen(false);
       setStudentToRemove(null);
@@ -239,7 +242,10 @@ export default function ThesisEligibleStudentsSection({
                   ),
                   icon: BadgeCheck,
                   onClick: () => {
-                    setStudentToMarkPaid(student);
+                    setStudentToMarkPaid({
+                      ...student,
+                      application: row.application || null,
+                    });
                     setIsMarkPaidOpen(true);
                   },
                 });
@@ -257,7 +263,12 @@ export default function ThesisEligibleStudentsSection({
                   className:
                     "text-red-600 focus:text-red-600 dark:text-red-400",
                   onClick: () => {
-                    setStudentToRemove(student);
+                    setStudentToRemove({
+                      ...student,
+                      applicationId: row.application?._id
+                        ? String(row.application._id)
+                        : null,
+                    });
                     setIsRemoveConfirmOpen(true);
                   },
                 });
