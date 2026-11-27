@@ -1219,7 +1219,10 @@ const EnrolledStudentDetails = () => {
         )}
 
       {activeTab === "thesis" && (
-        <StudentThesisTab userId={studentUserId} />
+        <StudentThesisTab
+          userId={studentUserId}
+          applicationId={studentData.application_id || id}
+        />
       )}
 
       {activeTab === "documents" && (

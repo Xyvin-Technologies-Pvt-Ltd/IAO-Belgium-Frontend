@@ -33,6 +33,7 @@ import {
   exportTrajectoryStudentsDocumentsZip,
   exportThesisEligibleStudentsCsv,
   addThesisEligibleStudents,
+  getMatchingEligibleApplications,
   removeThesisEligibleStudent,
   markThesisStudentAsPaid,
   getTrajectoryStudentDetail,
@@ -602,8 +603,8 @@ export const useExportTrajectoryEligibleStudentsCsv =
 export const useAddThesisEligibleStudents = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, userIds }) =>
-      addThesisEligibleStudents(thesisId, userIds),
+    mutationFn: ({ thesisId, userIds, applications }) =>
+      addThesisEligibleStudents(thesisId, { userIds, applications }),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["thesis-eligible-students", variables.thesisId],
@@ -621,11 +622,18 @@ export const useAddThesisEligibleStudents = () => {
 /** @deprecated Use useAddThesisEligibleStudents */
 export const useAddTrajectoryEligibleStudents = useAddThesisEligibleStudents;
 
+export const useMatchingEligibleApplications = () => {
+  return useMutation({
+    mutationFn: ({ thesisId, userIds }) =>
+      getMatchingEligibleApplications(thesisId, userIds),
+  });
+};
+
 export const useRemoveThesisEligibleStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, userId }) =>
-      removeThesisEligibleStudent(thesisId, userId),
+    mutationFn: ({ thesisId, userId, applicationId }) =>
+      removeThesisEligibleStudent(thesisId, userId, { applicationId }),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["thesis-eligible-students", variables.thesisId],
@@ -647,10 +655,11 @@ export const useRemoveTrajectoryEligibleStudent =
 export const useMarkThesisStudentAsPaid = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ thesisId, userId, trajectoryId, reason }) =>
+    mutationFn: ({ thesisId, userId, trajectoryId, reason, applicationId }) =>
       markThesisStudentAsPaid(thesisId, userId, {
         trajectory_id: trajectoryId,
         reason,
+        application_id: applicationId,
       }),
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({

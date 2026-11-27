@@ -383,11 +383,39 @@ export const exportTrajectoryEligibleStudentsCsv = async (
   params = {}
 ) => exportThesisEligibleStudentsCsv(thesisId, params);
 
-export const addThesisEligibleStudents = async (thesisId, userIds = []) => {
+export const getMatchingEligibleApplications = async (
+  thesisId,
+  userIds = []
+) => {
   try {
+    const response = await axiosInstance.get(
+      `/thesis/${thesisId}/eligible-students/matching-applications`,
+      {
+        params: {
+          user_ids: (userIds || []).join(","),
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const addThesisEligibleStudents = async (
+  thesisId,
+  { userIds = [], applications = [] } = {}
+) => {
+  try {
+    const payload = {};
+    if (applications?.length) {
+      payload.applications = applications;
+    } else {
+      payload.user_ids = userIds;
+    }
     const response = await axiosInstance.post(
       `/thesis/${thesisId}/eligible-students`,
-      { user_ids: userIds }
+      payload
     );
     return response.data;
   } catch (error) {
@@ -400,12 +428,19 @@ export const addTrajectoryEligibleStudents = async (
   thesisId,
   _trajectoryId,
   userIds = []
-) => addThesisEligibleStudents(thesisId, userIds);
+) => addThesisEligibleStudents(thesisId, { userIds });
 
-export const removeThesisEligibleStudent = async (thesisId, userId) => {
+export const removeThesisEligibleStudent = async (
+  thesisId,
+  userId,
+  { applicationId } = {}
+) => {
   try {
     const response = await axiosInstance.delete(
-      `/thesis/${thesisId}/eligible-students/${userId}`
+      `/thesis/${thesisId}/eligible-students/${userId}`,
+      {
+        params: applicationId ? { application_id: applicationId } : undefined,
+      }
     );
     return response.data;
   } catch (error) {
@@ -416,7 +451,7 @@ export const removeThesisEligibleStudent = async (thesisId, userId) => {
 export const markThesisStudentAsPaid = async (
   thesisId,
   userId,
-  { trajectory_id, reason } = {}
+  { trajectory_id, reason, application_id } = {}
 ) => {
   try {
     const response = await axiosInstance.post(
@@ -424,6 +459,7 @@ export const markThesisStudentAsPaid = async (
       {
         trajectory_id,
         ...(reason ? { reason } : {}),
+        ...(application_id ? { application_id } : {}),
       }
     );
     return response.data;
